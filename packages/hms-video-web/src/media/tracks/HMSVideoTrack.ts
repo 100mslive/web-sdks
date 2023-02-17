@@ -59,6 +59,11 @@ export class HMSVideoTrack extends HMSTrack {
     }
   }
 
+  cleanup(): void {
+    super.cleanup();
+    this.videoHandler?.cleanup();
+  }
+
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {

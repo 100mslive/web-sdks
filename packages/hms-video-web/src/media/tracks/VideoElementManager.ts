@@ -1,13 +1,15 @@
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import { isBrowser } from '../../utils/support';
 import { debounce } from '../../utils/timer-utils';
 
 export class VideoElementManager {
   private resizeObserver?: ResizeObserver;
-  private intersectionObserver?: IntersectionObserver;
+  private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
+  private entries = new Map<HTMLVideoElement, DOMRectReadOnly>();
 
   constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
     this.init();
@@ -32,7 +34,7 @@ export class VideoElementManager {
     this.init();
     this.videoElements.add(videoElement);
     if (this.intersectionObserver) {
-      this.intersectionObserver.observe(videoElement);
+      this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else {
       if (this.isElementInViewport(videoElement)) {
         this.track.addSink(videoElement);
@@ -51,7 +53,7 @@ export class VideoElementManager {
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
-    this.intersectionObserver?.unobserve(videoElement);
+    this.intersectionObserver?.unobserve(videoElement, this.handleIntersection);
   }
 
   getVideoElements(): HTMLVideoElement[] {
@@ -64,29 +66,31 @@ export class VideoElementManager {
         this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
       }
       if (typeof window.IntersectionObserver !== 'undefined' && !this.intersectionObserver) {
-        this.intersectionObserver = new IntersectionObserver(this.handleIntersection);
+        this.intersectionObserver = HMSIntersectionObserver;
       }
     }
   }
 
-  private handleIntersection = async (entries: IntersectionObserverEntry[]) => {
-    for (const entry of entries) {
-      const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
-
-      // .contains check is needed for pip component as the video tiles are not mounted to dom element
-      if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
-        this.track.addSink(entry.target as HTMLVideoElement);
-      } else {
-        this.track.removeSink(entry.target as HTMLVideoElement);
-      }
+  private handleIntersection = async (entry: IntersectionObserverEntry) => {
+    const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
+    // .contains check is needed for pip component as the video tiles are not mounted to dom element
+    if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
+      this.track.addSink(entry.target as HTMLVideoElement);
+    } else {
+      this.track.removeSink(entry.target as HTMLVideoElement);
     }
-    this.selectMaxLayer(entries.map(entry => entry.boundingClientRect));
+    this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
+    this.selectMaxLayer();
   };
 
   private handleResize = async (entries: ResizeObserverEntry[]) => {
-    if (this.track.enabled && this.track instanceof HMSRemoteVideoTrack) {
-      this.selectMaxLayer(entries.map(entry => entry.contentRect));
+    if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
+      return;
     }
+    for (const entry of entries) {
+      this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
+    }
+    this.selectMaxLayer();
   };
 
   /**
@@ -119,12 +123,12 @@ export class VideoElementManager {
     );
   }
 
-  private async selectMaxLayer(dimensions: Array<{ width: number; height: number }>) {
+  private async selectMaxLayer() {
     let maxLayer!: HMSPreferredSimulcastLayer;
     if (!(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
-    for (const entry of dimensions) {
+    for (const entry of this.entries.values()) {
       const { width, height } = entry;
       const layer = getClosestLayer(this.track.getSimulcastDefinitions(), { width, height });
       if (!maxLayer) {
@@ -136,4 +140,10 @@ export class VideoElementManager {
 
     await this.track.setPreferredLayer(maxLayer);
   }
+
+  cleanup = () => {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = undefined;
+    this.intersectionObserver = undefined;
+  };
 }
