@@ -1,5 +1,5 @@
 import { LevelParsed } from 'hls.js';
-import { HMSHLSControllerEvents } from './constants';
+import { HMSHLSControllerEvents } from '../utilies/constants';
 
 export declare interface HMSHLSControllerListeners {
   [HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE]: (

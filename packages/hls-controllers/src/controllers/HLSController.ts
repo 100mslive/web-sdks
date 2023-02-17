@@ -1,11 +1,11 @@
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter } from 'eventemitter3';
-import Hls, { HlsConfig, Level, LevelParsed } from 'hls.js';
-import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HMSHLSControllerEvents, IS_OPTIMIZED } from './constants';
+import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSControllerEventEmitter, HMSHLSControllerListeners } from './events';
+import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import IHMSHLSController from '../interfaces/IHLSController';
+import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HMSHLSControllerEvents, IS_OPTIMIZED } from '../utilies/constants';
 import { metadataPayloadParser } from '../utilies/utils';
-
 export type { LevelParsed };
 
 export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEventEmitter {
@@ -22,7 +22,7 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
     this.hlsUrl = hlsUrl;
     this.videoRef = videoRef;
     if (!videoRef || !videoRef.current) {
-      throw new Error('video ref cannot be null');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     if (!hlsUrl) {
       throw new Error('hls url is not valid');
@@ -68,6 +68,7 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
     if (HMSHLSController.isMSESupported()) {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
+      this.hls.off(Hls.Events.ERROR, this.handleHLSException);
     }
     if (this.videoRef && this.videoRef.current) {
       this.videoRef.current.removeEventListener('play', this.playEventHandler);
@@ -111,7 +112,7 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
   jumpToLive() {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
-      throw new Error('Video element is not defined');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     videoEl.currentTime = this.hls?.liveSyncPosition || 0;
     if (videoEl.paused) {
@@ -182,6 +183,66 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
     }
     return false;
   }
+
+  private handleNetworkRelatedError = (data: ErrorData) => {
+    const details = data.error?.message || data.err?.message || '';
+    switch (data.details) {
+      case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
+        throw HMSHLSErrorFactory.HLSNetworkError.manifestLoadError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
+        throw HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
+        throw HMSHLSErrorFactory.HLSNetworkError.levelLoadError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      default: {
+        throw HMSHLSErrorFactory.UnknownError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+    }
+  };
+  private handleHLSException = (_: any, data: ErrorData) => {
+    const details = data.error?.message || data.err?.message || '';
+    this.handleNetworkRelatedError(data);
+    switch (data.details) {
+      case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
+        throw HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
+        throw HMSHLSErrorFactory.HLSMediaError.fragDecryptError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
+        throw HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+      default: {
+        throw HMSHLSErrorFactory.UnknownError({
+          details: details,
+          fatal: data.fatal,
+        });
+      }
+    }
+  };
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     this.removeAudioLevels(levels);
     this.trigger(HMSHLSControllerEvents.HLS_MANIFEST_LOADED, {
@@ -213,14 +274,14 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
   seek = (interval: number) => {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
-      throw new Error('Video element is not defined');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     videoEl.currentTime = interval;
   };
   playVideo = async () => {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
-      throw new Error('Video element is not defined');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     try {
       if (videoEl.paused) {
@@ -314,11 +375,12 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
   private listenHLSEvent() {
     const videoEl = this.videoRef.current;
     if (!videoEl) {
-      throw new Error('Video element is not defined');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     if (HMSHLSController.isMSESupported()) {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
+      this.hls.on(Hls.Events.ERROR, this.handleHLSException);
     } else if (videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       videoEl.src = this.hlsUrl;
@@ -336,7 +398,7 @@ export class HMSHLSController implements IHMSHLSController, HMSHLSControllerEven
   private onHLSTimeMetadataParsing() {
     const videoEle = this.videoRef.current;
     if (!videoEle) {
-      throw new Error('Video element is not defined');
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
     }
     this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
       try {
