@@ -6,7 +6,7 @@ export interface HMSIntersectionObserverCallback {
 
 class HMSIntersectionObserverWrapper {
   private intersectionObserver?: IntersectionObserver;
-  private listeners = new Map<HTMLElement, Set<HMSIntersectionObserverCallback>>();
+  private listeners = new Map<HTMLElement, HMSIntersectionObserverCallback>();
   constructor() {
     this.createObserver();
   }
@@ -18,18 +18,13 @@ class HMSIntersectionObserverWrapper {
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
     this.createObserver();
     this.intersectionObserver?.observe(element);
-    let currentListeners = this.listeners.get(element);
-    if (!currentListeners) {
-      currentListeners = new Set();
-    }
-    currentListeners.add(onIntersection);
-    this.listeners.set(element, currentListeners);
+    this.listeners.set(element, onIntersection);
   };
 
-  unobserve = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
+  unobserve = (element: HTMLElement) => {
     this.intersectionObserver?.unobserve(element);
     if (this.listeners.has(element)) {
-      this.listeners.get(element)?.delete(onIntersection);
+      this.listeners.delete(element);
     }
   };
 
@@ -42,12 +37,7 @@ class HMSIntersectionObserverWrapper {
   private handleIntersection = (entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
       if (this.listeners.has(entry.target as HTMLElement)) {
-        const callbacks = this.listeners.get(entry.target as HTMLElement);
-        if (callbacks) {
-          for (const callback of callbacks) {
-            callback(entry);
-          }
-        }
+        this.listeners.get(entry.target as HTMLElement)?.(entry);
       }
     }
   };
