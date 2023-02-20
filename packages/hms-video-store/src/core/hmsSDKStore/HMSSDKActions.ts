@@ -54,7 +54,6 @@ import {
   HMSRoleChangeRequest,
   selectHMSMessagesCount,
   selectIsConnectedToRoom,
-  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -1185,9 +1184,10 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    const roomState = this.store.getState(selectRoomState);
+    const isInPreviewOrReconnecting = [HMSRoomState.Preview, HMSRoomState.Reconnecting].includes(roomState);
     // if room is not in preview, clear preview fields
-    const isInPreview = this.store.getState(selectIsInPreview);
-    if (!isInPreview) {
+    if (!isInPreviewOrReconnecting) {
       return;
     }
 
