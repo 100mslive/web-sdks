@@ -1058,6 +1058,11 @@ export default class HMSTransport implements ITransport {
   }
 
   private retryPublishIceFailedTask = async () => {
+    /**
+     * Proceed with the retry even if the connection state is connected as the offer could have failed
+     * which will cause missing tiles if it is not sent again.
+     * Do iceRestart only if not connected
+     */
     if (this.publishConnection) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
