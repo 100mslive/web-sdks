@@ -2,11 +2,11 @@ import { getClosestLayer, layerToIntMapping } from './trackUtils';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
+import { HMSResizeObserver } from '../../utils/resize-observer';
 import { isBrowser } from '../../utils/support';
-import { debounce } from '../../utils/timer-utils';
 
 export class VideoElementManager {
-  private resizeObserver?: ResizeObserver;
+  private resizeObserver?: typeof HMSResizeObserver;
   private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
   private entries = new Map<HTMLVideoElement, DOMRectReadOnly>();
@@ -44,7 +44,7 @@ export class VideoElementManager {
       }
     }
     if (this.resizeObserver) {
-      this.resizeObserver.observe(videoElement, { box: 'border-box' });
+      this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
       this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
@@ -63,9 +63,7 @@ export class VideoElementManager {
 
   private init() {
     if (isBrowser) {
-      if (typeof window.ResizeObserver !== 'undefined' && !this.resizeObserver) {
-        this.resizeObserver = new ResizeObserver(debounce(this.handleResize, 300));
-      }
+      this.resizeObserver = HMSResizeObserver;
       this.intersectionObserver = HMSIntersectionObserver;
     }
   }
@@ -82,13 +80,11 @@ export class VideoElementManager {
     this.selectMaxLayer();
   };
 
-  private handleResize = async (entries: ResizeObserverEntry[]) => {
+  private handleResize = async (entry: ResizeObserverEntry) => {
     if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
-    for (const entry of entries) {
-      this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
-    }
+    this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
     this.selectMaxLayer();
   };
 
@@ -141,7 +137,6 @@ export class VideoElementManager {
   }
 
   cleanup = () => {
-    this.resizeObserver?.disconnect();
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };
