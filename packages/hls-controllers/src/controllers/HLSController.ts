@@ -31,7 +31,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(videoRef.current);
     this._isLive = true;
-    this._volume = videoRef.current.volume;
+    this._volume = videoRef.current.volume * 100;
     this.hlsStats = new HlsStats(this.hls, videoRef.current);
     this.listenHLSEvent();
     this.onHLSTimeMetadataParsing();
@@ -146,8 +146,14 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
   }
   /**
    * set video volumne
+   * @param { volume } - define volume in range [1,100]
    */
   public set volume(volume: number) {
+    const videoEl = this.videoRef.current;
+    if (!videoEl) {
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
+    }
+    videoEl.volume = volume / 100;
     this._volume = volume;
   }
   /**

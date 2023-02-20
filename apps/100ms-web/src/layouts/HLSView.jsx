@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import { HMSHLSController } from "@100mslve/hls-controllers";
+import { HMSHLSController } from "@100mslive/hls-controllers";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -232,7 +232,7 @@ const HLSView = () => {
                   isPaused={isPaused}
                 />
                 <HMSVideoPlayer.Duration videoRef={videoRef} />
-                <HMSVideoPlayer.Volume videoRef={videoRef} />
+                <HMSVideoPlayer.Volume hlsController={hlsController} />
               </HMSVideoPlayer.Controls.Left>
 
               <HMSVideoPlayer.Controls.Right>

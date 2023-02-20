@@ -2,9 +2,8 @@ import { useState } from "react";
 import { SpeakerIcon } from "@100mslive/react-icons";
 import { Flex, Slider } from "@100mslive/react-ui";
 
-export const VolumeControl = ({ videoRef }) => {
-  const videoEl = videoRef.current;
-  const [volume, setVolume] = useState(videoEl?.volume ?? 100);
+export const VolumeControl = ({ hlsController }) => {
+  const [volume, setVolume] = useState(hlsController?.volume ?? 100);
 
   return (
     <Flex align="center" css={{ color: "$white" }}>
@@ -12,8 +11,8 @@ export const VolumeControl = ({ videoRef }) => {
         style={{ cursor: "pointer" }}
         onClick={() => {
           setVolume(0);
-          if (videoRef.current) {
-            videoRef.current.volume = 0;
+          if (hlsController) {
+            hlsController.volume = 0;
           }
         }}
       />
@@ -30,7 +29,7 @@ export const VolumeControl = ({ videoRef }) => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          videoEl.volume = volume / 100;
+          hlsController.volume = volume;
           setVolume(volume);
         }}
         thumbStyles={{ w: "$6", h: "$6" }}
