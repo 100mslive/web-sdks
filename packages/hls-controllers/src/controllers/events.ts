@@ -1,3 +1,4 @@
+import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { LevelParsed } from 'hls.js';
 import { HMSHLSControllerEvents } from '../utilies/constants';
 
@@ -44,25 +45,16 @@ export declare interface HLSManifestLoaded {
 export declare interface HLSLevelUpdated {
   level: LevelParsed;
 }
-export interface HMSHLSControllerEventEmitter {
-  on<E extends keyof HMSHLSControllerListeners, Context = undefined>(
+export interface IHMSHLSControllerEventEmitter {
+  on<E extends keyof HMSHLSControllerListeners>(
     event: E,
     listener: HMSHLSControllerListeners[E],
-    context?: Context,
+    options?: boolean,
   ): void;
-  once<E extends keyof HMSHLSControllerListeners, Context = undefined>(
-    event: E,
-    listener: HMSHLSControllerListeners[E],
-    context?: Context,
-  ): void;
+  once<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]): void;
 
   removeAllListeners<E extends keyof HMSHLSControllerListeners>(event?: E): void;
-  off<E extends keyof HMSHLSControllerListeners, Context = undefined>(
-    event: E,
-    listener?: HMSHLSControllerListeners[E],
-    context?: Context,
-    once?: boolean,
-  ): void;
+  off<E extends keyof HMSHLSControllerListeners>(event: E, listener?: HMSHLSControllerListeners[E]): void;
 
   listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][];
   emit<E extends keyof HMSHLSControllerListeners>(
@@ -71,4 +63,40 @@ export interface HMSHLSControllerEventEmitter {
     eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
   ): boolean;
   listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number;
+}
+
+export class HMSHLSControllerEventEmitter implements IHMSHLSControllerEventEmitter {
+  constructor(private eventEmitter: EventEmitter) {}
+  on<E extends keyof HMSHLSControllerListeners>(
+    event: E,
+    listener: HMSHLSControllerListeners[E],
+    options?: boolean,
+  ): void {
+    this.eventEmitter.on(event, listener, options);
+  }
+
+  once<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]) {
+    this.eventEmitter.once(event, listener);
+  }
+
+  removeAllListeners<E extends keyof HMSHLSControllerListeners>(event?: E) {
+    this.eventEmitter.removeAllListeners(event);
+  }
+  off<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]) {
+    this.eventEmitter.off(event, listener);
+  }
+
+  listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][] {
+    return this.eventEmitter.listeners(event);
+  }
+  emit<E extends keyof HMSHLSControllerListeners>(
+    event: E,
+    name: E,
+    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
+  ): boolean {
+    return this.eventEmitter.emit(event, name, eventObject);
+  }
+  listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number {
+    return this.eventEmitter.listenerCount(event);
+  }
 }
