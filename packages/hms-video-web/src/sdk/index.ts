@@ -297,8 +297,9 @@ export class HMSSdk implements HMSInterface {
     }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        if (this.localPeer && config.asRole) {
-          this.localPeer.asRole = this.store.getPolicyForRole(config.asRole);
+        if (this.localPeer) {
+          const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+          this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
