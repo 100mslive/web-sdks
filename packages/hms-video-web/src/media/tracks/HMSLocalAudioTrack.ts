@@ -68,7 +68,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const prevState = this.enabled;
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
     const newTrack = await getAudioTrack(settings);
     /*
@@ -76,8 +75,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    newTrack.enabled = this.enabled;
     HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-    newTrack.enabled = prevState;
 
     const localStream = this.stream as HMSLocalStream;
     // change nativeTrack so plugin can start its work
@@ -119,12 +118,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
 
-    await this.handleDeviceChange(newSettings, internal);
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
+    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
