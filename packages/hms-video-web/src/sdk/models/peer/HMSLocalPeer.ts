@@ -18,6 +18,10 @@ export class HMSLocalPeer extends HMSPeer implements IHMSLocalPeer {
     this.asRole = peerData.asRole;
   }
 
+  isInPreview() {
+    return !!this.asRole;
+  }
+
   toString(): string {
     return `{
       name: ${this.name};

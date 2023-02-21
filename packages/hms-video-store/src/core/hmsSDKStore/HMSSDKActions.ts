@@ -1184,10 +1184,8 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
-    const roomState = this.store.getState(selectRoomState);
-    const isInPreviewOrReconnecting = [HMSRoomState.Preview, HMSRoomState.Reconnecting].includes(roomState);
     // if room is not in preview, clear preview fields
-    if (!isInPreviewOrReconnecting) {
+    if (!sdkLocalPeer.isInPreview()) {
       return;
     }
 

@@ -7,4 +7,6 @@ export interface HMSLocalPeer extends HMSPeer {
   audioTrack?: HMSLocalAudioTrack;
   videoTrack?: HMSLocalVideoTrack;
   auxiliaryTracks: HMSLocalTrack[];
+
+  isInPreview: () => boolean;
 }
