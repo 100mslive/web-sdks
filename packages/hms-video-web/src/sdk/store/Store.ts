@@ -273,7 +273,8 @@ class Store implements IStore {
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
-    if (!this.simulcastEnabled) {
+    // Enable only when backend enables and source is video or screen. ignore videoplaylist
+    if (!this.simulcastEnabled || !['screen', 'regular'].includes(source)) {
       return [];
     }
     if (source === 'screen') {
