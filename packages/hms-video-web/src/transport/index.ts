@@ -702,6 +702,8 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    track.isPublished = true;
+
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
