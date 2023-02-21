@@ -54,6 +54,10 @@ export class RetryScheduler {
     this.inProgress.clear();
   }
 
+  isTaskInProgress(category: TFC) {
+    return !!this.inProgress.get(category);
+  }
+
   // eslint-disable-next-line complexity
   private async scheduleTask({
     category,

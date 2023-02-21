@@ -13,6 +13,7 @@ async function main() {
     entryPoints: [source],
     minify: false,
     bundle: true,
+    sourcemap: true,
     target: 'esnext',
     tsconfig: 'tsconfig.json',
     external,
