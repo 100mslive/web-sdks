@@ -1,4 +1,3 @@
-import { Comparator } from './Comparator';
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
@@ -29,7 +28,6 @@ import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
 class Store implements IStore {
-  private readonly comparator: Comparator = new Comparator(this);
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
@@ -61,11 +59,9 @@ class Store implements IStore {
   }
 
   getPublishParams() {
-    return this.getLocalPeer()?.role?.publishParams;
-  }
-
-  getComparator() {
-    return this.comparator;
+    const peer = this.getLocalPeer();
+    const role = peer?.asRole || peer?.role;
+    return role?.publishParams;
   }
 
   getRoom() {

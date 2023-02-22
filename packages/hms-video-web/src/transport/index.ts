@@ -138,7 +138,7 @@ export default class HMSTransport implements ITransport {
         this.signal.answer(answer);
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
-        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌');
+        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
         this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
@@ -146,9 +146,8 @@ export default class HMSTransport implements ITransport {
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
-
+        this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
-        throw ex;
       }
     },
 
@@ -703,6 +702,8 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    track.isPublished = true;
+
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
@@ -806,7 +807,9 @@ export default class HMSTransport implements ITransport {
               HMSAction.JOIN,
               `Websocket join error - ${(error as Error).message}`,
             );
-      const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
+      const shouldRetry =
+        parseInt(`${hmsError.code / 100}`) === 5 ||
+        [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
 
       if (shouldRetry) {
         this.joinRetryCount = 0;
@@ -928,13 +931,14 @@ export default class HMSTransport implements ITransport {
   }
 
   private async handleIceConnectionFailure(role: HMSConnectionRole, error: HMSException) {
-    // retry is already in progress(from disconnect state)
-    const callback = this.callbacks.get(
-      role === HMSConnectionRole.Publish ? RENEGOTIATION_CALLBACK_ID : SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
-    );
-    const isIceRetryInProgress = callback && callback.action === HMSAction.RESTART_ICE;
-
-    if (isIceRetryInProgress) {
+    // ice retry is already in progress(from disconnect state)
+    if (
+      this.retryScheduler.isTaskInProgress(
+        HMSConnectionRole.Publish
+          ? TransportFailureCategory.PublishIceConnectionFailed
+          : TransportFailureCategory.SubscribeIceConnectionFailed,
+      )
+    ) {
       return;
     }
 
@@ -1056,11 +1060,12 @@ export default class HMSTransport implements ITransport {
   }
 
   private retryPublishIceFailedTask = async () => {
-    if (
-      this.publishConnection &&
-      (this.publishConnection.iceConnectionState !== 'connected' ||
-        this.publishConnection.connectionState !== 'connected')
-    ) {
+    /**
+     * Proceed with the retry even if the connection state is connected as the offer could have failed
+     * which will cause missing tiles if it is not sent again.
+     * Do iceRestart only if not connected
+     */
+    if (this.publishConnection) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -1068,7 +1073,7 @@ export default class HMSTransport implements ITransport {
           extra: {},
         });
       });
-      await this.performPublishRenegotiation({ iceRestart: true });
+      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
       await p;
     }
 
@@ -1076,11 +1081,7 @@ export default class HMSTransport implements ITransport {
   };
 
   private retrySubscribeIceFailedTask = async () => {
-    if (
-      this.subscribeConnection &&
-      (this.subscribeConnection.iceConnectionState !== 'connected' ||
-        this.subscribeConnection.connectionState !== 'connected')
-    ) {
+    if (this.subscribeConnection && this.subscribeConnection.connectionState !== 'connected') {
       const p = new Promise<boolean>((resolve, reject) => {
         // Use subscribe constant string
         this.callbacks.set(SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID, {

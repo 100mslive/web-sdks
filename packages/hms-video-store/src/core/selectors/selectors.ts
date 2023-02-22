@@ -142,14 +142,9 @@ const selectTracks = createSelector(selectTracksMap, storeTracks => {
 /**
  * Select the local peer object object assigned to you.
  */
-export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers) => {
+export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers): HMSPeer | undefined => {
   return peers[room.localPeer];
 });
-
-/**
- * Select the peer object used in preview
- */
-export const selectPreviewPeer = (store: HMSStore) => store.preview.peer;
 
 /**
  * Select the peer ID of your local peer.
@@ -189,7 +184,7 @@ const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => pee
 export const selectLocalTrackIDs = createSelector(
   [selectLocalAudioTrackID, selectLocalVideoTrackID, selectLocalAuxiliaryTrackIDs],
   (audioTrackID, videoTrackID, auxiliaryTrackIDs) => {
-    const trackIDs: string[] = [...auxiliaryTrackIDs];
+    const trackIDs: string[] = auxiliaryTrackIDs ? [...auxiliaryTrackIDs] : [];
     audioTrackID && trackIDs.unshift(audioTrackID);
     videoTrackID && trackIDs.unshift(videoTrackID);
     return trackIDs;
@@ -396,6 +391,16 @@ export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMa
  */
 export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesMap], (localPeer, rolesMap) =>
   localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
+);
+
+export const selectPreviewRoleName = (store: HMSStore) => store.preview?.asRole;
+
+/**
+ * Select the {@link HMSRole} used for preview.
+ *
+ */
+export const selectPreviewRole = createSelector([selectPreviewRoleName, selectRolesMap], (roleName, rolesMap) =>
+  roleName ? rolesMap[roleName] : null,
 );
 
 /**

@@ -29,7 +29,12 @@ export interface HMSStore {
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   sessionMetadata?: any;
-  preview: { peer?: HMSPeer };
+  preview?: {
+    localPeer?: HMSPeerID;
+    asRole?: string;
+    videoTrack?: HMSTrackID;
+    audioTrack?: HMSTrackID;
+  };
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
 }
 
@@ -109,7 +114,6 @@ export const createDefaultStoreState = (): HMSStore => {
     },
     roles: {},
     roleChangeRequests: [],
-    preview: {},
     errors: [],
   };
 };

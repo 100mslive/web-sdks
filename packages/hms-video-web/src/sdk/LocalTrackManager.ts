@@ -90,15 +90,6 @@ export class LocalTrackManager {
     this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
     this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
 
-    /**
-     * concat local tracks only if both are true which means it is either join or switched from a role
-     * with no tracks earlier.
-     * the reason we need this is for preview API to work, in case of preview we want to publish the same
-     * tracks which were shown and are already part of the local peer instead of creating new ones.
-     * */
-    // if (publishConfig.publishAudio && publishConfig.publishVideo) {
-    //   return tracks.concat(localTracks);
-    // }
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
       tracksToPublish.push(videoTrack);
     }
