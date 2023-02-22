@@ -49,6 +49,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   publishedTrackId?: string;
 
+  /**
+   * will be false for preview tracks
+   */
+  isPublished = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -97,6 +102,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         track = await this.replaceTrackWithBlank();
       }
       await this.replaceSender(track, value);
+      this.nativeTrack?.stop();
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
@@ -176,6 +182,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+    this.isPublished = false;
   }
 
   /**

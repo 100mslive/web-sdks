@@ -23,12 +23,7 @@ import {
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import {
-  areArraysEqual,
-  mergeNewPeersInDraft,
-  mergeNewTracksInDraft,
-  mergePreviewPeerInDraft,
-} from './sdkUtils/storeMergeUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
@@ -731,8 +726,8 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (this.hmsSDKPeers[localPeer?.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -820,6 +815,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -840,8 +836,10 @@ export class HMSSDKActions implements IHMSActions {
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
-      if (hmsPeer.isLocal) {
-        Object.assign(newMediaSettings, this.getMediaSettings(sdkPeer));
+      if (sdkPeer.isLocal) {
+        const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
+        newPreview = this.getPreviewFields(localPeer);
+        Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
 
@@ -861,10 +859,19 @@ export class HMSSDKActions implements IHMSActions {
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+
+      /**
+       * if preview is already present merge,
+       * else set as is(which will create/delete)
+       */
+      if (draftStore.preview?.localPeer && newPreview?.localPeer) {
+        Object.assign(draftStore.preview, newPreview);
+      } else {
+        draftStore.preview = newPreview;
+      }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
-      mergePreviewPeerInDraft(draftStore, draftPeers);
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
@@ -1176,6 +1183,22 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
+  private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    // if room is not in preview, clear preview fields
+    if (!sdkLocalPeer.isInPreview()) {
+      return;
+    }
+
+    const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
+
+    return {
+      localPeer: hmsLocalPeer.id,
+      audioTrack: hmsLocalPeer.audioTrack,
+      videoTrack: hmsLocalPeer.videoTrack,
+      asRole: sdkLocalPeer.asRole?.name || sdkLocalPeer.role?.name,
+    };
+  }
+
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
@@ -1201,7 +1224,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private localAndVideoUnmuting(trackID: string) {
     const localPeer = this.store.getState(selectLocalPeer);
-    if (localPeer.videoTrack !== trackID) {
+    if (localPeer?.videoTrack !== trackID) {
       return false;
     }
     const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);

@@ -382,7 +382,7 @@ export class PlaylistManager
   };
 
   private removeTrack = async (trackId: string) => {
-    await this.sdk.removeTrack(trackId);
+    await this.sdk.removeTrack(trackId, true);
     HMSLogger.d(this.TAG, 'Playlist track removed', trackId);
   };
 }

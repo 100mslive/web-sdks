@@ -78,7 +78,7 @@ export class NotificationManager {
     this.connectionQualityManager.listener = qualityListener;
   }
 
-  handleNotification(message: { method: string; params: any }, isReconnecting = false, isPreviewInProgress = false) {
+  handleNotification(message: { method: string; params: any }, isReconnecting = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
 
@@ -107,11 +107,11 @@ export class NotificationManager {
     this.requestManager.handleNotification(method, notification);
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
-    this.handleIsolatedMethods(method, notification, isPreviewInProgress);
+    this.handleIsolatedMethods(method, notification);
   }
 
   // eslint-disable-next-line complexity
-  handleIsolatedMethods(method: string, notification: any, isPreviewInProgress = false) {
+  handleIsolatedMethods(method: string, notification: any) {
     switch (method) {
       case HMSNotificationMethod.TRACK_METADATA_ADD: {
         this.trackManager.handleTrackMetadataAdd(notification as TrackStateNotification);
@@ -134,7 +134,7 @@ export class NotificationManager {
         break;
 
       case HMSNotificationMethod.POLICY_CHANGE:
-        this.policyChangeManager.handlePolicyChange(notification as PolicyParams, isPreviewInProgress);
+        this.policyChangeManager.handlePolicyChange(notification as PolicyParams);
         break;
 
       default:
