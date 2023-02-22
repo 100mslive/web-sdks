@@ -73,7 +73,7 @@ const HLSView = () => {
     const pauseEventHandler = (_, data) => setIsPaused(data);
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
     if (videoEl && hlsUrl) {
-      hlsController = new HMSHLSController(hlsUrl, videoRef);
+      hlsController = new HMSHLSController(hlsUrl, videoEl);
       hlsController.on(
         HMSHLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
         handleNoLongerLive
@@ -215,7 +215,7 @@ const HLSView = () => {
             {!isMSENotSupported && (
               <HMSVideoPlayer.Progress
                 onValueChange={currentTime => {
-                  hlsController.seek(currentTime);
+                  hlsController.seekTo(currentTime);
                 }}
                 videoRef={videoRef}
               />
@@ -241,8 +241,8 @@ const HLSView = () => {
                     <IconButton
                       variant="standard"
                       css={{ px: "$2" }}
-                      onClick={() => {
-                        hlsController.jumpToLive();
+                      onClick={async () => {
+                        await hlsController.seekToLivePosition();
                         setIsVideoLive(true);
                       }}
                       key="jump-to-live_btn"

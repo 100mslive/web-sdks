@@ -1,4 +1,5 @@
-import { HMSHLSController, LevelParsed } from './controllers/HLSController';
+import { HMSHLSController } from './controllers/HLSController';
+import { ILevel } from './interfaces/ILevel';
 import { HMSHLSControllerEvents } from './utilies/constants';
-export type { LevelParsed, HMSHLSControllerEvents };
+export type { ILevel, HMSHLSControllerEvents };
 export { HMSHLSController };

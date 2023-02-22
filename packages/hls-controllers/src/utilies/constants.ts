@@ -24,5 +24,6 @@ export enum HMSHLSExceptionEvents {
   BUFFER_INCOMPATIBLE_CODECS_ERROR = 'buffer-incompatible-codecs-error',
 
   VIDEO_ELEMENT_NOT_FOUND = 'video-element-not-found',
+  HLS_URL_NOT_FOUND = 'hls-url-not-found',
   UNKNOWN_ERROR = 'unknown-error',
 }

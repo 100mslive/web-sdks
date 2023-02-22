@@ -1,21 +1,21 @@
-import { Level } from 'hls.js';
+import { ILevel } from './ILevel';
 interface IHMSHLSController {
   /**
    *
-   * @returns returns a Number which represents current
+   * @returns returns a ILevel which represents current
    * quality level. -1 if currentlevel is set to "Auto"
    */
-  getCurrentLevel(): number;
+  getCurrentLevel(): ILevel | null;
   /**
    *
-   * @param { Hls.Level } currentLevel - currentLevel we want to
+   * @param { ILevel } currentLevel - currentLevel we want to
    * set the stream to. -1 for Auto
    */
-  setCurrentLevel(currentLevel: Level): void;
+  setCurrentLevel(currentLevel: ILevel): void;
   /**
    * move the video to Live
    */
-  jumpToLive(): void;
+  seekToLivePosition(): void;
 }
 
 export default IHMSHLSController;

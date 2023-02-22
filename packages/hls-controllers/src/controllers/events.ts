@@ -1,8 +1,8 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { LevelParsed } from 'hls.js';
+import { ILevel } from '../interfaces/ILevel';
 import { HMSHLSControllerEvents } from '../utilies/constants';
 
-export declare interface HMSHLSControllerListeners {
+export interface HMSHLSControllerListeners {
   [HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE]: (
     event: HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE,
     data: HLSStreamLive,
@@ -31,19 +31,19 @@ export declare interface HMSHLSControllerListeners {
   ) => void;
 }
 
-export declare interface HLSStreamLive {
+export interface HLSStreamLive {
   isLive: boolean;
 }
-export declare interface HLSTimedMetadataPayload {
+export interface HLSTimedMetadataPayload {
   payload: string;
   duration: number;
 }
 
-export declare interface HLSManifestLoaded {
-  levels: LevelParsed[];
+export interface HLSManifestLoaded {
+  levels: ILevel[];
 }
-export declare interface HLSLevelUpdated {
-  level: LevelParsed;
+export interface HLSLevelUpdated {
+  level: ILevel;
 }
 export interface IHMSHLSControllerEventEmitter {
   on<E extends keyof HMSHLSControllerListeners>(
@@ -57,11 +57,6 @@ export interface IHMSHLSControllerEventEmitter {
   off<E extends keyof HMSHLSControllerListeners>(event: E, listener?: HMSHLSControllerListeners[E]): void;
 
   listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][];
-  emit<E extends keyof HMSHLSControllerListeners>(
-    event: E,
-    name: E,
-    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
-  ): boolean;
   listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number;
 }
 

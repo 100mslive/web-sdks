@@ -65,6 +65,14 @@ export const HMSHLSErrorFactory = {
         false,
       );
     },
+    hlsURLNotFound(): HMSHLSException {
+      return new HMSHLSException(
+        HMSHLSExceptionEvents.HLS_URL_NOT_FOUND,
+        'hls url not found',
+        'hls url not found',
+        false,
+      );
+    },
   },
   UnknownError: (data: HLSErrorDetails): HMSHLSException => {
     return new HMSHLSException(

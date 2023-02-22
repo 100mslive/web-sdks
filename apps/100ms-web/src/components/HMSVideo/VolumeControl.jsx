@@ -12,7 +12,7 @@ export const VolumeControl = ({ hlsController }) => {
         onClick={() => {
           setVolume(0);
           if (hlsController) {
-            hlsController.volume = 0;
+            hlsController.setVolume(0);
           }
         }}
       />
@@ -29,7 +29,7 @@ export const VolumeControl = ({ hlsController }) => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          hlsController.volume = volume;
+          hlsController.setVolume(volume);
           setVolume(volume);
         }}
         thumbStyles={{ w: "$6", h: "$6" }}
