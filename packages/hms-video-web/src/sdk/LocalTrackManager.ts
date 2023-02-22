@@ -33,7 +33,7 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
-let blankCanvas: any;
+let blankCanvas: HTMLCanvasElement;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -260,8 +260,10 @@ export class LocalTrackManager {
     const height = prevTrack?.getSettings()?.height || 240;
     const frameRate = 10; // fps TODO: experiment, see if this can be reduced
     if (!blankCanvas) {
-      blankCanvas = Object.assign(document.createElement('canvas'), { width, height });
-      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
+      blankCanvas = document.createElement('canvas');
+      blankCanvas.width = width;
+      blankCanvas.height = height;
+      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
     }
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
