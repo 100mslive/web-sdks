@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { init } from "zipyai";
+import { init } from 'zipyai';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import '100ms_edtech_template/dist/index.css';
@@ -17,10 +17,9 @@ if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_ZIPY_KEY) {
   if (shouldBlacklistDomainForZipy()) {
     console.debug(`Not initializing zipy for ${window.location.hostname}`);
   } else {
-      init(process.env.REACT_APP_ZIPY_KEY);
+    init(process.env.REACT_APP_ZIPY_KEY);
   }
 }
-
 
 const root = createRoot(document.getElementById('root'));
 root.render(
