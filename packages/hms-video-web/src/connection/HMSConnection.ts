@@ -91,6 +91,10 @@ export default abstract class HMSConnection {
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate signalling state closed`);
+      return;
+    }
     HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate);
   }
