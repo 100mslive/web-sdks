@@ -33,3 +33,4 @@ export * as HMSSelect from './ReactSelect';
 export * from './Tabs';
 export * from './QRCode';
 export * from './Link';
+export * from './Collapsible';

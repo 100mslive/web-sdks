@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 import {
+  selectIsAllowedToPreviewMedia,
   selectIsAllowedToPublish,
+  selectIsInPreview,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
 } from '@100mslive/hms-video-store';
@@ -34,7 +36,9 @@ export interface useAVToggleResult {
 export const useAVToggle = (handleError: hooksErrHandler = logErrorHandler): useAVToggleResult => {
   const isLocalAudioEnabled = useHMSStore(selectIsLocalAudioEnabled);
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const isInPreview = useHMSStore(selectIsInPreview);
+  const selectAllowed = isInPreview ? selectIsAllowedToPreviewMedia : selectIsAllowedToPublish;
+  const isAllowedToPublish = useHMSStore(selectAllowed);
   const actions = useHMSActions();
 
   const toggleAudio = useCallback(async () => {

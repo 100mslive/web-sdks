@@ -1,14 +1,5 @@
 import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
-import {
-  HMSPeer,
-  HMSPeerID,
-  HMSRoomState,
-  HMSScreenVideoTrack,
-  HMSStore,
-  HMSTrack,
-  HMSTrackID,
-  HMSVideoTrack,
-} from '../../schema';
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
@@ -58,18 +49,6 @@ export const mergeNewTracksInDraft = (
     } else if (isEntityAdded(oldTrack, newTrack)) {
       draftTracks[trackID] = newTrack as HMSTrack;
     }
-  }
-};
-
-export const mergePreviewPeerInDraft = (draftStore: HMSStore, draftPeers: Record<HMSPeerID, HMSPeer>) => {
-  if (draftStore.room.roomState === HMSRoomState.Preview) {
-    if (!draftStore.preview.peer) {
-      draftStore.preview.peer = draftPeers[draftStore.room.localPeer];
-    } else {
-      Object.assign(draftStore.preview.peer, draftPeers[draftStore.room.localPeer]);
-    }
-  } else {
-    delete draftStore.preview.peer;
   }
 };
 
