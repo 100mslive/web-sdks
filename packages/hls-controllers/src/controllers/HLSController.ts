@@ -1,6 +1,6 @@
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
+import Hls, { ErrorData, Fragment, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSControllerEventEmitter, HMSHLSControllerListeners, IHMSHLSControllerEventEmitter } from './events';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import IHMSHLSController from '../interfaces/IHLSController';
@@ -34,7 +34,6 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this._volume = videoEl.volume * 100;
     this.hlsStats = new HlsStats(this.hls, videoEl);
     this.listenHLSEvent();
-    this.onHLSTimeMetadataParsing();
     this.seekToLivePosition();
   }
   /**
@@ -78,6 +77,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.off(Hls.Events.ERROR, this.handleHLSException);
+      this.hls.off(Hls.Events.FRAG_CHANGED, this.fragChangeHandler);
     }
     if (this.videoEl) {
       this.videoEl.removeEventListener('play', this.playEventHandler);
@@ -333,6 +333,73 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       level: qualityLevel,
     });
   };
+
+  /**
+   * Metadata are automatically parsed and added to the video element's
+   * textTrack cue by hlsjs as they come through the stream.
+   * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
+   * when the current fragment has a metadata to play.
+   */
+  private fragChangeHandler = (_: any, { frag }: { frag: Fragment }) => {
+    if (!this.videoEl) {
+      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
+    }
+    try {
+      if (this.videoEl.textTracks.length === 0) {
+        return;
+      }
+      const fragStartTime = frag.start;
+      /**
+       * this destructuring is needed because the cues array not a pure
+       * JS array and prevents us from
+       * performing array operations like map(),filter() etc.
+       */
+      // @ts-ignore
+      const metadata = [...this.videoEl.textTracks[0].cues];
+      /**
+       * filter out only the metadata that have startTime set to future.
+       * (i.e) more than the current fragment's startime.
+       */
+      const metadataAfterFragStart = metadata.filter(mt => {
+        return mt.startTime >= fragStartTime;
+      });
+
+      metadataAfterFragStart.forEach(mt => {
+        const timeDifference = mt.startTime - fragStartTime;
+        const fragmentDuration = frag.end - frag.start;
+
+        if (timeDifference < fragmentDuration) {
+          const data = mt.value.data;
+          const payload = metadataPayloadParser(data).payload;
+          /**
+           * we start a timeout for difference seconds.
+           * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
+           * time JS will wait before calling emit(). It's not guaranteed even
+           * for timeDifference = 0.
+           */
+          setTimeout(() => {
+            /** Even though duration comes as an attribute in the stream,
+             * HlsJs doesn't give us a property duration directly. So
+             * we calculate it ouselves. This is same as reading
+             * EXT-INF tag.
+             */
+            const duration = mt.endTime - mt.startTime;
+
+            /**
+             * finally emit event letting the user know its time to
+             * do whatever they want with the payload
+             */
+            this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
+              payload,
+              duration,
+            });
+          }, timeDifference * 1000);
+        }
+      });
+    } catch (e) {
+      console.error('FRAG_CHANGED event error', e);
+    }
+  };
   private extractMetaTextTrack = (): TextTrack | null => {
     const textTrackListCount = this.videoEl?.textTracks.length || 0;
     for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
@@ -415,6 +482,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.on(Hls.Events.ERROR, this.handleHLSException);
+      this.hls.on(Hls.Events.FRAG_CHANGED, this.fragChangeHandler);
     } else if (this.videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       this.videoEl.src = this.hlsUrl;
@@ -423,75 +491,6 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this.videoEl.addEventListener('play', this.playEventHandler);
     this.videoEl.addEventListener('pause', this.pauseEventHandler);
     this.videoEl.addEventListener('volumechange', this.volumeEventHandler);
-  }
-  /**
-   * Metadata are automatically parsed and added to the video element's
-   * textTrack cue by hlsjs as they come through the stream.
-   * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
-   * when the current fragment has a metadata to play.
-   */
-  private onHLSTimeMetadataParsing() {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
-    this.hls.on(Hls.Events.FRAG_CHANGED, (_, { frag }) => {
-      try {
-        if (this.videoEl.textTracks.length === 0) {
-          return;
-        }
-
-        const fragStartTime = frag.start;
-        /**
-         * this destructuring is needed because the cues array not a pure
-         * JS array and prevents us from
-         * performing array operations like map(),filter() etc.
-         */
-        // @ts-ignore
-        const metadata = [...this.videoEl.textTracks[0].cues];
-        /**
-         * filter out only the metadata that have startTime set to future.
-         * (i.e) more than the current fragment's startime.
-         */
-        const metadataAfterFragStart = metadata.filter(mt => {
-          return mt.startTime >= fragStartTime;
-        });
-
-        metadataAfterFragStart.forEach(mt => {
-          const timeDifference = mt.startTime - fragStartTime;
-          const fragmentDuration = frag.end - frag.start;
-
-          if (timeDifference < fragmentDuration) {
-            const data = mt.value.data;
-            const payload = metadataPayloadParser(data).payload;
-            /**
-             * we start a timeout for difference seconds.
-             * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
-             * time JS will wait before calling emit(). It's not guaranteed even
-             * for timeDifference = 0.
-             */
-            setTimeout(() => {
-              /** Even though duration comes as an attribute in the stream,
-               * HlsJs doesn't give us a property duration directly. So
-               * we calculate it ouselves. This is same as reading
-               * EXT-INF tag.
-               */
-              const duration = mt.endTime - mt.startTime;
-
-              /**
-               * finally emit event letting the user know its time to
-               * do whatever they want with the payload
-               */
-              this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
-                payload,
-                duration,
-              });
-            }, timeDifference * 1000);
-          }
-        });
-      } catch (e) {
-        console.error('FRAG_CHANGED event error', e);
-      }
-    });
   }
 
   getControllerConfig(isOptimized: boolean = IS_OPTIMIZED): Partial<HlsConfig> {
