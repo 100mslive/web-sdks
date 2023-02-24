@@ -60,15 +60,6 @@ import { HMSAudioContextHandler } from '../utils/media';
 import { isNode } from '../utils/support';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
-// @DISCUSS: Adding it here as a hotfix
-const defaultSettings = {
-  isAudioMuted: false,
-  isVideoMuted: false,
-  audioInputDeviceId: 'default',
-  audioOutputDeviceId: 'default',
-  videoDeviceId: 'default',
-};
-
 const INITIAL_STATE = {
   published: false,
   isInitialised: false,
@@ -301,13 +292,16 @@ export class HMSSdk implements HMSInterface {
           const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
-        const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
+        const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
         this.analyticsTimer.end(TimedEvent.PREVIEW);
-        listener.onPreview(this.store.getRoom(), tracks);
+        const room = this.store.getRoom();
+        if (room) {
+          listener.onPreview(room, tracks);
+        }
         this.sendPreviewAnalyticsEvent();
         resolve();
       };
@@ -429,7 +423,7 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
-      await this.publish(config.settings || defaultSettings, previewRole);
+      await this.publish(config.settings, previewRole);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
@@ -846,7 +840,7 @@ export class HMSSdk implements HMSInterface {
     this.frameworkInfo = frameworkInfo;
   }
 
-  private async publish(initialSettings: InitialSettings, oldRole?: string) {
+  private async publish(initialSettings?: InitialSettings, oldRole?: string) {
     if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
       // if preview asRole(oldRole) is used, use roleChangeManager to diff policy and publish, else do normal publish
       const publishAction =
@@ -865,7 +859,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private async getAndPublishTracks(initialSettings: InitialSettings) {
+  private async getAndPublishTracks(initialSettings?: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
@@ -937,6 +931,10 @@ export class HMSSdk implements HMSInterface {
   private notifyJoin() {
     const localPeer = this.store.getLocalPeer();
     const room = this.store.getRoom();
+    if (!room) {
+      return;
+    }
+
     room.joinedAt = new Date();
     if (localPeer) {
       localPeer.joinedAt = room.joinedAt;

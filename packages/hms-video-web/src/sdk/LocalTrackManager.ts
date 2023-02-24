@@ -50,7 +50,7 @@ export class LocalTrackManager {
   }
 
   // eslint-disable-next-line complexity
-  async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
+  async getTracksToPublish(initialSettings: InitialSettings = defaultSettings): Promise<HMSLocalTrack[]> {
     const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
