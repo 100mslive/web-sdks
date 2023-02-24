@@ -1116,7 +1116,7 @@ export default class HMSTransport implements ITransport {
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect
-    const ok = this.store.getRoom().joinedAt
+    const ok = this.store.getRoom()?.joinedAt
       ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
