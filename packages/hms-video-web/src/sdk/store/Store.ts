@@ -65,7 +65,7 @@ class Store implements IStore {
   }
 
   getRoom() {
-    return this.room!;
+    return this.room;
   }
 
   getPolicyForRole(role: string) {
