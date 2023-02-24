@@ -20,7 +20,10 @@ export class PolicyChangeManager {
     }
 
     this.store.setKnownRoles(params);
-    this.store.getRoom().templateId = params.template_id;
+    const room = this.store.getRoom();
+    if (room) {
+      room.templateId = params.template_id;
+    }
     // handle when role is not present in known_roles
     // const publishParams = params.known_roles[params.name]?.publishParams;
     // this.store.setPublishParams(publishParams);

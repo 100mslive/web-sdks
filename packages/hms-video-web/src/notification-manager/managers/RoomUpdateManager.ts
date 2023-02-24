@@ -55,6 +55,10 @@ export class RoomUpdateManager {
   private onRoomState(roomNotification: RoomState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
+    if (!room) {
+      return;
+    }
+
     room.peerCount = peerCount;
     room.name = name;
     room.recording.server.running = !!recording?.sfu.enabled;
@@ -91,6 +95,10 @@ export class RoomUpdateManager {
       return;
     }
     const room = this.store.getRoom();
+    if (!room) {
+      return;
+    }
+
     notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error?.code;
     room.hls = this.convertHls(notification);
     room.recording.hls = this.getHLSRecording(notification);
@@ -140,6 +148,10 @@ export class RoomUpdateManager {
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
     const room = this.store.getRoom();
+    if (!room) {
+      return;
+    }
+
     let action: HMSRoomUpdate;
     if (notification.type === 'sfu') {
       room.recording.server = {
@@ -161,6 +173,10 @@ export class RoomUpdateManager {
 
   private setRTMPStatus(running: boolean, notification: RTMPNotification) {
     const room = this.store.getRoom();
+    if (!room) {
+      return;
+    }
+
     room.rtmp = {
       running,
       startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
