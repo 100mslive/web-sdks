@@ -1,12 +1,10 @@
 import { HMSConnectionRole } from './model';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
-const TAG = '[HMSConnection]';
 interface RTCIceCandidatePair {
   local: RTCIceCandidate;
   remote: RTCIceCandidate;
@@ -15,6 +13,7 @@ interface RTCIceCandidatePair {
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
   protected readonly signal: ISignal;
+  private readonly TAG = '[HMSConnection]';
 
   abstract readonly nativeConnection: RTCPeerConnection;
   /**
@@ -55,7 +54,7 @@ export default abstract class HMSConnection {
   async createOffer(tracks?: Map<string, TrackState>, options?: RTCOfferOptions): Promise<RTCSessionDescriptionInit> {
     try {
       const offer = await this.nativeConnection.createOffer(options);
-      HMSLogger.d(TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
+      HMSLogger.d(this.TAG, `[role=${this.role}] createOffer offer=${JSON.stringify(offer, null, 1)}`);
       return enableOpusDtx(fixMsid(offer, tracks));
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.CreateOfferFailed(this.action, (error as Error).message);
@@ -65,7 +64,7 @@ export default abstract class HMSConnection {
   async createAnswer(options: RTCOfferOptions | undefined = undefined): Promise<RTCSessionDescriptionInit> {
     try {
       const answer = await this.nativeConnection.createAnswer(options);
-      HMSLogger.d(TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
+      HMSLogger.d(this.TAG, `[role=${this.role}] createAnswer answer=${JSON.stringify(answer, null, 1)}`);
       return answer;
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.CreateAnswerFailed(this.action, (error as Error).message);
@@ -74,7 +73,10 @@ export default abstract class HMSConnection {
 
   async setLocalDescription(description: RTCSessionDescriptionInit): Promise<void> {
     try {
-      HMSLogger.d(TAG, `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`);
+      HMSLogger.d(
+        this.TAG,
+        `[role=${this.role}] setLocalDescription description=${JSON.stringify(description, null, 1)}`,
+      );
       await this.nativeConnection.setLocalDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetLocalDescriptionFailed(this.action, (error as Error).message);
@@ -83,7 +85,10 @@ export default abstract class HMSConnection {
 
   async setRemoteDescription(description: RTCSessionDescriptionInit): Promise<void> {
     try {
-      HMSLogger.d(TAG, `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`);
+      HMSLogger.d(
+        this.TAG,
+        `[role=${this.role}] setRemoteDescription description=${JSON.stringify(description, null, 1)}`,
+      );
       await this.nativeConnection.setRemoteDescription(description);
     } catch (error) {
       throw ErrorFactory.WebrtcErrors.SetRemoteDescriptionFailed(this.action, (error as Error).message);
@@ -92,10 +97,10 @@ export default abstract class HMSConnection {
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
     if (this.nativeConnection.signalingState === 'closed') {
-      HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate signalling state closed`);
+      HMSLogger.d(this.TAG, `[role=${this.role}] addIceCandidate signalling state closed`);
       return;
     }
-    HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
+    HMSLogger.d(this.TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate);
   }
 
@@ -130,7 +135,7 @@ export default abstract class HMSConnection {
               // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
               HMSLogger.d(
-                TAG,
+                this.TAG,
                 `${HMSConnectionRole[this.role]} connection`,
                 `selected ${kindOfTrack || 'unknown'} candidate pair`,
                 JSON.stringify(this.selectedCandidatePair, null, 2),
@@ -148,7 +153,7 @@ export default abstract class HMSConnection {
       });
     } catch (error) {
       HMSLogger.w(
-        TAG,
+        this.TAG,
         `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
         error,
       );
@@ -158,31 +163,6 @@ export default abstract class HMSConnection {
   removeTrack(sender: RTCRtpSender) {
     if (this.nativeConnection.signalingState !== 'closed') {
       this.nativeConnection.removeTrack(sender);
-    }
-  }
-
-  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
-    const maxBitrate = track.settings.maxBitrate;
-    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
-    const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
-
-    if (sender) {
-      const params = sender.getParameters();
-      if (params.encodings.length > 0) {
-        if (maxBitrate) {
-          params.encodings[0].maxBitrate = maxBitrate * 1000;
-        }
-        if (maxFramerate) {
-          // @ts-ignore
-          params.encodings[0].maxFramerate = maxFramerate;
-        }
-      }
-      await sender.setParameters(params);
-    } else {
-      HMSLogger.w(
-        TAG,
-        `no sender found to setMaxBitrate for track - ${track.trackId}, sentTrackId - ${track.getTrackIDBeingSent()}`,
-      );
     }
   }
 

@@ -14,7 +14,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+  async addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const trackEncodings: RTCRtpEncodingParameters[] = [];
     if (track instanceof HMSLocalVideoTrack) {
       if (simulcastLayers.length > 0) {
@@ -34,12 +34,35 @@ export default class HMSLocalStream extends HMSMediaStream {
       direction: 'sendonly',
       sendEncodings: trackEncodings,
     });
+    await this.setMaxBitrateAndFramerate(transceiver, track);
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
-    return transceiver;
   }
 
-  async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
-    await this.connection?.setMaxBitrateAndFramerate(track);
+  async setMaxBitrateAndFramerate(transceiver: RTCRtpTransceiver, track: HMSLocalTrack) {
+    const maxBitrate = track.settings.maxBitrate;
+    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
+    const sender = transceiver.sender;
+    const params = sender.getParameters();
+    if (params.encodings.length === 0) {
+      return;
+    }
+
+    if (maxBitrate) {
+      params.encodings[0].maxBitrate = maxBitrate * 1000;
+    }
+    // @ts-ignore
+    params.encodings[0].maxFramerate = maxFramerate;
+    try {
+      await sender.setParameters(params);
+      HMSLogger.d(
+        this.TAG,
+        `Setting maxBitrate=${maxBitrate} kpbs`,
+        `${maxFramerate ? `maxFramerate=${maxFramerate}` : ''}`,
+        `for ${track.source} ${track.type} ${track.trackId}`,
+      );
+    } catch (error) {
+      HMSLogger.w(this.TAG, 'Failed setting maxBitrate and maxFramerate', error);
+    }
   }
 
   // @ts-ignore
@@ -104,10 +127,14 @@ export default class HMSLocalStream extends HMSMediaStream {
     }
   }
 
-  hasSender(track: HMSLocalTrack): boolean {
-    return !!this.connection
+  getSender(track: HMSLocalTrack) {
+    return this.connection
       ?.getSenders()
       .find(sender => sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent());
+  }
+
+  hasSender(track: HMSLocalTrack): boolean {
+    return !!this.getSender(track);
   }
 
   trackUpdate(track: HMSLocalTrack) {

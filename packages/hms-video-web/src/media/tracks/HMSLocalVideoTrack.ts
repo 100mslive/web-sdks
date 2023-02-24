@@ -321,11 +321,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
-    const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrateAndFramerate(this);
-    }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       await this.nativeTrack.applyConstraints(settings.toConstraints());
