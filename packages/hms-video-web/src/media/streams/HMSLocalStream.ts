@@ -16,17 +16,12 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   async addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const trackEncodings: RTCRtpEncodingParameters[] = [];
-    if (track instanceof HMSLocalVideoTrack) {
-      if (simulcastLayers.length > 0) {
-        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
-        trackEncodings.push(...simulcastLayers);
-      } else {
-        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track.settings.maxBitrate && !isNode) {
-          encodings.maxBitrate = track.settings.maxBitrate;
-        }
-        trackEncodings.push(encodings);
-      }
+    const isVideoTrack = track instanceof HMSLocalVideoTrack;
+    if (isVideoTrack && simulcastLayers.length) {
+      HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
+      trackEncodings.push(...simulcastLayers);
+    } else {
+      trackEncodings.push(this.getEncodingsWithBitrateAndFramerate(track));
     }
 
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
@@ -34,11 +29,11 @@ export default class HMSLocalStream extends HMSMediaStream {
       direction: 'sendonly',
       sendEncodings: trackEncodings,
     });
-    await this.setMaxBitrateAndFramerate(transceiver, track);
+    // await this.setMaxBitrateAndFramerate(transceiver, track);
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
   }
 
-  async setMaxBitrateAndFramerate(transceiver: RTCRtpTransceiver, track: HMSLocalTrack) {
+  /* async setMaxBitrateAndFramerate(transceiver: RTCRtpTransceiver, track: HMSLocalTrack) {
     const maxBitrate = track.settings.maxBitrate;
     const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = transceiver.sender;
@@ -63,7 +58,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     } catch (error) {
       HMSLogger.w(this.TAG, 'Failed setting maxBitrate and maxFramerate', error);
     }
-  }
+  } */
 
   // @ts-ignore
   setPreferredCodec(_transceiver: RTCRtpTransceiver, _kind: string) {
@@ -139,5 +134,20 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   trackUpdate(track: HMSLocalTrack) {
     this.connection?.trackUpdate(track);
+  }
+
+  private getEncodingsWithBitrateAndFramerate(track: HMSLocalTrack) {
+    const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
+    if (!isNode) {
+      if (track.settings.maxBitrate) {
+        console.error(track.settings.maxBitrate);
+        encodings.maxBitrate = track.settings.maxBitrate * 1000;
+      }
+      if (track instanceof HMSLocalVideoTrack && track.settings.maxFramerate) {
+        //@ts-ignore
+        encodings.maxFramerate = track.settings.maxFramerate;
+      }
+    }
+    return encodings;
   }
 }
