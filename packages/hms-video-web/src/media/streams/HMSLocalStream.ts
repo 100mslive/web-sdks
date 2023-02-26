@@ -53,6 +53,8 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   /**
+   * On mute and unmute of video tracks as well as for changing cameras, we replace the track with new track,
+   * so as to avoid a renegotiation with the backend and reflect changes faster.
    * In case of video plugins we need to replace the track sent to remote without stopping the original one. As
    * if the original is stopped, plugin would stop getting input frames to process. So only the track in the
    * sender needs to be replaced.

@@ -5,6 +5,11 @@ import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import { HMSResizeObserver } from '../../utils/resize-observer';
 import { isBrowser } from '../../utils/support';
 
+/**
+ * This class is to manager video elements for video tracks.
+ * This will handle attaching/detaching when element is in view or out of view.
+ * This will also handle selecting appropriate layer when element size changesx
+ */
 export class VideoElementManager {
   private resizeObserver?: typeof HMSResizeObserver;
   private intersectionObserver?: typeof HMSIntersectionObserver;

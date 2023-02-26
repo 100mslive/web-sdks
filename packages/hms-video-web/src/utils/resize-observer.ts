@@ -1,3 +1,4 @@
+import HMSLogger from './logger';
 import { isBrowser } from './support';
 import { debounce } from './timer-utils';
 
@@ -5,15 +6,24 @@ export interface HMSResizeObserverCallback {
   (entry: ResizeObserverEntry): void;
 }
 
+/**
+ * This is a wrapper around ResizeObserver which will call the callback passed
+ * for an element while observing, only when that element is intersecting
+ */
 class HMSResizeObserverWrapper {
   private resizeObserver?: ResizeObserver;
+  private readonly TAG = '[HMSResizeObserverWrapper]';
   private listeners = new Map<HTMLElement, HMSResizeObserverCallback>();
   constructor() {
     this.createObserver();
   }
 
   isSupported() {
-    return isBrowser && typeof window.ResizeObserver !== 'undefined';
+    const isSupported = isBrowser && typeof window.ResizeObserver !== 'undefined';
+    if (!isSupported) {
+      HMSLogger.w(this.TAG, 'Resize Observer is not supported');
+    }
+    return isSupported;
   }
 
   observe = (

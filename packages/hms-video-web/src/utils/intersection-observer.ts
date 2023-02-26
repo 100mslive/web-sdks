@@ -1,18 +1,28 @@
+import HMSLogger from './logger';
 import { isBrowser } from './support';
 
 export interface HMSIntersectionObserverCallback {
   (entry: IntersectionObserverEntry): void;
 }
 
+/**
+ * This is a wrapper around IntersectionObserver which will call the callback passed
+ * for an element while observing, only when that element is intersecting
+ */
 class HMSIntersectionObserverWrapper {
   private intersectionObserver?: IntersectionObserver;
+  private readonly TAG = '[HMSIntersectionObserverWrapper]';
   private listeners = new Map<HTMLElement, HMSIntersectionObserverCallback>();
   constructor() {
     this.createObserver();
   }
 
   isSupported() {
-    return isBrowser && typeof window.IntersectionObserver !== 'undefined';
+    const isSupported = isBrowser && typeof window.IntersectionObserver !== 'undefined';
+    if (!isSupported) {
+      HMSLogger.w(this.TAG, 'IntersectionObserver is not supported, fallback will be used instead');
+    }
+    return isSupported;
   }
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
