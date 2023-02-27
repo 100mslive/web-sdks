@@ -229,7 +229,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
       return;
     }
-    this.removeOrReplaceProcessedTrack(processedTrack);
+    await this.removeOrReplaceProcessedTrack(processedTrack);
     this.videoHandler.updateSinks();
   }
 
