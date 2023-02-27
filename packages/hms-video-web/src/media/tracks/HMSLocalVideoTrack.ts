@@ -231,27 +231,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
       return;
     }
-    // if all plugins are removed reset everything back to native track
-    if (!processedTrack) {
-      if (this.processedTrack) {
-        // remove, reset back to the native track
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
-      }
-      this.processedTrack = undefined;
-      this.videoHandler?.updateSinks();
-      return;
-    }
-    if (processedTrack !== this.processedTrack) {
-      if (this.processedTrack) {
-        // replace previous processed track with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
-      } else {
-        // there is no prev processed track, replace native with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
-      }
-      this.processedTrack = processedTrack;
-      this.videoHandler?.updateSinks();
-    }
+    this.removeOrReplaceProcessedTrack(processedTrack);
+    this.videoHandler?.updateSinks();
   }
 
   /**
@@ -351,6 +332,31 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }
+    }
+  };
+
+  /**
+   * This will either remove or update the processedTrack value on the class instance.
+   * It will also replace sender if the processedTrack is updated
+   * @param {MediaStreamTrack|undefined}processedTrack
+   */
+  private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
+    // if all plugins are removed reset everything back to native track
+    if (!processedTrack) {
+      if (this.processedTrack) {
+        // remove, reset back to the native track
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
+      }
+      this.processedTrack = undefined;
+    } else if (processedTrack !== this.processedTrack) {
+      if (this.processedTrack) {
+        // replace previous processed track with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
+      } else {
+        // there is no prev processed track, replace native with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
+      }
+      this.processedTrack = processedTrack;
     }
   };
 }
