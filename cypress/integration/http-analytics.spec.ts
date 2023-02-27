@@ -1,10 +1,10 @@
-import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
-import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
-import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
-import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
-import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
-import { ErrorFactory, HMSAction } from '../../packages/hms-video-web/src/error/ErrorFactory';
 import { HMSUpdateListener } from '../../packages/hms-video-web/src';
+import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
+import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
+import { ErrorFactory, HMSAction } from '../../packages/hms-video-web/src/error/ErrorFactory';
+import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
+import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
+import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
 
 let sdk: HMSSdk;
 let token: string;

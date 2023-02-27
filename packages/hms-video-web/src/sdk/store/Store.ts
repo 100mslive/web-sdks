@@ -59,7 +59,9 @@ class Store implements IStore {
   }
 
   getPublishParams() {
-    return this.getLocalPeer()?.role?.publishParams;
+    const peer = this.getLocalPeer();
+    const role = peer?.asRole || peer?.role;
+    return role?.publishParams;
   }
 
   getRoom() {
@@ -271,7 +273,8 @@ class Store implements IStore {
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
-    if (!this.simulcastEnabled) {
+    // Enable only when backend enables and source is video or screen. ignore videoplaylist
+    if (!this.simulcastEnabled || !['screen', 'regular'].includes(source)) {
       return [];
     }
     if (source === 'screen') {

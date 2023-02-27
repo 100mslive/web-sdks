@@ -14,7 +14,6 @@ import {
 
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
-import LogRocket from 'logrocket';
 import { logError } from 'zipyai';
 
 const Header = React.lazy(() => import('./components/Header'));
@@ -105,7 +104,6 @@ const App = () => {
   const getRoomDetails = async name => {
     const code = getRoomCodeFromUrl();
     if (!code) {
-      LogRocket.track('roomIdNull', window.location.pathname);
       logError('roomIdNull', '', undefined, { pathname: window.location.pathname });
       return;
     }
@@ -187,7 +185,6 @@ const App = () => {
           title: 'Something went wrong',
           body: errorMessage,
         };
-        LogRocket.track('getDetailsError', error);
         logError('getDetailsError', error.body);
         if (err.response && err.response.status === 404) {
           error = {

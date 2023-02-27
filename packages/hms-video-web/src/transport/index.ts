@@ -702,6 +702,8 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    track.isPublished = true;
+
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
@@ -805,7 +807,9 @@ export default class HMSTransport implements ITransport {
               HMSAction.JOIN,
               `Websocket join error - ${(error as Error).message}`,
             );
-      const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
+      const shouldRetry =
+        parseInt(`${hmsError.code / 100}`) === 5 ||
+        [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
 
       if (shouldRetry) {
         this.joinRetryCount = 0;
@@ -1056,7 +1060,12 @@ export default class HMSTransport implements ITransport {
   }
 
   private retryPublishIceFailedTask = async () => {
-    if (this.publishConnection && this.publishConnection.connectionState !== 'connected') {
+    /**
+     * Proceed with the retry even if the connection state is connected as the offer could have failed
+     * which will cause missing tiles if it is not sent again.
+     * Do iceRestart only if not connected
+     */
+    if (this.publishConnection) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -1064,7 +1073,7 @@ export default class HMSTransport implements ITransport {
           extra: {},
         });
       });
-      await this.performPublishRenegotiation({ iceRestart: true });
+      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
       await p;
     }
 
