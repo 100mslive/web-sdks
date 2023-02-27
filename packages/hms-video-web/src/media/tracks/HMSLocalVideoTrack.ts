@@ -1,5 +1,4 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import { VideoElementManager } from './VideoElementManager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
@@ -58,7 +57,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     settings: HMSVideoTrackSettings = new HMSVideoTrackSettingsBuilder().build(),
   ) {
     super(stream, track, source);
-    this.setVideoHandler(new VideoElementManager(this));
     stream.tracks.push(this);
     this.settings = settings;
     // Replace the 'default' or invalid deviceId with the actual deviceId
@@ -102,7 +100,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await this.replaceSender(track, value);
       this.nativeTrack?.stop();
       this.nativeTrack = track;
-      this.videoHandler?.updateSinks();
+      this.videoHandler.updateSinks();
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
@@ -232,7 +230,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     }
     this.removeOrReplaceProcessedTrack(processedTrack);
-    this.videoHandler?.updateSinks();
+    this.videoHandler.updateSinks();
   }
 
   /**
@@ -324,7 +322,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
-        this.videoHandler?.updateSinks();
+        this.videoHandler.updateSinks();
       }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {

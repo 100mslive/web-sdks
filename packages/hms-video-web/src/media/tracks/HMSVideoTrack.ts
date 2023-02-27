@@ -6,7 +6,7 @@ import HMSMediaStream from '../streams/HMSMediaStream';
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
-  videoHandler?: VideoElementManager;
+  videoHandler: VideoElementManager;
 
   /**
    * sink=video element rendering the video
@@ -19,15 +19,12 @@ export class HMSVideoTrack extends HMSTrack {
     return this.videoHandler?.getVideoElements() || [];
   }
 
-  setVideoHandler(videoHandler: VideoElementManager) {
-    this.videoHandler = videoHandler;
-  }
-
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
+    this.videoHandler = new VideoElementManager(this);
   }
 
   attach(videoElement: HTMLVideoElement) {
