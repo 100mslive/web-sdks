@@ -94,3 +94,10 @@ Handles support for custom audio and video plugins. These plugins are synonymous
 HTTP filters from the API world. They hook into the processing pipeline for audio and video
 and can modify them before they're sent to the remote peers. This allows for
 possibilities like applying filters, virtual background, noise reduction, artistic effects etc.
+
+
+## VideoElementManager
+
+Handles rendering of video track provided video elements. it keeps track of the video elements and attaches/detaches video when it
+is in view or out of view(This was earlier done in react-sdk, now moving to the core, to reduce the end user friction).
+This also handles selecting appropriate layer for remote track on resize.
