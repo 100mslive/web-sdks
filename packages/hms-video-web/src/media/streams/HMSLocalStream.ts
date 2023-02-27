@@ -60,12 +60,11 @@ export default class HMSLocalStream extends HMSMediaStream {
    * sender needs to be replaced.
    */
   async replaceSenderTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
-    // Join not called, so not connection would be created, no need to replace
-    if (!this.connection) {
-      HMSLogger.d(this.TAG, 'peer connection not established yet');
+    if (!this.connection || this.connection.connectionState === 'closed') {
+      HMSLogger.d(this.TAG, `publish connection is not initialised or closed`);
       return;
     }
-    const sender = this.connection?.getSenders().find(sender => sender.track && sender.track.id === track.id);
+    const sender = this.connection.getSenders().find(sender => sender.track && sender.track.id === track.id);
 
     if (sender === undefined) {
       HMSLogger.w(this.TAG, `No sender found for trackId=${track.id}`);

@@ -33,7 +33,7 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
-let blankCanvas: any;
+let blankCanvas: HTMLCanvasElement;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -90,15 +90,6 @@ export class LocalTrackManager {
     this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
     this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
 
-    /**
-     * concat local tracks only if both are true which means it is either join or switched from a role
-     * with no tracks earlier.
-     * the reason we need this is for preview API to work, in case of preview we want to publish the same
-     * tracks which were shown and are already part of the local peer instead of creating new ones.
-     * */
-    // if (publishConfig.publishAudio && publishConfig.publishVideo) {
-    //   return tracks.concat(localTracks);
-    // }
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
       tracksToPublish.push(videoTrack);
     }
@@ -269,8 +260,10 @@ export class LocalTrackManager {
     const height = prevTrack?.getSettings()?.height || 240;
     const frameRate = 10; // fps TODO: experiment, see if this can be reduced
     if (!blankCanvas) {
-      blankCanvas = Object.assign(document.createElement('canvas'), { width, height });
-      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
+      blankCanvas = document.createElement('canvas');
+      blankCanvas.width = width;
+      blankCanvas.height = height;
+      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
     }
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
