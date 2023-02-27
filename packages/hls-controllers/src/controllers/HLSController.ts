@@ -27,9 +27,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this._emitter = new HMSHLSControllerEventEmitter(new EventEmitter());
     this.hlsUrl = hlsUrl;
     this.videoEl = videoEl;
-    if (!videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
     }
@@ -154,9 +152,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    * @param { volume } - define volume in range [1,100]
    */
   setVolume(volume: number) {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     this.videoEl.volume = volume / 100;
     this._volume = volume;
   }
@@ -176,12 +172,12 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
   /**
    *
    * @param { ILevel } currentLevel - currentLevel we want to
-   * set the stream to. -1 for Auto
+   * set the stream to -1 for Auto
    */
   setCurrentLevel(currentLevel: ILevel) {
     if (this.hls) {
       const current = this.hls.levels.findIndex((level: Level) => {
-        return level.attrs?.RESOLUTION === currentLevel.attrs?.RESOLUTION;
+        return level?.attrs?.RESOLUTION === currentLevel?.attrs?.RESOLUTION;
       });
       this.hls.currentLevel = current;
     }
@@ -191,9 +187,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    * set current stream to Live
    */
   async seekToLivePosition() {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     this.videoEl.currentTime = this.hls?.liveSyncPosition || 0;
     if (this.videoEl.paused) {
       try {
@@ -220,15 +214,18 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    * @param seekValue Pass currentTime in second
    */
   seekTo = (seekValue: number) => {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     this.videoEl.currentTime = seekValue;
   };
-  private playVideo = async () => {
+  private validateVideoEl() {
     if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
+      const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
+      this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+      throw error;
     }
+  }
+  private playVideo = async () => {
+    this.validateVideoEl();
     try {
       if (this.videoEl.paused) {
         await this.videoEl.play();
@@ -242,11 +239,9 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     }
   };
   private pauseVideo = () => {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     try {
-      if (this.videoEl.paused) {
+      if (!this.videoEl.paused) {
         this.videoEl.pause();
       }
     } catch (error: any) {
@@ -264,9 +259,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     });
   };
   private volumeEventHandler = () => {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     this._volume = this.videoEl.volume;
   };
 
@@ -350,9 +343,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    * when the current fragment has a metadata to play.
    */
   private fragChangeHandler = (_: any, { frag }: { frag: Fragment }) => {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     try {
       if (this.videoEl.textTracks.length === 0) {
         return;
@@ -484,9 +475,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    * Listen to hlsjs and video related events
    */
   private listenHLSEvent() {
-    if (!this.videoEl) {
-      throw HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-    }
+    this.validateVideoEl();
     if (HMSHLSController.isMSESupported()) {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
