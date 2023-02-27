@@ -1,5 +1,5 @@
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
-import { HMSRemoteVideoTrack, HMSVideoTrack } from '.';
+import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import { HMSResizeObserver } from '../../utils/resize-observer';
@@ -16,7 +16,7 @@ export class VideoElementManager {
   private videoElements = new Set<HTMLVideoElement>();
   private entries = new Map<HTMLVideoElement, DOMRectReadOnly>();
 
-  constructor(private track: HMSVideoTrack) {
+  constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
     this.init();
   }
 
