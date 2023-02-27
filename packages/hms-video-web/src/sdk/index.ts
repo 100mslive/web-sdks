@@ -297,9 +297,9 @@ export class HMSSdk implements HMSInterface {
     }, 3000);
     return new Promise<void>((resolve, reject) => {
       const policyHandler = async () => {
-        if (config.asRole) {
-          const newRole = this.store.getPolicyForRole(config.asRole);
-          newRole && this.localPeer?.updateRole(newRole);
+        if (this.localPeer) {
+          const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+          this.localPeer.asRole = newRole || this.localPeer.role;
         }
         const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
@@ -382,7 +382,7 @@ export class HMSSdk implements HMSInterface {
 
     const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
-    const previewRole = this.localPeer?.role?.name;
+    const previewRole = this.localPeer?.asRole?.name || this.localPeer?.role?.name;
     this.networkTestManager?.stop();
     this.listener = listener;
     this.commonSetup(config, roomId, listener);
@@ -399,6 +399,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.role = this.store.getPolicyForRole(role);
       this.localPeer.customerUserId = userId;
       this.localPeer.metadata = config.metaData;
+      delete this.localPeer.asRole;
     }
 
     this.roleChangeManager = new RoleChangeManager(
@@ -469,7 +470,7 @@ export class HMSSdk implements HMSInterface {
     this.store.cleanUp();
     this.listener = undefined;
     if (this.roleChangeManager) {
-      this.eventBus.localRoleUpdate.unsubscribe(this.roleChangeManager.handleLocalPeerRoleUpdate);
+      this.eventBus.localRoleUpdate.unsubscribe(this.handleLocalRoleUpdate);
     }
   }
 
@@ -642,23 +643,21 @@ export class HMSSdk implements HMSInterface {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsTrack, this.localPeer!);
   }
 
-  async removeTrack(trackId: string) {
+  async removeTrack(trackId: string, internal = false) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot removeTrack');
     }
     const trackIndex = this.localPeer.auxiliaryTracks.findIndex(t => t.trackId === trackId);
     if (trackIndex > -1) {
       const track = this.localPeer.auxiliaryTracks[trackIndex];
-      if (track.publishedTrackId) {
+      if (track.isPublished) {
         await this.transport!.unpublish([track]);
       } else {
         await track.cleanup();
       }
       // Stop local playback when playlist track is removed
-      if (track.source === 'audioplaylist') {
-        this.playlistManager.stop(HMSPlaylistType.audio);
-      } else if (track.source === 'videoplaylist') {
-        this.playlistManager.stop(HMSPlaylistType.video);
+      if (!internal) {
+        this.stopPlaylist(track);
       }
       this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
@@ -853,7 +852,7 @@ export class HMSSdk implements HMSInterface {
       const publishAction =
         oldRole && oldRole !== this.localPeer?.role?.name
           ? () =>
-              this.roleChangeManager?.handleLocalPeerRoleUpdate({
+              this.roleChangeManager?.diffRolesAndPublishTracks({
                 oldRole: this.store.getPolicyForRole(oldRole),
                 newRole: this.localPeer!.role!,
               })
@@ -975,7 +974,7 @@ export class HMSSdk implements HMSInterface {
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
-    this.createAndAddLocalPeerToStore(config, config.asRole || role, userId);
+    this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
     HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 
@@ -1014,13 +1013,16 @@ export class HMSSdk implements HMSInterface {
    * @param {string} role
    * @param {string} userId
    */
-  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string) {
+  private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string, asRole?: string) {
     const policy = this.store.getPolicyForRole(role);
+    const asRolePolicy = asRole ? this.store.getPolicyForRole(asRole) : undefined;
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
       customerUserId: userId,
       metadata: config.metaData || '',
       role: policy,
+      // default value is the original role if user didn't pass asRole in config
+      asRole: asRolePolicy || policy,
     });
 
     this.store.addPeer(localPeer);
@@ -1130,4 +1132,12 @@ export class HMSSdk implements HMSInterface {
   private sendAnalyticsEvent = (event: AnalyticsEvent) => {
     this.analyticsEventsService.queue(event).flush();
   };
+
+  private stopPlaylist(track: HMSLocalTrack) {
+    if (track.source === 'audioplaylist') {
+      this.playlistManager.stop(HMSPlaylistType.audio);
+    } else if (track.source === 'videoplaylist') {
+      this.playlistManager.stop(HMSPlaylistType.video);
+    }
+  }
 }

@@ -70,7 +70,11 @@ export default class HMSLocalStream extends HMSMediaStream {
    * sender needs to be replaced.
    */
   async replaceSenderTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
-    const sender = this.connection?.getSenders().find(sender => sender.track && sender.track!.id === track.id);
+    if (!this.connection || this.connection.connectionState === 'closed') {
+      HMSLogger.d(this.TAG, `publish connection is not initialised or closed`);
+      return;
+    }
+    const sender = this.connection.getSenders().find(sender => sender.track && sender.track.id === track.id);
 
     if (sender === undefined) {
       HMSLogger.w(this.TAG, `No sender found for trackId=${track.id}`);
@@ -81,7 +85,7 @@ export default class HMSLocalStream extends HMSMediaStream {
 
   removeSender(track: HMSLocalTrack) {
     let removedSenderCount = 0;
-    this.connection!.getSenders().forEach(sender => {
+    this.connection?.getSenders().forEach(sender => {
       if (sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent()) {
         this.connection!.removeTrack(sender);
         removedSenderCount += 1;
@@ -98,6 +102,12 @@ export default class HMSLocalStream extends HMSMediaStream {
     if (removedSenderCount !== 1) {
       HMSLogger.e(this.TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
     }
+  }
+
+  hasSender(track: HMSLocalTrack): boolean {
+    return !!this.connection
+      ?.getSenders()
+      .find(sender => sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent());
   }
 
   trackUpdate(track: HMSLocalTrack) {

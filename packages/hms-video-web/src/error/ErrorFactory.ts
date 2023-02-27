@@ -282,6 +282,7 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to set answer. `,
         description,
+        true,
       );
     },
 
