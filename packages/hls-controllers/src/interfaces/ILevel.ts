@@ -8,9 +8,6 @@ export declare interface ILevel extends Partial<LevelParsed> {
   readonly name: string | undefined;
   readonly width?: number;
   readonly level?: number;
-  readonly videoCodec: string | undefined;
-  readonly audioCodec: string | undefined;
-  readonly unknownCodecs: string[] | undefined;
   url: string;
 }
 

@@ -30,13 +30,10 @@ export const mapLevels = (qualityLevel: Level[] | LevelParsed[]): ILevel[] => {
 export const mapLevel = (qualityLevel: Level | LevelParsed): ILevel => {
   const level = {
     attrs: qualityLevel.attrs,
-    audioCodec: qualityLevel.audioCodec,
     bitrate: qualityLevel.bitrate,
     height: qualityLevel.height,
     id: qualityLevel.id,
-    unknownCodecs: qualityLevel.unknownCodecs,
     url: qualityLevel.url[0],
-    videoCodec: qualityLevel.videoCodec,
     width: qualityLevel.width,
     name: qualityLevel.name || '',
     level: 'level' in qualityLevel ? qualityLevel.level : undefined,

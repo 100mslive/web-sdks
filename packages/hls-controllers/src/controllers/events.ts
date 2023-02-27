@@ -1,6 +1,7 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import { HMSHLSException } from '../error/HMSHLSException';
 import { ILevel } from '../interfaces/ILevel';
-import { HMSHLSControllerEvents } from '../utilies/constants';
+import { HMSHLSControllerEvents, HMSHLSPlaybackState } from '../utilies/constants';
 
 export interface HMSHLSControllerListeners {
   [HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE]: (
@@ -11,9 +12,12 @@ export interface HMSHLSControllerListeners {
     event: HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED,
     data: HLSTimedMetadataPayload,
   ) => void;
+  [HMSHLSControllerEvents.HLS_PLAYBACK_STATE]: (
+    event: HMSHLSControllerEvents.HLS_PLAYBACK_STATE,
+    data: HLSPlaybackState,
+  ) => void;
 
-  [HMSHLSControllerEvents.HLS_PLAY]: (event: HMSHLSControllerEvents.HLS_PLAY, data: boolean) => void;
-  [HMSHLSControllerEvents.HLS_PAUSE]: (event: HMSHLSControllerEvents.HLS_PAUSE, data: boolean) => void;
+  [HMSHLSControllerEvents.HLS_ERROR]: (event: HMSHLSControllerEvents.HLS_ERROR, data: HMSHLSException) => void;
   [HMSHLSControllerEvents.HLS_CURRENT_TIME]: (event: HMSHLSControllerEvents.HLS_CURRENT_TIME, data: number) => void;
   [HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED]: (
     event: HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED,
@@ -33,6 +37,9 @@ export interface HMSHLSControllerListeners {
 
 export interface HLSStreamLive {
   isLive: boolean;
+}
+export interface HLSPlaybackState {
+  state: HMSHLSPlaybackState;
 }
 export interface HLSTimedMetadataPayload {
   payload: string;

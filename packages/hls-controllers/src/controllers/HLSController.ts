@@ -5,7 +5,12 @@ import { HMSHLSControllerEventEmitter, HMSHLSControllerListeners, IHMSHLSControl
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import IHMSHLSController from '../interfaces/IHLSController';
 import { ILevel } from '../interfaces/ILevel';
-import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HMSHLSControllerEvents, IS_OPTIMIZED } from '../utilies/constants';
+import {
+  HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY,
+  HMSHLSControllerEvents,
+  HMSHLSPlaybackState,
+  IS_OPTIMIZED,
+} from '../utilies/constants';
 import { mapLevel, mapLevels, metadataPayloadParser } from '../utilies/utils';
 
 export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEventEmitter {
@@ -249,10 +254,14 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     }
   };
   private playEventHandler = () => {
-    this.trigger(HMSHLSControllerEvents.HLS_PLAY, true);
+    this.trigger(HMSHLSControllerEvents.HLS_PLAYBACK_STATE, {
+      state: HMSHLSPlaybackState.play,
+    });
   };
   private pauseEventHandler = () => {
-    this.trigger(HMSHLSControllerEvents.HLS_PAUSE, true);
+    this.trigger(HMSHLSControllerEvents.HLS_PLAYBACK_STATE, {
+      state: HMSHLSPlaybackState.pause,
+    });
   };
   private volumeEventHandler = () => {
     if (!this.videoEl) {
@@ -263,60 +272,60 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
 
   private handleNetworkRelatedError = (data: ErrorData) => {
     const details = data.error?.message || data.err?.message || '';
+    const detail = {
+      details: details,
+      fatal: data.fatal,
+    };
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
-        throw HMSHLSErrorFactory.HLSNetworkError.manifestLoadError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
-        throw HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
-        throw HMSHLSErrorFactory.HLSNetworkError.levelLoadError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       default: {
-        throw HMSHLSErrorFactory.UnknownError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.UnknownError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
     }
   };
   private handleHLSException = (_: any, data: ErrorData) => {
     const details = data.error?.message || data.err?.message || '';
     this.handleNetworkRelatedError(data);
+    const detail = {
+      details: details,
+      fatal: data.fatal,
+    };
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
-        throw HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
-        throw HMSHLSErrorFactory.HLSMediaError.fragDecryptError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSMediaError.fragDecryptError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
-        throw HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
       default: {
-        throw HMSHLSErrorFactory.UnknownError({
-          details: details,
-          fatal: data.fatal,
-        });
+        const error = HMSHLSErrorFactory.UnknownError(detail);
+        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
+        throw error;
       }
     }
   };

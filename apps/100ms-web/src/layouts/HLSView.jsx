@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import { HMSHLSController } from "@100mslive/hls-controllers";
+import {
+  HMSHLSController,
+  HMSHLSPlaybackState,
+} from "@100mslive/hls-controllers";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -69,8 +72,11 @@ const HLSView = () => {
       setIsVideoLive(isLive);
     };
 
-    const playEventHandler = (_, data) => setIsPaused(!data);
-    const pauseEventHandler = (_, data) => setIsPaused(data);
+    const playbackEventHandler = (_, data) =>
+      data.state === HMSHLSPlaybackState.pause
+        ? setIsPaused(true)
+        : setIsPaused(false);
+
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
     if (videoEl && hlsUrl) {
       hlsController = new HMSHLSController(hlsUrl, videoEl);
@@ -82,8 +88,10 @@ const HLSView = () => {
         HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController.on(HMSHLSController.Events.HLS_PLAY, playEventHandler);
-      hlsController.on(HMSHLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController.on(
+        HMSHLSController.Events.HLS_PLAYBACK_STATE,
+        playbackEventHandler
+      );
       hlsController.on(
         HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
         handleAutoplayBlock
@@ -115,8 +123,10 @@ const HLSView = () => {
         HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController?.off(HMSHLSController.Events.HLS_PLAY, playEventHandler);
-      hlsController?.off(HMSHLSController.Events.HLS_PAUSE, pauseEventHandler);
+      hlsController?.off(
+        HMSHLSController.Events.HLS_PLAYBACK_STATE,
+        playbackEventHandler
+      );
       hlsController?.off(
         HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
         handleAutoplayBlock
