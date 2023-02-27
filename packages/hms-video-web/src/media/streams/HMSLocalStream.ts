@@ -66,7 +66,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     HMSLogger.d(
       this.TAG,
       'Native stream tracks after replace',
-      this.nativeStream.getAudioTracks(),
+      this.nativeStream.getAudioTracks().map(stringifyMediaStreamTrack),
       `prev Track - ${stringifyMediaStreamTrack(track)}`,
       `new Track - ${stringifyMediaStreamTrack(withTrack)}`,
     );
