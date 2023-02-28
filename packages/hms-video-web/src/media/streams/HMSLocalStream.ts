@@ -1,6 +1,7 @@
 import HMSMediaStream from './HMSMediaStream';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { SimulcastLayer } from '../../interfaces';
+import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
@@ -62,6 +63,13 @@ export default class HMSLocalStream extends HMSMediaStream {
   replaceStreamTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
     this.nativeStream.addTrack(withTrack);
     this.nativeStream.removeTrack(track);
+    HMSLogger.d(
+      this.TAG,
+      'Native stream tracks after replace',
+      this.nativeStream.getAudioTracks().map(stringifyMediaStreamTrack),
+      `prev Track - ${stringifyMediaStreamTrack(track)}`,
+      `new Track - ${stringifyMediaStreamTrack(withTrack)}`,
+    );
   }
 
   /**
