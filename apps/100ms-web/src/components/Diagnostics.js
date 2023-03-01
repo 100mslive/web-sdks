@@ -1,7 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
-import { HMSDiagnostics } from "@100mslive/hms-diagnostics";
+import {
+  HMSDiagnostics,
+  TrackAudioLevelMonitor,
+} from "@100mslive/hms-diagnostics";
 import { v4 } from "uuid";
 import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
 import {
@@ -9,6 +18,7 @@ import {
   Flex,
   StyledVideo,
   Text,
+  useTheme,
   VerticalDivider,
 } from "@100mslive/react-ui";
 import { Logo } from "./Header/HeaderComponents";
@@ -82,37 +92,95 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
   );
 };
 
-const VideoTile = React.memo(({ track }) => {
-  const videoRef = useRef();
+const sigmoid = z => {
+  return 1 / (1 + Math.exp(-z));
+};
+
+const AUDIO_LEVEL_THRESHOLD = 35;
+
+function useAudioLevelStyles(track, ref) {
+  const audioLevelMonitor = useRef(null);
+  const { theme } = useTheme();
+  const color = theme.colors.brandDefault.value;
+  const getStyle = useCallback(
+    level => {
+      const style = {
+        transition: "box-shadow 0.4s ease-in-out",
+      };
+      style["box-shadow"] = level
+        ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${
+            16 * sigmoid(level)
+          }px ${color}`
+        : "";
+      return style;
+    },
+    [color]
+  );
 
   useEffect(() => {
     if (track) {
+      audioLevelMonitor.current = new TrackAudioLevelMonitor(track, level => {
+        if (!ref.current) {
+          return;
+        }
+        level = level > AUDIO_LEVEL_THRESHOLD ? level : 0;
+
+        const styles = getStyle(level);
+        for (const key in styles) {
+          ref.current.style[key] = styles[key];
+        }
+      });
+      audioLevelMonitor.current.start();
+    }
+
+    return () => {
+      audioLevelMonitor.current?.stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [track]);
+}
+
+const VideoTile = React.memo(({ videoTrack, audioTrack }) => {
+  const videoRef = useRef();
+  useAudioLevelStyles(audioTrack, videoRef);
+
+  useEffect(() => {
+    if (videoTrack) {
       const videoElement = videoRef.current;
       const srcObject = videoElement.srcObject;
       if (srcObject !== null && srcObject instanceof MediaStream) {
         const existingTrackID = srcObject.getVideoTracks()[0]?.id;
-        if (existingTrackID === track.id) {
+        if (existingTrackID === videoTrack.id) {
           // it's already attached, attaching again would just cause flickering
           return;
         }
       }
-      videoElement.srcObject = new MediaStream([track]);
+      videoElement.srcObject = new MediaStream([videoTrack]);
     }
-  }, [track]);
+  }, [videoTrack]);
 
   return (
     <Flex direction="column" css={{ w: "60%" }}>
-      <StyledVideo
-        autoPlay
-        muted
-        playsInline
-        controls={false}
-        ref={videoRef}
-        mirror={true}
-      />
-      <Text css={{ textAlign: "center", my: "$3" }}>
-        Camera Used: {track.label}
-      </Text>
+      {videoTrack && (
+        <>
+          <StyledVideo
+            autoPlay
+            muted
+            playsInline
+            controls={false}
+            ref={videoRef}
+            mirror={true}
+          />
+          <Text css={{ textAlign: "center", mb: "$3", mt: "$10" }}>
+            Camera Used: {videoTrack.label}
+          </Text>
+        </>
+      )}
+      {audioTrack && (
+        <Text css={{ textAlign: "center", my: "$3" }}>
+          Microphone Used: {audioTrack.label}
+        </Text>
+      )}
     </Flex>
   );
 });
@@ -228,8 +296,7 @@ const Diagnostics = () => {
               alignItems: "center",
             }}
           >
-            {videoTrack && <VideoTile track={videoTrack} />}
-            {audioTrack && <Text>Microphone Used: {audioTrack.label}</Text>}
+            <VideoTile videoTrack={videoTrack} audioTrack={audioTrack} />
           </Flex>
         </Flex>
       )}

@@ -26,6 +26,8 @@ const descriptionForPath: Record<string, string> = {
   'devices.microphone': 'Verifies if the microphone works properly',
 };
 
+export { TrackAudioLevelMonitor } from '@100mslive/hms-video';
+
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
   private listener?: HMSDiagnosticUpdateListener;
