@@ -59,6 +59,7 @@ describe('videoElementManager', () => {
     localTrack.attach(localVideoElement);
     expect(localTrack.getSinks().length).toBe(1);
     localTrack.attach(localVideoElement);
+    // same element should not update sinks
     expect(localTrack.getSinks().length).toBe(1);
     localTrack.attach(document.createElement('video'));
     expect(localTrack.getSinks().length).toBe(2);
@@ -72,6 +73,7 @@ describe('videoElementManager', () => {
     remoteTrack.attach(remoteVideoElement);
     expect(remoteTrack.getSinks().length).toBe(1);
     remoteTrack.attach(remoteVideoElement);
+    // same element should not update sinks
     expect(remoteTrack.getSinks().length).toBe(1);
     remoteTrack.attach(document.createElement('video'));
     expect(remoteTrack.getSinks().length).toBe(2);
