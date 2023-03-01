@@ -8,17 +8,22 @@ export const layerToIntMapping = {
 };
 const DELTA_THRESHOLD = 0.5;
 
+/**
+ * Given the simulcast layers and the current video element dimensions, this function finds the
+ * layer with dimensions closer to the video element dimensions.
+ */
 export const getClosestLayer = (
   simulcastLayers: HMSSimulcastLayerDefinition[],
-  videoResolution: { width: number; height: number },
+  videoElementDimensions: { width: number; height: number },
 ): HMSPreferredSimulcastLayer => {
   let closestLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
-  const maxDimension = videoResolution.width >= videoResolution.height ? 'width' : 'height';
+  const maxDimension = videoElementDimensions.width >= videoElementDimensions.height ? 'width' : 'height';
   const layers = [...simulcastLayers].sort((a, b) => layerToIntMapping[a.layer] - layerToIntMapping[b.layer]);
-  const videoDimesion = videoResolution[maxDimension];
+  const videoDimesion = videoElementDimensions[maxDimension];
   for (let i = 0; i < layers.length; i++) {
     const { resolution, layer } = layers[i];
     const layerDimension = resolution[maxDimension];
+    // we break here because the layers are already sorted, the next would always be greater if the below condition satisifes
     if (videoDimesion <= layerDimension) {
       closestLayer = layer;
       break;
