@@ -86,6 +86,9 @@ class RemoteAudioLevels {
     }
     const analyserNode = this.analysers[stream.id];
     const level = this.calculateAudioLevel(analyserNode);
+    if (level === 0) {
+      return;
+    }
     console.log(`audio level for ${peer.name} is ${level}`);
     if (window.__triggerBeamEvent__) {
       const payload = {
