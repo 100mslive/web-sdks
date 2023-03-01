@@ -125,15 +125,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     event: E,
     eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
   ): boolean {
-    try {
-      return this.emit(event, event, eventObject);
-    } catch (e: any) {
-      console.error(
-        `An internal error happened while handling event ${event}. Error message: "${e.message}". Here is a stacktrace:`,
-        e,
-      );
-    }
-    return false;
+    return this.emit(event, event, eventObject);
   }
   /**
    * get if is video stream is live
