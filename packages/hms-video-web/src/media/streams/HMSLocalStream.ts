@@ -21,7 +21,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
       trackEncodings.push(...simulcastLayers);
     } else {
-      trackEncodings.push(this.getEncodingsWithBitrateAndFramerate(track));
+      trackEncodings.push({ active: track.enabled });
     }
 
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
@@ -29,36 +29,9 @@ export default class HMSLocalStream extends HMSMediaStream {
       direction: 'sendonly',
       sendEncodings: trackEncodings,
     });
-    // await this.setMaxBitrateAndFramerate(transceiver, track);
+    await this.setParameters(track, transceiver);
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
   }
-
-  /* async setMaxBitrateAndFramerate(transceiver: RTCRtpTransceiver, track: HMSLocalTrack) {
-    const maxBitrate = track.settings.maxBitrate;
-    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
-    const sender = transceiver.sender;
-    const params = sender.getParameters();
-    if (params.encodings.length === 0) {
-      return;
-    }
-
-    if (maxBitrate) {
-      params.encodings[0].maxBitrate = maxBitrate * 1000;
-    }
-    // @ts-ignore
-    params.encodings[0].maxFramerate = maxFramerate;
-    try {
-      await sender.setParameters(params);
-      HMSLogger.d(
-        this.TAG,
-        `Setting maxBitrate=${maxBitrate} kpbs`,
-        `${maxFramerate ? `maxFramerate=${maxFramerate}` : ''}`,
-        `for ${track.source} ${track.type} ${track.trackId}`,
-      );
-    } catch (error) {
-      HMSLogger.w(this.TAG, 'Failed setting maxBitrate and maxFramerate', error);
-    }
-  } */
 
   // @ts-ignore
   setPreferredCodec(_transceiver: RTCRtpTransceiver, _kind: string) {
@@ -136,18 +109,17 @@ export default class HMSLocalStream extends HMSMediaStream {
     this.connection?.trackUpdate(track);
   }
 
-  private getEncodingsWithBitrateAndFramerate(track: HMSLocalTrack) {
-    const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-    if (!isNode) {
-      if (track.settings.maxBitrate) {
-        console.error(track.settings.maxBitrate);
-        encodings.maxBitrate = track.settings.maxBitrate * 1000;
-      }
-      if (track instanceof HMSLocalVideoTrack && track.settings.maxFramerate) {
-        //@ts-ignore
-        encodings.maxFramerate = track.settings.maxFramerate;
-      }
+  private async setParameters(track: HMSLocalTrack, transceiver: RTCRtpTransceiver) {
+    const params = transceiver.sender.getParameters();
+    if (isNode || params.encodings.length > 1) {
+      return;
     }
-    return encodings;
+    if (track.settings.maxBitrate) {
+      params.encodings[0].maxBitrate = track.settings.maxBitrate * 1000;
+    }
+    //@ts-ignore
+    params.encodings[0].maxFrameRate = track.settings.maxFrameRate;
+    params.degradationPreference = track.source === 'screen' ? 'maintain-framerate' : 'maintain-resolution';
+    await transceiver.sender.setParameters(params);
   }
 }
