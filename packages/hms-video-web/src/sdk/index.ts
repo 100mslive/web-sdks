@@ -1129,7 +1129,7 @@ export class HMSSdk implements HMSInterface {
     const builder = new HMSVideoTrackSettingsBuilder()
       .maxBitrate(
         source === 'videoplaylist'
-          ? 700
+          ? 1000
           : source === 'screen'
           ? publishParams?.screen.bitRate
           : publishParams?.video.bitRate,
