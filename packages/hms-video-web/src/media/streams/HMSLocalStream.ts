@@ -120,6 +120,15 @@ export default class HMSLocalStream extends HMSMediaStream {
     //@ts-ignore
     params.encodings[0].maxFrameRate = track.settings.maxFrameRate;
     params.degradationPreference = track.source === 'screen' ? 'maintain-framerate' : 'maintain-resolution';
-    await transceiver.sender.setParameters(params);
+    try {
+      await transceiver.sender.setParameters(params);
+    } catch (error) {
+      HMSLogger.w(
+        this.TAG,
+        'error setting parameters on transceiver for track -',
+        `${track}`,
+        (error as Error).message,
+      );
+    }
   }
 }
