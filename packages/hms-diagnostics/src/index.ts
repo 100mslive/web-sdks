@@ -15,6 +15,17 @@ import type { ConnectivityKeys, HMSDiagnosticsConfig } from './interfaces';
 import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
 import { DEFAULT_DIAGNOSTICS_USERNAME, PROD_INIT_ENDPOINT } from './utils';
 
+const descriptionForPath: Record<string, string> = {
+  'connectivity.init':
+    'Verifies connectivity to Init API which provides preliminary data about the session such as cluster, media servers, etc.',
+  'connectivity.websocket': 'Verifies the bidirectional connectivity to 100ms server for essential communication',
+  webRTC: 'Verifies if browser is WebRTC compatible and has the related necessary interfaces',
+  devices:
+    'Verifies if the app is used under secure context(HTTPS) and the browser navigator has access camera/microphone fetching interfaces',
+  'devices.camera': 'Verifies if the camera works properly',
+  'devices.microphone': 'Verifies if the microphone works properly',
+};
+
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
   private listener?: HMSDiagnosticUpdateListener;
@@ -223,20 +234,32 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     return initConfig;
   }
 
+  private getDescriptionForPath(path: string) {
+    if (path.includes('turn') || path.includes('stun')) {
+      return 'Verifies connectivity to 100ms media server';
+    }
+    return descriptionForPath[path];
+  }
+
   private updateStatus({
     path,
     id = path,
     success = true,
-    errorMessage = '',
+    errorMessage,
+    description,
     info,
   }: {
     path: string;
     id?: string;
     success?: boolean;
     errorMessage?: string;
+    description?: string;
     info?: Record<string, any>;
   }) {
+    if (!description) {
+      description = this.getDescriptionForPath(path);
+    }
     setInObject(this.result, path, { success, errorMessage, info });
-    this.listener?.onUpdate({ id, success, errorMessage, info }, path);
+    this.listener?.onUpdate({ id, success, errorMessage, info, description }, path);
   }
 }
