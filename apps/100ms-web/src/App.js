@@ -14,6 +14,7 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, HMSThemeProvider } from "@100mslive/react-ui";
 import { AppData } from "./components/AppData/AppData.jsx";
+import { RemoteAudioLevels } from "./components/AudioLevel/RemoteAudioLevels";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import FullPageProgress from "./components/FullPageProgress";
@@ -248,6 +249,7 @@ function AppRoutes({ getUserToken, getDetails }) {
       <Confetti />
       <RemoteStopScreenshare />
       <KeyboardHandler />
+      <RemoteAudioLevels />
       <Routes>
         <Route
           path="/*"
