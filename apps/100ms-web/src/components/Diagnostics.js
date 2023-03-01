@@ -60,14 +60,14 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
       </Accordion.Header>
       <Accordion.Content>
         <Flex direction="column" css={{ overflowX: "auto" }}>
-          {properties.errorMessage && (
-            <Text variant="body" css={{ my: "$4" }}>
-              Error: {properties.errorMessage}
-            </Text>
-          )}
           {properties.description && (
             <Text variant="body" css={{ my: "$4" }}>
               {properties.description}
+            </Text>
+          )}
+          {properties.errorMessage && (
+            <Text variant="body" css={{ my: "$4" }}>
+              Error: {properties.errorMessage}
             </Text>
           )}
           {properties.info && (

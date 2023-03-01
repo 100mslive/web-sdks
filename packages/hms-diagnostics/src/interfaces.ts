@@ -2,7 +2,7 @@ export interface HMSDiagnosticsOutputValue {
   id: string;
   success: boolean | null;
   errorMessage?: string;
-  description: string;
+  description?: string;
   info?: Record<string, any>;
 }
 
