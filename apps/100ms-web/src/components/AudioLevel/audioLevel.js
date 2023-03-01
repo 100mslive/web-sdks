@@ -94,7 +94,7 @@ class RemoteAudioLevels {
       const payload = {
         event: "app-audio-level",
         data: {
-          peerId: peer.peerId,
+          peerId: peer.id,
           peerName: peer.name,
           level,
         },
