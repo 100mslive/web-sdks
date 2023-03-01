@@ -165,12 +165,12 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       this.updateStatus({
         path: 'devices.camera',
         info: {
+          videoTrack,
           deviceId: settings.deviceId,
           groupId: settings.groupId,
           label: videoTrack.label,
         },
       });
-      videoTrack.stop();
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
       this.updateStatus({
@@ -190,12 +190,12 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       this.updateStatus({
         path: 'devices.microphone',
         info: {
+          audioTrack,
           deviceId: settings.deviceId,
           groupId: settings.groupId,
           label: audioTrack.label,
         },
       });
-      audioTrack.stop();
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
       this.updateStatus({

@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
 import { HMSDiagnostics } from "@100mslive/hms-diagnostics";
 import { v4 } from "uuid";
 import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
-import { Accordion, Flex, Text, VerticalDivider } from "@100mslive/react-ui";
+import {
+  Accordion,
+  Flex,
+  StyledVideo,
+  Text,
+  VerticalDivider,
+} from "@100mslive/react-ui";
 import { Logo } from "./Header/HeaderComponents";
 import { ErrorDialog } from "../primitives/DialogContent";
 import FullPageProgress from "./FullPageProgress";
@@ -76,6 +82,41 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
   );
 };
 
+const VideoTile = React.memo(({ track }) => {
+  const videoRef = useRef();
+
+  useEffect(() => {
+    if (track) {
+      const videoElement = videoRef.current;
+      const srcObject = videoElement.srcObject;
+      if (srcObject !== null && srcObject instanceof MediaStream) {
+        const existingTrackID = srcObject.getVideoTracks()[0]?.id;
+        if (existingTrackID === track.id) {
+          // it's already attached, attaching again would just cause flickering
+          return;
+        }
+      }
+      videoElement.srcObject = new MediaStream([track]);
+    }
+  }, [track]);
+
+  return (
+    <Flex direction="column" css={{ w: "60%" }}>
+      <StyledVideo
+        autoPlay
+        muted
+        playsInline
+        controls={false}
+        ref={videoRef}
+        mirror={true}
+      />
+      <Text css={{ textAlign: "center", my: "$3" }}>
+        Camera Used: {track.label}
+      </Text>
+    </Flex>
+  );
+});
+
 const Header = () => {
   return (
     <Flex css={{ p: "$8" }}>
@@ -136,7 +177,16 @@ const Diagnostics = () => {
     }
   }, [token]);
 
-  useEffect(() => console.log(result), [result]);
+  const videoTrack = useMemo(
+    () => result.find(item => item.title.includes("camera"))?.info.videoTrack,
+    [result]
+  );
+
+  const audioTrack = useMemo(
+    () =>
+      result.find(item => item.title.includes("microphone"))?.info.audioTrack,
+    [result]
+  );
 
   if (error.title) {
     return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;
@@ -150,18 +200,15 @@ const Diagnostics = () => {
     <Flex direction="column" css={{ size: "100%", overflowY: "auto" }}>
       <Header />
       {result && (
-        <Flex
-          direction={{ "@md": "column" }}
-          css={{
-            w: "50%",
-            m: "$8",
-          }}
-        >
+        <Flex>
           <Accordion.Root
             type="single"
             defaultValue="WebRTC"
             collapsible
-            css={{ w: "100%" }}
+            css={{
+              w: "40%",
+              m: "$8",
+            }}
           >
             {result.map(item => {
               return (
@@ -173,6 +220,17 @@ const Diagnostics = () => {
               );
             })}
           </Accordion.Root>
+          <Flex
+            direction="column"
+            css={{
+              width: "60%",
+              pt: "$20",
+              alignItems: "center",
+            }}
+          >
+            {videoTrack && <VideoTile track={videoTrack} />}
+            {audioTrack && <Text>Microphone Used: {audioTrack.label}</Text>}
+          </Flex>
         </Flex>
       )}
     </Flex>
