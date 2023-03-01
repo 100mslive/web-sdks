@@ -22,18 +22,18 @@ export class TrackAudioLevelMonitor {
   private analyserNode?: AnalyserNode;
   private isMonitored = false;
   /** Frequency of polling audio level from track */
-  private interval = 100;
   /** Store past audio levels for this duration */
   private historyInterval = 700;
   private history = new Queue<number>(this.historyInterval / this.interval);
 
   constructor(
-    private track: HMSLocalAudioTrack,
-    private audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>,
-    private silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
+    private track: MediaStreamTrack,
+    private onAudioLevel: (audioLevel: number) => void,
+    private onSilence?: () => void,
+    private interval = 100,
   ) {
     try {
-      const stream = new MediaStream([this.track.nativeTrack]);
+      const stream = new MediaStream([this.track]);
       this.analyserNode = this.createAnalyserNodeForStream(stream);
     } catch (ex) {
       HMSLogger.w(this.TAG, 'Unable to initialize AudioContext', ex);
@@ -56,7 +56,7 @@ export class TrackAudioLevelMonitor {
         if (this.isSilentThisInstant()) {
           silenceCounter++;
           if (silenceCounter > tickThreshold) {
-            this.silenceEvent.publish({ track: this.track });
+            this.onSilence?.();
             break;
           }
         } else {
@@ -93,12 +93,10 @@ export class TrackAudioLevelMonitor {
   }
 
   private sendAudioLevel(audioLevel = 0) {
-    audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
     const isSignificantChange = Math.abs(this.audioLevel - audioLevel) > UPDATE_THRESHOLD;
     if (isSignificantChange) {
       this.audioLevel = audioLevel;
-      const audioLevelUpdate: ITrackAudioLevelUpdate = { track: this.track, audioLevel: this.audioLevel };
-      this.audioLevelEvent.publish(audioLevelUpdate);
+      this.onAudioLevel(this.audioLevel);
     }
   }
 
@@ -149,5 +147,25 @@ export class TrackAudioLevelMonitor {
     const source = audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
     return analyser;
+  }
+}
+
+export class HMSTrackAudioLevelMonitor extends TrackAudioLevelMonitor {
+  constructor(
+    track: HMSLocalAudioTrack,
+    audioLevelEvent: HMSInternalEvent<ITrackAudioLevelUpdate>,
+    silenceEvent: HMSInternalEvent<{ track: HMSLocalAudioTrack }>,
+  ) {
+    const onAudioLevel = (audioLevel: number) => {
+      audioLevel = audioLevel > THRESHOLD ? audioLevel : 0;
+      const audioLevelUpdate: ITrackAudioLevelUpdate = { track, audioLevel };
+      audioLevelEvent.publish(audioLevelUpdate);
+    };
+
+    const onSilence = () => {
+      silenceEvent.publish({ track });
+    };
+
+    super(track.nativeTrack, onAudioLevel, onSilence);
   }
 }

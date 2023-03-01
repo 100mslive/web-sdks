@@ -8,7 +8,7 @@ import { HMSAudioPluginsManager } from '../../plugins/audio';
 import HMSLogger from '../../utils/logger';
 import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
-import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
+import { HMSTrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 
@@ -24,7 +24,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
 
-  audioLevelMonitor?: TrackAudioLevelMonitor;
+  audioLevelMonitor?: HMSTrackAudioLevelMonitor;
 
   /**
    * see the doc in HMSLocalVideoTrack
@@ -186,7 +186,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.destroyAudioLevelMonitor();
     }
     HMSLogger.d(this.TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
-    this.audioLevelMonitor = new TrackAudioLevelMonitor(
+    this.audioLevelMonitor = new HMSTrackAudioLevelMonitor(
       this,
       this.eventBus.trackAudioLevelUpdate,
       this.eventBus.localAudioSilence,
