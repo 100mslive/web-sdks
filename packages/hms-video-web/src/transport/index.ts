@@ -683,7 +683,7 @@ export default class HMSTransport implements ITransport {
     const stream = track.stream as HMSLocalStream;
     stream.setConnection(this.publishConnection!);
     const simulcastLayers = this.store.getSimulcastLayers(track.source!);
-    stream.addTransceiver(track, simulcastLayers);
+    await stream.addTransceiver(track, simulcastLayers);
     HMSLogger.time(`publish-${track.trackId}-${track.type}`);
     await p;
     HMSLogger.timeEnd(`publish-${track.trackId}-${track.type}`);
