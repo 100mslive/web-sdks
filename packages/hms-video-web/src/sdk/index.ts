@@ -1138,7 +1138,6 @@ export class HMSSdk implements HMSInterface {
       .setWidth(settings.width)
       .setHeight(settings.height)
       .codec(publishParams?.video.codec as HMSVideoCodec);
-    console.log(track.getConstraints());
     return builder.build();
   }
 }
