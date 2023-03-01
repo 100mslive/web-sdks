@@ -56,6 +56,7 @@ export class RoomUpdateManager {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     if (!room) {
+      HMSLogger.w(this.TAG, 'on room state - room not present');
       return;
     }
 
@@ -96,6 +97,7 @@ export class RoomUpdateManager {
     }
     const room = this.store.getRoom();
     if (!room) {
+      HMSLogger.w(this.TAG, 'on hls - room not present');
       return;
     }
 
@@ -149,6 +151,7 @@ export class RoomUpdateManager {
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
     const room = this.store.getRoom();
     if (!room) {
+      HMSLogger.w(this.TAG, `set recording status running=${running} - room not present`);
       return;
     }
 
@@ -174,6 +177,7 @@ export class RoomUpdateManager {
   private setRTMPStatus(running: boolean, notification: RTMPNotification) {
     const room = this.store.getRoom();
     if (!room) {
+      HMSLogger.w(this.TAG, 'on policy change - room not present');
       return;
     }
 

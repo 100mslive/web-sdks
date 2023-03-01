@@ -45,7 +45,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     if (!this.hasSinks()) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
-        `Track does not have any sink, saving ${layer}, source=${this.source}`,
+        `Track does not have any sink, saving ${layer}, source=setPreferredLayer`,
       );
       return;
     }
@@ -155,12 +155,12 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         this.logIdentifier,
         source,
       );
-      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${this.source}`);
+      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${source}`);
       return response;
     } catch (error) {
       HMSLogger.d(
         `[Remote Track] ${this.logIdentifier}`,
-        `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
+        `Failed to set layer ${layer}, source=${source}, ${(error as Error).message}`,
       );
       throw error;
     }
