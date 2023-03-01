@@ -1106,13 +1106,11 @@ export default class HMSTransport implements ITransport {
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
-      try {
-        await this.internalConnect(
-          this.joinParameters!.authToken,
-          this.joinParameters!.endpoint,
-          this.joinParameters!.peerId,
-        );
-      } catch (ex) {}
+      await this.internalConnect(
+        this.joinParameters!.authToken,
+        this.joinParameters!.endpoint,
+        this.joinParameters!.peerId,
+      );
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect

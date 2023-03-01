@@ -1,5 +1,6 @@
 import { EventBus } from '../../events/EventBus';
 import { IStore } from '../../sdk/store';
+import HMSLogger from '../../utils/logger';
 import { PolicyParams } from '../HMSNotifications';
 
 /**
@@ -23,6 +24,8 @@ export class PolicyChangeManager {
     const room = this.store.getRoom();
     if (room) {
       room.templateId = params.template_id;
+    } else {
+      HMSLogger.w('[PolicyChangeManager]', 'on policy change - room not present');
     }
     // handle when role is not present in known_roles
     // const publishParams = params.known_roles[params.name]?.publishParams;
