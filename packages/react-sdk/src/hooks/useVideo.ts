@@ -41,8 +41,12 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
 
   useEffect(() => {
     (async () => {
-      if (track?.id && videoRef.current && attach !== false) {
-        await actions.attachVideo(track.id, videoRef.current);
+      if (track?.id && videoRef.current) {
+        if (attach !== false) {
+          await actions.attachVideo(track.id, videoRef.current);
+        } else {
+          await actions.detachVideo(track.id, videoRef.current);
+        }
       }
     })();
   }, [track?.id, attach, actions]);
