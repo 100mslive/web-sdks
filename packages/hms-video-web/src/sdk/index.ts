@@ -100,6 +100,7 @@ export class HMSSdk implements HMSInterface {
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  autoHandleVideoElement = true;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -1039,6 +1040,7 @@ export class HMSSdk implements HMSInterface {
     if (!config.initEndpoint) {
       config.initEndpoint = 'https://prod-init.100ms.live';
     }
+    this.autoHandleVideoElement = config.autoHandleVideoElement || false;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
