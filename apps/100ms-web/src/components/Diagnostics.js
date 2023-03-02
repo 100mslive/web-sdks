@@ -12,9 +12,9 @@ import {
   TrackAudioLevelMonitor,
 } from "@100mslive/hms-diagnostics";
 import { v4 } from "uuid";
-import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
 import {
   Accordion,
+  Button,
   Flex,
   StyledVideo,
   Text,
@@ -41,7 +41,11 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
   return (
     <Accordion.Item
       value={properties.id}
-      css={{ p: "$4 $8", borderBottom: "1px solid $backgroundDefault" }}
+      css={{
+        p: "$4 $8",
+        borderBottom: "1px solid $backgroundDefault",
+        cursor: "pointer",
+      }}
     >
       <Accordion.Header>
         <Flex
@@ -52,19 +56,13 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
             {title}
           </Text>
           {properties.success === null ? null : properties.success ? (
-            <Flex css={{ color: "$success", alignItems: "center", mx: "$10" }}>
-              <Text variant="body2" css={{ color: "$success" }}>
-                Passed
-              </Text>
-              <CheckIcon />
-            </Flex>
+            <Text variant="body2" css={{ color: "$success", mx: "$6" }}>
+              Passed
+            </Text>
           ) : (
-            <Flex css={{ color: "$error", alignItems: "center", mx: "$10" }}>
-              <Text variant="body2" css={{ color: "$error" }}>
-                Failed
-              </Text>
-              <CrossIcon />
-            </Flex>
+            <Text variant="body2" css={{ color: "$error", mx: "$6" }}>
+              Failed
+            </Text>
           )}
         </Flex>
       </Accordion.Header>
@@ -191,15 +189,26 @@ const Header = () => {
       <Flex align="center">
         <Logo />
         <VerticalDivider css={{ mx: "$4" }} />
-        <Text variant="h4">Diagnostics</Text>
+        <Text variant="h5">Diagnostics</Text>
       </Flex>
     </Flex>
   );
 };
 
+const downloadJson = (obj, fileName) => {
+  var a = document.createElement("a");
+  var file = new Blob([JSON.stringify(obj, null, 2)], {
+    type: "application/json",
+  });
+  a.href = URL.createObjectURL(file);
+  a.download = `${fileName}.json`;
+  a.click();
+};
+
 const env = process.env.REACT_APP_ENV;
 const Diagnostics = () => {
-  const [result, setResult] = useState([]);
+  const [checkResults, setCheckResults] = useState([]);
+  const [result, setResult] = useState();
   const tokenEndpoint = useTokenEndpoint();
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const [token, setToken] = useState(null);
@@ -229,31 +238,38 @@ const Diagnostics = () => {
 
   useEffect(() => {
     if (token) {
-      diagnostics.start(
-        {
-          authToken: token,
-          initEndpoint: `https://${env}-init.100ms.live/`,
-        },
-        {
-          onUpdate: (result, path) => {
-            setResult(res =>
-              res.concat({ ...result, title: path.split(".").at(-1) })
-            );
+      diagnostics
+        .start(
+          {
+            authToken: token,
+            initEndpoint: `https://${env}-init.100ms.live/`,
           },
-        }
-      );
+          {
+            onUpdate: (result, path) => {
+              setCheckResults(res =>
+                res.concat({ ...result, title: path.split(".").at(-1) })
+              );
+            },
+          }
+        )
+        .then(res => {
+          console.log(JSON.stringify(res, null, "\t"));
+          setResult(res);
+        });
     }
   }, [token]);
 
   const videoTrack = useMemo(
-    () => result.find(item => item.title.includes("camera"))?.info.videoTrack,
-    [result]
+    () =>
+      checkResults.find(item => item.title.includes("camera"))?.info.videoTrack,
+    [checkResults]
   );
 
   const audioTrack = useMemo(
     () =>
-      result.find(item => item.title.includes("microphone"))?.info.audioTrack,
-    [result]
+      checkResults.find(item => item.title.includes("microphone"))?.info
+        .audioTrack,
+    [checkResults]
   );
 
   if (error.title) {
@@ -267,27 +283,34 @@ const Diagnostics = () => {
   return (
     <Flex direction="column" css={{ size: "100%", overflowY: "auto" }}>
       <Header />
-      {result && (
+      {checkResults && (
         <Flex>
-          <Accordion.Root
-            type="single"
-            defaultValue="WebRTC"
-            collapsible
+          <Flex
+            direction="column"
             css={{
               w: "40%",
               m: "$8",
             }}
           >
-            {result.map(item => {
-              return (
-                <DiagnosticsItem
-                  key={item.id}
-                  title={item.title}
-                  properties={item}
-                />
-              );
-            })}
-          </Accordion.Root>
+            <Accordion.Root defaultValue="WebRTC" collapsible>
+              {checkResults.map(item => {
+                return (
+                  <DiagnosticsItem
+                    key={item.id}
+                    title={item.title}
+                    properties={item}
+                  />
+                );
+              })}
+            </Accordion.Root>
+            <Flex css={{ w: "100%", justifyContent: "center", my: "$10" }}>
+              <Button
+                onClick={() => downloadJson(result, "diagnostics_result")}
+              >
+                Download Results
+              </Button>
+            </Flex>
+          </Flex>
           <Flex
             direction="column"
             css={{
