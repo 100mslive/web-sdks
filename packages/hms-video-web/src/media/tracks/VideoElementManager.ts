@@ -142,6 +142,10 @@ export class VideoElementManager {
   }
 
   cleanup = () => {
+    this.videoElements.forEach(videoElement => {
+      videoElement.srcObject = null;
+    });
+    this.videoElements.clear();
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
   };

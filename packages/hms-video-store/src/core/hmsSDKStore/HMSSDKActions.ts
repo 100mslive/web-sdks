@@ -393,11 +393,7 @@ export class HMSSDKActions implements IHMSActions {
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      if (this.sdk.autoHandleVideoElement) {
-        (sdkTrack as SDKHMSVideoTrack).detach(videoElement);
-      } else {
-        (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
-      }
+      this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
@@ -793,11 +789,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      if (this.sdk.autoHandleVideoElement) {
-        (sdkTrack as SDKHMSVideoTrack).attach(videoElement);
-      } else {
-        (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
-      }
+      this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }

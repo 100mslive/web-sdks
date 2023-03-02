@@ -47,6 +47,7 @@ import {
   HMSRemoteTrack,
   HMSTrackSource,
   HMSTrackType,
+  HMSVideoTrack,
 } from '../media/tracks';
 import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
@@ -100,7 +101,6 @@ export class HMSSdk implements HMSInterface {
   private networkTestManager!: NetworkTestManager;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
-  autoHandleVideoElement = true;
 
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
@@ -847,6 +847,23 @@ export class HMSSdk implements HMSInterface {
     this.frameworkInfo = frameworkInfo;
   }
 
+  attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoHandleVideoElement) {
+      track.attach(videoElement);
+    } else {
+      track.addSink(videoElement);
+    }
+  }
+  detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoHandleVideoElement) {
+      track.detach(videoElement);
+    } else {
+      track.removeSink(videoElement);
+    }
+  }
+
   private async publish(initialSettings: InitialSettings, oldRole?: string) {
     if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
       // if preview asRole(oldRole) is used, use roleChangeManager to diff policy and publish, else do normal publish
@@ -1040,7 +1057,6 @@ export class HMSSdk implements HMSInterface {
     if (!config.initEndpoint) {
       config.initEndpoint = 'https://prod-init.100ms.live';
     }
-    this.autoHandleVideoElement = config.autoHandleVideoElement || false;
     this.errorListener = listener;
     this.deviceChangeListener = listener;
     this.initStoreAndManagers();
