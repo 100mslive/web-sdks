@@ -44,6 +44,7 @@ export class VideoElementManager {
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
         this.TAG,
+        `${this.track}`,
         `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
       );
     }
