@@ -849,7 +849,7 @@ export class HMSSdk implements HMSInterface {
 
   attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
-    if (config?.autoHandleVideoElement) {
+    if (config?.autoManageVideo) {
       track.attach(videoElement);
     } else {
       track.addSink(videoElement);
@@ -857,7 +857,7 @@ export class HMSSdk implements HMSInterface {
   }
   detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
-    if (config?.autoHandleVideoElement) {
+    if (config?.autoManageVideo) {
       track.detach(videoElement);
     } else {
       track.removeSink(videoElement);

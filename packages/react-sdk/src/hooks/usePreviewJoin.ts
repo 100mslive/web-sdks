@@ -93,7 +93,7 @@ export const usePreviewJoin = ({
       initEndpoint: initEndpoint,
       asRole,
       captureNetworkQualityInPreview,
-      autoHandleVideoElement: true,
+      autoManageVideo: true,
     };
   }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole]);
 

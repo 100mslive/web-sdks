@@ -50,7 +50,7 @@ export interface HMSConfig {
    * By enabling this flag, once you pass the video element to 100ms, the subsequent attach/detach when enabled/disabled
    * or when plugins are added is handled by the sdk
    */
-  autoHandleVideoElement?: boolean;
+  autoManageVideo?: boolean;
 }
 
 /**
