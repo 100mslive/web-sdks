@@ -245,10 +245,9 @@ const Diagnostics = () => {
             initEndpoint: `https://${env}-init.100ms.live/`,
           },
           {
-            onUpdate: (result, path) => {
-              setCheckResults(res =>
-                res.concat({ ...result, title: path.split(".").at(-1) })
-              );
+            onUpdate: (update, path) => {
+              const title = path.split(".")[path.split(".").length - 1];
+              setCheckResults(res => res.concat({ ...update, title }));
             },
           }
         )
@@ -292,7 +291,7 @@ const Diagnostics = () => {
               m: "$8",
             }}
           >
-            <Accordion.Root defaultValue="WebRTC" collapsible>
+            <Accordion.Root defaultValue="WebRTC" type="multiple" collapsible>
               {checkResults.map(item => {
                 return (
                   <DiagnosticsItem
@@ -303,13 +302,15 @@ const Diagnostics = () => {
                 );
               })}
             </Accordion.Root>
-            <Flex css={{ w: "100%", justifyContent: "center", my: "$10" }}>
-              <Button
-                onClick={() => downloadJson(result, "diagnostics_result")}
-              >
-                Download Results
-              </Button>
-            </Flex>
+            {result && (
+              <Flex css={{ w: "100%", justifyContent: "center", my: "$10" }}>
+                <Button
+                  onClick={() => downloadJson(result, "diagnostics_result")}
+                >
+                  Download Results
+                </Button>
+              </Flex>
+            )}
           </Flex>
           <Flex
             direction="column"
