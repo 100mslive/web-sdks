@@ -995,7 +995,7 @@ export default class HMSTransport implements ITransport {
           ),
         );
       }
-      HMSLogger.d(TAG, '❌ internal connect: failed', error);
+      HMSLogger.e(TAG, '❌ internal connect: failed', error);
       throw error;
     }
   }

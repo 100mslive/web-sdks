@@ -2,6 +2,7 @@ import { getClosestLayer, layerToIntMapping } from './trackUtils';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
+import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
 import { isBrowser } from '../../utils/support';
 
@@ -11,6 +12,7 @@ import { isBrowser } from '../../utils/support';
  * This will also handle selecting appropriate layer when element size changesx
  */
 export class VideoElementManager {
+  private readonly TAG = '[VideoElementManager]';
   private resizeObserver?: typeof HMSResizeObserver;
   private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
@@ -39,6 +41,12 @@ export class VideoElementManager {
     // it will be a no-op if initialize already
     this.init();
     this.videoElements.add(videoElement);
+    if (this.videoElements.size >= 10) {
+      HMSLogger.w(
+        this.TAG,
+        `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
+      );
+    }
     if (this.intersectionObserver?.isSupported()) {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
@@ -138,6 +146,7 @@ export class VideoElementManager {
       }
     }
 
+    HMSLogger.d(this.TAG, 'selecting max layer for the track', `${this.track}`);
     await this.track.setPreferredLayer(maxLayer);
   }
 
