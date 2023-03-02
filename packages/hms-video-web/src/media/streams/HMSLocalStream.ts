@@ -119,7 +119,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     }
     //@ts-ignore
     params.encodings[0].maxFrameRate = track.settings.maxFrameRate;
-    if (track.source === 'videoplaylist') {
+    if ([track.source === 'videoplaylist', track.type === 'video'].every(value => !!value)) {
       params.degradationPreference = 'maintain-resolution';
     }
     try {
