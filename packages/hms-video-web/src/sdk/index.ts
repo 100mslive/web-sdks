@@ -847,20 +847,20 @@ export class HMSSdk implements HMSInterface {
     this.frameworkInfo = frameworkInfo;
   }
 
-  attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+  async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
     if (config?.autoManageVideo) {
       track.attach(videoElement);
     } else {
-      track.addSink(videoElement);
+      await track.addSink(videoElement);
     }
   }
-  detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+  async detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
     if (config?.autoManageVideo) {
       track.detach(videoElement);
     } else {
-      track.removeSink(videoElement);
+      await track.removeSink(videoElement);
     }
   }
 
