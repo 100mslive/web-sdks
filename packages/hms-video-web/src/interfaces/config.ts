@@ -47,8 +47,9 @@ export interface HMSConfig {
    */
   captureNetworkQualityInPreview?: boolean;
   /**
-   * By enabling this flag, once you pass the video element to 100ms, the subsequent attach/detach when enabled/disabled
-   * or when plugins are added is handled by the sdk
+   * if this flag is enabled, the sdk takes care of unsubscribing to the video when it goes out of view.
+   * Additionally if simulcast is enabled, it takes care of auto managing simulcast layers based on the 
+   * dimensions of the video element to conserve bandwidth.
    */
   autoManageVideo?: boolean;
 }
