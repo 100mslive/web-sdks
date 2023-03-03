@@ -147,7 +147,7 @@ export class VideoElementManager {
       }
     }
 
-    HMSLogger.d(this.TAG, 'selecting max layer for the track', `${this.track}`);
+    HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
     await this.track.setPreferredLayer(maxLayer);
   }
 
