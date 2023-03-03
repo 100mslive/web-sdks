@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { useMedia } from "react-use";
 import {
   selectAppData,
@@ -8,7 +8,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { EndStreamIcon, RecordIcon } from "@100mslive/react-icons";
+import { RecordIcon, WrenchIcon } from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -24,7 +24,7 @@ import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
 import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
-import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
+import { useSidepaneToggle, useSidepaneState } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { getDefaultMeetingUrl } from "../../common/utils";
 import {
@@ -32,6 +32,7 @@ import {
   RTMP_RECORD_DEFAULT_RESOLUTION,
   SIDE_PANE_OPTIONS,
 } from "../../common/constants";
+import { useRef } from "react";
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -95,11 +96,14 @@ export const RecordingStatus = () => {
 const EndStream = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
   const sidePane = useSidepaneState();
-  const [openedOnFirstLoad, setOpenedOnFirstLoad] = useState(false);
   useEffect(() => {
-    if (!openedOnFirstLoad && !sidePane) {
-      toggleStreaming();
-      setOpenedOnFirstLoad(true);
+    if (window && !sidePane) {
+      const userStartedStream =
+        window.sessionStorage.getItem("userStartedStream");
+      if (userStartedStream === "true") {
+        toggleStreaming();
+        window.sessionStorage.setItem("userStartedStream", "");
+      }
     }
   }, [sidePane]);
 
@@ -110,8 +114,8 @@ const EndStream = () => {
       icon
       onClick={toggleStreaming}
     >
-      <EndStreamIcon />
-      End Stream
+      <WrenchIcon />
+      Manage Stream
     </Button>
   );
 };
