@@ -16,7 +16,7 @@ export function sleep(ms: number): Promise<void> {
  * @param delay time by which the function execution has to be delayed
  * @returns {void}
  */
-export function debounce(fn: () => void, delay = 300) {
+export function debounce<T extends (...args: any) => any>(fn: T, delay = 300) {
   let timer: any | undefined;
   return function (...args: []) {
     clearTimeout(timer);
