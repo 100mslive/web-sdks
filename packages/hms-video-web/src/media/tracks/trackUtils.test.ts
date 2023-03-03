@@ -1,5 +1,5 @@
-import { HMSSimulcastLayer, HMSSimulcastLayerDefinition } from '@100mslive/hms-video-store';
-import { getClosestLayer } from './layout';
+import { getClosestLayer } from './trackUtils';
+import { HMSSimulcastLayer, HMSSimulcastLayerDefinition } from '../../interfaces';
 
 describe('test closest layer', () => {
   const layerDefinitions: HMSSimulcastLayerDefinition[] = [
@@ -29,18 +29,18 @@ describe('test closest layer', () => {
   test('closest layer should be high', () => {
     const width = 730;
     const height = 540;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.HIGH);
+    expect(getClosestLayer(layerDefinitions, { width, height })).toBe(HMSSimulcastLayer.HIGH);
   });
 
   test('closest layer should be medium', () => {
     const width = 520;
     const height = 390;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.MEDIUM);
+    expect(getClosestLayer(layerDefinitions, { width, height })).toBe(HMSSimulcastLayer.MEDIUM);
   });
 
   test('closest layer should be low', () => {
     const width = 284;
     const height = 207;
-    expect(getClosestLayer({ layerDefinitions, width, height })).toBe(HMSSimulcastLayer.LOW);
+    expect(getClosestLayer(layerDefinitions, { width, height })).toBe(HMSSimulcastLayer.LOW);
   });
 });

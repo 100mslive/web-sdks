@@ -108,6 +108,9 @@ export default class HMSTransport implements ITransport {
       const currentSubscribeBitrate = stats.getLocalPeerStats()?.subscribe?.bitrate || 0;
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
+
+    this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localVideoEnabled.subscribe(({ track }) => this.trackUpdate(track));
   }
 
   /**
@@ -775,7 +778,6 @@ export default class HMSTransport implements ITransport {
           this.signal,
           this.initConfig.rtcConfiguration,
           this.publishConnectionObserver,
-          this,
         );
       }
 
@@ -993,7 +995,7 @@ export default class HMSTransport implements ITransport {
           ),
         );
       }
-      HMSLogger.d(TAG, '❌ internal connect: failed', error);
+      HMSLogger.e(TAG, '❌ internal connect: failed', error);
       throw error;
     }
   }
