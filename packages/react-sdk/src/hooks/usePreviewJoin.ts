@@ -40,6 +40,7 @@ export interface usePreviewInput {
    */
   captureNetworkQualityInPreview?: boolean;
   asRole?: string;
+  autoManageVideo?: boolean;
 }
 
 export interface usePreviewResult {
@@ -77,6 +78,7 @@ export const usePreviewJoin = ({
   initialSettings,
   captureNetworkQualityInPreview,
   asRole,
+  autoManageVideo,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -93,8 +95,9 @@ export const usePreviewJoin = ({
       initEndpoint: initEndpoint,
       asRole,
       captureNetworkQualityInPreview,
+      autoManageVideo,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole]);
+  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole, autoManageVideo]);
 
   const preview = useCallback(async () => {
     if (!token) {

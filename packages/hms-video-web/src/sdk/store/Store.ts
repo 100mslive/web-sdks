@@ -215,6 +215,7 @@ class Store implements IStore {
         }
       }
     }
+    config.autoManageVideo = config.autoManageVideo !== false;
     this.config = config;
     this.setEnv();
   }

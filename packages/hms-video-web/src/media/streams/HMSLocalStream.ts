@@ -48,18 +48,6 @@ export default class HMSLocalStream extends HMSMediaStream {
     // TODO: Some browsers don't support setCodecPreferences, resort to SDPMunging?
   }
 
-  /**
-   * On mute and unmute of video tracks as well as for changing cameras, we replace the track using replaceTrack api
-   * so as to avoid a renegotiation with the backend and reflect changes faster.
-   * @param track - the current track
-   * @param withTrack - the track to replace it with
-   */
-  async replaceTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
-    await this.replaceSenderTrack(track, withTrack);
-    track.stop(); // If the track is already stopped, this does not throw any error. 😉
-    this.replaceStreamTrack(track, withTrack);
-  }
-
   replaceStreamTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
     this.nativeStream.addTrack(withTrack);
     this.nativeStream.removeTrack(track);
@@ -73,6 +61,8 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   /**
+   * On mute and unmute of video tracks as well as for changing cameras, we replace the track with new track,
+   * so as to avoid a renegotiation with the backend and reflect changes faster.
    * In case of video plugins we need to replace the track sent to remote without stopping the original one. As
    * if the original is stopped, plugin would stop getting input frames to process. So only the track in the
    * sender needs to be replaced.
@@ -115,10 +105,9 @@ export default class HMSLocalStream extends HMSMediaStream {
   hasSender(track: HMSLocalTrack): boolean {
     return !!this.connection
       ?.getSenders()
-      .find(sender => sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent());
-  }
-
-  trackUpdate(track: HMSLocalTrack) {
-    this.connection?.trackUpdate(track);
+      .find(
+        sender =>
+          sender.track && (sender.track.id === track.trackId || sender.track.id === track.getTrackIDBeingSent()),
+      );
   }
 }

@@ -47,6 +47,7 @@ import {
   HMSRemoteTrack,
   HMSTrackSource,
   HMSTrackType,
+  HMSVideoTrack,
 } from '../media/tracks';
 import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
@@ -838,6 +839,24 @@ export class HMSSdk implements HMSInterface {
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
     this.frameworkInfo = frameworkInfo;
+  }
+
+  async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoManageVideo) {
+      track.attach(videoElement);
+    } else {
+      await track.addSink(videoElement);
+    }
+  }
+
+  async detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoManageVideo) {
+      track.detach(videoElement);
+    } else {
+      await track.removeSink(videoElement);
+    }
   }
 
   private async publish(initialSettings?: InitialSettings, oldRole?: string) {
