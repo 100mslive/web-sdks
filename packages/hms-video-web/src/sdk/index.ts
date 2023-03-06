@@ -632,7 +632,7 @@ export class HMSSdk implements HMSInterface {
 
     const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
     const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
-    this.setPlaylistSettings({
+    await this.setPlaylistSettings({
       track,
       hmsTrack,
       source,
@@ -661,6 +661,7 @@ export class HMSSdk implements HMSInterface {
         this.stopPlaylist(track);
       }
       this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
+      console.log('removed track', track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
     } else {
       HMSLogger.w(this.TAG, `No track found for ${trackId}`);

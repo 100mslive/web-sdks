@@ -18,7 +18,10 @@ import { TypedEventEmitter } from '../utils/typed-event-emitter';
  *    - add audioTrack to canvas stream
  *    - The audio and video tracks are passed to playlist manager to publish
  */
-export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
+export class PlaylistVideoManager extends TypedEventEmitter<{
+  ended: null;
+  progress: Event;
+}> {
   private readonly TAG = '[PlaylistVideoManager]';
   private videoElement: HTMLVideoElement | null = null;
   private canvasContext: CanvasRenderingContext2D | null = null;
@@ -26,50 +29,45 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   private timer: any;
   private tracks: MediaStreamTrack[] = [];
   private audioContextManager!: AudioContextManager;
-  private DEFAUL_FPS = 24;
+  private DEFAUL_FPS = 30;
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
 
-  play(url: string) {
+  async play(url: string) {
     this.videoElement = this.getVideoElement();
     this.createCanvas();
+    this.videoElement = this.getVideoElement();
+    this.videoElement.src = url;
+    this.seeked = false;
+    this.videoElement.onerror = () => {
+      const error = `Error loading ${url}`;
+      HMSLogger.e(this.TAG, error);
+      this.stop();
+      throw error;
+    };
+    if (this.isVideoCapture()) {
+      HMSLogger.d(this.TAG, 'using video capture');
+      await this.videoElement.play();
+      // @ts-ignore
+      const stream = this.videoElement.captureStream() as MediaStream;
+      this.tracks = stream.getTracks();
+      return this.tracks;
+    }
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
-      this.videoElement = this.getVideoElement();
-      this.videoElement.src = url;
-      this.seeked = false;
-      this.videoElement.onerror = () => {
-        const error = `Error loading ${url}`;
-        HMSLogger.e(this.TAG, error);
-        this.stop();
-        reject(error);
-      };
       // oncanplaythrough is called when enough media is loaded for play to be possible in two cases -
       //    * when play is called for the first time
       //    * when user jumps to any mid track timestamp using seekTo
-      this.videoElement.oncanplaythrough = async () => {
+      this.videoElement!.oncanplaythrough = async () => {
         try {
           if (!this.videoElement) {
             return;
           }
           this.canvas.width = this.videoElement.videoWidth;
           this.canvas.height = this.videoElement.videoHeight;
-          // Capture stream only once and reuse the same tracks. it will be autoupdated with the selected video
           if (this.tracks.length === 0) {
-            this.clearCanvasAndTracks();
-            //@ts-ignore
-            const stream = this.canvas.captureStream();
-            if (!stream) {
-              HMSLogger.e(this.TAG, 'Browser does not support captureStream');
-              return;
-            }
-            this.videoElement.onplay = this.drawImage;
-            await this.audioContextManager.resumeContext();
             await this.videoElement.play();
-            const audioTrack = this.audioContextManager.getAudioTrack();
-            stream.addTrack(audioTrack);
-            stream.getTracks().forEach((track: MediaStreamTrack) => {
-              this.tracks.push(track);
-            });
+            this.clearCanvasAndTracks();
+            await this.createTracksFromVideo();
             resolve(this.tracks);
           } else {
             // No need to capture canvas stream/get audio track. They wull be auto updated
@@ -89,7 +87,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
           reject(err);
         }
       };
-      this.videoElement.onseeked = () => {
+      this.videoElement!.onseeked = () => {
         this.seeked = true;
       };
     });
@@ -109,6 +107,10 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
     this.videoElement = null;
     this.audioContextManager?.cleanup();
     this.clearCanvasAndTracks();
+  }
+
+  isVideoCapture() {
+    return 'captureStream' in HTMLMediaElement.prototype;
   }
 
   private clearCanvasAndTracks() {
@@ -146,5 +148,22 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       this.canvas = document.createElement('canvas');
       this.canvasContext = this.canvas.getContext('2d');
     }
+  }
+
+  private async createTracksFromVideo() {
+    if (!this.videoElement) {
+      return;
+    }
+    //@ts-ignore
+    const stream = this.canvas.captureStream();
+    if (!stream) {
+      HMSLogger.e(this.TAG, 'Browser does not support captureStream');
+      return;
+    }
+    this.videoElement.onplay = this.drawImage;
+    await this.audioContextManager.resumeContext();
+    const audioTrack = this.audioContextManager.getAudioTrack();
+    stream.addTrack(audioTrack);
+    this.tracks = stream.getTracks();
   }
 }

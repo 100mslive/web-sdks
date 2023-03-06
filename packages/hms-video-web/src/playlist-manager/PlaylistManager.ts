@@ -290,6 +290,7 @@ export class PlaylistManager
     }
   }
 
+  // eslint-disable-next-line complexity
   private async play(url: string, type: HMSPlaylistType = HMSPlaylistType.audio): Promise<void> {
     const manager = type === HMSPlaylistType.audio ? this.audioManager : this.videoManager;
     const element = manager.getElement();
@@ -301,9 +302,13 @@ export class PlaylistManager
       await element.play();
     } else {
       element?.pause();
+      const prevTracks = manager.getTracks();
       const tracks: MediaStreamTrack[] = await manager.play(url);
       for (const track of tracks) {
         await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
+      }
+      if (type === HMSPlaylistType.video && (manager as PlaylistVideoManager).isVideoCapture()) {
+        prevTracks.forEach(track => this.removeTrack(track));
       }
     }
   }
