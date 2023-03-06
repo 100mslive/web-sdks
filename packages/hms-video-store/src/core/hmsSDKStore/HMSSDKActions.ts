@@ -398,7 +398,7 @@ export class HMSSDKActions implements IHMSActions {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
       }
-      this.logPossibleInconsistency('no video track found to remove sink');
+      HMSLogger.d('possible inconsistency detected - no video track found to remove sink');
     }
   }
 
@@ -1233,7 +1233,7 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   private logPossibleInconsistency(inconsistency: string) {
-    HMSLogger.d('possible inconsistency detected - ', inconsistency);
+    HMSLogger.w('possible inconsistency detected - ', inconsistency);
   }
 
   private async addRemoveVideoPlugin(plugin: HMSVideoPlugin, action: 'add' | 'remove', pluginFrameRate?: number) {

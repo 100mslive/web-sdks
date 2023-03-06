@@ -951,6 +951,7 @@ export class HMSSdk implements HMSInterface {
     const localPeer = this.store.getLocalPeer();
     const room = this.store.getRoom();
     if (!room) {
+      HMSLogger.w(this.TAG, 'notify join - room not present');
       return;
     }
 
