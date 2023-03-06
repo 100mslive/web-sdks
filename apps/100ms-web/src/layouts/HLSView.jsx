@@ -53,7 +53,6 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
-      console.log("level ", levels);
       setAvailableLevels(levels);
     };
     const levelUpdatedHandler = (_, { level }) => {
