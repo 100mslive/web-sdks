@@ -4,7 +4,7 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
-import { useIsHeadless } from "./AppData/useUISettings";
+import { useAppConfig } from "./AppData/useAppConfig";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -21,14 +21,14 @@ const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
-  const isHeadless = useIsHeadless();
+  const headlessConfig = useAppConfig("headlessConfig");
   return (
     <Fragment>
       <Box
         css={{
           flex: "1 1 0",
           height: "100%",
-          mx: isHeadless ? "0" : "$8",
+          mx: headlessConfig?.tileOffset === 0 ? "0" : "$8",
           "@md": { flex: "2 1 0" },
         }}
       >
@@ -64,13 +64,13 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 
 // Side pane shows smaller tiles
 export const GridSidePaneView = ({ peers }) => {
-  const isHeadless = useIsHeadless();
+  const headlessConfig = useAppConfig("headlessConfig");
   return (
     <Flex
       direction="column"
       css={{
         flex: "0 0 20%",
-        mx: isHeadless ? "0" : "$8",
+        mx: headlessConfig?.tileOffset === 0 ? "0" : "$8",
         "@lg": {
           flex: "0 0 25%",
         },

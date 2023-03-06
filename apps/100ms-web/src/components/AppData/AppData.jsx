@@ -119,9 +119,6 @@ export const AppData = React.memo(
     }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
 
     useEffect(() => {
-      const headlessConfig = {
-        tileOffset: 0,
-      };
       const appData = {
         [APP_DATA.recordingUrl]: recordingUrl,
         [APP_DATA.tokenEndpoint]: tokenEndpoint,
@@ -129,7 +126,7 @@ export const AppData = React.memo(
         [APP_DATA.hlsViewerRole]:
           getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
           DEFAULT_HLS_VIEWER_ROLE,
-        [APP_DATA.appConfig]: { ...getAppDetails(appDetails), headlessConfig },
+        [APP_DATA.appConfig]: getAppDetails(appDetails),
       };
       for (const key in appData) {
         hmsActions.setAppData([key], appData[key]);
