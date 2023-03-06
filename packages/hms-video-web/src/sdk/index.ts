@@ -661,7 +661,6 @@ export class HMSSdk implements HMSInterface {
         this.stopPlaylist(track);
       }
       this.localPeer.auxiliaryTracks.splice(trackIndex, 1);
-      console.log('removed track', track);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, this.localPeer);
     } else {
       HMSLogger.w(this.TAG, `No track found for ${trackId}`);

@@ -307,6 +307,11 @@ export class PlaylistManager
       for (const track of tracks) {
         await this.addTrack(track, type === HMSPlaylistType.audio ? 'audioplaylist' : 'videoplaylist');
       }
+      /**
+       * New tracks will have to be created if we are using video capture i.e. videoElement.captureStream
+       * because the older tracks do not contain any data (muted is true).
+       * So we will be unpublishing older tracks
+       */
       if (type === HMSPlaylistType.video && (manager as PlaylistVideoManager).isVideoCapture()) {
         prevTracks.forEach(track => this.removeTrack(track));
       }
