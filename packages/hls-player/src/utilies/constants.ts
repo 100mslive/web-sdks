@@ -1,18 +1,17 @@
-export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 3;
-export const IS_OPTIMIZED = false;
+export const HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY = 5;
 
-export enum HMSHLSControllerEvents {
-  HLS_TIMED_METADATA_LOADED = 'hls-timed-metadata',
-  HLS_STREAM_NO_LONGER_LIVE = 'hls-stream-no-longer-live',
+export enum HMSHLSPlayerEvents {
+  TIMED_METADATA_LOADED = 'timed-metadata',
+  SEEK_POS_BEHIND_LIVE_EDGE = 'seek-pos-behind-live-edge',
 
-  HLS_CURRENT_TIME = 'hls-current-time',
-  HLS_AUTOPLAY_BLOCKED = 'hls-autoplay-blocked',
+  CURRENT_TIME = 'current-time',
+  AUTOPLAY_BLOCKED = 'autoplay-blocked',
 
-  HLS_MANIFEST_LOADED = 'hls-manifest-loaded',
-  HLS_LEVEL_UPDATED = 'hls-level-updated',
+  MANIFEST_LOADED = 'manifest-loaded',
+  LEVEL_UPDATED = 'level-updated',
 
-  HLS_ERROR = 'hls-error',
-  HLS_PLAYBACK_STATE = 'hls-playback-state',
+  ERROR = 'error',
+  PLAYBACK_STATE = 'playback-state',
 }
 
 export enum HMSHLSExceptionEvents {
@@ -29,7 +28,7 @@ export enum HMSHLSExceptionEvents {
   UNKNOWN_ERROR = 'unknown-error',
 }
 
-export enum HMSHLSPlaybackState {
+export enum HLSPlaybackState {
   play,
   pause,
 }

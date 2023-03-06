@@ -1,5 +1,5 @@
 import { ILevel } from './ILevel';
-interface IHMSHLSController {
+interface IHMSHLSPlayer {
   /**
    *
    * @returns returns a ILevel which represents current
@@ -18,4 +18,4 @@ interface IHMSHLSController {
   seekToLivePosition(): void;
 }
 
-export default IHMSHLSController;
+export default IHMSHLSPlayer;

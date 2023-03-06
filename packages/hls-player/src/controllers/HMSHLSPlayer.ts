@@ -1,56 +1,72 @@
 import { HlsStats } from '@100mslive/hls-stats';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import Hls, { ErrorData, Fragment, HlsConfig, Level, LevelParsed } from 'hls.js';
-import { HMSHLSControllerEventEmitter, HMSHLSControllerListeners, IHMSHLSControllerEventEmitter } from './events';
+import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
+import { HMSHLSMetadata } from './HMSHLSMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
-import IHMSHLSController from '../interfaces/IHLSController';
+import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { ILevel } from '../interfaces/ILevel';
-import {
-  HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY,
-  HMSHLSControllerEvents,
-  HMSHLSPlaybackState,
-  IS_OPTIMIZED,
-} from '../utilies/constants';
+import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 import { mapLevel, mapLevels, metadataPayloadParser } from '../utilies/utils';
 
-export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEventEmitter {
+export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private hls: Hls;
   private hlsUrl: string;
   private hlsStats: HlsStats;
-  private videoEl: HTMLMediaElement;
-  private _emitter: HMSHLSControllerEventEmitter;
+  private videoEl: HTMLVideoElement;
+  private _emitter: HMSHLSPlayerEventEmitter;
   private _subscribeHlsStats?: (() => void) | null = null;
   private _isLive: boolean;
   private _volume: number;
-  constructor(hlsUrl: string, videoEl: HTMLVideoElement) {
-    this.hls = new Hls(this.getControllerConfig());
-    this._emitter = new HMSHLSControllerEventEmitter(new EventEmitter());
+  private _metaData: HMSHLSMetadata;
+  /**
+   * Initiliaze the player with hlsUrl and video element
+   * @remarks If video element is not passed, we will create one and call a method getVideoElement get element
+   * @param hlsUrl required - Pass hls url to
+   * @param videoEl optional field - HTML video element
+   */
+  constructor(hlsUrl: string, videoEl?: HTMLVideoElement) {
+    this.hls = new Hls(this.getPlayerConfig());
+    this._emitter = new HMSHLSPlayerEventEmitter(new EventEmitter());
     this.hlsUrl = hlsUrl;
-    this.videoEl = videoEl;
-    this.validateVideoEl();
+    this.videoEl = videoEl || this.createVideoElement();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
     }
     this.hls.loadSource(hlsUrl);
-    this.hls.attachMedia(videoEl);
+    this.hls.attachMedia(this.videoEl);
+    this._metaData = new HMSHLSMetadata(this, this.videoEl);
     this._isLive = true;
-    this._volume = videoEl.volume * 100;
-    this.hlsStats = new HlsStats(this.hls, videoEl);
+    this._metaData.startMetadataListner();
+    this._volume = this.videoEl.volume * 100;
+    this.hlsStats = new HlsStats(this.hls, this.videoEl);
     this.listenHLSEvent();
     this.seekToLivePosition();
   }
   /**
-   * @returns return custom list of events
+   * @remarks It will create a video element with playiniline true.
+   * @returns HTML video element
    */
-  static get Events(): typeof HMSHLSControllerEvents {
-    return HMSHLSControllerEvents;
+  private createVideoElement(): HTMLVideoElement {
+    const video: HTMLVideoElement = document?.createElement('video');
+    video.playsInline = true;
+    video.controls = false;
+    video.autoplay = true;
+    video.style.height = '100%';
+    video.style.margin = 'auto';
+    return video;
   }
   /**
-   * MSE - media source extension is required to run hls.js
-   * @returns return if mse is supported or not
+   * @returns get html video element
    */
-  static isMSESupported(): boolean {
-    return Hls.isSupported();
+  getVideoElement(): HTMLVideoElement {
+    return this.videoEl;
+  }
+  /**
+   * @returns return custom list of events
+   */
+  static get Events(): typeof HMSHLSPlayerEvents {
+    return HMSHLSPlayerEvents;
   }
   /**
    *  Subscribe to hls stats
@@ -75,8 +91,10 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       this.hls.detachMedia();
       this.unsubscribeStats();
     }
-
-    if (HMSHLSController.isMSESupported()) {
+    if (this._metaData) {
+      this._metaData.endMetaListner();
+    }
+    if (Hls.isSupported()) {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.off(Hls.Events.ERROR, this.handleHLSException);
@@ -89,50 +107,18 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       this.videoEl.removeEventListener('volumechange', this.volumeEventHandler);
     }
   }
-  on<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]) {
+  on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
     this._emitter.on(event, listener);
   }
 
-  once<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]) {
-    this._emitter.once(event, listener);
-  }
-
-  removeAllListeners<E extends keyof HMSHLSControllerListeners>(event?: E | undefined) {
-    this._emitter.removeAllListeners(event);
-  }
-
-  off<E extends keyof HMSHLSControllerListeners>(event: E, listener: HMSHLSControllerListeners[E]) {
+  off<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
     this._emitter.off(event, listener);
   }
 
-  listeners<E extends keyof HMSHLSControllerListeners>(event: E): HMSHLSControllerListeners[E][] {
-    return this._emitter.listeners(event);
+  emit<E extends keyof HMSHLSPlayerListeners>(event: E, eventObject: Parameters<HMSHLSPlayerListeners[E]>[1]): boolean {
+    return this._emitter.emit(event, event, eventObject);
   }
 
-  private emit<E extends keyof HMSHLSControllerListeners>(
-    event: E,
-    name: E,
-    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
-  ): boolean {
-    return this._emitter.emit(event, name, eventObject);
-  }
-
-  listenerCount<E extends keyof HMSHLSControllerListeners>(event: E): number {
-    return this._emitter.listenerCount(event);
-  }
-
-  private trigger<E extends keyof HMSHLSControllerListeners>(
-    event: E,
-    eventObject: Parameters<HMSHLSControllerListeners[E]>[1],
-  ): boolean {
-    return this.emit(event, event, eventObject);
-  }
-  /**
-   * get if is video stream is live
-   */
-  isLive(): boolean {
-    return this._isLive;
-  }
   /**
    * get current video volume
    */
@@ -180,7 +166,11 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    */
   async seekToLivePosition() {
     this.validateVideoEl();
-    this.videoEl.currentTime = this.hls?.liveSyncPosition || 0;
+    let end = 0;
+    if (this.videoEl?.buffered.length > 0) {
+      end = this.videoEl?.buffered.end(this.videoEl?.buffered.length - 1);
+    }
+    this.videoEl.currentTime = this.hls?.liveSyncPosition || end;
     if (this.videoEl.paused) {
       try {
         await this.playVideo();
@@ -209,11 +199,18 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this.validateVideoEl();
     this.videoEl.currentTime = seekValue;
   };
+  unblockAutoPlay = async () => {
+    try {
+      await this.play();
+    } catch (error) {
+      console.error('Tried to unblock autoplay failed with', error);
+      throw new Error('failed to autoplay');
+    }
+  };
   private validateVideoEl() {
     if (!this.videoEl) {
       const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-      this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-      throw error;
+      this.emit(HMSHLSPlayerEvents.ERROR, error);
     }
   }
   private playVideo = async () => {
@@ -226,7 +223,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       console.debug('Browser blocked autoplay with error', error.toString());
       console.debug('asking user to play the video manually...');
       if (error.name === 'NotAllowedError') {
-        this.trigger(HMSHLSControllerEvents.HLS_AUTOPLAY_BLOCKED, true);
+        this.emit(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, true);
       }
     }
   };
@@ -241,20 +238,19 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     }
   };
   private playEventHandler = () => {
-    this.trigger(HMSHLSControllerEvents.HLS_PLAYBACK_STATE, {
-      state: HMSHLSPlaybackState.play,
+    this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
+      state: HLSPlaybackState.play,
     });
   };
   private pauseEventHandler = () => {
-    this.trigger(HMSHLSControllerEvents.HLS_PLAYBACK_STATE, {
-      state: HMSHLSPlaybackState.pause,
+    this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
+      state: HLSPlaybackState.pause,
     });
   };
   private volumeEventHandler = () => {
     this.validateVideoEl();
     this._volume = this.videoEl.volume;
   };
-
   private handleNetworkRelatedError = (data: ErrorData) => {
     const details = data.error?.message || data.err?.message || '';
     const detail = {
@@ -264,23 +260,23 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       default: {
         const error = HMSHLSErrorFactory.UnknownError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
     }
   };
@@ -294,36 +290,37 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.fragDecryptError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
       default: {
+        console.log('unknow data ', data);
         const error = HMSHLSErrorFactory.UnknownError(detail);
-        this.trigger(HMSHLSControllerEvents.HLS_ERROR, error);
-        throw error;
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
     }
   };
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     const level: ILevel[] = mapLevels(levels);
     this.removeAudioLevels(level);
-    this.trigger(HMSHLSControllerEvents.HLS_MANIFEST_LOADED, {
+    this.emit(HMSHLSPlayerEvents.MANIFEST_LOADED, {
       levels: level,
     });
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLevel: ILevel = mapLevel(this.hls.levels[level]);
-    this.trigger(HMSHLSControllerEvents.HLS_LEVEL_UPDATED, {
+    this.emit(HMSHLSPlayerEvents.LEVEL_UPDATED, {
       level: qualityLevel,
     });
   };
@@ -381,9 +378,12 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
              * finally emit event letting the user know its time to
              * do whatever they want with the payload
              */
-            this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
-              payload,
-              duration,
+            this.emit(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
+              id: mt.id,
+              payload: payload,
+              duration: duration,
+              startDate: new Date(mt.startTime),
+              endDate: new Date(mt.endTime),
             });
           }, timeDifference * 1000);
         }
@@ -392,73 +392,17 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
       console.error('FRAG_CHANGED event error', e);
     }
   };
-  private extractMetaTextTrack = (): TextTrack | null => {
-    const textTrackListCount = this.videoEl?.textTracks.length || 0;
-    for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
-      const textTrack = this.videoEl?.textTracks[trackIndex];
-      if (textTrack?.kind !== 'metadata') {
-        continue;
-      }
-      textTrack.mode = 'showing';
-      return textTrack;
-    }
-    return null;
-  };
-  private fireCues = (cues: TextTrackCueList) => {
-    const cuesLength = cues.length;
-    let cueIndex = 0;
-    while (cueIndex < cuesLength) {
-      const cue: TextTrackCue = cues[cueIndex];
-      // @ts-ignore
-      if (cue.fired) {
-        cueIndex++;
-        continue;
-      }
-      // @ts-ignore
-      const data: { [key: string]: string } = metadataPayloadParser(cue.value.data);
-      // @ts-ignore
-      const programData = this.videoEl?.getStartDate();
-      const startDate = data.start_date;
-      const endDate = data.end_date;
-      const startTime =
-        new Date(startDate).getTime() - new Date(programData).getTime() - (this.videoEl?.currentTime || 0) * 1000;
-      const duration = new Date(endDate).getTime() - new Date(startDate).getTime();
-      setTimeout(() => {
-        this.trigger(HMSHLSControllerEvents.HLS_TIMED_METADATA_LOADED, {
-          payload: data.payload,
-          duration,
-        });
-      }, startTime);
-      // @ts-ignore
-      cue.fired = true;
-      cueIndex++;
-    }
-  };
-  private handleTimedMetaData = () => {
-    if (HMSHLSController.isMSESupported() || !this.videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
-      return;
-    }
-    // extracct timed metadata text track
-    const metaTextTrack: TextTrack | null = this.extractMetaTextTrack();
-    if (!metaTextTrack || !metaTextTrack.cues) {
-      return;
-    }
-    // fire cue for timed meta data extract
-    this.fireCues(metaTextTrack.cues);
-  };
   private handleTimeUpdateListener = (_: Event) => {
     if (!this.videoEl) {
       return;
     }
-    // handling timed metadata for non mse supported devices.
-    this.handleTimedMetaData();
-    this.trigger(HMSHLSControllerEvents.HLS_CURRENT_TIME, this.videoEl.currentTime);
-    const allowedDelay = this.getControllerConfig().liveMaxLatencyDuration || HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY;
-    this._isLive = this.hls.liveSyncPosition
-      ? this.hls.liveSyncPosition - this.videoEl.currentTime <= allowedDelay
+    this.emit(HMSHLSPlayerEvents.CURRENT_TIME, this.videoEl.currentTime);
+    const live = this.hls.liveSyncPosition
+      ? this.hls.liveSyncPosition - this.videoEl.currentTime <= HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY
       : false;
-    if (!this._isLive) {
-      this.trigger(HMSHLSControllerEvents.HLS_STREAM_NO_LONGER_LIVE, {
+    if (this._isLive !== live) {
+      this._isLive = live;
+      this.emit(HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE, {
         isLive: this._isLive,
       });
     }
@@ -468,12 +412,12 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
    */
   private listenHLSEvent() {
     this.validateVideoEl();
-    if (HMSHLSController.isMSESupported()) {
+    if (Hls.isSupported()) {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.on(Hls.Events.ERROR, this.handleHLSException);
       this.hls.on(Hls.Events.FRAG_CHANGED, this.fragChangeHandler);
-    } else if (this.videoEl?.canPlayType('application/vnd.apple.mpegurl')) {
+    } else if (this.videoEl.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       this.videoEl.src = this.hlsUrl;
     }
@@ -483,19 +427,7 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     this.videoEl.addEventListener('volumechange', this.volumeEventHandler);
   }
 
-  getControllerConfig(isOptimized: boolean = IS_OPTIMIZED): Partial<HlsConfig> {
-    if (isOptimized) {
-      // should reduce the latency by around 2-3 more seconds. Won't work well without good internet.
-      // optimezed version is not working disable seeks
-      return {
-        enableWorker: true,
-        liveSyncDuration: 1,
-        liveMaxLatencyDuration: 5,
-        highBufferWatchdogPeriod: 1,
-        maxBufferLength: 20,
-        backBufferLength: 10,
-      };
-    }
+  private getPlayerConfig(): Partial<HlsConfig> {
     return {
       enableWorker: true,
       maxBufferLength: 20,
@@ -519,3 +451,9 @@ export class HMSHLSController implements IHMSHLSController, IHMSHLSControllerEve
     return levels.filter(({ videoCodec, width, height }) => !!videoCodec || !!(width && height));
   }
 }
+/**
+ * Use mostly video element
+ * remove mse supported
+ * video element canPlay is supported, throw error
+ * separate timedMetadata class and listen on timeupdate events
+ */

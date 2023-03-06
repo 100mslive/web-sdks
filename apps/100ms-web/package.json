@@ -9,6 +9,7 @@
     "src"
   ],
   "dependencies": {
+    "@100mslive/hls-player": "0.0.1",
     "@100mslive/hls-stats": "0.0.6",
     "@100mslive/hms-noise-suppression": "0.7.4",
     "@100mslive/hms-virtual-background": "1.9.4",

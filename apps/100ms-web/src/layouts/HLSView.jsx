@@ -1,9 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import {
-  HMSHLSController,
-  HMSHLSPlaybackState,
-} from "@100mslive/hls-controllers";
+import { HLSPlaybackState, HMSHLSPlayer } from "@100mslive/hls-player";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -28,7 +25,7 @@ import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 import { ToastManager } from "../components/Toast/ToastManager";
 import { APP_DATA } from "../common/constants";
 
-let hlsController;
+let hlsPlayer;
 
 const HLSView = () => {
   const videoRef = useRef(null);
@@ -45,14 +42,13 @@ const HLSView = () => {
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isMSENotSupported, setIsMSENotSupported] = useState(false);
   const isFullScreenSupported = screenfull.isEnabled;
   const [show, toggle] = useToggle(false);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
   /**
-   * initialize HMSHLSController and add event listeners.
+   * initialize HMSHLSPlayer and add event listeners.
    */
   useEffect(() => {
     let videoEl = videoRef.current;
@@ -67,80 +63,53 @@ const HLSView = () => {
         title: `Payload from timed Metadata ${data.payload}`,
       });
     };
-
-    const handleNoLongerLive = ({ isLive }) => {
+    const handleError = (_, data) => {
+      console.error("facing some error ", data);
+    };
+    const handleNoLongerLive = (_, { isLive }) => {
       setIsVideoLive(isLive);
     };
 
     const playbackEventHandler = (_, data) =>
-      data.state === HMSHLSPlaybackState.pause
-        ? setIsPaused(true)
-        : setIsPaused(false);
+      setIsPaused(data.state === HLSPlaybackState.pause);
 
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
     if (videoEl && hlsUrl) {
-      hlsController = new HMSHLSController(hlsUrl, videoEl);
-      hlsController.on(
-        HMSHLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+      hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
+      hlsPlayer.on(
+        HMSHLSPlayer.Events.SEEK_POS_BEHIND_LIVE_EDGE,
         handleNoLongerLive
       );
-      hlsController.on(
-        HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
+      hlsPlayer.on(
+        HMSHLSPlayer.Events.TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController.on(
-        HMSHLSController.Events.HLS_PLAYBACK_STATE,
-        playbackEventHandler
-      );
-      hlsController.on(
-        HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
-        handleAutoplayBlock
-      );
+      hlsPlayer.on(HMSHLSPlayer.Events.ERROR, handleError);
+      hlsPlayer.on(HMSHLSPlayer.Events.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer.on(HMSHLSPlayer.Events.AUTOPLAY_BLOCKED, handleAutoplayBlock);
 
-      if (HMSHLSController.isMSESupported()) {
-        hlsController.on(
-          HMSHLSController.Events.HLS_MANIFEST_LOADED,
-          manifestLoadedHandler
-        );
-        hlsController.on(
-          HMSHLSController.Events.HLS_LEVEL_UPDATED,
-          levelUpdatedHandler
-        );
-      }
-      if (
-        !HMSHLSController.isMSESupported() &&
-        videoEl.canPlayType("application/vnd.apple.mpegurl")
-      ) {
-        setIsMSENotSupported(true);
-      }
+      hlsPlayer.on(HMSHLSPlayer.Events.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsPlayer.on(HMSHLSPlayer.Events.LEVEL_UPDATED, levelUpdatedHandler);
     }
     return () => {
-      hlsController?.off(
-        HMSHLSController.Events.HLS_STREAM_NO_LONGER_LIVE,
+      hlsPlayer?.off(
+        HMSHLSPlayer.Events.SEEK_POS_BEHIND_LIVE_EDGE,
         handleNoLongerLive
       );
-      hlsController?.off(
-        HMSHLSController.Events.HLS_TIMED_METADATA_LOADED,
+      hlsPlayer?.off(HMSHLSPlayer.Events.ERROR, handleError);
+      hlsPlayer?.off(
+        HMSHLSPlayer.Events.TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsController?.off(
-        HMSHLSController.Events.HLS_PLAYBACK_STATE,
-        playbackEventHandler
-      );
-      hlsController?.off(
-        HMSHLSController.Events.HLS_AUTOPLAY_BLOCKED,
-        handleAutoplayBlock
-      );
-      hlsController?.off(
-        HMSHLSController.Events.HLS_MANIFEST_LOADED,
+      hlsPlayer?.off(HMSHLSPlayer.Events.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer?.off(HMSHLSPlayer.Events.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+      hlsPlayer?.off(
+        HMSHLSPlayer.Events.MANIFEST_LOADED,
         manifestLoadedHandler
       );
-      hlsController?.off(
-        HMSHLSController.Events.HLS_LEVEL_UPDATED,
-        levelUpdatedHandler
-      );
-      hlsController?.reset();
-      hlsController = null;
+      hlsPlayer?.off(HMSHLSPlayer.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsPlayer?.reset();
+      hlsPlayer = null;
     };
   }, [hlsUrl]);
 
@@ -148,23 +117,22 @@ const HLSView = () => {
    * initialize and subscribe to hlsState
    */
   useEffect(() => {
-    let unsubscribe;
+    let unsubscribeStats;
     if (enablHlsStats) {
-      unsubscribe = hlsController.subscribe(state => {
+      unsubscribeStats = hlsPlayer.subscribeStats(state => {
         setHlsStatsState(state);
       });
     } else {
-      unsubscribe?.();
+      unsubscribeStats?.();
     }
     return () => {
-      unsubscribe?.();
+      unsubscribeStats?.();
     };
   }, [enablHlsStats]);
 
   const unblockAutoPlay = async () => {
     try {
-      await videoRef.current?.play();
-      console.debug("Successfully started playing the stream.");
+      await hlsPlayer.unblockAutoPlay();
       setIsHlsAutoplayBlocked(false);
     } catch (error) {
       console.error("Tried to unblock Autoplay failed with", error.toString());
@@ -173,11 +141,11 @@ const HLSView = () => {
 
   const handleQuality = useCallback(
     qualityLevel => {
-      if (hlsController) {
+      if (hlsPlayer) {
         setIsUserSelectedAuto(
           qualityLevel.height.toString().toLowerCase() === "auto"
         );
-        hlsController.setCurrentLevel(qualityLevel);
+        hlsPlayer.setCurrentLevel(qualityLevel);
       }
     },
     [availableLevels] //eslint-disable-line
@@ -222,10 +190,10 @@ const HLSView = () => {
             unblockAutoPlay={unblockAutoPlay}
           />
           <HMSVideoPlayer.Root ref={videoRef}>
-            {!isMSENotSupported && (
+            {hlsPlayer && (
               <HMSVideoPlayer.Progress
                 onValueChange={currentTime => {
-                  hlsController.seekTo(currentTime);
+                  hlsPlayer.seekTo(currentTime);
                 }}
                 videoRef={videoRef}
               />
@@ -242,17 +210,17 @@ const HLSView = () => {
                   isPaused={isPaused}
                 />
                 <HMSVideoPlayer.Duration videoRef={videoRef} />
-                <HMSVideoPlayer.Volume hlsController={hlsController} />
+                <HMSVideoPlayer.Volume hlsPlayer={hlsPlayer} />
               </HMSVideoPlayer.Controls.Left>
 
               <HMSVideoPlayer.Controls.Right>
-                {!isMSENotSupported && hlsController ? (
+                {availableLevels.length > 0 ? (
                   <>
                     <IconButton
                       variant="standard"
                       css={{ px: "$2" }}
                       onClick={async () => {
-                        await hlsController.seekToLivePosition();
+                        await hlsPlayer.seekToLivePosition();
                         setIsVideoLive(true);
                       }}
                       key="jump-to-live_btn"

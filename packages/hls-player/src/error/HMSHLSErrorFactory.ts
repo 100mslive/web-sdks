@@ -75,11 +75,6 @@ export const HMSHLSErrorFactory = {
     },
   },
   UnknownError: (data: HLSErrorDetails): HMSHLSException => {
-    return new HMSHLSException(
-      HMSHLSExceptionEvents.VIDEO_ELEMENT_NOT_FOUND,
-      data.details,
-      'Unknown error',
-      data.fatal,
-    );
+    return new HMSHLSException(HMSHLSExceptionEvents.UNKNOWN_ERROR, data.details, 'Unknown error', data.fatal);
   },
 };

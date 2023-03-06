@@ -2,8 +2,8 @@ import { useState } from "react";
 import { SpeakerIcon } from "@100mslive/react-icons";
 import { Flex, Slider } from "@100mslive/react-ui";
 
-export const VolumeControl = ({ hlsController }) => {
-  const [volume, setVolume] = useState(hlsController?.volume ?? 100);
+export const VolumeControl = ({ hlsPlayer }) => {
+  const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);
 
   return (
     <Flex align="center" css={{ color: "$white" }}>
@@ -11,8 +11,8 @@ export const VolumeControl = ({ hlsController }) => {
         style={{ cursor: "pointer" }}
         onClick={() => {
           setVolume(0);
-          if (hlsController) {
-            hlsController.setVolume(0);
+          if (hlsPlayer) {
+            hlsPlayer.setVolume(0);
           }
         }}
       />
@@ -29,7 +29,7 @@ export const VolumeControl = ({ hlsController }) => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          hlsController.setVolume(volume);
+          hlsPlayer.setVolume(volume);
           setVolume(volume);
         }}
         thumbStyles={{ w: "$6", h: "$6" }}
