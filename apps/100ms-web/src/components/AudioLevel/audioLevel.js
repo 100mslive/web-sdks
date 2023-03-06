@@ -67,40 +67,45 @@ class RemoteAudioLevels {
   }
 
   async logAllPeersAudioLevels() {
+    if (!window.__triggerBeamEvent__) {
+      return;
+    }
     // optimise this to selectTracks instead of selecting peers
     const allPeers = this.store.getState(selectPeers);
     const peers = allPeers.filter(peer => !!peer.audioTrack);
+    const peerAudioLevels = [];
     for (const peer of peers) {
       const sdkTrack = this.actions.hmsSDKTracks[peer.audioTrack];
       const nativeStream = sdkTrack?.stream?.nativeStream;
       if (nativeStream) {
-        await this.logAudioLevel(peer, nativeStream);
+        const peerLevel = await this.getAudioLevel(peer, nativeStream);
+        if (peerLevel.level > 0) {
+          peerAudioLevels.push(peerLevel);
+        }
       }
+    }
+    if (peerAudioLevels.length > 0) {
+      const payload = {
+        event: "app-audio-level",
+        data: peerAudioLevels,
+      };
+      console.log("logging audio levels", peerAudioLevels);
+      window.__triggerBeamEvent__(JSON.stringify(payload));
     }
   }
 
-  async logAudioLevel(peer, stream) {
+  async getAudioLevel(peer, stream) {
     // take audio stream from getusermedia
     if (!this.analysers[stream.id]) {
       this.analysers[stream.id] = this.createAnalyserNode(stream);
     }
     const analyserNode = this.analysers[stream.id];
     const level = this.calculateAudioLevel(analyserNode);
-    if (level === 0) {
-      return;
-    }
-    console.log(`audio level for ${peer.name} is ${level}`);
-    if (window.__triggerBeamEvent__) {
-      const payload = {
-        event: "app-audio-level",
-        data: {
-          peerId: peer.id,
-          peerName: peer.name,
-          level,
-        },
-      };
-      window.__triggerBeamEvent__(JSON.stringify(payload));
-    }
+    return {
+      peerId: peer.id,
+      peerName: peer.name,
+      level,
+    };
   }
 
   createAnalyserNode(stream) {
