@@ -1,5 +1,4 @@
 import { HlsStats } from '@100mslive/hls-stats';
-import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import Hls, { ErrorData, Fragment, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
 import { HMSHLSMetadata } from './HMSHLSMetadata';
@@ -27,7 +26,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   constructor(hlsUrl: string, videoEl?: HTMLVideoElement) {
     this.hls = new Hls(this.getPlayerConfig());
-    this._emitter = new HMSHLSPlayerEventEmitter(new EventEmitter());
+    this._emitter = new HMSHLSPlayerEventEmitter();
     this.hlsUrl = hlsUrl;
     this.videoEl = videoEl || this.createVideoElement();
     if (!hlsUrl) {
@@ -155,7 +154,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   setCurrentLevel(currentLevel: ILevel) {
     if (this.hls) {
       const current = this.hls.levels.findIndex((level: Level) => {
-        return level?.attrs?.RESOLUTION === currentLevel?.attrs?.RESOLUTION;
+        return level?.attrs?.RESOLUTION === currentLevel?.resolution;
       });
       this.hls.currentLevel = current;
     }
@@ -251,7 +250,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this.validateVideoEl();
     this._volume = this.videoEl.volume;
   };
-  private handleNetworkRelatedError = (data: ErrorData) => {
+  private handleNetworkRelatedError = (data: ErrorData): boolean => {
     const details = data.error?.message || data.err?.message || '';
     const detail = {
       details: details,
@@ -261,28 +260,28 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
-        break;
+        return true;
       }
       case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
-        break;
+        return true;
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
-        break;
-      }
-      default: {
-        const error = HMSHLSErrorFactory.UnknownError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
-        break;
+        return true;
       }
     }
+    return false;
   };
+  // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
     const details = data.error?.message || data.err?.message || '';
-    this.handleNetworkRelatedError(data);
+    const isErrorFound = this.handleNetworkRelatedError(data);
+    if (isErrorFound) {
+      return;
+    }
     const detail = {
       details: details,
       fatal: data.fatal,
@@ -304,7 +303,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         break;
       }
       default: {
-        console.log('unknow data ', data);
         const error = HMSHLSErrorFactory.UnknownError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
         break;
@@ -312,8 +310,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
   };
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
-    const level: ILevel[] = mapLevels(levels);
-    this.removeAudioLevels(level);
+    const level: ILevel[] = mapLevels(this.removeAudioLevels(levels));
     this.emit(HMSHLSPlayerEvents.MANIFEST_LOADED, {
       levels: level,
     });
@@ -447,7 +444,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @param {Array} levels array from hlsJS
    * @returns a new array with only video levels.
    */
-  private removeAudioLevels(levels: ILevel[]) {
+  private removeAudioLevels(levels: LevelParsed[]) {
     return levels.filter(({ videoCodec, width, height }) => !!videoCodec || !!(width && height));
   }
 }

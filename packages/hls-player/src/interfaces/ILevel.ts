@@ -1,14 +1,12 @@
 import { AttrList, LevelParsed } from 'hls.js';
 
 export declare interface ILevel extends Partial<LevelParsed> {
-  readonly attrs: LevelAttributes;
   readonly bitrate: number;
   readonly height?: number;
   readonly id?: number;
-  readonly name: string | undefined;
   readonly width?: number;
-  readonly level?: number;
   url: string;
+  resolution?: string;
 }
 
 export declare interface LevelAttributes extends AttrList {

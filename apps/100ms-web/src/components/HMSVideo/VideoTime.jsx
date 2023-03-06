@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
+import { HMSHLSPlayer } from "@100mslive/hls-player";
 import { Text } from "@100mslive/react-ui";
 import { getDurationFromSeconds } from "./HMSVIdeoUtils";
 
-export const VideoTime = ({ videoRef }) => {
+export const VideoTime = ({ hlsPlayer }) => {
   const [videoTime, setVideoTime] = useState("");
 
   useEffect(() => {
-    const videoEl = videoRef.current;
-    const timeupdateHandler = _ =>
-      setVideoTime(getDurationFromSeconds(videoEl.currentTime));
-    if (videoEl) {
-      videoEl.addEventListener("timeupdate", timeupdateHandler);
+    const timeupdateHandler = (_, currentTime) =>
+      setVideoTime(getDurationFromSeconds(currentTime));
+    if (hlsPlayer) {
+      hlsPlayer.on(HMSHLSPlayer.Events.CURRENT_TIME, timeupdateHandler);
     }
     return function cleanup() {
-      if (videoEl) {
-        videoEl.removeEventListener("timeupdate", timeupdateHandler);
+      if (hlsPlayer) {
+        hlsPlayer.off(HMSHLSPlayer.Events.CURRENT_TIME, timeupdateHandler);
       }
     };
-  }, []);
+  }, [hlsPlayer]);
 
-  return videoRef.current ? (
+  return hlsPlayer ? (
     <Text
+      css={{
+        minWidth: "$16",
+      }}
       variant={{
         "@sm": "xs",
       }}

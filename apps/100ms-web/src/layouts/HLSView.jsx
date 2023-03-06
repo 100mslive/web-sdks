@@ -53,6 +53,7 @@ const HLSView = () => {
   useEffect(() => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = (_, { levels }) => {
+      console.log("level ", levels);
       setAvailableLevels(levels);
     };
     const levelUpdatedHandler = (_, { level }) => {
@@ -202,14 +203,12 @@ const HLSView = () => {
             <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
               <HMSVideoPlayer.Controls.Left>
                 <HMSVideoPlayer.PlayButton
-                  onClick={() => {
-                    isPaused
-                      ? videoRef.current?.play()
-                      : videoRef.current?.pause();
+                  onClick={async () => {
+                    isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
                   }}
                   isPaused={isPaused}
                 />
-                <HMSVideoPlayer.Duration videoRef={videoRef} />
+                <HMSVideoPlayer.Duration hlsPlayer={hlsPlayer} />
                 <HMSVideoPlayer.Volume hlsPlayer={hlsPlayer} />
               </HMSVideoPlayer.Controls.Left>
 

@@ -1,13 +1,13 @@
 import { HMSHLSException } from './HMSHLSException';
 import { HMSHLSExceptionEvents } from '../utilies/constants';
 
-export type HLSErrorDetails = {
+export type HMSHLSErrorDetails = {
   details: string;
   fatal?: boolean;
 };
 export const HMSHLSErrorFactory = {
   HLSNetworkError: {
-    manifestLoadError(data: HLSErrorDetails): HMSHLSException {
+    manifestLoadError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.MANIFEST_LOAD_ERROR,
         data.details,
@@ -15,7 +15,7 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    nanifestParsingError(data: HLSErrorDetails): HMSHLSException {
+    nanifestParsingError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.MANIFEST_PARSING_ERROR,
         data.details,
@@ -23,7 +23,7 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    levelLoadError(data: HLSErrorDetails): HMSHLSException {
+    levelLoadError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.LEVEL_LOAD_ERROR,
         data.details,
@@ -33,7 +33,7 @@ export const HMSHLSErrorFactory = {
     },
   },
   HLSMediaError: {
-    manifestIncompatibleCodecsError(data: HLSErrorDetails): HMSHLSException {
+    manifestIncompatibleCodecsError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.MANIFEST_INCOMPATIBLE_CODECS_ERROR,
         data.details,
@@ -41,7 +41,7 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    fragDecryptError(data: HLSErrorDetails): HMSHLSException {
+    fragDecryptError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.FRAG_DECRYPT_ERROR,
         data.details,
@@ -49,7 +49,7 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    bufferIncompatibleCodecsError(data: HLSErrorDetails): HMSHLSException {
+    bufferIncompatibleCodecsError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.BUFFER_INCOMPATIBLE_CODECS_ERROR,
         data.details,
@@ -74,7 +74,7 @@ export const HMSHLSErrorFactory = {
       );
     },
   },
-  UnknownError: (data: HLSErrorDetails): HMSHLSException => {
+  UnknownError: (data: HMSHLSErrorDetails): HMSHLSException => {
     return new HMSHLSException(HMSHLSExceptionEvents.UNKNOWN_ERROR, data.details, 'Unknown error', data.fatal);
   },
 };

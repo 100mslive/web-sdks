@@ -50,7 +50,10 @@ export interface IHMSHLSPlayerEventEmitter {
 }
 
 export class HMSHLSPlayerEventEmitter implements IHMSHLSPlayerEventEmitter {
-  constructor(private eventEmitter: EventEmitter) {}
+  private eventEmitter: EventEmitter;
+  constructor() {
+    this.eventEmitter = new EventEmitter();
+  }
   on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E], options?: boolean): void {
     this.eventEmitter.on(event, listener, options);
   }
