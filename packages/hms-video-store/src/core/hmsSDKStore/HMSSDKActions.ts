@@ -144,12 +144,12 @@ export class HMSSDKActions implements IHMSActions {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         //@ts-ignore
         if (layer === HMSSimulcastLayer.NONE) {
-          HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          HMSLogger.d(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
           return;
         }
         const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
         if (alreadyInSameState) {
-          HMSLogger.w(`preferred layer is already ${layer}`);
+          HMSLogger.d(`preferred layer is already ${layer}`);
           return;
         }
         this.setState(draftStore => {
@@ -160,7 +160,7 @@ export class HMSSDKActions implements IHMSActions {
         }, 'setPreferredLayer');
         await track.setPreferredLayer(layer);
       } else {
-        HMSLogger.w(`track ${trackId} is not a remote video track`);
+        HMSLogger.d(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
@@ -393,12 +393,12 @@ export class HMSSDKActions implements IHMSActions {
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+      await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
       }
-      this.logPossibleInconsistency('no video track found to remove sink');
+      HMSLogger.d('possible inconsistency detected - no video track found to remove sink');
     }
   }
 
@@ -789,7 +789,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }

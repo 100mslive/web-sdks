@@ -65,7 +65,7 @@ class Store implements IStore {
   }
 
   getRoom() {
-    return this.room!;
+    return this.room;
   }
 
   getPolicyForRole(role: string) {
@@ -215,6 +215,7 @@ class Store implements IStore {
         }
       }
     }
+    config.autoManageVideo = config.autoManageVideo !== false;
     this.config = config;
     this.setEnv();
   }
