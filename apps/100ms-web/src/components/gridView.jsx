@@ -5,6 +5,7 @@ import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
 import { useAppConfig } from "./AppData/useAppConfig";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -22,13 +23,14 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
   const headlessConfig = useAppConfig("headlessConfig");
+  const isHeadless = useIsHeadless();
   return (
     <Fragment>
       <Box
         css={{
           flex: "1 1 0",
           height: "100%",
-          mx: headlessConfig?.tileOffset === 0 ? "0" : "$8",
+          mx: isHeadless && headlessConfig?.tileOffset === 0 ? "0" : "$8",
           "@md": { flex: "2 1 0" },
         }}
       >
@@ -65,12 +67,13 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 // Side pane shows smaller tiles
 export const GridSidePaneView = ({ peers }) => {
   const headlessConfig = useAppConfig("headlessConfig");
+  const isHeadless = useIsHeadless();
   return (
     <Flex
       direction="column"
       css={{
         flex: "0 0 20%",
-        mx: headlessConfig?.tileOffset === 0 ? "0" : "$8",
+        mx: isHeadless && headlessConfig?.tileOffset === 0 ? "0" : "$8",
         "@lg": {
           flex: "0 0 25%",
         },
