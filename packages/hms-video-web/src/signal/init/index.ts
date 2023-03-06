@@ -46,8 +46,9 @@ export default class InitService {
         HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
         return transformInitConfig(config);
       } catch (err) {
-        HMSLogger.e(TAG, 'json error', (err as Error).message, response.text());
-        throw ErrorFactory.InitAPIErrors.ServerErrors(response.status, HMSAction.INIT, (err as Error).message);
+        const text = await response.text();
+        HMSLogger.e(TAG, 'json error', (err as Error).message, text);
+        throw ErrorFactory.InitAPIErrors.ServerErrors(response.status, HMSAction.INIT, text);
       }
     } catch (err) {
       const error = err as Error;
