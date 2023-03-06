@@ -118,6 +118,7 @@ describe('init API call', () => {
           code: 401,
           message: 'signature is invalid',
         }),
+      text: () => Promise.resolve('invalid token'),
       status: 401,
       statusText: '',
     } as unknown as Response;
