@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
 import { v4 } from "uuid";
+import { useHMSActions } from "@100mslive/react-sdk";
 import { Box, Flex, Loading, styled } from "@100mslive/react-ui";
 import PreviewContainer from "./Preview/PreviewContainer";
 import SidePane from "../layouts/SidePane";
@@ -32,6 +33,7 @@ import {
 const env = process.env.REACT_APP_ENV;
 const PreviewScreen = React.memo(({ getUserToken }) => {
   const navigate = useNavigation();
+  const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
   const [, setIsHeadless] = useSetUiSettings(UI_SETTINGS.isHeadless);
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
@@ -60,9 +62,25 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     if (!tokenEndpoint || !urlRoomId) {
       return;
     }
-    const getTokenFn = !userRole
-      ? () => getUserToken(v4())
+    const roomCode = !userRole && urlRoomId;
+    // new short code format: 3-4-3, old format: 3-3-3 or 3 random words
+    const isNewShortCode =
+      roomCode &&
+      roomCode
+        .split("-")
+        .every((part, index) =>
+          index === 1 ? part.length === 4 : part.length === 3
+        );
+
+    console.log(roomCode, isNewShortCode);
+
+    const getTokenFn = roomCode
+      ? isNewShortCode
+        ? () =>
+            hmsActions.getToken(roomCode, v4()).then(response => response.token)
+        : () => getUserToken(v4())
       : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
+
     getTokenFn()
       .then(token => {
         setToken(token);
@@ -70,7 +88,7 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
       .catch(error => {
         setError(convertPreviewError(error));
       });
-  }, [tokenEndpoint, urlRoomId, getUserToken, userRole, authToken]);
+  }, [hmsActions, tokenEndpoint, urlRoomId, getUserToken, userRole, authToken]);
 
   const onJoin = () => {
     !directJoinHeadful && setIsHeadless(skipPreview);
