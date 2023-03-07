@@ -25,7 +25,7 @@ export interface IStore {
   getPublishParams(): PublishParams | undefined;
   getErrorListener(): IErrorListener | undefined;
 
-  getRoom(): HMSRoom;
+  getRoom(): HMSRoom | undefined;
   getPolicyForRole(role: string): HMSRole;
   getKnownRoles(): KnownRoles;
   setSimulcastEnabled(enabled: boolean): void;
