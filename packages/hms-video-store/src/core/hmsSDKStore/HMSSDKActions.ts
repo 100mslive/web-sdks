@@ -167,6 +167,10 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  getToken(roomCode: string, userId?: string, env?: string): Promise<sdkTypes.TokenResult> {
+    return this.sdk.getToken(roomCode, userId, env);
+  }
+
   async preview(config: sdkTypes.HMSPreviewConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
