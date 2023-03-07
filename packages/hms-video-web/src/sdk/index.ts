@@ -18,6 +18,7 @@ import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
+  HMSAudioCodec,
   HMSChangeMultiTrackStateParams,
   HMSConfig,
   HMSConnectionQualityListener,
@@ -29,6 +30,7 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  HMSVideoCodec,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
@@ -39,6 +41,7 @@ import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import HMSLocalStream from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -624,17 +627,18 @@ export class HMSSdk implements HMSInterface {
       return;
     }
 
-    const type = track.kind;
     const nativeStream = new MediaStream([track]);
     const stream = new HMSLocalStream(nativeStream);
 
-    const TrackKlass = type === 'audio' ? HMSLocalAudioTrack : HMSLocalVideoTrack;
-    const hmsTrack = new TrackKlass(stream, track, source, this.eventBus);
-    await this.setPlaylistSettings({
-      track,
-      hmsTrack,
-      source,
-    });
+    let hmsTrack;
+    if (track.kind === 'audio') {
+      const settings = this.getAudioTrackSettings(source);
+
+      hmsTrack = new HMSLocalAudioTrack(stream, track, source, this.eventBus, settings);
+    } else {
+      const settings = this.getVideoTrackSettings(source, track);
+      hmsTrack = new HMSLocalVideoTrack(stream, track, source, this.eventBus, settings);
+    }
 
     await this.transport?.publish([hmsTrack]);
     hmsTrack.peerId = this.localPeer?.peerId;
@@ -1001,36 +1005,6 @@ export class HMSSdk implements HMSInterface {
   }
 
   /**
-   * Set bitrate and dimensions for playlist track
-   */
-  private async setPlaylistSettings({
-    track,
-    hmsTrack,
-    source,
-  }: {
-    track: MediaStreamTrack;
-    hmsTrack: HMSLocalAudioTrack | HMSLocalVideoTrack;
-    source: string;
-  }) {
-    if (source === 'videoplaylist') {
-      const settings: { maxBitrate?: number; width?: number; height?: number } = {};
-      if (track.kind === 'audio') {
-        settings.maxBitrate = 64;
-      } else {
-        settings.maxBitrate = 1000;
-        const { width, height } = track.getSettings();
-        settings.width = width;
-        settings.height = height;
-      }
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings(settings);
-    } else if (source === 'audioplaylist') {
-      // TODO: rt update from policy once policy is updated
-      await hmsTrack.setSettings({ maxBitrate: 64 });
-    }
-  }
-
-  /**
    * @param {HMSConfig} config
    * @param {string} role
    * @param {string} userId
@@ -1161,5 +1135,32 @@ export class HMSSdk implements HMSInterface {
     } else if (track.source === 'videoplaylist') {
       this.playlistManager.stop(HMSPlaylistType.video);
     }
+  }
+
+  private getAudioTrackSettings(source: HMSTrackSource) {
+    const publishParams = this.store.getPublishParams();
+    const isPlaylist = ['audioplaylist', 'videoplaylist'].includes(source);
+    const builder = new HMSAudioTrackSettingsBuilder();
+    builder.maxBitrate(isPlaylist ? 64 : publishParams?.audio.bitRate);
+    builder.codec(publishParams?.audio.codec as HMSAudioCodec);
+    return builder.build();
+  }
+
+  private getVideoTrackSettings(source: HMSTrackSource, track: MediaStreamTrack) {
+    const publishParams = this.store.getPublishParams();
+    const settings = track.getSettings();
+    const builder = new HMSVideoTrackSettingsBuilder()
+      .maxBitrate(
+        source === 'videoplaylist'
+          ? 1000
+          : source === 'screen'
+          ? publishParams?.screen.bitRate
+          : publishParams?.video.bitRate,
+      )
+      .maxFramerate(source === 'screen' ? publishParams?.screen.frameRate : publishParams?.video.frameRate)
+      .setWidth(settings.width)
+      .setHeight(settings.height)
+      .codec(publishParams?.video.codec as HMSVideoCodec);
+    return builder.build();
   }
 }

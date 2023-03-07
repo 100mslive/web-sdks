@@ -23,8 +23,10 @@ export default class HMSLocalStream extends HMSMediaStream {
         trackEncodings.push(...simulcastLayers);
       } else {
         const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track.settings.maxBitrate && !isNode) {
+        if (!isNode) {
           encodings.maxBitrate = track.settings.maxBitrate;
+          //@ts-ignore
+          encodings.maxFrameRate = track.settings.maxFramerate;
         }
         trackEncodings.push(encodings);
       }
