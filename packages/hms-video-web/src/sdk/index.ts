@@ -619,7 +619,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
     }
     const publishParams = this.store.getPublishParams();
-    if (!publishParams?.allowed.includes('screen')) {
+    if (!publishParams?.allowed?.includes('screen')) {
       throw ErrorFactory.GenericErrors.ValidationFailed('Screenshare not allowed for the current role');
     }
     if (!track || !(track instanceof MediaStreamTrack)) {
