@@ -613,13 +613,17 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  // eslint-disable-next-line complexity
   async addTrack(track: MediaStreamTrack, source: HMSTrackSource = 'regular'): Promise<void> {
-    if (!track) {
-      HMSLogger.w(this.TAG, 'Please pass a valid MediaStreamTrack');
-      return;
-    }
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot addTrack');
+    }
+    const publishParams = this.store.getPublishParams();
+    if (!publishParams?.allowed.includes('screen')) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('Screenshare not allowed for the current role');
+    }
+    if (!track || !(track instanceof MediaStreamTrack)) {
+      throw ErrorFactory.GenericErrors.ValidationFailed('pass a valid MediaStreamTrack');
     }
     const isTrackPresent = this.localPeer.auxiliaryTracks.find(t => t.trackId === track.id);
     if (isTrackPresent) {

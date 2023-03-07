@@ -64,6 +64,11 @@ export class PlaylistManager
       HMSLogger.w(this.TAG, `Please pass in a list of HMSPlaylistItem's`);
       return;
     }
+    if (!this.isPlaylistAllowed()) {
+      throw ErrorFactory.GenericErrors.ValidationFailed(
+        'Current role has no screenshare permissions to enable playlist feature',
+      );
+    }
     list.forEach((item: HMSPlaylistItem<T>) => {
       if (!this.state[item.type].list.find(listItem => listItem.url === item.url)) {
         this.state[item.type].list.push(item);
@@ -394,5 +399,9 @@ export class PlaylistManager
   private removeTrack = async (trackId: string) => {
     await this.sdk.removeTrack(trackId, true);
     HMSLogger.d(this.TAG, 'Playlist track removed', trackId);
+  };
+
+  private isPlaylistAllowed = () => {
+    return !!this.sdk.getLocalPeer()?.role?.publishParams?.allowed?.includes('screen');
   };
 }
