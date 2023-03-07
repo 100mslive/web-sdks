@@ -65,7 +65,7 @@ export class PlaylistManager
       return;
     }
     list.forEach((item: HMSPlaylistItem<T>) => {
-      if (!this.state[item.type].list.includes(item)) {
+      if (!this.state[item.type].list.find(listItem => listItem.url === item.url)) {
         this.state[item.type].list.push(item);
       }
     });

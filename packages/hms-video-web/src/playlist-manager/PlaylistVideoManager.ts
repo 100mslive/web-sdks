@@ -35,8 +35,6 @@ export class PlaylistVideoManager extends TypedEventEmitter<{
 
   async play(url: string) {
     this.videoElement = this.getVideoElement();
-    this.createCanvas();
-    this.videoElement = this.getVideoElement();
     this.videoElement.src = url;
     this.seeked = false;
     this.videoElement.onerror = () => {
@@ -54,6 +52,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{
       return this.tracks;
     }
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
+      this.createCanvas();
       // oncanplaythrough is called when enough media is loaded for play to be possible in two cases -
       //    * when play is called for the first time
       //    * when user jumps to any mid track timestamp using seekTo
@@ -65,9 +64,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{
           this.canvas.width = this.videoElement.videoWidth;
           this.canvas.height = this.videoElement.videoHeight;
           if (this.tracks.length === 0) {
-            await this.videoElement.play();
             this.clearCanvasAndTracks();
             await this.createTracksFromVideo();
+            await this.videoElement.play();
             resolve(this.tracks);
           } else {
             // No need to capture canvas stream/get audio track. They wull be auto updated
