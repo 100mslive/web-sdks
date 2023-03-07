@@ -61,15 +61,11 @@ export const ConferenceMainView = () => {
     const videoPlaylist = JSON.parse(
       process.env.REACT_APP_VIDEO_PLAYLIST || "[]"
     );
-    try {
-      if (videoPlaylist.length > 0) {
-        hmsActions.videoPlaylist.setList(videoPlaylist);
-      }
-      if (audioPlaylist.length > 0) {
-        hmsActions.audioPlaylist.setList(audioPlaylist);
-      }
-    } catch (error) {
-      console.error(error);
+    if (videoPlaylist.length > 0) {
+      hmsActions.videoPlaylist.setList(videoPlaylist);
+    }
+    if (audioPlaylist.length > 0) {
+      hmsActions.audioPlaylist.setList(audioPlaylist);
     }
   }, [isConnected, hmsActions]);
 

@@ -65,9 +65,8 @@ export class PlaylistManager
       return;
     }
     if (!this.isPlaylistAllowed()) {
-      throw ErrorFactory.GenericErrors.ValidationFailed(
-        'Current role has no screenshare permissions to enable playlist feature',
-      );
+      HMSLogger.e(this.TAG, 'Current role has no screenshare permissions to enable playlist feature');
+      return;
     }
     list.forEach((item: HMSPlaylistItem<T>) => {
       if (!this.state[item.type].list.find(listItem => listItem.url === item.url)) {
