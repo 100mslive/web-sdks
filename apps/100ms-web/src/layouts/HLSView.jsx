@@ -71,7 +71,7 @@ const HLSView = () => {
     };
 
     const playbackEventHandler = (_, data) =>
-      setIsPaused(data.state === HLSPlaybackState.pause);
+      setIsPaused(data.state === HLSPlaybackState.paused);
 
     const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
     if (videoEl && hlsUrl) {

@@ -1,7 +1,7 @@
 import { HlsStats } from '@100mslive/hls-stats';
 import Hls, { ErrorData, Fragment, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
-import { HMSHLSMetadata } from './HMSHLSMetadata';
+import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { ILevel } from '../interfaces/ILevel';
@@ -17,7 +17,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _subscribeHlsStats?: (() => void) | null = null;
   private _isLive: boolean;
   private _volume: number;
-  private _metaData: HMSHLSMetadata;
+  private _metaData: HMSHLSTimedMetadata;
   /**
    * Initiliaze the player with hlsUrl and video element
    * @remarks If video element is not passed, we will create one and call a method getVideoElement get element
@@ -34,9 +34,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(this.videoEl);
-    this._metaData = new HMSHLSMetadata(this, this.videoEl);
+    this._metaData = new HMSHLSTimedMetadata(this);
     this._isLive = true;
-    this._metaData.startMetadataListner();
     this._volume = this.videoEl.volume * 100;
     this.hlsStats = new HlsStats(this.hls, this.videoEl);
     this.listenHLSEvent();
@@ -91,7 +90,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       this.unsubscribeStats();
     }
     if (this._metaData) {
-      this._metaData.endMetaListner();
+      this._metaData.unregisterListener();
     }
     if (Hls.isSupported()) {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
@@ -238,12 +237,12 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
   private playEventHandler = () => {
     this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
-      state: HLSPlaybackState.play,
+      state: HLSPlaybackState.playing,
     });
   };
   private pauseEventHandler = () => {
     this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
-      state: HLSPlaybackState.pause,
+      state: HLSPlaybackState.paused,
     });
   };
   private volumeEventHandler = () => {

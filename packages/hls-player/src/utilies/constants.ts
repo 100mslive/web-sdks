@@ -29,6 +29,6 @@ export enum HMSHLSExceptionEvents {
 }
 
 export enum HLSPlaybackState {
-  play,
-  pause,
+  playing,
+  paused,
 }
