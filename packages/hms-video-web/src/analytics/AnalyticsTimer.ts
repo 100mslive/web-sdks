@@ -13,6 +13,7 @@ export enum TimedEvent {
   PEER_LIST = 'peer_list_time',
   ROOM_STATE = 'room_state_time',
   JOIN_RESPONSE = 'join_response_time',
+  GET_TOKEN = 'GET_TOKEN',
 }
 
 const defaultEventNames = [

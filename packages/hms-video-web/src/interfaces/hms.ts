@@ -9,6 +9,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
+import { TokenResult } from './token-result';
 import { HMSScreenShareConfig } from './track-settings';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -21,6 +22,8 @@ export default interface HMS {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
+
+  getToken(roomCode: string, userId?: string, env?: string): Promise<TokenResult>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
