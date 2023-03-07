@@ -67,7 +67,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
         </Flex>
       )}
       {showStatsOnTiles ? (
-        <Box css={{ "& > div": { top: "$14", left: "$8" } }}>
+        <Box css={{ "& > div": { top: active ? "$14" : "$4", left: "$8" } }}>
           <VideoTileStats
             audioTrackID={audioTrack?.id}
             videoTrackID={videoTrack?.id}
