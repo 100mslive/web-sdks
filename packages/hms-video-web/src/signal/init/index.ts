@@ -41,7 +41,7 @@ export default class InitService {
         },
       });
       try {
-        const config = await response.json();
+        const config = await response.clone().json();
         this.handleError(response, config);
         HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
         return transformInitConfig(config);
