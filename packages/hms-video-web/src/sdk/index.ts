@@ -504,7 +504,7 @@ export class HMSSdk implements HMSInterface {
         method: 'POST',
         body: JSON.stringify({ user_id: tokenRequest.userId }),
       },
-      [500, 429],
+      [429, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511],
     );
 
     const data = await response.json();
