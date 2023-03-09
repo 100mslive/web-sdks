@@ -29,6 +29,8 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  TokenRequest,
+  TokenRequestOptions,
   TokenResult,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
@@ -492,15 +494,15 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async getToken(roomCode: string, userId?: string | undefined, env = 'prod'): Promise<TokenResult> {
+  async getToken(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult> {
     const tokenEndpoint =
-      env && `https://auth${env === 'prod' ? '' : '-nonprod'}.100ms.live/v2/room-codes/token/${roomCode}`;
+      tokenRequestOptions?.endpoint || `https://auth.100ms.live/v2/room-codes/token/${tokenRequest.roomCode}`;
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
       tokenEndpoint,
       {
         method: 'POST',
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ user_id: tokenRequest.userId }),
       },
       [500, 429],
     );

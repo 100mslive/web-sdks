@@ -50,6 +50,8 @@ import {
   RTMPRecordingConfig,
   ScreenCaptureHandle,
   simulcastMapping,
+  TokenRequest,
+  TokenRequestOptions,
   TokenResult,
 } from '@100mslive/hms-video';
 
@@ -108,5 +110,7 @@ export type {
   RID,
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
   TokenResult,
 };

@@ -10,6 +10,8 @@ import {
   HMSScreenShareConfig,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
+  TokenRequest,
+  TokenRequestOptions,
   TokenResult,
 } from '@100mslive/hms-video';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
@@ -474,5 +476,5 @@ export interface IHMSActions {
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
 
-  getToken(roomCode: string, userId?: string, env?: string): Promise<TokenResult>;
+  getToken(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
 }

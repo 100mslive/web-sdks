@@ -75,7 +75,9 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     const getTokenFn = roomCode
       ? isNewShortCode
         ? () =>
-            hmsActions.getToken(roomCode, v4()).then(response => response.token)
+            hmsActions
+              .getToken({ roomCode, userId: v4() })
+              .then(response => response.token)
         : () => getUserToken(v4())
       : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
 

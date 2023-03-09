@@ -39,6 +39,8 @@ export type {
   HMSScreenShareConfig,
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
   TokenResult,
 } from './hmsSDKStore/sdkTypes';
 
