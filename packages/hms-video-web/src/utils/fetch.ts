@@ -12,7 +12,7 @@ export const fetchWithRetry = async (
     try {
       // fetch will throw error if there's a browser-level issue
       const response = await fetch(url, options);
-      const data = await response.json();
+      const data = await response.clone().json();
       // throw error for additional codes to retry based on server's response
       if (retryCodes && !response.ok && retryCodes.includes(data.code)) {
         throw Error(data.message);
