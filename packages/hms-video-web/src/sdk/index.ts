@@ -493,8 +493,8 @@ export class HMSSdk implements HMSInterface {
   }
 
   async getToken(roomCode: string, userId?: string | undefined, env = 'prod'): Promise<TokenResult> {
-    const tokenEndpoint = env && `https://dev-in2.100ms.live/room-codes/api/v2/token/${roomCode}`;
-
+    const tokenEndpoint =
+      env && `https://auth${env === 'prod' ? '' : '-nonprod'}.100ms.live/v2/room-codes/token/${roomCode}`;
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
       tokenEndpoint,

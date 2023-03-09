@@ -72,8 +72,6 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
           index === 1 ? part.length === 4 : part.length === 3
         );
 
-    console.log(roomCode, isNewShortCode);
-
     const getTokenFn = roomCode
       ? isNewShortCode
         ? () =>
