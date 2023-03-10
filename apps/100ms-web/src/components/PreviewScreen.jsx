@@ -156,7 +156,21 @@ const PreviewScreen = React.memo(
 
 const convertPreviewError = error => {
   console.error("[error]", { error });
-  if (error.response && error.response.status === 404) {
+  if (error.message && error.message === "code not active") {
+    return {
+      title: "Room code is disabled",
+      body: ErrorWithSupportLink(
+        "Room code corresponding to this link is no more active."
+      ),
+    };
+  } else if (error.message && error.message === "code not found") {
+    return {
+      title: "Room does not exist",
+      body: ErrorWithSupportLink(
+        "We could not find a room corresponding to this link."
+      ),
+    };
+  } else if (error.response && error.response.status === 404) {
     return {
       title: "Room does not exist",
       body: ErrorWithSupportLink(
