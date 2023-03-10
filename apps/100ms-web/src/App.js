@@ -83,6 +83,7 @@ export function EdtechComponent({
   getUserToken = defaultGetUserToken,
   policyConfig = envPolicyConfig,
   getDetails = () => {},
+  authTokenByRoomCodeEndpoint = "",
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
@@ -135,6 +136,7 @@ export function EdtechComponent({
             <AppRoutes
               getUserToken={getUserTokenCallback}
               getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
             />
           </Box>
         </HMSRoomProvider>
@@ -166,7 +168,11 @@ const RedirectToPreview = ({ getDetails }) => {
   );
 };
 
-const RouteList = ({ getUserToken, getDetails }) => {
+const RouteList = ({
+  getUserToken,
+  getDetails,
+  authTokenByRoomCodeEndpoint,
+}) => {
   return (
     <Routes>
       <Route path="preview">
@@ -174,7 +180,10 @@ const RouteList = ({ getUserToken, getDetails }) => {
           path=":roomId/:role"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen getUserToken={getUserToken} />
+              <PreviewScreen
+                getUserToken={getUserToken}
+                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              />
             </Suspense>
           }
         />
@@ -182,7 +191,10 @@ const RouteList = ({ getUserToken, getDetails }) => {
           path=":roomId"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen getUserToken={getUserToken} />
+              <PreviewScreen
+                getUserToken={getUserToken}
+                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              />
             </Suspense>
           }
         />
