@@ -1,6 +1,7 @@
 /**
  * @param retryCodes codes from the server reponse that needs to be retried
  */
+// eslint-disable-next-line complexity
 export const fetchWithRetry = async (
   url: RequestInfo,
   options: RequestInit,
@@ -14,7 +15,7 @@ export const fetchWithRetry = async (
       const response = await fetch(url, options);
       const data = await response.clone().json();
       // throw error for additional codes to retry based on server's response
-      if (retryCodes && !response.ok && retryCodes.includes(data.code)) {
+      if (retryCodes && retryCodes.length && !response.ok && retryCodes.includes(data.code)) {
         throw Error(data.message);
       }
 
