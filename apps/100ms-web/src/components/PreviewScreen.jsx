@@ -78,7 +78,7 @@ const PreviewScreen = React.memo(
           ? () =>
               hmsActions
                 .getAuthTokenByRoomCode(
-                  { roomCode, userId: uuid() },
+                  { roomCode },
                   { endpoint: authTokenByRoomCodeEndpoint }
                 )
                 .then(response => response.token)
