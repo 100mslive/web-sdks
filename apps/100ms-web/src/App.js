@@ -90,7 +90,7 @@ export function EdtechComponent({
     .map(el => parseInt(el));
 
   const getUserTokenCallback = useCallback(getUserToken, []); //eslint-disable-line
-
+  console.log("EdtechComponent::endpoint", authTokenByRoomCodeEndpoint);
   return (
     <ErrorBoundary>
       <HMSThemeProvider
@@ -173,6 +173,7 @@ const RouteList = ({
   getDetails,
   authTokenByRoomCodeEndpoint,
 }) => {
+  console.log("Routelist::endpoint", authTokenByRoomCodeEndpoint);
   return (
     <Routes>
       <Route path="preview">
