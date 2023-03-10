@@ -251,7 +251,7 @@ const BackSwipe = () => {
   return null;
 };
 
-function AppRoutes({ getUserToken, getDetails }) {
+function AppRoutes({ getUserToken, getDetails, authTokenByRoomCodeEndpoint }) {
   return (
     <Router>
       <ToastContainer />
@@ -264,13 +264,21 @@ function AppRoutes({ getUserToken, getDetails }) {
         <Route
           path="/*"
           element={
-            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+            <RouteList
+              getUserToken={getUserToken}
+              getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+            />
           }
         />
         <Route
           path="/streaming/*"
           element={
-            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+            <RouteList
+              getUserToken={getUserToken}
+              getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+            />
           }
         />
       </Routes>
