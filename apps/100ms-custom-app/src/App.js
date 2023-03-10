@@ -285,7 +285,7 @@ const App = () => {
               recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
-            authTokenEndpointByRoomCode={getAuthTokenByRoomCodeEndpoint()}
+            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
             getDetails={fetchData}
           />
         </Suspense>

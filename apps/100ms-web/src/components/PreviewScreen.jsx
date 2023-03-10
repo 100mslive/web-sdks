@@ -55,8 +55,6 @@ const PreviewScreen = React.memo(
     const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
     let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
 
-    console.log("endpoint", authTokenByRoomCodeEndpoint);
-
     useEffect(() => {
       if (authToken) {
         setToken(authToken);
