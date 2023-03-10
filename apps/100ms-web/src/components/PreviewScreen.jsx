@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
-import { v4 } from "uuid";
+import { v4 as uuid } from "uuid";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { Box, Flex, Loading, styled } from "@100mslive/react-ui";
 import PreviewContainer from "./Preview/PreviewContainer";
@@ -76,10 +76,10 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
       ? isNewShortCode
         ? () =>
             hmsActions
-              .getToken({ roomCode, userId: v4() })
+              .getAuthTokenByRoomCode({ roomCode, userId: uuid() })
               .then(response => response.token)
-        : () => getUserToken(v4())
-      : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
+        : () => getUserToken(uuid())
+      : () => getToken(tokenEndpoint, uuid(), userRole, urlRoomId);
 
     getTokenFn()
       .then(token => {

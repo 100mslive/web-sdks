@@ -23,7 +23,7 @@ export default interface HMS {
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
 
-  getToken(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];

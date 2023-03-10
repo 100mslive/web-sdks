@@ -494,12 +494,15 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async getToken(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult> {
-    const tokenEndpoint =
-      tokenRequestOptions?.endpoint || `https://auth.100ms.live/v2/room-codes/token/${tokenRequest.roomCode}`;
+  async getAuthTokenByRoomCode(
+    tokenRequest: TokenRequest,
+    tokenRequestOptions?: TokenRequestOptions,
+  ): Promise<TokenResult> {
+    const { endpoint = 'https://auth.100ms.live/v2/room-codes/token/' } = tokenRequestOptions || {};
+    const tokenAPIURL = `${endpoint}${tokenRequest.roomCode}`;
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
-      tokenEndpoint,
+      tokenAPIURL,
       {
         method: 'POST',
         body: JSON.stringify({ user_id: tokenRequest.userId }),
@@ -515,7 +518,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     const { token } = data;
-    if (token === null) {
+    if (!token) {
       throw Error(data.message);
     }
     return {
