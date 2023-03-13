@@ -514,7 +514,7 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.end(TimedEvent.GET_TOKEN);
 
     if (!response.ok) {
-      throw new Error(data.message);
+      throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
     }
 
     const { token } = data;
