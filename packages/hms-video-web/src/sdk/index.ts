@@ -498,14 +498,13 @@ export class HMSSdk implements HMSInterface {
     tokenRequest: TokenRequest,
     tokenRequestOptions?: TokenRequestOptions,
   ): Promise<TokenResult> {
-    const endpoint = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/room-codes/token/';
-    const tokenAPIURL = `${endpoint}${tokenRequest.roomCode}`;
+    const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/token';
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
       tokenAPIURL,
       {
         method: 'POST',
-        body: JSON.stringify({ user_id: tokenRequest.userId }),
+        body: JSON.stringify({ code: tokenRequest.roomCode, user_id: tokenRequest.userId }),
       },
       [429, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511],
     );
