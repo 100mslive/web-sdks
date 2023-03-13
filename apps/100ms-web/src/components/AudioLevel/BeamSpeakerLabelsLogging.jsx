@@ -7,7 +7,7 @@ export function BeamSpeakerLabelsLogging() {
   const isHeadless = useIsHeadless();
 
   useEffect(() => {
-    if (!isHeadless) {
+    if (isHeadless) {
       hmsActions.enableBeamSpeakerLabelsLogging();
     }
   }, [hmsActions, isHeadless]);
