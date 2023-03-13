@@ -105,7 +105,7 @@ export class HMSSDKActions implements IHMSActions {
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
-  private beamSpeakerLabelsLogger: BeamSpeakerLabelsLogger | undefined;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger;
 
   constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
     this.store = store;
