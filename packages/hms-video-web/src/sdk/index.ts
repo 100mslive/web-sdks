@@ -524,8 +524,6 @@ export class HMSSdk implements HMSInterface {
     return {
       token,
       expiresAt: data.expires_at,
-      roomId: data.room_id,
-      role: data.role,
     };
   }
 
