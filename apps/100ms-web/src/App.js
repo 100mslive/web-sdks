@@ -259,9 +259,7 @@ function AppRoutes({ getUserToken, getDetails, authTokenByRoomCodeEndpoint }) {
       <Confetti />
       <RemoteStopScreenshare />
       <KeyboardHandler />
-      {FeatureFlags.enableBeamSpeakersLogging ? (
-        <BeamSpeakerLabelsLogging />
-      ) : null}
+      <BeamSpeakerLabelsLogging />
       <Routes>
         <Route
           path="/*"
