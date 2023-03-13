@@ -10,8 +10,6 @@ on:
   schedule:
     # qa-in
     - cron: '0 9 * * *'
-    # qa-us
-    - cron: '10 9 * * *'
     # prod-in
     - cron: '20 9 * * *'
     # prod-us
@@ -49,10 +47,6 @@ jobs:
       - name: (From Cron) QA-IN
         if: github.event.schedule == '0 9 * * *'
         run: echo "REGION=qa-in" >> $GITHUB_ENV
-
-      - name: (From Cron) QA-US
-        if: github.event.schedule == '10 9 * * *'
-        run: echo "REGION=qa-us" >> $GITHUB_ENV
 
       - name: (From Cron) PROD-IN
         if: github.event.schedule == '20 9 * * *'
