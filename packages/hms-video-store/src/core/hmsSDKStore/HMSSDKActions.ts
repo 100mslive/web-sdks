@@ -678,6 +678,7 @@ export class HMSSDKActions implements IHMSActions {
 
   async enableBeamSpeakerLabelsLogging() {
     if (!this.beamSpeakerLabelsLogger) {
+      HMSLogger.i('enabling beam speaker labels logging');
       this.beamSpeakerLabelsLogger = new BeamSpeakerLabelsLogger(this.store, this);
       await this.beamSpeakerLabelsLogger.start();
     }

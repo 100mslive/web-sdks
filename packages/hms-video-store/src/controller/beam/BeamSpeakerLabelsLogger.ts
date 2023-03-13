@@ -7,16 +7,15 @@ import { IHMSActions } from '../../core/IHMSActions';
  * diarization.
  */
 export class BeamSpeakerLabelsLogger {
-  private audioContext: AudioContext;
+  private audioContext?: AudioContext;
   private readonly intervalMs: number;
   private shouldMonitor: boolean;
   private hasStarted: boolean;
   private unsubs: any[];
   private readonly analysers: Record<string, AnalyserNode>;
-  private store: IHMSStore;
+  private readonly store: IHMSStore;
   private actions: IHMSActions;
   constructor(store: IHMSStore, actions: IHMSActions) {
-    this.audioContext = new AudioContext();
     this.intervalMs = 100;
     this.shouldMonitor = false;
     this.hasStarted = false;
@@ -31,7 +30,12 @@ export class BeamSpeakerLabelsLogger {
       return;
     }
     this.hasStarted = true;
-    HMSLogger.i('starting audio level monitor for remote peers');
+    HMSLogger.d('starting audio level monitor for remote peers', this.store);
+    const isConnected = this.store.getState(selectIsConnectedToRoom);
+    HMSLogger.d('starting audio levels is connected to room', isConnected);
+    if (isConnected) {
+      await this.monitorAudioLevels();
+    }
     const unsub = this.store.subscribe(this.monitorAudioLevels.bind(this), selectIsConnectedToRoom);
     this.unsubs.push(unsub);
   }
@@ -49,26 +53,29 @@ export class BeamSpeakerLabelsLogger {
   async monitorAudioLevels() {
     const isConnected = this.store.getState(selectIsConnectedToRoom);
     if (!isConnected) {
-      HMSLogger.i('room no longer connected, stopping audio level monitoring for remote');
-      this.shouldMonitor = false;
+      if (this.shouldMonitor) {
+        HMSLogger.i('room no longer connected, stopping audio level monitoring for remote');
+        this.shouldMonitor = false;
+      }
       return;
     }
     if (this.shouldMonitor) {
       return;
     }
-    HMSLogger.d('monitoring audio levels');
+    HMSLogger.i('monitoring audio levels');
     this.shouldMonitor = true;
     const loop = () => {
       if (this.shouldMonitor) {
         this.logAllPeersAudioLevels();
         setTimeout(loop, this.intervalMs);
       } else {
-        HMSLogger.d('stopped monitoring audio levels');
+        HMSLogger.i('stopped monitoring audio levels');
       }
     };
     setTimeout(loop, 1000);
   }
 
+  // eslint-disable-next-line complexity
   async logAllPeersAudioLevels() {
     if (!window.__triggerBeamEvent__) {
       return;
@@ -81,6 +88,9 @@ export class BeamSpeakerLabelsLogger {
       // @ts-ignore
       const sdkTrack = this.actions.hmsSDKTracks[peer.audioTrack];
       const nativeStream: MediaStream = sdkTrack?.stream?.nativeStream;
+      if (!peer.joinedAt) {
+        continue;
+      }
       if (nativeStream) {
         const peerLevel = await this.getAudioLevel(peer, nativeStream);
         if (peerLevel.level > 0) {
@@ -93,13 +103,12 @@ export class BeamSpeakerLabelsLogger {
         event: 'app-audio-level',
         data: peerAudioLevels,
       };
-      HMSLogger.d('logging audio levels', peerAudioLevels);
+      // HMSLogger.d('logging audio levels', peerAudioLevels);
       window.__triggerBeamEvent__(JSON.stringify(payload));
     }
   }
 
   async getAudioLevel(peer: HMSPeer, stream: MediaStream) {
-    // take audio stream from getusermedia
     if (!this.analysers[stream.id]) {
       this.analysers[stream.id] = this.createAnalyserNode(stream);
     }
@@ -113,6 +122,9 @@ export class BeamSpeakerLabelsLogger {
   }
 
   createAnalyserNode(stream: MediaStream) {
+    if (!this.audioContext) {
+      this.audioContext = new AudioContext();
+    }
     const analyser = this.audioContext.createAnalyser();
     const source = this.audioContext.createMediaStreamSource(stream);
     source.connect(analyser);
