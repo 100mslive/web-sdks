@@ -165,9 +165,9 @@ const convertPreviewError = error => {
     };
   } else if (error.message && error.message === "code not found") {
     return {
-      title: "Room does not exist",
+      title: "Room code does not exist",
       body: ErrorWithSupportLink(
-        "We could not find a room corresponding to this link."
+        "We could not find a room code corresponding to this link."
       ),
     };
   } else if (error.response && error.response.status === 404) {
