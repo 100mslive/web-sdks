@@ -67,17 +67,20 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       const streamId = stream.id;
+      const mid = e.transceiver.mid;
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
 
-        stream.onremovetrack = e => {
+        stream.onremovetrack = (ev: MediaStreamTrackEvent) => {
           /*
            * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
            * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
            * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
            */
-          const toRemoveTrackIdx = remote.tracks.findIndex(track => track.nativeTrack.id === e.track.id);
+          const toRemoveTrackIdx = remote.tracks.findIndex(
+            track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === mid,
+          );
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
