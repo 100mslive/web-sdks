@@ -25,6 +25,7 @@ declare global {
   interface Window {
     __hms: HMSReactiveStore;
     __beam: BeamControllerStore;
+    __triggerBeamEvent__: (args: any) => void;
   }
 }
 

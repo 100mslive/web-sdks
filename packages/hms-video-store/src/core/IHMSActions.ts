@@ -477,4 +477,10 @@ export interface IHMSActions {
   setAppData(key: string, value: any): void;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
+
+  /**
+   * enable sending audio speaker data to beam
+   * @alpha
+   */
+  enableBeamSpeakerLabelsLogging(): Promise<void>;
 }
