@@ -40,10 +40,16 @@ export default class InitService {
           Authorization: `Bearer ${token}`,
         },
       });
-      const config = await response.json();
-      this.handleError(response, config);
-      HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
-      return transformInitConfig(config);
+      try {
+        const config = await response.clone().json();
+        this.handleError(response, config);
+        HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+        return transformInitConfig(config);
+      } catch (err) {
+        const text = await response.text();
+        HMSLogger.e(TAG, 'json error', (err as Error).message, text);
+        throw ErrorFactory.InitAPIErrors.ServerErrors(response.status, HMSAction.INIT, text);
+      }
     } catch (err) {
       const error = err as Error;
       if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
