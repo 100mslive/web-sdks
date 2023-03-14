@@ -418,7 +418,7 @@ export default class HMSTransport implements ITransport {
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
           ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
           ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
-          ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+          ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         ].includes(error.code) ||
           error.code.toString().startsWith('5') ||
           error.code.toString().startsWith('429'));
@@ -1011,7 +1011,7 @@ export default class HMSTransport implements ITransport {
 
   private async openSignal(token: string, peerId: string) {
     if (!this.initConfig) {
-      throw ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
+      throw ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
 
     HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);

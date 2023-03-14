@@ -10,6 +10,7 @@ import {
   mapFromBackend,
   mapTileShape,
   storeRoomSettings,
+  getAuthTokenByRoomCodeEndpoint
 } from './utils/utils';
 
 import logoLight from './assets/images/logo-on-white.png';
@@ -283,6 +284,7 @@ const App = () => {
               recordingUrl: settings.recording_url,
             }}
             getUserToken={getRoomDetails}
+            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
             getDetails={fetchData}
           />
         </Suspense>

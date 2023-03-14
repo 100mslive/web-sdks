@@ -29,6 +29,9 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  TokenRequest,
+  TokenRequestOptions,
+  TokenResult,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
@@ -55,6 +58,7 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -488,6 +492,38 @@ export class HMSSdk implements HMSInterface {
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
+  }
+
+  async getAuthTokenByRoomCode(
+    tokenRequest: TokenRequest,
+    tokenRequestOptions?: TokenRequestOptions,
+  ): Promise<TokenResult> {
+    const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/token';
+    this.analyticsTimer.start(TimedEvent.GET_TOKEN);
+    const response = await fetchWithRetry(
+      tokenAPIURL,
+      {
+        method: 'POST',
+        body: JSON.stringify({ code: tokenRequest.roomCode, user_id: tokenRequest.userId }),
+      },
+      [429, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511],
+    );
+
+    const data = await response.json();
+    this.analyticsTimer.end(TimedEvent.GET_TOKEN);
+
+    if (!response.ok) {
+      throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
+    }
+
+    const { token } = data;
+    if (!token) {
+      throw Error(data.message);
+    }
+    return {
+      token,
+      expiresAt: data.expires_at,
+    };
   }
 
   getLocalPeer() {

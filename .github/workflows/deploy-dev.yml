@@ -36,6 +36,7 @@ jobs:
       REACT_APP_ENABLE_WHITEBOARD: 'true'
       REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
       REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
+      REACT_APP_ENABLE_BEAM_SPEAKERS_LOGGING: 'true'
     steps:
       - name: log inputs
         run: |
