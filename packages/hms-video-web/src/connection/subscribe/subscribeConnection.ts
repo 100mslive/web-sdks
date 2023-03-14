@@ -79,7 +79,10 @@ export default class HMSSubscribeConnection extends HMSConnection {
            * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
            */
           const toRemoveTrackIdx = remote.tracks.findIndex(
-            track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === mid,
+            track =>
+              track.nativeTrack.id === ev.track.id &&
+              e.transceiver.mid === mid &&
+              e.transceiver.currentDirection === 'recvonly',
           );
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
