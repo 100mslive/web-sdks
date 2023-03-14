@@ -1,3 +1,5 @@
+import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+
 /**
  * @param retryCodes codes from the server reponse that needs to be retried
  */
@@ -16,13 +18,16 @@ export const fetchWithRetry = async (
       const data = await response.clone().json();
       // throw error for additional codes to retry based on server's response
       if (retryCodes && retryCodes.length && !response.ok && retryCodes.includes(data.code)) {
-        throw Error(data.message);
+        throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
       }
 
       return response;
     } catch (err) {
       error = err as unknown as Error;
     }
+  }
+  if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
+    throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.GET_TOKEN, error.message);
   }
   throw error;
 };
