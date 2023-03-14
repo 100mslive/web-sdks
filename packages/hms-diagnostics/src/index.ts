@@ -11,22 +11,30 @@ import {
   validateRTCPeerConnection,
 } from '@100mslive/hms-video';
 import { initialState } from './initial-state';
-import type { ConnectivityKeys, HMSDiagnosticsConfig } from './interfaces';
-import { HMSDiagnosticsInterface, HMSDiagnosticsOutput, HMSDiagnosticUpdateListener } from './interfaces';
+import {
+  ConnectivityKeys,
+  HMSDiagnosticsCheck,
+  HMSDiagnosticsConfig,
+  HMSDiagnosticsInterface,
+  HMSDiagnosticsOutput,
+  HMSDiagnosticsPath,
+  HMSDiagnosticUpdateListener,
+} from './interfaces';
 import { DEFAULT_DIAGNOSTICS_USERNAME, PROD_INIT_ENDPOINT } from './utils';
 
-const descriptionForPath: Record<string, string> = {
-  'connectivity.init':
-    'Verifies connectivity to Init API which provides preliminary data about the session such as cluster, media servers, etc.',
-  'connectivity.websocket': 'Verifies the bidirectional connectivity to 100ms server for essential communication',
-  webRTC: 'Verifies if browser is WebRTC compatible and has the related necessary interfaces',
-  devices:
+const descriptionForCheck: Record<HMSDiagnosticsCheck, string> = {
+  Init: 'Verifies connectivity to Init API which provides preliminary data about the session such as cluster, media servers, etc.',
+  Websocket: 'Verifies the bidirectional connectivity to 100ms server for essential communication',
+  WebRTC: 'Verifies if browser is WebRTC compatible and has the related necessary interfaces',
+  Devices:
     'Verifies if the app is used under secure context(HTTPS) and the browser navigator has access camera/microphone fetching interfaces',
-  'devices.camera': 'Verifies if the camera works properly',
-  'devices.microphone': 'Verifies if the microphone works properly',
+  Camera: 'Verifies if the camera works properly',
+  Microphone: 'Verifies if the microphone works properly',
+  StunTCP: 'Verifies connectivity to 100ms media server',
+  StunUDP: 'Verifies connectivity to 100ms media server',
+  TurnTCP: 'Verifies connectivity to 100ms media server',
+  TurnUDP: 'Verifies connectivity to 100ms media server',
 };
-
-export { TrackAudioLevelMonitor } from '@100mslive/hms-video';
 
 export class HMSDiagnostics implements HMSDiagnosticsInterface {
   private result: HMSDiagnosticsOutput;
@@ -53,12 +61,13 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       const initConfig = await this.checkInit(config);
       await this.checkSTUNAndTURNConnectivity(initConfig);
     } catch (error) {
-      this.updateStatus({ path: 'connectivity.init', success: false, errorMessage: (error as Error).message });
+      this.updateStatus({ name: HMSDiagnosticsCheck.Init, success: false, errorMessage: (error as Error).message });
     }
     (Object.keys(this.result.connectivity) as ConnectivityKeys[]).forEach((connectionType: ConnectivityKeys) => {
       const status = this.result.connectivity[connectionType].success;
+      const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1);
       if (status === null) {
-        this.updateStatus({ path: `connectivity.${connectionType}`, success: false });
+        this.updateStatus({ name: capitalize(connectionType) as HMSDiagnosticsCheck, success: false });
       }
     });
     return this.result.connectivity;
@@ -67,12 +76,12 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   async checkDevices() {
     try {
       validateMediaDevicesExistence();
-      this.updateStatus({ path: 'devices' });
+      this.updateStatus({ name: HMSDiagnosticsCheck.Devices });
       await this.checkCamera();
       await this.checkMicrophone();
     } catch (error) {
       this.updateStatus({
-        path: 'devices',
+        name: HMSDiagnosticsCheck.Devices,
         errorMessage: (error as HMSException).message,
         info: error as HMSException,
       });
@@ -83,10 +92,10 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   checkwebRTC() {
     try {
       validateRTCPeerConnection();
-      this.updateStatus({ path: 'webRTC' });
+      this.updateStatus({ name: HMSDiagnosticsCheck.WebRTC });
     } catch (error) {
       this.updateStatus({
-        path: 'webRTC',
+        name: HMSDiagnosticsCheck.WebRTC,
         success: false,
         errorMessage: (error as HMSException).message,
         info: error as HMSException,
@@ -123,7 +132,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       if (candidate.type === 'srflx') {
         if (candidate.protocol === 'udp') {
           this.updateStatus({
-            path: `connectivity.stunUDP`,
+            name: HMSDiagnosticsCheck.StunUDP,
             id: `stunUDP-${candidate.address}:${candidate.port}`,
             info: candidate,
           });
@@ -131,7 +140,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
         if (candidate.protocol === 'tcp') {
           this.updateStatus({
-            path: `connectivity.stunTCP`,
+            name: HMSDiagnosticsCheck.StunTCP,
             id: `stunTCP-${candidate.address}:${candidate.port}`,
             info: candidate,
           });
@@ -141,8 +150,9 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       // If a relay candidate was found, the TURN server works!
       if (candidate.type === 'relay') {
         if (candidate.protocol === 'udp') {
+          console.log('turn UDP');
           this.updateStatus({
-            path: `connectivity.turnUDP`,
+            name: HMSDiagnosticsCheck.TurnUDP,
             id: `turnUDP-${candidate.address}:${candidate.port}`,
             info: candidate,
           });
@@ -150,7 +160,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
 
         if (candidate.protocol === 'tcp') {
           this.updateStatus({
-            path: `connectivity.turnTCP`,
+            name: HMSDiagnosticsCheck.TurnTCP,
             id: `turnTCP-${candidate.address}:${candidate.port}`,
             info: candidate,
           });
@@ -165,7 +175,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       const videoTrack = stream.getVideoTracks()[0];
       const settings = videoTrack.getSettings();
       this.updateStatus({
-        path: 'devices.camera',
+        name: HMSDiagnosticsCheck.Camera,
         info: {
           videoTrack,
           deviceId: settings.deviceId,
@@ -176,7 +186,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.VIDEO);
       this.updateStatus({
-        path: 'devices.camera',
+        name: HMSDiagnosticsCheck.Camera,
         info: exception,
         errorMessage: exception.message,
         success: false,
@@ -190,7 +200,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       const audioTrack = stream.getAudioTracks()[0];
       const settings = audioTrack.getSettings();
       this.updateStatus({
-        path: 'devices.microphone',
+        name: HMSDiagnosticsCheck.Microphone,
         info: {
           audioTrack,
           deviceId: settings.deviceId,
@@ -201,7 +211,7 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
     } catch (error) {
       const exception = BuildGetMediaError(error as Error, HMSGetMediaActions.AUDIO);
       this.updateStatus({
-        path: 'devices.microphone',
+        name: HMSDiagnosticsCheck.Microphone,
         success: false,
         errorMessage: exception.message,
         info: exception,
@@ -230,38 +240,35 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       { name: 'diagnostics' },
       false,
     );
-    this.updateStatus({ path: 'connectivity.init', info: initConfig });
-    //@ts-ignore
-    this.updateStatus({ path: 'connectivity.websocket', success: sdk.transport.signal.isConnected });
+    this.updateStatus({ name: HMSDiagnosticsCheck.Init, info: initConfig });
+    // @ts-ignore
+    this.updateStatus({ name: HMSDiagnosticsCheck.Websocket, success: sdk.transport.signal.isConnected });
     return initConfig;
   }
 
-  private getDescriptionForPath(path: string) {
-    if (path.includes('turn') || path.includes('stun')) {
-      return 'Verifies connectivity to 100ms media server';
-    }
-    return descriptionForPath[path];
+  getDescriptionForCheck(name: HMSDiagnosticsCheck) {
+    return descriptionForCheck[name];
   }
 
   private updateStatus({
-    path,
-    id = path,
+    name,
+    id = name,
     success = true,
     errorMessage,
-    description,
     info,
   }: {
-    path: string;
+    name: HMSDiagnosticsCheck;
     id?: string;
     success?: boolean;
     errorMessage?: string;
-    description?: string;
     info?: Record<string, any>;
   }) {
-    if (!description) {
-      description = this.getDescriptionForPath(path);
-    }
-    setInObject(this.result, path, { success, errorMessage, info });
-    this.listener?.onUpdate({ id, success, errorMessage, info, description }, path);
+    const path = HMSDiagnosticsPath[name];
+    const description = this.getDescriptionForCheck(name);
+    setInObject(this.result, path, { id, success, errorMessage, info, description });
+    this.listener?.onUpdate({ id, success, errorMessage, info, description, name }, path);
   }
 }
+
+export { TrackAudioLevelMonitor } from '@100mslive/hms-video';
+export { HMSDiagnosticsCheck } from './interfaces';

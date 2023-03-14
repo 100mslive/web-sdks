@@ -1,6 +1,33 @@
+export enum HMSDiagnosticsCheck {
+  WebRTC = 'WebRTC',
+  Init = 'Init',
+  Websocket = 'Websocket',
+  StunUDP = 'StunUDP',
+  TurnUDP = 'TurnUDP',
+  StunTCP = 'StunTCP',
+  TurnTCP = 'TurnTCP',
+  Devices = 'Devices',
+  Camera = 'Camera',
+  Microphone = 'Microphone',
+}
+
+export const HMSDiagnosticsPath: Record<HMSDiagnosticsCheck, string> = {
+  StunUDP: 'connectivity.stunUDP',
+  StunTCP: 'connectivity.stunTCP',
+  TurnUDP: 'connectivity.turnUDP',
+  TurnTCP: 'connectivity.turnTCP',
+  Init: 'connectivity.init',
+  Websocket: 'connectivity.websocket',
+  Devices: 'devices',
+  Camera: 'devices.camera',
+  Microphone: 'devices.microphone',
+  WebRTC: 'webRTC',
+};
+
 export interface HMSDiagnosticsOutputValue {
   id: string;
   success: boolean | null;
+  name: HMSDiagnosticsCheck;
   errorMessage?: string;
   description?: string;
   info?: Record<string, any>;
@@ -16,6 +43,7 @@ export interface HMSDiagnosticsOutput {
     websocket: HMSDiagnosticsOutputValue;
   };
   devices: {
+    name: HMSDiagnosticsCheck;
     success: boolean | null;
     errorMessage: string;
     camera: HMSDiagnosticsOutputValue;
@@ -48,6 +76,11 @@ export interface HMSDiagnosticsInterface {
   checkConnectivity(config: HMSDiagnosticsConfig): Promise<HMSDiagnosticsOutput['connectivity']>;
   checkDevices(): Promise<HMSDiagnosticsOutput['devices']>;
   checkwebRTC(): HMSDiagnosticsOutput['webRTC'];
+
+  /**
+   * Get informative description about what each check verifies
+   */
+  getDescriptionForCheck(name: HMSDiagnosticsCheck): string;
 }
 
 export type ConnectivityKeys = keyof HMSDiagnosticsOutput['connectivity'];
