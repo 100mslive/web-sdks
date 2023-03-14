@@ -45,7 +45,7 @@ const DiagnosticsItem = ({ name, properties } = {}) => {
 
   return (
     <Accordion.Item
-      value={name || properties.id}
+      value={properties ? properties.id : name}
       css={{
         p: "$4 $8",
         borderBottom: "1px solid $backgroundDefault",
