@@ -156,29 +156,21 @@ const PreviewScreen = React.memo(
 
 const convertPreviewError = error => {
   console.error("[error]", { error });
-  if (error.action && error.action === "GET_TOKEN" && error.code === 403) {
+  if (error.action === "GET_TOKEN" && error.code === 403) {
     return {
       title: "Room code is disabled",
       body: ErrorWithSupportLink(
         "Room code corresponding to this link is no more active."
       ),
     };
-  } else if (
-    error.action &&
-    error.action === "GET_TOKEN" &&
-    error.code === 404
-  ) {
+  } else if (error.action === "GET_TOKEN" && error.code === 404) {
     return {
       title: "Room code does not exist",
       body: ErrorWithSupportLink(
         "We could not find a room code corresponding to this link."
       ),
     };
-  } else if (
-    error.action &&
-    error.action === "GET_TOKEN" &&
-    error.code === 2003
-  ) {
+  } else if (error.action === "GET_TOKEN" && error.code === 2003) {
     return {
       title: "Endpoint is not reachable",
       body: ErrorWithSupportLink(
