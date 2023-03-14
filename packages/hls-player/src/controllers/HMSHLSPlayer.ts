@@ -1,12 +1,12 @@
 import { HlsStats } from '@100mslive/hls-stats';
-import Hls, { ErrorData, Fragment, HlsConfig, Level, LevelParsed } from 'hls.js';
+import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { ILevel } from '../interfaces/ILevel';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
-import { mapLevel, mapLevels, metadataPayloadParser } from '../utilies/utils';
+import { mapLevel, mapLevels } from '../utilies/utils';
 
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private hls: Hls;
@@ -34,11 +34,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
     this.hls.loadSource(hlsUrl);
     this.hls.attachMedia(this.videoEl);
-    this._metaData = new HMSHLSTimedMetadata(this);
     this._isLive = true;
     this._volume = this.videoEl.volume * 100;
     this.hlsStats = new HlsStats(this.hls, this.videoEl);
     this.listenHLSEvent();
+    this._metaData = new HMSHLSTimedMetadata(this, this.hls);
     this.seekToLivePosition();
   }
   /**
@@ -96,7 +96,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.off(Hls.Events.ERROR, this.handleHLSException);
-      this.hls.off(Hls.Events.FRAG_CHANGED, this.fragChangeHandler);
     }
     if (this.videoEl) {
       this.videoEl.removeEventListener('play', this.playEventHandler);
@@ -321,73 +320,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     });
   };
 
-  /**
-   * Metadata are automatically parsed and added to the video element's
-   * textTrack cue by hlsjs as they come through the stream.
-   * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
-   * when the current fragment has a metadata to play.
-   */
-  private fragChangeHandler = (_: any, { frag }: { frag: Fragment }) => {
-    this.validateVideoEl();
-    try {
-      if (this.videoEl.textTracks.length === 0) {
-        return;
-      }
-      const fragStartTime = frag.start;
-      /**
-       * this destructuring is needed because the cues array not a pure
-       * JS array and prevents us from
-       * performing array operations like map(),filter() etc.
-       */
-      // @ts-ignore
-      const metadata = [...this.videoEl.textTracks[0].cues];
-      /**
-       * filter out only the metadata that have startTime set to future.
-       * (i.e) more than the current fragment's startime.
-       */
-      const metadataAfterFragStart = metadata.filter(mt => {
-        return mt.startTime >= fragStartTime;
-      });
-
-      metadataAfterFragStart.forEach(mt => {
-        const timeDifference = mt.startTime - fragStartTime;
-        const fragmentDuration = frag.end - frag.start;
-
-        if (timeDifference < fragmentDuration) {
-          const data = mt.value.data;
-          const payload = metadataPayloadParser(data).payload;
-          /**
-           * we start a timeout for difference seconds.
-           * NOTE: Due to how setTimeout works, the time is only the minimum gauranteed
-           * time JS will wait before calling emit(). It's not guaranteed even
-           * for timeDifference = 0.
-           */
-          setTimeout(() => {
-            /** Even though duration comes as an attribute in the stream,
-             * HlsJs doesn't give us a property duration directly. So
-             * we calculate it ouselves. This is same as reading
-             * EXT-INF tag.
-             */
-            const duration = mt.endTime - mt.startTime;
-
-            /**
-             * finally emit event letting the user know its time to
-             * do whatever they want with the payload
-             */
-            this.emit(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
-              id: mt.id,
-              payload: payload,
-              duration: duration,
-              startDate: new Date(mt.startTime),
-              endDate: new Date(mt.endTime),
-            });
-          }, timeDifference * 1000);
-        }
-      });
-    } catch (e) {
-      console.error('FRAG_CHANGED event error', e);
-    }
-  };
   private handleTimeUpdateListener = (_: Event) => {
     if (!this.videoEl) {
       return;
@@ -412,7 +344,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this.hls.on(Hls.Events.ERROR, this.handleHLSException);
-      this.hls.on(Hls.Events.FRAG_CHANGED, this.fragChangeHandler);
     } else if (this.videoEl.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       this.videoEl.src = this.hlsUrl;
@@ -447,9 +378,3 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     return levels.filter(({ videoCodec, width, height }) => !!videoCodec || !!(width && height));
   }
 }
-/**
- * Use mostly video element
- * remove mse supported
- * video element canPlay is supported, throw error
- * separate timedMetadata class and listen on timeupdate events
- */

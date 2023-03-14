@@ -6,7 +6,7 @@ import { ILevel } from '../interfaces/ILevel';
  * @param payload a base64 string coming from backend
  * @returns a parsed data which contains payload, start_date, end_date, version
  */
-export const metadataPayloadParser = (payload: string) => {
+export const metadataPayloadParser = (payload: string): Record<string, any> => {
   try {
     const data = window?.atob(payload);
     const parsedData = JSON.parse(data);
