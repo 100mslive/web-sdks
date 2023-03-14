@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
 import {
   HMSDiagnostics,
+  HMSDiagnosticsCheck,
   TrackAudioLevelMonitor,
 } from "@100mslive/hms-diagnostics";
 import { v4 } from "uuid";
@@ -16,6 +17,7 @@ import {
   Accordion,
   Button,
   Flex,
+  Loading,
   StyledVideo,
   Text,
   useTheme,
@@ -33,14 +35,17 @@ import {
 import { QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
 
 const diagnostics = new HMSDiagnostics();
+const HMSDiagnosticsChecks = Object.keys(HMSDiagnosticsCheck);
 
-const DiagnosticsItem = ({ title, properties } = {}) => {
-  if (!title || !properties) {
+const DiagnosticsItem = ({ name, properties } = {}) => {
+  if (!name) {
     return null;
   }
+  const description = diagnostics.getDescriptionForCheck(name);
+
   return (
     <Accordion.Item
-      value={properties.id}
+      value={name || properties.id}
       css={{
         p: "$4 $8",
         borderBottom: "1px solid $backgroundDefault",
@@ -53,36 +58,44 @@ const DiagnosticsItem = ({ title, properties } = {}) => {
           css={{ width: "100%", justifyContent: "space-between" }}
         >
           <Text variant="lg" css={{ mr: "$2" }}>
-            {title}
+            {name}
           </Text>
-          {properties.success === null ? null : properties.success ? (
-            <Text variant="body2" css={{ color: "$success", mx: "$6" }}>
-              Passed
-            </Text>
+          {properties ? (
+            properties.success ? (
+              <Text variant="body2" css={{ color: "$success", mx: "$6" }}>
+                Passed
+              </Text>
+            ) : (
+              <Text variant="body2" css={{ color: "$error", mx: "$6" }}>
+                Failed
+              </Text>
+            )
           ) : (
-            <Text variant="body2" css={{ color: "$error", mx: "$6" }}>
-              Failed
-            </Text>
+            <Loading />
           )}
         </Flex>
       </Accordion.Header>
       <Accordion.Content>
         <Flex direction="column" css={{ overflowX: "auto" }}>
-          {properties.description && (
+          {description && (
             <Text variant="body" css={{ my: "$4" }}>
-              {properties.description}
+              {description}
             </Text>
           )}
-          {properties.errorMessage && (
-            <Text variant="body" css={{ my: "$4" }}>
-              Error: {properties.errorMessage}
-            </Text>
-          )}
-          {properties.info && (
-            <Text variant="body" css={{ my: "$4" }}>
-              Info:
-              <pre>{JSON.stringify(properties.info, null, "\t")}</pre>
-            </Text>
+          {properties && (
+            <>
+              {properties.errorMessage && (
+                <Text variant="body" css={{ my: "$4" }}>
+                  Error: {properties.errorMessage}
+                </Text>
+              )}
+              {properties.info && (
+                <Text variant="body" css={{ my: "$4" }}>
+                  Info:
+                  <pre>{JSON.stringify(properties.info, null, "\t")}</pre>
+                </Text>
+              )}
+            </>
           )}
         </Flex>
       </Accordion.Content>
@@ -207,8 +220,8 @@ const downloadJson = (obj, fileName) => {
 
 const env = process.env.REACT_APP_ENV;
 const Diagnostics = () => {
-  const [checkResults, setCheckResults] = useState([]);
-  const [result, setResult] = useState();
+  const [results, setResults] = useState([]);
+  const [jsonResult, setJsonResult] = useState();
   const tokenEndpoint = useTokenEndpoint();
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const [token, setToken] = useState(null);
@@ -246,29 +259,29 @@ const Diagnostics = () => {
           },
           {
             onUpdate: (update, path) => {
-              const title = path.split(".")[path.split(".").length - 1];
-              setCheckResults(res => res.concat({ ...update, title }));
+              setResults(res => res.concat(update));
             },
           }
         )
         .then(res => {
           console.log(JSON.stringify(res, null, "\t"));
-          setResult(res);
+          setJsonResult(res);
         });
     }
   }, [token]);
 
   const videoTrack = useMemo(
     () =>
-      checkResults.find(item => item.title.includes("camera"))?.info.videoTrack,
-    [checkResults]
+      results.find(item => item.name.toLowerCase().includes("camera"))?.info
+        .videoTrack,
+    [results]
   );
 
   const audioTrack = useMemo(
     () =>
-      checkResults.find(item => item.title.includes("microphone"))?.info
+      results.find(item => item.name.toLowerCase().includes("microphone"))?.info
         .audioTrack,
-    [checkResults]
+    [results]
   );
 
   if (error.title) {
@@ -282,7 +295,7 @@ const Diagnostics = () => {
   return (
     <Flex direction="column" css={{ size: "100%", overflowY: "auto" }}>
       <Header />
-      {checkResults && (
+      {results && (
         <Flex>
           <Flex
             direction="column"
@@ -292,20 +305,28 @@ const Diagnostics = () => {
             }}
           >
             <Accordion.Root defaultValue="WebRTC" type="multiple" collapsible>
-              {checkResults.map(item => {
-                return (
-                  <DiagnosticsItem
-                    key={item.id}
-                    title={item.title}
-                    properties={item}
-                  />
+              {HMSDiagnosticsChecks.map(name => {
+                const checkResults = results.filter(
+                  check => check.name === name
                 );
+                // check loading
+                if (checkResults.length === 0) {
+                  return <DiagnosticsItem key={name} name={name} />;
+                } else {
+                  return checkResults.map(item => (
+                    <DiagnosticsItem
+                      key={item.id}
+                      name={item.name}
+                      properties={item}
+                    />
+                  ));
+                }
               })}
             </Accordion.Root>
-            {result && (
+            {jsonResult && (
               <Flex css={{ w: "100%", justifyContent: "center", my: "$10" }}>
                 <Button
-                  onClick={() => downloadJson(result, "diagnostics_result")}
+                  onClick={() => downloadJson(jsonResult, "diagnostics_result")}
                 >
                   Download Results
                 </Button>
