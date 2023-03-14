@@ -1,4 +1,4 @@
-import { HlsStats } from '@100mslive/hls-stats';
+import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
 import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
@@ -46,6 +46,9 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @returns HTML video element
    */
   private createVideoElement(): HTMLVideoElement {
+    if (this.videoEl) {
+      return this.videoEl;
+    }
     const video: HTMLVideoElement = document?.createElement('video');
     video.playsInline = true;
     video.controls = false;
@@ -69,8 +72,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   /**
    *  Subscribe to hls stats
    */
-  subscribeStats = (callback: (state: any) => void, interval = 2000) => {
-    this._subscribeHlsStats = this.hlsStats.subscribe((state: any) => {
+  subscribeStats = (callback: (state: HlsPlayerStats) => void, interval = 2000) => {
+    this._subscribeHlsStats = this.hlsStats.subscribe((state: HlsPlayerStats) => {
       callback(state);
     }, interval);
     return this.unsubscribeStats;
@@ -363,14 +366,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   }
 
   /**
-   *
-   * This function is needed because HLSJS currently doesn't
-   * support switching to audio rendition from a video rendition.
-   * more on this here
-   * https://github.com/video-dev/hls.js/issues/4881
-   * https://github.com/video-dev/hls.js/issues/3480#issuecomment-778799541
-   * https://github.com/video-dev/hls.js/issues/163#issuecomment-169773788
-   *
    * @param {Array} levels array from hlsJS
    * @returns a new array with only video levels.
    */
