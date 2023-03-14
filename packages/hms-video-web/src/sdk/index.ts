@@ -29,6 +29,9 @@ import {
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
+  TokenRequest,
+  TokenRequestOptions,
+  TokenResult,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
@@ -47,6 +50,7 @@ import {
   HMSRemoteTrack,
   HMSTrackSource,
   HMSTrackType,
+  HMSVideoTrack,
 } from '../media/tracks';
 import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
@@ -54,20 +58,12 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 import { isNode } from '../utils/support';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
-
-// @DISCUSS: Adding it here as a hotfix
-const defaultSettings = {
-  isAudioMuted: false,
-  isVideoMuted: false,
-  audioInputDeviceId: 'default',
-  audioOutputDeviceId: 'default',
-  videoDeviceId: 'default',
-};
 
 const INITIAL_STATE = {
   published: false,
@@ -301,13 +297,16 @@ export class HMSSdk implements HMSInterface {
           const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
           this.localPeer.asRole = newRole || this.localPeer.role;
         }
-        const tracks = await this.localTrackManager.getTracksToPublish(config.settings || defaultSettings);
+        const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
         tracks.forEach(track => this.setLocalPeerTrack(track));
         this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
         await this.initDeviceManagers();
         this.sdkState.isPreviewInProgress = false;
         this.analyticsTimer.end(TimedEvent.PREVIEW);
-        listener.onPreview(this.store.getRoom(), tracks);
+        const room = this.store.getRoom();
+        if (room) {
+          listener.onPreview(room, tracks);
+        }
         this.sendPreviewAnalyticsEvent();
         resolve();
       };
@@ -429,7 +428,7 @@ export class HMSSdk implements HMSInterface {
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
-      await this.publish(config.settings || defaultSettings, previewRole);
+      await this.publish(config.settings, previewRole);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
@@ -493,6 +492,38 @@ export class HMSSdk implements HMSInterface {
       this.cleanUp();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
+  }
+
+  async getAuthTokenByRoomCode(
+    tokenRequest: TokenRequest,
+    tokenRequestOptions?: TokenRequestOptions,
+  ): Promise<TokenResult> {
+    const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/token';
+    this.analyticsTimer.start(TimedEvent.GET_TOKEN);
+    const response = await fetchWithRetry(
+      tokenAPIURL,
+      {
+        method: 'POST',
+        body: JSON.stringify({ code: tokenRequest.roomCode, user_id: tokenRequest.userId }),
+      },
+      [429, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511],
+    );
+
+    const data = await response.json();
+    this.analyticsTimer.end(TimedEvent.GET_TOKEN);
+
+    if (!response.ok) {
+      throw ErrorFactory.APIErrors.ServerErrors(data.code, HMSAction.GET_TOKEN, data.message, false);
+    }
+
+    const { token } = data;
+    if (!token) {
+      throw Error(data.message);
+    }
+    return {
+      token,
+      expiresAt: data.expires_at,
+    };
   }
 
   getLocalPeer() {
@@ -846,7 +877,25 @@ export class HMSSdk implements HMSInterface {
     this.frameworkInfo = frameworkInfo;
   }
 
-  private async publish(initialSettings: InitialSettings, oldRole?: string) {
+  async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoManageVideo) {
+      track.attach(videoElement);
+    } else {
+      await track.addSink(videoElement);
+    }
+  }
+
+  async detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+    const config = this.store.getConfig();
+    if (config?.autoManageVideo) {
+      track.detach(videoElement);
+    } else {
+      await track.removeSink(videoElement);
+    }
+  }
+
+  private async publish(initialSettings?: InitialSettings, oldRole?: string) {
     if ([this.store.getPublishParams(), !this.sdkState.published, !isNode].every(value => !!value)) {
       // if preview asRole(oldRole) is used, use roleChangeManager to diff policy and publish, else do normal publish
       const publishAction =
@@ -865,7 +914,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private async getAndPublishTracks(initialSettings: InitialSettings) {
+  private async getAndPublishTracks(initialSettings?: InitialSettings) {
     const tracks = await this.localTrackManager.getTracksToPublish(initialSettings);
     await this.setAndPublishTracks(tracks);
     this.localPeer?.audioTrack?.initAudioLevelMonitor();
@@ -937,6 +986,11 @@ export class HMSSdk implements HMSInterface {
   private notifyJoin() {
     const localPeer = this.store.getLocalPeer();
     const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'notify join - room not present');
+      return;
+    }
+
     room.joinedAt = new Date();
     if (localPeer) {
       localPeer.joinedAt = room.joinedAt;

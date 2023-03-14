@@ -94,3 +94,11 @@ Handles support for custom audio and video plugins. These plugins are synonymous
 HTTP filters from the API world. They hook into the processing pipeline for audio and video
 and can modify them before they're sent to the remote peers. This allows for
 possibilities like applying filters, virtual background, noise reduction, artistic effects etc.
+
+
+## VideoElementManager
+
+Handles rendering of video track provided video elements. it keeps track of the video elements and attaches/detaches video when it
+is in view or out of view(This was earlier done in react-sdk, but is now part of the core sdk). A flag provided at the run time controls whether this is enabled. Every HMSVideoTrack has its own VideoElementManager which stores a reference to the video element(s) it's attached to. The class takes care of primarily two things - 
+- Video subscription using [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API) - ensures that only visible video elements are subscribed to, to save on bandwidth and device resources(video decoding is cpu heavy)
+- Rendering the proper resolution using [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver) - In case of Simulcast, there are multiple layers which can be subscribed to. The class is responsible for figuring out the dimensions of the video element rendering the video and picking the appropriate layer.

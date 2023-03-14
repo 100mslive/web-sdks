@@ -83,6 +83,9 @@ describe('init API call', () => {
     const token = headers['Authorization'].split('Bearer ')[1];
 
     const correctResponse = {
+      clone: function () {
+        return this;
+      },
       json: () =>
         Promise.resolve({
           endpoint: 'wss://prod-in2.100ms.live/v2/ws',
@@ -113,11 +116,15 @@ describe('init API call', () => {
     } as unknown as Response;
 
     const wrongResponse = {
+      clone: function () {
+        return this;
+      },
       json: () =>
         Promise.resolve({
           code: 401,
           message: 'signature is invalid',
         }),
+      text: () => Promise.resolve('invalid token'),
       status: 401,
       statusText: '',
     } as unknown as Response;

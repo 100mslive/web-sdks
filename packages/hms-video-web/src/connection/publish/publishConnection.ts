@@ -1,7 +1,5 @@
 import { IPublishConnectionObserver } from './IPublishConnectionObserver';
-import { HMSLocalTrack } from '../../media/tracks';
 import { ISignal } from '../../signal/ISignal';
-import HMSTransport from '../../transport';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import HMSConnection from '../HMSConnection';
@@ -11,17 +9,10 @@ export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
   private readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
-  private readonly transport: HMSTransport;
 
-  constructor(
-    signal: ISignal,
-    config: RTCConfiguration,
-    observer: IPublishConnectionObserver,
-    transport: HMSTransport,
-  ) {
+  constructor(signal: ISignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
-    this.transport = transport;
 
     this.nativeConnection = new RTCPeerConnection(config);
     this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
@@ -49,9 +40,5 @@ export default class HMSPublishConnection extends HMSConnection {
       HMSLogger.d(this.TAG, `onnegotiationneeded`);
       await this.observer.onRenegotiationNeeded();
     };
-  }
-
-  trackUpdate(track: HMSLocalTrack) {
-    this.transport.trackUpdate(track);
   }
 }

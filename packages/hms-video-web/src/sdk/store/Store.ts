@@ -65,7 +65,7 @@ class Store implements IStore {
   }
 
   getRoom() {
-    return this.room!;
+    return this.room;
   }
 
   getPolicyForRole(role: string) {
@@ -215,6 +215,7 @@ class Store implements IStore {
         }
       }
     }
+    config.autoManageVideo = config.autoManageVideo !== false;
     this.config = config;
     this.setEnv();
   }
@@ -273,7 +274,8 @@ class Store implements IStore {
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
-    if (!this.simulcastEnabled) {
+    // Enable only when backend enables and source is video or screen. ignore videoplaylist
+    if (!this.simulcastEnabled || !['screen', 'regular'].includes(source)) {
       return [];
     }
     if (source === 'screen') {

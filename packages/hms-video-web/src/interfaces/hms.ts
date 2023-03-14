@@ -1,5 +1,6 @@
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
+import { TokenRequest, TokenRequestOptions, TokenResult } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
@@ -21,6 +22,8 @@ export default interface HMS {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
+
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];

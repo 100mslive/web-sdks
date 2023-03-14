@@ -110,7 +110,7 @@ describe('Http Analytics tests', () => {
       { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
       { statusCode: 200, statusText: 'Event recorded' },
     );
-    const event = AnalyticsEventFactory.connect(ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT));
+    const event = AnalyticsEventFactory.connect(ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT));
     event.properties.token = token;
     localStorage.setItem('client-events', JSON.stringify([event]));
     sdk.join({ userName: 'test', authToken: token, initEndpoint }, joinListener);
