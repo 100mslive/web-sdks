@@ -204,7 +204,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       await this.play();
     } catch (error) {
       console.error('Tried to unblock autoplay failed with', error);
-      throw new Error('failed to autoplay');
+      this.emit(HMSHLSPlayerEvents.ERROR, HMSHLSErrorFactory.HLSMediaError.autoblockFailed());
     }
   };
   private validateVideoEl() {

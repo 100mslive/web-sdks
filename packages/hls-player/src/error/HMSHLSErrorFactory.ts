@@ -65,6 +65,14 @@ export const HMSHLSErrorFactory = {
         false,
       );
     },
+    autoblockFailed(): HMSHLSException {
+      return new HMSHLSException(
+        HMSHLSExceptionEvents.HLS_AUTOPLAY_FAILED,
+        'Failed to autoplay',
+        'Failed to autoplay',
+        false,
+      );
+    },
     hlsURLNotFound(): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.HLS_URL_NOT_FOUND,
