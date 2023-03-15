@@ -30,6 +30,7 @@ import { HMSPlaylist } from './HMSPlaylist';
 import { NamedSetState } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
+import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -104,6 +105,7 @@ export class HMSSDKActions implements IHMSActions {
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger;
 
   constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
     this.store = store;
@@ -229,6 +231,9 @@ export class HMSSDKActions implements IHMSActions {
       .leave(notifyServer)
       .then(() => {
         this.resetState('leave');
+        if (this.beamSpeakerLabelsLogger) {
+          this.beamSpeakerLabelsLogger.stop().catch(HMSLogger.e);
+        }
         HMSLogger.i('left room');
       })
       .catch(err => {
@@ -668,6 +673,14 @@ export class HMSSDKActions implements IHMSActions {
           this.ignoredMessageTypes.push(msgType);
         }
       }
+    }
+  }
+
+  async enableBeamSpeakerLabelsLogging() {
+    if (!this.beamSpeakerLabelsLogger) {
+      HMSLogger.i('enabling beam speaker labels logging');
+      this.beamSpeakerLabelsLogger = new BeamSpeakerLabelsLogger(this.store, this);
+      await this.beamSpeakerLabelsLogger.start();
     }
   }
 
