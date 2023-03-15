@@ -150,7 +150,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
       // If a relay candidate was found, the TURN server works!
       if (candidate.type === 'relay') {
         if (candidate.protocol === 'udp') {
-          console.log('turn UDP');
           this.updateStatus({
             name: HMSDiagnosticsCheck.TurnUDP,
             id: `turnUDP-${candidate.address}:${candidate.port}`,
