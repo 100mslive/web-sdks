@@ -37,7 +37,7 @@
   },
   "author": "100ms <tech-common@100ms.live>",
   "dependencies": {
-    "@100mslive/hms-video": "^0.7.5-alpha.1",
+    "@100mslive/hms-video": "^0.8.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.set": "^4.3.2"
   },
