@@ -44,6 +44,13 @@ export enum HMSSignalMethod {
   GET_METADATA = 'get-metadata',
 }
 
+export const terminalHMSSignalMethods = [
+  HMSSignalMethod.JOIN,
+  HMSSignalMethod.OFFER,
+  HMSSignalMethod.ANSWER,
+  HMSSignalMethod.TRICKLE,
+];
+
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {
   switch (method) {
     case HMSSignalMethod.JOIN:

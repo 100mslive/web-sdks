@@ -1,5 +1,11 @@
 import { v4 as uuid } from 'uuid';
-import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
+import {
+  convertSignalMethodtoErrorAction,
+  HMSSignalMethod,
+  JsonRpcRequest,
+  JsonRpcResponse,
+  terminalHMSSignalMethods,
+} from './models';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -115,6 +121,7 @@ export default class JsonRpcSignal implements ISignal {
         Number(error.code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),
         error.message,
+        terminalHMSSignalMethods.includes(method as HMSSignalMethod),
       );
     }
   }
@@ -388,6 +395,7 @@ export default class JsonRpcSignal implements ISignal {
             Number(response.params.code),
             HMSAction.NONE,
             response.params.message,
+            terminalHMSSignalMethods.includes(response.method as HMSSignalMethod),
           ),
         );
         break;
@@ -435,7 +443,12 @@ export default class JsonRpcSignal implements ISignal {
 
   private async call<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
-    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
+    let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(
+      500,
+      method,
+      `Default ${method} error`,
+      terminalHMSSignalMethods.includes(method as HMSSignalMethod),
+    );
 
     for (let i = 0; i < MAX_RETRIES; i++) {
       try {

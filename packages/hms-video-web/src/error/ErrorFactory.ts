@@ -316,8 +316,8 @@ export const ErrorFactory = {
   },
 
   WebsocketMethodErrors: {
-    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description, true);
+    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string, isTerminal: boolean) {
+      return new HMSException(code, 'ServerErrors', action, description, description, isTerminal);
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
