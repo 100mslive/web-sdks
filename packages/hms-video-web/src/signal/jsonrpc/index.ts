@@ -345,16 +345,17 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   private async onMessageHandler(event: MessageEvent) {
-    let response;
     const text: string = event.data;
-    if (text.includes('room-state')) {
-      const json = JSON.stringify(await import('./RoomState.json'));
-      console.time('jsonparse');
-      response = JSON.parse(json);
-      console.timeEnd('jsonparse');
-    } else {
-      response = JSON.parse(text);
-    }
+    const response = JSON.parse(text);
+    // let response;
+    // if (text.includes('room-state')) {
+    //   const json = JSON.stringify(await import('./RoomState.json'));
+    //   console.time('jsonparse');
+    //   response = JSON.parse(json);
+    //   console.timeEnd('jsonparse');
+    // } else {
+    //   response = JSON.parse(text);
+    // }
 
     if (response.id) {
       this.handleResponseWithId(response);
