@@ -67,7 +67,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       const streamId = stream.id;
-      const mid = e.transceiver.mid;
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
@@ -79,7 +78,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
            * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
            */
           const toRemoveTrackIdx = remote.tracks.findIndex(
-            track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === mid,
+            track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.mid,
           );
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
@@ -97,6 +96,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
+      track.mid = e.transceiver.mid;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);

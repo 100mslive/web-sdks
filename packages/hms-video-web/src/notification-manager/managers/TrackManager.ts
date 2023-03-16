@@ -62,6 +62,11 @@ export class TrackManager {
       return;
     }
 
+    const storeTrack = this.store.getTracks().find(_track => _track.mid === track.mid);
+    if (!storeTrack) {
+      return;
+    }
+
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     this.store.removeTrack(track.trackId);
