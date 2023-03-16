@@ -191,6 +191,7 @@ export class TrackManager {
     } else {
       hmsPeer.auxiliaryTracks.push(track);
     }
+    HMSLogger.d(this.TAG, 'audio track added', `${track}`);
   }
 
   private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
@@ -205,6 +206,7 @@ export class TrackManager {
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);
     }
+    HMSLogger.d(this.TAG, 'audio track added', `${track}`);
   }
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
