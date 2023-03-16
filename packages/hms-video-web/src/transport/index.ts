@@ -808,7 +808,6 @@ export default class HMSTransport implements ITransport {
               500,
               HMSAction.JOIN,
               `Websocket join error - ${(error as Error).message}`,
-              true,
             );
       const shouldRetry =
         parseInt(`${hmsError.code / 100}`) === 5 ||

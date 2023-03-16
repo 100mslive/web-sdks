@@ -316,8 +316,15 @@ export const ErrorFactory = {
   },
 
   WebsocketMethodErrors: {
-    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string, isTerminal: boolean) {
-      return new HMSException(code, 'ServerErrors', action, description, description, isTerminal);
+    ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
+      const terminalActions: (HMSSignalMethod | HMSAction)[] = [
+        HMSSignalMethod.JOIN,
+        HMSSignalMethod.OFFER,
+        HMSSignalMethod.ANSWER,
+        HMSSignalMethod.TRICKLE,
+        HMSAction.JOIN,
+      ];
+      return new HMSException(code, 'ServerErrors', action, description, description, terminalActions.includes(action));
     },
 
     AlreadyJoined(action: HMSAction, description = '') {
