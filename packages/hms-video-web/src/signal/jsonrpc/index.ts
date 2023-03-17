@@ -344,7 +344,7 @@ export default class JsonRpcSignal implements ISignal {
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
   }
 
-  private async onMessageHandler(event: MessageEvent) {
+  private onMessageHandler(event: MessageEvent) {
     const text: string = event.data;
     const response = JSON.parse(text);
     if (response.id) {
