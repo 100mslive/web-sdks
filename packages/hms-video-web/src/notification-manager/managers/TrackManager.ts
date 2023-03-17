@@ -62,8 +62,11 @@ export class TrackManager {
       return;
     }
 
-    const storeTrack = this.store.getTracks().find(_track => _track.mid === track.mid);
+    const storeTrack = this.store
+      .getTracks()
+      .find(_track => _track.trackId === track.trackId && _track.mid === track.mid);
     if (!storeTrack) {
+      HMSLogger.d(this.TAG, 'Track not found in store');
       return;
     }
 
