@@ -194,7 +194,7 @@ export class TrackManager {
     if (track.type !== HMSTrackType.AUDIO) {
       return;
     }
-    if (!hmsPeer.audioTrack && track.source === 'regular') {
+    if (track.source === 'regular' && (!hmsPeer.audioTrack || hmsPeer.audioTrack?.trackId === track.trackId)) {
       hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(track);
@@ -208,7 +208,7 @@ export class TrackManager {
     const remoteTrack = track as HMSRemoteVideoTrack;
     const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
     remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-    if (!hmsPeer.videoTrack && track.source === 'regular') {
+    if (track.source === 'regular' && (!hmsPeer.videoTrack || hmsPeer.videoTrack?.trackId === track.trackId)) {
       hmsPeer.videoTrack = remoteTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);
