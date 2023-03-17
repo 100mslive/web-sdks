@@ -206,7 +206,7 @@ export class TrackManager {
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);
     }
-    HMSLogger.d(this.TAG, 'audio track added', `${track}`);
+    HMSLogger.d(this.TAG, 'video track added', `${track}`);
   }
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
