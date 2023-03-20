@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+import { CanvasHandler } from './canvasUtils';
 import { HMSVideoPlugin, HMSVideoPluginCanvasContextType, HMSVideoPluginType } from './HMSVideoPlugin';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
@@ -56,6 +57,7 @@ export class HMSVideoPluginsManager {
   private pluginNumFramesToSkip: Record<string, number>;
   private pluginNumFramesSkipped: Record<string, number>;
   private canvases: Array<CanvasElement>; //array of canvases to store intermediate result
+  private canvasHandler: CanvasHandler | undefined;
 
   constructor(track: HMSLocalVideoTrack, eventBus: EventBus) {
     this.hmsTrack = track;
@@ -238,8 +240,19 @@ export class HMSVideoPluginsManager {
     if (!this.inputVideo) {
       this.inputVideo = document.createElement('video');
     }
+    const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = this.hmsTrack.getMediaTrackSettings();
+    // TODO: should we reduce height/width to optimize?
+    if (this.inputCanvas.height !== height) {
+      this.inputCanvas.height = height;
+    }
+    if (this.inputCanvas.width !== width) {
+      this.inputCanvas.width = width;
+    }
+
+    this.canvasHandler = new CanvasHandler(this.inputCanvas, this.inputVideo);
+    this.canvasHandler.init();
     // FF issue https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
-    this.inputCanvas.getContext('2d');
+    // this.inputCanvas.getContext('2d');
     this.outputCanvas.getContext(contextType || HMSVideoPluginCanvasContextType['2D']);
     // capture stream automatically uses the framerate at which the output canvas is changing
     const outputStream = this.outputCanvas.captureStream();
@@ -311,7 +324,7 @@ export class HMSVideoPluginsManager {
 
   private async doPreProcessing() {
     await this.addTrackToVideo(); // ensure current native track is playing in video
-    await this.updateInputCanvas(); // put the latest video frame on input canvas
+    this.canvasHandler?.draw();
   }
 
   /**
@@ -387,26 +400,6 @@ export class HMSVideoPluginsManager {
     this.inputVideo.muted = true;
     this.inputVideo.playsInline = true;
     await this.inputVideo.play();
-  }
-
-  /**
-   * get the new video frame from input video element and put it on canvas
-   * @private
-   */
-  private async updateInputCanvas() {
-    if (!this.inputCanvas || !this.inputVideo) {
-      return;
-    }
-    const { width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = this.hmsTrack.getMediaTrackSettings();
-    // TODO: should we reduce height/width to optimize?
-    if (this.inputCanvas.height !== height) {
-      this.inputCanvas.height = height;
-    }
-    if (this.inputCanvas.width !== width) {
-      this.inputCanvas.width = width;
-    }
-    const ctx = this.inputCanvas.getContext('2d');
-    ctx!.drawImage(this.inputVideo, 0, 0, width, height);
   }
 
   private resetCanvases() {
