@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.7.0",
+  "version": "0.7.1-alpha.0",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -51,8 +51,8 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.7.0",
-    "@100mslive/react-sdk": "0.7.0",
+    "@100mslive/react-icons": "0.7.1-alpha.0",
+    "@100mslive/react-sdk": "0.7.1-alpha.0",
     "@radix-ui/react-accordion": "1.0.0",
     "@radix-ui/react-checkbox": "1.0.0",
     "@radix-ui/react-collapsible": "^1.0.1",
