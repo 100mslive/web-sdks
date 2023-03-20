@@ -170,7 +170,7 @@ const SmallTilePeersView = ({
           maxColCount={showSidebarInBottom ? undefined : 2}
           maxRowCount={showSidebarInBottom ? 1 : undefined}
           includeScreenShareForPeer={shouldShowScreenFn}
-          showStatsOnTiles={showStatsOnTiles}
+          forceHideStatsOnTile={true}
         />
       )}
     </Flex>

@@ -13,6 +13,7 @@ const List = ({
   maxColCount,
   maxRowCount,
   includeScreenShareForPeer,
+  forceHideStatsOnTile = false,
 }) => {
   const { aspectRatio } = useTheme();
   const tileOffset = useAppConfig("headlessConfig", "tileOffset");
@@ -64,6 +65,7 @@ const List = ({
                       peerId={tile.peer?.id}
                       trackId={tile.track?.id}
                       visible={pageNo === page}
+                      forceHideStatsOnTile={forceHideStatsOnTile}
                     />
                   );
                 })}

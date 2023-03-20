@@ -28,7 +28,14 @@ import { useAppConfig } from "./AppData/useAppConfig";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
 
-const Tile = ({ peerId, trackId, width, height, visible = true }) => {
+const Tile = ({
+  peerId,
+  trackId,
+  width,
+  height,
+  visible = true,
+  forceHideStatsOnTile = false,
+}) => {
   const trackSelector = trackId
     ? selectVideoTrackByID(trackId)
     : selectVideoTrackByPeerID(peerId);
@@ -80,7 +87,7 @@ const Tile = ({ peerId, trackId, width, height, visible = true }) => {
               headlessConfig?.tileOffset === 0 && { "border-radius": 0 }),
           }}
         >
-          {showStatsOnTiles ? (
+          {showStatsOnTiles && !forceHideStatsOnTile ? (
             <VideoTileStats
               audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
