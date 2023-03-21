@@ -5,8 +5,10 @@ import {
   HMSPluginSupportResult,
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
+  HMSVideoPluginCanvasContextType,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
+import { CanvasHandler } from './canvasUtils';
 import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {
@@ -24,6 +26,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   private tempGifContext: CanvasRenderingContext2D | null;
   private prevResults?: MediaPipeResults;
   private input?: HTMLCanvasElement;
+  private canvasHandler?: CanvasHandler;
 
   constructor(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
     this.background = background;
@@ -40,6 +43,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
 
   isSupported(): boolean {
     return this.checkSupport().isSupported;
+  }
+
+  getContextType() {
+    return HMSVideoPluginCanvasContextType['WEBGL2'];
   }
 
   checkSupport(): HMSPluginSupportResult {
@@ -149,6 +156,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     if (this.backgroundType !== HMSVirtualBackgroundTypes.BLUR && this.background !== HMSVirtualBackgroundTypes.NONE) {
       this.segmentation?.reset();
     }
+    this.canvasHandler = undefined;
     //gif related
     this.gifFrameImageData = null;
     this.gifFrames = null;
@@ -161,19 +169,24 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     if (!input || !output) {
       throw new Error('Plugin invalid input/output');
     }
+
     this.input = input;
     output.width = input.width;
     output.height = input.height;
-    this.outputCanvas = output;
-    this.outputCtx = output.getContext('2d');
+    if (!this.canvasHandler) {
+      this.canvasHandler = new CanvasHandler(output);
+    }
     if (skipProcessing && this.prevResults) {
       this.handleResults(this.prevResults);
       return;
     }
+    /*  this.outputCanvas = output;
+    this.outputCtx = output.getContext('2d');
+   
     if (this.backgroundType === HMSVirtualBackgroundTypes.NONE) {
       this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
       return;
-    }
+    } */
     await this.segmentation.send({ image: input });
   }
 
@@ -186,16 +199,17 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private handleResults = (results: MediaPipeResults) => {
-    if (!this.outputCanvas || !this.outputCtx) {
-      return;
-    }
-    this.outputCtx.save();
-    this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    // if (!this.outputCanvas || !this.outputCtx) {
+    //   return;
+    // }
+    // this.outputCtx.save();
+    // this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     switch (this.backgroundType) {
       case HMSVirtualBackgroundTypes.IMAGE:
       case HMSVirtualBackgroundTypes.CANVAS:
       case HMSVirtualBackgroundTypes.VIDEO:
-        this.renderBackground(results, this.background as HMSBackgroundInput);
+        // this.renderBackground(results, this.background as HMSBackgroundInput);
+        this.canvasHandler?.draw(results, this.background as HTMLImageElement);
         break;
       case HMSVirtualBackgroundTypes.GIF:
         this.renderGIF(results);
@@ -204,7 +218,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         this.renderBlur(results);
         break;
     }
-    this.outputCtx.restore();
+    // this.outputCtx.restore();
     this.prevResults = results;
   };
 
@@ -254,7 +268,7 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     // Only overwrite missing pixels.
     this.outputCtx.globalCompositeOperation = 'destination-atop';
-    this.outputCtx.drawImage(this.input, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   };
 
   private renderBlur(results: MediaPipeResults) {
