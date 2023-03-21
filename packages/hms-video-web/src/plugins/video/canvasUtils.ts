@@ -93,24 +93,24 @@ export class CanvasHandler {
     );
     gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
     this.texture = texture;
+    const textureUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_texture');
+    gl.useProgram(this.shaderProgram);
+    gl.uniform1i(textureUniformLocation, 0);
   }
   draw(): void {
     if (!this.gl || !this.shaderProgram || !this.texture) {
       return;
     }
     const gl = this.gl;
-    const textureUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_texture');
+
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, this.video);
-
-    gl.useProgram(this.shaderProgram);
-    gl.uniform1i(textureUniformLocation, 0);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.video);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
   cleanUp() {
-    this.gl.deleteProgram(this.shaderProgram);
     this.gl.deleteTexture(this.texture);
+    this.gl.deleteProgram(this.shaderProgram);
   }
 }

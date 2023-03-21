@@ -1,4 +1,5 @@
 import { Results } from '@mediapipe/selfie_segmentation';
+import { HMSBackgroundInput } from './interfaces';
 
 export class CanvasHandler {
   private canvas: HTMLCanvasElement;
@@ -7,6 +8,7 @@ export class CanvasHandler {
   private texture: WebGLTexture | null = null;
   private segmentationTexture: WebGLTexture | null = null;
   private inputTexture: WebGLTexture | null = null;
+  private background?: HMSBackgroundInput;
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.init();
@@ -21,28 +23,29 @@ export class CanvasHandler {
     const vertexShaderSource = `
           attribute vec2 a_position;
           attribute vec2 a_texCoord;
-          varying vec2 v_texCoord;
+          varying vec2 v_uv;
           void main() {
               gl_Position = vec4(a_position, 0, 1);
-              v_texCoord = vec2(a_texCoord.x, 1.0 - a_texCoord.y);
+              v_uv = vec2(a_texCoord.x, 1.0 - a_texCoord.y);
           }
           `;
 
     const fragmentShaderSource = `
           precision mediump float;
-          varying vec2 v_texCoord;
+          varying vec2 v_uv;
           uniform sampler2D u_texture;
           uniform sampler2D u_segmentation;
           uniform sampler2D u_input;
 
           void main() {
-              vec4 background = texture2D(u_texture, v_texCoord);
-              vec4 segmentation = texture2D(u_segmentation, v_texCoord);
-              vec4 source = texture2D(u_input, v_texCoord);
-              if (segmentation.r == 1.0) 
-                  gl_FragColor = source;
-               else 
+              vec4 background = texture2D(u_texture, v_uv);
+              vec4 segmentation = texture2D(u_segmentation, v_uv);
+              vec4 source = texture2D(u_input, v_uv);
+              if (segmentation.a < 0.3) {
                   gl_FragColor = background;
+              } else {
+                  gl_FragColor = source;
+              }
           }
           `;
 
@@ -95,9 +98,10 @@ export class CanvasHandler {
       gl.STATIC_DRAW,
     );
     gl.vertexAttribPointer(texCoordAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.useProgram(this.shaderProgram);
   }
 
-  draw(_results: Results, _background: HTMLImageElement): void {
+  draw(results: Results): void {
     if (!this.gl || !this.shaderProgram || !this.texture || !this.segmentationTexture || !this.inputTexture) {
       return;
     }
@@ -105,7 +109,6 @@ export class CanvasHandler {
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.useProgram(this.shaderProgram);
 
     const textureUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_texture');
     const segmentationUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_segmentation');
@@ -115,19 +118,26 @@ export class CanvasHandler {
     gl.uniform1i(segmentationUniformLocation, 1);
     gl.uniform1i(inputUniformLocation, 2);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, _background);
-
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.segmentationTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, _results.segmentationMask);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, results.segmentationMask);
 
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.inputTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, _results.image);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, results.image);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+  }
+
+  setBackground(background: HMSBackgroundInput) {
+    if (!this.gl || !this.texture || this.background === background) {
+      return;
+    }
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, background);
+    this.background = background;
   }
 
   cleanUp() {
@@ -150,7 +160,6 @@ export class CanvasHandler {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    // gl.texStorage2D(gl.TEXTURE_2D, 1, gl.R32F, width, height);
     return texture;
   }
 }

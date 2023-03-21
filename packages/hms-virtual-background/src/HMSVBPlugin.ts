@@ -209,7 +209,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       case HMSVirtualBackgroundTypes.CANVAS:
       case HMSVirtualBackgroundTypes.VIDEO:
         // this.renderBackground(results, this.background as HMSBackgroundInput);
-        this.canvasHandler?.draw(results, this.background as HTMLImageElement);
+        this.canvasHandler?.setBackground(this.background as HMSBackgroundInput);
+        this.canvasHandler?.draw(results);
         break;
       case HMSVirtualBackgroundTypes.GIF:
         this.renderGIF(results);
