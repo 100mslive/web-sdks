@@ -426,7 +426,6 @@ export class HMSSdk implements HMSInterface {
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       await this.notifyJoin();
-      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
     } catch (error) {
