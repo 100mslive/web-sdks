@@ -130,7 +130,7 @@ export class CanvasHandler {
   }
 
   setBackground(background: HMSBackgroundInput) {
-    if (!this.gl || !this.texture || this.background === background) {
+    if (!this.gl || !this.texture || (this.background === background && !(background instanceof HTMLVideoElement))) {
       return;
     }
     const gl = this.gl;
