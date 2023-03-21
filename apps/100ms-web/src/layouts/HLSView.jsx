@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFullscreen, useToggle } from "react-use";
-import { HLSPlaybackState, HMSHLSPlayer } from "@100mslive/hls-player";
+import {
+  HLSPlaybackState,
+  HMSHLSPlayer,
+  HMSHLSPlayerEvents,
+} from "@100mslive/hls-player";
 import screenfull from "screenfull";
 import {
   selectAppData,
@@ -77,37 +81,34 @@ const HLSView = () => {
     if (videoEl && hlsUrl) {
       hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
       hlsPlayer.on(
-        HMSHLSPlayer.Events.SEEK_POS_BEHIND_LIVE_EDGE,
+        HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
         handleNoLongerLive
       );
       hlsPlayer.on(
-        HMSHLSPlayer.Events.TIMED_METADATA_LOADED,
+        HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsPlayer.on(HMSHLSPlayer.Events.ERROR, handleError);
-      hlsPlayer.on(HMSHLSPlayer.Events.PLAYBACK_STATE, playbackEventHandler);
-      hlsPlayer.on(HMSHLSPlayer.Events.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+      hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
+      hlsPlayer.on(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
 
-      hlsPlayer.on(HMSHLSPlayer.Events.MANIFEST_LOADED, manifestLoadedHandler);
-      hlsPlayer.on(HMSHLSPlayer.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.LEVEL_UPDATED, levelUpdatedHandler);
     }
     return () => {
       hlsPlayer?.off(
-        HMSHLSPlayer.Events.SEEK_POS_BEHIND_LIVE_EDGE,
+        HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
         handleNoLongerLive
       );
-      hlsPlayer?.off(HMSHLSPlayer.Events.ERROR, handleError);
+      hlsPlayer?.off(HMSHLSPlayerEvents.ERROR, handleError);
       hlsPlayer?.off(
-        HMSHLSPlayer.Events.TIMED_METADATA_LOADED,
+        HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
         metadataLoadedHandler
       );
-      hlsPlayer?.off(HMSHLSPlayer.Events.PLAYBACK_STATE, playbackEventHandler);
-      hlsPlayer?.off(HMSHLSPlayer.Events.AUTOPLAY_BLOCKED, handleAutoplayBlock);
-      hlsPlayer?.off(
-        HMSHLSPlayer.Events.MANIFEST_LOADED,
-        manifestLoadedHandler
-      );
-      hlsPlayer?.off(HMSHLSPlayer.Events.LEVEL_UPDATED, levelUpdatedHandler);
+      hlsPlayer?.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer?.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+      hlsPlayer?.off(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsPlayer?.off(HMSHLSPlayerEvents.LEVEL_UPDATED, levelUpdatedHandler);
       hlsPlayer?.reset();
       hlsPlayer = null;
     };

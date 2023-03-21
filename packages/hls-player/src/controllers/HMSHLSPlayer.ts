@@ -62,12 +62,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     return this._videoEl;
   }
   /**
-   * @returns return custom list of events
-   */
-  static get Events(): typeof HMSHLSPlayerEvents {
-    return HMSHLSPlayerEvents;
-  }
-  /**
    *  Subscribe to hls stats
    */
   subscribeStats = (callback: (state: HlsPlayerStats) => void, interval = 2000) => {
