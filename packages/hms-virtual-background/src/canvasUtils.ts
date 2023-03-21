@@ -41,7 +41,10 @@ export class CanvasHandler {
               vec4 background = texture2D(u_texture, v_texCoord);
               vec4 segmentation = texture2D(u_segmentation, v_texCoord);
               vec4 source = texture2D(u_input, v_texCoord);
-              gl_FragColor = segmentation;
+              if (segmentation.r == 1.0) 
+                  gl_FragColor = source;
+               else 
+                  gl_FragColor = background;
           }
           `;
 
