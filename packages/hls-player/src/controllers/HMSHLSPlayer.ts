@@ -31,6 +31,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl = videoEl || this.createVideoElement();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
+    } else if (!hlsUrl.endsWith('m3u8')) {
+      throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound('Invalid URL, pass m3u8 url');
     }
     this._hls.loadSource(hlsUrl);
     this._hls.attachMedia(this._videoEl);

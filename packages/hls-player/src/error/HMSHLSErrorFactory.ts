@@ -73,12 +73,12 @@ export const HMSHLSErrorFactory = {
         false,
       );
     },
-    hlsURLNotFound(): HMSHLSException {
+    hlsURLNotFound(msg?: string): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.HLS_URL_NOT_FOUND,
-        'hls url not found',
-        'hls url not found',
-        false,
+        msg || 'hls url not found',
+        msg || 'hls url not found',
+        true,
       );
     },
   },
