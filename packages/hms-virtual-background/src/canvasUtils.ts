@@ -2,13 +2,11 @@ import { Results } from '@mediapipe/selfie_segmentation';
 
 export class CanvasHandler {
   private canvas: HTMLCanvasElement;
-  private gl!: WebGL2RenderingContext;
+  private gl?: WebGL2RenderingContext;
   private shaderProgram: WebGLProgram | null = null;
-  private segmentationProgram: WebGLProgram | null = null;
   private texture: WebGLTexture | null = null;
   private segmentationTexture: WebGLTexture | null = null;
   private inputTexture: WebGLTexture | null = null;
-  private vertexShader: WebGLShader | null = null;
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.init();
@@ -54,7 +52,6 @@ export class CanvasHandler {
     }
     gl.shaderSource(vertexShader, vertexShaderSource);
     gl.compileShader(vertexShader);
-    this.vertexShader = vertexShader;
 
     const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
     if (!fragmentShader) {
@@ -106,12 +103,9 @@ export class CanvasHandler {
     }
     const gl = this.gl;
     gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.useProgram(this.shaderProgram);
-
-    // gl.enable(gl.BLEND);
-    // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    // gl.clearColor(0, 0, 0, 0);
-    // gl.clear(gl.COLOR_BUFFER_BIT);
 
     const textureUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_texture');
     const segmentationUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_segmentation');
@@ -134,67 +128,15 @@ export class CanvasHandler {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, _results.image);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-    // this.attachSegmentationShader(_results, _background);
   }
 
   cleanUp() {
-    this.gl.deleteProgram(this.shaderProgram);
-    this.gl.deleteTexture(this.texture);
-  }
-
-  attachSegmentationShader(_results: Results, _background: HTMLImageElement | HTMLCanvasElement) {
-    const gl = this.gl;
-    if (!gl) {
-      return;
+    if (this.gl) {
+      this.gl.deleteProgram(this.shaderProgram);
+      this.gl.deleteTexture(this.texture);
+      this.gl.deleteTexture(this.segmentationTexture);
+      this.gl.deleteTexture(this.inputTexture);
     }
-
-    const fragmentShaderSource = `
-      precision highp float;
-      uniform sampler2D u_inputSegmentation;
-      in vec2 v_texCoord;
-      out vec4 outColor;
-      void main() {
-        vec2 segmentation = texture(u_inputSegmentation, v_texCoord).rg;
-        float shift = max(segmentation.r, segmentation.g);
-        float backgroundExp = exp(segmentation.r - shift);
-        float personExp = exp(segmentation.g - shift);
-        outColor = vec4(vec3(0.0), personExp / (backgroundExp + personExp));
-      }
-  `;
-
-    const segmentationTexture = this.createTexture();
-
-    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-    if (!fragmentShader) {
-      return;
-    }
-    gl.shaderSource(fragmentShader, fragmentShaderSource);
-    gl.compileShader(fragmentShader);
-
-    const program = this.createProgram(fragmentShader)!;
-    const inputLocation = gl.getUniformLocation(program, 'u_inputSegmentation');
-    const frameBuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, segmentationTexture!, 0);
-
-    gl.useProgram(program);
-    gl.uniform1i(inputLocation, 1);
-
-    this.segmentationProgram = program;
-  }
-
-  drawSegmentation(results: Results) {
-    const gl = this.gl;
-    if (!gl || !this.segmentationProgram) {
-      return;
-    }
-    const inputTexture = this.createTexture();
-    gl.useProgram(this.segmentationProgram);
-    gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, inputTexture!);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, results.segmentationMask);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
 
   private createTexture() {
@@ -210,20 +152,5 @@ export class CanvasHandler {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     // gl.texStorage2D(gl.TEXTURE_2D, 1, gl.R32F, width, height);
     return texture;
-  }
-
-  private createProgram(fragmentShader: WebGLShader) {
-    if (!this.gl || !this.vertexShader) {
-      return;
-    }
-    const gl = this.gl;
-    const program = gl.createProgram()!;
-    gl.attachShader(program, this.vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      throw new Error(`Could not link WebGL program: ${gl.getProgramInfoLog(program)}`);
-    }
-    return program;
   }
 }
