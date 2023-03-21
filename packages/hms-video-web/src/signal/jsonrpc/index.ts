@@ -347,7 +347,6 @@ export default class JsonRpcSignal implements ISignal {
   private onMessageHandler(event: MessageEvent) {
     const text: string = event.data;
     const response = JSON.parse(text);
-
     if (response.id) {
       this.handleResponseWithId(response);
     } else if (response.method) {
