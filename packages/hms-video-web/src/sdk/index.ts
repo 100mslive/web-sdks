@@ -424,8 +424,8 @@ export class HMSSdk implements HMSInterface {
         config.autoVideoSubscribe,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
+      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       this.sdkState.isJoinInProgress = false;
       this.sendJoinAnalyticsEvent(isPreviewCalled);
       await this.publish(config.settings, previewRole);
