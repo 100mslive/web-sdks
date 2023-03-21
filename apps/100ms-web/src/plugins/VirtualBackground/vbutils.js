@@ -43,7 +43,7 @@ export function getRandomVirtualBackground() {
   }));
   backgroundList.push(...videoList);
 
-  const randomIdx = Math.floor(Math.random() * backgroundList.length);
+  const randomIdx = 1 || Math.floor(Math.random() * backgroundList.length);
   const virtualBackground = backgroundList[randomIdx];
   switch (virtualBackground.backgroundType) {
     case HMSVirtualBackgroundTypes.IMAGE:
