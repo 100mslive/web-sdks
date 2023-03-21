@@ -70,6 +70,7 @@ const INITIAL_STATE = {
   isInitialised: false,
   isReconnecting: false,
   isPreviewInProgress: false,
+  isPreviewCalled: false,
   isJoinInProgress: false,
   deviceManagersInitialised: false,
 };
@@ -196,6 +197,7 @@ export class HMSSdk implements HMSInterface {
           break;
         case HMSNotificationMethod.PEER_LIST:
           this.analyticsTimer.end(TimedEvent.PEER_LIST);
+          this.sendJoinAnalyticsEvent(this.sdkState.isPreviewCalled);
           break;
         case HMSNotificationMethod.ROOM_STATE:
           this.analyticsTimer.end(TimedEvent.ROOM_STATE);
@@ -379,7 +381,6 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.start(TimedEvent.JOIN);
     this.sdkState.isJoinInProgress = true;
 
-    const isPreviewCalled = this.transportState === TransportState.Preview;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     const previewRole = this.localPeer?.asRole?.name || this.localPeer?.role?.name;
     this.networkTestManager?.stop();
@@ -424,16 +425,14 @@ export class HMSSdk implements HMSInterface {
         config.autoVideoSubscribe,
       );
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
-      this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
       this.sdkState.isJoinInProgress = false;
-      this.sendJoinAnalyticsEvent(isPreviewCalled);
       await this.publish(config.settings, previewRole);
     } catch (error) {
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
       this.listener?.onError(error as HMSException);
-      this.sendJoinAnalyticsEvent(isPreviewCalled, error as HMSException);
+      this.sendJoinAnalyticsEvent(this.sdkState.isPreviewCalled, error as HMSException);
       HMSLogger.e(this.TAG, 'Unable to join room', error);
       throw error;
     }
@@ -1017,6 +1016,7 @@ export class HMSSdk implements HMSInterface {
    */
   private setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
     this.listener = listener as unknown as HMSUpdateListener;
+    this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
     const { roomId, userId, role } = decodeJWT(config.authToken);
     this.commonSetup(config, roomId, listener);
