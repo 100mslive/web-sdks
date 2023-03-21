@@ -27,9 +27,13 @@ export class TrackManager {
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
   constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
-
+  /**
+   * Add event from biz on track-add
+   * @param params TrackStateNotification
+   */
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
+    console.log('track meta add ', params);
 
     for (const trackId in params.tracks) {
       this.store.setTrackState({
@@ -46,6 +50,7 @@ export class TrackManager {
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
+    console.log('track add ', track);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -56,6 +61,8 @@ export class TrackManager {
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
+    console.log('track remove ', track);
+
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
@@ -74,6 +81,7 @@ export class TrackManager {
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     this.store.removeTrack(track.trackId);
     const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
+
     if (!hmsPeer) {
       return;
     }

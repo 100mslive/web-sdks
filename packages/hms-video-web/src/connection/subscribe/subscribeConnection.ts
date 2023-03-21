@@ -17,7 +17,6 @@ import { HMSConnectionRole } from '../model';
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
-
   private readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
@@ -65,8 +64,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
     };
 
     this.nativeConnection.ontrack = e => {
+      console.log('stream counts ', JSON.stringify(e.streams.length));
       const stream = e.streams[0];
       const streamId = stream.id;
+      // Keeping track of stream counts
+
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
@@ -77,29 +79,71 @@ export default class HMSSubscribeConnection extends HMSConnection {
            * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
            * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
            */
+          // here only removing audio not video. id will be same for audio and video.
           const toRemoveTrackIdx = remote.tracks.findIndex(
             track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.mid,
+          );
+          console.log(
+            'sub remove ',
+            JSON.stringify(
+              remote.tracks.map(track => track.stream.id),
+              null,
+              '\t',
+            ),
+            streamId,
+            toRemoveTrackIdx,
+            JSON.stringify(e.transceiver.mid),
+            JSON.stringify(
+              remote.tracks.map(track => track.mid),
+              null,
+              '\t',
+            ),
           );
           if (toRemoveTrackIdx >= 0) {
             const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
             this.observer.onTrackRemove(toRemoveTrack);
             remote.tracks.splice(toRemoveTrackIdx, 1);
-
+            console.log('tracs 1 ', streamId, remote.tracks.length);
             // If the length becomes 0 we assume that stream is removed entirely
             if (remote.tracks.length === 0) {
               this.remoteStreams.delete(streamId);
             }
           }
+          // lets remove both
+          // const indexes = remote.tracks.map((track, index) => {
+          //   if (track.nativeTrack.id !== ev.track.id) {
+          //     return -1;
+          //   }
+          //   return index;
+          // });
+          // if (indexes.length > 0) {
+          //   indexes.map(index => {
+          //     if (index === -1) {
+          //       return;
+          //     }
+          //     const toRemoveTrack = remote.tracks[index];
+          //     this.observer.onTrackRemove(toRemoveTrack);
+          //     remote.tracks.splice(index, 1);
+          //     console.log('tracs 1 ', streamId, remote.tracks.length);
+          //     // If the length becomes 0 we assume that stream is removed entirely
+          //     if (remote.tracks.length === 0) {
+          //       this.remoteStreams.delete(streamId);
+          //     }
+          //   });
+          // }
         };
       }
 
       const remote = this.remoteStreams.get(streamId)!;
+      console.log('tracs 2 ', streamId, remote.tracks.length);
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
       track.mid = e.transceiver.mid;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);
+      console.log('tracs 3 ', streamId, remote.tracks.length);
+      console.log('adding tracks ', remote.tracks);
       this.observer.onTrackAdd(track);
     };
   }
