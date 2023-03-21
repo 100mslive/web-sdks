@@ -15,7 +15,7 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    nanifestParsingError(data: HMSHLSErrorDetails): HMSHLSException {
+    manifestParsingError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.MANIFEST_PARSING_ERROR,
         data.details,
@@ -65,7 +65,7 @@ export const HMSHLSErrorFactory = {
         false,
       );
     },
-    autoblockFailed(): HMSHLSException {
+    autoplayFailed(): HMSHLSException {
       return new HMSHLSException(
         HMSHLSExceptionEvents.HLS_AUTOPLAY_FAILED,
         'Failed to autoplay',

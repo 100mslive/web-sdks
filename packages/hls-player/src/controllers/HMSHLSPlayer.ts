@@ -9,10 +9,10 @@ import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEv
 import { mapLevel, mapLevels } from '../utilies/utils';
 
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
-  private hls: Hls;
-  private hlsUrl: string;
-  private hlsStats: HlsStats;
-  private videoEl: HTMLVideoElement;
+  private _hls: Hls;
+  private _hlsUrl: string;
+  private _hlsStats: HlsStats;
+  private _videoEl: HTMLVideoElement;
   private _emitter: HMSHLSPlayerEventEmitter;
   private _subscribeHlsStats?: (() => void) | null = null;
   private _isLive: boolean;
@@ -25,20 +25,20 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @param videoEl optional field - HTML video element
    */
   constructor(hlsUrl: string, videoEl?: HTMLVideoElement) {
-    this.hls = new Hls(this.getPlayerConfig());
+    this._hls = new Hls(this.getPlayerConfig());
     this._emitter = new HMSHLSPlayerEventEmitter();
-    this.hlsUrl = hlsUrl;
-    this.videoEl = videoEl || this.createVideoElement();
+    this._hlsUrl = hlsUrl;
+    this._videoEl = videoEl || this.createVideoElement();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
     }
-    this.hls.loadSource(hlsUrl);
-    this.hls.attachMedia(this.videoEl);
+    this._hls.loadSource(hlsUrl);
+    this._hls.attachMedia(this._videoEl);
     this._isLive = true;
-    this._volume = this.videoEl.volume * 100;
-    this.hlsStats = new HlsStats(this.hls, this.videoEl);
+    this._volume = this._videoEl.volume * 100;
+    this._hlsStats = new HlsStats(this._hls, this._videoEl);
     this.listenHLSEvent();
-    this._metaData = new HMSHLSTimedMetadata(this, this.hls);
+    this._metaData = new HMSHLSTimedMetadata(this, this._hls);
     this.seekToLivePosition();
   }
   /**
@@ -46,22 +46,20 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @returns HTML video element
    */
   private createVideoElement(): HTMLVideoElement {
-    if (this.videoEl) {
-      return this.videoEl;
+    if (this._videoEl) {
+      return this._videoEl;
     }
     const video: HTMLVideoElement = document?.createElement('video');
     video.playsInline = true;
     video.controls = false;
     video.autoplay = true;
-    video.style.height = '100%';
-    video.style.margin = 'auto';
     return video;
   }
   /**
    * @returns get html video element
    */
   getVideoElement(): HTMLVideoElement {
-    return this.videoEl;
+    return this._videoEl;
   }
   /**
    * @returns return custom list of events
@@ -73,7 +71,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    *  Subscribe to hls stats
    */
   subscribeStats = (callback: (state: HlsPlayerStats) => void, interval = 2000) => {
-    this._subscribeHlsStats = this.hlsStats.subscribe((state: HlsPlayerStats) => {
+    this._subscribeHlsStats = this._hlsStats.subscribe((state: HlsPlayerStats) => {
       callback(state);
     }, interval);
     return this.unsubscribeStats;
@@ -88,24 +86,25 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
   // reset the controller
   reset() {
-    if (this.hls && this.hls.media) {
-      this.hls.detachMedia();
+    if (this._hls && this._hls.media) {
+      this._hls.detachMedia();
       this.unsubscribeStats();
     }
     if (this._metaData) {
       this._metaData.unregisterListener();
     }
     if (Hls.isSupported()) {
-      this.hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
-      this.hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
-      this.hls.off(Hls.Events.ERROR, this.handleHLSException);
+      this._hls.off(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
+      this._hls.off(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
+      this._hls.off(Hls.Events.ERROR, this.handleHLSException);
     }
-    if (this.videoEl) {
-      this.videoEl.removeEventListener('play', this.playEventHandler);
-      this.videoEl.removeEventListener('pause', this.pauseEventHandler);
-      this.videoEl.removeEventListener('timeupdate', this.handleTimeUpdateListener);
-      this.videoEl.removeEventListener('volumechange', this.volumeEventHandler);
+    if (this._videoEl) {
+      this._videoEl.removeEventListener('play', this.playEventHandler);
+      this._videoEl.removeEventListener('pause', this.pauseEventHandler);
+      this._videoEl.removeEventListener('timeupdate', this.handleTimeUpdateListener);
+      this._videoEl.removeEventListener('volumechange', this.volumeEventHandler);
     }
+    this.removeAllListeners();
   }
   on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
     this._emitter.on(event, listener);
@@ -118,7 +117,9 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   emit<E extends keyof HMSHLSPlayerListeners>(event: E, eventObject: Parameters<HMSHLSPlayerListeners[E]>[1]): boolean {
     return this._emitter.emit(event, event, eventObject);
   }
-
+  private removeAllListeners<E extends keyof HMSHLSPlayerListeners>(event?: E): void {
+    this._emitter.removeAllListeners(event);
+  }
   /**
    * get current video volume
    */
@@ -131,7 +132,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   setVolume(volume: number) {
     this.validateVideoEl();
-    this.videoEl.volume = volume / 100;
+    this._videoEl.volume = volume / 100;
     this._volume = volume;
   }
   /**
@@ -140,8 +141,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * quality level. -1 if currentlevel is set to "Auto"
    */
   getCurrentLevel(): ILevel | null {
-    if (this.hls && this.hls.currentLevel !== -1) {
-      const currentLevel = this.hls?.levels.at(this.hls?.currentLevel);
+    if (this._hls && this._hls.currentLevel !== -1) {
+      const currentLevel = this._hls?.levels.at(this._hls?.currentLevel);
       return currentLevel ? mapLevel(currentLevel) : null;
     }
     return null;
@@ -153,11 +154,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * set the stream to -1 for Auto
    */
   setCurrentLevel(currentLevel: ILevel) {
-    if (this.hls) {
-      const current = this.hls.levels.findIndex((level: Level) => {
+    if (this._hls) {
+      const current = this._hls.levels.findIndex((level: Level) => {
         return level?.attrs?.RESOLUTION === currentLevel?.resolution;
       });
-      this.hls.currentLevel = current;
+      this._hls.currentLevel = current;
     }
     return;
   }
@@ -167,11 +168,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   async seekToLivePosition() {
     this.validateVideoEl();
     let end = 0;
-    if (this.videoEl?.buffered.length > 0) {
-      end = this.videoEl?.buffered.end(this.videoEl?.buffered.length - 1);
+    if (this._videoEl?.buffered.length > 0) {
+      end = this._videoEl?.buffered.end(this._videoEl?.buffered.length - 1);
     }
-    this.videoEl.currentTime = this.hls?.liveSyncPosition || end;
-    if (this.videoEl.paused) {
+    this._videoEl.currentTime = this._hls?.liveSyncPosition || end;
+    if (this._videoEl.paused) {
       try {
         await this.playVideo();
       } catch (err) {
@@ -197,18 +198,18 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   seekTo = (seekValue: number) => {
     this.validateVideoEl();
-    this.videoEl.currentTime = seekValue;
+    this._videoEl.currentTime = seekValue;
   };
   unblockAutoPlay = async () => {
     try {
       await this.play();
     } catch (error) {
       console.error('Tried to unblock autoplay failed with', error);
-      this.emit(HMSHLSPlayerEvents.ERROR, HMSHLSErrorFactory.HLSMediaError.autoblockFailed());
+      this.emit(HMSHLSPlayerEvents.ERROR, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
     }
   };
   private validateVideoEl() {
-    if (!this.videoEl) {
+    if (!this._videoEl) {
       const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
       this.emit(HMSHLSPlayerEvents.ERROR, error);
     }
@@ -216,8 +217,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private playVideo = async () => {
     this.validateVideoEl();
     try {
-      if (this.videoEl.paused) {
-        await this.videoEl.play();
+      if (this._videoEl.paused) {
+        await this._videoEl.play();
       }
     } catch (error: any) {
       console.debug('Browser blocked autoplay with error', error.toString());
@@ -230,8 +231,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private pauseVideo = () => {
     this.validateVideoEl();
     try {
-      if (!this.videoEl.paused) {
-        this.videoEl.pause();
+      if (!this._videoEl.paused) {
+        this._videoEl.pause();
       }
     } catch (error: any) {
       console.debug('asking user to pause the video manually...');
@@ -249,7 +250,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
   private volumeEventHandler = () => {
     this.validateVideoEl();
-    this._volume = this.videoEl.volume;
+    this._volume = this._videoEl.volume;
   };
   private handleNetworkRelatedError = (data: ErrorData): boolean => {
     const details = data.error?.message || data.err?.message || '';
@@ -264,7 +265,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         return true;
       }
       case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
-        const error = HMSHLSErrorFactory.HLSNetworkError.nanifestParsingError(detail);
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
         return true;
       }
@@ -317,19 +318,19 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     });
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
-    const qualityLevel: ILevel = mapLevel(this.hls.levels[level]);
+    const qualityLevel: ILevel = mapLevel(this._hls.levels[level]);
     this.emit(HMSHLSPlayerEvents.LEVEL_UPDATED, {
       level: qualityLevel,
     });
   };
 
   private handleTimeUpdateListener = (_: Event) => {
-    if (!this.videoEl) {
+    if (!this._videoEl) {
       return;
     }
-    this.emit(HMSHLSPlayerEvents.CURRENT_TIME, this.videoEl.currentTime);
-    const live = this.hls.liveSyncPosition
-      ? this.hls.liveSyncPosition - this.videoEl.currentTime <= HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY
+    this.emit(HMSHLSPlayerEvents.CURRENT_TIME, this._videoEl.currentTime);
+    const live = this._hls.liveSyncPosition
+      ? this._hls.liveSyncPosition - this._videoEl.currentTime <= HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY
       : false;
     if (this._isLive !== live) {
       this._isLive = live;
@@ -344,17 +345,17 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private listenHLSEvent() {
     this.validateVideoEl();
     if (Hls.isSupported()) {
-      this.hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
-      this.hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
-      this.hls.on(Hls.Events.ERROR, this.handleHLSException);
-    } else if (this.videoEl.canPlayType('application/vnd.apple.mpegurl')) {
+      this._hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
+      this._hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
+      this._hls.on(Hls.Events.ERROR, this.handleHLSException);
+    } else if (this._videoEl.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
-      this.videoEl.src = this.hlsUrl;
+      this._videoEl.src = this._hlsUrl;
     }
-    this.videoEl.addEventListener('timeupdate', this.handleTimeUpdateListener);
-    this.videoEl.addEventListener('play', this.playEventHandler);
-    this.videoEl.addEventListener('pause', this.pauseEventHandler);
-    this.videoEl.addEventListener('volumechange', this.volumeEventHandler);
+    this._videoEl.addEventListener('timeupdate', this.handleTimeUpdateListener);
+    this._videoEl.addEventListener('play', this.playEventHandler);
+    this._videoEl.addEventListener('pause', this.pauseEventHandler);
+    this._videoEl.addEventListener('volumechange', this.volumeEventHandler);
   }
 
   private getPlayerConfig(): Partial<HlsConfig> {

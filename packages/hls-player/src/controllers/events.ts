@@ -69,4 +69,8 @@ export class HMSHLSPlayerEventEmitter implements IHMSHLSPlayerEventEmitter {
   ): boolean {
     return this.eventEmitter.emit(event, name, eventObject);
   }
+
+  removeAllListeners<E extends keyof HMSHLSPlayerListeners>(event?: E): void {
+    this.eventEmitter.removeAllListeners(event);
+  }
 }
