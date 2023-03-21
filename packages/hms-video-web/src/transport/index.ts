@@ -1025,7 +1025,6 @@ export default class HMSTransport implements ITransport {
     this.analyticsTimer.end(TimedEvent.WEBSOCKET_CONNECT);
     this.analyticsTimer.start(TimedEvent.ON_POLICY_CHANGE);
     this.analyticsTimer.start(TimedEvent.ROOM_STATE);
-    this.analyticsTimer.start(TimedEvent.PEER_LIST);
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
