@@ -38,10 +38,10 @@ export class CanvasHandler {
           uniform sampler2D u_input;
 
           void main() {
-              vec4 color0 = texture2D(u_texture, v_texCoord);
-              vec4 color1 = texture2D(u_segmentation, v_texCoord);
-              vec4 color2 = texture2D(u_input, v_texCoord);
-              gl_FragColor = (color1 * color2) + color0;
+              vec4 background = texture2D(u_texture, v_texCoord);
+              vec4 segmentation = texture2D(u_segmentation, v_texCoord);
+              vec4 source = texture2D(u_input, v_texCoord);
+              gl_FragColor = background * source;
           }
           `;
 
@@ -102,11 +102,13 @@ export class CanvasHandler {
       return;
     }
     const gl = this.gl;
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.useProgram(this.shaderProgram);
 
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
+    // gl.enable(gl.BLEND);
+    // gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    // gl.clearColor(0, 0, 0, 0);
+    // gl.clear(gl.COLOR_BUFFER_BIT);
 
     const textureUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_texture');
     const segmentationUniformLocation = gl.getUniformLocation(this.shaderProgram, 'u_segmentation');
@@ -127,10 +129,6 @@ export class CanvasHandler {
     gl.activeTexture(gl.TEXTURE2);
     gl.bindTexture(gl.TEXTURE_2D, this.inputTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, _results.image);
-
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
-    gl.useProgram(this.shaderProgram);
-    gl.uniform1i(textureUniformLocation, 0);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
