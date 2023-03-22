@@ -20,15 +20,14 @@ export const metadataPayloadParser = (payload: string): Record<string, any> => {
  * map Level[] to ILevel[]
  */
 export const mapLevels = (qualityLevel: Level[] | LevelParsed[]): ILevel[] => {
-  const levels = qualityLevel.map((level: Level | LevelParsed) => mapLevel(level));
-  return levels;
+  return qualityLevel.map((level: Level | LevelParsed) => mapLevel(level));
 };
 
 /**
  * map Level[] to ILevel[]
  */
 export const mapLevel = (qualityLevel: Level | LevelParsed): ILevel => {
-  const level = {
+  return {
     resolution: qualityLevel.attrs?.RESOLUTION,
     bitrate: qualityLevel.bitrate,
     height: qualityLevel.height,
@@ -36,5 +35,4 @@ export const mapLevel = (qualityLevel: Level | LevelParsed): ILevel => {
     url: qualityLevel.url[0],
     width: qualityLevel.width,
   };
-  return level;
 };
