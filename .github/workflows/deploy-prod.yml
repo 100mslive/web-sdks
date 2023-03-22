@@ -27,6 +27,7 @@ jobs:
       REACT_APP_ENABLE_WHITEBOARD: 'true'
       REACT_APP_ZIPY_KEY: ${{ secrets.PROD_ZIPY_KEY }}
       REACT_APP_ENV: 'prod'
+      REACT_APP_ENABLE_BEAM_SPEAKERS_LOGGING: 'true'
 
     steps:
       - name: log inputs
