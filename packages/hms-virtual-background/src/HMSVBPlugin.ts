@@ -21,11 +21,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
 
   private gifFrames: any;
   private gifFramesIndex: number;
-  private gifFrameImageData: any;
+  private gifFrameImageData: ImageData | null = null;
   private tempGifCanvas: HTMLCanvasElement;
   private tempGifContext: CanvasRenderingContext2D | null;
   private prevResults?: MediaPipeResults;
-  private input?: HTMLCanvasElement;
   private canvasHandler?: CanvasHandler;
 
   constructor(background: HMSVirtualBackground, backgroundType: HMSVirtualBackgroundTypes) {
@@ -33,7 +32,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.backgroundType = backgroundType;
     this.gifFrames = null;
     this.gifFramesIndex = 0;
-    this.gifFrameImageData = null;
     this.tempGifCanvas = document.createElement('canvas');
     this.tempGifContext = this.tempGifCanvas.getContext('2d');
 
@@ -169,8 +167,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     if (!input || !output) {
       throw new Error('Plugin invalid input/output');
     }
-
-    this.input = input;
     output.width = input.width;
     output.height = input.height;
     if (!this.canvasHandler) {
@@ -180,13 +176,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       this.handleResults(this.prevResults);
       return;
     }
-    /*  this.outputCanvas = output;
-    this.outputCtx = output.getContext('2d');
-   
-    if (this.backgroundType === HMSVirtualBackgroundTypes.NONE) {
-      this.outputCtx?.drawImage(input, 0, 0, input.width, input.height);
-      return;
-    } */
     await this.segmentation.send({ image: input });
   }
 
@@ -199,18 +188,11 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   }
 
   private handleResults = (results: MediaPipeResults) => {
-    // if (!this.outputCanvas || !this.outputCtx) {
-    //   return;
-    // }
-    // this.outputCtx.save();
-    // this.outputCtx.clearRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     switch (this.backgroundType) {
       case HMSVirtualBackgroundTypes.IMAGE:
       case HMSVirtualBackgroundTypes.CANVAS:
       case HMSVirtualBackgroundTypes.VIDEO:
-        // this.renderBackground(results, this.background as HMSBackgroundInput);
-        this.canvasHandler?.setBackground(this.background as HMSBackgroundInput);
-        this.canvasHandler?.draw(results);
+        this.canvasHandler?.draw(results, this.background as HMSBackgroundInput);
         break;
       case HMSVirtualBackgroundTypes.GIF:
         this.renderGIF(results);
@@ -219,7 +201,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         this.renderBlur(results);
         break;
     }
-    // this.outputCtx.restore();
     this.prevResults = results;
   };
 
@@ -236,62 +217,21 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     console.debug(this.TAG, ...data);
   }
 
-  private renderBackground = (results: MediaPipeResults, background: HMSBackgroundInput) => {
-    if (
-      !this.input ||
-      !this.outputCanvas ||
-      !this.outputCtx ||
-      this.backgroundType === HMSVirtualBackgroundTypes.NONE ||
-      this.backgroundType === HMSVirtualBackgroundTypes.BLUR
-    ) {
-      return;
-    }
-    this.outputCtx.filter = 'none';
-    this.outputCtx.imageSmoothingEnabled = true;
-    this.outputCtx.imageSmoothingQuality = 'high';
-    // Only overwrite existing pixels.
-    this.outputCtx.globalCompositeOperation = 'source-out';
-    const bgWidth = background instanceof HTMLVideoElement ? background.videoWidth : background.width;
-    const bgHeight = background instanceof HTMLVideoElement ? background.videoHeight : background.height;
-
-    this.outputCtx.drawImage(
-      background,
-      0,
-      0,
-      bgWidth,
-      bgHeight,
-      0,
-      0,
-      this.outputCanvas.width,
-      this.outputCanvas.height,
-    );
-    this.outputCtx.globalCompositeOperation = 'destination-out';
-    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    // Only overwrite missing pixels.
-    this.outputCtx.globalCompositeOperation = 'destination-atop';
-    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-  };
-
   private renderBlur(results: MediaPipeResults) {
     if (!this.outputCanvas || !this.outputCtx || this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
       return;
     }
-    this.outputCtx!.filter = 'none';
-    this.outputCtx!.globalCompositeOperation = 'source-out';
-    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx!.globalCompositeOperation = 'destination-atop';
-    this.outputCtx?.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx!.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
-    this.outputCtx?.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.filter = 'none';
+    this.outputCtx.globalCompositeOperation = 'source-out';
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.globalCompositeOperation = 'destination-atop';
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
+    this.outputCtx.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
+    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
   }
 
-  private renderGIF(results: MediaPipeResults) {
-    if (
-      !this.outputCanvas ||
-      !this.outputCtx ||
-      !this.tempGifContext ||
-      this.backgroundType !== HMSVirtualBackgroundTypes.GIF
-    ) {
+  private async renderGIF(results: MediaPipeResults) {
+    if (!this.tempGifContext || this.backgroundType !== HMSVirtualBackgroundTypes.GIF) {
       return;
     }
     if (this.gifFrameImageData == null) {
@@ -304,6 +244,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     this.gifFrameImageData.data.set(this.gifFrames[this.gifFramesIndex].patch);
     this.tempGifContext.putImageData(this.gifFrameImageData, 0, 0);
     this.gifFramesIndex = (this.gifFramesIndex + 1) % this.gifFrames.length;
-    this.renderBackground(results, this.tempGifCanvas);
+    this.canvasHandler?.draw(results, this.tempGifCanvas);
   }
 }

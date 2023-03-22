@@ -41,11 +41,7 @@ export class CanvasHandler {
               vec4 background = texture2D(u_texture, v_uv);
               vec4 segmentation = texture2D(u_segmentation, v_uv);
               vec4 source = texture2D(u_input, v_uv);
-              if (segmentation.a < 0.3) {
-                  gl_FragColor = background;
-              } else {
-                  gl_FragColor = source;
-              }
+              gl_FragColor = mix(background, source, segmentation.a);
           }
           `;
 
@@ -101,7 +97,7 @@ export class CanvasHandler {
     gl.useProgram(this.shaderProgram);
   }
 
-  draw(results: Results): void {
+  draw(results: Results, background: HMSBackgroundInput): void {
     if (!this.gl || !this.shaderProgram || !this.texture || !this.segmentationTexture || !this.inputTexture) {
       return;
     }
@@ -118,6 +114,8 @@ export class CanvasHandler {
     gl.uniform1i(segmentationUniformLocation, 1);
     gl.uniform1i(inputUniformLocation, 2);
 
+    this.setBackground(background);
+
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, this.segmentationTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, results.segmentationMask);
@@ -130,7 +128,7 @@ export class CanvasHandler {
   }
 
   setBackground(background: HMSBackgroundInput) {
-    if (!this.gl || !this.texture || (this.background === background && !(background instanceof HTMLVideoElement))) {
+    if (!this.gl || !this.texture || (this.background === background && background instanceof HTMLImageElement)) {
       return;
     }
     const gl = this.gl;
