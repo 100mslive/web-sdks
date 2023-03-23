@@ -1,19 +1,22 @@
+import {
+  AcceptRoleChangeParams,
+  BroadcastResponse,
+  GetSessionMetadataResponse,
+  HLSRequestParams,
+  HLSTimedMetadataParams,
+  MultiTrackUpdateRequestParams,
+  RemovePeerRequest,
+  RequestForBulkRoleChangeParams,
+  RequestForRoleChangeParams,
+  SessionMetadataUpdateParams,
+  StartRTMPOrRecordingRequestParams,
+  Track,
+  TrackUpdateRequestParams,
+  UpdatePeerRequestParams,
+} from './interfaces';
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSMessage } from '../interfaces';
-import {
-  Track,
-  AcceptRoleChangeParams,
-  RequestForRoleChangeParams,
-  TrackUpdateRequestParams,
-  RemovePeerRequest,
-  MultiTrackUpdateRequestParams,
-  StartRTMPOrRecordingRequestParams,
-  UpdatePeerRequestParams,
-  HLSRequestParams,
-  BroadcastResponse,
-  HLSTimedMetadataParams,
-} from './interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
@@ -27,6 +30,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     data: string,
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
+    simulcast: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
@@ -48,6 +52,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   requestRoleChange(params: RequestForRoleChangeParams): Promise<void>;
 
+  requestBulkRoleChange(params: RequestForBulkRoleChangeParams): Promise<void>;
+
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): Promise<void>;
 
   requestTrackStateChange(params: TrackUpdateRequestParams): Promise<void>;
@@ -67,6 +73,10 @@ export interface ISignal extends IAnalyticsTransportProvider {
   sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void>;
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
+
+  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+
+  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
 
   close(): Promise<void>;
 }

@@ -1,15 +1,16 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
-import { getAudioTrack, isEmptyTrack } from '../../utils/track';
-import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
-import HMSLogger from '../../utils/logger';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { HMSException } from '../../error/HMSException';
+import { EventBus } from '../../events/EventBus';
+import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
-import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
-import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { EventBus } from '../../events/EventBus';
-import { HMSException } from '../../error/HMSException';
+import HMSLogger from '../../utils/logger';
+import { isBrowser, isIOS } from '../../utils/support';
+import { getAudioTrack, isEmptyTrack } from '../../utils/track';
+import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
+import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -17,9 +18,8 @@ function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>,
   };
 }
 
-const TAG = 'HMSLocalAudioTrack';
-
 export class HMSLocalAudioTrack extends HMSAudioTrack {
+  private readonly TAG = '[HMSLocalAudioTrack]';
   settings: HMSAudioTrackSettings;
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
@@ -32,6 +32,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    */
   publishedTrackId?: string;
 
+  /**
+   * will be false for preview tracks
+   */
+  isPublished = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -43,25 +48,35 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     stream.tracks.push(this);
 
     this.settings = settings;
-    // Replace the 'default' deviceId with the actual deviceId
+    // Replace the 'default' or invalid deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default' && !isEmptyTrack(track)) {
+    if (settings.deviceId !== track.getSettings().deviceId && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
     this.setFirstTrackId(track.id);
+    if (isIOS() && isBrowser) {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'visible') {
+      await this.replaceTrackWith(this.settings);
+    }
+  };
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const prevState = this.enabled;
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
-    /**
-     * Stop has to be called before getting newTrack as it would cause NotReadableError
+    const newTrack = await getAudioTrack(settings);
+    /*
+     * stop the previous only after acquiring the new track otherwise this can lead to
+     * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
-    const newTrack = await getAudioTrack(settings);
-    newTrack.enabled = prevState;
+    newTrack.enabled = this.enabled;
+    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
 
     const localStream = this.stream as HMSLocalStream;
     // change nativeTrack so plugin can start its work
@@ -90,7 +105,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
     }
     this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
-    (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
   /**
@@ -103,12 +117,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async setSettings(settings: Partial<IHMSAudioTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
 
-    await this.handleDeviceChange(newSettings, internal);
     if (isEmptyTrack(this.nativeTrack)) {
       // if it is an empty track, cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
     }
+    await this.handleDeviceChange(newSettings, internal);
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
   }
@@ -170,7 +184,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (this.audioLevelMonitor) {
       this.destroyAudioLevelMonitor();
     }
-    HMSLogger.d(TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
+    HMSLogger.d(this.TAG, 'Monitor Audio Level for', this, this.getMediaTrackSettings().deviceId);
     this.audioLevelMonitor = new TrackAudioLevelMonitor(
       this,
       this.eventBus.trackAudioLevelUpdate,
@@ -190,7 +204,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
     this.processedTrack?.stop();
+    this.isPublished = false;
     this.destroyAudioLevelMonitor();
+    if (isIOS() && isBrowser) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**
@@ -218,11 +236,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrate(settings.maxBitrate, this);
+      await stream.setMaxBitrateAndFramerate(this);
     }
 
     if (hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      await this.replaceTrackWith(settings);
     }
   };
 

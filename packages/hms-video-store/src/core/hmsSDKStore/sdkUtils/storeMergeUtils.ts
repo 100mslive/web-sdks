@@ -1,4 +1,5 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../schema';
+import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
+import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
 /**
@@ -69,6 +70,31 @@ export const mergeNewIndividualStatsInDraft = <TID extends string, T extends HMS
   }
 };
 
+export const mergeLocalTrackStats = (
+  draftStats: Record<HMSTrackID, HMSTrackStats[] | undefined>,
+  newStats: Record<HMSTrackID, Record<string, HMSTrackStats>>,
+  tracks: SDKHMSLocalTrack[],
+) => {
+  const trackMap: Record<string, HMSTrackStats[]> = tracks.reduce((acc, track) => {
+    // @ts-ignore
+    acc[track.firstTrackId] = Object.values(newStats[track.getTrackIDBeingSent()] || {}).sort((a, b) => {
+      if (!a.rid || !b.rid) {
+        return 0;
+      }
+      return a.rid < b.rid ? -1 : 1;
+    });
+    return acc;
+  }, {});
+  const IDs = union(Object.keys(draftStats), Object.keys(trackMap));
+  for (const trackID of IDs) {
+    if (!trackMap[trackID]) {
+      delete draftStats[trackID];
+      continue;
+    }
+    draftStats[trackID] = trackMap[trackID];
+  }
+};
+
 /**
  * array's are usually created with new reference, avoid that update if both arrays are same
  */
@@ -76,8 +102,12 @@ const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) 
   if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
     newTrack.plugins = oldTrack.plugins;
   }
-  if (oldTrack.layerDefinitions && areArraysEqual(oldTrack.layerDefinitions, newTrack.layerDefinitions)) {
-    newTrack.layerDefinitions = oldTrack.layerDefinitions;
+  if (
+    oldTrack.type === 'video' &&
+    oldTrack.layerDefinitions &&
+    areArraysEqual(oldTrack.layerDefinitions, (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions)
+  ) {
+    (newTrack as HMSVideoTrack | HMSScreenVideoTrack).layerDefinitions = oldTrack.layerDefinitions;
   }
 };
 

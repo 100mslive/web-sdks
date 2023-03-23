@@ -1,13 +1,12 @@
-import React, { Fragment, useState, useMemo } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import { useMeasure } from "react-use";
 import { FixedSizeList } from "react-window";
 import {
-  selectAvailableRoleNames,
-  selectRemotePeers,
-  useHMSStore,
-  selectUnreadHMSMessagesCount,
-  selectMessagesUnreadCountByRole,
   selectMessagesUnreadCountByPeerID,
+  selectMessagesUnreadCountByRole,
+  selectRemotePeers,
+  selectUnreadHMSMessagesCount,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { CheckIcon } from "@100mslive/react-icons";
 import {
@@ -18,8 +17,14 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
-import { ChatDotIcon } from "./ChatDotIcon";
 import { ParticipantSearch } from "../Header/ParticipantList";
+import { useFilteredRoles } from "../../common/hooks";
+
+const ChatDotIcon = () => {
+  return (
+    <Box css={{ size: "$6", bg: "$brandDefault", mx: "$2", r: "$round" }} />
+  );
+};
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
@@ -104,7 +109,7 @@ const VirtualizedSelectItemList = ({
   onSelect,
 }) => {
   const [ref, { width, height }] = useMeasure();
-  const roles = useHMSStore(selectAvailableRoleNames);
+  const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
       peers.filter(
@@ -118,7 +123,10 @@ const VirtualizedSelectItemList = ({
 
   const listItems = useMemo(() => {
     const selectItems = [
-      <Everyone onSelect={onSelect} active={!selectedRole && !selectedRole} />,
+      <Everyone
+        onSelect={onSelect}
+        active={!selectedRole && !selectedPeerId}
+      />,
     ];
 
     roles.length > 0 &&

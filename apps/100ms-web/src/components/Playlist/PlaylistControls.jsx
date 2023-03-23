@@ -10,11 +10,11 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import {
-  PrevIcon,
   NextIcon,
-  PlayIcon,
   PauseIcon,
+  PlayIcon,
   PlaylistIcon,
+  PrevIcon,
   SpeakerIcon,
 } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Slider, Text } from "@100mslive/react-ui";
@@ -133,7 +133,7 @@ const VolumeControl = () => {
         min={0}
         max={100}
         step={1}
-        value={[Math.floor(sliderVolume)]}
+        value={[Math.floor(sliderVolume ?? 100)]}
         onValueChange={e => {
           const value = e[0];
           if (active) {

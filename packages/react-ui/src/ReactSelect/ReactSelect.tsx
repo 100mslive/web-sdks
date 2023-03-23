@@ -1,6 +1,5 @@
-import { styled } from '../Theme';
-
 import * as SelectPrimitive from '@radix-ui/react-select';
+import { styled } from '../Theme';
 
 const StyledRoot = styled(SelectPrimitive.Root, {});
 
@@ -53,7 +52,7 @@ const StyledSeparator = styled(SelectPrimitive.Separator, {
   height: '$px',
   backgroundColor: '$white',
   margin: '$4',
-  opacity: 0.4
+  opacity: 0.4,
 });
 
 const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
@@ -63,7 +62,7 @@ const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '$white'
+  color: '$white',
 });
 
 const scrollButtonStyles = {

@@ -1,13 +1,17 @@
 {
   "entryPoints": ["./src/index.ts"],
   "out": "docs",
+  "plugin": ["../../scripts/typedocNavigationPlugin.js", "typedoc-plugin-markdown"],
   "disableSources": true,
   "excludeInternal": true,
   "excludePrivate": true,
   "excludeProtected": true,
-  "excludeTags": ["privateremarks"],
+  "excludeTags": ["@privateRemarks"],
   "hideBreadcrumbs": true,
   "hideInPageTOC": true,
+  "hidePageTitle": true,
+  "packageDocsPath": "packages/hms-video-store/docs",
   "publicPath": "/api-reference/javascript/v2/",
-  "githubPages": false
+  "githubPages": false,
+  "pagesPattern": "(?<!README\.md)$",
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   selectAppData,
   useHMSActions,
@@ -238,6 +238,7 @@ const EndRTMP = () => {
     <Box css={{ p: "$4 $10" }}>
       <ErrorText error={error} />
       <Button
+        data-testid="stop_rtmp"
         variant="danger"
         css={{ w: "100%", r: "$0", my: "$8" }}
         icon
@@ -282,7 +283,7 @@ const FormLabel = ({ id, children }) => {
 const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
   const formRef = useRef(null);
   return (
-    <Flex id={id} direction="column" css={{ mb: "$8" }} ref={formRef}>
+    <Flex id={id} direction="column" css={{ mb: "$8", px: "$8" }} ref={formRef}>
       <FormLabel id="rtmpURL">
         RTMP URL
         <Asterik />

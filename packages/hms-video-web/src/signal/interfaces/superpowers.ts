@@ -10,10 +10,17 @@ export interface RequestForRoleChangeParams {
   role: string;
 }
 
+export interface RequestForBulkRoleChangeParams {
+  roles: string[];
+  force: boolean;
+  role: string;
+}
+
 /**
  * Parameters for accepting a role change request sent to the server.
  */
 export interface AcceptRoleChangeParams {
+  requested_by?: string;
   role: string;
   token: string;
 }
@@ -48,6 +55,10 @@ export interface StartRTMPOrRecordingRequestParams {
 export interface UpdatePeerRequestParams {
   name?: string;
   data?: string;
+}
+
+export interface SessionMetadataUpdateParams {
+  data?: any;
 }
 
 export interface HLSRequestParams {

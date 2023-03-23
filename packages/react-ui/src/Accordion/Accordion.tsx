@@ -1,41 +1,24 @@
 import React, { PropsWithChildren } from 'react';
-import { keyframes, CSS } from '@stitches/react';
 import * as BaseAccordion from '@radix-ui/react-accordion';
-import { ChevronDownIcon } from '@radix-ui/react-icons';
-import { styled } from '../Theme';
+import { CSS } from '@stitches/react';
+import { ChevronUpIcon } from '@100mslive/react-icons';
 import { Box } from '../Layout';
+import { styled } from '../Theme';
+import { slideDown, slideUp } from '../utils';
 
-const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: 'var(--radix-accordion-content-height)' },
-});
-
-const slideUp = keyframes({
-  from: { height: 'var(--radix-accordion-content-height)' },
-  to: { height: 0 },
-});
-
-const StyledAccordion = styled(BaseAccordion.Root, {
-  borderRadius: '$4',
-  backgroundColor: '$surfaceDefault',
-  cursor: 'pointer',
-});
+const StyledAccordion = styled(BaseAccordion.Root, {});
 
 const StyledItem = styled(BaseAccordion.Item, {
-  overflow: 'hidden',
   marginTop: '$px',
-
+  display: 'block',
   '&:first-child': {
     marginTop: 0,
     borderTopLeftRadius: '$0',
     borderTopRightRadius: '$0',
   },
   '&:last-child': {
-    borderBottom: '0',
-  },
-  '&:focus-within': {
-    position: 'relative',
-    zIndex: 1,
+    borderBottomLeftRadius: '$4',
+    borderBottomRightRadius: '$4',
   },
 });
 
@@ -48,8 +31,6 @@ const StyledHeader = styled(BaseAccordion.Header, {
 const StyledTrigger = styled(BaseAccordion.Trigger, {
   all: 'unset',
   fontFamily: '$sans',
-  backgroundColor: '$surfaceDefault',
-
   flex: 1,
   display: 'flex',
   alignItems: 'center',
@@ -57,30 +38,25 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   fontSize: '$md',
   lineHeight: '$md',
   color: '$textHighEmp',
-  '&[data-state="closed"]': { backgroundColor: '$surfaceDefault' },
-  '&[data-state="open"]': { backgroundColor: '$surfaceDefault' },
-  '&:hover': { backgroundColor: '$surfaceDefault' },
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
-  overflow: 'hidden',
+  display: 'contents',
   fontSize: '$md',
   fontFamily: '$sans',
   color: '$textMedEmp',
-  backgroundColor: '$surfaceDefault',
-
   '&[data-state="open"]': {
-    animation: `${slideDown} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
   '&[data-state="closed"]': {
-    animation: `${slideUp} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
+    animation: `${slideUp('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
 });
 
-const StyledChevron = styled(ChevronDownIcon, {
+const StyledChevron = styled(ChevronUpIcon, {
   color: '$textPrimary',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-  '[data-state=open] &': { transform: 'rotate(180deg)' },
+  '[data-state=closed] &': { transform: 'rotate(180deg)' },
 });
 
 // Exports

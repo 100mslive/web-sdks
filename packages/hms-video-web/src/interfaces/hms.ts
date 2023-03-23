@@ -1,25 +1,29 @@
-import { HMSConfig } from './config';
-import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
-import { HMSMessage } from './message';
-import { HMSLogLevel } from '../utils/logger';
-import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
-import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
-import { HMSRole } from './role';
-import { HMSPreviewListener } from './preview-listener';
-import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
-import { HMSRoleChangeRequest } from './role-change-request';
-import { HMSPlaylistManager } from './playlist';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
-import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSHLS, HMSRecording, HMSRTMP } from './room';
-import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSConfig, HMSPreviewConfig } from './config';
+import { TokenRequest, TokenRequestOptions, TokenResult } from './get-token';
 import { HLSConfig } from './hls-config';
-import { ScreenShareConfig } from './track-settings';
+import { HMSMessage } from './message';
+import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSPlaylistManager } from './playlist';
+import { HMSPreviewListener } from './preview-listener';
+import { HMSRole } from './role';
+import { HMSRoleChangeRequest } from './role-change-request';
+import { HMSHLS, HMSRecording, HMSRTMP } from './room';
+import { RTMPRecordingConfig } from './rtmp-recording-config';
+import { HMSScreenShareConfig } from './track-settings';
+import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
+import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
+import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
+import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
+import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSLogLevel } from '../utils/logger';
+
 export default interface HMS {
-  preview(config: HMSConfig, listener: HMSPreviewListener): Promise<void>;
+  preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
-  leave(): Promise<void>;
+  leave(notifyServer?: boolean): Promise<void>;
+
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
@@ -29,7 +33,15 @@ export default interface HMS {
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
   refreshDevices(): Promise<void>;
 
+  /**
+   * @deprecated Use `changeRoleOfPeer` instead
+   */
   changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+
+  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+
+  changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string): void;
+
   acceptChangeRole(request: HMSRoleChangeRequest): void;
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
@@ -49,6 +61,11 @@ export default interface HMS {
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
 
+  /** @alpha */
+  setSessionMetadata(metadata: any): Promise<void>;
+  /** @alpha */
+  getSessionMetadata(): Promise<any>;
+
   /**
    * @deprecated The method should not be used
    * @see sendBroadcastMessage
@@ -58,7 +75,7 @@ export default interface HMS {
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 
-  startScreenShare(onStop: () => void, config: ScreenShareConfig): Promise<void>;
+  startScreenShare(onStop: () => void, config?: HMSScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;
 
   addTrack(track: MediaStreamTrack, source: HMSTrackSource): Promise<void>;

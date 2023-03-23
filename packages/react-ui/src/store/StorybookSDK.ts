@@ -1,15 +1,15 @@
 import {
   HMSActions,
-  IHMSStore,
-  HMSPeer,
-  HMSRoom,
-  HMSTrackSource,
-  HMSRoomState,
-  HMSMessageInput,
   HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
   HMSConfig,
-  HMSSimulcastLayer,
+  HMSMessageInput,
+  HMSPeer,
+  HMSPreferredSimulcastLayer,
+  HMSRoom,
+  HMSRoomState,
+  HMSTrackSource,
+  HMSVideoTrackSettings,
+  IHMSStore,
 } from '@100mslive/react-sdk';
 import { makeFakeMessage } from '../fixtures/chats';
 
@@ -27,11 +27,11 @@ export class StoryBookSDK implements Partial<HMSActions> {
   constructor(store: IHMSStore) {
     this.store = store;
   }
-  setPreferredLayer(_trackId: string, _layer: HMSSimulcastLayer): void {
+  setPreferredLayer(_trackId: string, _layer: HMSPreferredSimulcastLayer): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  setVolume(_value: number, _trackId?: string): void {
+  setVolume(_value: number, _trackId?: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
@@ -180,6 +180,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: this.randomFromArray([true, false]),
           id: audioTrackID,
           type: 'audio',
+          source: 'regular',
         };
       }
       if (peer.videoTrack) {
@@ -187,6 +188,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           enabled: true,
           id: videoTrackID,
           type: 'video',
+          source: 'regular',
         };
       }
     });

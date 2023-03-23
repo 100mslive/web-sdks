@@ -4,6 +4,7 @@ export class AudioContextManager {
   private audioContext: AudioContext;
   private destinationNode?: MediaStreamAudioDestinationNode;
   private source: MediaElementAudioSourceNode;
+  private readonly TAG = '[AudioContextManager]';
 
   constructor(element: HTMLMediaElement) {
     this.audioContext = new AudioContext();
@@ -16,10 +17,10 @@ export class AudioContextManager {
    * Note: when the browser tab is muted by default, AudioContext will be in suspended state
    * It has to be resumed for the video/audio to be played.
    */
-  resumeContext() {
+  async resumeContext() {
     if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
       HMSLogger.d(this.TAG, 'AudioContext is resumed');
-      this.audioContext.resume();
     }
   }
 
@@ -35,11 +36,9 @@ export class AudioContextManager {
 
   cleanup() {
     if (this.audioContext.state !== 'closed') {
-      this.audioContext.close();
+      this.audioContext.close().catch(e => {
+        HMSLogger.d(this.TAG, 'AudioContext close error', e.message);
+      });
     }
-  }
-
-  private get TAG() {
-    return 'AudioContextManager';
   }
 }

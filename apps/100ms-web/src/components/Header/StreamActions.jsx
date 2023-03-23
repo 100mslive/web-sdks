@@ -1,4 +1,5 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useMedia } from "react-use";
 import {
   selectAppData,
   selectIsConnectedToRoom,
@@ -7,10 +8,11 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-import { EndStreamIcon, RecordIcon } from "@100mslive/react-icons";
+import { RecordIcon, WrenchIcon } from "@100mslive/react-icons";
 import {
   Box,
   Button,
+  config as cssConfig,
   Flex,
   Loading,
   Popover,
@@ -18,11 +20,11 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import GoLiveButton from "../GoLiveButton";
-import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
+import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
-import { ResolutionInput } from "../Streaming/ResolutionInput";
-import { useSidepaneToggle } from "../AppData/useSidepane";
+import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
+import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { getDefaultMeetingUrl } from "../../common/utils";
 import {
@@ -91,23 +93,28 @@ export const RecordingStatus = () => {
 };
 
 const EndStream = () => {
-  const { isStreamingOn } = useRecordingStreaming();
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  if (!isStreamingOn) {
-    return null;
-  }
+  const sidePane = useSidepaneState();
+  useEffect(() => {
+    if (window && !sidePane) {
+      const userStartedStream =
+        window.sessionStorage.getItem("userStartedStream");
+      if (userStartedStream === "true") {
+        toggleStreaming();
+        window.sessionStorage.setItem("userStartedStream", "");
+      }
+    }
+  }, [sidePane]);
+
   return (
     <Button
       data-testid="end_stream"
-      variant="standard"
-      outlined
+      variant="danger"
       icon
-      onClick={() => {
-        toggleStreaming();
-      }}
+      onClick={toggleStreaming}
     >
-      <EndStreamIcon />
-      End Stream
+      <WrenchIcon />
+      Manage Stream
     </Button>
   );
 };
@@ -146,30 +153,32 @@ const StartRecording = () => {
             </Text>
           </Button>
         </Popover.Trigger>
-        <Popover.Content align="end" sideOffset={8} css={{ w: "$64" }}>
-          <Text variant="body" css={{ color: "$textMedEmp" }}>
-            Are you sure you want to end the recording?
-          </Text>
-          <Button
-            data-testid="stop_recording_confirm"
-            variant="danger"
-            icon
-            css={{ ml: "auto" }}
-            onClick={async () => {
-              try {
-                await hmsActions.stopRTMPAndRecording();
-              } catch (error) {
-                ToastManager.addToast({
-                  title: error.message,
-                  variant: "error",
-                });
-              }
-              setOpen(false);
-            }}
-          >
-            Stop
-          </Button>
-        </Popover.Content>
+        <Popover.Portal>
+          <Popover.Content align="end" sideOffset={8} css={{ w: "$64" }}>
+            <Text variant="body" css={{ color: "$textMedEmp" }}>
+              Are you sure you want to end the recording?
+            </Text>
+            <Button
+              data-testid="stop_recording_confirm"
+              variant="danger"
+              icon
+              css={{ ml: "auto" }}
+              onClick={async () => {
+                try {
+                  await hmsActions.stopRTMPAndRecording();
+                } catch (error) {
+                  ToastManager.addToast({
+                    title: error.message,
+                    variant: "error",
+                  });
+                }
+                setOpen(false);
+              }}
+            >
+              Stop
+            </Button>
+          </Popover.Content>
+        </Popover.Portal>
       </Popover.Root>
     );
   }
@@ -218,7 +227,7 @@ const StartRecording = () => {
                 record: true,
               });
             } catch (error) {
-              if (error.message.includes("stream alredy running")) {
+              if (error.message.includes("stream already running")) {
                 ToastManager.addToast({
                   title: "Recording already running",
                   variant: "error",
@@ -244,6 +253,9 @@ const StartRecording = () => {
 export const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
+  const isMobile = useMedia(cssConfig.media.md);
+  const { isStreamingOn } = useRecordingStreaming();
+
   return (
     <Flex align="center" css={{ gap: "$4" }}>
       <AdditionalRoomState />
@@ -251,13 +263,13 @@ export const StreamActions = () => {
         <LiveStatus />
         <RecordingStatus />
       </Flex>
-      {isConnected && <StartRecording />}
-      {isConnected && (permissions.hlsStreaming || permissions.rtmpStreaming) && (
-        <Fragment>
-          <GoLiveButton />
-          <EndStream />
-        </Fragment>
-      )}
+      {isConnected && !isMobile ? <StartRecording /> : null}
+      {isConnected &&
+        (permissions.hlsStreaming || permissions.rtmpStreaming) && (
+          <Fragment>
+            {isStreamingOn ? <EndStream /> : <GoLiveButton />}
+          </Fragment>
+        )}
     </Flex>
   );
 };

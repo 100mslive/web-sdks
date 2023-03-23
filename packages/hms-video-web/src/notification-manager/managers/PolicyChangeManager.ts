@@ -1,7 +1,7 @@
-import { IStore } from '../../sdk/store';
-import { PolicyParams } from '../HMSNotifications';
-import { PublishParams } from '../../interfaces';
 import { EventBus } from '../../events/EventBus';
+import { IStore } from '../../sdk/store';
+import HMSLogger from '../../utils/logger';
+import { PolicyParams } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -20,12 +20,16 @@ export class PolicyChangeManager {
       localPeer.updateRole(newRole);
     }
 
-    this.store.setKnownRoles(params.known_roles);
-    this.store.getRoom().templateId = params.template_id;
+    this.store.setKnownRoles(params);
+    const room = this.store.getRoom();
+    if (room) {
+      room.templateId = params.template_id;
+    } else {
+      HMSLogger.w('[PolicyChangeManager]', 'on policy change - room not present');
+    }
     // handle when role is not present in known_roles
-    const publishParams = params.known_roles[params.name]?.publishParams;
-    this.store.setPublishParams(publishParams);
-    this.setSimulcastLayers(publishParams);
+    // const publishParams = params.known_roles[params.name]?.publishParams;
+    // this.store.setPublishParams(publishParams);
 
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
@@ -34,13 +38,5 @@ export class PolicyChangeManager {
       this.eventBus.localRoleUpdate.publish({ oldRole, newRole });
     }
     this.eventBus.policyChange.publish(params);
-  }
-
-  setSimulcastLayers(publishParams?: PublishParams) {
-    if (publishParams && Object.keys(publishParams).length > 0) {
-      const { videoSimulcastLayers, screenSimulcastLayers } = publishParams;
-      this.store.setVideoSimulcastLayers(videoSimulcastLayers);
-      this.store.setScreenshareSimulcastLayers(screenSimulcastLayers);
-    }
   }
 }

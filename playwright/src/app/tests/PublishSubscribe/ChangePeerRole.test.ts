@@ -8,15 +8,30 @@ test.skip(`Change peer Role`, async ({ context }) => {
     if (i === 2) {
       continue;
     }
+    await pages[0].timeout(3000);
+    await pages[0].click(pages[0].header.participant_list);
+    await pages[0].timeout(3000);
 
-    await pages[0].click(
-      pages[0].header.participant_list,
-      pages[0].header.participant_setting.replace('?', pages[1].localName),
-      pages[0].header.dialog_select_change_role_to,
-    );
+    await pages[0].click(pages[0].header.participant_setting.replace('?', pages[1].localName));
+    await pages[0].timeout(3000);
 
-    await pages[0].selectPopupOption(pages[0].header.role_list[i]);
-    await pages[0].click(pages[0].center.dialog_confirm);
+    await pages[0].click(pages[0].header.dialog_select_change_role_to);
+
+    // await pages[0].clickWithTimeout(
+    //   3000,
+    //   pages[0].header.participant_list,
+    //   pages[0].header.participant_setting.replace('?', pages[1].localName),
+    //   pages[0].header.dialog_select_change_role_to,
+    // );
+    await pages[0].timeout(3000);
+
+    await pages[0].click(pages[0].header.participant_dropdown);
+    await pages[0].timeout(3000);
+    await pages[0].click('div[data-testid=?]'.replace('?', pages[0].header.role_list[i]));
+
+    await pages[1].timeout(2000);
+
+    await pages[0].click(pages[0].center.dialog_change_button);
 
     //page2 check
     await pages[1].timeout(2000);
@@ -31,7 +46,7 @@ test.skip(`Change peer Role`, async ({ context }) => {
       pages[0].header.dialog_select_change_role_to,
     );
 
-    await pages[0].selectPopupOption(pages[0].header.role_list[2]);
+    // await pages[0].selectPopupOption(pages[0].header.role_list[2]);
     await pages[0].click(pages[0].center.dialog_confirm);
 
     //page2 click Accept

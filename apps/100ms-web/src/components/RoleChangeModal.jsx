@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { forwardRef, useRef, useState } from "react";
 import {
-  useHMSStore,
   selectPeerByID,
   useHMSActions,
-  selectAvailableRoleNames,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import {
   CheckIcon,
@@ -11,40 +10,89 @@ import {
   ChevronUpIcon,
 } from "@100mslive/react-icons";
 import {
-  Dialog,
-  Button,
-  Text,
-  Label,
-  Checkbox,
   Box,
-  Flex,
+  Button,
+  Checkbox,
+  Dialog,
   Dropdown,
+  Flex,
+  Label,
+  Text,
+  textEllipsis,
+  Tooltip,
 } from "@100mslive/react-ui";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
+import { useFilteredRoles } from "../common/hooks";
+
+const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
+  <Text
+    {...rest}
+    ref={ref}
+    as="strong"
+    variant="body2"
+    css={{
+      ...textEllipsis(maxWidth),
+      display: "inline-block",
+      fontWeight: "$semiBold",
+      c: "inherit",
+    }}
+  >
+    {children}
+  </Text>
+));
 
 export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peer = useHMSStore(selectPeerByID(peerId));
-  const roles = useHMSStore(selectAvailableRoleNames);
+  const roles = useFilteredRoles();
   const [selectedRole, setRole] = useState(peer?.roleName);
   const [requestPermission, setRequestPermission] = useState(true);
   const hmsActions = useHMSActions();
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
+  const [peerNameRef, setPeerNameRef] = useState();
+  const ref = useRef();
   if (!peer) {
     return null;
   }
+
+  const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
-          <Dialog.Title css={{ p: 0 }}>
-            <Text variant="h6">Change Role</Text>
+          <Dialog.Title css={{ p: 0 }} asChild>
+            <Text as="h6" variant="h6">
+              Change Role
+            </Text>
+          </Dialog.Title>
+          <Dialog.Description asChild>
             <Text
               variant="body2"
-              css={{ fontWeight: 400, mt: "$4", mb: "$8", c: "$textMedEmp" }}
-            >{`Change the role of "${peer.name}" to`}</Text>
-          </Dialog.Title>
+              css={{
+                mt: "$4",
+                mb: "$8",
+                c: "$textMedEmp",
+                display: "flex",
+                flexWrap: "wrap",
+                columnGap: "4px",
+              }}
+            >
+              Change the role of
+              {peerNameRef && peerNameRef.clientWidth === peerNameMaxWidth ? (
+                <Tooltip title={peer.name} side="top">
+                  <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
+                    {peer.name}
+                  </PeerName>
+                </Tooltip>
+              ) : (
+                <PeerName ref={setPeerNameRef} maxWidth={peerNameMaxWidth}>
+                  {peer.name}
+                </PeerName>
+              )}
+              to
+            </Text>
+          </Dialog.Description>
           <Flex
             align="center"
             css={{
@@ -57,12 +105,6 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                 position: "relative",
                 flex: "1 1 0",
                 minWidth: 0,
-                "[data-radix-popper-content-wrapper]": {
-                  w: "100%",
-                  minWidth: "0 !important",
-                  transform: "translateY($space$17) !important",
-                  zIndex: 11,
-                },
               }}
             >
               <Dropdown.Root
@@ -78,8 +120,8 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                     bg: "$surfaceLight",
                     r: "$1",
                     p: "$6 $9",
-                    zIndex: 10,
                   }}
+                  ref={ref}
                 >
                   <Flex
                     align="center"
@@ -90,28 +132,29 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                     {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
                   </Flex>
                 </Dropdown.Trigger>
-                <Dropdown.Content
-                  align="start"
-                  sideOffset={8}
-                  css={{ w: "100%" }}
-                  portalled={false}
-                >
-                  {roles.map(role => {
-                    return (
-                      <Dropdown.Item
-                        data-testid={role}
-                        key={role}
-                        onSelect={() => setRole(role)}
-                        css={{
-                          px: "$9",
-                          bg: role === selectedRole ? selectionBg : undefined,
-                        }}
-                      >
-                        {role}
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Content>
+                <Dropdown.Portal>
+                  <Dropdown.Content
+                    align="start"
+                    sideOffset={8}
+                    css={{ zIndex: 1000, width: ref.current?.clientWidth }}
+                  >
+                    {roles.map(role => {
+                      return (
+                        <Dropdown.Item
+                          data-testid={role}
+                          key={role}
+                          onSelect={() => setRole(role)}
+                          css={{
+                            px: "$9",
+                            bg: role === selectedRole ? selectionBg : undefined,
+                          }}
+                        >
+                          {role}
+                        </Dropdown.Item>
+                      );
+                    })}
+                  </Dropdown.Content>
+                </Dropdown.Portal>
               </Dropdown.Root>
             </Box>
           </Flex>
@@ -141,7 +184,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
             css={{ width: "100%", gap: "$md" }}
           >
             <Box css={{ width: "50%" }}>
-              <Dialog.Close css={{ width: "100%" }}>
+              <Dialog.Close css={{ width: "100%" }} asChild>
                 <Button
                   variant="standard"
                   outlined

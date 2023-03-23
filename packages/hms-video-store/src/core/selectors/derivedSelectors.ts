@@ -1,7 +1,8 @@
-import { HMSPeer, HMSStore } from '../schema';
-import { selectLocalPeerRole, selectPeersMap, selectRolesMap, selectTracksMap } from './selectors';
 import { createSelector } from 'reselect';
 import { HMSRole } from '@100mslive/hms-video';
+import { selectLocalPeerRole, selectPeersMap, selectPreviewRole, selectRolesMap, selectTracksMap } from './selectors';
+import { isRoleAllowedToPublish } from './selectorUtils';
+import { HMSPeer, HMSStore } from '../schema';
 
 export interface HMSPeerWithMuteStatus {
   peer: HMSPeer;
@@ -16,12 +17,6 @@ export interface HMSRoleChangeRequest {
   requestedBy?: HMSPeer;
   role: HMSRole;
   token: string;
-}
-
-export interface HMSPublishAllowed {
-  video: boolean;
-  audio: boolean;
-  screen: boolean;
 }
 
 export const selectPeersWithAudioStatus = createSelector([selectPeersMap, selectTracksMap], (peersMap, tracksMap) => {
@@ -58,18 +53,9 @@ export const selectRoleChangeRequest = createSelector(
 /**
  * Select what streams is the local peer allowed to publish from video, audio and screenshare.
  */
-export const selectIsAllowedToPublish = createSelector([selectLocalPeerRole], (role): HMSPublishAllowed => {
-  let video = false,
-    audio = false,
-    screen = false;
-  if (role?.publishParams?.allowed) {
-    video = role.publishParams.allowed.includes('video');
-    audio = role.publishParams.allowed.includes('audio');
-    screen = role.publishParams.allowed.includes('screen');
-  }
-  return {
-    video,
-    audio,
-    screen,
-  };
-});
+export const selectIsAllowedToPublish = createSelector([selectLocalPeerRole], role => isRoleAllowedToPublish(role));
+
+/**
+ * Select what streams is the local peer allowed to preview from video, audio
+ */
+export const selectIsAllowedToPreviewMedia = createSelector([selectPreviewRole], role => isRoleAllowedToPublish(role));

@@ -1,12 +1,13 @@
-import { HMSSdk } from '../sdk';
-import { HMSPlaylistItem, HMSPlaylistType, HMSPlaylistManager, HMSPlaylistProgressEvent } from '../interfaces';
 import { PlaylistAudioManager } from './PlaylistAudioManager';
 import { PlaylistVideoManager } from './PlaylistVideoManager';
-import HMSLogger from '../utils/logger';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { TypedEventEmitter } from '../utils/typed-event-emitter';
 import { EventBus } from '../events/EventBus';
+import { HMSPlaylistItem, HMSPlaylistManager, HMSPlaylistProgressEvent, HMSPlaylistType } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';
+import { HMSSdk } from '../sdk';
+import { stringifyMediaStreamTrack } from '../utils/json';
+import HMSLogger from '../utils/logger';
+import { TypedEventEmitter } from '../utils/typed-event-emitter';
 
 type PlaylistManagerState<T> = {
   audio: {
@@ -45,6 +46,7 @@ export class PlaylistManager
   private state = { audio: { ...INITIAL_STATE.audio }, video: { ...INITIAL_STATE.video } };
   private audioManager: PlaylistAudioManager;
   private videoManager: PlaylistVideoManager;
+  private readonly TAG = '[PlaylistManager]';
 
   constructor(private sdk: HMSSdk, private eventBus: EventBus) {
     super();
@@ -351,7 +353,7 @@ export class PlaylistManager
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
     this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
-    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
+    this.eventBus.localVideoEnabled.subscribe(this.handlePausePlaylist);
   }
 
   /**
@@ -376,15 +378,11 @@ export class PlaylistManager
 
   private addTrack = async (track: MediaStreamTrack, source: string) => {
     await this.sdk.addTrack(track, source);
-    HMSLogger.d(this.TAG, 'Playlist track added', track);
+    HMSLogger.d(this.TAG, 'Playlist track added', stringifyMediaStreamTrack(track));
   };
 
   private removeTrack = async (trackId: string) => {
-    await this.sdk.removeTrack(trackId);
+    await this.sdk.removeTrack(trackId, true);
     HMSLogger.d(this.TAG, 'Playlist track removed', trackId);
   };
-
-  private get TAG() {
-    return 'PlaylistManager';
-  }
 }

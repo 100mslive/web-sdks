@@ -1,38 +1,48 @@
-import React, { useEffect, useCallback, useState, Fragment } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from "react";
 import {
-  usePreviewJoin,
-  selectLocalPeer,
-  useHMSStore,
   selectIsLocalVideoEnabled,
+  selectLocalPeer,
+  selectVideoTrackByID,
   useAVToggle,
+  useHMSStore,
+  usePreviewJoin,
 } from "@100mslive/react-sdk";
+import { SettingsIcon } from "@100mslive/react-icons";
 import {
-  styled,
-  flexCenter,
-  Text,
-  StyledVideoTile,
-  Loading,
-  Video,
-  useBorderAudioLevel,
-  useTheme,
   Avatar,
   Flex,
+  flexCenter,
+  Loading,
+  styled,
+  StyledVideoTile,
+  Text,
   textEllipsis,
+  useBorderAudioLevel,
+  useTheme,
+  Video,
 } from "@100mslive/react-ui";
-import { SettingsIcon } from "@100mslive/react-icons";
-import { AudioVideoToggle } from "../AudioVideoToggle";
-import SettingsModal from "../Settings/SettingsModal";
-import TileConnection from "../Connection/TileConnection";
-import PreviewName from "./PreviewName";
 import IconButton from "../../IconButton";
+import { AudioVideoToggle } from "../AudioVideoToggle";
+import TileConnection from "../Connection/TileConnection";
+import SettingsModal from "../Settings/SettingsModal";
+import PreviewName from "./PreviewName";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
+import { useUISettings } from "../AppData/useUISettings";
 import {
-  useUserPreferences,
-  UserPreferencesKeys,
   defaultPreviewPreference,
+  UserPreferencesKeys,
+  useUserPreferences,
 } from "../hooks/useUserPreferences";
+import { UI_SETTINGS } from "../../common/constants";
 
-const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
+const PreviewJoin = ({
+  token,
+  onJoin,
+  env,
+  skipPreview,
+  initialName,
+  asRole,
+}) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
@@ -47,6 +57,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
+      speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
     },
     captureNetworkQualityInPreview: true,
     handleError: (_, method) => {
@@ -54,6 +65,7 @@ const PreviewJoin = ({ token, onJoin, env, skipPreview, initialName }) => {
         setPreviewError(true);
       }
     },
+    asRole,
   });
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -127,6 +139,10 @@ const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
+  const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
+  const track = useHMSStore(trackSelector);
+
   const {
     aspectRatio: { width, height },
   } = useTheme();
@@ -150,7 +166,7 @@ const PreviewTile = ({ name, error }) => {
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
-            mirror={true}
+            mirror={track?.facingMode !== "environment" && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />

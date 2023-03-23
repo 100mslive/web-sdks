@@ -1,7 +1,7 @@
 import AnalyticsEvent from './AnalyticsEvent';
 
 export interface IAnalyticsTransportProvider {
-  TAG: string;
+  readonly TAG: string;
   isConnected: boolean;
   sendEvent: (event: AnalyticsEvent) => void;
 }

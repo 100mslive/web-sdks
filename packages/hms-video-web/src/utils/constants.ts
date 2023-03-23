@@ -18,6 +18,8 @@ export const PONG_RESPONSE_TIMES_SIZE = 5;
 export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID';
 export const SUBSCRIBE_TIMEOUT = 60000;
 
+export const ICE_DISCONNECTION_TIMEOUT = 5000;
+
 export const RTC_STATS_MONITOR_INTERVAL = 1000;
 
 export const MAINTAIN_TRACK_HISTORY = false;
@@ -46,4 +48,5 @@ export const HMSEvents = {
   AUTOPLAY_ERROR: 'autoplay-error',
   ROLE_UPDATE_AFTER_ROLE_CHANGE: 'role-update-after-role-change',
   PUBLISH_COMPLETE_AFTER_JOIN: 'publish-complete-after-join',
+  LEAVE: 'leave',
 };

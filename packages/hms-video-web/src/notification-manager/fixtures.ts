@@ -1,4 +1,4 @@
-import { PeerNotification, PeerListNotification, SpeakerList, MessageNotification } from './HMSNotifications';
+import { MessageNotification, PeerListNotification, PeerNotification, SpeakerList } from './HMSNotifications';
 
 export const FAKE_PEER_ID = 'peer_id_1';
 

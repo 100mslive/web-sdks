@@ -1,6 +1,6 @@
+import { AudioContextManager } from './AudioContextManager';
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
-import { AudioContextManager } from './AudioContextManager';
 
 /**
  * This class handles video playlist management
@@ -19,6 +19,7 @@ import { AudioContextManager } from './AudioContextManager';
  *    - The audio and video tracks are passed to playlist manager to publish
  */
 export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progress: Event }> {
+  private readonly TAG = '[PlaylistVideoManager]';
   private videoElement: HTMLVideoElement | null = null;
   private canvasContext: CanvasRenderingContext2D | null = null;
   private canvas!: HTMLCanvasElement;
@@ -62,7 +63,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
               return;
             }
             this.videoElement.onplay = this.drawImage;
-            this.audioContextManager.resumeContext();
+            await this.audioContextManager.resumeContext();
             await this.videoElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
             stream.addTrack(audioTrack);
@@ -145,9 +146,5 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
       this.canvas = document.createElement('canvas');
       this.canvasContext = this.canvas.getContext('2d');
     }
-  }
-
-  private get TAG() {
-    return 'PlaylistVideoManager';
   }
 }

@@ -1,8 +1,8 @@
+import { HMSPeer } from './peer';
 import { HMSRole } from '../../interfaces';
 import { HMSMessage } from '../../interfaces/message';
-import { ISignalParamsProvider } from '../../signal/ISignalSendParamsProvider';
 import { SendMessage } from '../../notification-manager';
-import { HMSPeer } from './peer';
+import { ISignalParamsProvider } from '../../signal/ISignalSendParamsProvider';
 
 export default class Message implements HMSMessage, ISignalParamsProvider<SendMessage> {
   sender?: HMSPeer;
@@ -37,5 +37,16 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
       sendParams.peer_id = peer;
     }
     return sendParams;
+  }
+
+  toString() {
+    return `{
+      sender: ${this.sender};
+      recipientPeer: ${this.recipientPeer};
+      recipientRoles: ${this.recipientRoles?.map(role => role.name)};
+      message: ${this.message};
+      time: ${this.time};
+      type: ${this.type};
+    }`;
   }
 }

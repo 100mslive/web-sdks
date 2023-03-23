@@ -26,10 +26,12 @@ describe('join api', () => {
     cy.spy(actions, 'onTrackUpdate').as('onTrackUpdate');
   });
 
-  it('should throw error if no token', () => {
-    actions.join({ userName: 'test', authToken: '', initEndpoint }).catch(error => {
+  it('should throw error if no token', async () => {
+    try {
+      await actions.join({ userName: 'test', authToken: '', initEndpoint });
+    } catch (error) {
       expect(error.message).to.include('Token is not in proper JWT format');
-    });
+    }
   });
 
   describe('join with token', () => {
@@ -114,5 +116,18 @@ describe('join api', () => {
             });
         });
     });
+  });
+
+  it('should throw terminal error for failures', async () => {
+    try {
+      await actions.join({
+        userName: 'test',
+        authToken:
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3Nfa2V5IjoiNWZmNTg4MzE4MGI2Njk2OWUxZmIzNWZxcXEiLCJyb29tX2lkIjoiNjBmMWU3OTRmODgxMTdiOWU0N2JmNWUyIiwidXNlcl9pZCI6InN1bW1hIiwicm9sZSI6InRlYWNoZXIiLCJ0eXBlIjoiYXBwIiwidmVyc2lvbiI6MiwiaWF0IjoxNjY1MzgzNTQ0LCJuYmYiOjE2NjUzODM1NDQsImV4cCI6MTY2NTQ2OTk0NCwianRpIjoiZmIwZTk1NTgtMDczZi00OTk1LTllZGYtZWE1MzA4ZmQ5ZWNmIn0._LFlI647Dx-4Sn73fOeXVoFSviIqGYDODew0k01ryUI',
+        initEndpoint: 'https://qa-init.100ms.live/init',
+      });
+    } catch (error) {
+      expect(error.isTerminal).to.be.true;
+    }
   });
 });

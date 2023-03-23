@@ -5,14 +5,15 @@
  * Copyright © 2021 100ms. All rights reserved.
  */
 
-import { HMSSignalMethod } from '../signal/jsonrpc/models';
 import { ErrorCodes } from './ErrorCodes';
 import { HMSException } from './HMSException';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export enum HMSAction {
   NONE = 'NONE',
   TRACK = 'TRACK',
   INIT = 'INIT',
+  GET_TOKEN = 'GET_TOKEN',
   PUBLISH = 'PUBLISH',
   UNPUBLISH = 'UNPUBLISH',
   JOIN = 'JOIN',
@@ -27,6 +28,14 @@ export enum HMSAction {
   PLAYLIST = 'PLAYLIST',
   PREVIEW = 'PREVIEW',
 }
+
+const terminalActions: (HMSSignalMethod | HMSAction)[] = [
+  HMSSignalMethod.JOIN,
+  HMSSignalMethod.OFFER,
+  HMSSignalMethod.ANSWER,
+  HMSSignalMethod.TRICKLE,
+  HMSAction.JOIN,
+];
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
@@ -49,16 +58,33 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    AbnormalClose(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
+        'WebSocketAbnormalClose',
+        action,
+        `Websocket closed abnormally`,
+        description,
+      );
+    },
   },
 
-  InitAPIErrors: {
-    ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
+  APIErrors: {
+    ServerErrors(code: number, action: HMSAction, description = '', isTerminal = true) {
+      return new HMSException(
+        code,
+        'ServerErrors',
+        action,
+        `[${action}]: Server error ${description}`,
+        description,
+        isTerminal,
+      );
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+        ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
         `Endpoint is not reachable - ${description}`,
@@ -68,7 +94,7 @@ export const ErrorFactory = {
 
     InvalidTokenFormat(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.INVALID_TOKEN_FORMAT,
+        ErrorCodes.APIErrors.INVALID_TOKEN_FORMAT,
         'InvalidTokenFormat',
         action,
         `Token is not in proper JWT format - ${description}`,
@@ -79,7 +105,7 @@ export const ErrorFactory = {
 
     InitConfigNotAvailable(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.INIT_CONFIG_NOT_AVAILABLE,
+        ErrorCodes.APIErrors.INIT_CONFIG_NOT_AVAILABLE,
         'InitError',
         action,
         `[INIT]: ${description}`,
@@ -139,12 +165,16 @@ export const ErrorFactory = {
       );
     },
 
-    NothingToReturn(action: HMSAction, description = '') {
+    NothingToReturn(
+      action: HMSAction,
+      description = '',
+      message = `There is no media to return. Please select either video or audio or both.`,
+    ) {
       return new HMSException(
         ErrorCodes.TracksErrors.NOTHING_TO_RETURN,
         'NothingToReturn',
         action,
-        `There is no media to return. Please select either video or audio or both.`,
+        message,
         description,
       );
     },
@@ -208,6 +238,26 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    CurrentTabNotShared() {
+      return new HMSException(
+        ErrorCodes.TracksErrors.CURRENT_TAB_NOT_SHARED,
+        'CurrentTabNotShared',
+        HMSAction.TRACK,
+        'The app requires you to share the current tab',
+        'You must screen share the current tab in order to proceed',
+      );
+    },
+
+    AudioPlaybackError(description: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.AUDIO_PLAYBACK_ERROR,
+        'Audio playback error',
+        HMSAction.TRACK,
+        description,
+        description,
+      );
+    },
   },
 
   WebrtcErrors: {
@@ -248,6 +298,7 @@ export const ErrorFactory = {
         action,
         `[${action.toString()}]: Failed to set answer. `,
         description,
+        true,
       );
     },
 
@@ -260,11 +311,21 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    ICEDisconnected(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.ICE_DISCONNECTED,
+        'ICEDisconnected',
+        action,
+        `[${action.toString()}]: Ice connection state DISCONNECTED`,
+        description,
+      );
+    },
   },
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description, true);
+      return new HMSException(code, 'ServerErrors', action, description, description, terminalActions.includes(action));
     },
 
     AlreadyJoined(action: HMSAction, description = '') {

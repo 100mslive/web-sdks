@@ -1,3 +1,11 @@
+import { HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
+import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
+import { ServerError } from '../../interfaces/internal';
+import { IStore } from '../../sdk/store';
+import { convertDateNumToDate } from '../../utils/date';
+import HMSLogger from '../../utils/logger';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
   HLSNotification,
   PeerListNotification,
@@ -6,17 +14,9 @@ import {
   RoomState,
   RTMPNotification,
 } from '../HMSNotifications';
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
-import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
-import { IStore } from '../../sdk/store';
-import { convertDateNumToDate } from '../../utils/date';
-import { ServerError } from '../../interfaces/internal';
-import { HMSException } from '../../error/HMSException';
-import { HMSAction } from '../../error/ErrorFactory';
-import HMSLogger from '../../utils/logger';
 
 export class RoomUpdateManager {
-  private TAG = 'RoomUpdateManager';
+  private readonly TAG = '[RoomUpdateManager]';
 
   constructor(private store: IStore, public listener?: HMSUpdateListener) {}
 
@@ -55,6 +55,11 @@ export class RoomUpdateManager {
   private onRoomState(roomNotification: RoomState, peerCount?: number) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on room state - room not present');
+      return;
+    }
+
     room.peerCount = peerCount;
     room.name = name;
     room.recording.server.running = !!recording?.sfu.enabled;
@@ -91,6 +96,11 @@ export class RoomUpdateManager {
       return;
     }
     const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on hls - room not present');
+      return;
+    }
+
     notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error?.code;
     room.hls = this.convertHls(notification);
     room.recording.hls = this.getHLSRecording(notification);
@@ -140,6 +150,11 @@ export class RoomUpdateManager {
 
   private setRecordingStatus(running: boolean, notification: RecordingNotification) {
     const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, `set recording status running=${running} - room not present`);
+      return;
+    }
+
     let action: HMSRoomUpdate;
     if (notification.type === 'sfu') {
       room.recording.server = {
@@ -161,6 +176,11 @@ export class RoomUpdateManager {
 
   private setRTMPStatus(running: boolean, notification: RTMPNotification) {
     const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on policy change - room not present');
+      return;
+    }
+
     room.rtmp = {
       running,
       startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,

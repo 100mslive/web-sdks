@@ -1,14 +1,14 @@
+import { useCallback, useMemo } from 'react';
 import {
+  HMSConfigInitialSettings,
+  HMSPreviewConfig,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
-  HMSConfigInitialSettings,
 } from '@100mslive/hms-video-store';
-import { useCallback, useMemo } from 'react';
-import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { hooksErrHandler } from './types';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { HMSConfig } from '@100mslive/hms-video';
 
 export interface usePreviewInput {
   /**
@@ -39,6 +39,8 @@ export interface usePreviewInput {
    * 1-5 ranges from poor to good quality.
    */
   captureNetworkQualityInPreview?: boolean;
+  asRole?: string;
+  autoManageVideo?: boolean;
 }
 
 export interface usePreviewResult {
@@ -62,7 +64,7 @@ export interface usePreviewResult {
 }
 
 /**
- * This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
+ * This hook can be used to build a preview UI component, this lets you call preview every time the passed in
  * token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
  * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
  * Any device change or mute/unmute will be carried across to join.
@@ -75,13 +77,15 @@ export const usePreviewJoin = ({
   initEndpoint,
   initialSettings,
   captureNetworkQualityInPreview,
+  asRole,
+  autoManageVideo,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
   const enableJoin = roomState === HMSRoomState.Preview;
 
-  const config: HMSConfig = useMemo(() => {
+  const config: HMSPreviewConfig = useMemo(() => {
     return {
       userName: name,
       authToken: token,
@@ -89,9 +93,11 @@ export const usePreviewJoin = ({
       rememberDeviceSelection: true,
       settings: initialSettings,
       initEndpoint: initEndpoint,
+      asRole,
       captureNetworkQualityInPreview,
+      autoManageVideo,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview]);
+  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole, autoManageVideo]);
 
   const preview = useCallback(async () => {
     if (!token) {

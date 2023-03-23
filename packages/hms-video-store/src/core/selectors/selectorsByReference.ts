@@ -1,16 +1,21 @@
 import { createSelector } from 'reselect';
 import {
-  selectPeers,
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
+  selectPeers,
   selectRolesMap,
   selectRoom,
   selectTracksMap,
 } from './selectors';
+import { isRoleAllowedToPublish } from './selectorUtils';
 import { HMSPeer, HMSTrack } from '../schema';
 
 export const selectRoleByRoleName = (roleName: string) =>
   createSelector([selectRolesMap], rolesMap => rolesMap[roleName]);
+
+export const selectIsRoleAllowedToPublish = (roleName: string) => {
+  return createSelector(selectRoleByRoleName(roleName), role => isRoleAllowedToPublish(role));
+};
 
 const selectLocalVideoPlugins = createSelector([selectLocalVideoTrackID, selectTracksMap], (trackID, tracksMap) => {
   let track: HMSTrack | null = null;

@@ -1,29 +1,31 @@
 import produce from 'immer';
+import shallow from 'zustand/shallow';
 import create, {
-  StateSelector,
-  StoreApi,
-  SetState,
-  StateSliceListener,
   EqualityChecker,
   PartialState,
+  SetState,
   State,
+  StateSelector,
+  StateSliceListener,
+  StoreApi,
 } from 'zustand/vanilla';
-import shallow from 'zustand/shallow';
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
-import { IHMSActions } from '../IHMSActions';
-import { HMSSDKActions } from './HMSSDKActions';
-import { IHMSStatsStoreReadOnly, IStore } from '../IHMSStore';
-import { IHMSStore, IHMSStoreReadOnly } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
 import { HMSNotifications } from './HMSNotifications';
-import { IHMSNotifications } from '../IHMSNotifications';
+import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
-import { HMSStats } from '../webrtc-stats';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { BeamControllerStore } from '../../controller/beam/BeamController';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
+import { createDefaultStoreState, HMSStore } from '../schema';
+import { IHMSNotifications } from '../schema/notification';
+import { HMSStats } from '../webrtc-stats';
 
 declare global {
   interface Window {
     __hms: HMSReactiveStore;
+    __beam: BeamControllerStore;
+    __triggerBeamEvent__: (args: any) => void;
   }
 }
 
@@ -57,10 +59,14 @@ export class HMSReactiveStore {
       this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
 
+    // @ts-ignore
+    this.actions.setFrameworkInfo({ type: 'js', sdkVersion: require('../../../package.json').version });
+
     this.initialTriggerOnSubscribe = false;
 
     if (isBrowser) {
       window.__hms = this;
+      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
     }
   }
 
@@ -143,28 +149,7 @@ export class HMSReactiveStore {
     const prevGetState = hmsStore.getState;
     // eslint-disable-next-line complexity
     hmsStore.getState = <StateSlice>(selector?: StateSelector<T, StateSlice>) => {
-      if (selector) {
-        const name = selector.name || 'byIDSelector';
-        // @ts-ignore
-        if (!window.selectorsCount) {
-          // @ts-ignore
-          window.selectorsCount = {};
-        }
-        // @ts-ignore
-        window.selectorsCount[name] = (window.selectorsCount[name] || 0) + 1;
-        const start = performance.now();
-        const updatedState = selector(prevGetState());
-        const diff = performance.now() - start;
-        // store selectors that take more than 1ms
-        if (diff > 1) {
-          // @ts-ignore
-          window.expensiveSelectors = window.expensiveSelectors || new Map();
-          // @ts-ignore
-          window.expensiveSelectors.set(name, diff);
-        }
-        return updatedState;
-      }
-      return prevGetState();
+      return selector ? selector(prevGetState()) : prevGetState();
     };
     HMSReactiveStore.compareWithShallowCheckInSubscribe(hmsStore);
     const namedSetState = HMSReactiveStore.setUpDevtools(hmsStore, storeName);
@@ -191,7 +176,7 @@ export class HMSReactiveStore {
   /**
    * use shallow equality check by default for subscribe to optimize for array/object selectors.
    * by default zustand does only reference matching so something like, getPeers for eg. would trigger
-   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array everytime.
+   * the corresponding component even if peers didn't actually change, as selectPeers creates a new array every time.
    * Although the array reference changes, the order of peers and peer objects don't themselves change in this case,
    * and a shallow check avoids that triggering.
    * @private

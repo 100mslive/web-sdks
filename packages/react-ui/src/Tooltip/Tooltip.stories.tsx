@@ -2,6 +2,7 @@ import React from 'react';
 import { ComponentMeta } from '@storybook/react';
 import { alignTooltip, sideTooltip, Tooltip } from './Tooltip';
 import { Flex } from '../Layout';
+import { Text } from '../Text';
 
 export default {
   title: 'UI Components/Tooltip',
@@ -29,7 +30,7 @@ const TooltipStoryWithString = (
   return (
     <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
       <Tooltip title="This is title" {...args}>
-        <span>Hover to see Tooltip</span>
+        <Text>Hover to see Tooltip</Text>
       </Tooltip>
     </Flex>
   );
@@ -52,7 +53,7 @@ const TooltipStorywithReactNode = (
   return (
     <Flex justify="center" align="center" css={{ w: 800, h: 200 }}>
       <Tooltip title={<ExampleTitle />} {...args}>
-        <span>Hover to see Tooltip</span>
+        <Text>Hover to see tooltip</Text>
       </Tooltip>
     </Flex>
   );

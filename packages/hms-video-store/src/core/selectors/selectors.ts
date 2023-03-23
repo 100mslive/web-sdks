@@ -1,23 +1,41 @@
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore } from '../schema';
 import { createSelector } from 'reselect';
+import {
+  getScreenSharesByPeer,
+  isAudioPlaylist,
+  isDegraded,
+  isTrackDisplayEnabled,
+  isTrackEnabled,
+  isVideo,
+  isVideoPlaylist,
+} from './selectorUtils';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
-  getPeerTracksByCondition,
-  isDegraded,
-  isVideoPlaylist,
-  isTrackDisplayEnabled,
-  isTrackEnabled,
-  isAudioPlaylist,
-  isVideo,
-} from './selectorUtils';
+  HMSException,
+  HMSMessage,
+  HMSPeer,
+  HMSPeerID,
+  HMSRoom,
+  HMSRoomState,
+  HMSStore,
+  HMSVideoTrack,
+} from '../schema';
 
 /**
  * Select the current {@link HMSRoom} object to which you are connected.
  * @param store
  */
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
+/**
+ * Select the current {@link HMSException[]} object to monitor the error logs
+ * @param store
+ */
+export const selectErrors = (store: HMSStore): HMSException[] => store.errors;
 
+/**
+ * It will help to get the all the error
+ */
+export const selectRecentError = createSelector(selectErrors, errors => (errors.length === 0 ? null : errors.at(-1)));
 /**
  * Select the ID of the current room to which you are connected.
  */
@@ -124,7 +142,7 @@ const selectTracks = createSelector(selectTracksMap, storeTracks => {
 /**
  * Select the local peer object object assigned to you.
  */
-export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers) => {
+export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers): HMSPeer | undefined => {
   return peers[room.localPeer];
 });
 
@@ -166,7 +184,7 @@ const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => pee
 export const selectLocalTrackIDs = createSelector(
   [selectLocalAudioTrackID, selectLocalVideoTrackID, selectLocalAuxiliaryTrackIDs],
   (audioTrackID, videoTrackID, auxiliaryTrackIDs) => {
-    const trackIDs: string[] = [...auxiliaryTrackIDs];
+    const trackIDs: string[] = auxiliaryTrackIDs ? [...auxiliaryTrackIDs] : [];
     audioTrackID && trackIDs.unshift(audioTrackID);
     videoTrackID && trackIDs.unshift(videoTrackID);
     return trackIDs;
@@ -234,7 +252,7 @@ export const selectIsLocalVideoDisplayEnabled = (store: HMSStore) => {
  * Select a boolean denoting whether your screen is shared to remote peers in the room.
  */
 export const selectIsLocalScreenShared = createSelector(selectLocalPeer, selectTracksMap, (localPeer, tracksMap) => {
-  const { video, audio } = getPeerTracksByCondition(tracksMap, localPeer);
+  const { video, audio } = getScreenSharesByPeer(tracksMap, localPeer);
   return !!(video || audio);
 });
 
@@ -245,7 +263,7 @@ export const selectPeerScreenSharing = createSelector(selectPeersMap, selectTrac
   let screensharePeer = undefined;
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       return peer;
     } else if (audio && !screensharePeer) {
@@ -268,7 +286,7 @@ export const selectIsSomeoneScreenSharing = createSelector(selectPeerScreenShari
 export const selectPeerSharingAudio = createSelector(selectPeersMap, selectTracksMap, (peersMap, tracksMap) => {
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { audio, video } = getPeerTracksByCondition(tracksMap, peer);
+    const { audio, video } = getScreenSharesByPeer(tracksMap, peer);
     if (!video && !!audio) {
       return peer;
     }
@@ -284,7 +302,7 @@ export const selectPeersScreenSharing = createSelector(selectPeersMap, selectTra
   const audioPeers = [];
   for (const peerID in peersMap) {
     const peer = peersMap[peerID];
-    const { video, audio } = getPeerTracksByCondition(tracksMap, peer);
+    const { video, audio } = getScreenSharesByPeer(tracksMap, peer);
     if (video) {
       videoPeers.push(peer);
     } else if (audio) {
@@ -317,7 +335,9 @@ export const selectPeerSharingAudioPlaylist = createSelector(selectPeersMap, sel
 /**
  * Select an array of tracks that have been degraded(receiving lower video quality/no video) due to bad network locally.
  */
-export const selectDegradedTracks = createSelector(selectTracks, tracks => tracks.filter(isDegraded));
+export const selectDegradedTracks = createSelector(selectTracks, tracks =>
+  (tracks as HMSVideoTrack[]).filter(isDegraded),
+);
 
 /**
  * Select the number of messages(sent and received).
@@ -373,6 +393,16 @@ export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesM
   localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
 );
 
+export const selectPreviewRoleName = (store: HMSStore) => store.preview?.asRole;
+
+/**
+ * Select the {@link HMSRole} used for preview.
+ *
+ */
+export const selectPreviewRole = createSelector([selectPreviewRoleName, selectRolesMap], (roleName, rolesMap) =>
+  roleName ? rolesMap[roleName] : null,
+);
+
 /**
  * Select a boolean denoting whether if your local peer is allowed to subscribe to any other role.
  */
@@ -392,3 +422,5 @@ export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
+/** @alpha */
+export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;

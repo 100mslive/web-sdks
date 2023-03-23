@@ -1,11 +1,11 @@
-import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
+import { FAKE_PEER_ID, fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList } from './fixtures';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
-import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
-import HMSRoom from '../sdk/models/HMSRoom';
 import { NotificationManager } from './NotificationManager';
-import { Store } from '../sdk/store';
-import { fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList, FAKE_PEER_ID } from './fixtures';
 import { EventBus } from '../events/EventBus';
+import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
+import HMSRoom from '../sdk/models/HMSRoom';
+import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
+import { Store } from '../sdk/store';
 
 let joinHandler: jest.Mock<any, any>;
 let roomUpdateHandler: jest.Mock<any, any>;
@@ -131,9 +131,9 @@ describe('Notification Manager', () => {
       expect(peerUpdateHandler.mock.calls[0][1]).toBeInstanceOf(HMSRemotePeer);
       expect(peerUpdateHandler.mock.calls[0][1].peerId).toBe('peer_id_3');
 
-      expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_JOINED);
-      expect(peerUpdateHandler.mock.calls[1][1]).toBeInstanceOf(HMSRemotePeer);
-      expect(peerUpdateHandler.mock.calls[1][1].peerId).toBe('peer_id_2');
+      expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_LIST);
+      expect(peerUpdateHandler.mock.calls[1][1][0]).toBeInstanceOf(HMSRemotePeer);
+      expect(peerUpdateHandler.mock.calls[1][1][0].peerId).toBe('peer_id_2');
 
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);

@@ -1,9 +1,9 @@
 import { useRecordingStreaming } from "@100mslive/react-sdk";
-import { Button, Tooltip } from "@100mslive/react-ui";
 import { GoLiveIcon } from "@100mslive/react-icons";
+import { Button, Tooltip } from "@100mslive/react-ui";
 import {
-  useSidepaneToggle,
   useIsSidepaneTypeOpen,
+  useSidepaneToggle,
 } from "./AppData/useSidepane";
 import {
   useIsHLSStartedFromUI,
@@ -28,15 +28,15 @@ const GoLiveButton = () => {
       tooltipText = "RTMP start in progress";
     }
   }
-  if (isStreamingOn) {
-    return null;
-  }
   return (
     <Tooltip title={tooltipText}>
       <Button
         data-testid="go_live"
         variant={isStreamingSidepaneOpen ? "standard" : "primary"}
-        onClick={toggleStreaming}
+        onClick={() => {
+          toggleStreaming();
+          window.sessionStorage.setItem("userStartedStream", "true");
+        }}
         icon
         loading={isRTMPStartedFromUI || isHLSStartedFromUI}
         disabled={isBrowserRecordingOn && !isStreamingOn}

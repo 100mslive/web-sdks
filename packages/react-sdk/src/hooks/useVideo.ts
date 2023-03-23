@@ -1,6 +1,5 @@
-import { selectTrackByID, HMSTrackID } from '@100mslive/hms-video-store';
 import React, { useCallback, useEffect, useRef } from 'react';
-import { useInView } from 'react-intersection-observer';
+import { HMSTrackID, selectVideoTrackByID } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import HMSLogger from '../utils/logger';
 
@@ -14,12 +13,7 @@ export interface useVideoInput {
    * when attach is false, even if tile is inView or enabled, it won't be rendered
    */
   attach?: boolean;
-  /**
-   * Number between 0 and 1 indication when the element is considered inView
-   */
-  threshold?: number;
 }
-
 export interface useVideoOutput {
   videoRef: React.RefCallback<HTMLVideoElement>;
 }
@@ -29,36 +23,28 @@ export interface useVideoOutput {
  * The hook will take care of attaching and detaching video, and will automatically detach when the video
  * goes out of view to save on bandwidth.
  */
-export const useVideo = ({ trackId, attach, threshold = 0.5 }: useVideoInput): useVideoOutput => {
+export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => {
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const track = useHMSStore(selectTrackByID(trackId));
+  const track = useHMSStore(selectVideoTrackByID(trackId));
 
-  const { ref: inViewRef, inView } = useInView({ threshold });
-
-  const setRefs = useCallback(
-    (node: HTMLVideoElement) => {
-      if (node) {
-        videoRef.current = node;
-        inViewRef(node);
-      }
-    },
-    [inViewRef],
-  );
+  const setRefs = useCallback((node: HTMLVideoElement) => {
+    if (node) {
+      videoRef.current = node;
+    }
+  }, []);
 
   useEffect(() => {
     (async () => {
-      if (videoRef.current && track?.id) {
-        if (inView && track.enabled && attach !== false) {
-          // attach when in view and enabled
+      if (track?.id && videoRef.current) {
+        if (attach !== false) {
           await actions.attachVideo(track.id, videoRef.current);
         } else {
-          // detach when not in view
           await actions.detachVideo(track.id, videoRef.current);
         }
       }
     })();
-  }, [actions, inView, videoRef, track?.id, track?.enabled, track?.deviceID, track?.plugins, attach]);
+  }, [track?.id, attach, actions]);
 
   // detach on unmount
   useEffect(() => {

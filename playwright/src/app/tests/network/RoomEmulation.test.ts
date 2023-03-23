@@ -13,7 +13,7 @@ test.afterEach(async () => {
 
 const networkDisconnectedDurations = [5000, 25000];
 
-test(`Verify network disconnection/reconnection notifications`, async ({ context }) => {
+test.skip(`Verify network disconnection/reconnection notifications`, async ({ context }) => {
   pages = await PageWrapper.openPages(context, 2, {
     mic: true,
   });

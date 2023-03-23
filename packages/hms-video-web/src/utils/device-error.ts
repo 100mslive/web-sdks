@@ -1,9 +1,9 @@
+import { getLocalStream } from './media';
+import { getAudioTrack, getVideoTrack } from './track';
 import { HMSAction } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';
-import { getLocalStream } from './media';
-import { getAudioTrack, getVideoTrack } from './track';
 
 // Errors out when there's any device error, returns false when there are no device errors.
 export async function validateDeviceAV() {

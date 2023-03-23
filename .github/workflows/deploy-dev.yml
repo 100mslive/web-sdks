@@ -1,0 +1,99 @@
+name: Deploy Dev
+on:
+  workflow_dispatch:
+    inputs:
+      buildEnvForDev:
+        description: 'which env to build - qa/prod for dev-app, applies only if env is dev'
+        type: 'choice'
+        required: false
+        default: prod
+        options:
+          - prod
+          - qa
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      REACT_APP_TILE_SHAPE: '1-1'
+      REACT_APP_THEME: 'dark'
+      REACT_APP_COLOR: '#2F80FF'
+      REACT_APP_LOGO: ''
+      REACT_APP_FONT: 'Roboto'
+      REACT_APP_POLICY_CONFIG: ''
+      REACT_APP_WEBINAR_PROPS: '{}'
+      REACT_APP_DEFAULT_APP_DETAILS: '{}'
+      ENABLE_ROOT_PATH_BUILD_CACHE: '1'
+      REACT_APP_PUSHER_APP_KEY: ${{ secrets.PUSHER_KEY }}
+      REACT_APP_AMBIENT_MUSIC: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/Together+With+You.mp3'
+      REACT_APP_PUSHER_AUTHENDPOINT: 'https://whiteboard-server.vercel.app/api/pusher/auth'
+      REACT_APP_ZIPY_BLACKLIST: 'peakperformerapp.app.100ms.live,callrockethealth.app.100ms.live,buyume1.app.100ms.live,automation.app.100ms.live,juniorkoder.app.100ms.live,qaroy1.qa-app.100ms.live,kluster.app.100ms.live,pankhuriapp.app.100ms.live,leancrop.app.100ms.live,routes2roots-class.app.100ms.live,liveholofy.app.100ms.live,ulesson.app.100ms.live,truyoga.app.100ms.live'
+      REACT_APP_PORTRAIT_MODE_DOMAINS: 'whatmorelive-stage.app.100ms.live,arjun.app.100ms.live,koo.app.100ms.live,socialjawn.app.100ms.live'
+      REACT_APP_AUDIO_PLAYLIST: '[{"name":"Audio1","id":"audio1","metadata":{"description":"Artist1"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio1.mp3","type":"audio"},{"name":"Audio2","id":"audio2","metadata":{"description":"Artist2"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio2.mp3","type":"audio"},{"name":"Audio3","id":"audio3","metadata":{"description":"Artist3"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio3.mp3","type":"audio"},{"name":"Audio4","id":"audio4","metadata":{"description":"Artist4"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/audio4.mp3","type":"audio"}]'
+      REACT_APP_VIDEO_PLAYLIST: '[{"name":"100ms-360P","id":"video1","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-360p.mp4","type":"video"},{"name":"100ms-720P","id":"video2","metadata":{"description":"100ms"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/100ms-720p.mp4","type":"video"},{"name":"Big Buck Bunny","id":"video3","metadata":{"description":"Bunny"},"url":"https://d2qi07yyjujoxr.cloudfront.net/webapp/playlist/video2.mp4","type":"video"}]'
+      REACT_APP_HEADLESS_JOIN: false
+      REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
+      REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
+      REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
+      REACT_APP_ENABLE_BEAM_SPEAKERS_LOGGING: 'true'
+    steps:
+      - name: log inputs
+        run: |
+          echo "env: dev, branch: ${{ github.ref_name }}"
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          access_token: ${{ github.token }}
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: yarn packages cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Build for Dev
+        run: yarn build
+
+      - name: 'Upload Build Artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          path: apps/100ms-custom-app/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.S3_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.S3_SECRET_KEY }}
+          aws-region: ${{ secrets.S3_BUCKET_REGION }}
+
+      - name: Download Build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifact
+          path: build
+
+      - name: Deploy to Dev
+        env:
+          BUCKET: ${{ secrets.S3_BUCKET_DEV }}
+        # upload static folder first and then upload the rest to ensure index.html assets are all present
+        run: |
+          aws s3 sync ./build s3://$BUCKET --exclude "index.html"
+          aws s3 sync ./build s3://$BUCKET --include "index.html"

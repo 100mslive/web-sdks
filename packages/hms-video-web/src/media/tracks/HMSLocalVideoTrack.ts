@@ -1,13 +1,20 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import { getVideoTrack } from '../../utils/track';
+import { VideoElementManager } from './VideoElementManager';
+import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { EventBus } from '../../events/EventBus';
+import {
+  HMSSimulcastLayerDefinition,
+  HMSVideoTrackSettings as IHMSVideoTrackSettings,
+  ScreenCaptureHandle,
+} from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
-import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { EventBus } from '../../events/EventBus';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import HMSLogger from '../../utils/logger';
+import { getVideoTrack } from '../../utils/track';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
+import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -21,6 +28,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
+  private TAG = '[HMSLocalVideoTrack]';
+
+  /**
+   * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
+   * at the point of writing this comment.
+   */
+  isCurrentTab = false;
 
   /**
    * @internal
@@ -35,6 +50,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   publishedTrackId?: string;
 
+  /**
+   * will be false for preview tracks
+   */
+  isPublished = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -44,14 +64,28 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
+    this.setVideoHandler(new VideoElementManager(this));
     this.settings = settings;
-    // Replace the 'default' deviceId with the actual deviceId
+    // Replace the 'default' or invalid deviceId with the actual deviceId
     // This is to maintain consistency with selected devices as in some cases there will be no 'default' device
-    if (settings.deviceId === 'default' && track.enabled) {
+    if (settings.deviceId !== track.getSettings().deviceId && track.enabled) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
+  }
+
+  /** @internal */
+  setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
+    this._layerDefinitions = definitions;
+  }
+
+  /**
+   * Method to get available simulcast definitions for the track
+   * @returns {HMSSimulcastLayerDefinition[]}
+   */
+  getSimulcastDefinitions(): HMSSimulcastLayerDefinition[] {
+    return this._layerDefinitions;
   }
 
   /**
@@ -62,6 +96,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (value === this.enabled) {
       return;
     }
+    super.setEnabled(value);
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
       if (value) {
@@ -70,15 +105,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         track = await this.replaceTrackWithBlank();
       }
       await this.replaceSender(track, value);
+      this.nativeTrack?.stop();
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
+      this.videoHandler.updateSinks();
     }
-    await super.setEnabled(value);
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
-    (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
   /**
@@ -149,6 +184,44 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+    this.isPublished = false;
+  }
+
+  /**
+   * only for screenshare track to crop to a cropTarget
+   * @internal
+   */
+  async cropTo(cropTarget?: object) {
+    if (!cropTarget) {
+      return;
+    }
+    if (this.source !== 'screen') {
+      return;
+    }
+    try {
+      // @ts-ignore
+      if (this.nativeTrack.cropTo) {
+        // @ts-ignore
+        await this.nativeTrack.cropTo(cropTarget);
+      }
+    } catch (err) {
+      HMSLogger.e(this.TAG, 'failed to crop screenshare capture - ', err);
+      throw ErrorFactory.TracksErrors.GenericTrack(HMSAction.TRACK, 'failed to crop screenshare capture');
+    }
+  }
+
+  /**
+   * only for screenshare track to get the captureHandle
+   * TODO: add an API for capturehandlechange event
+   * @internal
+   */
+  getCaptureHandle(): ScreenCaptureHandle | undefined {
+    // @ts-ignore
+    if (this.nativeTrack.getCaptureHandle) {
+      // @ts-ignore
+      return this.nativeTrack.getCaptureHandle();
+    }
+    return undefined;
   }
 
   /**
@@ -164,25 +237,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
       return;
     }
-    // if all plugins are removed reset everything back to native track
-    if (!processedTrack) {
-      if (this.processedTrack) {
-        // remove, reset back to the native track
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
-      }
-      this.processedTrack = undefined;
-      return;
-    }
-    if (processedTrack !== this.processedTrack) {
-      if (this.processedTrack) {
-        // replace previous processed track with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
-      } else {
-        // there is no prev processed track, replace native with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
-      }
-      this.processedTrack = processedTrack;
-    }
+    await this.removeOrReplaceProcessedTrack(processedTrack);
+    this.videoHandler.updateSinks();
   }
 
   /**
@@ -206,8 +262,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
+    /*
+     * stop the previous only after acquiring the new track otherwise this can lead to
+     * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
+     */
+    prevTrack?.stop();
+    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
@@ -222,8 +283,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
+    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
     prevTrack?.stop();
-    return LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
+    return newTrack;
   }
 
   private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
@@ -246,7 +309,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrate(settings.maxBitrate, this);
+      await stream.setMaxBitrateAndFramerate(this);
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
@@ -267,6 +330,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        this.videoHandler.updateSinks();
       }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
@@ -274,6 +338,31 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }
+    }
+  };
+
+  /**
+   * This will either remove or update the processedTrack value on the class instance.
+   * It will also replace sender if the processedTrack is updated
+   * @param {MediaStreamTrack|undefined}processedTrack
+   */
+  private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
+    // if all plugins are removed reset everything back to native track
+    if (!processedTrack) {
+      if (this.processedTrack) {
+        // remove, reset back to the native track
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
+      }
+      this.processedTrack = undefined;
+    } else if (processedTrack !== this.processedTrack) {
+      if (this.processedTrack) {
+        // replace previous processed track with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
+      } else {
+        // there is no prev processed track, replace native with new one
+        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
+      }
+      this.processedTrack = processedTrack;
     }
   };
 }

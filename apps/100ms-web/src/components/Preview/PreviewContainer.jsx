@@ -1,8 +1,15 @@
 import React from "react";
-import { styled, flexCenter } from "@100mslive/react-ui";
+import { flexCenter, styled } from "@100mslive/react-ui";
 import PreviewJoin from "./PreviewJoin";
 
-const PreviewContainer = ({ token, onJoin, env, skipPreview, initialName }) => {
+const PreviewContainer = ({
+  token,
+  onJoin,
+  env,
+  skipPreview,
+  initialName,
+  asRole,
+}) => {
   return (
     <Container>
       <PreviewJoin
@@ -11,6 +18,7 @@ const PreviewContainer = ({ token, onJoin, env, skipPreview, initialName }) => {
         env={env}
         onJoin={onJoin}
         token={token}
+        asRole={asRole}
       />
     </Container>
   );

@@ -1,12 +1,12 @@
 /* eslint-disable complexity */
-// @ts-ignore
-import NoiseModule from './models/Noise.js';
 import {
   HMSAudioPlugin,
   HMSAudioPluginType,
   HMSPluginSupportResult,
   HMSPluginUnsupportedTypes,
 } from '@100mslive/hms-video';
+// @ts-ignore
+import NoiseModule from './models/Noise.js';
 
 const TAG = 'NoiseSuppressionProcessor';
 const pkg = require('../package.json');

@@ -1,14 +1,14 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
-import { HMSEvents } from '../utils/constants';
 import { HMSInternalEvent } from './HMSInternalEvent';
-import { HMSRemoteAudioTrack, HMSLocalAudioTrack, HMSRemoteVideoTrack, HMSLocalVideoTrack } from '../media/tracks';
-import { HMSWebrtcStats } from '../rtc-stats';
-import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
-import { PolicyParams } from '../notification-manager';
-import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
 import { HMSException } from '../error/HMSException';
+import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { PolicyParams } from '../notification-manager';
+import { HMSWebrtcStats } from '../rtc-stats';
+import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
+import { HMSEvents } from '../utils/constants';
+import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
 
 export class EventBus {
   private eventEmitter: EventEmitter = new EventEmitter();
@@ -80,4 +80,5 @@ export class EventBus {
     HMSEvents.PUBLISH_COMPLETE_AFTER_JOIN,
     this.eventEmitter,
   );
+  readonly leave = new HMSInternalEvent<HMSException | undefined>(HMSEvents.LEAVE, this.eventEmitter);
 }

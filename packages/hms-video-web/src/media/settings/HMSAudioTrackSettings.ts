@@ -1,5 +1,5 @@
-import { HMSAudioTrackSettings as IHMSAudioTrackSettings, HMSAudioCodec } from '../../interfaces';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
+import { HMSAudioCodec, HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interfaces';
 
 export class HMSAudioTrackSettingsBuilder {
   private _volume = 1.0;

@@ -1,12 +1,12 @@
-import { HMSLocalTrack, HMSTrackSource } from '../../media/tracks';
 import { HMSRemotePeer, HMSRoleChangeRequest, HMSUpdateListener } from '../../interfaces';
+import { HMSLocalTrack, HMSTrackSource } from '../../media/tracks';
 import { IStore } from '../../sdk/store';
+import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
+  ChangeTrackMuteStateNotification,
   RoleChangeRequestParams,
   TrackUpdateRequestNotification,
-  ChangeTrackMuteStateNotification,
 } from '../HMSNotifications';
-import { HMSNotificationMethod } from '../HMSNotificationMethod';
 
 /**
  * Handles request from remote peers to change something on the local side. For eg. role change, track mute/unmute.

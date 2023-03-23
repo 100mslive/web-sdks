@@ -1,6 +1,6 @@
-import * as icons from '@100mslive/react-icons';
-import { IconGallery, IconItem } from '@storybook/addon-docs/';
 import React from 'react';
+import { IconGallery, IconItem } from '@storybook/addon-docs/';
+import * as icons from '@100mslive/react-icons';
 
 const IconsList = () => {
   return (

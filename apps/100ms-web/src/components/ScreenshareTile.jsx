@@ -1,17 +1,17 @@
 import React, { useRef, useState } from "react";
-import screenfull from "screenfull";
 import { useFullscreen } from "react-use";
+import screenfull from "screenfull";
 import {
-  useHMSStore,
   selectPeerByID,
   selectScreenShareAudioByPeerID,
   selectScreenShareByPeerID,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
 import { StyledVideoTile, Video, VideoTileStats } from "@100mslive/react-ui";
+import { getVideoTileLabel } from "./peerTileUtils";
 import TileMenu from "./TileMenu";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { getVideoTileLabel } from "./peerTileUtils";
 import { UI_SETTINGS } from "../common/constants";
 
 const labelStyles = {
@@ -78,7 +78,6 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
               mirror={peer.isLocal && track?.source === "regular"}
               attach={!isAudioOnly}
               trackId={track.id}
-              threshold={0.05}
             />
           ) : null}
           <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { RecordIcon } from '@100mslive/react-icons';
+import { ComponentStory } from '@storybook/react';
 import { Toast } from './Toast';
-import ToastDocs from './Toast.mdx';
+import mdx from './Toast.mdx';
 import { Button } from '../Button';
-import { Text } from '../Text';
 
 const ReactToastStory = ({ ...props }) => {
   return (
@@ -29,37 +28,29 @@ const ToastMeta = {
   },
   parameters: {
     docs: {
-      page: ToastDocs,
+      page: mdx,
     },
   },
 };
 
-const ReactToastComponent = ({ ...props }) => {
+const ReactToastComponent: ComponentStory<typeof ReactToastStory> = args => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</Button>
       <Toast.HMSToast
-        title={'Toast title goes here'}
-        description="Toast description goes here"
-        open={true}
+        title="This is a title"
+        description="This is a toast using the HMSToast component."
+        open={isOpen}
         isClosable={true}
-        icon={<RecordIcon />}
-        action={
-          <Button variant="standard" outlined css={{ w: 'max-content', p: '$4 $8', gap: '8px' }} icon>
-            <Text variant="body2" as="div" css={{ fontWeight: '$regular', lineHeight: '0', c: '$textMedEmp' }}>
-              Hello
-            </Text>
-            <RecordIcon></RecordIcon>
-          </Button>
-        }
         onOpenChange={o => setIsOpen(o)}
-        {...props}
-      ></Toast.HMSToast>
+        {...args}
+      />
       <Toast.Viewport css={{ bottom: '$24' }} />
     </>
   );
 };
 
-export const AppToast = ReactToastStory.bind({});
+export const Playground: ComponentStory<typeof ReactToastStory> = ReactToastStory.bind({});
+Playground.storyName = 'HMSToast';
 export default ToastMeta;

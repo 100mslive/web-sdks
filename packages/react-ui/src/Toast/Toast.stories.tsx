@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { ComponentStory } from '@storybook/react';
 import { Toast } from './Toast';
 import ToastDocs from './Toast.mdx';
 import { Button } from '../Button';
+import { Flex } from '../Layout';
+import { Text } from '../Text';
 
 const ToastStory = ({ ...props }) => {
   return (
@@ -18,10 +21,6 @@ const ToastMeta = {
     onClick: { action: 'clicked' },
     icon: { control: 'boolean' },
   },
-  args: {
-    variant: 'standard',
-    title: 'Hello from Toast Component',
-  },
   parameters: {
     docs: {
       page: ToastDocs,
@@ -34,15 +33,25 @@ const ToastComponent = ({ ...props }) => {
   return (
     <>
       <Button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Launch'} Toast</Button>
-      <Toast.Root open={isOpen} onOpenChange={o => setIsOpen(o)} {...props}>   
-        <Toast.Title css={{ mr: '$12' }}>Hello from Toast Component</Toast.Title>
-        <Toast.Description css={{ mr: '$12' }}>Toast component Description</Toast.Description>
-        <Toast.Close />
+      <Toast.Root open={isOpen} onOpenChange={o => setIsOpen(o)} {...props}>
+        <Toast.Title asChild>
+          <Flex align="center" css={{ gap: '$4', flex: '1 1 0', minWidth: 0 }}>
+            <Text variant="sub1" css={{ c: 'inherit', wordBreak: 'break-word' }}>
+              Hello from toast.
+            </Text>
+            <Toast.Close />
+          </Flex>
+        </Toast.Title>
+        <Toast.Description>
+          This is a custom toast component using primitives with controlled open and close state using React state.
+        </Toast.Description>
       </Toast.Root>
       <Toast.Viewport css={{ bottom: '$24' }} />
     </>
   );
 };
-export const Example = ToastStory.bind({});
+export const Example: ComponentStory<typeof ToastStory> = ToastStory.bind({});
+
+Example.storyName = 'Toast';
 
 export default ToastMeta;

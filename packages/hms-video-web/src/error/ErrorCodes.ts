@@ -6,15 +6,19 @@
  */
 
 export const ErrorCodes = {
+  // https://www.rfc-editor.org/rfc/rfc6455#section-7.4.1
   WebSocketConnectionErrors: {
     // Error connecting to ws or init config not available
     FAILED_TO_CONNECT: 1000,
 
     // Network connection lost
     WEBSOCKET_CONNECTION_LOST: 1003,
+
+    // Abnormal close without receiving a Close control frame
+    ABNORMAL_CLOSE: 1006,
   },
 
-  InitAPIErrors: {
+  APIErrors: {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
     //init config not available
@@ -63,6 +67,12 @@ export const ErrorCodes = {
 
     // Operating System denied permission
     SYSTEM_DENIED_PERMISSION: 3011,
+
+    // Current tab is not shared when forceCurrentTab was set to true for screenshare
+    CURRENT_TAB_NOT_SHARED: 3012,
+
+    // any error that occurs while playing audio of remote audio tracks
+    AUDIO_PLAYBACK_ERROR: 3013,
   },
 
   WebrtcErrors: {
@@ -80,6 +90,9 @@ export const ErrorCodes = {
 
     // [{action}]: Ice connection state FAILED
     ICE_FAILURE: 4005,
+
+    // [{action}]: Ice connection state FAILED
+    ICE_DISCONNECTED: 4006,
   },
 
   WebsocketMethodErrors: {

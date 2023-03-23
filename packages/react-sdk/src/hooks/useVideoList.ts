@@ -1,5 +1,7 @@
-import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
 import React, { useMemo } from 'react';
+import { useResizeDetector } from 'react-resize-detector';
+import { HMSPeer, HMSTrack, HMSTrackID, selectTracksMap } from '@100mslive/hms-video-store';
+import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
 import {
   calculateLayoutSizes,
   chunkElements,
@@ -7,8 +9,6 @@ import {
   getVideoTracksFromPeers,
   TrackWithPeer,
 } from '../utils/layout';
-import { useHMSVanillaStore } from '../primitives/HmsRoomProvider';
-import { useResizeDetector } from 'react-resize-detector';
 
 export interface useVideoListInput {
   /**
@@ -28,11 +28,11 @@ export interface useVideoListInput {
    */
   maxColCount?: number;
   /**
-   * A function which tells whether to show the screenShare for a peer who is screensharing. A peer is passed
+   * A function which tells whether to show the screenshare for a peer who is sharing their screen. A peer is passed
    * and a boolean value is expected.
    * This can be useful if there are multiple screenShares in the room where you may want to show the main one in the
    * center view and others in video list along side other tiles. No screenShare is included by default.
-   * e.g. includeScreenShare = (peer) => return peer.id !== mainScreenSharingPeer.id
+   * for example. includeScreenShare = (peer) => return peer.id !== mainScreenSharingPeer.id
    */
   includeScreenShareForPeer?: (peer: HMSPeer) => boolean;
   /**
@@ -93,7 +93,7 @@ export const useVideoList = ({
 }: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
   const store = useHMSVanillaStore();
-  // using vanilla store as we don't need re-rendering everytime something in a track changes
+  // using vanilla store as we don't need re-rendering every time something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
   const tracksWithPeer: TrackWithPeer[] = getVideoTracksFromPeers(
     peers,

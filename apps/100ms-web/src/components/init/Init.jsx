@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
 import {
-  useHMSStore,
-  selectSessionId,
   selectLocalPeerID,
   selectLocalPeerName,
   selectLocalPeerRoleName,
+  selectSessionId,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { useTheme } from "@100mslive/react-ui";
+import { setUpZipy } from "./initUtils";
 import { FeatureFlagsInit } from "../../services/FeatureFlags";
-import { setUpLogRocket } from "./initUtils";
 
 const Init = () => {
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -37,14 +37,15 @@ const Init = () => {
 
   useEffect(() => {
     if (localPeerID && localPeerRole && localPeerName) {
-      setUpLogRocket({
+      const peerData = {
         localPeer: {
           id: localPeerID,
           name: localPeerName,
           roleName: localPeerRole,
         },
         sessionId,
-      });
+      };
+      setUpZipy(peerData);
     }
     // eslint-disable-next-line
   }, [localPeerID, localPeerName, localPeerRole, sessionId]);

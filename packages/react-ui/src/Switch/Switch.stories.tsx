@@ -1,7 +1,7 @@
-import { ComponentStory, ComponentMeta } from '@storybook/react';
+import React, { useEffect } from 'react';
+import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { Switch } from './Switch';
 import SwitchDocs from './Switch.mdx';
-import React, { useEffect } from 'react';
 import { Flex } from '../Layout';
 
 export default {
@@ -35,9 +35,10 @@ const Template: ComponentStory<typeof Switch> = ({ checked: initialChecked, ...a
   );
 };
 
-export const Index = Template.bind({});
+export const Playground = Template.bind({});
 
-Index.args = {
+Playground.storyName = 'Switch';
+Playground.args = {
   checked: false,
   onCheckedChange: () => {
     return;

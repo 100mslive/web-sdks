@@ -6,8 +6,8 @@ export type {
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
 export type { IHMSActions as HMSActions } from './IHMSActions';
-export type { IHMSNotifications as HMSNotifications } from './IHMSNotifications';
-export type { HMSNotificationCallback } from './IHMSNotifications';
+export type { IHMSNotifications as HMSNotifications } from './schema/notification';
+export type { HMSNotificationInCallback, HMSNotificationCallback } from './schema/notification';
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';
@@ -17,11 +17,15 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
+  HMSSimulcastLayer,
+  simulcastMapping,
+  DeviceType,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 
 export type {
   HMSConfig,
+  HMSPreviewConfig,
   HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
@@ -32,4 +36,12 @@ export type {
   HMSRemoteTrackStats,
   HLSConfig,
   HLSMeetingURLVariant,
+  HMSScreenShareConfig,
+  ScreenCaptureHandle,
+  HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
+  TokenResult,
 } from './hmsSDKStore/sdkTypes';
+
+export * from '../controller/beam/BeamController';

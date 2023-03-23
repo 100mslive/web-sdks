@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyledVideoTile } from './StyledVideoTile';
 import { MicOffIcon } from '@100mslive/react-icons';
-import Video from '../Video/Video';
+import { StyledVideoTile } from './StyledVideoTile';
 import VideoTileDocs from './VideoTile.mdx';
+import Video from '../Video/Video';
 
 const VideoTileMeta = {
   title: 'Video/VideoTile',

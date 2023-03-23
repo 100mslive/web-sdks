@@ -1,36 +1,43 @@
-<!-- Custom-MDX-Documentation.mdx -->
+import { Story, Props, Preview } from '@storybook/addon-docs';
 
-# Replacing DocsPage with custom `MDX` content
-
-This file is a documentation-only `MDX`file to customize Storybook's [DocsPage](https://storybook.js.org/docs/react/writing-docs/docs-page#replacing-docspage).
-
-It can be further expanded with your own code snippets and include specific information related to your stories.
-
-For example:
-
-import { Story } from '@storybook/addon-docs';
+import { Button } from '.';
+import { HangUpIcon } from '@100mslive/react-icons';
 
 ## Button
 
-Button is the primary component. It has four possible states.
+The button has three possible variants,
 
-- [Primary](#primary)
-- [Standard](#standard)
-- [Danger](#danger)
-- [With Icon](#with-icon)
+- Primary,
+- Standard, and
+- Danger
+
+Button can also have an icon, you can add the icon as a children of that Button. The `icon` attribute will add a padding
+between those children elements.
+
+A Button also have an attribute `outlined` which will add an outline to that Button.
 
 ### Primary
 
-<Story id="button--primary" />
+<Preview>
+  <Story id="ui-components-button--primary" />
+</Preview>
 
 ### Standard
 
-<Story id="button--standard" />
+<Preview>
+  <Story id="ui-components-button--standard" />
+</Preview>
 
 ### Danger
 
-<Story id="button--danger" />
+<Preview>
+  <Story id="ui-components-button--danger" />
+</Preview>
 
 ### With Icon
 
-<Story id="button--icon" />
+<Preview>
+  <Story id="ui-components-button--with-icon" />
+</Preview>
+
+<Props />

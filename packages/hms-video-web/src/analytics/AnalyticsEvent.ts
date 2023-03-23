@@ -1,8 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
-import { domainCategory } from './domain-analytics';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
+import { domainCategory } from './domain-analytics';
+import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
 import { getAnalyticsDeviceId } from '../utils/support';
+import { createUserAgent } from '../utils/user-agent';
 
 interface AnalyticsEventInit {
   name: string;
@@ -37,8 +38,10 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
       user_name?: string;
       user_data?: string;
     };
+    userAgent: string;
   } = {
     peer: {},
+    userAgent: createUserAgent(),
   };
   timestamp: number;
   event_id: string;

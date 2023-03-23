@@ -22,10 +22,10 @@ export class Header {
   participant_list = 'button[data-testid="participant_list"]';
   participant_name = 'div[data-testid="participant_?"]';
 
-  participant_setting = 'div[data-testid="participant_?"] p[type="button"]';
-
+  participant_setting = 'div[data-testid="participant_?"] div p[data-testid="participant_more_actions"]';
+  participant_dropdown = 'div[data-testid="open_role_selection_dropdown"]';
   participant_role_heading = 'text=?';
-  dialog_select_change_role_to = 'div[data-testid="dialog_select_Change role to"]';
+  dialog_select_change_role_to = '//p[text()="Change Role"]';
   role_list = ['audio', 'audio-video', 'audio-video-sshare', 'hls-viewer', 'screenshare', 'video', 'viewer'];
   setting_role_peer = 'div[role="menuitem"]:nth-child(?) button';
   peerlist_network = 'div[data-testid="participant_?"] span[data-testid="tile_network"]';

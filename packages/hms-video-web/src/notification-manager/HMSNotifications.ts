@@ -1,8 +1,8 @@
-import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
+import { VideoTrackLayerUpdate } from '../connection/channel-messages';
 import { HMSRole } from '../interfaces/role';
-import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
-import { HMSSimulcastLayer } from '../interfaces';
+import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
+import { Track } from '../signal/interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -24,11 +24,7 @@ export interface TrackStateNotification {
 
 export interface OnTrackLayerUpdateNotification {
   tracks: {
-    [track_id: string]: {
-      current_layer: HMSSimulcastLayer;
-      expected_layer: HMSSimulcastLayer;
-      track_id: string;
-    };
+    [track_id: string]: VideoTrackLayerUpdate;
   };
 }
 

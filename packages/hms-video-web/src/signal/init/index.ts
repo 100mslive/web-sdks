@@ -1,19 +1,17 @@
 import { InitConfig } from './models';
-import HMSLogger from '../../utils/logger';
-import { userAgent } from '../../utils/support';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import HMSLogger from '../../utils/logger';
 
-const TAG = 'InitService';
-
+const TAG = '[InitService]';
 export default class InitService {
   private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {
       case 404:
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
+        throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
       case 200:
         break;
       default:
-        throw ErrorFactory.InitAPIErrors.ServerErrors(
+        throw ErrorFactory.APIErrors.ServerErrors(
           body.code || response.status,
           HMSAction.INIT,
           body.message || response?.statusText,
@@ -21,35 +19,48 @@ export default class InitService {
     }
   }
 
-  static async fetchInitConfig(
-    token: string,
-    peerId: string,
+  static async fetchInitConfig({
+    token,
+    peerId,
+    userAgent,
     initEndpoint = 'https://prod-init.100ms.live',
     region = '',
-  ): Promise<InitConfig> {
+  }: {
+    token: string;
+    peerId: string;
+    userAgent: string;
+    initEndpoint?: string;
+    region?: string;
+  }): Promise<InitConfig> {
     HMSLogger.d(TAG, `fetchInitConfig: initEndpoint=${initEndpoint} token=${token} peerId=${peerId} region=${region} `);
-    const url = getUrl(initEndpoint, peerId, region);
+    const url = getUrl(initEndpoint, peerId, userAgent, region);
     try {
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const config = await response.json();
-      this.handleError(response, config);
-      HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
-      return transformInitConfig(config);
+      try {
+        const config = await response.clone().json();
+        this.handleError(response, config);
+        HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+        return transformInitConfig(config);
+      } catch (err) {
+        const text = await response.text();
+        HMSLogger.e(TAG, 'json error', (err as Error).message, text);
+        throw ErrorFactory.APIErrors.ServerErrors(response.status, HMSAction.INIT, text);
+      }
     } catch (err) {
       const error = err as Error;
       if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
+        throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
       }
       throw error;
     }
   }
 }
 
-export function getUrl(endpoint: string, peerId: string, region?: string) {
+export function getUrl(endpoint: string, peerId: string, userAgent: string, region?: string) {
   try {
     const url = new URL('/init', endpoint);
 
@@ -57,7 +68,7 @@ export function getUrl(endpoint: string, peerId: string, region?: string) {
       url.searchParams.set('region', region.trim());
     }
     url.searchParams.set('peer_id', peerId);
-    url.searchParams.set('user_agent', userAgent);
+    url.searchParams.set('user_agent_v2', userAgent);
     return url.toString();
   } catch (err) {
     const error = err as Error;
