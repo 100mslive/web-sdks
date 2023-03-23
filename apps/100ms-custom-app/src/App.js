@@ -61,7 +61,6 @@ const App = () => {
       metadata: '',
     },
   });
-  // const [authTokenByRoomCodeEndpoint] = useState(getAuthTokenByRoomCodeEndpoint())
 
   useEffect(() => {
     const code = getRoomCodeFromUrl();
