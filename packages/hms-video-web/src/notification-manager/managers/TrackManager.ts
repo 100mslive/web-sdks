@@ -62,6 +62,14 @@ export class TrackManager {
       return;
     }
 
+    const storeTrack = this.store
+      .getTracks()
+      .find(_track => _track.trackId === track.trackId && _track.mid === track.mid);
+    if (!storeTrack) {
+      HMSLogger.d(this.TAG, 'Track not found in store');
+      return;
+    }
+
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     this.store.removeTrack(track.trackId);
@@ -186,7 +194,7 @@ export class TrackManager {
     if (track.type !== HMSTrackType.AUDIO) {
       return;
     }
-    if (!hmsPeer.audioTrack && track.source === 'regular') {
+    if (track.source === 'regular' && (!hmsPeer.audioTrack || hmsPeer.audioTrack?.trackId === track.trackId)) {
       hmsPeer.audioTrack = track as HMSRemoteAudioTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(track);
@@ -200,7 +208,7 @@ export class TrackManager {
     const remoteTrack = track as HMSRemoteVideoTrack;
     const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
     remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-    if (!hmsPeer.videoTrack && track.source === 'regular') {
+    if (track.source === 'regular' && (!hmsPeer.videoTrack || hmsPeer.videoTrack?.trackId === track.trackId)) {
       hmsPeer.videoTrack = remoteTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);

@@ -36,6 +36,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       sendEncodings: trackEncodings,
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
+    track.mid = transceiver.mid;
     return transceiver;
   }
 
