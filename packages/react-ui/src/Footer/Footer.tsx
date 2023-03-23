@@ -5,7 +5,6 @@ const Root = styled(Flex, {
   justifyContent: 'space-between',
   alignItems: 'center',
   py: '$2',
-  position: 'relative',
   height: '100%',
   '@md': { flexWrap: 'wrap', gap: '$4' },
 });
