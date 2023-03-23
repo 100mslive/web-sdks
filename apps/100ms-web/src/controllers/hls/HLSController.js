@@ -1,12 +1,12 @@
-import Hls from "hls.js";
 import { EventEmitter2 as EventEmitter } from "eventemitter2";
-import { FeatureFlags } from "../../services/FeatureFlags";
+import Hls from "hls.js";
 import {
   getSecondsFromTime,
   isAlreadyInMetadataMap,
   parseAttributesFromMetadata,
   parseTagsList,
 } from "./HLSUtils";
+import { FeatureFlags } from "../../services/FeatureFlags";
 
 export const HLS_TIMED_METADATA_LOADED = "hls-timed-metadata";
 export const HLS_STREAM_NO_LONGER_LIVE = "hls-stream-no-longer-live";
