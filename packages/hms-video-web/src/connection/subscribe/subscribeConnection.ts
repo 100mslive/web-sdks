@@ -66,7 +66,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       const streamId = stream.id;
-      // Keeping track of stream counts
 
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
@@ -82,7 +81,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
          * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
          * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
          */
-        // here only removing audio not video. id will be same for audio and video.
         const toRemoveTrackIdx = remote.tracks.findIndex(
           track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.mid,
         );
