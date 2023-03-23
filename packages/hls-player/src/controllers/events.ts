@@ -1,3 +1,4 @@
+import { HlsPlayerStats } from '@100mslive/hls-stats';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { HMSHLSException } from '../error/HMSHLSException';
 import { ILevel } from '../interfaces/ILevel';
@@ -12,6 +13,7 @@ export interface HMSHLSPlayerListeners {
     event: HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
     data: HMSHLSCue,
   ) => void;
+  [HMSHLSPlayerEvents.STATS]: (event: HMSHLSPlayerEvents.STATS, data: HlsPlayerStats) => void;
   [HMSHLSPlayerEvents.PLAYBACK_STATE]: (event: HMSHLSPlayerEvents.PLAYBACK_STATE, data: HMSHLSPlaybackState) => void;
 
   [HMSHLSPlayerEvents.ERROR]: (event: HMSHLSPlayerEvents.ERROR, data: HMSHLSException) => void;

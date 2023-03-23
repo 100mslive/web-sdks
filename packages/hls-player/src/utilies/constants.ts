@@ -12,6 +12,7 @@ export enum HMSHLSPlayerEvents {
 
   ERROR = 'error',
   PLAYBACK_STATE = 'playback-state',
+  STATS = 'stats',
 }
 
 export enum HMSHLSExceptionEvents {

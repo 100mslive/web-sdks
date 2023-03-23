@@ -66,16 +66,15 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   /**
    *  Subscribe to hls stats
    */
-  subscribeStats = (callback: (state: HlsPlayerStats) => void, interval = 2000) => {
+  private subscribeStats = (interval = 2000) => {
     this._subscribeHlsStats = this._hlsStats.subscribe((state: HlsPlayerStats) => {
-      callback(state);
+      this.emit(HMSHLSPlayerEvents.STATS, state);
     }, interval);
-    return this.unsubscribeStats;
   };
   /**
    * Unsubscribe to hls stats
    */
-  unsubscribeStats = () => {
+  private unsubscribeStats = () => {
     if (this._subscribeHlsStats) {
       this._subscribeHlsStats();
     }
@@ -344,6 +343,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       this._hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this._hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);
       this._hls.on(Hls.Events.ERROR, this.handleHLSException);
+      this.subscribeStats();
     } else if (this._videoEl.canPlayType('application/vnd.apple.mpegurl')) {
       // code for ios safari, mseNot Supported.
       this._videoEl.src = this._hlsUrl;

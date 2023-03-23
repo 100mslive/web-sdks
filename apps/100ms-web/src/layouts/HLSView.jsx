@@ -118,16 +118,14 @@ const HLSView = () => {
    * initialize and subscribe to hlsState
    */
   useEffect(() => {
-    let unsubscribeStats;
+    const onHLSStats = (_, state) => setHlsStatsState(state);
     if (enablHlsStats) {
-      unsubscribeStats = hlsPlayer.subscribeStats(state => {
-        setHlsStatsState(state);
-      });
+      hlsPlayer.on(HMSHLSPlayerEvents.STATS, onHLSStats);
     } else {
-      unsubscribeStats?.();
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     }
     return () => {
-      unsubscribeStats?.();
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     };
   }, [enablHlsStats]);
 
@@ -196,7 +194,7 @@ const HLSView = () => {
                 onValueChange={currentTime => {
                   hlsPlayer.seekTo(currentTime);
                 }}
-                videoRef={videoRef}
+                hlsPlayer={hlsPlayer}
               />
             )}
 
