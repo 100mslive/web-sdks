@@ -67,6 +67,7 @@ export class VideoElementManager {
   removeVideoElement(videoElement: HTMLVideoElement): void {
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
+    this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
   }
@@ -147,7 +148,7 @@ export class VideoElementManager {
       }
     }
 
-    HMSLogger.d(this.TAG, 'selecting max layer for the track', `${this.track}`);
+    HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
     await this.track.setPreferredLayer(maxLayer);
   }
 

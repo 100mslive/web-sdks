@@ -173,7 +173,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         `[Remote Track] ${this.logIdentifier} 
       streamId=${this.stream.id}
       trackId=${this.trackId}
-      Requested layer ${layer}, source=${this.source}`,
+      Requested layer ${layer}, source=${source}`,
       );
       return response;
     } catch (error) {
@@ -181,7 +181,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         `[Remote Track] ${this.logIdentifier} 
       streamId=${this.stream.id}
       trackId=${this.trackId}
-      Failed to set layer ${layer}, source=${this.source}
+      Failed to set layer ${layer}, source=${source}
       error=${(error as Error).message}`,
       );
       throw error;

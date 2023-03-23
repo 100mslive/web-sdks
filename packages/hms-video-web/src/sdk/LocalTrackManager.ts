@@ -50,7 +50,7 @@ export class LocalTrackManager {
   }
 
   // eslint-disable-next-line complexity
-  async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
+  async getTracksToPublish(initialSettings: InitialSettings = defaultSettings): Promise<HMSLocalTrack[]> {
     const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
@@ -74,8 +74,12 @@ export class LocalTrackManager {
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
 
-    this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
-    this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
+    if (fetchTrackOptions.audio) {
+      this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
+    }
+    if (fetchTrackOptions.video) {
+      this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
+    }
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
@@ -87,8 +91,12 @@ export class LocalTrackManager {
         localStream,
       );
     }
-    this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
-    this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
+    if (fetchTrackOptions.audio) {
+      this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
+    }
+    if (fetchTrackOptions.video) {
+      this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
+    }
 
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
       tracksToPublish.push(videoTrack);

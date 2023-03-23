@@ -1,5 +1,5 @@
-import { PageWrapper } from "../../PageWrapper";
-import { test } from "@playwright/test";
+import { PageWrapper } from '../../PageWrapper';
+import { test } from '@playwright/test';
 
 let page: PageWrapper;
 
@@ -14,7 +14,7 @@ test.afterEach(async () => {
 
 test(`Change name check`, async () => {
   const oldName = page.localName;
-  const newName = "peer_new_name";
+  const newName = 'peer_new_name';
 
   await page.center.assertTilePresence(oldName, true);
   await page.header.assertPeerInPeerList(oldName, true);
