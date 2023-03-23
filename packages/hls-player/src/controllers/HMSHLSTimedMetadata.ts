@@ -15,9 +15,9 @@ export class HMSHLSTimedMetadata {
     this.registerListner();
   }
   extractMetaTextTrack = (): TextTrack | null => {
-    const textTrackListCount = this.videoEl?.textTracks.length || 0;
+    const textTrackListCount = this.videoEl.textTracks.length || 0;
     for (let trackIndex = 0; trackIndex < textTrackListCount; trackIndex++) {
-      const textTrack = this.videoEl?.textTracks[trackIndex];
+      const textTrack = this.videoEl.textTracks[trackIndex];
       if (textTrack?.kind !== 'metadata') {
         continue;
       }
@@ -33,18 +33,17 @@ export class HMSHLSTimedMetadata {
     if (!cues) {
       return;
     }
-    // @ts-ignore
     const cuesLength = cues.length;
     let cueIndex = 0;
     while (cueIndex < cuesLength) {
-      // @ts-ignore
-      const cue: TextTrackCue = cues[cueIndex];
-      // @ts-ignore
+      const cue = cues[cueIndex] as TextTrackCue & {
+        queued: boolean;
+        value: { data: string };
+      };
       if (cue.queued) {
         return;
       }
       // here we are converting base64 to actual data.
-      // @ts-ignore
       const data: Record<string, any> = metadataPayloadParser(cue.value.data);
       const startDate = data.start_date;
       const endDate = data.end_date;
@@ -60,7 +59,6 @@ export class HMSHLSTimedMetadata {
             endDate: new Date(endDate),
           });
         }, timeDiff);
-        // @ts-ignore
         cue.queued = true;
       }
       cueIndex++;
@@ -76,7 +74,7 @@ export class HMSHLSTimedMetadata {
     }
     // @ts-ignore
     const firstFragProgramDateTime = this.videoEl?.getStartDate() || 0;
-    const currentAbsTime = new Date(firstFragProgramDateTime).getTime() + (this.videoEl?.currentTime || 0) * 1000;
+    const currentAbsTime = new Date(firstFragProgramDateTime).getTime() + (this.videoEl.currentTime || 0) * 1000;
     // fire cue for timed meta data extract
     this.fireCues(currentAbsTime, 0.25);
   };
