@@ -33,7 +33,6 @@ export class TrackManager {
    */
   handleTrackMetadataAdd(params: TrackStateNotification) {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
-    console.log('track meta add ', params);
 
     for (const trackId in params.tracks) {
       this.store.setTrackState({
@@ -50,7 +49,6 @@ export class TrackManager {
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
-    console.log('track add ', track);
     this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
@@ -61,7 +59,6 @@ export class TrackManager {
    */
   handleTrackRemove = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
-    console.log('track remove ', track);
 
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
