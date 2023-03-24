@@ -66,17 +66,15 @@ export class TrackManager {
       return;
     }
 
-    const storeTrack = this.store
-      .getTracks()
-      .find(_track => _track.trackId === track.trackId && _track.transceiver?.mid === track.transceiver?.mid);
-    if (!storeTrack) {
+    const storeHasTrack = this.store.hasTrack(track);
+    if (!storeHasTrack) {
       HMSLogger.d(this.TAG, 'Track not found in store');
       return;
     }
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
-    this.store.removeTrack(track.trackId);
+    this.store.removeTrack(track);
     const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
 
     if (!hmsPeer) {
@@ -186,11 +184,14 @@ export class TrackManager {
     const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
     if (auxiliaryTrackIndex > -1) {
       hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
+      HMSLogger.d(this.TAG, 'auxiliary track removed', `${track}`);
     } else {
-      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack?.trackId === track.trackId) {
+      if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack === track) {
         hmsPeer.audioTrack = undefined;
-      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack?.trackId === track.trackId) {
+        HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
+      } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
         hmsPeer.videoTrack = undefined;
+        HMSLogger.d(this.TAG, 'video track removed', `${track}`);
       }
     }
   }
