@@ -25,11 +25,11 @@ interface IHMSHLSPlayer {
   /**
    * move the video to Live
    */
-  seekToLivePosition(): void;
+  seekToLivePosition(): Promise<void>;
   /**
    * play stream
    */
-  play(): void;
+  play(): Promise<void>;
   /**
    * pause stream
    */
@@ -43,7 +43,7 @@ interface IHMSHLSPlayer {
   /**
    * unblock autoplay
    */
-  unblockAutoPlay(): void;
+  unblockAutoPlay(): Promise<void>;
 }
 
 export default IHMSHLSPlayer;
