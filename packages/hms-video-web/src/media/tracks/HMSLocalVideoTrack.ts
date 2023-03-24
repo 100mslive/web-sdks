@@ -182,6 +182,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   async cleanup() {
     super.cleanup();
+    this.transceiver = undefined;
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;

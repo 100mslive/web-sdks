@@ -68,7 +68,7 @@ export class TrackManager {
 
     const storeTrack = this.store
       .getTracks()
-      .find(_track => _track.trackId === track.trackId && _track.mid === track.mid);
+      .find(_track => _track.trackId === track.trackId && _track.transceiver?.mid === track.transceiver?.mid);
     if (!storeTrack) {
       HMSLogger.d(this.TAG, 'Track not found in store');
       return;
@@ -170,7 +170,7 @@ export class TrackManager {
   }
 
   private setLayer(track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) {
-    const peer = this.store.getPeerByTrackId(track.trackId)!;
+    const peer = this.store.getPeerByTrackId(track.trackId);
     if (!peer) {
       return;
     }

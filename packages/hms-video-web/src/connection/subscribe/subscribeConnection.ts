@@ -82,7 +82,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
          * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
          */
         const toRemoveTrackIdx = remote.tracks.findIndex(
-          track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.mid,
+          track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.transceiver?.mid,
         );
         if (toRemoveTrackIdx >= 0) {
           const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
@@ -98,7 +98,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
-      track.mid = e.transceiver.mid;
+      track.transceiver = e.transceiver;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);

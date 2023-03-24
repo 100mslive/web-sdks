@@ -12,7 +12,7 @@ export abstract class HMSTrack {
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;
   peerId?: string;
-  mid?: string | null;
+  transceiver?: RTCRtpTransceiver;
 
   /**
    * @internal to print as a helpful identifier alongside logs

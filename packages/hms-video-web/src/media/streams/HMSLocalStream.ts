@@ -36,7 +36,7 @@ export default class HMSLocalStream extends HMSMediaStream {
       sendEncodings: trackEncodings,
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
-    track.mid = transceiver.mid;
+    track.transceiver = transceiver;
     return transceiver;
   }
 
@@ -83,32 +83,21 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   removeSender(track: HMSLocalTrack) {
-    let removedSenderCount = 0;
-    this.connection?.getSenders().forEach(sender => {
-      if (sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent()) {
-        this.connection!.removeTrack(sender);
-        removedSenderCount += 1;
-
-        // Remove the local reference as well
-        const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
-        if (toRemoveLocalTrackIdx !== -1) {
-          this.tracks.splice(toRemoveLocalTrackIdx, 1);
-        } else {
-          HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
-        }
-      }
-    });
-    if (removedSenderCount !== 1) {
-      HMSLogger.e(this.TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
+    if (!this.connection || this.connection.connectionState === 'closed') {
+      HMSLogger.d(this.TAG, `publish connection is not initialised or closed`);
+      return;
     }
-  }
-
-  hasSender(track: HMSLocalTrack): boolean {
-    return !!this.connection
-      ?.getSenders()
-      .find(
-        sender =>
-          sender.track && (sender.track.id === track.trackId || sender.track.id === track.getTrackIDBeingSent()),
-      );
+    const sender = track.transceiver?.sender;
+    if (!sender) {
+      HMSLogger.e(this.TAG, `No sender found for trackId=${track.trackId}`);
+      return;
+    }
+    this.connection?.removeTrack(sender);
+    const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
+    if (toRemoveLocalTrackIdx !== -1) {
+      this.tracks.splice(toRemoveLocalTrackIdx, 1);
+    } else {
+      HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
+    }
   }
 }
