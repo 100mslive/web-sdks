@@ -53,7 +53,7 @@ const PreviewJoin = ({
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token,
-    // initEndpoint: env ? `https://${env}-init.100ms.live/init` : undefined,
+    initEndpoint: env ? `https://${env}-init.100ms.live/init` : undefined,
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,

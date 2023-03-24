@@ -30,7 +30,7 @@ const tileShapeMapping = {
 };
 
 const env = process.env.REACT_APP_ENV || 'prod';
-export const apiBasePath = `https://prod-in2.100ms.live/hmsapi/`;
+export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
 const authTokenEndpointByRoomCode = {
   qa: 'https://auth-nonprod.100ms.live/v2/token',
   dev: 'https://auth-nonprod.100ms.live/v2/token',
