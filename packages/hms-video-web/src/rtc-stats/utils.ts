@@ -1,4 +1,3 @@
-import { HMSWebrtcStats } from './HMSWebrtcStats';
 import {
   HMSPeerStats,
   HMSTrackStats,
@@ -11,7 +10,6 @@ import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
 
 export const getLocalTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
   track: HMSLocalTrack,
   peerName?: string,
   prevTrackStats?: Record<string, HMSTrackStats>,
@@ -22,7 +20,7 @@ export const getLocalTrackStats = async (
     return;
   }
   try {
-    trackReport = await getStats['publish']?.(track.getTrackBeingSent());
+    trackReport = await track.transceiver.sender.getStats();
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
     const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
@@ -70,14 +68,13 @@ export const getLocalTrackStats = async (
 };
 
 export const getTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
   track: HMSRemoteTrack,
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   try {
-    trackReport = await getStats['subscribe']?.(track.nativeTrack);
+    trackReport = await track.transceiver?.receiver.getStats();
   } catch (err) {
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }
