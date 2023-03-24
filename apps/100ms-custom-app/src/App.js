@@ -25,7 +25,7 @@ const HMSEdtechTemplate = React.lazy(() =>
 );
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
-  hostname = process.env.REACT_APP_HOST_NAME || hostname;
+  hostname = 'decoder-uolo.app.100ms.live' || process.env.REACT_APP_HOST_NAME || hostname;
 } else if (hostname.endsWith('dev-app.100ms.live')) {
   // route dev-app appropriately to qa or prod
   const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
