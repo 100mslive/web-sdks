@@ -12,7 +12,7 @@ import create, {
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
-import { NamedSetState } from './internalTypes';
+import { GenericTypes, NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../../common/storeName';
 import { BeamControllerStore } from '../../controller/beam/BeamController';
 import { IHMSActions } from '../IHMSActions';
@@ -29,20 +29,20 @@ declare global {
   }
 }
 
-export class HMSReactiveStore {
+export class HMSReactiveStore<T extends GenericTypes = { appData?: any; sessionStore?: any }> {
   private readonly sdk?: HMSSdk;
-  private readonly actions: IHMSActions;
-  private readonly store: IHMSStore;
-  private readonly notifications: HMSNotifications;
-  private stats?: HMSStats;
+  private readonly actions: IHMSActions<T>;
+  private readonly store: IHMSStore<T>;
+  private readonly notifications: HMSNotifications<T>;
+  private stats?: HMSStats<T>;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
-  constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
+  constructor(hmsStore?: IHMSStore<T>, hmsActions?: IHMSActions<T>, hmsNotifications?: HMSNotifications<T>) {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
-      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>(
+      this.store = HMSReactiveStore.createNewHMSStore<HMSStore<T>>(
         storeNameWithTabTitle('HMSStore'),
         createDefaultStoreState,
       );
@@ -66,7 +66,7 @@ export class HMSReactiveStore {
 
     if (isBrowser) {
       window.__hms = this;
-      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
+      window.__beam = new BeamControllerStore<T>(this.store, this.actions, this.notifications);
     }
   }
 
@@ -103,7 +103,7 @@ export class HMSReactiveStore {
    *
    * @deprecated use getActions
    */
-  getHMSActions(): IHMSActions {
+  getHMSActions(): IHMSActions<T> {
     return this.actions;
   }
 
@@ -111,7 +111,7 @@ export class HMSReactiveStore {
    * Any action which may modify the store or may need to talk to the SDK will happen
    * through the IHMSActions instance returned by this
    */
-  getActions(): IHMSActions {
+  getActions(): IHMSActions<T> {
     return this.actions;
   }
 
@@ -129,7 +129,7 @@ export class HMSReactiveStore {
    */
   getStats = (): IHMSStatsStoreReadOnly => {
     if (!this.stats) {
-      this.stats = new HMSStats(this.store, this.sdk);
+      this.stats = new HMSStats<T>(this.store, this.sdk);
     }
     return this.stats;
   };

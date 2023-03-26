@@ -1,4 +1,5 @@
 import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '@100mslive/hms-video';
+import { GenericTypes } from '../hmsSDKStore/internalTypes';
 import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
 import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
@@ -11,7 +12,11 @@ import {
 } from '../selectors';
 
 type Unsubscribe = (() => void) | undefined;
-export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
+export const subscribeToSdkWebrtcStats = <T extends GenericTypes>(
+  sdk: HMSSdk,
+  webrtcStore: IHMSStatsStore,
+  store: IHMSStore<T>,
+) => {
   // also used as flag to check if webrtc internals has been initialised
   let unsubscribe: Unsubscribe;
   /**
@@ -43,7 +48,11 @@ export const subscribeToSdkWebrtcStats = (sdk: HMSSdk, webrtcStore: IHMSStatsSto
   }, selectRoomState);
 };
 
-const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, store: IHMSStore) => {
+const initAndSubscribeWebrtcStore = <T extends GenericTypes>(
+  sdk: HMSSdk,
+  webrtcStore: IHMSStatsStore,
+  store: IHMSStore<T>,
+) => {
   const unsubLocalPeer = updateLocalPeerInWebrtcStore(store, webrtcStore);
 
   sdk.getWebrtcInternals()?.start();
@@ -57,7 +66,7 @@ const initAndSubscribeWebrtcStore = (sdk: HMSSdk, webrtcStore: IHMSStatsStore, s
   };
 };
 
-const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsStore) => {
+const updateLocalPeerInWebrtcStore = <T extends GenericTypes>(store: IHMSStore<T>, webrtcStore: IHMSStatsStore) => {
   let unsubID: Unsubscribe, unsubVideoTrackID: Unsubscribe, unsubAudioTrackID: Unsubscribe;
   if (store.getState(selectLocalPeerID)) {
     webrtcStore.namedSetState(draft => {
@@ -105,10 +114,10 @@ const updateLocalPeerInWebrtcStore = (store: IHMSStore, webrtcStore: IHMSStatsSt
   };
 };
 
-const updateWebrtcStoreStats = (
+const updateWebrtcStoreStats = <T extends GenericTypes>(
   webrtcStore: IHMSStatsStore,
   stats: HMSWebrtcStats,
-  hmsStore: IHMSStore,
+  hmsStore: IHMSStore<T>,
   sdk: HMSSdk,
 ) => {
   const tracks: Record<HMSTrackID, HMSTrack> = hmsStore.getState(selectTracksMap);

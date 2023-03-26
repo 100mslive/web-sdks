@@ -2,20 +2,23 @@ import { Subscribe } from 'zustand/vanilla';
 import { HMSSdk } from '@100mslive/hms-video';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { GenericTypes } from '../hmsSDKStore/internalTypes';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
 import { createDefaultStatsStore, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
 
 /**
  * @internal
  */
-export class HMSStats implements IHMSStatsStoreReadOnly {
+export class HMSStats<T extends GenericTypes = { appData?: any; sessionStore?: any }>
+  implements IHMSStatsStoreReadOnly
+{
   readonly getState: GetState<HMSStatsStore>;
   readonly subscribe: Subscribe<HMSStatsStore>;
   readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;
   readonly getSubscribePeerConnection: () => Promise<RTCPeerConnection | undefined>;
   private readonly store: IHMSStatsStore;
 
-  constructor(private hmsStore: IHMSStore, private sdk?: HMSSdk) {
+  constructor(private hmsStore: IHMSStore<T>, private sdk?: HMSSdk) {
     this.store = HMSReactiveStore.createNewHMSStore<HMSStatsStore>(
       storeNameWithTabTitle('HMSStatsStore'),
       createDefaultStatsStore,
@@ -54,6 +57,6 @@ export class HMSStats implements IHMSStatsStoreReadOnly {
       return;
     }
 
-    subscribeToSdkWebrtcStats(this.sdk, this.store, this.hmsStore);
+    subscribeToSdkWebrtcStats<T>(this.sdk, this.store, this.hmsStore);
   }
 }

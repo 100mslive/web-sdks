@@ -1,5 +1,6 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { GenericTypes } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -27,12 +28,12 @@ import { selectPeerByID, selectTrackByID } from '../selectors';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
-export class HMSNotifications implements IHMSNotifications {
+export class HMSNotifications<T extends GenericTypes> implements IHMSNotifications {
   private id = 0;
   private eventEmitter: EventEmitter;
-  private store: IHMSStore;
+  private store: IHMSStore<T>;
 
-  constructor(store: IHMSStore) {
+  constructor(store: IHMSStore<T>) {
     this.store = store;
     this.eventEmitter = new EventEmitter({ maxListeners: Object.keys(HMSNotificationTypes).length });
   }
