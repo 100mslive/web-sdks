@@ -5,6 +5,7 @@ import { HMSMessage } from './message';
 import { HMSConnectionQuality } from './peer';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSRoom } from './room';
+import { SessionStoreUpdate } from './session-store';
 import { HMSSpeaker } from './speaker';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
@@ -65,5 +66,6 @@ export interface HMSUpdateListener extends DeviceChangeListener {
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
   onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
+  onSessionStoreUpdate(values: SessionStoreUpdate[]): void;
   onNetworkQuality?(score: number): void;
 }

@@ -19,3 +19,4 @@ export * from './hls-config';
 export * from './webrtc-stats';
 export * from './framework-info';
 export * from './get-token';
+export * from './session-store';
