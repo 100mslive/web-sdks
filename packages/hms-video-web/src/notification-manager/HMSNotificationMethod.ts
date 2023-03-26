@@ -30,4 +30,5 @@ export enum HMSNotificationMethod {
   RECORDING_STOP = 'on-record-stop',
   HLS_START = 'on-hls-start',
   HLS_STOP = 'on-hls-stop',
+  METADATA_CHANGE = 'on-metadata-change',
 }

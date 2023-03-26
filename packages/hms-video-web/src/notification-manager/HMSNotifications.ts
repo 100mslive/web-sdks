@@ -233,3 +233,13 @@ export interface HLSVariantInfo {
   metadata?: string;
   started_at?: number;
 }
+
+export interface MetadataChangeNotification {
+  values: {
+    change_version: number;
+    updated_by: string;
+    data: any;
+    key: string;
+    updated_at: number;
+  }[];
+}
