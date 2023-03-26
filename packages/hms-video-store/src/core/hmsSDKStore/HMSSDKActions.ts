@@ -20,6 +20,7 @@ import {
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
+  SessionStoreUpdate,
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
@@ -27,7 +28,8 @@ import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './s
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
-import { NamedSetState } from './internalTypes';
+import { HMSSessionStore } from './HMSSessionStore';
+import { GenericTypes, NamedSetState } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
@@ -50,6 +52,7 @@ import {
   HMSTrackSource,
   HMSVideoTrack,
   IHMSPlaylistActions,
+  IHMSSessionStoreActions,
 } from '../schema';
 import {
   HMSRoleChangeRequest,
@@ -94,23 +97,27 @@ import {
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKActions implements IHMSActions {
+export class HMSSDKActions<T extends GenericTypes> implements IHMSActions<T> {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
-  private readonly store: IHMSStore;
+  private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
-  private hmsNotifications: HMSNotifications;
+  private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
-  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger;
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
-  constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
+  constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+
+    this.sessionStore = new HMSSessionStore<T>(this.sdk, this.setSessionStoreValueLocally);
+
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -710,6 +717,7 @@ export class HMSSDKActions implements IHMSActions {
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
+      onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -784,6 +792,12 @@ export class HMSSDKActions implements IHMSActions {
         store.connectionQualities[peerId] = { peerID: peerId, downlinkQuality: quality };
       }
     }, 'ConnectionQuality');
+  }
+
+  private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
+    updates.forEach(update => {
+      this.setSessionStoreValueLocally(update.key, update.value);
+    });
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {
@@ -1364,12 +1378,25 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
+  private setSessionStoreValueLocally<K extends keyof T['sessionStore']>(key: K, value: T['sessionStore'][K]) {
+    this.setState(store => {
+      if (store.sessionStore) {
+        store.sessionStore[key] = value;
+      } else {
+        const newSessionStore = {
+          [key]: value,
+        };
+        store.sessionStore = newSessionStore;
+      }
+    });
+  }
+
   /**
    * setState is separate so any future changes to how state change can be done from one place.
    * @param fn
    * @param name
    */
-  private setState: NamedSetState<HMSStore> = (fn, name) => {
+  private setState: NamedSetState<HMSStore<T>> = (fn, name) => {
     return this.store.namedSetState(fn, name);
   };
 }
