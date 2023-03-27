@@ -87,21 +87,17 @@ export const defaultVideoList = [
   },
 ];
 
-export const emojiReactionList = [
-  [
-    { emojiId: "+1", emoji: "👍" },
-    { emojiId: "-1", emoji: "👎" },
-    { emojiId: "wave", emoji: "👎" },
-    { emojiId: "clap", emoji: "👏" },
-    { emojiId: "fire", emoji: "🔥" },
-  ],
-  [
-    { emojiId: "tada", emoji: "🎉" },
-    { emojiId: "heart_eyes", emoji: "😍" },
-    { emojiId: "joy", emoji: "😂" },
-    { emojiId: "open_mouth", emoji: "😮" },
-    { emojiId: "sob", emoji: "😭" },
-  ],
+export const emojiIdMapping = [
+  { emojiId: "+1", emoji: "👍" },
+  { emojiId: "-1", emoji: "👎" },
+  { emojiId: "wave", emoji: "👎" },
+  { emojiId: "clap", emoji: "👏" },
+  { emojiId: "fire", emoji: "🔥" },
+  { emojiId: "tada", emoji: "🎉" },
+  { emojiId: "heart_eyes", emoji: "😍" },
+  { emojiId: "joy", emoji: "😂" },
+  { emojiId: "open_mouth", emoji: "😮" },
+  { emojiId: "sob", emoji: "😭" },
 ];
 
 export const DEFAULT_HLS_ROLE_KEY = "HLS_VIEWER_ROLE";

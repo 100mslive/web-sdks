@@ -1,7 +1,7 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useCallback, useState } from "react";
 import data from "@emoji-mart/data/sets/14/apple.json";
 import { init } from "emoji-mart";
-import { useHMSActions } from "@100mslive/react-sdk";
+import { useCustomEvent, useHMSActions } from "@100mslive/react-sdk";
 import { EmojiIcon } from "@100mslive/react-icons";
 import {
   Box,
@@ -13,18 +13,44 @@ import {
 } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
 import {
-  emojiReactionList,
+  emojiIdMapping,
   HLS_TIMED_METADATA_DOC_URL,
 } from "../common/constants";
 
 init({ data });
-
+const emojiReactionList = [
+  [
+    { emojiId: "+1" },
+    { emojiId: "-1" },
+    { emojiId: "wave" },
+    { emojiId: "clap" },
+    { emojiId: "fire" },
+  ],
+  [
+    { emojiId: "tada" },
+    { emojiId: "heart_eyes" },
+    { emojiId: "joy" },
+    { emojiId: "open_mouth" },
+    { emojiId: "sob" },
+  ],
+];
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const hmsActions = useHMSActions();
 
+  const onEmojiEvent = useCallback(data => {
+    const emoji = emojiIdMapping.find(emoji => emoji.emojiId === data.emojiId);
+    window.sendConfetti({ emojis: [emoji?.emoji] });
+  }, []);
+
+  const { sendEvent } = useCustomEvent({
+    type: "EMOJI_REACTION",
+    onEvent: onEmojiEvent,
+  });
+
   const sendReaction = async emojiId => {
     const data = { triggerConfetti: true, emojiId: emojiId };
+    sendEvent(data);
     await hmsActions.sendHLSTimedMetadata([
       {
         payload: btoa(JSON.stringify(data)),
@@ -32,6 +58,7 @@ export const EmojiReaction = () => {
       },
     ]);
   };
+
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
