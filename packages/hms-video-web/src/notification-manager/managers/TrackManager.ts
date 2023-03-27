@@ -187,7 +187,7 @@ export class TrackManager {
       HMSLogger.d(this.TAG, 'auxiliary track removed', `${track}`);
     } else {
       if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack === track) {
-        hmsPeer.audioTrack?.cleanup();
+        hmsPeer.audioTrack.cleanup();
         hmsPeer.audioTrack = undefined;
         HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
       } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
