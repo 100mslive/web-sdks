@@ -75,6 +75,9 @@ const HLSView = () => {
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
       const duration = rest.duration * 1000;
+      if (data?.triggerConfetti === true) {
+        window.sendConfetti({ emojis: [data.emoji] });
+      }
       const toast = {
         title: `Payload from timed Metadata ${data.payload}`,
         duration: duration || 3000,
