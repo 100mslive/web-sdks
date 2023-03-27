@@ -65,7 +65,9 @@ export class HMSReactiveStore<T extends GenericTypes = { appData?: any; sessionS
     this.initialTriggerOnSubscribe = false;
 
     if (isBrowser) {
+      // @ts-ignore
       window.__hms = this;
+      // @ts-ignore
       window.__beam = new BeamControllerStore<T>(this.store, this.actions, this.notifications);
     }
   }
