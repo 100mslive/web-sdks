@@ -76,7 +76,6 @@ export class TrackManager {
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
     this.store.removeTrack(track);
     const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
-
     if (!hmsPeer) {
       return;
     }
@@ -190,6 +189,7 @@ export class TrackManager {
         hmsPeer.audioTrack = undefined;
         HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
       } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
+        hmsPeer.videoTrack.cleanup();
         hmsPeer.videoTrack = undefined;
         HMSLogger.d(this.TAG, 'video track removed', `${track}`);
       }
