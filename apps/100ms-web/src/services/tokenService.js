@@ -48,41 +48,6 @@ export default async function getToken(tokenEndpoint, userId, role, roomId) {
   }
 }
 
-export async function getUserToken(name) {
-  const extractUrlCode = () => {
-    const path = window.location.pathname;
-    const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
-    return path.match(regex)?.groups?.code || null;
-  };
-
-  const code = extractUrlCode();
-
-  const url = getBackendEndpoint() + "get-token";
-
-  const headers = {
-    "Content-Type": "application/json",
-    subdomain: process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN,
-  };
-
-  const response = await fetchWithRetry(url, {
-    method: "post",
-    body: JSON.stringify({
-      code: code,
-      user_id: name,
-    }),
-    headers,
-  });
-
-  if (!response.ok) {
-    let error = new Error("Request failed!");
-    error.response = response;
-    throw error;
-  }
-
-  const { token } = await response.json();
-  return token;
-}
-
 export function getBackendEndpoint() {
   let BASE_BACKEND_URL;
   const baseDomain = window.location.hostname;
