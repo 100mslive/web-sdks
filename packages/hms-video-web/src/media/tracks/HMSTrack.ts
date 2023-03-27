@@ -102,6 +102,7 @@ export abstract class HMSTrack {
       streamId: ${this.stream.id};
       peerId: ${this.peerId};
       trackId: ${this.trackId};
+      mid: ${this.transceiver?.mid || '-'};
       logIdentifier: ${this.logIdentifier};
       source: ${this.source};
       enabled: ${this.enabled};
