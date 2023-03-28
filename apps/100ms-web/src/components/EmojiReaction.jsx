@@ -17,6 +17,7 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
+import { useHLSViewerRole } from "./AppData/useUISettings";
 import { isInternalRole } from "../common/utils";
 import { HLS_TIMED_METADATA_DOC_URL } from "../common/constants";
 
@@ -42,10 +43,11 @@ export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
+  const hlsViewerRole = useHLSViewerRole();
 
   const filteredRoles = useMemo(
-    () => roles.filter(role => role !== "hls-viewer" && !isInternalRole(role)),
-    [roles]
+    () => roles.filter(role => role !== hlsViewerRole && !isInternalRole(role)),
+    [roles, hlsViewerRole]
   );
 
   const onEmojiEvent = useCallback(data => {
