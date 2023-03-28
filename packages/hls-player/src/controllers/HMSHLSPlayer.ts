@@ -18,6 +18,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _isLive: boolean;
   private _volume: number;
   private _metaData: HMSHLSTimedMetadata;
+  private readonly TAG = '[HMSHLSPlayer]';
   /**
    * Initiliaze the player with hlsUrl and video element
    * @remarks If video element is not passed, we will create one and call a method getVideoElement get element
@@ -171,7 +172,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       try {
         await this.playVideo();
       } catch (err) {
-        console.error('Attempt to jump to live position Failed.', err);
+        console.error(this.TAG, 'Attempt to jump to live position Failed.', err);
       }
     }
   }
@@ -201,8 +202,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         await this._videoEl.play();
       }
     } catch (error) {
-      console.debug('Browser blocked autoplay with error', (error as Error).message);
-      console.debug('asking user to play the video manually...');
+      console.debug(this.TAG, 'Play failed with error', (error as Error).message);
       if ((error as Error).name === 'NotAllowedError') {
         this.emit(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
       }
@@ -226,38 +226,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private volumeEventHandler = () => {
     this._volume = this._videoEl.volume;
   };
-  private handleNetworkRelatedError = (data: ErrorData): boolean => {
-    const details = data.error?.message || data.err?.message || '';
-    const detail = {
-      details: details,
-      fatal: data.fatal,
-    };
-    switch (data.details) {
-      case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
-        const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
-        return true;
-      }
-      case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
-        const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
-        return true;
-      }
-      case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
-        const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
-        return true;
-      }
-    }
-    return false;
-  };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
+    console.error(this.TAG, data);
     const details = data.error?.message || data.err?.message || '';
-    const isErrorFound = this.handleNetworkRelatedError(data);
-    if (isErrorFound) {
-      return;
-    }
     const detail = {
       details: details,
       fatal: data.fatal,
@@ -275,6 +247,22 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       }
       case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      // Below one are network related errors
+      case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
+        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
