@@ -1,17 +1,20 @@
 import Hls, { Fragment } from 'hls.js';
-import { HMSHLSPlayer } from './HMSHLSPlayer';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
+import { HMSHLSPlayerListeners } from '../interfaces/events';
 import { HMSHLSPlayerEvents } from '../utilies/constants';
 import { metadataPayloadParser } from '../utilies/utils';
 
 export class HMSHLSTimedMetadata {
-  private hlsPlayer: HMSHLSPlayer;
   private hls: Hls;
-  private videoEl: HTMLVideoElement;
-  constructor(hlsPlayer: HMSHLSPlayer, hls: Hls) {
-    this.hlsPlayer = hlsPlayer;
+  constructor(
+    hls: Hls,
+    private videoEl: HTMLVideoElement,
+    private emit: <E extends keyof HMSHLSPlayerListeners>(
+      event: keyof HMSHLSPlayerListeners,
+      eventObject: Parameters<HMSHLSPlayerListeners[E]>[1],
+    ) => boolean,
+  ) {
     this.hls = hls;
-    this.videoEl = hlsPlayer.getVideoElement();
     this.registerListner();
   }
   extractMetaTextTrack = (): TextTrack | null => {
@@ -51,7 +54,7 @@ export class HMSHLSTimedMetadata {
       const duration = new Date(endDate).getTime() - new Date(startDate).getTime();
       if (timeDiff <= tolerance) {
         setTimeout(() => {
-          this.hlsPlayer.emit(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
+          this.emit(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
             id: cue?.id,
             payload: data.payload,
             duration: duration,
@@ -87,7 +90,7 @@ export class HMSHLSTimedMetadata {
   fragChangeHandler = (_: any, { frag }: { frag: Fragment }) => {
     if (!this.videoEl) {
       const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-      this.hlsPlayer.emit(HMSHLSPlayerEvents.ERROR, error);
+      this.emit(HMSHLSPlayerEvents.ERROR, error);
     }
     try {
       if (this.videoEl.textTracks.length === 0) {

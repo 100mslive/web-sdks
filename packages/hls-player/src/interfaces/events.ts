@@ -1,7 +1,7 @@
 import { HlsPlayerStats } from '@100mslive/hls-stats';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
+import { ILevel } from './ILevel';
 import { HMSHLSException } from '../error/HMSHLSException';
-import { ILevel } from '../interfaces/ILevel';
 import { HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 
 export interface HMSHLSPlayerListeners {

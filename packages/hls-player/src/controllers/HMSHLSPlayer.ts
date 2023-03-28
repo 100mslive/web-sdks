@@ -1,8 +1,8 @@
 import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
 import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
-import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from './events';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
+import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from '../interfaces/events';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { ILevel } from '../interfaces/ILevel';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
@@ -40,7 +40,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._volume = this._videoEl.volume * 100;
     this._hlsStats = new HlsStats(this._hls, this._videoEl);
     this.listenHLSEvent();
-    this._metaData = new HMSHLSTimedMetadata(this, this._hls);
+    this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emit);
     this.seekToLivePosition();
   }
   /**
@@ -51,7 +51,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     if (this._videoEl) {
       return this._videoEl;
     }
-    const video: HTMLVideoElement = document?.createElement('video');
+    const video: HTMLVideoElement = document.createElement('video');
     video.playsInline = true;
     video.controls = false;
     video.autoplay = true;
@@ -126,7 +126,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @param { volume } - define volume in range [1,100]
    */
   setVolume(volume: number) {
-    this.validateVideoEl();
     this._videoEl.volume = volume / 100;
     this._volume = volume;
   }
@@ -161,7 +160,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * set current stream to Live
    */
   async seekToLivePosition() {
-    this.validateVideoEl();
     let end = 0;
     if (this._videoEl?.buffered.length > 0) {
       end = this._videoEl?.buffered.end(this._videoEl?.buffered.length - 1);
@@ -192,7 +190,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * @param seekValue Pass currentTime in second
    */
   seekTo = (seekValue: number) => {
-    this.validateVideoEl();
     this._videoEl.currentTime = seekValue;
   };
   unblockAutoPlay = async () => {
@@ -203,14 +200,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       this.emit(HMSHLSPlayerEvents.ERROR, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
     }
   };
-  private validateVideoEl() {
-    if (!this._videoEl) {
-      const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-      this.emit(HMSHLSPlayerEvents.ERROR, error);
-    }
-  }
+
   private playVideo = async () => {
-    this.validateVideoEl();
     try {
       if (this._videoEl.paused) {
         await this._videoEl.play();
@@ -224,13 +215,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
   };
   private pauseVideo = () => {
-    this.validateVideoEl();
-    try {
-      if (!this._videoEl.paused) {
-        this._videoEl.pause();
-      }
-    } catch (error: any) {
-      console.debug('asking user to pause the video manually...');
+    if (!this._videoEl.paused) {
+      this._videoEl.pause();
     }
   };
   private playEventHandler = () => {
@@ -244,7 +230,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     });
   };
   private volumeEventHandler = () => {
-    this.validateVideoEl();
     this._volume = this._videoEl.volume;
   };
   private handleNetworkRelatedError = (data: ErrorData): boolean => {
@@ -338,7 +323,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    * Listen to hlsjs and video related events
    */
   private listenHLSEvent() {
-    this.validateVideoEl();
     if (Hls.isSupported()) {
       this._hls.on(Hls.Events.MANIFEST_LOADED, this.manifestLoadedHandler);
       this._hls.on(Hls.Events.LEVEL_UPDATED, this.levelUpdatedHandler);

@@ -68,7 +68,7 @@ const HLSView = () => {
       });
     };
     const handleError = (_, data) => {
-      console.error("facing some error ", data);
+      console.error("[HLSView] error in hls", data);
     };
     const handleNoLongerLive = (_, { isLive }) => {
       setIsVideoLive(isLive);
@@ -120,7 +120,7 @@ const HLSView = () => {
   useEffect(() => {
     const onHLSStats = (_, state) => setHlsStatsState(state);
     if (enablHlsStats) {
-      hlsPlayer.on(HMSHLSPlayerEvents.STATS, onHLSStats);
+      hlsPlayer?.on(HMSHLSPlayerEvents.STATS, onHLSStats);
     } else {
       hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     }
