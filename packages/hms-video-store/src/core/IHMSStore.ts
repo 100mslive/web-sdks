@@ -7,8 +7,8 @@
  */
 
 import { State, StateSelector, StoreApi, Subscribe } from 'zustand/vanilla';
-import { GenericTypes, NamedSetState } from './hmsSDKStore/internalTypes';
-import { HMSStatsStore, HMSStore } from './schema';
+import { NamedSetState } from './hmsSDKStore/internalTypes';
+import { HMSGenericTypes, HMSStatsStore, HMSStore } from './schema';
 
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
@@ -59,7 +59,7 @@ export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'name
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export interface IHMSStore<T extends GenericTypes = { appData?: any; sessionStore?: any }>
+export interface IHMSStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>
   extends IStore<HMSStore<T>> {}
 
 /**
@@ -76,7 +76,8 @@ export interface IHMSStore<T extends GenericTypes = { appData?: any; sessionStor
  *
  * @category Core
  */
-export interface IHMSStoreReadOnly extends IStoreReadOnly<HMSStore> {}
+export interface IHMSStoreReadOnly<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>
+  extends IStoreReadOnly<HMSStore<T>> {}
 
 export interface IHMSStatsStore extends IStore<HMSStatsStore> {}
 export interface IHMSStatsStoreReadOnly extends IStoreReadOnly<HMSStatsStore> {}

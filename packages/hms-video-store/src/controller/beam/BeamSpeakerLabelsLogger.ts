@@ -1,13 +1,12 @@
 import { HMSLogger } from '../../common/ui-logger';
-import { HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
-import { GenericTypes } from '../../core/hmsSDKStore/internalTypes';
+import { HMSGenericTypes, HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 
 /**
  * Log data of audio level and speaker speaking periodically to beam for transcript
  * diarization.
  */
-export class BeamSpeakerLabelsLogger<T extends GenericTypes> {
+export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
   private audioContext?: AudioContext;
   private readonly intervalMs: number;
   private shouldMonitor: boolean;

@@ -1,8 +1,7 @@
 import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '@100mslive/hms-video';
-import { GenericTypes } from '../hmsSDKStore/internalTypes';
 import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
-import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
+import { createDefaultStatsStore, HMSGenericTypes, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
 import {
   selectLocalAudioTrackID,
   selectLocalPeerID,
@@ -12,7 +11,7 @@ import {
 } from '../selectors';
 
 type Unsubscribe = (() => void) | undefined;
-export const subscribeToSdkWebrtcStats = <T extends GenericTypes>(
+export const subscribeToSdkWebrtcStats = <T extends HMSGenericTypes>(
   sdk: HMSSdk,
   webrtcStore: IHMSStatsStore,
   store: IHMSStore<T>,
@@ -48,7 +47,7 @@ export const subscribeToSdkWebrtcStats = <T extends GenericTypes>(
   }, selectRoomState);
 };
 
-const initAndSubscribeWebrtcStore = <T extends GenericTypes>(
+const initAndSubscribeWebrtcStore = <T extends HMSGenericTypes>(
   sdk: HMSSdk,
   webrtcStore: IHMSStatsStore,
   store: IHMSStore<T>,
@@ -66,7 +65,7 @@ const initAndSubscribeWebrtcStore = <T extends GenericTypes>(
   };
 };
 
-const updateLocalPeerInWebrtcStore = <T extends GenericTypes>(store: IHMSStore<T>, webrtcStore: IHMSStatsStore) => {
+const updateLocalPeerInWebrtcStore = <T extends HMSGenericTypes>(store: IHMSStore<T>, webrtcStore: IHMSStatsStore) => {
   let unsubID: Unsubscribe, unsubVideoTrackID: Unsubscribe, unsubAudioTrackID: Unsubscribe;
   if (store.getState(selectLocalPeerID)) {
     webrtcStore.namedSetState(draft => {
@@ -114,7 +113,7 @@ const updateLocalPeerInWebrtcStore = <T extends GenericTypes>(store: IHMSStore<T
   };
 };
 
-const updateWebrtcStoreStats = <T extends GenericTypes>(
+const updateWebrtcStoreStats = <T extends HMSGenericTypes>(
   webrtcStore: IHMSStatsStore,
   stats: HMSWebrtcStats,
   hmsStore: IHMSStore<T>,

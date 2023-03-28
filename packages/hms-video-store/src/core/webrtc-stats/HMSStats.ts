@@ -2,14 +2,13 @@ import { Subscribe } from 'zustand/vanilla';
 import { HMSSdk } from '@100mslive/hms-video';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../../common/storeName';
-import { GenericTypes } from '../hmsSDKStore/internalTypes';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
-import { createDefaultStatsStore, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
+import { createDefaultStatsStore, HMSGenericTypes, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
 
 /**
  * @internal
  */
-export class HMSStats<T extends GenericTypes = { appData?: any; sessionStore?: any }>
+export class HMSStats<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>
   implements IHMSStatsStoreReadOnly
 {
   readonly getState: GetState<HMSStatsStore>;

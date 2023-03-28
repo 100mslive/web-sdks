@@ -6,14 +6,18 @@ import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { GenericTypes } from '../hmsSDKStore/internalTypes';
 import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
+
+export interface HMSGenericTypes {
+  sessionStore?: any;
+  appData?: any;
+}
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
  * of this central store. This is the global state - the single source of immutable truth.
  */
-export interface HMSStore<T extends GenericTypes = { appData?: any; sessionStore?: any }> {
+export interface HMSStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }> {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
@@ -54,7 +58,7 @@ export interface HMSStatsStore {
 /**
  * @internal
  */
-export const createDefaultStoreState = <T extends GenericTypes>(): HMSStore<T> => {
+export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T> => {
   return {
     room: {
       id: '',

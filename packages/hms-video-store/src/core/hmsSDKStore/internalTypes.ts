@@ -6,8 +6,3 @@ export type NamedSetState<T extends State> = {
     name?: string,
   ): void;
 };
-
-export interface GenericTypes {
-  sessionStore?: any;
-  appData?: any;
-}

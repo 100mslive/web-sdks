@@ -1,12 +1,11 @@
-import { HMSNotifications, IHMSNotifications, IHMSStore } from '../../core';
-import { GenericTypes } from '../../core/hmsSDKStore/internalTypes';
+import { HMSGenericTypes, HMSNotifications, IHMSNotifications, IHMSStore } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 import { IHMSStoreReadOnly } from '../../core/IHMSStore';
 
 /**
  * @internal
  */
-export class BeamControllerStore<T extends GenericTypes = { appData?: any; sessionStore?: any }> {
+export class BeamControllerStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }> {
   // perform action to add, remove beam
   private readonly actions: IHMSActions<T>;
   // get all details from store about room, peers, tracks.

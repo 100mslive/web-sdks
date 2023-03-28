@@ -12,12 +12,12 @@ import create, {
 import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
-import { GenericTypes, NamedSetState } from './internalTypes';
+import { NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../../common/storeName';
 import { BeamControllerStore } from '../../controller/beam/BeamController';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
+import { createDefaultStoreState, HMSGenericTypes, HMSStore } from '../schema';
 import { IHMSNotifications } from '../schema/notification';
 import { HMSStats } from '../webrtc-stats';
 
@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-export class HMSReactiveStore<T extends GenericTypes = { appData?: any; sessionStore?: any }> {
+export class HMSReactiveStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }> {
   private readonly sdk?: HMSSdk;
   private readonly actions: IHMSActions<T>;
   private readonly store: IHMSStore<T>;

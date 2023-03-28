@@ -29,7 +29,7 @@ import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
-import { GenericTypes, NamedSetState } from './internalTypes';
+import { NamedSetState } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
@@ -38,6 +38,7 @@ import { IHMSStore } from '../IHMSStore';
 import {
   createDefaultStoreState,
   HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMediaSettings,
   HMSMessage,
   HMSMessageInput,
@@ -97,7 +98,7 @@ import {
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKActions<T extends GenericTypes> implements IHMSActions<T> {
+export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;

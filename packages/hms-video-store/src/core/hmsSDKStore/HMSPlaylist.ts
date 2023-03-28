@@ -1,11 +1,10 @@
-import { GenericTypes } from './internalTypes';
 import { HMSPlaylistManager } from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { IHMSStore } from '../IHMSStore';
-import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
+import { HMSGenericTypes, HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { selectAudioPlaylist, selectVideoPlaylist } from '../selectors';
 
-export class HMSPlaylist<T extends GenericTypes> implements IHMSPlaylistActions {
+export class HMSPlaylist<T extends HMSGenericTypes> implements IHMSPlaylistActions {
   private type: HMSPlaylistType;
   constructor(
     private playlistManager: HMSPlaylistManager,
