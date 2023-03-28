@@ -57,7 +57,7 @@ export default interface ITransport {
 
   changeMetadata(metadata: string): Promise<void>;
 
-  getSessionMetadata(key: string): Promise<GetSessionMetadataResponse>;
+  getSessionMetadata(key?: string): Promise<GetSessionMetadataResponse>;
 
   setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
 
