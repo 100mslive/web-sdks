@@ -30,7 +30,7 @@ import {
   HLSController,
 } from "../controllers/hls/HLSController";
 import { metadataPayloadParser } from "../common/utils";
-import { APP_DATA, emojiIdMapping } from "../common/constants";
+import { APP_DATA } from "../common/constants";
 
 let hlsController;
 let hlsStats;
@@ -72,19 +72,25 @@ const HLSView = () => {
     };
     let videoEl = videoRef.current;
     const metadataLoadedHandler = ({ payload, ...rest }) => {
-      const handleConfetti = data => {
-        const emoji = emojiIdMapping.find(
-          emoji => emoji.emojiId === data.emojiId
-        );
-        window.sendConfetti({ emojis: [emoji?.emoji] });
+      const isJson = str => {
+        try {
+          JSON.parse(str);
+        } catch (e) {
+          return false;
+        }
+        return true;
       };
 
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
       const duration = rest.duration * 1000;
-      if (data?.triggerConfetti === true) {
-        handleConfetti(data);
-        return;
+
+      if (isJson(data.payload)) {
+        const parsedPayload = JSON.parse(data.payload);
+        if (parsedPayload?.triggerConfetti) {
+          window.showConfettiUsingEmojiId(parsedPayload?.emojiId);
+          return;
+        }
       }
       const toast = {
         title: `Payload from timed Metadata ${data.payload}`,

@@ -1,7 +1,12 @@
-import React, { Fragment, useCallback, useState } from "react";
+import React, { Fragment, useCallback, useMemo, useState } from "react";
 import data from "@emoji-mart/data/sets/14/apple.json";
 import { init } from "emoji-mart";
-import { useCustomEvent, useHMSActions } from "@100mslive/react-sdk";
+import {
+  selectAvailableRoleNames,
+  useCustomEvent,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { EmojiIcon } from "@100mslive/react-icons";
 import {
   Box,
@@ -12,10 +17,8 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
-import {
-  emojiIdMapping,
-  HLS_TIMED_METADATA_DOC_URL,
-} from "../common/constants";
+import { isInternalRole } from "../common/utils";
+import { HLS_TIMED_METADATA_DOC_URL } from "../common/constants";
 
 init({ data });
 const emojiReactionList = [
@@ -34,13 +37,19 @@ const emojiReactionList = [
     { emojiId: "sob" },
   ],
 ];
+
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const hmsActions = useHMSActions();
+  const roles = useHMSStore(selectAvailableRoleNames);
+
+  const filteredRoles = useMemo(
+    () => roles.filter(role => role !== "hls-viewer" && !isInternalRole(role)),
+    [roles]
+  );
 
   const onEmojiEvent = useCallback(data => {
-    const emoji = emojiIdMapping.find(emoji => emoji.emojiId === data.emojiId);
-    window.sendConfetti({ emojis: [emoji?.emoji] });
+    window.showConfettiUsingEmojiId(data.emojiId);
   }, []);
 
   const { sendEvent } = useCustomEvent({
@@ -50,10 +59,10 @@ export const EmojiReaction = () => {
 
   const sendReaction = async emojiId => {
     const data = { triggerConfetti: true, emojiId: emojiId };
-    sendEvent(data);
+    sendEvent(data, { roleNames: filteredRoles });
     await hmsActions.sendHLSTimedMetadata([
       {
-        payload: btoa(JSON.stringify(data)),
+        payload: JSON.stringify(data),
         duration: 2,
       },
     ]);
@@ -92,16 +101,20 @@ export const EmojiReaction = () => {
               ))}
             </Flex>
           ))}
-          <Text
-            variant="sm"
-            css={{ textAlign: "center", color: "$ textAccentMedium" }}
-          >
-            Reactions will be timed for Live Streaming viewers.{" "}
+          <div style={{ textAlign: "center" }}>
             <Text
               variant="sm"
+              inline={true}
               css={{
-                display: "inline",
-                textAlign: "center",
+                color: "$ textAccentMedium",
+              }}
+            >
+              Reactions will be timed for Live Streaming viewers.{" "}
+            </Text>
+            <Text
+              variant="sm"
+              inline={true}
+              css={{
                 color: "$primaryLight",
                 fontWeight: "$semiBold",
               }}
@@ -114,7 +127,7 @@ export const EmojiReaction = () => {
                 {"Learn more ->"}
               </a>
             </Text>
-          </Text>
+          </div>
         </Dropdown.Content>
       </Dropdown.Root>
     </Fragment>
