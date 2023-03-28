@@ -9,9 +9,9 @@ export class HMSHLSTimedMetadata {
   constructor(
     hls: Hls,
     private videoEl: HTMLVideoElement,
-    private emit: <E extends keyof HMSHLSPlayerListeners>(
-      event: keyof HMSHLSPlayerListeners,
-      eventObject: Parameters<HMSHLSPlayerListeners[E]>[1],
+    private emit: <E extends HMSHLSPlayerEvents>(
+      eventName: E,
+      eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
     ) => boolean,
   ) {
     this.hls = hls;

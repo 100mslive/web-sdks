@@ -4,26 +4,21 @@ import { ILevel } from './ILevel';
 import { HMSHLSException } from '../error/HMSHLSException';
 import { HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 
-export interface HMSHLSPlayerListeners {
-  [HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE]: (
-    event: HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
-    data: HMSHLSStreamLive,
-  ) => void;
-  [HMSHLSPlayerEvents.TIMED_METADATA_LOADED]: (
-    event: HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
-    data: HMSHLSCue,
-  ) => void;
-  [HMSHLSPlayerEvents.STATS]: (event: HMSHLSPlayerEvents.STATS, data: HlsPlayerStats) => void;
-  [HMSHLSPlayerEvents.PLAYBACK_STATE]: (event: HMSHLSPlayerEvents.PLAYBACK_STATE, data: HMSHLSPlaybackState) => void;
+type HMSHLSListenerDataMapping = {
+  [HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE]: HMSHLSStreamLive;
+  [HMSHLSPlayerEvents.TIMED_METADATA_LOADED]: HMSHLSCue;
+  [HMSHLSPlayerEvents.STATS]: HlsPlayerStats;
+  [HMSHLSPlayerEvents.PLAYBACK_STATE]: HMSHLSPlaybackState;
 
-  [HMSHLSPlayerEvents.ERROR]: (event: HMSHLSPlayerEvents.ERROR, data: HMSHLSException) => void;
-  [HMSHLSPlayerEvents.CURRENT_TIME]: (event: HMSHLSPlayerEvents.CURRENT_TIME, data: number) => void;
-  [HMSHLSPlayerEvents.AUTOPLAY_BLOCKED]: (event: HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, data: boolean) => void;
+  [HMSHLSPlayerEvents.ERROR]: HMSHLSException;
+  [HMSHLSPlayerEvents.CURRENT_TIME]: number;
+  [HMSHLSPlayerEvents.AUTOPLAY_BLOCKED]: HMSHLSException;
 
-  [HMSHLSPlayerEvents.MANIFEST_LOADED]: (event: HMSHLSPlayerEvents.MANIFEST_LOADED, data: HMSHLSManifestLoaded) => void;
+  [HMSHLSPlayerEvents.MANIFEST_LOADED]: HMSHLSManifestLoaded;
+  [HMSHLSPlayerEvents.LEVEL_UPDATED]: HMSHLSLevelUpdated;
+};
 
-  [HMSHLSPlayerEvents.LEVEL_UPDATED]: (event: HMSHLSPlayerEvents.LEVEL_UPDATED, data: HMSHLSLevelUpdated) => void;
-}
+export type HMSHLSPlayerListeners<E extends HMSHLSPlayerEvents> = (data: HMSHLSListenerDataMapping[E], name: E) => void;
 
 export interface HMSHLSStreamLive {
   isLive: boolean;
@@ -46,9 +41,9 @@ export interface HMSHLSLevelUpdated {
   level: ILevel;
 }
 export interface IHMSHLSPlayerEventEmitter {
-  on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E], options?: boolean): void;
+  on<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>): void;
 
-  off<E extends keyof HMSHLSPlayerListeners>(event: E, listener?: HMSHLSPlayerListeners[E]): void;
+  off<E extends HMSHLSPlayerEvents>(eventName: E, listener?: HMSHLSPlayerListeners<E>): void;
 }
 
 export class HMSHLSPlayerEventEmitter implements IHMSHLSPlayerEventEmitter {
@@ -56,23 +51,19 @@ export class HMSHLSPlayerEventEmitter implements IHMSHLSPlayerEventEmitter {
   constructor() {
     this.eventEmitter = new EventEmitter();
   }
-  on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E], options?: boolean): void {
-    this.eventEmitter.on(event, listener, options);
+  on<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>): void {
+    this.eventEmitter.on(eventName, listener);
   }
 
-  off<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
-    this.eventEmitter.off(event, listener);
+  off<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) {
+    this.eventEmitter.off(eventName, listener);
   }
 
-  emit<E extends keyof HMSHLSPlayerListeners>(
-    event: E,
-    name: E,
-    eventObject: Parameters<HMSHLSPlayerListeners[E]>[1],
-  ): boolean {
-    return this.eventEmitter.emit(event, name, eventObject);
+  emit<E extends HMSHLSPlayerEvents>(eventName: E, eventObject: Parameters<HMSHLSPlayerListeners<E>>[0]): boolean {
+    return this.eventEmitter.emit(eventName, eventObject, eventName);
   }
 
-  removeAllListeners<E extends keyof HMSHLSPlayerListeners>(event?: E): void {
-    this.eventEmitter.removeAllListeners(event);
+  removeAllListeners<E extends HMSHLSPlayerEvents>(eventName?: E): void {
+    this.eventEmitter.removeAllListeners(eventName);
   }
 }

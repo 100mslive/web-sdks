@@ -101,19 +101,21 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
     this.removeAllListeners();
   }
-  on<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
-    this._emitter.on(event, listener);
+
+  on<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) {
+    this._emitter.on(eventName, listener);
   }
 
-  off<E extends keyof HMSHLSPlayerListeners>(event: E, listener: HMSHLSPlayerListeners[E]) {
-    this._emitter.off(event, listener);
+  off<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) {
+    this._emitter.off(eventName, listener);
   }
 
-  emit<E extends keyof HMSHLSPlayerListeners>(event: E, eventObject: Parameters<HMSHLSPlayerListeners[E]>[1]): boolean {
-    return this._emitter.emit(event, event, eventObject);
+  emit<E extends HMSHLSPlayerEvents>(eventName: E, eventObject: Parameters<HMSHLSPlayerListeners<E>>[0]): boolean {
+    return this._emitter.emit(eventName, eventObject);
   }
-  private removeAllListeners<E extends keyof HMSHLSPlayerListeners>(event?: E): void {
-    this._emitter.removeAllListeners(event);
+
+  private removeAllListeners<E extends HMSHLSPlayerEvents>(eventName?: E): void {
+    this._emitter.removeAllListeners(eventName);
   }
   /**
    * get current video volume
@@ -192,25 +194,17 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   seekTo = (seekValue: number) => {
     this._videoEl.currentTime = seekValue;
   };
-  unblockAutoPlay = async () => {
-    try {
-      await this.play();
-    } catch (error) {
-      console.error('Tried to unblock autoplay failed with', error);
-      this.emit(HMSHLSPlayerEvents.ERROR, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
-    }
-  };
 
   private playVideo = async () => {
     try {
       if (this._videoEl.paused) {
         await this._videoEl.play();
       }
-    } catch (error: any) {
-      console.debug('Browser blocked autoplay with error', error.toString());
+    } catch (error) {
+      console.debug('Browser blocked autoplay with error', (error as Error).message);
       console.debug('asking user to play the video manually...');
-      if (error.name === 'NotAllowedError') {
-        this.emit(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, true);
+      if ((error as Error).name === 'NotAllowedError') {
+        this.emit(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
       }
     }
   };

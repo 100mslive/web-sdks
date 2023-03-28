@@ -56,28 +56,28 @@ const HLSView = () => {
    */
   useEffect(() => {
     let videoEl = videoRef.current;
-    const manifestLoadedHandler = (_, { levels }) => {
+    const manifestLoadedHandler = ({ levels }) => {
       setAvailableLevels(levels);
     };
-    const levelUpdatedHandler = (_, { level }) => {
+    const levelUpdatedHandler = ({ level }) => {
       setCurrentSelectedQuality(level);
     };
-    const metadataLoadedHandler = (_, data) => {
+    const metadataLoadedHandler = data => {
       ToastManager.addToast({
         title: `Payload from timed Metadata ${data.payload}`,
       });
     };
-    const handleError = (_, data) => {
+    const handleError = data => {
       console.error("[HLSView] error in hls", data);
     };
-    const handleNoLongerLive = (_, { isLive }) => {
+    const handleNoLongerLive = ({ isLive }) => {
       setIsVideoLive(isLive);
     };
 
-    const playbackEventHandler = (_, data) =>
+    const playbackEventHandler = data =>
       setIsPaused(data.state === HLSPlaybackState.paused);
 
-    const handleAutoplayBlock = (_, data) => setIsHlsAutoplayBlocked(data);
+    const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
     if (videoEl && hlsUrl) {
       hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
       hlsPlayer.on(
@@ -94,31 +94,34 @@ const HLSView = () => {
 
       hlsPlayer.on(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.LEVEL_UPDATED, levelUpdatedHandler);
+      return () => {
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
+          handleNoLongerLive
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.ERROR, handleError);
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
+          metadataLoadedHandler
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+        hlsPlayer.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.MANIFEST_LOADED,
+          manifestLoadedHandler
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.LEVEL_UPDATED, levelUpdatedHandler);
+        hlsPlayer.reset();
+        hlsPlayer = null;
+      };
     }
-    return () => {
-      hlsPlayer?.off(
-        HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
-        handleNoLongerLive
-      );
-      hlsPlayer?.off(HMSHLSPlayerEvents.ERROR, handleError);
-      hlsPlayer?.off(
-        HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
-        metadataLoadedHandler
-      );
-      hlsPlayer?.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
-      hlsPlayer?.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
-      hlsPlayer?.off(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
-      hlsPlayer?.off(HMSHLSPlayerEvents.LEVEL_UPDATED, levelUpdatedHandler);
-      hlsPlayer?.reset();
-      hlsPlayer = null;
-    };
   }, [hlsUrl]);
 
   /**
    * initialize and subscribe to hlsState
    */
   useEffect(() => {
-    const onHLSStats = (_, state) => setHlsStatsState(state);
+    const onHLSStats = state => setHlsStatsState(state);
     if (enablHlsStats) {
       hlsPlayer?.on(HMSHLSPlayerEvents.STATS, onHLSStats);
     } else {
@@ -131,10 +134,10 @@ const HLSView = () => {
 
   const unblockAutoPlay = async () => {
     try {
-      await hlsPlayer.unblockAutoPlay();
+      await hlsPlayer.play();
       setIsHlsAutoplayBlocked(false);
     } catch (error) {
-      console.error("Tried to unblock Autoplay failed with", error.toString());
+      console.error("Tried to unblock Autoplay failed with", error.message);
     }
   };
 

@@ -28,6 +28,7 @@ interface IHMSHLSPlayer {
   seekToLivePosition(): Promise<void>;
   /**
    * play stream
+   * call this when autoplay error is received
    */
   play(): Promise<void>;
   /**
@@ -40,10 +41,6 @@ interface IHMSHLSPlayer {
    * @param seekValue Pass currentTime in second
    */
   seekTo(seekValue: number): void;
-  /**
-   * unblock autoplay
-   */
-  unblockAutoPlay(): Promise<void>;
 }
 
 export default IHMSHLSPlayer;

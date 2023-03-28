@@ -7,7 +7,7 @@ export const VideoTime = ({ hlsPlayer }) => {
   const [videoTime, setVideoTime] = useState("");
 
   useEffect(() => {
-    const timeupdateHandler = (_, currentTime) =>
+    const timeupdateHandler = currentTime =>
       setVideoTime(getDurationFromSeconds(currentTime));
     if (hlsPlayer) {
       hlsPlayer.on(HMSHLSPlayerEvents.CURRENT_TIME, timeupdateHandler);
