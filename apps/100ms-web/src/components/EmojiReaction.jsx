@@ -61,7 +61,7 @@ export const EmojiReaction = () => {
   });
 
   const sendReaction = async emojiId => {
-    const data = { triggerConfetti: true, emojiId: emojiId };
+    const data = { type: "EMOJI_REACTION", emojiId: emojiId };
     sendEvent(data, { roleNames: filteredRoles });
     await hmsActions.sendHLSTimedMetadata([
       {
