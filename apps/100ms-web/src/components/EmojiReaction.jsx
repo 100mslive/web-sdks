@@ -3,6 +3,7 @@ import data from "@emoji-mart/data/sets/14/apple.json";
 import { init } from "emoji-mart";
 import {
   selectAvailableRoleNames,
+  selectLocalPeerRoleName,
   useCustomEvent,
   useHMSActions,
   useHMSStore,
@@ -43,10 +44,11 @@ export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hlsViewerRole = useHLSViewerRole();
 
   const filteredRoles = useMemo(
-    () => roles.filter(role => role !== hlsViewerRole && !isInternalRole(role)),
+    () => roles.filter(role => role !== hlsViewerRole),
     [roles, hlsViewerRole]
   );
 
@@ -69,7 +71,9 @@ export const EmojiReaction = () => {
       },
     ]);
   };
-
+  if (localPeerRole === hlsViewerRole) {
+    return null;
+  }
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -108,7 +112,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: "$ textAccentMedium",
+                color: "$textAccentMedium",
               }}
             >
               Reactions will be timed for Live Streaming viewers.{" "}
@@ -139,8 +143,8 @@ export const EmojiReaction = () => {
 const EmojiContainer = styled("span", {
   position: "relative",
   cursor: "pointer",
-  width: "46px",
-  height: "46px",
+  width: "$16",
+  height: "$16",
   p: "$4",
   "&:hover": {
     p: "7px",
