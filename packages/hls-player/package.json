@@ -28,7 +28,7 @@
     "lint": "eslint -c ../../.eslintrc .",
     "lint:fix": "yarn lint --fix"
   },
-  "author": "Amar Kumar Bathwal",
+  "author": "100ms",
   "license": "MIT",
   "dependencies": {
     "@100mslive/hls-stats": "0.1.1-alpha.2",
