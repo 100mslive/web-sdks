@@ -19,7 +19,6 @@ import {
 } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
 import { useHLSViewerRole } from "./AppData/useUISettings";
-import { isInternalRole } from "../common/utils";
 import { HLS_TIMED_METADATA_DOC_URL } from "../common/constants";
 
 init({ data });
