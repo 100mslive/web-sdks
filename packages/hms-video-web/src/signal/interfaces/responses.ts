@@ -2,10 +2,6 @@ export interface BroadcastResponse {
   timestamp: number;
 }
 
-export interface GetSessionMetadataResponseV1 {
-  data?: any;
-}
-
 export interface GetSessionMetadataResponse {
   change_version: number;
   updated_by: string;

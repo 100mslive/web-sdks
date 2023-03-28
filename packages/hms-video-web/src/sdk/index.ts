@@ -821,11 +821,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   async setSessionMetadata(metadata: any) {
-    await this.transport.setSessionMetadataV1(metadata);
+    await this.transport.setSessionMetadata({ data: metadata });
   }
 
   async getSessionMetadata() {
-    const response = await this.transport.getSessionMetadataV1();
+    const response = await this.transport.getSessionMetadata();
     return response.data;
   }
 

@@ -19,14 +19,12 @@ import {
   AcceptRoleChangeParams,
   BroadcastResponse,
   GetSessionMetadataResponse,
-  GetSessionMetadataResponseV1,
   HLSRequestParams,
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
-  SessionMetadataUpdateParamsV1,
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
@@ -339,14 +337,6 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
-  async setSessionMetadataV1(params: SessionMetadataUpdateParamsV1) {
-    await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
-  }
-
-  getSessionMetadataV1() {
-    return this.call<GetSessionMetadataResponseV1>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
-  }
-
   setSessionMetadata(params: SetSessionMetadataParams) {
     return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { version: '1.1', ...params });
   }
@@ -355,7 +345,7 @@ export default class JsonRpcSignal implements ISignal {
     return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { version: '1.1', keys });
   }
 
-  getSessionMetadata(key: string) {
+  getSessionMetadata(key?: string) {
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
   }
 

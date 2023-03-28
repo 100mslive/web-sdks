@@ -57,12 +57,8 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
-export interface SessionMetadataUpdateParamsV1 {
-  data?: any;
-}
-
 export interface SetSessionMetadataParams {
-  key: string;
+  key?: string;
   data: any;
   if_change_version?: number;
 }

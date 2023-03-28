@@ -9,7 +9,6 @@ import {
 import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
-  GetSessionMetadataResponseV1,
   MultiTrackUpdateRequestParams,
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
@@ -57,10 +56,6 @@ export default interface ITransport {
   changeName(name: string): Promise<void>;
 
   changeMetadata(metadata: string): Promise<void>;
-
-  getSessionMetadataV1(): Promise<GetSessionMetadataResponseV1>;
-
-  setSessionMetadataV1(metadata: any): Promise<void>;
 
   getSessionMetadata(key: string): Promise<GetSessionMetadataResponse>;
 
