@@ -117,7 +117,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
 
-    this.sessionStore = new HMSSessionStore<T>(this.sdk, this.setSessionStoreValueLocally);
+    this.sessionStore = new HMSSessionStore<T>(this.sdk, this.setSessionStoreValueLocally.bind(this));
 
     // this.actionBatcher = new ActionBatcher(store);
   }
@@ -797,7 +797,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
     updates.forEach(update => {
-      this.setSessionStoreValueLocally(update.key, update.value);
+      this.setSessionStoreValueLocally(update.key, update.value, 'sessionStoreUpdate');
     });
   }
 
@@ -1379,7 +1379,11 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
-  private setSessionStoreValueLocally<K extends keyof T['sessionStore']>(key: K, value: T['sessionStore'][K]) {
+  private setSessionStoreValueLocally<K extends keyof T['sessionStore']>(
+    key: K,
+    value: T['sessionStore'][K],
+    actionName = 'setSessionStore',
+  ) {
     this.setState(store => {
       if (store.sessionStore) {
         store.sessionStore[key] = value;
@@ -1389,7 +1393,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
         };
         store.sessionStore = newSessionStore;
       }
-    });
+    }, actionName);
   }
 
   /**
