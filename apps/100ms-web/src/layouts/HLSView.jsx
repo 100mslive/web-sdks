@@ -84,10 +84,9 @@ const HLSView = () => {
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
       const duration = rest.duration * 1000;
-      let parsedPayload = data.payload;
-      if (isJson(data.payload)) {
-        parsedPayload = JSON.parse(data.payload);
-      }
+      const parsedPayload = isJson(data.payload)
+        ? JSON.parse(data.payload)
+        : data.payload;
 
       switch (parsedPayload?.type) {
         case "EMOJI_REACTION":
