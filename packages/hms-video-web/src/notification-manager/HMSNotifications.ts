@@ -236,10 +236,10 @@ export interface HLSVariantInfo {
 
 export interface MetadataChangeNotification {
   values: {
-    change_version: number;
-    updated_by: string;
+    change_version?: number;
+    updated_by?: string;
     data: any;
     key: string;
-    updated_at: number;
+    updated_at?: number;
   }[];
 }

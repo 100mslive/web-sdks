@@ -1,5 +1,6 @@
 import { HMSSessionStore } from '../interfaces';
 import ITransport from '../transport/ITransport';
+import { convertDateNumToDate } from '../utils/date';
 
 export class SessionStore implements HMSSessionStore {
   private observedKeys: string[] = [];
@@ -9,12 +10,12 @@ export class SessionStore implements HMSSessionStore {
   async get(key: string) {
     const { data, updated_at } = await this.transport.getSessionMetadata(key);
 
-    return { value: data, updatedAt: new Date(updated_at) };
+    return { value: data, updatedAt: convertDateNumToDate(updated_at) };
   }
 
-  async set(key: string, data: any): Promise<{ value: any; updatedAt: Date }> {
+  async set(key: string, data: any) {
     const { data: value, updated_at } = await this.transport.setSessionMetadata({ key, data });
-    const updatedAt = new Date(updated_at)!;
+    const updatedAt = convertDateNumToDate(updated_at);
     return { value, updatedAt };
   }
 
