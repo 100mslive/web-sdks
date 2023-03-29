@@ -78,7 +78,7 @@ export const EmojiReaction = () => {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
           <IconButton>
-            <Tooltip title="Emoji Reaction">
+            <Tooltip title="Emoji reaction">
               <Box>
                 <EmojiIcon />
               </Box>
