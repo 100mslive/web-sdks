@@ -103,21 +103,24 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this.removeAllListeners();
   }
 
-  on<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) {
+  on = <E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) => {
     this._emitter.on(eventName, listener);
-  }
+  };
 
-  off<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) {
+  off = <E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>) => {
     this._emitter.off(eventName, listener);
-  }
+  };
 
-  emit<E extends HMSHLSPlayerEvents>(eventName: E, eventObject: Parameters<HMSHLSPlayerListeners<E>>[0]): boolean {
+  emit = <E extends HMSHLSPlayerEvents>(
+    eventName: E,
+    eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
+  ): boolean => {
     return this._emitter.emit(eventName, eventObject);
-  }
+  };
 
-  private removeAllListeners<E extends HMSHLSPlayerEvents>(eventName?: E): void {
+  private removeAllListeners = <E extends HMSHLSPlayerEvents>(eventName?: E): void => {
     this._emitter.removeAllListeners(eventName);
-  }
+  };
   /**
    * get current video volume
    */
