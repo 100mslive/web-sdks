@@ -59,7 +59,7 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { appData?: any; ses
     if (actions && store) {
       providerProps = {
         actions: actions,
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...store,
           setState: errFn,
           destroy: errFn,
@@ -80,7 +80,7 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { appData?: any; ses
       const hmsReactiveStore = new HMSReactiveStore<T>();
       providerProps = {
         actions: hmsReactiveStore.getActions(),
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...hmsReactiveStore.getStore(),
           setState: errFn,
           destroy: errFn,
