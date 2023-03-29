@@ -8,6 +8,7 @@ export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
+  private readonly TAG = '[HMSAudioTrack]';
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -58,7 +59,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   async setOutputDevice(device: MediaDeviceInfo) {
     if (!this.audioElement) {
-      HMSLogger.d('[AudioTrack]', this.logIdentifier, 'no audio element to set output', `${this}`);
+      HMSLogger.d(this.TAG, this.logIdentifier, 'no audio element to set output', `${this}`);
       return;
     }
     try {
@@ -69,7 +70,7 @@ export class HMSAudioTrack extends HMSTrack {
         this.outputDevice = device;
       }
     } catch (error) {
-      HMSLogger.d('[AudioTrack] error in setSinkId', error);
+      HMSLogger.d(this.TAG, 'error in setSinkId', error);
     }
   }
 
