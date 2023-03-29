@@ -114,37 +114,30 @@ export const selectAppData = byIDCurry(
 );
 
 /**
- * Select a particular key from ui app data by passed in key.
+ * Select a particular key from session store by passed in key.
  * if key is not passed, full data is returned.
  */
-// export const selectSessionStore1 = byKeyCurry<T>(
-//   createSelector([selectFullSessionStore, selectSessionStoreKey], (sessionStore, key) => {
-//     if (!sessionStore) {
-//       return undefined;
-//     }
-//     if (key) {
-//       return sessionStore[key];
-//     }
-//     return sessionStore;
-//   }),
-// );
-
-export function selectSessionStore<
-  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
->(): T['sessionStore'];
+export function selectSessionStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>(): (
+  store: HMSStore<T>,
+) => T['sessionStore'] | undefined;
 export function selectSessionStore<
   T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
   K extends keyof T['sessionStore'] = keyof T['sessionStore'],
->(key: K): T['sessionStore'][K];
+>(key: K): (store: HMSStore<T>) => T['sessionStore'][K] | undefined;
 export function selectSessionStore<
   T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
   K extends keyof T['sessionStore'] = keyof T['sessionStore'],
 >(key?: K) {
-  return (store: HMSStore<T>): (K extends undefined ? T['sessionStore'] : T['sessionStore'][K]) | undefined => {
-    if (!key) {
-      return store.sessionStore as T['sessionStore'];
+  return (
+    store: HMSStore<T>,
+  ): (K extends keyof T['sessionStore'] ? T['sessionStore'][K] : T['sessionStore']) | undefined => {
+    if (!store.sessionStore) {
+      return undefined;
     }
-    return store.sessionStore ? (store.sessionStore[key] as T['sessionStore'][K]) : store.sessionStore;
+    if (key) {
+      return store.sessionStore[key];
+    }
+    return store.sessionStore;
   };
 }
 
