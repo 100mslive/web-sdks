@@ -8,7 +8,7 @@ import { createDefaultStatsStore, HMSGenericTypes, HMSReactiveStore, HMSStatsSto
 /**
  * @internal
  */
-export class HMSStats<T extends HMSGenericTypes = { sessionStore: Record<any, any> }>
+export class HMSStats<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
   implements IHMSStatsStoreReadOnly
 {
   readonly getState: GetState<HMSStatsStore>;

@@ -44,7 +44,7 @@ import { HMSRoleChangeRequest } from './selectors';
  *
  * @category Core
  */
-export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<any, any> }> {
+export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
