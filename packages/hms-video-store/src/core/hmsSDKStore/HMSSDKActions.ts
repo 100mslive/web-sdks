@@ -964,12 +964,12 @@ export class HMSSDKActions implements IHMSActions {
     this.sendPeerUpdateNotification(type, sdkPeer);
   }
 
-  protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, _peer: sdkTypes.HMSPeer) {
+  protected onTrackUpdate(type: sdkTypes.HMSTrackUpdate, track: SDKHMSTrack, peer: sdkTypes.HMSPeer) {
     // this check is needed because for track removed case, the notification needs to
     // be send before the track is removed from store
     if (type === sdkTypes.HMSTrackUpdate.TRACK_REMOVED) {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
-      this.syncRoomState(TRACK_NOTIFICATION_TYPES[type]);
+      this.handleTrackRemove(track, peer);
     } else {
       const actionName = TRACK_NOTIFICATION_TYPES[type] || 'trackUpdate';
       this.syncRoomState(actionName);
@@ -1144,6 +1144,27 @@ export class HMSSDKActions implements IHMSActions {
     HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
+  private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
+    this.setState(draftStore => {
+      const hmsPeer = draftStore.peers[sdkPeer.peerId];
+      const draftTracks = draftStore.tracks;
+      const trackId = sdkTrack.trackId;
+      // find and remove the exact track from hmsPeer
+      if (this.isSameStoreSDKTrack(trackId, hmsPeer?.audioTrack)) {
+        delete hmsPeer?.audioTrack;
+      } else if (this.isSameStoreSDKTrack(trackId, hmsPeer?.videoTrack)) {
+        delete hmsPeer?.videoTrack;
+      } else {
+        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
+        if (auxiliaryIndex > -1 && this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])) {
+          hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
+        }
+      }
+      delete draftTracks[trackId];
+      delete this.hmsSDKTracks[trackId];
+    }, 'trackRemoved');
+  }
+
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
     const track = this.hmsSDKTracks[trackID];
     if (track) {
@@ -1274,6 +1295,17 @@ export class HMSSDKActions implements IHMSActions {
         this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
       }
     }
+  }
+
+  /**
+   * In case of replace track id is changed but not in store. Given the store id, check the real id
+   * sdk is using to refer to the track and match them.
+   */
+  private isSameStoreSDKTrack(sdkTrackID: string, storeTrackID?: string): boolean {
+    if (!storeTrackID) {
+      return false;
+    }
+    return this.hmsSDKTracks[storeTrackID]?.trackId === sdkTrackID;
   }
 
   /**
