@@ -2,7 +2,6 @@ import { createSelector } from 'reselect';
 import { byIDCurry } from './common';
 import {
   selectFullAppData,
-  // selectFullSessionStore,
   selectHMSMessages,
   selectLocalPeerID,
   selectPeers,
@@ -17,7 +16,6 @@ import {
   isVideo,
   isVideoPlaylist,
 } from './selectorUtils';
-// import { byKeyCurry } from './session-store-selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioTrack,
