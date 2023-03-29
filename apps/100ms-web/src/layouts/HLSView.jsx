@@ -62,26 +62,24 @@ const HLSView = () => {
     const levelUpdatedHandler = ({ level }) => {
       setCurrentSelectedQuality(level);
     };
-    const metadataLoadedHandler = ({ payload: data, ...rest }) => {
-      const dataPayload = str => {
+    const metadataLoadedHandler = ({ payload, ...rest }) => {
+      const parsePayload = str => {
         try {
           return JSON.parse(str);
         } catch (e) {
           return str;
         }
       };
-
       // parse payload and extract start_time and payload
       const duration = rest.duration * 1000;
-      const parsedPayload = dataPayload(data.payload);
-
-      switch (parsedPayload?.type) {
+      const parsedPayload = parsePayload(payload);
+      switch (parsedPayload.type) {
         case "EMOJI_REACTION":
           window.showConfettiUsingEmojiId(parsedPayload?.emojiId);
           break;
         default: {
           const toast = {
-            title: `Payload from timed Metadata ${data.payload}`,
+            title: `Payload from timed Metadata ${parsedPayload}`,
             duration: duration || 3000,
           };
           console.debug("Added toast ", JSON.stringify(toast));
