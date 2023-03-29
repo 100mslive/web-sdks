@@ -9,14 +9,14 @@ import { HMSMediaSettings } from './settings';
 import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 
 export interface HMSGenericTypes {
-  sessionStore?: Record<any, any>;
+  sessionStore: Record<any, any>;
 }
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
  * of this central store. This is the global state - the single source of immutable truth.
  */
-export interface HMSStore<T extends HMSGenericTypes = { sessionStore?: Record<any, any> }> {
+export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<any, any> }> {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;

@@ -40,7 +40,7 @@ const HMSContext = createContext<HMSContextProviderProps | null>(null);
  * @constructor
  */
 // eslint-disable-next-line complexity
-export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore?: any }>({
+export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: any }>({
   children,
   actions,
   store,

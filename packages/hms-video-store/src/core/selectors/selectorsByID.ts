@@ -111,20 +111,18 @@ export const selectAppData = byIDCurry(
  * Select a particular key from session store by passed in key.
  * if key is not passed, full data is returned.
  */
-export function selectSessionStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>(): (
+export function selectSessionStore<T extends HMSGenericTypes = { sessionStore: Record<any, any> }>(): (
   store: HMSStore<T>,
 ) => T['sessionStore'] | undefined;
 export function selectSessionStore<
-  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
+  T extends HMSGenericTypes = { sessionStore: Record<any, any> },
   K extends keyof T['sessionStore'] = keyof T['sessionStore'],
 >(key: K): (store: HMSStore<T>) => T['sessionStore'][K] | undefined;
 export function selectSessionStore<
-  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
+  T extends HMSGenericTypes = { sessionStore: Record<any, any> },
   K extends keyof T['sessionStore'] = keyof T['sessionStore'],
 >(key?: K) {
-  return (
-    store: HMSStore<T>,
-  ): (K extends keyof T['sessionStore'] ? T['sessionStore'][K] : T['sessionStore']) | undefined => {
+  return (store: HMSStore<T>) => {
     if (!store.sessionStore) {
       return undefined;
     }

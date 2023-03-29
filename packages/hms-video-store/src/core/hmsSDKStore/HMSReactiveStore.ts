@@ -29,7 +29,7 @@ declare global {
   }
 }
 
-export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore?: any }> {
+export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record<any, any> }> {
   private readonly sdk?: HMSSdk;
   private readonly actions: IHMSActions<T>;
   private readonly store: IHMSStore<T>;

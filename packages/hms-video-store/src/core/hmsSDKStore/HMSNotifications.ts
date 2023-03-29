@@ -28,7 +28,9 @@ import { selectPeerByID, selectTrackByID } from '../selectors';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
-export class HMSNotifications<T extends HMSGenericTypes = { sessionStore?: any }> implements IHMSNotifications {
+export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record<any, any> }>
+  implements IHMSNotifications
+{
   private id = 0;
   private eventEmitter: EventEmitter;
   private store: IHMSStore<T>;

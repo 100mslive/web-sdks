@@ -59,7 +59,8 @@ export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'name
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export interface IHMSStore<T extends HMSGenericTypes = { sessionStore?: any }> extends IStore<HMSStore<T>> {}
+export interface IHMSStore<T extends HMSGenericTypes = { sessionStore: Record<any, any> }>
+  extends IStore<HMSStore<T>> {}
 
 /**
  * HMS store can be used to:
@@ -75,7 +76,7 @@ export interface IHMSStore<T extends HMSGenericTypes = { sessionStore?: any }> e
  *
  * @category Core
  */
-export interface IHMSStoreReadOnly<T extends HMSGenericTypes = { sessionStore?: any }>
+export interface IHMSStoreReadOnly<T extends HMSGenericTypes = { sessionStore: Record<any, any> }>
   extends IStoreReadOnly<HMSStore<T>> {}
 
 export interface IHMSStatsStore extends IStore<HMSStatsStore> {}
