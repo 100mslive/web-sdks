@@ -8,9 +8,7 @@ import { createDefaultStatsStore, HMSGenericTypes, HMSReactiveStore, HMSStatsSto
 /**
  * @internal
  */
-export class HMSStats<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>
-  implements IHMSStatsStoreReadOnly
-{
+export class HMSStats<T extends HMSGenericTypes = { sessionStore?: any }> implements IHMSStatsStoreReadOnly {
   readonly getState: GetState<HMSStatsStore>;
   readonly subscribe: Subscribe<HMSStatsStore>;
   readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;

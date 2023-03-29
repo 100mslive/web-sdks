@@ -9,15 +9,14 @@ import { HMSMediaSettings } from './settings';
 import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 
 export interface HMSGenericTypes {
-  sessionStore?: any;
-  appData?: any;
+  sessionStore?: Record<any, any>;
 }
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
  * of this central store. This is the global state - the single source of immutable truth.
  */
-export interface HMSStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }> {
+export interface HMSStore<T extends HMSGenericTypes = { sessionStore?: Record<any, any> }> {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
@@ -41,7 +40,7 @@ export interface HMSStore<T extends HMSGenericTypes = { appData?: any; sessionSt
     audioTrack?: HMSTrackID;
   };
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
-  sessionStore?: T['sessionStore'];
+  sessionStore: T['sessionStore'];
 }
 
 export interface HMSStatsStore {
@@ -121,6 +120,7 @@ export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T
     roles: {},
     roleChangeRequests: [],
     errors: [],
+    sessionStore: {},
   };
 };
 

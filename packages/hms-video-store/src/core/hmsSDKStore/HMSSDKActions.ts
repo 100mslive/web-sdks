@@ -117,7 +117,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
 
-    this.sessionStore = new HMSSessionStore<T>(this.sdk, this.setSessionStoreValueLocally.bind(this));
+    this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
 
     // this.actionBatcher = new ActionBatcher(store);
   }
@@ -797,7 +797,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
     updates.forEach(update => {
-      this.setSessionStoreValueLocally(update.key, update.value, 'sessionStoreUpdate');
+      this.setSessionStoreValueLocally(update.key as keyof T['sessionStore'], update.value, 'sessionStoreUpdate');
     });
   }
 

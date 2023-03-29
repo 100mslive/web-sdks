@@ -5,7 +5,7 @@ import { IHMSStoreReadOnly } from '../../core/IHMSStore';
 /**
  * @internal
  */
-export class BeamControllerStore<T extends HMSGenericTypes = { appData?: any; sessionStore?: any }> {
+export class BeamControllerStore<T extends HMSGenericTypes = { sessionStore?: any }> {
   // perform action to add, remove beam
   private readonly actions: IHMSActions<T>;
   // get all details from store about room, peers, tracks.
