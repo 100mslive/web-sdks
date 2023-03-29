@@ -1,6 +1,6 @@
 import { HlsPlayerStats } from '@100mslive/hls-stats';
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { ILevel } from './ILevel';
+import { HMSHLSLayer } from './IHMSHLSLayer';
 import { HMSHLSException } from '../error/HMSHLSException';
 import { HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 
@@ -15,7 +15,7 @@ type HMSHLSListenerDataMapping = {
   [HMSHLSPlayerEvents.AUTOPLAY_BLOCKED]: HMSHLSException;
 
   [HMSHLSPlayerEvents.MANIFEST_LOADED]: HMSHLSManifestLoaded;
-  [HMSHLSPlayerEvents.LEVEL_UPDATED]: HMSHLSLevelUpdated;
+  [HMSHLSPlayerEvents.LAYER_UPDATED]: HMSHLSLayerUpdated;
 };
 
 export type HMSHLSPlayerListeners<E extends HMSHLSPlayerEvents> = (data: HMSHLSListenerDataMapping[E], name: E) => void;
@@ -35,10 +35,10 @@ export interface HMSHLSCue {
 }
 
 export interface HMSHLSManifestLoaded {
-  levels: ILevel[];
+  layers: HMSHLSLayer[];
 }
-export interface HMSHLSLevelUpdated {
-  level: ILevel;
+export interface HMSHLSLayerUpdated {
+  layer: HMSHLSLayer;
 }
 export interface IHMSHLSPlayerEventEmitter {
   on<E extends HMSHLSPlayerEvents>(eventName: E, listener: HMSHLSPlayerListeners<E>): void;
