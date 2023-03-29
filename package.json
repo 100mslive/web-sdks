@@ -57,6 +57,7 @@
     "sdk": "cd packages/hms-video-web && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
+    "controller": "cd packages/hls-controller && yarn start",
     "reactui": "cd packages/react-ui && yarn start",
     "storybook": "cd packages/react-ui && yarn storybook",
     "build-storybook": "cd packages/react-ui && build-storybook"
