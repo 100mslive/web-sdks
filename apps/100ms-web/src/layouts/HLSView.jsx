@@ -72,21 +72,18 @@ const HLSView = () => {
     };
     let videoEl = videoRef.current;
     const metadataLoadedHandler = ({ payload, ...rest }) => {
-      const isJson = str => {
+      const dataPayload = str => {
         try {
-          JSON.parse(str);
+          return JSON.parse(str);
         } catch (e) {
-          return false;
+          return str;
         }
-        return true;
       };
 
       // parse payload and extract start_time and payload
       const data = metadataPayloadParser(payload);
       const duration = rest.duration * 1000;
-      const parsedPayload = isJson(data.payload)
-        ? JSON.parse(data.payload)
-        : data.payload;
+      const parsedPayload = dataPayload(data.payload);
 
       switch (parsedPayload?.type) {
         case "EMOJI_REACTION":

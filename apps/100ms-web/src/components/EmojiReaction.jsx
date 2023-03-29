@@ -128,6 +128,15 @@ export const EmojiReaction = () => {
                 href={HLS_TIMED_METADATA_DOC_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  window.analytics.track("btn.clicked", {
+                    // email: currentUser()?.email,
+                    platform: "hms-website",
+                    btnId: "pricingPage.priceInfo.getStartedForFree",
+                    componentId: "pricingPage.priceInfo",
+                    // ...getUtmParams(),
+                  });
+                }}
               >
                 {"Learn more ->"}
               </a>
