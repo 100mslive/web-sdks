@@ -16,28 +16,23 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
-    const trackEncodings: RTCRtpEncodingParameters[] = [];
-    if (track instanceof HMSLocalVideoTrack) {
-      if (simulcastLayers.length > 0) {
-        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
-        trackEncodings.push(...simulcastLayers);
-      } else {
-        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track.settings.maxBitrate && !isNode) {
-          encodings.maxBitrate = track.settings.maxBitrate;
-        }
-        trackEncodings.push(encodings);
-      }
-    }
-
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
       direction: 'sendonly',
-      sendEncodings: trackEncodings,
+      sendEncodings: this.getTrackEncodings(track, simulcastLayers),
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     track.transceiver = transceiver;
     return transceiver;
+  }
+
+  setSimulcastLayers(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+    const sender = track.transceiver?.sender;
+    if (sender) {
+      const params = sender.getParameters();
+      params.encodings = this.getTrackEncodings(track, simulcastLayers);
+      sender.setParameters(params);
+    }
   }
 
   async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
@@ -99,5 +94,22 @@ export default class HMSLocalStream extends HMSMediaStream {
     } else {
       HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
     }
+  }
+
+  private getTrackEncodings(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+    const trackEncodings: RTCRtpEncodingParameters[] = [];
+    if (track instanceof HMSLocalVideoTrack) {
+      if (simulcastLayers.length > 0) {
+        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
+        trackEncodings.push(...simulcastLayers);
+      } else {
+        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
+        if (track.settings.maxBitrate && !isNode) {
+          encodings.maxBitrate = track.settings.maxBitrate;
+        }
+        trackEncodings.push(encodings);
+      }
+    }
+    return trackEncodings;
   }
 }
