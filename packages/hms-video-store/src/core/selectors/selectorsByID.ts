@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 import { byIDCurry } from './common';
 import {
   selectFullAppData,
+  // selectFullSessionStore,
   selectHMSMessages,
   selectLocalPeerID,
   selectPeers,
@@ -16,9 +17,11 @@ import {
   isVideo,
   isVideoPlaylist,
 } from './selectorUtils';
+// import { byKeyCurry } from './session-store-selectors';
 import { HMSLogger } from '../../common/ui-logger';
 import {
   HMSAudioTrack,
+  HMSGenericTypes,
   HMSPeer,
   HMSPeerID,
   HMSRoleName,
@@ -33,6 +36,10 @@ const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
 const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
+export const selectSessionStoreKey = <T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>(
+  _store: HMSStore<T>,
+  key?: keyof T['sessionStore'],
+) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -105,6 +112,41 @@ export const selectAppData = byIDCurry(
     return appData;
   }),
 );
+
+/**
+ * Select a particular key from ui app data by passed in key.
+ * if key is not passed, full data is returned.
+ */
+// export const selectSessionStore1 = byKeyCurry<T>(
+//   createSelector([selectFullSessionStore, selectSessionStoreKey], (sessionStore, key) => {
+//     if (!sessionStore) {
+//       return undefined;
+//     }
+//     if (key) {
+//       return sessionStore[key];
+//     }
+//     return sessionStore;
+//   }),
+// );
+
+export function selectSessionStore<
+  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
+>(): T['sessionStore'];
+export function selectSessionStore<
+  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
+  K extends keyof T['sessionStore'] = keyof T['sessionStore'],
+>(key: K): T['sessionStore'][K];
+export function selectSessionStore<
+  T extends HMSGenericTypes = { appData?: any; sessionStore?: any },
+  K extends keyof T['sessionStore'] = keyof T['sessionStore'],
+>(key?: K) {
+  return (store: HMSStore<T>): (K extends undefined ? T['sessionStore'] : T['sessionStore'][K]) | undefined => {
+    if (!key) {
+      return store.sessionStore as T['sessionStore'];
+    }
+    return store.sessionStore ? (store.sessionStore[key] as T['sessionStore'][K]) : store.sessionStore;
+  };
+}
 
 export const selectAppDataByPath = (...keys: string[]) =>
   createSelector([selectFullAppData], appData => {
