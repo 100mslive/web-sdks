@@ -164,10 +164,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   async seekToLivePosition() {
     let end = 0;
-    if (this._videoEl?.buffered.length > 0) {
-      end = this._videoEl?.buffered.end(this._videoEl?.buffered.length - 1);
+    if (this._videoEl.buffered.length > 0) {
+      end = this._videoEl.buffered.end(this._videoEl.buffered.length - 1);
     }
-    this._videoEl.currentTime = this._hls?.liveSyncPosition || end;
+    this._videoEl.currentTime = this._hls.liveSyncPosition || end;
     if (this._videoEl.paused) {
       try {
         await this.playVideo();
@@ -287,9 +287,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
 
   private handleTimeUpdateListener = (_: Event) => {
-    if (!this._videoEl) {
-      return;
-    }
     this.emit(HMSHLSPlayerEvents.CURRENT_TIME, this._videoEl.currentTime);
     const live = this._hls.liveSyncPosition
       ? this._hls.liveSyncPosition - this._videoEl.currentTime <= HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY
