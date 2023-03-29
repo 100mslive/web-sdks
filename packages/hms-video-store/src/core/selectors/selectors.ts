@@ -12,7 +12,6 @@ import {
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
 import {
   HMSException,
-  HMSGenericTypes,
   HMSMessage,
   HMSPeer,
   HMSPeerID,
@@ -74,12 +73,6 @@ export const selectLocalMediaSettings = (store: HMSStore) => store.settings;
  * @internal
  */
 export const selectFullAppData = (store: HMSStore) => store.appData;
-
-/**
- * select sessionStore.
- * @internal
- */
-export const selectFullSessionStore = <T extends HMSGenericTypes>(store: HMSStore<T>) => store.sessionStore;
 
 /**
  * Select the available audio input, audio output and video input devices on your machine.

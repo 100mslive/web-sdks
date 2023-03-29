@@ -36,10 +36,6 @@ const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
 const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
-export const selectSessionStoreKey = <T extends HMSGenericTypes = { appData?: any; sessionStore?: any }>(
-  _store: HMSStore<T>,
-  key?: keyof T['sessionStore'],
-) => key;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
