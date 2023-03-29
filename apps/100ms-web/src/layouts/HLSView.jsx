@@ -62,10 +62,33 @@ const HLSView = () => {
     const levelUpdatedHandler = ({ level }) => {
       setCurrentSelectedQuality(level);
     };
-    const metadataLoadedHandler = data => {
-      ToastManager.addToast({
-        title: `Payload from timed Metadata ${data.payload}`,
-      });
+    const metadataLoadedHandler = ({ payload: data, ...rest }) => {
+      const dataPayload = str => {
+        try {
+          return JSON.parse(str);
+        } catch (e) {
+          return str;
+        }
+      };
+
+      // parse payload and extract start_time and payload
+      const duration = rest.duration * 1000;
+      const parsedPayload = dataPayload(data.payload);
+
+      switch (parsedPayload?.type) {
+        case "EMOJI_REACTION":
+          window.showConfettiUsingEmojiId(parsedPayload?.emojiId);
+          break;
+        default: {
+          const toast = {
+            title: `Payload from timed Metadata ${data.payload}`,
+            duration: duration || 3000,
+          };
+          console.debug("Added toast ", JSON.stringify(toast));
+          ToastManager.addToast(toast);
+          break;
+        }
+      }
     };
     const handleError = data => {
       console.error("[HLSView] error in hls", data);
