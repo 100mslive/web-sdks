@@ -8,7 +8,7 @@ export enum HMSHLSPlayerEvents {
   AUTOPLAY_BLOCKED = 'autoplay-blocked',
 
   MANIFEST_LOADED = 'manifest-loaded',
-  LEVEL_UPDATED = 'level-updated',
+  LAYER_UPDATED = 'layer-updated',
 
   ERROR = 'error',
   PLAYBACK_STATE = 'playback-state',
@@ -18,7 +18,7 @@ export enum HMSHLSPlayerEvents {
 export enum HMSHLSExceptionEvents {
   MANIFEST_LOAD_ERROR = 'manifest-load-error',
   MANIFEST_PARSING_ERROR = 'manifest-parsing-error',
-  LEVEL_LOAD_ERROR = 'level-load-error',
+  LAYER_LOAD_ERROR = 'layer-load-error',
 
   MANIFEST_INCOMPATIBLE_CODECS_ERROR = 'manifest-incompatible-codecs-error',
   FRAG_DECRYPT_ERROR = 'frag-decrypt-error',

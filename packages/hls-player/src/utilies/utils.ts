@@ -1,5 +1,5 @@
 import { Level, LevelParsed } from 'hls.js';
-import { ILevel } from '../interfaces/ILevel';
+import { HMSHLSLayer } from '../interfaces/IHMSHLSLayer';
 
 /**
  *
@@ -17,22 +17,22 @@ export const metadataPayloadParser = (payload: string): Record<string, any> => {
 };
 
 /**
- * map Level[] to ILevel[]
+ * map Level[] to HMSHLSLayer[]
  */
-export const mapLevels = (qualityLevel: Level[] | LevelParsed[]): ILevel[] => {
-  return qualityLevel.map((level: Level | LevelParsed) => mapLevel(level));
+export const mapLayers = (levels: Level[] | LevelParsed[]): HMSHLSLayer[] => {
+  return levels.map((level: Level | LevelParsed) => mapLayer(level));
 };
 
 /**
- * map Level[] to ILevel[]
+ * map Level[] to HMSHLSLayer[]
  */
-export const mapLevel = (qualityLevel: Level | LevelParsed): ILevel => {
+export const mapLayer = (quality: Level | LevelParsed): HMSHLSLayer => {
   return {
-    resolution: qualityLevel.attrs?.RESOLUTION,
-    bitrate: qualityLevel.bitrate,
-    height: qualityLevel.height,
-    id: qualityLevel.id,
-    url: qualityLevel.url[0],
-    width: qualityLevel.width,
+    resolution: quality.attrs?.RESOLUTION,
+    bitrate: quality.bitrate,
+    height: quality.height,
+    id: quality.id,
+    url: quality.url[0],
+    width: quality.width,
   };
 };

@@ -3,10 +3,10 @@ import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from '../interfaces/events';
+import { HMSHLSLayer } from '../interfaces/IHMSHLSLayer';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
-import { ILevel } from '../interfaces/ILevel';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
-import { mapLevel, mapLevels } from '../utilies/utils';
+import { mapLayer, mapLayers } from '../utilies/utils';
 
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _hls: Hls;
@@ -44,6 +44,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emit);
     this.seekToLivePosition();
   }
+
   /**
    * @remarks It will create a video element with playiniline true.
    * @returns HTML video element
@@ -121,42 +122,28 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private removeAllListeners = <E extends HMSHLSPlayerEvents>(eventName?: E): void => {
     this._emitter.removeAllListeners(eventName);
   };
-  /**
-   * get current video volume
-   */
+
   public get volume(): number {
     return this._volume;
   }
-  /**
-   * set video volumne
-   * @param { volume } - define volume in range [1,100]
-   */
+
   setVolume(volume: number) {
     this._videoEl.volume = volume / 100;
     this._volume = volume;
   }
-  /**
-   *
-   * @returns returns a ILevel which represents current
-   * quality level. -1 if currentlevel is set to "Auto"
-   */
-  getCurrentLevel(): ILevel | null {
+
+  getLayer(): HMSHLSLayer | null {
     if (this._hls && this._hls.currentLevel !== -1) {
       const currentLevel = this._hls?.levels.at(this._hls?.currentLevel);
-      return currentLevel ? mapLevel(currentLevel) : null;
+      return currentLevel ? mapLayer(currentLevel) : null;
     }
     return null;
   }
 
-  /**
-   *
-   * @param { ILevel } currentLevel - currentLevel we want to
-   * set the stream to -1 for Auto
-   */
-  setCurrentLevel(currentLevel: ILevel) {
+  setLayer(layer: HMSHLSLayer): void {
     if (this._hls) {
       const current = this._hls.levels.findIndex((level: Level) => {
-        return level?.attrs?.RESOLUTION === currentLevel?.resolution;
+        return level?.attrs?.RESOLUTION === layer?.resolution;
       });
       this._hls.currentLevel = current;
     }
@@ -265,7 +252,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         break;
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
-        const error = HMSHLSErrorFactory.HLSNetworkError.levelLoadError(detail);
+        const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
         this.emit(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
@@ -277,15 +264,15 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
   };
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
-    const level: ILevel[] = mapLevels(this.removeAudioLevels(levels));
+    const layers: HMSHLSLayer[] = mapLayers(this.removeAudioLevels(levels));
     this.emit(HMSHLSPlayerEvents.MANIFEST_LOADED, {
-      levels: level,
+      layers,
     });
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
-    const qualityLevel: ILevel = mapLevel(this._hls.levels[level]);
-    this.emit(HMSHLSPlayerEvents.LEVEL_UPDATED, {
-      level: qualityLevel,
+    const qualityLayer: HMSHLSLayer = mapLayer(this._hls.levels[level]);
+    this.emit(HMSHLSPlayerEvents.LAYER_UPDATED, {
+      layer: qualityLayer,
     });
   };
 

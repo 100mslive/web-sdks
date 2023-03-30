@@ -1,4 +1,4 @@
-import { ILevel } from './ILevel';
+import { HMSHLSLayer } from './IHMSHLSLayer';
 interface IHMSHLSPlayer {
   /**
    * @returns get html video element
@@ -7,21 +7,21 @@ interface IHMSHLSPlayer {
 
   /**
    * set video volumne
-   * @param { volume } - define volume in range [1,100]
+   * @param { volume } - in range [0,100]
    */
   setVolume(volume: number): void;
   /**
    *
-   * @returns returns a ILevel which represents current
-   * quality level. -1 if currentlevel is set to "Auto"
+   * @returns returns HMSHLSLayer which represents current
+   * quality.
    */
-  getCurrentLevel(): ILevel | null;
+  getLayer(): HMSHLSLayer | null;
   /**
    *
-   * @param { ILevel } currentLevel - currentLevel we want to
-   * set the stream to. -1 for Auto
+   * @param { HMSHLSLayer } layer - layer we want to set the stream to.
+   * set { height: auto } to set the layer to auto
    */
-  setCurrentLevel(currentLevel: ILevel): void;
+  setLayer(layer: HMSHLSLayer): void;
   /**
    * move the video to Live
    */
