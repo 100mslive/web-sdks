@@ -98,7 +98,9 @@ import {
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> {
+export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  implements IHMSActions<T>
+{
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
@@ -1384,7 +1386,6 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     actionName = 'setSessionStore',
   ) {
     const updatesList: SessionStoreUpdate[] = Array.isArray(updates) ? updates : [updates];
-    console.log('asdasd', updatesList);
     this.setState(store => {
       updatesList.forEach(update => {
         store.sessionStore[update.key as keyof T['sessionStore']] = update.value;
