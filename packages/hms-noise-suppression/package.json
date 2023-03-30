@@ -1,5 +1,5 @@
 {
-  "version": "0.8.1-alpha.1",
+  "version": "0.9.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -37,6 +37,6 @@
   "author": "vishaldhull09",
   "module": "dist/index.js",
   "devDependencies": {
-    "@100mslive/hms-video": "0.8.1-alpha.1"
+    "@100mslive/hms-video": "0.9.0"
   }
 }
