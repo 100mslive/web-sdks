@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import {
   selectLocalPeerID,
   selectPermissions,
+  selectSessionStore,
   selectTrackByID,
   selectVideoTrackByPeerID,
   useCustomEvent,
@@ -17,6 +18,7 @@ import {
   RemoveUserIcon,
   ShareScreenIcon,
   SpeakerIcon,
+  StarIcon,
   VideoOffIcon,
   VideoOnIcon,
 } from "@100mslive/react-icons";
@@ -24,6 +26,51 @@ import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
+
+const PinAndSpotlightActions = ({ audioTrackID, videoTrackID }) => {
+  const hmsActions = useHMSActions();
+  const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(
+    APP_DATA.pinnedTrackId
+  );
+  const spotlightTrackId = useHMSStore(selectSessionStore("spotlight"));
+
+  const isSameTile = trackId =>
+    trackId &&
+    ((videoTrackID && videoTrackID === trackId) ||
+      (audioTrackID && audioTrackID === trackId));
+  const isTilePinned = isSameTile(pinnedTrackId);
+  const isTileSpotlighted = isSameTile(spotlightTrackId);
+
+  const setSpotlightTrackId = trackId =>
+    hmsActions.sessionStore.set("spotlight", trackId);
+
+  return (
+    <>
+      <StyledMenuTile.ItemButton
+        onClick={() =>
+          isTilePinned
+            ? setPinnedTrackId()
+            : setPinnedTrackId(videoTrackID || audioTrackID)
+        }
+      >
+        <PinIcon />
+        <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
+      </StyledMenuTile.ItemButton>
+      <StyledMenuTile.ItemButton
+        onClick={() =>
+          isTileSpotlighted
+            ? setSpotlightTrackId()
+            : setSpotlightTrackId(videoTrackID || audioTrackID)
+        }
+      >
+        <StarIcon />
+        <span>
+          {isTileSpotlighted ? "Remove from Spotlight" : "Spotlight Tile"}
+        </span>
+      </StyledMenuTile.ItemButton>
+    </>
+  );
+};
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -49,13 +96,7 @@ const TileMenu = ({
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
-  const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(
-    APP_DATA.pinnedTrackId
-  );
-  const isTilePinned =
-    pinnedTrackId &&
-    ((videoTrackID && videoTrackID === pinnedTrackId) ||
-      (audioTrackID && audioTrackID === pinnedTrackId));
+
   const isPrimaryVideoTrack =
     useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
 
@@ -84,16 +125,10 @@ const TileMenu = ({
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="top" align="end">
         {isLocal && showPinAction ? (
-          <StyledMenuTile.ItemButton
-            onClick={() =>
-              isTilePinned
-                ? setPinnedTrackId()
-                : setPinnedTrackId(videoTrackID || audioTrackID)
-            }
-          >
-            <PinIcon />
-            <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
-          </StyledMenuTile.ItemButton>
+          <PinAndSpotlightActions
+            audioTrackID={audioTrackID}
+            videoTrackID={videoTrackID}
+          />
         ) : (
           <>
             {toggleVideo ? (
@@ -139,16 +174,10 @@ const TileMenu = ({
               </StyledMenuTile.VolumeItem>
             ) : null}
             {showPinAction && (
-              <StyledMenuTile.ItemButton
-                onClick={() =>
-                  isTilePinned
-                    ? setPinnedTrackId()
-                    : setPinnedTrackId(videoTrackID || audioTrackID)
-                }
-              >
-                <PinIcon />
-                <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
-              </StyledMenuTile.ItemButton>
+              <PinAndSpotlightActions
+                audioTrackID={audioTrackID}
+                videoTrackID={videoTrackID}
+              />
             )}
             <SimulcastLayers trackId={videoTrackID} />
             {removeOthers ? (
