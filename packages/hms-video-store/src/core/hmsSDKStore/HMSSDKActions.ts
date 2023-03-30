@@ -628,6 +628,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'setSessionMetadata');
+    this.setSessionStoreValueLocally('default', metadata, 'setSessionMetadata');
   }
 
   async populateSessionMetadata(): Promise<void> {
@@ -635,6 +636,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'populateSessionMetadata');
+    this.setSessionStoreValueLocally('default', metadata, 'populateSessionmetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {

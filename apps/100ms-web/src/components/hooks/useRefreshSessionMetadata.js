@@ -1,13 +1,9 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import {
   selectIsConnectedToRoom,
-  useCustomEvent,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-
-export const REFRESH_MESSAGE = "refresh";
-export const METADATA_MESSAGE_TYPE = "metadata";
 
 /**
  * Refresh(re-populate) session metadata on receiving refresh broadcast message of type metadata
@@ -17,23 +13,12 @@ export const useRefreshSessionMetadata = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
 
   useEffect(() => {
-    if (isConnected) {
-      hmsActions.populateSessionMetadata().catch(console.error);
-    }
-  }, [hmsActions, isConnected]);
-
-  const onEvent = useCallback(
-    message => {
-      if (message === REFRESH_MESSAGE) {
-        hmsActions.populateSessionMetadata();
+    (async () => {
+      if (isConnected) {
+        await hmsActions.sessionStore.observe("default").then(() => {
+          hmsActions.sessionStore.observe("spotlight");
+        });
       }
-    },
-    [hmsActions]
-  );
-
-  useCustomEvent({
-    type: METADATA_MESSAGE_TYPE,
-    json: false,
-    onEvent,
-  });
+    })();
+  }, [hmsActions, isConnected]);
 };

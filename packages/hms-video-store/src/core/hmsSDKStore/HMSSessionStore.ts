@@ -2,7 +2,10 @@ import { HMSSdk } from '@100mslive/hms-video';
 import { IHMSSessionStoreActions } from '../schema';
 
 export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessionStoreActions<T> {
-  constructor(private sdk: HMSSdk, private setLocally: <K extends keyof T>(key: K, value: T[K]) => void) {}
+  constructor(
+    private sdk: HMSSdk,
+    private setLocally: <K extends keyof T>(key: K, value: T[K], actionName?: string) => void,
+  ) {}
 
   private get sdkSessionStore() {
     return this.sdk.getSessionStore();
@@ -16,7 +19,9 @@ export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessi
   async observe<K extends keyof T>(key: K) {
     await this.sdkSessionStore.observe(String(key));
     const { value } = await this.sdkSessionStore.get(String(key));
-    this.setLocally(key, value);
+    if (value) {
+      this.setLocally(key, value);
+    }
 
     return value;
   }

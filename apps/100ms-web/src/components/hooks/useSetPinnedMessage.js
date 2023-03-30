@@ -7,10 +7,6 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import {
-  METADATA_MESSAGE_TYPE,
-  REFRESH_MESSAGE,
-} from "./useRefreshSessionMetadata";
 
 /**
  * set pinned chat message by updating the session metadata
@@ -36,10 +32,6 @@ export const useSetPinnedMessage = () => {
         : null;
       if (newPinnedMessage !== pinnedMessage) {
         await hmsActions.setSessionMetadata(newPinnedMessage);
-        await hmsActions.sendBroadcastMessage(
-          REFRESH_MESSAGE,
-          METADATA_MESSAGE_TYPE
-        );
       }
     },
     [hmsActions, vanillaStore, pinnedMessage]
