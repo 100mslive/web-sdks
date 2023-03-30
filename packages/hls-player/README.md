@@ -11,6 +11,7 @@ import {
 // hlsUrl is the url in which the hls stream is ongoing
 // videoElement is the video element where you want to play the stream
 const player = new HMSHLSPlayer(hlsUrl, videoElement);
+player.play()
 
 ```
 
