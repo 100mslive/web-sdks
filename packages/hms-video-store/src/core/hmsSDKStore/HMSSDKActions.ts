@@ -173,7 +173,7 @@ export class HMSSDKActions implements IHMSActions {
   getAuthTokenByRoomCode(
     tokenRequest: sdkTypes.TokenRequest,
     tokenRequestOptions?: sdkTypes.TokenRequestOptions,
-  ): Promise<sdkTypes.TokenResult> {
+  ): Promise<string> {
     return this.sdk.getAuthTokenByRoomCode(tokenRequest, tokenRequestOptions);
   }
 
