@@ -13,12 +13,8 @@ export const useRefreshSessionMetadata = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
 
   useEffect(() => {
-    (async () => {
-      if (isConnected) {
-        await hmsActions.sessionStore.observe("default").then(() => {
-          hmsActions.sessionStore.observe("spotlight");
-        });
-      }
-    })();
+    if (isConnected) {
+      hmsActions.sessionStore.observe(["default", "spotlight"]);
+    }
   }, [hmsActions, isConnected]);
 };
