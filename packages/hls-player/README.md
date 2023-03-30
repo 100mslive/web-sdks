@@ -1,4 +1,4 @@
-`@100mslive/hls-player` is a wrapper on hls.js with easy to use interfaces and also includes 100ms implementations 
+`@100mslive/hls-player` is a currently a wrapper on hls.js with easy to use interface and few add-ons for [100ms's interactive live streaming feature](https://www.100ms.live/docs/javascript/v2/how--to-guides/record-and-live-stream/hls/hls).
 on top of hls.js out of the box.
 
 Sample usage: 
