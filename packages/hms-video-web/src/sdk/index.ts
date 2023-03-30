@@ -31,7 +31,6 @@ import {
   HMSScreenShareConfig,
   TokenRequest,
   TokenRequestOptions,
-  TokenResult,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
@@ -494,10 +493,7 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  async getAuthTokenByRoomCode(
-    tokenRequest: TokenRequest,
-    tokenRequestOptions?: TokenRequestOptions,
-  ): Promise<TokenResult> {
+  async getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string> {
     const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/token';
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
@@ -520,10 +516,7 @@ export class HMSSdk implements HMSInterface {
     if (!token) {
       throw Error(data.message);
     }
-    return {
-      token,
-      expiresAt: data.expires_at,
-    };
+    return token;
   }
 
   getLocalPeer() {

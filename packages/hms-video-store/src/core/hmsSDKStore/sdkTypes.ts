@@ -52,7 +52,6 @@ import {
   simulcastMapping,
   TokenRequest,
   TokenRequestOptions,
-  TokenResult,
 } from '@100mslive/hms-video';
 
 export {
@@ -112,5 +111,4 @@ export type {
   HMSPreferredSimulcastLayer,
   TokenRequest,
   TokenRequestOptions,
-  TokenResult,
 };
