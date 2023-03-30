@@ -1,11 +1,15 @@
-import { HMSSessionStore } from '../interfaces';
+import { HMSSessionStore, SessionStoreListener, SessionStoreUpdate } from '../interfaces';
 import ITransport from '../transport/ITransport';
 import { convertDateNumToDate } from '../utils/date';
 
 export class SessionStore implements HMSSessionStore {
-  private observedKeys: string[] = [];
+  private observedKeys: Set<string> = new Set();
 
-  constructor(private transport: ITransport) {}
+  constructor(private transport: ITransport, private listener?: SessionStoreListener) {}
+
+  setListener(listener?: SessionStoreListener) {
+    this.listener = listener;
+  }
 
   async get(key: string) {
     const { data, updated_at } = await this.transport.getSessionMetadata(key);
@@ -19,21 +23,32 @@ export class SessionStore implements HMSSessionStore {
     return { value, updatedAt };
   }
 
-  async observe(key: string) {
-    if (this.observedKeys.includes(key)) {
-      return;
+  async observe(keys: string[]) {
+    const newObservedKeys = new Set(this.observedKeys);
+    keys.forEach(key => newObservedKeys.add(key));
+
+    if (this.observedKeys.size !== newObservedKeys.size) {
+      await this.transport.listenMetadataChange(Array.from(newObservedKeys));
+      this.observedKeys = newObservedKeys;
     }
 
-    await this.transport.listenMetadataChange([...this.observedKeys, key]);
-    this.observedKeys.push(key);
+    const updates: SessionStoreUpdate[] = [];
+    for (const key of keys) {
+      const { value } = await this.get(String(key));
+      updates.push({ key, value });
+    }
+
+    this.listener?.onSessionStoreUpdate(updates);
   }
 
-  async unobserve(key: string) {
-    if (!this.observedKeys.includes(key)) {
-      return;
-    }
+  async unobserve(keys: string[]) {
+    const newObservedKeys = new Set(this.observedKeys);
+    let hasChanged = false;
+    keys.forEach(key => (hasChanged = newObservedKeys.delete(key) || hasChanged));
 
-    await this.transport.listenMetadataChange(this.observedKeys.filter(existingKey => existingKey !== key));
-    this.observedKeys = this.observedKeys.filter(existingKey => existingKey !== key);
+    if (hasChanged) {
+      await this.transport.listenMetadataChange(Array.from(newObservedKeys));
+      this.observedKeys = newObservedKeys;
+    }
   }
 }

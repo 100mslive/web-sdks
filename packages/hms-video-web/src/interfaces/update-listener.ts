@@ -52,7 +52,11 @@ export interface HMSConnectionQualityListener {
   onConnectionQualityUpdate(qualityUpdates: HMSConnectionQuality[]): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener {
+export interface SessionStoreListener {
+  onSessionStoreUpdate(values: SessionStoreUpdate[]): void;
+}
+
+export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
@@ -66,6 +70,5 @@ export interface HMSUpdateListener extends DeviceChangeListener {
   onChangeTrackStateRequest(request: HMSChangeTrackStateRequest): void;
   onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
-  onSessionStoreUpdate(values: SessionStoreUpdate[]): void;
   onNetworkQuality?(score: number): void;
 }
