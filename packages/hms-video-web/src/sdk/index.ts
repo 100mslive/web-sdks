@@ -31,7 +31,6 @@ import {
   HMSScreenShareConfig,
   TokenRequest,
   TokenRequestOptions,
-  TokenResult,
 } from '../interfaces';
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
