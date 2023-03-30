@@ -628,7 +628,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'setSessionMetadata');
-    this.setSessionStoreValueLocally('default', metadata, 'setSessionMetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'setSessionMetadata');
   }
 
   async populateSessionMetadata(): Promise<void> {
@@ -636,7 +636,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'populateSessionMetadata');
-    this.setSessionStoreValueLocally('default', metadata, 'populateSessionmetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'populateSessionmetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -798,9 +798,7 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
   }
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
-    updates.forEach(update => {
-      this.setSessionStoreValueLocally(update.key as keyof T['sessionStore'], update.value, 'sessionStoreUpdate');
-    });
+    this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {
@@ -1381,20 +1379,16 @@ export class HMSSDKActions<T extends HMSGenericTypes> implements IHMSActions<T> 
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
-  private setSessionStoreValueLocally<K extends keyof T['sessionStore']>(
-    key: K,
-    value: T['sessionStore'][K],
+  private setSessionStoreValueLocally(
+    updates: SessionStoreUpdate | SessionStoreUpdate[],
     actionName = 'setSessionStore',
   ) {
+    const updatesList: SessionStoreUpdate[] = Array.isArray(updates) ? updates : [updates];
+    console.log('asdasd', updatesList);
     this.setState(store => {
-      if (store.sessionStore) {
-        store.sessionStore[key] = value;
-      } else {
-        const newSessionStore = {
-          [key]: value,
-        };
-        store.sessionStore = newSessionStore;
-      }
+      updatesList.forEach(update => {
+        store.sessionStore[update.key as keyof T['sessionStore']] = update.value;
+      });
     }, actionName);
   }
 

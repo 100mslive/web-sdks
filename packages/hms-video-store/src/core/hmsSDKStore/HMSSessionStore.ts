@@ -1,10 +1,10 @@
-import { HMSSdk } from '@100mslive/hms-video';
+import { HMSSdk, SessionStoreUpdate } from '@100mslive/hms-video';
 import { IHMSSessionStoreActions } from '../schema';
 
 export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessionStoreActions<T> {
   constructor(
     private sdk: HMSSdk,
-    private setLocally: <K extends keyof T>(key: K, value: T[K], actionName?: string) => void,
+    private setLocally: (updates: SessionStoreUpdate | SessionStoreUpdate[], actionName?: string) => void,
   ) {}
 
   private get sdkSessionStore() {
@@ -13,20 +13,16 @@ export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessi
 
   async set<K extends keyof T>(key: K, value: T[K]) {
     const { value: latestValue } = await this.sdkSessionStore.set(String(key), value);
-    this.setLocally(key, latestValue);
+    this.setLocally({ key: key as string, value: latestValue });
   }
 
-  async observe<K extends keyof T>(key: K) {
-    await this.sdkSessionStore.observe(String(key));
-    const { value } = await this.sdkSessionStore.get(String(key));
-    if (value) {
-      this.setLocally(key, value);
-    }
-
-    return value;
+  async observe(keys: keyof T | Array<keyof T>) {
+    const stringifiedKeys: string[] = Array.isArray(keys) ? keys.map(key => String(key)) : [String(keys)];
+    await this.sdkSessionStore.observe(stringifiedKeys);
   }
 
-  async unobserve<K extends keyof T>(key: K) {
-    await this.sdkSessionStore.unobserve(String(key));
+  async unobserve(keys: keyof T | Array<keyof T>) {
+    const stringifiedKeys: string[] = Array.isArray(keys) ? keys.map(key => String(key)) : [String(keys)];
+    await this.sdkSessionStore.unobserve(stringifiedKeys);
   }
 }
