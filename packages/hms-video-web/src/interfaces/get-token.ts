@@ -6,8 +6,3 @@ export interface TokenRequest {
 export interface TokenRequestOptions {
   endpoint?: string;
 }
-
-export interface TokenResult {
-  token: string;
-  expiresAt: string;
-}

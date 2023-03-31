@@ -64,6 +64,7 @@ import {
   selectLocalTrackIDs,
   selectLocalVideoTrackID,
   selectPeerByID,
+  selectPeersMap,
   selectPermissions,
   selectRolesMap,
   selectRoomState,
@@ -172,7 +173,7 @@ export class HMSSDKActions implements IHMSActions {
   getAuthTokenByRoomCode(
     tokenRequest: sdkTypes.TokenRequest,
     tokenRequestOptions?: sdkTypes.TokenRequestOptions,
-  ): Promise<sdkTypes.TokenResult> {
+  ): Promise<string> {
     return this.sdk.getAuthTokenByRoomCode(tokenRequest, tokenRequestOptions);
   }
 
@@ -950,15 +951,29 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     }
     if (Array.isArray(sdkPeer)) {
+      const storePeers = this.store.getState(selectPeersMap);
+      const newPeerIds = sdkPeer.filter(peer => !storePeers[peer.peerId]);
       this.syncRoomState('peersJoined');
-      const hmsPeers = [];
-      for (const peer of sdkPeer) {
-        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        if (hmsPeer) {
-          hmsPeers.push(hmsPeer);
+      const connected = this.store.getState(selectIsConnectedToRoom);
+      // This is not send unnecessary notifications while in preview
+      // now room state also call peer list to handle large peers
+      if (connected) {
+        const hmsPeers = [];
+        for (const peer of sdkPeer) {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            hmsPeers.push(hmsPeer);
+          }
         }
+        this.hmsNotifications.sendPeerList(hmsPeers);
+      } else {
+        newPeerIds.forEach(peer => {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            this.hmsNotifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_JOINED, hmsPeer);
+          }
+        });
       }
-      this.hmsNotifications.sendPeerList(hmsPeers);
       return;
     }
     this.sendPeerUpdateNotification(type, sdkPeer);
