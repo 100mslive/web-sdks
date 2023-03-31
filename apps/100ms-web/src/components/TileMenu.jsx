@@ -42,7 +42,7 @@ const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
   });
 
   const setSpotlightTrackId = trackId =>
-    hmsActions.sessionStore.set("spotlight", [trackId]);
+    hmsActions.sessionStore.set("spotlight", trackId);
 
   return (
     <StyledMenuTile.ItemButton
