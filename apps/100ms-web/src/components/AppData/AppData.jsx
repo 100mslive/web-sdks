@@ -119,8 +119,12 @@ export const AppData = React.memo(
     }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
 
     useEffect(() => {
+      const path = recordingUrl?.split("qa-app.100ms.live")[1];
+      const newRecordingUrl = recordingUrl
+        ? `${window.location.origin}${path}`
+        : undefined;
       const appData = {
-        [APP_DATA.recordingUrl]: recordingUrl,
+        [APP_DATA.recordingUrl]: newRecordingUrl,
         [APP_DATA.tokenEndpoint]: tokenEndpoint,
         [APP_DATA.logo]: logo,
         [APP_DATA.hlsViewerRole]:

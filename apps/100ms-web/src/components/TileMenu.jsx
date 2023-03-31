@@ -54,7 +54,9 @@ const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
     >
       <StarIcon />
       <span>
-        {isTileSpotlighted ? "Remove from Spotlight" : "Spotlight Tile"}
+        {isTileSpotlighted
+          ? "Remove from Spotlight"
+          : "Spotlight Tile for everyone"}
       </span>
     </StyledMenuTile.ItemButton>
   );
@@ -81,7 +83,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         }
       >
         <PinIcon />
-        <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile</span>
+        <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
   );
