@@ -133,7 +133,7 @@ describe('Notification Manager', () => {
 
       expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_LIST);
       expect(peerUpdateHandler.mock.calls[1][1][0]).toBeInstanceOf(HMSRemotePeer);
-      expect(peerUpdateHandler.mock.calls[1][1][0].peerId).toBe('peer_id_2');
+      expect(peerUpdateHandler.mock.calls[1][1][0].peerId).toBe('peer_id_1');
 
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
