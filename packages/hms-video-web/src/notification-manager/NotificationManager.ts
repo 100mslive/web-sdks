@@ -69,6 +69,7 @@ export class NotificationManager {
     this.requestManager.listener = listener;
     this.activeSpeakerManager.listener = listener;
     this.roomUpdateManager.listener = listener;
+    this.sessionMetadataManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {

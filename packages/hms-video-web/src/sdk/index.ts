@@ -107,7 +107,6 @@ export class HMSSdk implements HMSInterface {
        */
       this.notificationManager.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
-      this.sessionStore.setListener(this.listener);
       return;
     }
 
@@ -138,7 +137,7 @@ export class HMSSdk implements HMSInterface {
       this.analyticsEventsService,
       this.analyticsTimer,
     );
-    this.sessionStore = new SessionStore(this.transport, this.listener);
+    this.sessionStore = new SessionStore(this.transport);
 
     /**
      * Note: Subscribe to events here right after creating stores and managers

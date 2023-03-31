@@ -1,15 +1,11 @@
-import { HMSSessionStore, SessionStoreListener, SessionStoreUpdate } from '../interfaces';
+import { HMSSessionStore } from '../interfaces';
 import ITransport from '../transport/ITransport';
 import { convertDateNumToDate } from '../utils/date';
 
 export class SessionStore implements HMSSessionStore {
   private observedKeys: Set<string> = new Set();
 
-  constructor(private transport: ITransport, private listener?: SessionStoreListener) {}
-
-  setListener(listener?: SessionStoreListener) {
-    this.listener = listener;
-  }
+  constructor(private transport: ITransport) {}
 
   async get(key: string) {
     const { data, updated_at } = await this.transport.getSessionMetadata(key);
@@ -31,14 +27,6 @@ export class SessionStore implements HMSSessionStore {
       await this.transport.listenMetadataChange(Array.from(newObservedKeys));
       this.observedKeys = newObservedKeys;
     }
-
-    const updates: SessionStoreUpdate[] = [];
-    for (const key of keys) {
-      const { value } = await this.get(String(key));
-      updates.push({ key, value });
-    }
-
-    this.listener?.onSessionStoreUpdate(updates);
   }
 
   async unobserve(keys: string[]) {
