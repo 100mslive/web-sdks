@@ -30,11 +30,9 @@ export class SessionStore implements HMSSessionStore {
   }
 
   async unobserve(keys: string[]) {
-    const newObservedKeys = new Set(this.observedKeys);
-    let hasChanged = false;
-    keys.forEach(key => (hasChanged = newObservedKeys.delete(key) || hasChanged));
+    const newObservedKeys = new Set([...this.observedKeys].filter(key => !keys.includes(key)));
 
-    if (hasChanged) {
+    if (this.observedKeys.size !== newObservedKeys.size) {
       await this.transport.listenMetadataChange(Array.from(newObservedKeys));
       this.observedKeys = newObservedKeys;
     }
