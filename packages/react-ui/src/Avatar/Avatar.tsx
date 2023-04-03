@@ -16,31 +16,17 @@ export const StyledAvatar = styled('div', {
   padding: '5%',
   fontWeight: 600,
   fontSize: '1.8rem',
-  minHeight: 0,
+  minHeight: '$16',
+  minWidth: '$16',
+  height: '20%',
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
       square: getAvatarShape('$1'),
     },
-    initial: {
-      single: {
-        '&:before': {
-          display: 'inline-block',
-          content: '',
-          width: '0.5ch',
-        },
-        '&:after': {
-          display: 'inline-block',
-          content: '',
-          width: '0.5ch',
-        },
-      },
-      double: {},
-    },
   },
   defaultVariants: {
     shape: 'circle',
-    initial: 'double',
   },
 });
 
@@ -52,7 +38,7 @@ type Props = VariantProps<typeof StyledAvatar> &
 export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   const { initials, color } = getAvatarBg(name);
   return (
-    <StyledAvatar css={{ bg: color, ...css }} {...props} initial={initials.length === 1 ? 'single' : 'double'}>
+    <StyledAvatar css={{ bg: color, ...css }} {...props}>
       {initials}
     </StyledAvatar>
   );
