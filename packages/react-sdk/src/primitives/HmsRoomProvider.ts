@@ -19,7 +19,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
   actions?: HMSActions<T>;
   store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
-  stats?: HMSStats<T>;
+  stats?: HMSStats;
   /**
    * if true this will enable webrtc stats collection
    */
