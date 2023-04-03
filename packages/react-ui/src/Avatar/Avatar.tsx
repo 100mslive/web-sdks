@@ -19,6 +19,7 @@ export const StyledAvatar = styled('div', {
   minHeight: '$16',
   minWidth: '$16',
   height: '20%',
+  maxHeight: '$20',
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
