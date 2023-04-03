@@ -32,7 +32,7 @@ class Store implements IStore {
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
-  private tracks: Record<string, HMSTrack> = {};
+  private tracks = new Map<HMSTrack, HMSTrack>();
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
@@ -103,7 +103,7 @@ class Store implements IStore {
   }
 
   getTracks() {
-    return Object.values(this.tracks);
+    return Array.from(this.tracks.values());
   }
 
   getVideoTracks() {
@@ -130,8 +130,12 @@ class Store implements IStore {
     return this.getPeerTracks(this.localPeerId) as HMSLocalTrack[];
   }
 
+  hasTrack(track: HMSTrack) {
+    return this.tracks.has(track);
+  }
+
   getTrackById(trackId: string) {
-    const track = this.tracks[trackId];
+    const track = Array.from(this.tracks.values()).find(track => track.trackId === trackId);
     if (track) {
       return track;
     }
@@ -155,8 +159,8 @@ class Store implements IStore {
   }
 
   getPeerByTrackId(trackId: string) {
-    const track = this.tracks[trackId];
-    return track.peerId ? this.peers[track.peerId] : undefined;
+    const track = Array.from(this.tracks.values()).find(track => track.trackId === trackId);
+    return track?.peerId ? this.peers[track.peerId] : undefined;
   }
 
   getSpeakers() {
@@ -233,7 +237,7 @@ class Store implements IStore {
    * Note: Only use this method to add published tracks not preview traks
    */
   addTrack(track: HMSTrack) {
-    this.tracks[track.trackId] = track;
+    this.tracks.set(track, track);
   }
 
   getTrackState(trackId: string) {
@@ -251,8 +255,8 @@ class Store implements IStore {
     delete this.peers[peerId];
   }
 
-  removeTrack(trackId: string) {
-    delete this.tracks[trackId];
+  removeTrack(track: HMSTrack) {
+    this.tracks.delete(track);
   }
 
   updateSpeakers(speakers: HMSSpeaker[]) {

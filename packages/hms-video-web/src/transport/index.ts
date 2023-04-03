@@ -478,7 +478,7 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
-    HMSLogger.i(
+    HMSLogger.d(
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
@@ -738,7 +738,7 @@ export default class HMSTransport implements ITransport {
     await p;
     await track.cleanup();
     // remove track from store on unpublish
-    this.store.removeTrack(track.trackId);
+    this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
