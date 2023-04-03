@@ -28,6 +28,16 @@ export const StyledAvatar = styled('div', {
   },
 });
 
+const InitialsContainer = styled('div', {
+  variants: {
+    initials: {
+      single: {
+        padding: '0.5ch',
+      },
+    },
+  },
+});
+
 type Props = VariantProps<typeof StyledAvatar> &
   React.ComponentProps<typeof StyledAvatar> & {
     name: string;
@@ -35,9 +45,10 @@ type Props = VariantProps<typeof StyledAvatar> &
 
 export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   const { initials, color } = getAvatarBg(name);
+  const isInitialsSingleLetter = initials.length === 1;
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
-      {initials}
+      <InitialsContainer initials={isInitialsSingleLetter ? 'single' : undefined}>{initials}</InitialsContainer>
     </StyledAvatar>
   );
 };
