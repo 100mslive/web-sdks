@@ -31,7 +31,7 @@ export const useSetPinnedMessage = () => {
           : message.message
         : null;
       if (newPinnedMessage !== pinnedMessage) {
-        await hmsActions.setSessionMetadata(newPinnedMessage);
+        await hmsActions.sessionStore.set("pinnedMessage", newPinnedMessage);
       }
     },
     [hmsActions, vanillaStore, pinnedMessage]

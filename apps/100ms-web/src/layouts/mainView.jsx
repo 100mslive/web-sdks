@@ -65,6 +65,8 @@ export const ConferenceMainView = () => {
     if (audioPlaylist.length > 0) {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
+
+    hmsActions.sessionStore.observe(["pinnedMessage", "spotlight"]);
   }, [isConnected, hmsActions]);
 
   if (!localPeerRole) {

@@ -21,7 +21,7 @@ import { CHAT_SELECTOR } from "../../common/constants";
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
-  const pinnedMessage = useHMSStore(selectSessionStore("default"));
+  const pinnedMessage = useHMSStore(selectSessionStore("pinnedMessage"));
 
   return pinnedMessage ? (
     <Flex
