@@ -108,6 +108,9 @@ export default class HMSTransport implements ITransport {
       const currentSubscribeBitrate = stats.getLocalPeerStats()?.subscribe?.bitrate || 0;
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
+
+    this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localVideoEnabled.subscribe(({ track }) => this.trackUpdate(track));
   }
 
   /**
@@ -138,7 +141,7 @@ export default class HMSTransport implements ITransport {
         this.signal.answer(answer);
         HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation DONE ✅');
       } catch (err) {
-        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌');
+        HMSLogger.d(TAG, '[role=SUBSCRIBE] onOffer renegotiation FAILED ❌', err);
         this.state = TransportState.Failed;
         let ex: HMSException;
         if (err instanceof HMSException) {
@@ -146,9 +149,8 @@ export default class HMSTransport implements ITransport {
         } else {
           ex = ErrorFactory.GenericErrors.Unknown(HMSAction.PUBLISH, (err as Error).message);
         }
-
+        this.observer.onFailure(ex);
         this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeFail(ex));
-        throw ex;
       }
     },
 
@@ -416,7 +418,7 @@ export default class HMSTransport implements ITransport {
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
           ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
           ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
-          ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+          ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         ].includes(error.code) ||
           error.code.toString().startsWith('5') ||
           error.code.toString().startsWith('429'));
@@ -476,7 +478,7 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
-    HMSLogger.i(
+    HMSLogger.d(
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
@@ -703,6 +705,8 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    track.isPublished = true;
+
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
   }
 
@@ -734,7 +738,7 @@ export default class HMSTransport implements ITransport {
     await p;
     await track.cleanup();
     // remove track from store on unpublish
-    this.store.removeTrack(track.trackId);
+    this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
@@ -774,7 +778,6 @@ export default class HMSTransport implements ITransport {
           this.signal,
           this.initConfig.rtcConfiguration,
           this.publishConnectionObserver,
-          this,
         );
       }
 
@@ -806,7 +809,9 @@ export default class HMSTransport implements ITransport {
               HMSAction.JOIN,
               `Websocket join error - ${(error as Error).message}`,
             );
-      const shouldRetry = parseInt(`${hmsError.code / 100}`) === 5 || hmsError.code === 429;
+      const shouldRetry =
+        parseInt(`${hmsError.code / 100}`) === 5 ||
+        [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
 
       if (shouldRetry) {
         this.joinRetryCount = 0;
@@ -990,7 +995,7 @@ export default class HMSTransport implements ITransport {
           ),
         );
       }
-      HMSLogger.d(TAG, '❌ internal connect: failed', error);
+      HMSLogger.e(TAG, '❌ internal connect: failed', error);
       throw error;
     }
   }
@@ -1006,7 +1011,7 @@ export default class HMSTransport implements ITransport {
 
   private async openSignal(token: string, peerId: string) {
     if (!this.initConfig) {
-      throw ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
+      throw ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
 
     HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);
@@ -1057,7 +1062,12 @@ export default class HMSTransport implements ITransport {
   }
 
   private retryPublishIceFailedTask = async () => {
-    if (this.publishConnection && this.publishConnection.connectionState !== 'connected') {
+    /**
+     * Proceed with the retry even if the connection state is connected as the offer could have failed
+     * which will cause missing tiles if it is not sent again.
+     * Do iceRestart only if not connected
+     */
+    if (this.publishConnection) {
       const p = new Promise<boolean>((resolve, reject) => {
         this.callbacks.set(RENEGOTIATION_CALLBACK_ID, {
           promise: { resolve, reject },
@@ -1065,7 +1075,7 @@ export default class HMSTransport implements ITransport {
           extra: {},
         });
       });
-      await this.performPublishRenegotiation({ iceRestart: true });
+      await this.performPublishRenegotiation({ iceRestart: this.publishConnection.connectionState !== 'connected' });
       await p;
     }
 
@@ -1098,17 +1108,15 @@ export default class HMSTransport implements ITransport {
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
-      try {
-        await this.internalConnect(
-          this.joinParameters!.authToken,
-          this.joinParameters!.endpoint,
-          this.joinParameters!.peerId,
-        );
-      } catch (ex) {}
+      await this.internalConnect(
+        this.joinParameters!.authToken,
+        this.joinParameters!.endpoint,
+        this.joinParameters!.peerId,
+      );
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect
-    const ok = this.store.getRoom().joinedAt
+    const ok = this.store.getRoom()?.joinedAt
       ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection

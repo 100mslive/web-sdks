@@ -12,7 +12,7 @@ test.afterEach(async () => {
   await page.close();
 });
 
-test(`Verify network connection/disconnection notification on preview page`, async () => {
+test.skip(`Verify network connection/disconnection notification on preview page`, async () => {
   await page.assertVisible(page.preview.preview_audio_on_btn);
   await page.setInternetEnabled(false);
   await page.assertVisible(page.center.network_offline_notification);

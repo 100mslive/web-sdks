@@ -66,12 +66,12 @@ export class AnalyticsEventsService {
     const localPeer = this.store.getLocalPeer();
     event.metadata.token = this.store.getConfig()?.authToken;
     event.metadata.peer = {
-      session_id: room.sessionId,
-      room_id: room.id,
-      room_name: room.name,
-      template_id: room.templateId,
-      joined_at: room.joinedAt?.getTime(),
-      session_started_at: room.startedAt?.getTime(),
+      session_id: room?.sessionId,
+      room_id: room?.id,
+      room_name: room?.name,
+      template_id: room?.templateId,
+      joined_at: room?.joinedAt?.getTime(),
+      session_started_at: room?.startedAt?.getTime(),
       role: localPeer?.role?.name,
       user_name: localPeer?.name,
       user_data: localPeer?.metadata,

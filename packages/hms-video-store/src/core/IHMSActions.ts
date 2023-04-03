@@ -10,6 +10,8 @@ import {
   HMSScreenShareConfig,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
+  TokenRequest,
+  TokenRequestOptions,
 } from '@100mslive/hms-video';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
@@ -472,4 +474,12 @@ export interface IHMSActions {
    **/
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
+
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
+
+  /**
+   * enable sending audio speaker data to beam
+   * @alpha
+   */
+  enableBeamSpeakerLabelsLogging(): Promise<void>;
 }

@@ -33,7 +33,7 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
-let blankCanvas: any;
+let blankCanvas: HTMLCanvasElement;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -50,7 +50,7 @@ export class LocalTrackManager {
   }
 
   // eslint-disable-next-line complexity
-  async getTracksToPublish(initialSettings: InitialSettings): Promise<HMSLocalTrack[]> {
+  async getTracksToPublish(initialSettings: InitialSettings = defaultSettings): Promise<HMSLocalTrack[]> {
     const trackSettings = this.getAVTrackSettings(initialSettings);
     if (!trackSettings) {
       return [];
@@ -74,8 +74,12 @@ export class LocalTrackManager {
       video: canPublishVideo && !videoTrack && (initialSettings.isVideoMuted ? 'empty' : true),
     };
 
-    this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
-    this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
+    if (fetchTrackOptions.audio) {
+      this.analyticsTimer.start(TimedEvent.LOCAL_AUDIO_TRACK);
+    }
+    if (fetchTrackOptions.video) {
+      this.analyticsTimer.start(TimedEvent.LOCAL_VIDEO_TRACK);
+    }
     try {
       HMSLogger.d(this.TAG, 'Init Local Tracks', { fetchTrackOptions });
       tracksToPublish = await this.getLocalTracks(fetchTrackOptions, trackSettings, localStream);
@@ -87,18 +91,13 @@ export class LocalTrackManager {
         localStream,
       );
     }
-    this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
-    this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
+    if (fetchTrackOptions.audio) {
+      this.analyticsTimer.end(TimedEvent.LOCAL_AUDIO_TRACK);
+    }
+    if (fetchTrackOptions.video) {
+      this.analyticsTimer.end(TimedEvent.LOCAL_VIDEO_TRACK);
+    }
 
-    /**
-     * concat local tracks only if both are true which means it is either join or switched from a role
-     * with no tracks earlier.
-     * the reason we need this is for preview API to work, in case of preview we want to publish the same
-     * tracks which were shown and are already part of the local peer instead of creating new ones.
-     * */
-    // if (publishConfig.publishAudio && publishConfig.publishVideo) {
-    //   return tracks.concat(localTracks);
-    // }
     if (videoTrack && canPublishVideo && !isVideoTrackPublished) {
       tracksToPublish.push(videoTrack);
     }
@@ -269,8 +268,10 @@ export class LocalTrackManager {
     const height = prevTrack?.getSettings()?.height || 240;
     const frameRate = 10; // fps TODO: experiment, see if this can be reduced
     if (!blankCanvas) {
-      blankCanvas = Object.assign(document.createElement('canvas'), { width, height });
-      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
+      blankCanvas = document.createElement('canvas');
+      blankCanvas.width = width;
+      blankCanvas.height = height;
+      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
     }
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];

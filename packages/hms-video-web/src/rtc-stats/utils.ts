@@ -1,7 +1,7 @@
-import { HMSWebrtcStats } from './HMSWebrtcStats';
 import {
   HMSPeerStats,
   HMSTrackStats,
+  MissingInboundStats,
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
@@ -10,18 +10,20 @@ import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
 
 export const getLocalTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
   track: HMSLocalTrack,
   peerName?: string,
   prevTrackStats?: Record<string, HMSTrackStats>,
 ): Promise<Record<string, HMSTrackStats> | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   const trackStats: Record<string, HMSTrackStats> = {};
+  if (!track.transceiver?.sender.track) {
+    return;
+  }
   try {
-    trackReport = await getStats['publish']?.(track.getTrackBeingSent());
+    trackReport = await track.transceiver.sender.getStats();
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
-    const inbound: Record<string, RTCInboundRtpStreamStats> = {};
+    const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
     trackReport?.forEach(stat => {
       switch (stat.type) {
         case 'outbound-rtp':
@@ -52,26 +54,27 @@ export const getLocalTrackStats = async (
         bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
         packetsLost: inStats?.packetsLost,
         jitter: inStats?.jitter,
+        roundTripTime: inStats?.roundTripTime,
+        totalRoundTripTime: inStats?.totalRoundTripTime,
         peerName,
         peerID: track.peerId,
         codec,
       };
     });
   } catch (err) {
-    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err);
+    HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err, (err as Error).name);
   }
   return trackStats;
 };
 
 export const getTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
   track: HMSRemoteTrack,
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   try {
-    trackReport = await getStats['subscribe']?.(track.nativeTrack);
+    trackReport = await track.transceiver?.receiver.getStats();
   } catch (err) {
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }

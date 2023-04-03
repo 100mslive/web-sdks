@@ -39,6 +39,8 @@ export type {
   HMSScreenShareConfig,
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
 } from './hmsSDKStore/sdkTypes';
 
 export * from '../controller/beam/BeamController';

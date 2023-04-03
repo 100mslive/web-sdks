@@ -52,7 +52,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private socket: WebSocket | null = null;
 
-  private callbacks = new Map<string, PromiseCallbacks<string>>();
+  private callbacks = new Map<string, PromiseCallbacks<string, { method: HMSSignalMethod }>>();
 
   private _isConnected = false;
   private id = 0;
@@ -72,6 +72,7 @@ export default class JsonRpcSignal implements ISignal {
     if (this._isConnected && !newValue) {
       // went offline
       this._isConnected = newValue;
+      this.rejectPendingCalls(reason);
       this.observer.onOffline(reason);
     } else if (!this._isConnected && newValue) {
       // went online
@@ -100,16 +101,20 @@ export default class JsonRpcSignal implements ISignal {
 
     try {
       const response = await new Promise<any>((resolve, reject) => {
-        this.callbacks.set(id, { resolve, reject });
+        this.callbacks.set(id, { resolve, reject, metadata: { method: method as HMSSignalMethod } });
       });
 
       return response;
     } catch (ex) {
-      const error = ex as HMSException;
+      if (ex instanceof HMSException) {
+        throw ex;
+      }
+
+      const error = ex as JsonRpcResponse['error'];
       throw ErrorFactory.WebsocketMethodErrors.ServerErrors(
-        Number((error as HMSException).code),
+        Number(error.code),
         convertSignalMethodtoErrorAction(method as HMSSignalMethod),
-        (error as HMSException).message,
+        error.message,
       );
     }
   }
@@ -142,11 +147,9 @@ export default class JsonRpcSignal implements ISignal {
          */
         HMSLogger.e(this.TAG, 'Error from websocket', error);
         promiseSettled = true;
+        // above error does not contain any description hence not sent here
         reject(
-          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(
-            HMSAction.JOIN,
-            `Error opening websocket connection - ${error}`,
-          ),
+          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(HMSAction.JOIN, `Error opening websocket connection`),
         );
       };
 
@@ -342,7 +345,6 @@ export default class JsonRpcSignal implements ISignal {
   private onMessageHandler(event: MessageEvent) {
     const text: string = event.data;
     const response = JSON.parse(text);
-
     if (response.id) {
       this.handleResponseWithId(response);
     } else if (response.method) {
@@ -393,6 +395,23 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onNotification(response);
         break;
     }
+  }
+
+  private rejectPendingCalls(reason = '') {
+    this.callbacks.forEach((callback, id) => {
+      if (callback.metadata?.method !== HMSSignalMethod.PING) {
+        HMSLogger.e(this.TAG, `rejecting pending callback ${callback.metadata?.method}, id=${id}`);
+        callback.reject(
+          ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+            callback.metadata?.method
+              ? convertSignalMethodtoErrorAction(callback.metadata?.method)
+              : HMSAction.RECONNECT_SIGNAL,
+            reason,
+          ),
+        );
+        this.callbacks.delete(id);
+      }
+    });
   }
 
   private async pingPongLoop(id: number) {

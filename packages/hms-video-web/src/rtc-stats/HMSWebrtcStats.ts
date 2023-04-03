@@ -7,7 +7,7 @@ import {
   union,
 } from './utils';
 import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
-import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 
@@ -84,21 +84,21 @@ export class HMSWebrtcStats {
   }
 
   private async updateRemoteTrackStats() {
-    const tracks = this.store.getTracksMap();
-    const trackIDs = union(Object.keys(this.remoteTrackStats), Object.keys(tracks)).filter(
-      trackId => tracks[trackId] && tracks[trackId].peerId !== this.localPeerID,
+    const tracks = Array.from(this.store.getTracksMap().values()).filter(
+      track => track instanceof HMSRemoteVideoTrack || track instanceof HMSRemoteAudioTrack,
     );
-    for (const trackID of trackIDs) {
-      const track = tracks[trackID];
-      if (track) {
-        const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
-        const prevTrackStats = this.getRemoteTrackStats(track.trackId);
-        const trackStats = await getTrackStats(this.getStats, track as HMSRemoteTrack, peerName, prevTrackStats);
-        if (trackStats) {
-          this.remoteTrackStats[trackID] = trackStats;
-        }
-      } else {
-        delete this.remoteTrackStats[trackID];
+    const trackIds = tracks.map(track => track.trackId);
+    Object.keys(this.remoteTrackStats).forEach(trackId => {
+      if (!trackIds.includes(trackId)) {
+        delete this.remoteTrackStats[trackId];
+      }
+    });
+    for (const track of tracks) {
+      const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
+      const prevTrackStats = this.getRemoteTrackStats(track.trackId);
+      const trackStats = await getTrackStats(track as HMSRemoteTrack, peerName, prevTrackStats);
+      if (trackStats) {
+        this.remoteTrackStats[track.trackId] = trackStats;
       }
     }
   }
@@ -113,7 +113,7 @@ export class HMSWebrtcStats {
       const track = tracks[trackID] as HMSLocalTrack;
       if (track) {
         const peerName = this.store.getLocalPeer()?.name;
-        const trackStats = await getLocalTrackStats(this.getStats, track, peerName, this.localTrackStats[trackID]);
+        const trackStats = await getLocalTrackStats(track, peerName, this.localTrackStats[trackID]);
         if (trackStats) {
           this.localTrackStats[trackID] = trackStats;
         }

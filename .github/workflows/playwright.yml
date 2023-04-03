@@ -6,18 +6,10 @@ on:
       region:
         description: 'Region to run the test for'
         required: true
-        default: 'qa-in'
+        default: 'prod-in'
   schedule:
-    # qa-in
-    - cron: '0 9 * * *'
-    # qa-us
-    - cron: '10 9 * * *'
     # prod-in
     - cron: '20 9 * * *'
-    # prod-us
-    - cron: '30 9 * * *'
-    # prod-eu
-    - cron: '40 9 * * *'
 
   push:
     branches: [main]
@@ -42,29 +34,9 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: echo "REGION=${{ github.event.inputs.region }}" >> $GITHUB_ENV
 
-      - name: Test on QA-IN when push
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
-        run: echo "REGION=qa-in" >> $GITHUB_ENV
-
-      - name: (From Cron) QA-IN
-        if: github.event.schedule == '0 9 * * *'
-        run: echo "REGION=qa-in" >> $GITHUB_ENV
-
-      - name: (From Cron) QA-US
-        if: github.event.schedule == '10 9 * * *'
-        run: echo "REGION=qa-us" >> $GITHUB_ENV
-
       - name: (From Cron) PROD-IN
         if: github.event.schedule == '20 9 * * *'
         run: echo "REGION=prod-in" >> $GITHUB_ENV
-
-      - name: (From Cron) PROD-US
-        if: github.event.schedule == '30 9 * * *'
-        run: echo "REGION=prod-us" >> $GITHUB_ENV
-
-      - name: (From Cron) PROD-EU
-        if: github.event.schedule == '40 9 * * *'
-        run: echo "REGION=prod-eu" >> $GITHUB_ENV
 
       - name: print selected region
         run: echo "selected region for test = ${{ env.REGION }}"

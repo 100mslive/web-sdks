@@ -106,6 +106,7 @@ export class PeerListManager {
       this.peerManager.handlePeerLeave(peerNotification);
     });
 
+    const peerList: PeerNotification[] = [];
     // Check for any tracks which are added/removed
     peers.forEach(newPeerNotification => {
       const oldPeer = this.store.getPeerById(newPeerNotification.peer_id);
@@ -143,11 +144,15 @@ export class PeerListManager {
 
         // Update peer's role locally, new role is received from the reconnect peer-list
         this.peerManager.handlePeerUpdate(newPeerNotification);
+        peerList.push(newPeerNotification);
       } else {
         // New peer joined while reconnecting
-        this.peerManager.handlePeerJoin(newPeerNotification);
+        peerList.push(newPeerNotification);
       }
     });
+    if (peerList.length > 0) {
+      this.peerManager.handlePeerList(peerList);
+    }
   };
 
   private removePeerTrack(peer: HMSPeer, trackId: string) {

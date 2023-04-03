@@ -23,18 +23,14 @@ import {
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import {
-  areArraysEqual,
-  mergeNewPeersInDraft,
-  mergeNewTracksInDraft,
-  mergePreviewPeerInDraft,
-} from './sdkUtils/storeMergeUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { NamedSetState } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
+import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -68,6 +64,7 @@ import {
   selectLocalTrackIDs,
   selectLocalVideoTrackID,
   selectPeerByID,
+  selectPeersMap,
   selectPermissions,
   selectRolesMap,
   selectRoomState,
@@ -109,6 +106,7 @@ export class HMSSDKActions implements IHMSActions {
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger;
 
   constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
     this.store = store;
@@ -149,12 +147,12 @@ export class HMSSDKActions implements IHMSActions {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         //@ts-ignore
         if (layer === HMSSimulcastLayer.NONE) {
-          HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          HMSLogger.d(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
           return;
         }
         const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
         if (alreadyInSameState) {
-          HMSLogger.w(`preferred layer is already ${layer}`);
+          HMSLogger.d(`preferred layer is already ${layer}`);
           return;
         }
         this.setState(draftStore => {
@@ -165,11 +163,18 @@ export class HMSSDKActions implements IHMSActions {
         }, 'setPreferredLayer');
         await track.setPreferredLayer(layer);
       } else {
-        HMSLogger.w(`track ${trackId} is not a remote video track`);
+        HMSLogger.d(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
     }
+  }
+
+  getAuthTokenByRoomCode(
+    tokenRequest: sdkTypes.TokenRequest,
+    tokenRequestOptions?: sdkTypes.TokenRequestOptions,
+  ): Promise<string> {
+    return this.sdk.getAuthTokenByRoomCode(tokenRequest, tokenRequestOptions);
   }
 
   async preview(config: sdkTypes.HMSPreviewConfig) {
@@ -227,6 +232,9 @@ export class HMSSDKActions implements IHMSActions {
       .leave(notifyServer)
       .then(() => {
         this.resetState('leave');
+        if (this.beamSpeakerLabelsLogger) {
+          this.beamSpeakerLabelsLogger.stop().catch(HMSLogger.e);
+        }
         HMSLogger.i('left room');
       })
       .catch(err => {
@@ -398,12 +406,12 @@ export class HMSSDKActions implements IHMSActions {
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
+      await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
       }
-      this.logPossibleInconsistency('no video track found to remove sink');
+      HMSLogger.d('possible inconsistency detected - no video track found to remove sink');
     }
   }
 
@@ -669,6 +677,14 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async enableBeamSpeakerLabelsLogging() {
+    if (!this.beamSpeakerLabelsLogger) {
+      HMSLogger.i('enabling beam speaker labels logging');
+      this.beamSpeakerLabelsLogger = new BeamSpeakerLabelsLogger(this.store, this);
+      await this.beamSpeakerLabelsLogger.start();
+    }
+  }
+
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
@@ -731,8 +747,8 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (this.hmsSDKPeers[localPeer?.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -794,7 +810,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
+      await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
@@ -820,6 +836,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -840,8 +857,10 @@ export class HMSSDKActions implements IHMSActions {
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
-      if (hmsPeer.isLocal) {
-        Object.assign(newMediaSettings, this.getMediaSettings(sdkPeer));
+      if (sdkPeer.isLocal) {
+        const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
+        newPreview = this.getPreviewFields(localPeer);
+        Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
 
@@ -861,10 +880,19 @@ export class HMSSDKActions implements IHMSActions {
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+
+      /**
+       * if preview is already present merge,
+       * else set as is(which will create/delete)
+       */
+      if (draftStore.preview?.localPeer && newPreview?.localPeer) {
+        Object.assign(draftStore.preview, newPreview);
+      } else {
+        draftStore.preview = newPreview;
+      }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
-      mergePreviewPeerInDraft(draftStore, draftPeers);
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
@@ -923,15 +951,29 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     }
     if (Array.isArray(sdkPeer)) {
+      const storePeers = this.store.getState(selectPeersMap);
+      const newPeerIds = sdkPeer.filter(peer => !storePeers[peer.peerId]);
       this.syncRoomState('peersJoined');
-      const hmsPeers = [];
-      for (const peer of sdkPeer) {
-        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        if (hmsPeer) {
-          hmsPeers.push(hmsPeer);
+      const connected = this.store.getState(selectIsConnectedToRoom);
+      // This is not send unnecessary notifications while in preview
+      // now room state also call peer list to handle large peers
+      if (connected) {
+        const hmsPeers = [];
+        for (const peer of sdkPeer) {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            hmsPeers.push(hmsPeer);
+          }
         }
+        this.hmsNotifications.sendPeerList(hmsPeers);
+      } else {
+        newPeerIds.forEach(peer => {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            this.hmsNotifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_JOINED, hmsPeer);
+          }
+        });
       }
-      this.hmsNotifications.sendPeerList(hmsPeers);
       return;
     }
     this.sendPeerUpdateNotification(type, sdkPeer);
@@ -1176,6 +1218,22 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
+  private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    // if room is not in preview, clear preview fields
+    if (!sdkLocalPeer.isInPreview()) {
+      return;
+    }
+
+    const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
+
+    return {
+      localPeer: hmsLocalPeer.id,
+      audioTrack: hmsLocalPeer.audioTrack,
+      videoTrack: hmsLocalPeer.videoTrack,
+      asRole: sdkLocalPeer.asRole?.name || sdkLocalPeer.role?.name,
+    };
+  }
+
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
@@ -1201,7 +1259,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private localAndVideoUnmuting(trackID: string) {
     const localPeer = this.store.getState(selectLocalPeer);
-    if (localPeer.videoTrack !== trackID) {
+    if (localPeer?.videoTrack !== trackID) {
       return false;
     }
     const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);
