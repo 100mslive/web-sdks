@@ -15,9 +15,10 @@ export const StyledAvatar = styled('div', {
   aspectRatio: 1,
   fontWeight: 600,
   fontSize: '1.8rem',
+  padding: '1.8rem',
   minHeight: '$16',
   minWidth: '$16',
-  height: '20%',
+  height: '22%',
   maxHeight: '$20',
   variants: {
     shape: {
