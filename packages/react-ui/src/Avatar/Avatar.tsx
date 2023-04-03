@@ -13,7 +13,6 @@ export const StyledAvatar = styled('div', {
   color: '$white',
   fontFamily: '$sans',
   aspectRatio: 1,
-  padding: '5%',
   fontWeight: 600,
   fontSize: '1.8rem',
   minHeight: '$16',
