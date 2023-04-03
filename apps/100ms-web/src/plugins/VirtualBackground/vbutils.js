@@ -23,13 +23,13 @@ export function getRandomVirtualBackground() {
 
   backgroundList.push(...images);
 
-  const gifList = [
+  /* const gifList = [
     {
       background: "https://www.100ms.live/images/vb-1.gif",
       backgroundType: HMSVirtualBackgroundTypes.GIF,
     },
   ];
-  backgroundList.push(...gifList);
+  backgroundList.push(...gifList); */
 
   const videoList = [
     "https://www.100ms.live/images/video-1.mp4",
