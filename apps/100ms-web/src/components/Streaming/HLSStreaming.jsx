@@ -163,12 +163,14 @@ const StartHLS = () => {
         setHLSStarted(true);
         setError("");
         await hmsActions.startHLSStreaming({
-          variants: [{ meetingURL: recordingUrl || getDefaultMeetingUrl() }],
+          variants,
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {
         if (error.message.includes("invalid input")) {
-          await startHLS();
+          await startHLS([
+            { meetingURL: recordingUrl || getDefaultMeetingUrl() },
+          ]);
           return;
         }
         setHLSStarted(false);
