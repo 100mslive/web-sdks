@@ -34,7 +34,7 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
   private readonly actions: IHMSActions<T>;
   private readonly store: IHMSStore<T>;
   private readonly notifications: HMSNotifications<T>;
-  private stats?: HMSStats<T>;
+  private stats?: HMSStats;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
@@ -131,7 +131,7 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
    */
   getStats = (): IHMSStatsStoreReadOnly => {
     if (!this.stats) {
-      this.stats = new HMSStats<T>(this.store, this.sdk);
+      this.stats = new HMSStats(this.store as unknown as IHMSStore, this.sdk);
     }
     return this.stats;
   };

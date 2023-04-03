@@ -3,21 +3,19 @@ import { HMSSdk } from '@100mslive/hms-video';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../../common/storeName';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
-import { createDefaultStatsStore, HMSGenericTypes, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
+import { createDefaultStatsStore, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
 
 /**
  * @internal
  */
-export class HMSStats<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
-  implements IHMSStatsStoreReadOnly
-{
+export class HMSStats implements IHMSStatsStoreReadOnly {
   readonly getState: GetState<HMSStatsStore>;
   readonly subscribe: Subscribe<HMSStatsStore>;
   readonly getPublishPeerConnection: () => Promise<RTCPeerConnection | undefined>;
   readonly getSubscribePeerConnection: () => Promise<RTCPeerConnection | undefined>;
   private readonly store: IHMSStatsStore;
 
-  constructor(private hmsStore: IHMSStore<T>, private sdk?: HMSSdk) {
+  constructor(private hmsStore: IHMSStore, private sdk?: HMSSdk) {
     this.store = HMSReactiveStore.createNewHMSStore<HMSStatsStore>(
       storeNameWithTabTitle('HMSStatsStore'),
       createDefaultStatsStore,
@@ -56,6 +54,6 @@ export class HMSStats<T extends HMSGenericTypes = { sessionStore: Record<string,
       return;
     }
 
-    subscribeToSdkWebrtcStats<T>(this.sdk, this.store, this.hmsStore);
+    subscribeToSdkWebrtcStats(this.sdk, this.store, this.hmsStore);
   }
 }
