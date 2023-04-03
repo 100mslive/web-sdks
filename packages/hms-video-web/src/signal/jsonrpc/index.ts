@@ -147,11 +147,9 @@ export default class JsonRpcSignal implements ISignal {
          */
         HMSLogger.e(this.TAG, 'Error from websocket', error);
         promiseSettled = true;
+        // above error does not contain any description hence not sent here
         reject(
-          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(
-            HMSAction.JOIN,
-            `Error opening websocket connection - ${error}`,
-          ),
+          ErrorFactory.WebSocketConnectionErrors.FailedToConnect(HMSAction.JOIN, `Error opening websocket connection`),
         );
       };
 
@@ -347,7 +345,6 @@ export default class JsonRpcSignal implements ISignal {
   private onMessageHandler(event: MessageEvent) {
     const text: string = event.data;
     const response = JSON.parse(text);
-
     if (response.id) {
       this.handleResponseWithId(response);
     } else if (response.method) {

@@ -17,7 +17,8 @@ export const getClosestLayer = (
   videoElementDimensions: { width: number; height: number },
 ): HMSPreferredSimulcastLayer => {
   let closestLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
-  const maxDimension = videoElementDimensions.width >= videoElementDimensions.height ? 'width' : 'height';
+  // when both width and height are equal pick height to select a better quality
+  const maxDimension = videoElementDimensions.width > videoElementDimensions.height ? 'width' : 'height';
   const layers = [...simulcastLayers].sort((a, b) => layerToIntMapping[a.layer] - layerToIntMapping[b.layer]);
   const videoDimesion = videoElementDimensions[maxDimension];
   for (let i = 0; i < layers.length; i++) {

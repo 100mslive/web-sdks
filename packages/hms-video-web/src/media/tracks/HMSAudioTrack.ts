@@ -58,7 +58,7 @@ export class HMSAudioTrack extends HMSTrack {
 
   async setOutputDevice(device: MediaDeviceInfo) {
     if (!this.audioElement) {
-      HMSLogger.d('audio-track', 'no audio element to set output');
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'no audio element to set output', `${this}`);
       return;
     }
     try {
@@ -69,7 +69,7 @@ export class HMSAudioTrack extends HMSTrack {
         this.outputDevice = device;
       }
     } catch (error) {
-      HMSLogger.d('audio-track', error);
+      HMSLogger.d('[HMSAudioTrack]', 'error in setSinkId', error);
     }
   }
 
