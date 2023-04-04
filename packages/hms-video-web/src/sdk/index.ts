@@ -494,7 +494,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   async getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string> {
-    const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth-nonprod.100ms.live/v2/token';
+    const tokenAPIURL = (tokenRequestOptions || {}).endpoint || 'https://auth.100ms.live/v2/token';
     this.analyticsTimer.start(TimedEvent.GET_TOKEN);
     const response = await fetchWithRetry(
       tokenAPIURL,

@@ -126,10 +126,7 @@ export const AppData = React.memo(
         [APP_DATA.hlsViewerRole]:
           getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
           DEFAULT_HLS_VIEWER_ROLE,
-        [APP_DATA.appConfig]: {
-          ...getAppDetails(appDetails),
-          headlessConfig: { tileOffset: 0 },
-        },
+        [APP_DATA.appConfig]: getAppDetails(appDetails),
       };
       for (const key in appData) {
         hmsActions.setAppData([key], appData[key]);

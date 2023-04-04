@@ -269,7 +269,7 @@ export default function App() {
   return (
     <EdtechComponent
       themeConfig={{
-        aspectRatio: "16-9",
+        aspectRatio: process.env.REACT_APP_TILE_SHAPE,,
         theme: process.env.REACT_APP_THEME,
         color: process.env.REACT_APP_COLOR,
         logo: process.env.REACT_APP_LOGO,
