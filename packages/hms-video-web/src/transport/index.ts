@@ -36,6 +36,7 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  SetSessionMetadataParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
@@ -652,12 +653,16 @@ export default class HMSTransport implements ITransport {
     });
   }
 
-  getSessionMetadata() {
-    return this.signal.getSessionMetadata();
+  getSessionMetadata(key?: string) {
+    return this.signal.getSessionMetadata(key);
   }
 
-  async setSessionMetadata(metadata: any) {
-    await this.signal.setSessionMetadata({ data: metadata });
+  setSessionMetadata(params: SetSessionMetadataParams) {
+    return this.signal.setSessionMetadata(params);
+  }
+
+  listenMetadataChange(keys: string[]): Promise<void> {
+    return this.signal.listenMetadataChange(keys);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

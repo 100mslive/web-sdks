@@ -1,21 +1,21 @@
 import { HMSLogger } from '../../common/ui-logger';
-import { HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
+import { HMSGenericTypes, HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
 import { IHMSActions } from '../../core/IHMSActions';
 
 /**
  * Log data of audio level and speaker speaking periodically to beam for transcript
  * diarization.
  */
-export class BeamSpeakerLabelsLogger {
+export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
   private audioContext?: AudioContext;
   private readonly intervalMs: number;
   private shouldMonitor: boolean;
   private hasStarted: boolean;
   private unsubs: any[];
   private readonly analysers: Record<string, AnalyserNode>;
-  private readonly store: IHMSStore;
-  private actions: IHMSActions;
-  constructor(store: IHMSStore, actions: IHMSActions) {
+  private readonly store: IHMSStore<T>;
+  private actions: IHMSActions<T>;
+  constructor(store: IHMSStore<T>, actions: IHMSActions<T>) {
     this.intervalMs = 100;
     this.shouldMonitor = false;
     this.hasStarted = false;

@@ -17,7 +17,7 @@ import { storeNameWithTabTitle } from '../../common/storeName';
 import { BeamControllerStore } from '../../controller/beam/BeamController';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
-import { createDefaultStoreState, HMSStore } from '../schema';
+import { createDefaultStoreState, HMSGenericTypes, HMSStore } from '../schema';
 import { IHMSNotifications } from '../schema/notification';
 import { HMSStats } from '../webrtc-stats';
 
@@ -29,20 +29,20 @@ declare global {
   }
 }
 
-export class HMSReactiveStore {
+export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   private readonly sdk?: HMSSdk;
-  private readonly actions: IHMSActions;
-  private readonly store: IHMSStore;
-  private readonly notifications: HMSNotifications;
+  private readonly actions: IHMSActions<T>;
+  private readonly store: IHMSStore<T>;
+  private readonly notifications: HMSNotifications<T>;
   private stats?: HMSStats;
   /** @TODO store flag for both HMSStore and HMSInternalsStore */
   private initialTriggerOnSubscribe: boolean;
 
-  constructor(hmsStore?: IHMSStore, hmsActions?: IHMSActions, hmsNotifications?: HMSNotifications) {
+  constructor(hmsStore?: IHMSStore<T>, hmsActions?: IHMSActions<T>, hmsNotifications?: HMSNotifications<T>) {
     if (hmsStore) {
       this.store = hmsStore;
     } else {
-      this.store = HMSReactiveStore.createNewHMSStore<HMSStore>(
+      this.store = HMSReactiveStore.createNewHMSStore<HMSStore<T>>(
         storeNameWithTabTitle('HMSStore'),
         createDefaultStoreState,
       );
@@ -65,8 +65,10 @@ export class HMSReactiveStore {
     this.initialTriggerOnSubscribe = false;
 
     if (isBrowser) {
+      // @ts-ignore
       window.__hms = this;
-      window.__beam = new BeamControllerStore(this.store, this.actions, this.notifications);
+      // @ts-ignore
+      window.__beam = new BeamControllerStore<T>(this.store, this.actions, this.notifications);
     }
   }
 
@@ -103,7 +105,7 @@ export class HMSReactiveStore {
    *
    * @deprecated use getActions
    */
-  getHMSActions(): IHMSActions {
+  getHMSActions(): IHMSActions<T> {
     return this.actions;
   }
 
@@ -111,7 +113,7 @@ export class HMSReactiveStore {
    * Any action which may modify the store or may need to talk to the SDK will happen
    * through the IHMSActions instance returned by this
    */
-  getActions(): IHMSActions {
+  getActions(): IHMSActions<T> {
     return this.actions;
   }
 
@@ -129,7 +131,7 @@ export class HMSReactiveStore {
    */
   getStats = (): IHMSStatsStoreReadOnly => {
     if (!this.stats) {
-      this.stats = new HMSStats(this.store, this.sdk);
+      this.stats = new HMSStats(this.store as unknown as IHMSStore, this.sdk);
     }
     return this.stats;
   };

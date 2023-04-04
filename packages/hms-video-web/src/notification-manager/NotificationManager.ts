@@ -6,6 +6,7 @@ import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
 import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
+import { SessionMetadataManager } from './managers/SessionMetadataManager';
 import { TrackManager } from './managers/TrackManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
@@ -32,6 +33,7 @@ export class NotificationManager {
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
+  private sessionMetadataManager: SessionMetadataManager;
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
@@ -55,6 +57,7 @@ export class NotificationManager {
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
     this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
+    this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -66,6 +69,7 @@ export class NotificationManager {
     this.requestManager.listener = listener;
     this.activeSpeakerManager.listener = listener;
     this.roomUpdateManager.listener = listener;
+    this.sessionMetadataManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {
@@ -107,6 +111,7 @@ export class NotificationManager {
     this.requestManager.handleNotification(method, notification);
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
+    this.sessionMetadataManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
   }
 

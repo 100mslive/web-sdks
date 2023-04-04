@@ -16,12 +16,14 @@ import {
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
+  IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 
@@ -41,7 +43,7 @@ import { HMSRoleChangeRequest } from './selectors';
  *
  * @category Core
  */
-export interface IHMSActions {
+export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
@@ -482,4 +484,6 @@ export interface IHMSActions {
    * @alpha
    */
   enableBeamSpeakerLabelsLogging(): Promise<void>;
+
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 }
