@@ -79,7 +79,7 @@ export default class HMSTransport implements ITransport {
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
-  private joinRetryCount = 0;
+  joinRetryCount = 0;
 
   constructor(
     private observer: ITransportObserver,

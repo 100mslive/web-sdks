@@ -1158,6 +1158,7 @@ export class HMSSdk implements HMSInterface {
         ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
+        retries_join: this.transport.joinRetryCount,
       }),
     );
   };
@@ -1166,7 +1167,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.preview({
         error,
-        ...this.analyticsTimer.getTimes(TimedEvent.ROOM_STATE),
+        ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),
     );
