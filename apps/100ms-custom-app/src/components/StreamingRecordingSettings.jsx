@@ -43,18 +43,6 @@ const StreamingRecordingSettings = ({ change, settings }) => {
       }),
     };
   };
-
-  const handleTileOffset = (key, value) => {
-    return {
-      ...settings.metadataFields,
-      metadata: JSON.stringify({
-        headlessConfig: {
-          ...(metaData.headlessConfig || {}),
-          [key]: value === '' ? undefined : Number(value),
-        },
-      }),
-    };
-  };
   return (
     <Fragment>
       <HeadlessItem title="Visible UI Elements">
@@ -89,7 +77,10 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             type="number"
             value={headlessConfig?.tileOffset}
             onChange={e => {
-              change('metadataFields', handleTileOffset('tileOffset', e.target.value));
+              change(
+                'metadataFields',
+                handleSettingsMetaData('tileOffset', e.target.value === '' ? undefined : Number(e.target.value)),
+              );
             }}
           />
         </Flex>
