@@ -182,16 +182,13 @@ export class TrackManager {
   private removePeerTracks(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
     const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
     if (auxiliaryTrackIndex > -1) {
-      const [deletedTrack] = hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
-      deletedTrack.cleanup();
+      hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
       HMSLogger.d(this.TAG, 'auxiliary track removed', `${track}`);
     } else {
       if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack === track) {
-        hmsPeer.audioTrack.cleanup();
         hmsPeer.audioTrack = undefined;
         HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
       } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
-        hmsPeer.videoTrack.cleanup();
         hmsPeer.videoTrack = undefined;
         HMSLogger.d(this.TAG, 'video track removed', `${track}`);
       }
