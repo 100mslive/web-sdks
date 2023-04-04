@@ -24,6 +24,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
   const limitMaxTiles = useMedia(mediaQueryLg);
   const headlessConfig = useAppConfig("headlessConfig");
   const isHeadless = useIsHeadless();
+  console.log("luffy: ", headlessConfig);
   return (
     <Fragment>
       <Box

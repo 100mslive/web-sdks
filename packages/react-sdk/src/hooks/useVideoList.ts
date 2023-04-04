@@ -92,6 +92,7 @@ export const useVideoList = ({
   offsetY = 0,
 }: useVideoListInput): useVideoResult => {
   const { width = 0, height = 0, ref } = useResizeDetector();
+  console.log('kaido: ', width, height, offsetY);
   const store = useHMSVanillaStore();
   // using vanilla store as we don't need re-rendering every time something in a track changes
   const tracksMap: Record<HMSTrackID, HMSTrack> = store.getState(selectTracksMap);
