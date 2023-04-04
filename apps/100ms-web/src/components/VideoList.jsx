@@ -85,10 +85,10 @@ const List = ({
 const VideoList = React.memo(List);
 
 const getOffset = ({ tileOffset, isHeadless }) => {
-  if (!isHeadless || typeof tileOffset !== "number") {
+  if (!isHeadless || tileOffset === "" || isNaN(tileOffset)) {
     return 32;
   }
-  return tileOffset;
+  return Number(tileOffset);
 };
 
 export default VideoList;

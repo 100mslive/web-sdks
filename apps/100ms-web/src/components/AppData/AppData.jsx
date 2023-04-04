@@ -41,7 +41,8 @@ import {
 
 export const getAppDetails = appDetails => {
   try {
-    return !appDetails ? {} : JSON.parse(appDetails);
+    const t = `{\"headlessConfig\":{\"hideAudioLevel\":false,\"hideTileAudioMute\":false,\"hideTileName\":true,\"tileOffset\":\"0\",\"uiMode\":\"grid\"}}`;
+    return !t ? {} : JSON.parse(t);
   } catch (error) {
     return {};
   }
