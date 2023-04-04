@@ -185,7 +185,7 @@ const showAudioMuted = ({ hideTileAudioMute, isHeadless, isAudioMuted }) => {
 };
 
 const getPadding = ({ isHeadless, tileOffset }) => {
-  if (!isHeadless || tileOffset === "" || isNaN(tileOffset)) {
+  if (!isHeadless || isNaN(Number(tileOffset))) {
     return undefined;
   }
   return Number(tileOffset) === 0 ? 0 : undefined;

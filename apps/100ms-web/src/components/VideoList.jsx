@@ -85,7 +85,7 @@ const List = ({
 const VideoList = React.memo(List);
 
 const getOffset = ({ tileOffset, isHeadless }) => {
-  if (!isHeadless || tileOffset === "" || isNaN(tileOffset)) {
+  if (!isHeadless || isNaN(Number(tileOffset))) {
     return 32;
   }
   return Number(tileOffset);
