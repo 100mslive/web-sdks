@@ -41,11 +41,7 @@ import {
 
 export const getAppDetails = appDetails => {
   try {
-    return !appDetails
-      ? {}
-      : JSON.parse(appDetails, (k, v) => {
-          return typeof v === "object" || isNaN(v) ? v : parseInt(v, 10);
-        });
+    return !appDetails ? {} : JSON.parse(appDetails);
   } catch (error) {
     return {};
   }
