@@ -1,5 +1,5 @@
 export interface IHMSSessionStoreActions<T> {
-  set<K extends keyof T>(key: K, value: T[K]): Promise<void>;
+  set<K extends keyof T>(key: K, value?: T[K]): Promise<void>;
   /**
    * observe a particular key or set of keys to receive udpates of its latest value when its changed
    */
