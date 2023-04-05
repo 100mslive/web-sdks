@@ -13,10 +13,12 @@ export const StyledAvatar = styled('div', {
   color: '$white',
   fontFamily: '$sans',
   aspectRatio: 1,
-  padding: '5%',
   fontWeight: 600,
   fontSize: '1.8rem',
-  minHeight: 0,
+  minHeight: '$16',
+  minWidth: '$16',
+  height: '20%',
+  maxHeight: '$20',
   variants: {
     shape: {
       circle: getAvatarShape('$round'),

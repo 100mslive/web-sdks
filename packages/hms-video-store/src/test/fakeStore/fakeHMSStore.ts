@@ -287,6 +287,7 @@ export const makeFakeStore = (): HMSStore => {
       audioTrack: '102',
     },
     errors: [],
+    sessionStore: {},
   };
 
   localPeer = fakeStore.peers['1'];

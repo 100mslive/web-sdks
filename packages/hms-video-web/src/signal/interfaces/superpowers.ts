@@ -57,8 +57,10 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
-export interface SessionMetadataUpdateParams {
-  data?: any;
+export interface SetSessionMetadataParams {
+  key?: string;
+  data: any;
+  if_change_version?: number;
 }
 
 export interface HLSRequestParams {

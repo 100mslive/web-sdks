@@ -12,17 +12,18 @@ import {
   HMSVideoTrackSettings,
   TokenRequest,
   TokenRequestOptions,
-  TokenResult,
 } from '@100mslive/hms-video';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
+  IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 
@@ -42,7 +43,7 @@ import { HMSRoleChangeRequest } from './selectors';
  *
  * @category Core
  */
-export interface IHMSActions {
+export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
@@ -476,11 +477,13 @@ export interface IHMSActions {
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
 
-  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   /**
    * enable sending audio speaker data to beam
    * @alpha
    */
   enableBeamSpeakerLabelsLogging(): Promise<void>;
+
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 }

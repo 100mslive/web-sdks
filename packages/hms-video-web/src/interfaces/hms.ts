@@ -1,6 +1,6 @@
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
-import { TokenRequest, TokenRequestOptions, TokenResult } from './get-token';
+import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
@@ -10,6 +10,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
+import { HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -23,12 +24,13 @@ export default interface HMS {
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
 
-  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<TokenResult>;
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
   getLocalPeer(): HMSLocalPeer | undefined;
   getPeers(): HMSPeer[];
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
+  getSessionStore(): HMSSessionStore;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
   refreshDevices(): Promise<void>;

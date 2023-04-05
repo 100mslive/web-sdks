@@ -23,11 +23,11 @@ export const HMSHLSErrorFactory = {
         data.fatal,
       );
     },
-    levelLoadError(data: HMSHLSErrorDetails): HMSHLSException {
+    layerLoadError(data: HMSHLSErrorDetails): HMSHLSException {
       return new HMSHLSException(
-        HMSHLSExceptionEvents.LEVEL_LOAD_ERROR,
+        HMSHLSExceptionEvents.LAYER_LOAD_ERROR,
         data.details,
-        'Unable to load levels',
+        'Unable to load quality layers',
         data.fatal,
       );
     },

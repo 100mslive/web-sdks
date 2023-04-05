@@ -21,6 +21,7 @@ let changeTrackStateRequestHandler: jest.Mock<any, any>;
 let changeMultiTrackStateRequestHandler: jest.Mock<any, any>;
 let removedFromRoomHandler: jest.Mock<any, any>;
 let audioUpdateHandler: jest.Mock<any, any>;
+let sessionStoreUpdateHandler: jest.Mock<any, any>;
 
 let listener: HMSUpdateListener;
 let audioListener: HMSAudioListener;
@@ -43,6 +44,7 @@ beforeEach(() => {
   changeMultiTrackStateRequestHandler = jest.fn();
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
+  sessionStoreUpdateHandler = jest.fn();
   eventBus = new EventBus();
   store.setRoom(new HMSRoom('1234', store));
 
@@ -60,6 +62,7 @@ beforeEach(() => {
     onChangeTrackStateRequest: changeTrackStateRequestHandler,
     onChangeMultiTrackStateRequest: changeMultiTrackStateRequestHandler,
     onRemovedFromRoom: removedFromRoomHandler,
+    onSessionStoreUpdate: sessionStoreUpdateHandler,
   };
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
@@ -133,7 +136,7 @@ describe('Notification Manager', () => {
 
       expect(peerUpdateHandler.mock.calls[1][0]).toBe(HMSPeerUpdate.PEER_LIST);
       expect(peerUpdateHandler.mock.calls[1][1][0]).toBeInstanceOf(HMSRemotePeer);
-      expect(peerUpdateHandler.mock.calls[1][1][0].peerId).toBe('peer_id_2');
+      expect(peerUpdateHandler.mock.calls[1][1][0].peerId).toBe('peer_id_1');
 
       expect(roomUpdateHandler).toHaveBeenCalled();
       expect(roomUpdateHandler.mock.calls[0][0]).toBe(HMSRoomUpdate.RECORDING_STATE_UPDATED);
