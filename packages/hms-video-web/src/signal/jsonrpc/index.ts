@@ -336,14 +336,32 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   setSessionMetadata(params: SetSessionMetadataParams) {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to set session store value due to network disconnection',
+      );
+    }
     return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { version: '1.1', ...params });
   }
 
   listenMetadataChange(keys: string[]): Promise<void> {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to observe session store key due to network disconnection',
+      );
+    }
     return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { version: '1.1', keys });
   }
 
   getSessionMetadata(key?: string) {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to set session store value due to network disconnection',
+      );
+    }
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
   }
 
