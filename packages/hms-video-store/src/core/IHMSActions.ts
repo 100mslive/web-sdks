@@ -486,9 +486,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   enableBeamSpeakerLabelsLogging(): Promise<void>;
 
   /**
-   * actions that can be performed on the realtime key-value store
+   * actions that can be performed on the real-time key-value store
    *
-   * Values in the ession store are available to every peer in the room(who have observed the relevant keys) and
+   * Values in the session store are available to every peer in the room(who have observed the relevant keys) and
    * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
