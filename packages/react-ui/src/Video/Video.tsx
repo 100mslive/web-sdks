@@ -29,6 +29,11 @@ export const StyledVideo = styled('video', {
         zIndex: -100,
       },
     },
+    noRadius: {
+      true: {
+        borderRadius: 0,
+      },
+    },
   },
   defaultVariants: {
     mirror: false,
