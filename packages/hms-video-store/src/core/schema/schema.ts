@@ -32,6 +32,7 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   roles: Record<string, HMSRole>;
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
+  /** @deprecated use `sessionStore` instead */
   sessionMetadata?: any;
   preview?: {
     localPeer?: HMSPeerID;
