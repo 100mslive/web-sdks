@@ -15,19 +15,26 @@ export const StyledAvatar = styled('div', {
   aspectRatio: 1,
   fontWeight: 600,
   fontSize: '1.8rem',
-  padding: '1.8rem',
-  minHeight: '$16',
-  minWidth: '$16',
-  height: '22%',
-  maxHeight: '$20',
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
       square: getAvatarShape('$1'),
     },
+    size: {
+      small: {
+        height: '48px',
+      },
+      medium: {
+        height: '64px',
+      },
+      large: {
+        height: '80px',
+      },
+    },
   },
   defaultVariants: {
     shape: 'circle',
+    size: 'medium',
   },
 });
 
