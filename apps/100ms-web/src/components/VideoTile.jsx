@@ -58,13 +58,13 @@ const Tile = ({ peerId, trackId, width, height, visible = true }) => {
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
   const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
   const avatarSize = useMemo(() => {
-    if (height <= 150) {
+    if (width <= 150 || height <= 150) {
       return "small";
-    } else if (height <= 300) {
+    } else if (width <= 300 || height <= 300) {
       return "medium";
     }
     return "large";
-  }, [height]);
+  }, [width, height]);
   return (
     <StyledVideoTile.Root
       css={{
