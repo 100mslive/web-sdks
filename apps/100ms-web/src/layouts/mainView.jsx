@@ -11,6 +11,7 @@ import {
 import { Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../components/FullPageProgress";
 import EmbedView from "./EmbedView";
+import { InsetView } from "./InsetView";
 import { MainGridView } from "./mainGridView";
 import ScreenShareView from "./screenShareView";
 import SidePane from "./SidePane";
@@ -21,6 +22,7 @@ import {
   useHLSViewerRole,
   useIsHeadless,
   usePinnedTrack,
+  useUiMode,
   useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -47,6 +49,7 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
+  const uiMode = useUiMode();
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -81,6 +84,8 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
+  } else if (uiMode === "inset") {
+    ViewComponent = InsetView;
   } else if (
     ((peerSharing && peerSharing.id !== peerSharingAudio?.id) ||
       peerSharingPlaylist) &&

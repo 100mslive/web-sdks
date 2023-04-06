@@ -28,7 +28,15 @@ import { useAppConfig } from "./AppData/useAppConfig";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
 
-const Tile = ({ peerId, trackId, width, height, visible = true }) => {
+const Tile = ({
+  peerId,
+  trackId,
+  width,
+  height,
+  visible = true,
+  css = {},
+  objectFit = "cover",
+}) => {
   const trackSelector = trackId
     ? selectVideoTrackByID(trackId)
     : selectVideoTrackByPeerID(peerId);
@@ -75,6 +83,7 @@ const Tile = ({ peerId, trackId, width, height, visible = true }) => {
           tileOffset: headlessConfig?.tileOffset,
         }),
         visibility: visible ? "visible" : "hidden",
+        ...css,
       }}
       data-testid={`participant_tile_${peerName}`}
     >
@@ -115,6 +124,9 @@ const Tile = ({ peerId, trackId, width, height, visible = true }) => {
               }
               degraded={isVideoDegraded}
               data-testid="participant_video_tile"
+              css={{
+                objectFit,
+              }}
             />
           ) : null}
           {isVideoMuted || isVideoDegraded || (!isLocal && isAudioOnly) ? (
