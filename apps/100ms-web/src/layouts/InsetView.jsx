@@ -4,17 +4,25 @@ import {
   selectAppData,
   selectLocalPeer,
   selectRemotePeers,
+  selectRolesMap,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import VideoTile from "../components/VideoTile";
 import { APP_DATA } from "../common/constants";
 
+const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
+  const role = roleMap[roleName];
+  const { width, height } = role.publishParams.video;
+  return isMobile ? height / width : width / height;
+};
+
 export function InsetView() {
   const remotePeers = useHMSStore(selectRemotePeers);
   const localPeer = useHMSStore(selectLocalPeer);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const isMobile = useMedia(cssConfig.media.md);
+  const roleMap = useHMSStore(selectRolesMap);
 
   return (
     <Flex
@@ -27,7 +35,11 @@ export function InsetView() {
           peerId={remotePeers[0].id}
           trackId={remotePeers[0].videoTrack}
           css={{
-            aspectRatio: isMobile ? 9 / 16 : 16 / 9,
+            aspectRatio: getAspectRatio({
+              roleMap,
+              roleName: remotePeers[0].roleName,
+              isMobile,
+            }),
             height: "100%",
             maxWidth: "100%",
           }}
@@ -40,7 +52,11 @@ export function InsetView() {
           top: 0,
           right: sidepane ? "$100" : 0,
           mr: sidepane ? "$10" : 0,
-          aspectRatio: isMobile ? 9 / 16 : 16 / 9,
+          aspectRatio: getAspectRatio({
+            roleMap,
+            roleName: localPeer.roleName,
+            isMobile,
+          }),
           ...(isMobile ? { height: 180 } : { width: 320 }),
         }}
       >
