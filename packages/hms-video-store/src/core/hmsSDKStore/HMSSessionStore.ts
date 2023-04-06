@@ -11,7 +11,7 @@ export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessi
     return this.sdk.getSessionStore();
   }
 
-  async set<K extends keyof T>(key: K, value: T[K]) {
+  async set<K extends keyof T>(key: K, value?: T[K]) {
     const { value: latestValue } = await this.sdkSessionStore.set(String(key), value);
     this.setLocally({ key: key as string, value: latestValue });
   }

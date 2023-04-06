@@ -63,9 +63,9 @@ export default interface HMS {
   changeName(name: string): Promise<void>;
   changeMetadata(metadata: string): Promise<void>;
 
-  /** @alpha */
+  /** @deprecated Use `getSessionStore().set` instead */
   setSessionMetadata(metadata: any): Promise<void>;
-  /** @alpha */
+  /** @deprecated Use `getSessionStore().observe` instead */
   getSessionMetadata(): Promise<any>;
 
   /**

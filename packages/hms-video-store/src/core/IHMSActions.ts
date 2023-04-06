@@ -374,14 +374,14 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * Session metadata is available to every peer in the room and is persisted throughout a session
    * till the last peer leaves a room
    *
-   * @alpha - the API is not stable and might have breaking changes later
+   * @deprecated use `actions.sessionStore.set` instead
    */
   setSessionMetadata(metadata: any): Promise<void>;
 
   /**
    * Fetch the current room metadata from the server and populate it in store
    *
-   * @alpha - the API is not stable and might have breaking changes later
+   * @deprecated use `actions.sessionStore.observe` instead
    */
   populateSessionMetadata(): Promise<void>;
 
@@ -485,5 +485,11 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   enableBeamSpeakerLabelsLogging(): Promise<void>;
 
+  /**
+   * actions that can be performed on the real-time key-value store
+   *
+   * Values in the session store are available to every peer in the room(who have observed the relevant keys) and
+   * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
+   */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 }
