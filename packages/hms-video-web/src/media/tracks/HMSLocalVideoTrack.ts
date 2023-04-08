@@ -293,8 +293,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       if ((e as HMSException).code === ErrorCodes.TracksErrors.DEVICE_IN_USE) {
         prevTrack?.stop();
         newTrack = await getVideoTrack(settings);
+      } else {
+        throw e;
       }
-      throw e;
     }
     /*
      * stop the previous only after acquiring the new track otherwise this can lead to
