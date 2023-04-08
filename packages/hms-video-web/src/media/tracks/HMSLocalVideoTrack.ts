@@ -283,7 +283,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const newTrack = await getVideoTrack(settings);
     /*
      * stop the previous only after acquiring the new track otherwise this can lead to
-     * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
+     * no video(black tile) when the above getVideoTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
     HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
