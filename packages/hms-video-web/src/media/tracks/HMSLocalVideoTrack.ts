@@ -283,6 +283,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
+    /**
+     * not stopping previous track results in device in use more frequently, as many devices will not allow even if
+     * you are requesting for a new device.
+     */
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
     HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
