@@ -8,7 +8,7 @@ export class HMSVideoTrackSettingsBuilder {
   private _maxFramerate?: number = 30;
   private _maxBitrate?: number = 150;
   private _deviceId?: string;
-  private _facingMode: HMSFacingMode = HMSFacingMode.USER;
+  private _facingMode?: HMSFacingMode;
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
   setWidth(width?: number) {

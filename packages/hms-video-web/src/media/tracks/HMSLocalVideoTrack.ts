@@ -259,19 +259,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async flipCamera() {
-    if (!isConstraintSupported('facingMode')) {
+    if (!isConstraintSupported('facingMode') || !this.getMediaTrackSettings().facingMode) {
       HMSLogger.d(this.TAG, 'facingMode not supported');
       return;
     }
     const facingMode =
-      this.settings.facingMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT;
-    await this.nativeTrack.applyConstraints({
-      ...this.settings.toConstraints(),
-      facingMode,
-      deviceId: undefined,
-    });
-    this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
+      this.getMediaTrackSettings().facingMode === HMSFacingMode.ENVIRONMENT
+        ? HMSFacingMode.USER
+        : HMSFacingMode.ENVIRONMENT;
+    const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
+    await this.replaceSender(track, this.enabled);
+    this.nativeTrack = track;
     this.videoHandler.updateSinks();
+    this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
   }
 
   /**
