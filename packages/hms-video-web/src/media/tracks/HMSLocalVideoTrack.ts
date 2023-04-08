@@ -270,6 +270,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       facingMode,
       deviceId: undefined,
     });
+    this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
   }
 
   /**
