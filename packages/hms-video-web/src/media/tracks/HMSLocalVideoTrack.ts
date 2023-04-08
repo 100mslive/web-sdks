@@ -335,12 +335,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (
-      [
-        hasPropertyChanged('width'),
-        hasPropertyChanged('height'),
-        hasPropertyChanged('advanced'),
-        hasPropertyChanged('facingMode'),
-      ].some(value => !!value)
+      [hasPropertyChanged('width'), hasPropertyChanged('height'), hasPropertyChanged('advanced')].some(value => !!value)
     ) {
       await this.nativeTrack.applyConstraints(settings.toConstraints());
     }
@@ -354,7 +349,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private handleDeviceChange = async (settings: HMSVideoTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
-    if (hasPropertyChanged('deviceId') && this.source === 'regular') {
+    if ((hasPropertyChanged('deviceId') || hasPropertyChanged('facingMode')) && this.source === 'regular') {
       if (this.enabled) {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
