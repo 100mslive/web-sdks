@@ -263,8 +263,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       HMSLogger.d(this.TAG, 'facingMode not supported');
       return;
     }
-    const currentFacingMode = this.settings.facingMode;
-    const facingMode = currentFacingMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT;
+    const facingMode =
+      this.settings.facingMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT;
     await this.nativeTrack.applyConstraints({
       ...this.settings.toConstraints(),
       facingMode,
@@ -342,7 +342,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await stream.setMaxBitrateAndFramerate(this);
     }
 
-    if (['width', 'height', 'advanced'].some((value: 'width' | 'height' | 'advanced') => hasPropertyChanged(value))) {
+    if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       await this.nativeTrack.applyConstraints(settings.toConstraints());
     }
   };
