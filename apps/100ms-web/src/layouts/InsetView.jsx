@@ -50,20 +50,27 @@ export function InsetView() {
         css={{
           position: "absolute",
           top: 0,
-          right: sidepane ? "$100" : 0,
+          right: sidepane ? "$100" : "$8",
           mr: sidepane ? "$10" : 0,
           aspectRatio: getAspectRatio({
             roleMap,
             roleName: localPeer.roleName,
             isMobile,
           }),
-          ...(isMobile ? { height: 180 } : { width: 320 }),
+          ...(isMobile ? { height: 240 } : { width: 320 }),
         }}
       >
         <VideoTile
           peerId={localPeer.id}
           trackid={localPeer.videoTrack}
-          css={{ size: isMobile ? "100%" : undefined }}
+          css={
+            isMobile
+              ? {
+                  size: "100%",
+                  padding: 0,
+                }
+              : undefined
+          }
         />
       </Box>
     </Flex>
