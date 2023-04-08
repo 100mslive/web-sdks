@@ -122,7 +122,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
       deviceId: this.deviceId,
       facingMode: this.facingMode,
     };
-    window.alert(constraints);
+    window.alert(JSON.stringify(constraints, null, 2));
     return constraints;
   }
 
