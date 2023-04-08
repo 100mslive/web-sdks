@@ -115,13 +115,15 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     if (isScreenShare) {
       dimensionConstraintKey = 'max';
     }
-    return {
+    const constraints = {
       width: { [dimensionConstraintKey]: this.width },
       height: { [dimensionConstraintKey]: this.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
       facingMode: this.facingMode,
     };
+    window.alert(constraints);
+    return constraints;
   }
 
   toAnalyticsProperties() {
