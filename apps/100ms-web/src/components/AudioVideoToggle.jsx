@@ -1,5 +1,11 @@
 import React, { Fragment } from "react";
-import { useAVToggle, useHMSActions } from "@100mslive/react-sdk";
+import {
+  selectLocalVideoTrackID,
+  selectVideoTrackByID,
+  useAVToggle,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import {
   CameraFlipIcon,
   MicOffIcon,
@@ -16,6 +22,8 @@ export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
   const actions = useHMSActions();
+  const videoTracKId = useHMSStore(selectLocalVideoTrackID);
+  const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTracKId));
 
   return (
     <Fragment>
@@ -59,22 +67,24 @@ export const AudioVideoToggle = () => {
           </IconButton>
         </Tooltip>
       ) : null}
-      <Tooltip title="Flip Camera" key="flipCamera">
-        <IconButton
-          onClick={async () => {
-            try {
-              await actions.flipCamera();
-            } catch (e) {
-              ToastManager.addToast({
-                title: `Error while flipping camera ${e.message || ""}`,
-                variant: "error",
-              });
-            }
-          }}
-        >
-          <CameraFlipIcon />
-        </IconButton>
-      </Tooltip>
+      {localVideoTrack?.facingMode ? (
+        <Tooltip title="Flip Camera" key="flipCamera">
+          <IconButton
+            onClick={async () => {
+              try {
+                await actions.flipCamera();
+              } catch (e) {
+                ToastManager.addToast({
+                  title: `Error while flipping camera ${e.message || ""}`,
+                  variant: "error",
+                });
+              }
+            }}
+          >
+            <CameraFlipIcon />
+          </IconButton>
+        </Tooltip>
+      ) : null}
     </Fragment>
   );
 };
