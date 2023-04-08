@@ -49,7 +49,6 @@ import {
   HMSRoomState,
   HMSStore,
   HMSTrack,
-  HMSTrackFacingMode,
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrack,
@@ -350,14 +349,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
       if (sdkTrack) {
         await sdkTrack.flipCamera();
-        this.setState(store => {
-          const track = store.tracks[trackID];
-          if (track && track.type === 'video') {
-            const mediaSettings = sdkTrack.getMediaTrackSettings();
-            (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
-            track.deviceID = mediaSettings.deviceId;
-          }
-        }, 'flipCamera');
+        this.syncRoomState('flipCamera');
       }
     }
   }
