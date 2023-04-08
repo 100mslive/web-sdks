@@ -14,6 +14,7 @@ export async function getAudioTrack(settings: HMSAudioTrackSettings): Promise<Me
 
 export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<MediaStreamTrack> {
   try {
+    window.alert(JSON.stringify(settings.toConstraints(), null, 2));
     const stream = await navigator.mediaDevices.getUserMedia({
       video: settings ? settings.toConstraints() : false,
     });
