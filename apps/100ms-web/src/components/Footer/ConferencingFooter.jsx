@@ -37,7 +37,6 @@ const FlipCamera = () => {
       <IconButton
         onClick={async () => {
           try {
-            console.log("flip Called");
             await actions.flipCamera();
           } catch (e) {
             ToastManager.addToast({

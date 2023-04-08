@@ -271,6 +271,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       deviceId: undefined,
     });
     this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
+    this.videoHandler.updateSinks();
   }
 
   /**
@@ -365,7 +366,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
-          deviceId: this.nativeTrack.getSettings().deviceId,
+          deviceId: settings.deviceId,
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }
