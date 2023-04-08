@@ -261,7 +261,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async flipCamera() {
     const currentMode = this.settings.facingMode;
     await this.setSettings(
-      { facingMode: currentMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT },
+      {
+        facingMode:
+          !currentMode || currentMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT,
+      },
       true,
     );
   }
