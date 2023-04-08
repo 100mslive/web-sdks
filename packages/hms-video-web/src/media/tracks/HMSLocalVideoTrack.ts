@@ -4,6 +4,7 @@ import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
 import {
+  HMSFacingMode,
   HMSSimulcastLayerDefinition,
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
@@ -18,7 +19,7 @@ import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
-    prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced',
+    prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced' | 'facingMode',
   ) {
     return prop in newSettings && newSettings[prop] !== oldSettings[prop];
   };
@@ -257,6 +258,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this.enabled ? this.processedTrack || this.nativeTrack : this.nativeTrack;
   }
 
+  async flipCamera() {
+    const currentMode = this.settings.facingMode;
+    await this.setSettings(
+      { facingMode: currentMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT },
+      true,
+    );
+  }
+
   /**
    * called when the video is unmuted
    * @private
@@ -301,8 +310,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
-    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
+    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode } = {
+      ...this.settings,
+      ...settings,
+    };
+    const newSettings = new HMSVideoTrackSettings(
+      width,
+      height,
+      codec,
+      maxFramerate,
+      deviceId,
+      advanced,
+      maxBitrate,
+      facingMode,
+    );
     return newSettings;
   };
 
@@ -313,7 +334,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await stream.setMaxBitrateAndFramerate(this);
     }
 
-    if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
+    if (
+      [
+        hasPropertyChanged('width'),
+        hasPropertyChanged('height'),
+        hasPropertyChanged('advanced'),
+        hasPropertyChanged('facingMode'),
+      ].some(value => !!value)
+    ) {
       await this.nativeTrack.applyConstraints(settings.toConstraints());
     }
   };

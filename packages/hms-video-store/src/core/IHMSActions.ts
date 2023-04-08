@@ -154,9 +154,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
-   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })`
+   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+  /**
+   * Toggle the camera between user facing and environment if the both the camera's exist
+   */
+  flipCamera(): Promise<void>;
 
   /**
    * You can use the attach and detach video function
