@@ -1,18 +1,21 @@
 import React, { Fragment } from "react";
-import { useAVToggle } from "@100mslive/react-sdk";
+import { useAVToggle, useHMSActions } from "@100mslive/react-sdk";
 import {
+  CameraFlipIcon,
   MicOffIcon,
   MicOnIcon,
   VideoOffIcon,
   VideoOnIcon,
 } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
+import { ToastManager } from "./Toast/ToastManager";
 import IconButton from "../IconButton";
 import { isMacOS } from "../common/constants";
 
 export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
+  const actions = useHMSActions();
 
   return (
     <Fragment>
@@ -56,6 +59,22 @@ export const AudioVideoToggle = () => {
           </IconButton>
         </Tooltip>
       ) : null}
+      <Tooltip title="Flip Camera" key="flipCamera">
+        <IconButton
+          onClick={async () => {
+            try {
+              await actions.flipCamera();
+            } catch (e) {
+              ToastManager.addToast({
+                title: `Error while flipping camera ${e.message || ""}`,
+                variant: "error",
+              });
+            }
+          }}
+        >
+          <CameraFlipIcon />
+        </IconButton>
+      </Tooltip>
     </Fragment>
   );
 };

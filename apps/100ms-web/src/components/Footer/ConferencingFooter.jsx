@@ -2,11 +2,10 @@ import React, { Fragment, useState } from "react";
 import {
   HMSPlaylistType,
   selectIsAllowedToPublish,
-  useHMSActions,
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { CameraFlipIcon, MusicIcon } from "@100mslive/react-icons";
+import { MusicIcon } from "@100mslive/react-icons";
 import { Flex, Footer as AppFooter, Tooltip } from "@100mslive/react-ui";
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
@@ -18,7 +17,6 @@ import { MoreSettings } from "../MoreSettings/MoreSettings";
 import { PIP } from "../PIP";
 import { ScreenshareToggle } from "../ScreenShare";
 import { ScreenShareHintModal } from "../ScreenshareHintModal";
-import { ToastManager } from "../Toast/ToastManager";
 import { ChatToggle } from "./ChatToggle";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
@@ -29,28 +27,6 @@ import { FeatureFlags } from "../../services/FeatureFlags";
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
 );
-
-const FlipCamera = () => {
-  const actions = useHMSActions();
-  return (
-    <Tooltip title="Flip Camera" key="flipCamera">
-      <IconButton
-        onClick={async () => {
-          try {
-            await actions.flipCamera();
-          } catch (e) {
-            ToastManager.addToast({
-              title: `Error while flipping camera ${e.message || ""}`,
-              variant: "error",
-            });
-          }
-        }}
-      >
-        <CameraFlipIcon />
-      </IconButton>
-    </Tooltip>
-  );
-};
 
 const ScreenshareAudio = () => {
   const {
@@ -117,7 +93,6 @@ export const ConferencingFooter = () => {
       </AppFooter.Left>
       <AppFooter.Center>
         <AudioVideoToggle />
-        <FlipCamera />
         <ScreenshareToggle />
         <PIP />
         <MoreSettings />
