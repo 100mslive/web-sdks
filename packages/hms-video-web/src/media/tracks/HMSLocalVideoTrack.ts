@@ -13,7 +13,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { getVideoTrack } from '../../utils/track';
+import { getVideoTrack, isConstraintSupported } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 
@@ -259,13 +259,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async flipCamera() {
+    if (!isConstraintSupported('facingMode')) {
+      HMSLogger.d(this.TAG, 'facingMode not supported');
+      return;
+    }
     const currentMode = this.settings.facingMode;
     await this.setSettings(
       {
         facingMode:
           !currentMode || currentMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT,
       },
-      true,
+      false,
     );
   }
 
@@ -361,7 +365,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       }
       if (!internal) {
         DeviceStorageManager.updateSelection('videoInput', {
-          deviceId: settings.deviceId,
+          deviceId: this.nativeTrack.getSettings().deviceId,
           groupId: this.nativeTrack.getSettings().groupId,
         });
       }

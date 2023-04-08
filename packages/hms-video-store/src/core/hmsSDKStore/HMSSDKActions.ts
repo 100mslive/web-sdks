@@ -347,15 +347,18 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   async flipCamera(): Promise<void> {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      await (sdkTrack as SDKHMSLocalVideoTrack)?.flipCamera();
-      this.setState(store => {
-        const track = store.tracks[trackID];
-        if (track && track.type === 'video') {
-          const mediaSettings = sdkTrack.getMediaTrackSettings();
-          (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
-        }
-      }, 'flipCamera');
+      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      if (sdkTrack) {
+        await sdkTrack.flipCamera();
+        this.setState(store => {
+          const track = store.tracks[trackID];
+          if (track && track.type === 'video') {
+            const mediaSettings = sdkTrack.getMediaTrackSettings();
+            (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
+            track.deviceID = mediaSettings.deviceId;
+          }
+        }, 'flipCamera');
+      }
     }
   }
 

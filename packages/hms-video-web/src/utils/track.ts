@@ -23,6 +23,11 @@ export async function getVideoTrack(settings: HMSVideoTrackSettings): Promise<Me
   }
 }
 
+export const isConstraintSupported = (constraint: keyof MediaTrackSupportedConstraints) => {
+  const supports = navigator.mediaDevices.getSupportedConstraints();
+  return !!supports[constraint];
+};
+
 // To differentiate between normal track and empty track.
 export function isEmptyTrack(track: MediaStreamTrack) {
   // Firefox gives '' as label for empty track(created from audio context)
