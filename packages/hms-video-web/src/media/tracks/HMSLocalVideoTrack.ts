@@ -13,7 +13,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { getVideoTrack, isConstraintSupported } from '../../utils/track';
+import { getVideoTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 
@@ -259,7 +259,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async flipCamera() {
-    if (!isConstraintSupported('facingMode') || !this.getMediaTrackSettings().facingMode) {
+    if (!this.getMediaTrackSettings().facingMode) {
       HMSLogger.d(this.TAG, 'facingMode not supported');
       return;
     }
