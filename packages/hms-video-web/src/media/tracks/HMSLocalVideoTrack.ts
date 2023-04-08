@@ -259,6 +259,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async flipCamera() {
+    window.alert(this.getMediaTrackSettings().facingMode);
     if (!isConstraintSupported('facingMode') || !this.getMediaTrackSettings().facingMode) {
       HMSLogger.d(this.TAG, 'facingMode not supported');
       return;
