@@ -267,8 +267,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.getMediaTrackSettings().facingMode === HMSFacingMode.ENVIRONMENT
         ? HMSFacingMode.USER
         : HMSFacingMode.ENVIRONMENT;
-    window.alert(facingMode);
-
+    this.nativeTrack?.stop();
     const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
     await this.replaceSender(track, this.enabled);
     this.nativeTrack = track;
