@@ -263,14 +263,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       HMSLogger.d(this.TAG, 'facingMode not supported');
       return;
     }
-    const currentMode = this.settings.facingMode;
-    await this.setSettings(
-      {
-        facingMode:
-          !currentMode || currentMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT,
-      },
-      false,
-    );
+    const currentFacingMode = this.settings.facingMode;
+    const facingMode = currentFacingMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT;
+    await this.nativeTrack.applyConstraints({
+      ...this.settings.toConstraints(),
+      facingMode,
+      deviceId: undefined,
+    });
   }
 
   /**
@@ -356,7 +355,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private handleDeviceChange = async (settings: HMSVideoTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
 
-    if ((hasPropertyChanged('deviceId') || hasPropertyChanged('facingMode')) && this.source === 'regular') {
+    if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
