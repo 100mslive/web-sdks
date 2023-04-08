@@ -360,6 +360,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
+        delete settings.facingMode;
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;

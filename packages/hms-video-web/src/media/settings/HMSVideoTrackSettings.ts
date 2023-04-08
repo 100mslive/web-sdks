@@ -88,7 +88,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
   readonly maxBitrate?: number;
   readonly deviceId?: string;
   readonly advanced?: Array<MediaTrackConstraintSet>;
-  readonly facingMode?: HMSFacingMode;
+  facingMode?: HMSFacingMode;
 
   constructor(
     width?: number,
