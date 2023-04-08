@@ -78,12 +78,16 @@ const Settings = ({ setHide }) => {
             devices={videoInput}
             icon={<VideoOnIcon />}
             selection={selectedDeviceIDs.videoInput}
-            onChange={deviceId =>
-              updateDevice({
-                deviceId,
-                deviceType: DeviceType.videoInput,
-              })
-            }
+            onChange={deviceId => {
+              try {
+                updateDevice({
+                  deviceId,
+                  deviceType: DeviceType.videoInput,
+                });
+              } catch (e) {
+                window.alert(JSON.stringify(e));
+              }
+            }}
           />
         </Fragment>
       ) : null}
