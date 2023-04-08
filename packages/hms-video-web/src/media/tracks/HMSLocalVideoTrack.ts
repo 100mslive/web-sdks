@@ -1,7 +1,9 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
+import { ErrorCodes } from '../../error/ErrorCodes';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -283,7 +285,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const newTrack = await getVideoTrack(settings);
+    let newTrack: MediaStreamTrack;
+    try {
+      newTrack = await getVideoTrack(settings);
+    } catch (e) {
+      // retry by stopping the previous track if device in use error
+      if ((e as HMSException).code === ErrorCodes.TracksErrors.DEVICE_IN_USE) {
+        prevTrack?.stop();
+        newTrack = await getVideoTrack(settings);
+      }
+      throw e;
+    }
     /*
      * stop the previous only after acquiring the new track otherwise this can lead to
      * no video(black tile) when the above getVideoTrack throws an error. ex: DeviceInUse error
