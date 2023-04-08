@@ -29,9 +29,7 @@ import { UI_SETTINGS } from "../../common/constants";
  * There is also another controlled way of using this by passing in open and onOpenChange.
  */
 const Settings = ({ setHide }) => {
-  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices(
-    window.alert
-  );
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
