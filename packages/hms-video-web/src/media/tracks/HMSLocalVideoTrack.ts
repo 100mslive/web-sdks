@@ -342,9 +342,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await stream.setMaxBitrateAndFramerate(this);
     }
 
-    if (
-      [hasPropertyChanged('width'), hasPropertyChanged('height'), hasPropertyChanged('advanced')].some(value => !!value)
-    ) {
+    if (['width', 'height', 'advanced'].some((value: 'width' | 'height' | 'advanced') => hasPropertyChanged(value))) {
       await this.nativeTrack.applyConstraints(settings.toConstraints());
     }
   };
