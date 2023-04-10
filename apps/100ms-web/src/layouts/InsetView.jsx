@@ -103,7 +103,8 @@ export function InsetView() {
           css={{ p: 0 }}
           rootClassName={css({
             height: isMobile ? "100%" : undefined,
-            padding: 0,
+            padding: "0 !important",
+            boxShadow: "0 0 8px 0 rgba(0,0,0,0.5)",
           })()}
         />
       </Box>
