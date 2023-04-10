@@ -26,12 +26,12 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  setSimulcastLayers(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+  async setSimulcastLayers(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const sender = track.transceiver?.sender;
     if (sender) {
       const params = sender.getParameters();
       params.encodings = this.getTrackEncodings(track, simulcastLayers);
-      sender.setParameters(params);
+      await sender.setParameters(params);
     }
   }
 
