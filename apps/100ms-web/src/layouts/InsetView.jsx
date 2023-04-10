@@ -30,22 +30,25 @@ export function InsetView() {
       justify="center"
       css={{ position: "relative", size: "100%" }}
     >
-      {remotePeers[0] && (
-        <VideoTile
-          peerId={remotePeers[0].id}
-          trackId={remotePeers[0].videoTrack}
-          css={{
-            aspectRatio: getAspectRatio({
-              roleMap,
-              roleName: remotePeers[0].roleName,
-              isMobile,
-            }),
-            height: "100%",
-            maxWidth: "100%",
-          }}
-          objectFit="contain"
-        />
-      )}
+      <Flex align="center" justify="center" css={{ size: "100%" }}>
+        {remotePeers.map(peer => (
+          <VideoTile
+            peerId={peer.id}
+            trackId={peer.videoTrack}
+            css={{
+              aspectRatio: getAspectRatio({
+                roleMap,
+                roleName: peer.roleName,
+                isMobile,
+              }),
+              height: "100%",
+              maxWidth: "100%",
+              minWidth: 0,
+            }}
+            objectFit="contain"
+          />
+        ))}
+      </Flex>
       <Box
         css={{
           position: "absolute",
