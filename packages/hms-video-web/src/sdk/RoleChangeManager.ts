@@ -51,7 +51,7 @@ export default class RoleChangeManager {
       audioOutputDeviceId: 'default',
     };
     // call publish with new settings, local track manager will diff policies
-    await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
+    await this.publish(initialSettings);
   };
 
   private async removeVideoTracks(removeVideo: boolean) {
