@@ -160,7 +160,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * Toggle the camera between user facing and environment if the both the camera's exist
    */
-  flipCamera(): Promise<void>;
+  switchCamera(): Promise<void>;
 
   /**
    * You can use the attach and detach video function

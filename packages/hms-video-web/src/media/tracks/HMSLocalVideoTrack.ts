@@ -262,7 +262,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * will change the facingMode to environment if current facing mode is user or vice versa.
    * will be useful when on mobile web to toggle between front and back camera's
    */
-  async flipCamera() {
+  async switchCamera() {
     const currentFacingMode = this.getMediaTrackSettings().facingMode;
     if (!currentFacingMode || this.source !== 'regular') {
       HMSLogger.d(this.TAG, 'facingMode not supported');

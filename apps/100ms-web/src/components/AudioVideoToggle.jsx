@@ -68,11 +68,11 @@ export const AudioVideoToggle = () => {
         </Tooltip>
       ) : null}
       {localVideoTrack?.facingMode ? (
-        <Tooltip title="Flip Camera" key="flipCamera">
+        <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
               try {
-                await actions.flipCamera();
+                await actions.switchCamera();
               } catch (e) {
                 ToastManager.addToast({
                   title: `Error while flipping camera ${e.message || ""}`,
