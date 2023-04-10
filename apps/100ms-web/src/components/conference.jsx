@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
@@ -25,6 +25,7 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
+  const [idleTimer, setIdleTimer] = useState(0);
 
   useEffect(() => {
     if (!roomId) {
@@ -51,6 +52,20 @@ const Conference = () => {
     }
   }, [isHeadless, hmsActions]);
 
+  const showControls = () => {
+    setIdleTimer(0);
+  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIdleTimer(prevCount => prevCount + 1);
+    }, 1000);
+    document.addEventListener("click", showControls);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("click", showControls);
+    };
+  }, []);
+
   if (!isConnectedToRoom) {
     return <FullPageProgress />;
   }
@@ -58,7 +73,18 @@ const Conference = () => {
   return (
     <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
-        <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
+        <Box
+          css={{
+            h: "$18",
+            "@md": { h: "$17" },
+            "@sm": {
+              ...(idleTimer >= 5 && {
+                display: "none",
+              }),
+            },
+          }}
+          data-testid="header"
+        >
           <Header />
         </Box>
       )}
@@ -73,7 +99,17 @@ const Conference = () => {
         <ConferenceMainView />
       </Box>
       {!isHeadless && (
-        <Box css={{ flex: "0 0 15%", maxHeight: "$24" }} data-testid="footer">
+        <Box
+          css={{
+            flex: "0 0 15%",
+            "@sm": {
+              ...(idleTimer >= 5 && {
+                display: "none",
+              }),
+            },
+          }}
+          data-testid="footer"
+        >
           <Footer />
         </Box>
       )}
