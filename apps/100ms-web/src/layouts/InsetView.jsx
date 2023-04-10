@@ -8,6 +8,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, css, Flex } from "@100mslive/react-ui";
+import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
 import { APP_DATA } from "../common/constants";
 
@@ -35,30 +36,34 @@ export function InsetView() {
         justify="center"
         css={{ size: "100%", gap: "$2", flexFlow: "row wrap" }}
       >
-        {remotePeers.map(peer => (
-          <VideoTile
-            key={peer.videoTrack || peer.id}
-            peerId={peer.id}
-            trackId={peer.videoTrack}
-            rootClassName={css({
-              aspectRatio: getAspectRatio({
-                roleMap,
-                roleName: peer.roleName,
-                isMobile,
-              }),
-              padding: 0,
-              height: "100%",
-              maxWidth: "100%",
-              minWidth: 0,
-            })()}
-            objectFit="contain"
-          />
-        ))}
+        {remotePeers.length > 0 ? (
+          remotePeers.map(peer => (
+            <VideoTile
+              key={peer.videoTrack || peer.id}
+              peerId={peer.id}
+              trackId={peer.videoTrack}
+              rootClassName={css({
+                aspectRatio: getAspectRatio({
+                  roleMap,
+                  roleName: peer.roleName,
+                  isMobile,
+                }),
+                padding: 0,
+                height: "100%",
+                maxWidth: "100%",
+                minWidth: 0,
+              })()}
+              objectFit="contain"
+            />
+          ))
+        ) : (
+          <FirstPersonDisplay />
+        )}
       </Flex>
       <Box
         css={{
           position: "absolute",
-          bottom: "$16",
+          bottom: remotePeers.length === 0 ? 0 : "$16",
           right: sidepane ? "$100" : "$10",
           mr: sidepane ? "$14" : 0,
           aspectRatio: getAspectRatio({
