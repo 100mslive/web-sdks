@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
@@ -26,6 +26,9 @@ const Conference = () => {
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [idleTimer, setIdleTimer] = useState(0);
+  const headerRef = useRef(null);
+  const footerRef = useRef(null);
+  const hideControls = idleTimer >= 5;
 
   useEffect(() => {
     if (!roomId) {
@@ -52,17 +55,17 @@ const Conference = () => {
     }
   }, [isHeadless, hmsActions]);
 
-  const showControls = () => {
+  const resetIdleTimer = () => {
     setIdleTimer(0);
   };
   useEffect(() => {
     const interval = setInterval(() => {
       setIdleTimer(prevCount => prevCount + 1);
     }, 1000);
-    document.addEventListener("click", showControls);
+    document.addEventListener("click", resetIdleTimer);
     return () => {
       clearInterval(interval);
-      document.removeEventListener("click", showControls);
+      document.removeEventListener("click", resetIdleTimer);
     };
   }, []);
 
@@ -76,13 +79,15 @@ const Conference = () => {
         <Box
           css={{
             h: "$18",
+            transition: "margin 0.5s ease-in-out",
             "@md": { h: "$17" },
             "@sm": {
-              ...(idleTimer >= 5 && {
-                display: "none",
+              ...(hideControls && {
+                marginTop: `-${headerRef?.current?.clientHeight}px`,
               }),
             },
           }}
+          ref={headerRef}
           data-testid="header"
         >
           <Header />
@@ -102,12 +107,14 @@ const Conference = () => {
         <Box
           css={{
             flex: "0 0 15%",
+            transition: "margin 0.5s ease-in-out",
             "@sm": {
-              ...(idleTimer >= 5 && {
-                display: "none",
+              ...(hideControls && {
+                marginBottom: `-${footerRef?.current?.clientHeight}px`,
               }),
             },
           }}
+          ref={footerRef}
           data-testid="footer"
         >
           <Footer />
