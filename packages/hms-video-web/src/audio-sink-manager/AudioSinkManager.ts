@@ -78,7 +78,7 @@ export class AudioSinkManager {
   }
 
   init(elementId?: string) {
-    if (this.state.initialized) {
+    if (this.state.initialized || this.audioSink) {
       return;
     }
     this.state.initialized = true;
@@ -89,6 +89,7 @@ export class AudioSinkManager {
     audioSinkParent.append(audioSink);
 
     this.audioSink = audioSink;
+    HMSLogger.d(this.TAG, 'audio sink created', this.audioSink);
   }
 
   cleanUp() {
@@ -160,7 +161,7 @@ export class AudioSinkManager {
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
-    await this.init(); // call to create sink element if not already created
+    this.init(); // call to create sink element if not already created
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);

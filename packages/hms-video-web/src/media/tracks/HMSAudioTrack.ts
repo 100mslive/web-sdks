@@ -32,7 +32,9 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   setAudioElement(element: HTMLAudioElement | null) {
+    HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
     this.audioElement = element;
+    this.setOutputDevice(this.outputDevice);
   }
 
   /**
@@ -56,9 +58,14 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  async setOutputDevice(device: MediaDeviceInfo) {
+  async setOutputDevice(device?: MediaDeviceInfo) {
+    if (!device) {
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'device is null', `${this}`);
+      return;
+    }
     if (!this.audioElement) {
       HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'no audio element to set output', `${this}`);
+      this.outputDevice = device;
       return;
     }
     try {
