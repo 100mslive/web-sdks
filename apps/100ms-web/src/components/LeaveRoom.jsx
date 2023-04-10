@@ -31,6 +31,7 @@ import {
 } from "../primitives/DialogContent";
 import { useNavigation } from "./hooks/useNavigation";
 import { isStreamingKit } from "../common/utils";
+import { APP_DATA } from "../common/constants";
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
@@ -96,7 +97,14 @@ export const LeaveRoom = () => {
               )}
             </Tooltip>
           </LeaveIconButton>
-          <Dropdown.Root>
+          <Dropdown.Root
+            onOpenChange={isDropDownOpen => {
+              hmsActions.setAppData(
+                APP_DATA.autoHideControlsAfter,
+                isDropDownOpen ? null : 5000
+              );
+            }}
+          >
             <Dropdown.Trigger
               asChild
               css={{

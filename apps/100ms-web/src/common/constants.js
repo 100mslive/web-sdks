@@ -144,6 +144,7 @@ export const APP_DATA = {
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
   pinnedTrackId: "pinnedTrackId",
+  autoHideControlsAfter: "autoHideControlsAfter",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",

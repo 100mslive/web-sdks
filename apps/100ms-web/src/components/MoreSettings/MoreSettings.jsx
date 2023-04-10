@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useMedia } from "react-use";
 import Hls from "hls.js";
 import {
@@ -66,7 +66,16 @@ export const MoreSettings = () => {
   const { isBrowserRecordingOn } = useRecordingStreaming();
   return (
     <Fragment>
-      <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Root
+        open={open}
+        onOpenChange={isDropDownOpen => {
+          hmsActions.setAppData(
+            APP_DATA.autoHideControlsAfter,
+            isDropDownOpen ? null : 5000
+          );
+          setOpen(isDropDownOpen);
+        }}
+      >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">

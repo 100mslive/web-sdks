@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
   HMSRoomState,
+  selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
   useHMSActions,
@@ -16,6 +17,9 @@ import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
+import { APP_DATA } from "../common/constants";
+
+let timeout = null;
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -25,10 +29,37 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const [idleTimer, setIdleTimer] = useState(0);
   const headerRef = useRef(null);
   const footerRef = useRef(null);
-  const hideControls = idleTimer >= 5;
+  const [hideControls, setHideControls] = useState(false);
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
+  const autoHideControlsAfterRef = useRef();
+  autoHideControlsAfterRef.current = autoHideControlsAfter;
+
+  const resetTimer = () => {
+    clearTimeout(timeout);
+    if (autoHideControlsAfterRef.current !== null) {
+      timeout = setTimeout(() => {
+        setHideControls(true);
+      }, autoHideControlsAfterRef.current || 5000);
+    }
+  };
+  const onPageClick = () => {
+    setHideControls(false);
+    resetTimer();
+  };
+
+  useEffect(() => {
+    resetTimer();
+  }, [autoHideControlsAfter]);
+  useEffect(() => {
+    document.addEventListener("click", onPageClick);
+    return () => {
+      document.removeEventListener("click", onPageClick);
+    };
+  }, []);
 
   useEffect(() => {
     if (!roomId) {
@@ -54,20 +85,6 @@ const Conference = () => {
       hmsActions.ignoreMessageTypes(["chat"]);
     }
   }, [isHeadless, hmsActions]);
-
-  const resetIdleTimer = () => {
-    setIdleTimer(0);
-  };
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIdleTimer(prevCount => prevCount + 1);
-    }, 1000);
-    document.addEventListener("click", resetIdleTimer);
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener("click", resetIdleTimer);
-    };
-  }, []);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;

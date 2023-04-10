@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import {
   selectLocalPeerID,
   selectPermissions,
@@ -103,6 +103,7 @@ const TileMenu = ({
   peerID,
   isScreenshare = false,
 }) => {
+  const [open, setOpen] = useState(false);
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
@@ -141,7 +142,16 @@ const TileMenu = ({
   }
 
   return (
-    <StyledMenuTile.Root>
+    <StyledMenuTile.Root
+      open={open}
+      onOpenChange={isDropDownOpen => {
+        actions.setAppData(
+          APP_DATA.autoHideControlsAfter,
+          isDropDownOpen ? null : 5000
+        );
+        setOpen(isDropDownOpen);
+      }}
+    >
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
