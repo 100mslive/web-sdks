@@ -34,7 +34,13 @@ export function InsetView() {
       <Flex
         align="center"
         justify="center"
-        css={{ size: "100%", gap: "$2", flexFlow: "row wrap" }}
+        css={{
+          size: "100%",
+          gap: "$4",
+          flexFlow: "row wrap",
+          "@lg": { flexFlow: "column" },
+          "@ls": { flexFlow: "row" },
+        }}
       >
         {remotePeers.length > 0 ? (
           remotePeers.map(peer => (
@@ -52,6 +58,23 @@ export function InsetView() {
                 height: "100%",
                 maxWidth: "100%",
                 minWidth: 0,
+                flex: "1 1 0",
+                display: "flex",
+                alignItems: "center",
+                "@lg": {
+                  display: "block",
+                  padding: "0 !important",
+                  width: "100%",
+                },
+              })()}
+              containerClassName={css({
+                height: "unset",
+                "@lg": {
+                  height: "100%",
+                },
+                "@ls": {
+                  height: "100%",
+                },
               })()}
               objectFit="contain"
             />
