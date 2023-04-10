@@ -96,12 +96,7 @@ const Tile = ({
               ? undefined
               : borderAudioRef
           }
-          css={{
-            ...(isHeadless &&
-              Number(headlessConfig?.tileOffset) === 0 && {
-                "border-radius": 0,
-              }),
-          }}
+          noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
         >
           {showStatsOnTiles && isTileBigEnoughToShowStats ? (
             <VideoTileStats
@@ -123,6 +118,7 @@ const Tile = ({
                 track?.facingMode !== "environment"
               }
               degraded={isVideoDegraded}
+              noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
               data-testid="participant_video_tile"
               css={{
                 objectFit,

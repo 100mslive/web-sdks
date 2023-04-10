@@ -25,6 +25,11 @@ const Container = styled('div', {
         background: 'transparent',
       },
     },
+    noRadius: {
+      true: {
+        borderRadius: 0,
+      },
+    },
   },
 });
 
