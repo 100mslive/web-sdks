@@ -33,6 +33,7 @@ export function InsetView() {
       <Flex align="center" justify="center" css={{ size: "100%" }}>
         {remotePeers.map(peer => (
           <VideoTile
+            key={peer.videoTrack || peer.id}
             peerId={peer.id}
             trackId={peer.videoTrack}
             css={{
@@ -44,6 +45,8 @@ export function InsetView() {
               height: "100%",
               maxWidth: "100%",
               minWidth: 0,
+              display: "flex",
+              alignItems: "center",
             }}
             objectFit="contain"
           />
@@ -52,9 +55,10 @@ export function InsetView() {
       <Box
         css={{
           position: "absolute",
-          top: 0,
+          bottom: 0,
           right: sidepane ? "$100" : "$8",
           mr: sidepane ? "$10" : 0,
+          zIndex: 11,
           aspectRatio: getAspectRatio({
             roleMap,
             roleName: localPeer.roleName,
