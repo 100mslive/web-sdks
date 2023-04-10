@@ -36,6 +36,7 @@ import { APP_DATA } from "../common/constants";
 export const LeaveRoom = () => {
   const navigate = useNavigation();
   const params = useParams();
+  const [open, setOpen] = useState(false);
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -98,11 +99,13 @@ export const LeaveRoom = () => {
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root
+            open={open}
             onOpenChange={isDropDownOpen => {
               hmsActions.setAppData(
                 APP_DATA.autoHideControlsAfter,
                 isDropDownOpen ? null : 5000
               );
+              setOpen(isDropDownOpen);
             }}
           >
             <Dropdown.Trigger

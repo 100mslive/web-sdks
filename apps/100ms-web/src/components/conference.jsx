@@ -55,9 +55,9 @@ const Conference = () => {
     resetTimer();
   }, [autoHideControlsAfter]);
   useEffect(() => {
-    document.addEventListener("click", onPageClick);
+    document.addEventListener("touchstart", onPageClick);
     return () => {
-      document.removeEventListener("click", onPageClick);
+      document.removeEventListener("touchstart", onPageClick);
     };
   }, []);
 
