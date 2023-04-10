@@ -93,6 +93,7 @@ export function InsetView() {
             roleMap,
             roleName: localPeer.roleName,
             isMobile,
+            boxShadow: "0 0 8px 0 rgba(0,0,0,0.5)",
           }),
           ...(isMobile ? { height: 240 } : { width: 320 }),
         }}
@@ -104,7 +105,6 @@ export function InsetView() {
           rootClassName={css({
             height: isMobile ? "100%" : undefined,
             padding: "0 !important",
-            boxShadow: "0 0 8px 0 rgba(0,0,0,0.5)",
           })()}
         />
       </Box>
