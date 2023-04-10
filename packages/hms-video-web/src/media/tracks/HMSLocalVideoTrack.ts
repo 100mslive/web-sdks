@@ -275,6 +275,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.nativeTrack = track;
     this.videoHandler.updateSinks();
     this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
+    DeviceStorageManager.updateSelection('videoInput', {
+      deviceId: this.settings.deviceId,
+      groupId: this.nativeTrack.getSettings().groupId,
+    });
   }
 
   /**
