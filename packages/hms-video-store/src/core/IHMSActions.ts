@@ -158,7 +158,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
   /**
-   * Toggle the camera between user facing and environment if the both the camera's exist
+   * Toggle the camera between front and back if the both the camera's exist
    */
   switchCamera(): Promise<void>;
 
