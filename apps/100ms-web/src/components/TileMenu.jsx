@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import {
   selectLocalPeerID,
   selectPermissions,
@@ -26,7 +26,11 @@ import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
+import {
+  APP_DATA,
+  AUTO_HIDE_CONTROLS_AFTER,
+  REMOTE_STOP_SCREENSHARE_TYPE,
+} from "../common/constants";
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId &&
@@ -103,6 +107,7 @@ const TileMenu = ({
   peerID,
   isScreenshare = false,
 }) => {
+  const [open, setOpen] = useState(false);
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
@@ -127,6 +132,7 @@ const TileMenu = ({
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
+
   if (
     !(
       removeOthers ||
@@ -141,7 +147,16 @@ const TileMenu = ({
   }
 
   return (
-    <StyledMenuTile.Root>
+    <StyledMenuTile.Root
+      open={open}
+      onOpenChange={isDropDownOpen => {
+        actions.setAppData(
+          APP_DATA.autoHideControlsAfter,
+          isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
+        );
+        setOpen(isDropDownOpen);
+      }}
+    >
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>

@@ -42,7 +42,13 @@ import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
+import {
+  APP_DATA,
+  AUTO_HIDE_CONTROLS_AFTER,
+  isAndroid,
+  isIOS,
+  isMacOS,
+} from "../../common/constants";
 
 const isMobileOS = isAndroid || isIOS;
 
@@ -64,9 +70,25 @@ export const MoreSettings = () => {
   const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { isBrowserRecordingOn } = useRecordingStreaming();
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
+
   return (
     <Fragment>
-      <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Root
+        open={open}
+        onOpenChange={isDropDownOpen => {
+          hmsActions.setAppData(
+            APP_DATA.autoHideControlsAfter,
+            isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
+          );
+          if (isDropDownOpen && autoHideControlsAfter !== null) {
+            hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
+          }
+          setOpen(isDropDownOpen);
+        }}
+      >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">

@@ -1,6 +1,7 @@
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
@@ -31,15 +32,20 @@ import {
 } from "../primitives/DialogContent";
 import { useNavigation } from "./hooks/useNavigation";
 import { isStreamingKit } from "../common/utils";
+import { APP_DATA, AUTO_HIDE_CONTROLS_AFTER } from "../common/constants";
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
   const params = useParams();
+  const [open, setOpen] = useState(false);
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
   const [lockRoom, setLockRoom] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
 
   const redirectToLeavePage = () => {
     if (params.role) {
@@ -96,7 +102,19 @@ export const LeaveRoom = () => {
               )}
             </Tooltip>
           </LeaveIconButton>
-          <Dropdown.Root>
+          <Dropdown.Root
+            open={open}
+            onOpenChange={isDropDownOpen => {
+              hmsActions.setAppData(
+                APP_DATA.autoHideControlsAfter,
+                isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
+              );
+              if (isDropDownOpen && autoHideControlsAfter !== null) {
+                hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
+              }
+              setOpen(isDropDownOpen);
+            }}
+          >
             <Dropdown.Trigger
               asChild
               css={{

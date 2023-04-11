@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
   HMSRoomState,
+  selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
   useHMSActions,
@@ -16,6 +17,7 @@ import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
+import { APP_DATA } from "../common/constants";
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -25,6 +27,37 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
+  const headerRef = useRef(null);
+  const footerRef = useRef(null);
+  const [hideControls, setHideControls] = useState(false);
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
+
+  useEffect(() => {
+    let timeout = null;
+    if (autoHideControlsAfter === null) {
+      setHideControls(false);
+    } else {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setHideControls(true);
+      }, autoHideControlsAfter);
+    }
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [autoHideControlsAfter, hideControls]);
+
+  useEffect(() => {
+    const onPageClick = () => {
+      setHideControls(false);
+    };
+    document.addEventListener("click", onPageClick);
+    return () => {
+      document.removeEventListener("click", onPageClick);
+    };
+  }, []);
 
   useEffect(() => {
     if (!roomId) {
@@ -58,7 +91,20 @@ const Conference = () => {
   return (
     <Flex css={{ size: "100%" }} direction="column">
       {!isHeadless && (
-        <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
+        <Box
+          css={{
+            h: "$18",
+            transition: "margin 0.5s ease-in-out",
+            "@md": { h: "$17" },
+            "@sm": {
+              ...(hideControls && {
+                marginTop: `-${headerRef?.current?.clientHeight}px`,
+              }),
+            },
+          }}
+          ref={headerRef}
+          data-testid="header"
+        >
           <Header />
         </Box>
       )}
@@ -73,7 +119,24 @@ const Conference = () => {
         <ConferenceMainView />
       </Box>
       {!isHeadless && (
-        <Box css={{ flex: "0 0 15%", maxHeight: "$24" }} data-testid="footer">
+        <Box
+          css={{
+            flex: "0 0 15%",
+            maxHeight: "$24",
+            transition: "margin 0.5s ease-in-out",
+            "@md": {
+              maxHeight: "none",
+            },
+            "@sm": {
+              maxHeight: "none",
+              ...(hideControls && {
+                marginBottom: `-${footerRef?.current?.clientHeight}px`,
+              }),
+            },
+          }}
+          ref={footerRef}
+          data-testid="footer"
+        >
           <Footer />
         </Box>
       )}
