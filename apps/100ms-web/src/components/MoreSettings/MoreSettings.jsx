@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useMedia } from "react-use";
 import Hls from "hls.js";
 import {
@@ -41,6 +41,7 @@ import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
+import { useAutoHide } from "../hooks/useAutoHide";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
 
@@ -64,18 +65,14 @@ export const MoreSettings = () => {
   const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { isBrowserRecordingOn } = useRecordingStreaming();
+  const autoHide = useAutoHide();
+  useEffect(() => {
+    autoHide(open);
+  }, [open]);
+
   return (
     <Fragment>
-      <Dropdown.Root
-        open={open}
-        onOpenChange={isDropDownOpen => {
-          hmsActions.setAppData(
-            APP_DATA.autoHideControlsAfter,
-            isDropDownOpen ? null : 5000
-          );
-          setOpen(isDropDownOpen);
-        }}
-      >
+      <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">

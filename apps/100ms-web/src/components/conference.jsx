@@ -19,8 +19,6 @@ import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
 import { APP_DATA } from "../common/constants";
 
-let timeout = null;
-
 const Conference = () => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
@@ -35,26 +33,26 @@ const Conference = () => {
   const autoHideControlsAfter = useHMSStore(
     selectAppData(APP_DATA.autoHideControlsAfter)
   );
-  const autoHideControlsAfterRef = useRef();
-  autoHideControlsAfterRef.current = autoHideControlsAfter;
 
-  const resetTimer = () => {
-    clearTimeout(timeout);
-    if (autoHideControlsAfterRef.current !== null) {
+  useEffect(() => {
+    let timeout = null;
+    if (autoHideControlsAfter === null) {
+      setHideControls(false);
+    } else {
+      clearTimeout(timeout);
       timeout = setTimeout(() => {
         setHideControls(true);
-      }, autoHideControlsAfterRef.current || 5000);
+      }, autoHideControlsAfter);
     }
-  };
-  const onPageClick = () => {
-    setHideControls(false);
-    resetTimer();
-  };
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [autoHideControlsAfter, hideControls]);
 
   useEffect(() => {
-    resetTimer();
-  }, [autoHideControlsAfter]);
-  useEffect(() => {
+    const onPageClick = () => {
+      setHideControls(false);
+    };
     document.addEventListener("click", onPageClick);
     return () => {
       document.removeEventListener("click", onPageClick);

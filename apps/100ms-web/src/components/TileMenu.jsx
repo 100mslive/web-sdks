@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import {
   selectLocalPeerID,
   selectPermissions,
@@ -25,6 +25,7 @@ import {
 import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
+import { useAutoHide } from "./hooks/useAutoHide";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
@@ -128,6 +129,11 @@ const TileMenu = ({
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
+  const autoHide = useAutoHide();
+  useEffect(() => {
+    autoHide(open);
+  }, [open]);
+
   if (
     !(
       removeOthers ||
@@ -142,16 +148,7 @@ const TileMenu = ({
   }
 
   return (
-    <StyledMenuTile.Root
-      open={open}
-      onOpenChange={isDropDownOpen => {
-        actions.setAppData(
-          APP_DATA.autoHideControlsAfter,
-          isDropDownOpen ? null : 5000
-        );
-        setOpen(isDropDownOpen);
-      }}
-    >
+    <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
