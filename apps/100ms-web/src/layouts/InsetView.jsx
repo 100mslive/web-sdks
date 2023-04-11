@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import Draggable from "react-draggable";
 import { useMedia } from "react-use";
 import {
   selectAppData,
@@ -24,12 +25,14 @@ export function InsetView() {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const isMobile = useMedia(cssConfig.media.md);
   const roleMap = useHMSStore(selectRolesMap);
+  const containerRef = useRef(null);
 
   return (
     <Flex
       align="center"
       justify="center"
       css={{ position: "relative", size: "100%", px: "$10" }}
+      ref={containerRef}
     >
       <Flex
         align="center"
@@ -83,38 +86,40 @@ export function InsetView() {
           <FirstPersonDisplay />
         )}
       </Flex>
-      <Box
-        css={{
-          position: "absolute",
-          bottom: remotePeers.length === 0 ? 0 : "$16",
-          right: sidepane ? "$100" : "$10",
-          mr: sidepane ? "$14" : 0,
-          boxShadow: "0 0 8px 0 rgba(0,0,0,0.3)",
-          zIndex: 10,
-          aspectRatio: getAspectRatio({
-            roleMap,
-            roleName: localPeer.roleName,
-            isMobile,
-          }),
-          w: 320,
-          "@ls": {
-            w: 240,
-          },
-          "@md": {
-            h: 240,
-            w: "auto",
-          },
-        }}
-      >
-        <VideoTile
-          peerId={localPeer.id}
-          trackid={localPeer.videoTrack}
-          rootCSS={{
-            height: isMobile ? "100%" : undefined,
-            padding: 0,
+      <Draggable bounds="parent">
+        <Box
+          css={{
+            position: "absolute",
+            bottom: remotePeers.length === 0 ? 0 : "$16",
+            right: sidepane ? "$100" : "$10",
+            mr: sidepane ? "$14" : 0,
+            boxShadow: "0 0 8px 0 rgba(0,0,0,0.3)",
+            zIndex: 10,
+            aspectRatio: getAspectRatio({
+              roleMap,
+              roleName: localPeer.roleName,
+              isMobile,
+            }),
+            w: 320,
+            "@ls": {
+              w: 240,
+            },
+            "@md": {
+              h: 240,
+              w: "auto",
+            },
           }}
-        />
-      </Box>
+        >
+          <VideoTile
+            peerId={localPeer.id}
+            trackid={localPeer.videoTrack}
+            rootCSS={{
+              height: isMobile ? "100%" : undefined,
+              padding: 0,
+            }}
+          />
+        </Box>
+      </Draggable>
     </Flex>
   );
 }
