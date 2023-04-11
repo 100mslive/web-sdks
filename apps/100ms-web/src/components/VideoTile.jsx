@@ -35,8 +35,8 @@ const Tile = ({
   height,
   visible = true,
   objectFit = "cover",
-  containerClassName,
-  rootClassName,
+  rootCSS = {},
+  containerCSS = {},
 }) => {
   const trackSelector = trackId
     ? selectVideoTrackByID(trackId)
@@ -84,8 +84,8 @@ const Tile = ({
           tileOffset: headlessConfig?.tileOffset,
         }),
         visibility: visible ? "visible" : "hidden",
+        ...rootCSS,
       }}
-      className={rootClassName}
       data-testid={`participant_tile_${peerName}`}
     >
       {peerName !== undefined ? (
@@ -98,7 +98,7 @@ const Tile = ({
               : borderAudioRef
           }
           noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
-          className={containerClassName}
+          css={containerCSS}
         >
           {showStatsOnTiles && isTileBigEnoughToShowStats ? (
             <VideoTileStats

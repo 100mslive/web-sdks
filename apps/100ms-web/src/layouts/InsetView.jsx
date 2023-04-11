@@ -7,7 +7,7 @@ import {
   selectRolesMap,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, config as cssConfig, css, Flex } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
 import { APP_DATA } from "../common/constants";
@@ -48,7 +48,7 @@ export function InsetView() {
               key={peer.videoTrack || peer.id}
               peerId={peer.id}
               trackId={peer.videoTrack}
-              rootClassName={css({
+              rootCSS={{
                 aspectRatio: getAspectRatio({
                   roleMap,
                   roleName: peer.roleName,
@@ -58,7 +58,7 @@ export function InsetView() {
                 height: "100%",
                 maxWidth: "100%",
                 minWidth: 0,
-                flex: "1 1 0",
+                flex: remotePeers.length === 1 ? undefined : "1 1 0",
                 display: "flex",
                 alignItems: "center",
                 "@lg": {
@@ -66,8 +66,8 @@ export function InsetView() {
                   padding: "0 !important",
                   width: "100%",
                 },
-              })()}
-              containerClassName={css({
+              }}
+              containerCSS={{
                 height: "unset",
                 "@lg": {
                   height: "100%",
@@ -75,7 +75,7 @@ export function InsetView() {
                 "@ls": {
                   height: "100%",
                 },
-              })()}
+              }}
               objectFit="contain"
             />
           ))
@@ -89,23 +89,30 @@ export function InsetView() {
           bottom: remotePeers.length === 0 ? 0 : "$16",
           right: sidepane ? "$100" : "$10",
           mr: sidepane ? "$14" : 0,
+          boxShadow: "0 0 8px 0 rgba(0,0,0,0.3)",
+          zIndex: 10,
           aspectRatio: getAspectRatio({
             roleMap,
             roleName: localPeer.roleName,
             isMobile,
-            boxShadow: "0 0 8px 0 rgba(0,0,0,0.5)",
           }),
-          ...(isMobile ? { height: 240 } : { width: 320 }),
+          w: 320,
+          "@ls": {
+            w: 240,
+          },
+          "@md": {
+            h: 240,
+            w: "auto",
+          },
         }}
       >
         <VideoTile
           peerId={localPeer.id}
           trackid={localPeer.videoTrack}
-          css={{ p: 0 }}
-          rootClassName={css({
+          rootCSS={{
             height: isMobile ? "100%" : undefined,
-            padding: "0 !important",
-          })()}
+            padding: 0,
+          }}
         />
       </Box>
     </Flex>
