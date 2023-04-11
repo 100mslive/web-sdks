@@ -28,6 +28,7 @@ import { useSetAppDataByKey } from "./useUISettings";
 import { getMetadata } from "../../common/utils";
 import {
   APP_DATA,
+  AUTO_HIDE_CONTROLS_AFTER,
   CHAT_SELECTOR,
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
@@ -76,7 +77,7 @@ const initialAppData = {
   [APP_DATA.recordingStarted]: false,
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
-  [APP_DATA.autoHideControlsAfter]: 5000,
+  [APP_DATA.autoHideControlsAfter]: AUTO_HIDE_CONTROLS_AFTER,
 };
 
 export const AppData = React.memo(

@@ -32,7 +32,7 @@ import {
 } from "../primitives/DialogContent";
 import { useNavigation } from "./hooks/useNavigation";
 import { isStreamingKit } from "../common/utils";
-import { APP_DATA } from "../common/constants";
+import { APP_DATA, AUTO_HIDE_CONTROLS_AFTER } from "../common/constants";
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
@@ -48,7 +48,10 @@ export const LeaveRoom = () => {
   );
 
   useEffect(() => {
-    hmsActions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+    hmsActions.setAppData(
+      APP_DATA.autoHideControlsAfter,
+      open ? null : AUTO_HIDE_CONTROLS_AFTER
+    );
     if (open && autoHideControlsAfter !== null) {
       hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
     }

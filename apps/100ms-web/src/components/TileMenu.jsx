@@ -26,7 +26,11 @@ import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
+import {
+  APP_DATA,
+  AUTO_HIDE_CONTROLS_AFTER,
+  REMOTE_STOP_SCREENSHARE_TYPE,
+} from "../common/constants";
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId &&
@@ -130,7 +134,10 @@ const TileMenu = ({
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
 
   useEffect(() => {
-    actions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+    actions.setAppData(
+      APP_DATA.autoHideControlsAfter,
+      open ? null : AUTO_HIDE_CONTROLS_AFTER
+    );
   }, [open, actions]);
 
   if (

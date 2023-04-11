@@ -42,7 +42,13 @@ import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
 import { FeatureFlags } from "../../services/FeatureFlags";
-import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
+import {
+  APP_DATA,
+  AUTO_HIDE_CONTROLS_AFTER,
+  isAndroid,
+  isIOS,
+  isMacOS,
+} from "../../common/constants";
 
 const isMobileOS = isAndroid || isIOS;
 
@@ -69,7 +75,10 @@ export const MoreSettings = () => {
   );
 
   useEffect(() => {
-    hmsActions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+    hmsActions.setAppData(
+      APP_DATA.autoHideControlsAfter,
+      open ? null : AUTO_HIDE_CONTROLS_AFTER
+    );
     if (open && autoHideControlsAfter !== null) {
       hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
     }
