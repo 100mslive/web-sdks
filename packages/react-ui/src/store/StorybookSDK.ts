@@ -129,6 +129,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
 
   async detachVideo(_trackID: string, videoElement: HTMLVideoElement): Promise<void> {
     videoElement.srcObject = null;
+    videoElement.remove();
     this.log('video removed');
   }
 

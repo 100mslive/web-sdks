@@ -272,6 +272,7 @@ export class HMSVideoPluginsManager {
     this.outputTrack?.stop();
     if (this.inputVideo) {
       this.inputVideo.srcObject = null;
+      this.inputVideo.remove();
       this.inputVideo = undefined;
     }
   }

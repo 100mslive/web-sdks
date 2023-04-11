@@ -431,6 +431,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
+        videoElement.remove();
       }
       HMSLogger.d('possible inconsistency detected - no video track found to remove sink');
     }
