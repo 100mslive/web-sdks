@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
+  selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
@@ -29,9 +30,9 @@ import {
   DialogContent,
   DialogRow,
 } from "../primitives/DialogContent";
-import { useAutoHide } from "./hooks/useAutoHide";
 import { useNavigation } from "./hooks/useNavigation";
 import { isStreamingKit } from "../common/utils";
+import { APP_DATA } from "../common/constants";
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
@@ -42,11 +43,17 @@ export const LeaveRoom = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
-  const autoHide = useAutoHide({ open });
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
 
   useEffect(() => {
-    autoHide(open);
-  }, [open]);
+    hmsActions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+    if (open && autoHideControlsAfter !== null) {
+      hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, hmsActions]);
 
   const redirectToLeavePage = () => {
     if (params.role) {

@@ -41,7 +41,6 @@ import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
-import { useAutoHide } from "../hooks/useAutoHide";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { APP_DATA, isAndroid, isIOS, isMacOS } from "../../common/constants";
 
@@ -65,10 +64,17 @@ export const MoreSettings = () => {
   const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { isBrowserRecordingOn } = useRecordingStreaming();
-  const autoHide = useAutoHide();
+  const autoHideControlsAfter = useHMSStore(
+    selectAppData(APP_DATA.autoHideControlsAfter)
+  );
+
   useEffect(() => {
-    autoHide(open);
-  }, [open]);
+    hmsActions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+    if (open && autoHideControlsAfter !== null) {
+      hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, hmsActions]);
 
   return (
     <Fragment>

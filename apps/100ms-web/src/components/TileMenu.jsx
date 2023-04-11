@@ -25,7 +25,6 @@ import {
 import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
-import { useAutoHide } from "./hooks/useAutoHide";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
@@ -129,10 +128,10 @@ const TileMenu = ({
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
-  const autoHide = useAutoHide();
+
   useEffect(() => {
-    autoHide(open);
-  }, [open]);
+    actions.setAppData(APP_DATA.autoHideControlsAfter, open ? null : 5000);
+  }, [open, actions]);
 
   if (
     !(
