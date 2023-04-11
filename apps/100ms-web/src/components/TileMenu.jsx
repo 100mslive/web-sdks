@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import {
   selectLocalPeerID,
   selectPermissions,
@@ -133,13 +133,6 @@ const TileMenu = ({
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
 
-  useEffect(() => {
-    actions.setAppData(
-      APP_DATA.autoHideControlsAfter,
-      open ? null : AUTO_HIDE_CONTROLS_AFTER
-    );
-  }, [open, actions]);
-
   if (
     !(
       removeOthers ||
@@ -154,7 +147,16 @@ const TileMenu = ({
   }
 
   return (
-    <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
+    <StyledMenuTile.Root
+      open={open}
+      onOpenChange={isDropDownOpen => {
+        actions.setAppData(
+          APP_DATA.autoHideControlsAfter,
+          isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
+        );
+        setOpen(isDropDownOpen);
+      }}
+    >
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>

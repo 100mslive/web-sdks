@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
 import Hls from "hls.js";
 import {
@@ -74,20 +74,21 @@ export const MoreSettings = () => {
     selectAppData(APP_DATA.autoHideControlsAfter)
   );
 
-  useEffect(() => {
-    hmsActions.setAppData(
-      APP_DATA.autoHideControlsAfter,
-      open ? null : AUTO_HIDE_CONTROLS_AFTER
-    );
-    if (open && autoHideControlsAfter !== null) {
-      hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, hmsActions]);
-
   return (
     <Fragment>
-      <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Root
+        open={open}
+        onOpenChange={isDropDownOpen => {
+          hmsActions.setAppData(
+            APP_DATA.autoHideControlsAfter,
+            isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
+          );
+          if (isDropDownOpen && autoHideControlsAfter !== null) {
+            hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
+          }
+          setOpen(isDropDownOpen);
+        }}
+      >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">
