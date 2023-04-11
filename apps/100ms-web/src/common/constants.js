@@ -130,7 +130,6 @@ export const APP_DATA = {
   chatSelector: "chatSelector",
   chatDraft: "chatDraft",
   appConfig: "appConfig",
-  uiMode: "uiMode",
   recordingUrl: "recordingUrl",
   sidePane: "sidePane",
   hlsStats: "hlsStats",

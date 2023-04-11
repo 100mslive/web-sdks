@@ -36,9 +36,9 @@ class Store implements IStore {
   private templateAppData: Record<string, any> = {
     uiMode: 'inset',
     inset: {
-      patient: { center: ['doctor'], sidepane: ['patient_guest', 'patient'] },
-      doctor: { center: ['doctor'], sidepane: ['patient_guest', 'patient'] },
-      patient_guest: { center: ['doctor'], sidepane: ['patient', 'doctor'] },
+      patient: { center: ['doctor'], sidepane: ['patientguest', 'patient'] },
+      doctor: { center: ['doctor'], sidepane: ['patientguest', 'patient'] },
+      patientguest: { center: ['doctor'], sidepane: ['patient', 'patient_guest'] },
     },
   };
   // Not used currently. Will be used exclusively for preview tracks.
