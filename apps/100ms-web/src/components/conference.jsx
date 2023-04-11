@@ -55,9 +55,9 @@ const Conference = () => {
     resetTimer();
   }, [autoHideControlsAfter]);
   useEffect(() => {
-    document.addEventListener("touchstart", onPageClick);
+    document.addEventListener("click", onPageClick);
     return () => {
-      document.removeEventListener("touchstart", onPageClick);
+      document.removeEventListener("click", onPageClick);
     };
   }, []);
 
@@ -124,8 +124,13 @@ const Conference = () => {
         <Box
           css={{
             flex: "0 0 15%",
+            maxHeight: "$24",
             transition: "margin 0.5s ease-in-out",
+            "@md": {
+              maxHeight: "none",
+            },
             "@sm": {
+              maxHeight: "none",
               ...(hideControls && {
                 marginBottom: `-${footerRef?.current?.clientHeight}px`,
               }),
