@@ -100,21 +100,14 @@ export function InsetView() {
               roleName: localPeer.roleName,
               isMobile,
             }),
-            w: 320,
-            "@ls": {
-              w: 240,
-            },
-            "@md": {
-              h: 240,
-              w: "auto",
-            },
+            h: 180,
           }}
         >
           <VideoTile
             peerId={localPeer.id}
             trackid={localPeer.videoTrack}
             rootCSS={{
-              height: isMobile ? "100%" : undefined,
+              size: "100%",
               padding: 0,
             }}
           />
