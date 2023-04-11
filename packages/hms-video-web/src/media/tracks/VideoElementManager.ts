@@ -30,7 +30,6 @@ export class VideoElementManager {
       if (this.track.enabled) {
         this.track.addSink(videoElement);
       } else {
-        console.log('update sink remove element ', this.videoElements);
         this.track.removeSink(videoElement);
       }
     }
@@ -57,20 +56,19 @@ export class VideoElementManager {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
-        await this.track.addSink(videoElement);
+        this.track.addSink(videoElement);
       } else {
-        await this.track.removeSink(videoElement);
+        this.track.removeSink(videoElement);
       }
     }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      await this.track.setPreferredLayer(this.track.getPreferredLayer());
+      this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    console.log('remove video element ', videoElement);
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
@@ -91,7 +89,6 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
-    console.log('[VideoElement handleIntersection] entry ', entry);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
