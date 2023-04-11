@@ -98,12 +98,12 @@ const AvatarContainer = styled(Box, {
   left: '50%',
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  width: '100%',
-  height: '100%',
-  '& > * + *': {
-    marginBottom: '0',
-    marginTop: '$4',
-  },
+  width: '35%',
+  height: '35%',
+  '& > div': {
+    maxHeight: "$24",
+    height: "100%"
+  }
 });
 
 interface VideoTileType {

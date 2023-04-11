@@ -67,6 +67,9 @@ const Tile = ({
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
   const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
   const avatarSize = useMemo(() => {
+    if (!width || !height) {
+      return undefined;
+    }
     if (width <= 150 || height <= 150) {
       return "small";
     } else if (width <= 300 || height <= 300) {
