@@ -92,6 +92,7 @@ export const makeFakeStore = (): HMSStore => {
     appData: {
       isAudioOnly: true,
     },
+    templateAppData: {},
     peers: {
       '1': {
         id: '1',

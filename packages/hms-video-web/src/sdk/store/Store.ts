@@ -33,6 +33,14 @@ class Store implements IStore {
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
   private tracks = new Map<HMSTrack, HMSTrack>();
+  private templateAppData: Record<string, any> = {
+    uiMode: 'inset',
+    inset: {
+      patient: { center: ['doctor'], sidepane: ['patient_guest', 'patient'] },
+      doctor: { center: ['doctor'], sidepane: ['patient_guest', 'patient'] },
+      patient_guest: { center: ['doctor'], sidepane: ['patient', 'doctor'] },
+    },
+  };
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
@@ -74,6 +82,10 @@ class Store implements IStore {
 
   getKnownRoles() {
     return this.knownRoles;
+  }
+
+  getTemplateAppData(): Record<string, any> {
+    return this.templateAppData;
   }
 
   getLocalPeer() {
@@ -181,6 +193,10 @@ class Store implements IStore {
 
   setRoom(room: HMSRoom) {
     this.room = room;
+  }
+
+  setTemplateAppData(appData: Record<string, any>): void {
+    this.templateAppData = appData;
   }
 
   setKnownRoles(params: PolicyParams) {
