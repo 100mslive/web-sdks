@@ -25,12 +25,9 @@ import {
 import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
+import { useDropdownList } from "./hooks/useDropdownList";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
-import {
-  APP_DATA,
-  AUTO_HIDE_CONTROLS_AFTER,
-  REMOTE_STOP_SCREENSHARE_TYPE,
-} from "../common/constants";
+import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId &&
@@ -133,6 +130,8 @@ const TileMenu = ({
   const hideSimulcastLayers =
     !track?.layerDefinitions?.length || track.degraded || !track.enabled;
 
+  useDropdownList({ open, name: "TileMenu" });
+
   if (
     !(
       removeOthers ||
@@ -147,16 +146,7 @@ const TileMenu = ({
   }
 
   return (
-    <StyledMenuTile.Root
-      open={open}
-      onOpenChange={isDropDownOpen => {
-        actions.setAppData(
-          APP_DATA.autoHideControlsAfter,
-          isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
-        );
-        setOpen(isDropDownOpen);
-      }}
-    >
+    <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
       <StyledMenuTile.Trigger data-testid="participant_menu_btn">
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>

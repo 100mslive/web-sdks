@@ -41,11 +41,11 @@ import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
+import { useDropdownList } from "../hooks/useDropdownList";
 import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   APP_DATA,
-  AUTO_HIDE_CONTROLS_AFTER,
   FEATURE_LIST,
   isAndroid,
   isIOS,
@@ -72,28 +72,24 @@ export const MoreSettings = () => {
   const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { isBrowserRecordingOn } = useRecordingStreaming();
-  const autoHideControlsAfter = useHMSStore(
-    selectAppData(APP_DATA.autoHideControlsAfter)
-  );
   const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
   const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
+  const anyModalOpen =
+    open ||
+    showChangeNameModal ||
+    showMuteAll ||
+    showOpenUrl ||
+    showBulkRoleChange ||
+    showDeviceSettings ||
+    showStatsForNerds ||
+    showSelfRoleChange ||
+    showStartRecording;
+  useDropdownList({ open: anyModalOpen, name: "MoreSettings" });
 
   return (
     <Fragment>
-      <Dropdown.Root
-        open={open}
-        onOpenChange={isDropDownOpen => {
-          hmsActions.setAppData(
-            APP_DATA.autoHideControlsAfter,
-            isDropDownOpen ? null : AUTO_HIDE_CONTROLS_AFTER
-          );
-          if (isDropDownOpen && autoHideControlsAfter !== null) {
-            hmsActions.setAppData(APP_DATA.autoHideControlsAfter, null);
-          }
-          setOpen(isDropDownOpen);
-        }}
-      >
+      <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">

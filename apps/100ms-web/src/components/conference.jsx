@@ -28,24 +28,22 @@ const Conference = () => {
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
-  const autoHideControlsAfter = useHMSStore(
-    selectAppData(APP_DATA.autoHideControlsAfter)
-  );
+  const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
 
   useEffect(() => {
     let timeout = null;
-    if (autoHideControlsAfter === null) {
+    if (Object.keys(dropdownList).length >= 1) {
       setHideControls(false);
     } else {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         setHideControls(true);
-      }, autoHideControlsAfter);
+      }, 5000);
     }
     return () => {
       clearTimeout(timeout);
     };
-  }, [autoHideControlsAfter, hideControls]);
+  }, [dropdownList, hideControls]);
 
   useEffect(() => {
     const onPageClick = () => {
@@ -92,7 +90,7 @@ const Conference = () => {
         <Box
           css={{
             h: "$18",
-            transition: "transform 0.5s ease-out",
+            transition: "transform 0.5s ease-in-out",
             "@md": {
               h: "$17",
               transform: hideControls ? "translateY(-100%)" : "none",
@@ -127,7 +125,7 @@ const Conference = () => {
           css={{
             flexShrink: 0,
             maxHeight: "$24",
-            transition: "transform 0.3s ease-out",
+            transition: "transform 0.5s ease-in-out",
             "@md": {
               maxHeight: "unset",
               transform: hideControls ? "translateY(100%)" : "none",

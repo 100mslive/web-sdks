@@ -111,7 +111,6 @@ export const QUERY_PARAM_AUTH_TOKEN = "auth_token";
 export const QUERY_PARAM_PREVIEW_AS_ROLE = "preview_as_role";
 export const UI_MODE_ACTIVE_SPEAKER = "activespeaker";
 export const UI_MODE_GRID = "grid";
-export const AUTO_HIDE_CONTROLS_AFTER = 5000;
 export const MAX_TOASTS = 5;
 export const RTMP_RECORD_RESOLUTION_MIN = 480;
 export const RTMP_RECORD_RESOLUTION_MAX = 1280;
@@ -145,7 +144,7 @@ export const APP_DATA = {
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
   pinnedTrackId: "pinnedTrackId",
-  autoHideControlsAfter: "autoHideControlsAfter",
+  dropdownList: "dropdownList",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
