@@ -30,7 +30,7 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   settings: HMSMediaSettings;
   devices: DeviceMap;
   roles: Record<string, HMSRole>;
-  templateAppData: Record<string, any>;
+  templateAppData: Record<string, string>;
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
   /** @deprecated use `sessionStore` instead */

@@ -33,11 +33,7 @@ class Store implements IStore {
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
   private tracks = new Map<HMSTrack, HMSTrack>();
-  private templateAppData: Record<string, any> = {
-    uiMode: 'inset',
-    rolePreference: '{"clinician":"patient","patient":"clinician","patientguest":"clinician"}',
-    features: 'chat',
-  };
+  private templateAppData?: Record<string, string>;
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
@@ -81,7 +77,7 @@ class Store implements IStore {
     return this.knownRoles;
   }
 
-  getTemplateAppData(): Record<string, any> {
+  getTemplateAppData() {
     return this.templateAppData;
   }
 
@@ -192,13 +188,10 @@ class Store implements IStore {
     this.room = room;
   }
 
-  setTemplateAppData(appData: Record<string, any>): void {
-    this.templateAppData = appData;
-  }
-
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
     this.roleDetailsArrived = true;
+    this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
       return;
     }
