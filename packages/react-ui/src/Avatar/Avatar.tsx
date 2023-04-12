@@ -30,7 +30,7 @@ export const StyledAvatar = styled('div', {
         fontSize: '$space$10'
       },
       large: {
-        height: '$24',
+        height: '$20',
         fontSize: '$space$12',
       },
     },
