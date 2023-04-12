@@ -34,6 +34,7 @@ export function InsetView() {
   const remotePeers = useHMSStore(selectRemotePeers);
   const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.ls);
   const roleMap = useHMSStore(selectRolesMap);
   const rolePreference = useRolePreference();
   let centerPeers = [];
@@ -50,18 +51,20 @@ export function InsetView() {
   } else {
     centerPeers = remotePeers;
   }
+  const hideInset = sidepanePeers.length > 0 && (isMobile || isLandscape);
 
   return (
     <Fragment>
       <Box
         css={{
           display: "grid",
-          gridTemplateColumns: sidepanePeers.length > 0 ? "75% 1fr" : "100%",
+          gridTemplateColumns: sidepanePeers.length > 0 ? "3fr 1fr" : "100%",
+          gridTemplateRows: "1fr",
           gap: "$8",
           px: "$10",
           size: "100%",
           "@md": {
-            gridTemplateColumns: "unset",
+            gridTemplateColumns: "1fr",
             gridTemplateRows: sidepanePeers.length > 0 ? `3fr 1fr` : "100%",
           },
         }}
@@ -123,35 +126,37 @@ export function InsetView() {
               placeContent: "center",
             }}
           >
-            {sidepanePeers.map(peer => (
-              <VideoTile
-                key={peer.videoTrack || peer.id}
-                peerId={peer.id}
-                trackId={peer.videoTrack}
-                rootCSS={{
-                  aspectRatio: getAspectRatio({
-                    roleMap,
-                    roleName: peer.roleName,
-                    isMobile: false,
-                  }),
-                  flexBasis: "100%",
-                  "@ls": {
-                    aspectRatio: 1,
-                    flexBasis: "45%",
-                  },
-                  "@md": {
-                    aspectRatio: 1,
-                    flexBasis: "45%",
-                  },
-                  padding: 0,
-                }}
-                objectFit="contain"
-              />
-            ))}
+            {(hideInset ? [...sidepanePeers, localPeer] : sidepanePeers).map(
+              peer => (
+                <VideoTile
+                  key={peer.videoTrack || peer.id}
+                  peerId={peer.id}
+                  trackId={peer.videoTrack}
+                  rootCSS={{
+                    aspectRatio: getAspectRatio({
+                      roleMap,
+                      roleName: peer.roleName,
+                      isMobile: false,
+                    }),
+                    flexBasis: "100%",
+                    "@ls": {
+                      aspectRatio: 1,
+                      flexBasis: "45%",
+                    },
+                    "@md": {
+                      aspectRatio: 1,
+                      flexBasis: "45%",
+                    },
+                    padding: 0,
+                  }}
+                  objectFit="contain"
+                />
+              )
+            )}
           </Flex>
         )}
       </Box>
-      <InsetTile roleMap={roleMap} isMobile={isMobile} />
+      {!hideInset && <InsetTile roleMap={roleMap} isMobile={isMobile} />}
     </Fragment>
   );
 }
