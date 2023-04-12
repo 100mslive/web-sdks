@@ -290,6 +290,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     /**
      * not stopping previous track results in device in use more frequently, as many devices will not allow even if
      * you are requesting for a new device.
+     * Note: Do not change the order of this.
      */
     prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);

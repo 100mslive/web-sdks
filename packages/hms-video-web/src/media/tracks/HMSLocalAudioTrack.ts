@@ -69,7 +69,8 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
     /*
-     * stop the previous only after acquiring the new track otherwise this can lead to
+     * Note: Do not change the order of this.
+     * stop the previous before acquiring the new track otherwise this can lead to
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
