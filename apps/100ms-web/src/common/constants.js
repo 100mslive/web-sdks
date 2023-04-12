@@ -185,3 +185,21 @@ export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
+
+export const FEATURE_LIST = {
+  AUIDO_ONLY_SCREENSHATRE: "audioscreenshare",
+  AUDIO_PLAYLIST: "audioplaylist",
+  VIDEO_PLAYLIST: "videoplaylist",
+  EMOJI_REACTION: "emojireaction",
+  AUDIO_PLUGINS: "audioplugins",
+  VIDEO_PLUGINS: "videoplugins",
+  WHITEBOARD: "whiteboard",
+  CHANGE_NAME: "changename",
+  FULLSCREEN: "fullscreen",
+  PICTURE_IN_PICTURE: "pip",
+  STARTS_FOR_NERDS: "statsfornerds",
+  EMBED_URL: "embedurl",
+  BRB: "brb",
+  HAND_RAISE: "handraise",
+  CHAT: "chat",
+};

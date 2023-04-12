@@ -41,10 +41,12 @@ import { ChangeSelfRole } from "./ChangeSelfRole";
 import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
 import { FullScreenItem } from "./FullScreenItem";
 import { MuteAllModal } from "./MuteAllModal";
+import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import {
   APP_DATA,
   AUTO_HIDE_CONTROLS_AFTER,
+  FEATURE_LIST,
   isAndroid,
   isIOS,
   isMacOS,
@@ -73,6 +75,9 @@ export const MoreSettings = () => {
   const autoHideControlsAfter = useHMSStore(
     selectAppData(APP_DATA.autoHideControlsAfter)
   );
+  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
+  const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
+  const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
 
   return (
     <Fragment>
@@ -117,15 +122,17 @@ export const MoreSettings = () => {
               <Dropdown.ItemSeparator />
             </>
           ) : null}
-          <Dropdown.Item
-            onClick={() => setShowChangeNameModal(value => !value)}
-            data-testid="change_name_btn"
-          >
-            <PencilIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
-              Change Name
-            </Text>
-          </Dropdown.Item>
+          {isChangeNameEnabled && (
+            <Dropdown.Item
+              onClick={() => setShowChangeNameModal(value => !value)}
+              data-testid="change_name_btn"
+            >
+              <PencilIcon />
+              <Text variant="sm" css={{ ml: "$4" }}>
+                Change Name
+              </Text>
+            </Dropdown.Item>
+          )}
           <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
           {permissions?.changeRole && (
             <Dropdown.Item
@@ -139,7 +146,7 @@ export const MoreSettings = () => {
             </Dropdown.Item>
           )}
           <FullScreenItem />
-          {isAllowedToPublish.screen && (
+          {isAllowedToPublish.screen && isEmbedEnabled && (
             <EmbedUrl setShowOpenUrl={setShowOpenUrl} />
           )}
           {permissions.mute && (
@@ -164,6 +171,7 @@ export const MoreSettings = () => {
             </Text>
           </Dropdown.Item>
           {FeatureFlags.enableStatsForNerds &&
+            isSFNEnabled &&
             (localPeerRole === "hls-viewer" ? (
               Hls.isSupported() ? (
                 <Dropdown.Item
