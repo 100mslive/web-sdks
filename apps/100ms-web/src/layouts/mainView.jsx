@@ -5,6 +5,7 @@ import {
   selectPeerScreenSharing,
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
+  selectTemplateAppData,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -22,7 +23,6 @@ import {
   useHLSViewerRole,
   useIsHeadless,
   usePinnedTrack,
-  useUiMode,
   useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -42,6 +42,7 @@ export const ConferenceMainView = () => {
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
   const hmsActions = useHMSActions();
   const isHeadless = useIsHeadless();
   const headlessUIMode = useAppConfig("headlessConfig", "uiMode");
@@ -49,7 +50,6 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
-  const uiMode = useUiMode();
   useEffect(() => {
     if (!isConnected) {
       return;

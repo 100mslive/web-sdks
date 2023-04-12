@@ -77,10 +77,6 @@ export const useLogo = () => {
   return useHMSStore(selectAppData(APP_DATA.logo));
 };
 
-export const useUiMode = () => {
-  return useHMSStore(selectAppData(APP_DATA.uiMode));
-};
-
 export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
