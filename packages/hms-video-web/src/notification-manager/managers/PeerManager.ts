@@ -154,7 +154,7 @@ export class PeerManager {
 
   private updateSimulcastLayersForPeer(peer: HMSPeer) {
     this.store.getPeerTracks(peer.peerId).forEach(track => {
-      if (track.type === 'video' && ['regular', 'screen'].includes(track.source)) {
+      if (track.type === 'video' && ['regular', 'screen'].includes(track.source!)) {
         const remoteTrack = track as HMSRemoteVideoTrack;
         const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(peer, remoteTrack.source!);
         remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
