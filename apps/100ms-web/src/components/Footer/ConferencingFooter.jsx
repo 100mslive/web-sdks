@@ -42,9 +42,9 @@ const ScreenshareAudio = () => {
   const [showModal, setShowModal] = useState(false);
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST);
   if (
+    !isFeatureEnabled ||
     !isAllowedToPublish.screen ||
-    !isScreenshareSupported() ||
-    !isFeatureEnabled
+    !isScreenshareSupported()
   ) {
     return null;
   }
