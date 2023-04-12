@@ -12,11 +12,11 @@ export const useIsFeatureEnabled = key => {
 
 export const useRolePreference = () => {
   let preference = useHMSStore(selectTemplateAppData)?.rolePreference;
-  console.log(preference);
   try {
     preference = JSON.parse(preference || "{}");
+    return preference;
   } catch (e) {
     console.log("role preference parse error", e);
+    return undefined;
   }
-  return preference;
 };
