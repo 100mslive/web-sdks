@@ -15,10 +15,19 @@ import VideoTile from "../components/VideoTile";
 import { APP_DATA } from "../common/constants";
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
-  console.log(roleName, roleMap);
   const role = roleMap[roleName];
   const { width, height } = role.publishParams.video;
   return isMobile ? height / width : width / height;
+};
+
+const useRolePreference = () => {
+  let preference = useHMSStore(selectTemplateAppData)?.rolePreference;
+  try {
+    preference = JSON.parse(preference || "{}");
+  } catch (e) {
+    console.log("role preference parse error", e);
+  }
+  return preference;
 };
 
 export function InsetView() {
@@ -26,18 +35,15 @@ export function InsetView() {
   const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
   const roleMap = useHMSStore(selectRolesMap);
-  const insetConfig = useHMSStore(selectTemplateAppData)?.inset?.[
-    localPeer?.roleName
-  ];
+  const rolePreference = useRolePreference();
   let centerPeers = [];
   let sidepanePeers = [];
-  if (insetConfig) {
-    const center = insetConfig.center || [];
-    const sidepane = insetConfig.sidepane || [];
+  if (rolePreference) {
+    const center = rolePreference[localPeer.roleName]?.split(",") || [];
     for (const peer of remotePeers) {
       if (center.includes(peer.roleName)) {
         centerPeers.push(peer);
-      } else if (sidepane.includes(peer.roleName)) {
+      } else {
         sidepanePeers.push(peer);
       }
     }
@@ -50,10 +56,14 @@ export function InsetView() {
       <Box
         css={{
           display: "grid",
-          gridTemplateColumns: "auto 25%",
+          gridTemplateColumns: sidepanePeers.length > 0 ? "75% 1fr" : "100%",
           gap: "$8",
           px: "$10",
           size: "100%",
+          "@md": {
+            gridTemplateColumns: "unset",
+            gridTemplateRows: sidepanePeers.length > 0 ? `3fr 1fr` : "100%",
+          },
         }}
       >
         <Flex
@@ -62,7 +72,10 @@ export function InsetView() {
           css={{
             size: "100%",
             gap: "$4",
-            flexFlow: "row wrap",
+            flexWrap: "wrap",
+            placeContent: "center",
+            minHeight: 0,
+            minWidth: 0,
             "@lg": { flexFlow: "column" },
             "@ls": { flexFlow: "row" },
           }}
@@ -99,33 +112,44 @@ export function InsetView() {
             <FirstPersonDisplay />
           )}
         </Flex>
-        <Flex
-          align="center"
-          justify="center"
-          css={{
-            size: "100%",
-            gap: "$4",
-            flexFlow: "row wrap",
-          }}
-        >
-          {sidepanePeers.map(peer => (
-            <VideoTile
-              key={peer.videoTrack || peer.id}
-              peerId={peer.id}
-              trackId={peer.videoTrack}
-              rootCSS={{
-                aspectRatio: getAspectRatio({
-                  roleMap,
-                  roleName: peer.roleName,
-                  isMobile,
-                }),
-                padding: 0,
-                flex: "1 1 45%",
-              }}
-              objectFit="contain"
-            />
-          ))}
-        </Flex>
+        {sidepanePeers.length > 0 && (
+          <Flex
+            align="center"
+            justify="center"
+            css={{
+              size: "100%",
+              gap: "$4",
+              flexFlow: "row wrap",
+              placeContent: "center",
+            }}
+          >
+            {sidepanePeers.map(peer => (
+              <VideoTile
+                key={peer.videoTrack || peer.id}
+                peerId={peer.id}
+                trackId={peer.videoTrack}
+                rootCSS={{
+                  aspectRatio: getAspectRatio({
+                    roleMap,
+                    roleName: peer.roleName,
+                    isMobile: false,
+                  }),
+                  flexBasis: "100%",
+                  "@ls": {
+                    aspectRatio: 1,
+                    flexBasis: "45%",
+                  },
+                  "@md": {
+                    aspectRatio: 1,
+                    flexBasis: "45%",
+                  },
+                  padding: 0,
+                }}
+                objectFit="contain"
+              />
+            ))}
+          </Flex>
+        )}
       </Box>
       <InsetTile roleMap={roleMap} isMobile={isMobile} />
     </Fragment>

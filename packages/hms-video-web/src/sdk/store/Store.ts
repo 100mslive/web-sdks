@@ -35,11 +35,7 @@ class Store implements IStore {
   private tracks = new Map<HMSTrack, HMSTrack>();
   private templateAppData: Record<string, any> = {
     uiMode: 'inset',
-    inset: {
-      patient: { center: ['doctor'], sidepane: ['patientguest', 'patient'] },
-      doctor: { center: ['doctor'], sidepane: ['patientguest', 'patient'] },
-      patientguest: { center: ['doctor'], sidepane: ['patient', 'patient_guest'] },
-    },
+    rolePreference: '{"clinician":"patient","patient":"clinician","patientguest":"clinician"}',
   };
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
