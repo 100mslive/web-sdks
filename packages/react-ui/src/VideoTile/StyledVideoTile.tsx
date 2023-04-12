@@ -101,7 +101,7 @@ const AvatarContainer = styled(Box, {
   width: '35%',
   height: '35%',
   '& > div': {
-    maxHeight: "$24",
+    maxHeight: "$20",
     height: "100%"
   }
 });
