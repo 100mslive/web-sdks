@@ -6,28 +6,18 @@ import {
   selectLocalPeer,
   selectRemotePeers,
   selectRolesMap,
-  selectTemplateAppData,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
+import { useRolePreference } from "../components/hooks/useFeatures";
 import { APP_DATA } from "../common/constants";
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];
   const { width, height } = role.publishParams.video;
   return isMobile ? height / width : width / height;
-};
-
-const useRolePreference = () => {
-  let preference = useHMSStore(selectTemplateAppData)?.rolePreference;
-  try {
-    preference = JSON.parse(preference || "{}");
-  } catch (e) {
-    console.log("role preference parse error", e);
-  }
-  return preference;
 };
 
 export function InsetView() {
