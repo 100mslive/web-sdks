@@ -14,7 +14,7 @@ export const StyledAvatar = styled('div', {
   fontFamily: '$sans',
   aspectRatio: 1,
   fontWeight: 600,
-  fontSize: '$md',
+  fontSize: '$space$10',
   variants: {
     shape: {
       circle: getAvatarShape('$round'),
@@ -22,14 +22,16 @@ export const StyledAvatar = styled('div', {
     },
     size: {
       small: {
-        height: '48px',
+        height: '$16',
         fontSize: '$sm'
       },
       medium: {
-        height: '64px',
+        height: '$18',
+        fontSize: '$space$10'
       },
       large: {
-        height: '80px',
+        height: '$24',
+        fontSize: '$space$12',
       },
     },
   },
