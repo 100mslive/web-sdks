@@ -36,6 +36,7 @@ class Store implements IStore {
   private templateAppData: Record<string, any> = {
     uiMode: 'inset',
     rolePreference: '{"clinician":"patient","patient":"clinician","patientguest":"clinician"}',
+    features: 'chat',
   };
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
