@@ -87,7 +87,7 @@ const Conference = () => {
   }
 
   return (
-    <Flex css={{ size: "100%" }} direction="column">
+    <Flex css={{ size: "100%", overflow: "hidden" }} direction="column">
       {!isHeadless && (
         <Box
           css={{
@@ -95,10 +95,10 @@ const Conference = () => {
             transition: "transform 0.5s ease-out",
             "@md": {
               h: "$17",
-              transform: hideControls ? "translateY(100%)" : "none",
+              transform: hideControls ? "translateY(-100%)" : "none",
             },
             "@ls": {
-              transform: hideControls ? "translateY(100%)" : "none",
+              transform: hideControls ? "translateY(-100%)" : "none",
             },
           }}
           data-testid="header"
