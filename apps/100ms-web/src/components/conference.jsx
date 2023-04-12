@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
@@ -27,8 +27,6 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const headerRef = useRef(null);
-  const footerRef = useRef(null);
   const [hideControls, setHideControls] = useState(false);
   const autoHideControlsAfter = useHMSStore(
     selectAppData(APP_DATA.autoHideControlsAfter)
@@ -94,15 +92,15 @@ const Conference = () => {
         <Box
           css={{
             h: "$18",
-            transition: "margin 0.5s ease-in-out",
-            "@md": { h: "$17" },
-            "@sm": {
-              ...(hideControls && {
-                marginTop: `-${headerRef?.current?.clientHeight}px`,
-              }),
+            transition: "transform 0.5s ease-out",
+            "@md": {
+              h: "$17",
+              transform: hideControls ? "translateY(100%)" : "none",
+            },
+            "@ls": {
+              transform: hideControls ? "translateY(100%)" : "none",
             },
           }}
-          ref={headerRef}
           data-testid="header"
         >
           <Header />
@@ -113,6 +111,12 @@ const Conference = () => {
           w: "100%",
           flex: "1 1 0",
           minHeight: 0,
+          "@md": {
+            flex: hideControls ? "0 0 100%" : "1 1 0",
+          },
+          "@ls": {
+            flex: hideControls ? "0 0 100%" : "1 1 0",
+          },
         }}
         data-testid="conferencing"
       >
@@ -121,20 +125,17 @@ const Conference = () => {
       {!isHeadless && (
         <Box
           css={{
-            flex: "0 0 15%",
+            flexShrink: 0,
             maxHeight: "$24",
-            transition: "margin 0.5s ease-in-out",
+            transition: "transform 0.3s ease-out",
             "@md": {
-              maxHeight: "none",
+              maxHeight: "unset",
+              transform: hideControls ? "translateY(100%)" : "none",
             },
-            "@sm": {
-              maxHeight: "none",
-              ...(hideControls && {
-                marginBottom: `-${footerRef?.current?.clientHeight}px`,
-              }),
+            "@ls": {
+              transform: hideControls ? "translateY(100%)" : "none",
             },
           }}
-          ref={footerRef}
           data-testid="footer"
         >
           <Footer />

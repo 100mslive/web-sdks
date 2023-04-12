@@ -85,7 +85,7 @@ export const ConferencingFooter = () => {
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
         <NoiseSuppression />
-        {FeatureFlags.enableTranscription && <TranscriptionButton />}
+        {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
         <Flex
           align="center"
           css={{
