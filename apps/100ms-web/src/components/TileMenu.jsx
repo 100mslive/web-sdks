@@ -3,6 +3,7 @@ import {
   selectLocalPeerID,
   selectPermissions,
   selectSessionStore,
+  selectTemplateAppData,
   selectTrackByID,
   selectVideoTrackByPeerID,
   useCustomEvent,
@@ -128,10 +129,14 @@ const TileMenu = ({
 
   const isPrimaryVideoTrack =
     useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
-  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
+  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
+  const isInset = uiMode === "inset";
 
+  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
   const showPinAction =
-    isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack));
+    isPinEnabled &&
+    (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) &&
+    !isInset;
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
@@ -149,6 +154,10 @@ const TileMenu = ({
     ) &&
     hideSimulcastLayers
   ) {
+    return null;
+  }
+
+  if (isInset && isLocal) {
     return null;
   }
 
