@@ -17,7 +17,7 @@ import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
-import { APP_DATA } from "../common/constants";
+import { APP_DATA, isAndroid, isIOS } from "../common/constants";
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -31,6 +31,7 @@ const Conference = () => {
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
+  const performAutoHide = hideControls && (isAndroid() || isIOS());
 
   useEffect(() => {
     let timeout = null;
@@ -95,12 +96,9 @@ const Conference = () => {
           css={{
             h: "$18",
             transition: "transform 0.5s ease-in-out",
+            transform: performAutoHide ? "translateY(-100%)" : "none",
             "@lg": {
               h: "$17",
-              transform: hideControls ? "translateY(-100%)" : "none",
-            },
-            "@ls": {
-              transform: hideControls ? "translateY(-100%)" : "none",
             },
           }}
           data-testid="header"
@@ -111,14 +109,8 @@ const Conference = () => {
       <Box
         css={{
           w: "100%",
-          flex: "1 1 0",
+          flex: performAutoHide ? "0 0 100%" : "1 1 0",
           minHeight: 0,
-          "@lg": {
-            flex: hideControls ? "0 0 100%" : "1 1 0",
-          },
-          "@ls": {
-            flex: hideControls ? "0 0 100%" : "1 1 0",
-          },
         }}
         data-testid="conferencing"
       >
@@ -130,12 +122,9 @@ const Conference = () => {
             flexShrink: 0,
             maxHeight: "$24",
             transition: "transform 0.5s ease-in-out",
-            "@lg": {
+            transform: performAutoHide ? "translateY(100%)" : "none",
+            "@md": {
               maxHeight: "unset",
-              transform: hideControls ? "translateY(100%)" : "none",
-            },
-            "@ls": {
-              transform: hideControls ? "translateY(100%)" : "none",
             },
           }}
           data-testid="footer"
