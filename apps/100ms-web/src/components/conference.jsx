@@ -34,7 +34,7 @@ const Conference = () => {
 
   useEffect(() => {
     let timeout = null;
-    if (dropdownList.length >= 1) {
+    if (dropdownList.length > 0) {
       setHideControls(false);
     } else {
       clearTimeout(timeout);

@@ -3,22 +3,18 @@ import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export const useDropdownList = ({ name, open }) => {
-  const [dropdownList, setDropdownList] = useSetAppDataByKey(
-    APP_DATA.dropdownList
-  );
+  const [, setDropdownList] = useSetAppDataByKey(APP_DATA.dropdownList);
 
   useEffect(() => {
     if (open) {
-      if (!dropdownList.includes(name)) {
-        setDropdownList([...dropdownList, name]);
-      }
+      setDropdownList(list => {
+        return list.includes(name) ? list : list.concat(name);
+      });
     } else {
-      const index = dropdownList.indexOf(name);
-      if (index >= 0) {
-        const newDropdownList = [...dropdownList];
-        newDropdownList.splice(index, 1);
-        setDropdownList(newDropdownList);
-      }
+      setDropdownList(list => {
+        const index = list.indexOf(name);
+        return index >= 0 ? [...list].splice(index, 1) : list;
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, name]);
