@@ -97,7 +97,7 @@ const Conference = () => {
             h: "$18",
             transition: "transform 0.5s ease-in-out",
             transform: performAutoHide ? "translateY(-100%)" : "none",
-            "@lg": {
+            "@md": {
               h: "$17",
             },
           }}
