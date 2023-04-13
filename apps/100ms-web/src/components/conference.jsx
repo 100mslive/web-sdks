@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
@@ -29,15 +29,19 @@ const Conference = () => {
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
+  const dropdownListRef = useRef();
+  dropdownListRef.current = dropdownList;
 
   useEffect(() => {
     let timeout = null;
-    if (Object.keys(dropdownList).length >= 1) {
+    if (dropdownList.length > 0) {
       setHideControls(false);
     } else {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        setHideControls(true);
+        if (dropdownListRef.current.length === 0) {
+          setHideControls(true);
+        }
       }, 5000);
     }
     return () => {

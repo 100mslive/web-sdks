@@ -180,6 +180,9 @@ const InsetTile = ({ isMobile, roleMap }) => {
             size: "100%",
             padding: 0,
           }}
+          containerCSS={{
+            bg: "$surfaceDefault",
+          }}
         />
       </Box>
     </Draggable>

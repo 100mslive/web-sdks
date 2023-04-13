@@ -9,13 +9,14 @@ export const useDropdownList = ({ name, open }) => {
 
   useEffect(() => {
     if (open) {
-      if (!(name in dropdownList)) {
-        setDropdownList({ ...dropdownList, [name]: true });
+      if (!dropdownList.includes(name)) {
+        setDropdownList([...dropdownList, name]);
       }
     } else {
-      if (name in dropdownList) {
-        const newDropdownList = { ...dropdownList };
-        delete newDropdownList[name];
+      const index = dropdownList.indexOf(name);
+      if (index >= 0) {
+        const newDropdownList = [...dropdownList];
+        newDropdownList.splice(index, 1);
         setDropdownList(newDropdownList);
       }
     }

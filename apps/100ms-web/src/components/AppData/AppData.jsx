@@ -76,7 +76,7 @@ const initialAppData = {
   [APP_DATA.recordingStarted]: false,
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
-  [APP_DATA.dropdownList]: {},
+  [APP_DATA.dropdownList]: [],
 };
 
 export const AppData = React.memo(
