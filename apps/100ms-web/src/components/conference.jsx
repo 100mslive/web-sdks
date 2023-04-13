@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
   HMSRoomState,
+  parsedUserAgent,
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
@@ -32,7 +33,12 @@ const Conference = () => {
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
   const performAutoHide = hideControls && (isAndroid || isIOS);
-  console.log(performAutoHide, isAndroid, isIOS);
+  console.log(
+    performAutoHide,
+    isAndroid,
+    isIOS,
+    parsedUserAgent.getOS()?.name?.toLowerCase()
+  );
 
   useEffect(() => {
     let timeout = null;
