@@ -95,7 +95,7 @@ const Conference = () => {
           css={{
             h: "$18",
             transition: "transform 0.5s ease-in-out",
-            "@md": {
+            "@lg": {
               h: "$17",
               transform: hideControls ? "translateY(-100%)" : "none",
             },
@@ -113,7 +113,7 @@ const Conference = () => {
           w: "100%",
           flex: "1 1 0",
           minHeight: 0,
-          "@md": {
+          "@lg": {
             flex: hideControls ? "0 0 100%" : "1 1 0",
           },
           "@ls": {
@@ -130,7 +130,7 @@ const Conference = () => {
             flexShrink: 0,
             maxHeight: "$24",
             transition: "transform 0.5s ease-in-out",
-            "@md": {
+            "@lg": {
               maxHeight: "unset",
               transform: hideControls ? "translateY(100%)" : "none",
             },
