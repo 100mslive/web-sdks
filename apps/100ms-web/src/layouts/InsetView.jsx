@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import Draggable from "react-draggable";
 import { useMedia } from "react-use";
 import {
@@ -154,10 +154,73 @@ export function InsetView() {
 const InsetTile = ({ isMobile, roleMap }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const nodeRef = useRef(null);
+
+  const handleStop = (_, data) => {
+    const { x, y, node } = data;
+    const container = node.parentElement || {};
+    const corners = [
+      [0, 0],
+      [0, -container.clientHeight],
+      [-container.clientWidth + 48, 0],
+      [-container.clientWidth + 48, -container.clientHeight],
+    ];
+    let min = Number.POSITIVE_INFINITY;
+    let minDistanceCorner = [];
+    for (const [x1, y1] of corners) {
+      const distance = Math.sqrt(
+        Math.pow(x - x1 - node.clientWidth, 2) +
+          Math.pow(y - y1 - node.clientHeight, 2)
+      );
+      if (distance < min) {
+        min = distance;
+        minDistanceCorner = [
+          x1 !== 0 ? x1 + node.clientWidth : x1,
+          y1 !== 0 ? y1 + node.clientHeight : y1,
+        ];
+      }
+    }
+    node.style.transform = `translate(
+      ${minDistanceCorner[0]}px, 
+      ${minDistanceCorner[1]}px
+    )`;
+  };
+
+  useEffect(() => {
+    if (!nodeRef.current) {
+      return;
+    }
+    /**
+     * Taken from the discussion
+     * https://github.com/react-grid-layout/react-draggable/issues/363#issuecomment-947751127
+     */
+    const triggerMouseEvent = (element, eventType) => {
+      const mouseEvent = new Event(eventType, {
+        bubbles: true,
+        cancelable: true,
+      });
+      element.dispatchEvent(mouseEvent);
+    };
+    const onResize = () => {
+      triggerMouseEvent(nodeRef.current, "mouseover");
+      triggerMouseEvent(nodeRef.current, "mousedown");
+      triggerMouseEvent(document, "mousemove");
+      triggerMouseEvent(nodeRef.current, "mouseup");
+      triggerMouseEvent(nodeRef.current, "click");
+    };
+    window.addEventListener("resize", onResize);
+    if (window.ScreenOrientation) {
+      window.ScreenOrientation.onchange = onResize;
+    }
+    return () => {
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
 
   return (
-    <Draggable bounds="parent">
+    <Draggable bounds="parent" nodeRef={nodeRef} onStop={handleStop}>
       <Box
+        ref={nodeRef}
         css={{
           position: "absolute",
           bottom: 0,
@@ -171,6 +234,9 @@ const InsetTile = ({ isMobile, roleMap }) => {
             isMobile,
           }),
           h: 180,
+          "@ls": {
+            maxWidth: "25vw",
+          },
         }}
       >
         <VideoTile
