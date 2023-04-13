@@ -64,7 +64,7 @@ export function InsetView() {
           justify="center"
           css={{
             size: "100%",
-            gap: "$4",
+            gap: "$8",
             flexWrap: "wrap",
             placeContent: "center",
             minHeight: 0,
