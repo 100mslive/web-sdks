@@ -154,7 +154,13 @@ export function InsetView() {
 const InsetTile = ({ isMobile, roleMap }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
-
+  const aspectRatio = getAspectRatio({
+    roleMap,
+    roleName: localPeer.roleName,
+    isMobile,
+  });
+  const height = 180;
+  const width = height * aspectRatio;
   return (
     <Draggable bounds="parent">
       <Box
@@ -165,12 +171,8 @@ const InsetTile = ({ isMobile, roleMap }) => {
           mr: sidepane ? "$14" : 0,
           boxShadow: "0 0 8px 0 rgba(0,0,0,0.3)",
           zIndex: 10,
-          aspectRatio: getAspectRatio({
-            roleMap,
-            roleName: localPeer.roleName,
-            isMobile,
-          }),
-          h: 180,
+          aspectRatio: aspectRatio,
+          h: height,
         }}
       >
         <VideoTile
@@ -183,6 +185,7 @@ const InsetTile = ({ isMobile, roleMap }) => {
           containerCSS={{
             bg: "$surfaceDefault",
           }}
+          width={width}
         />
       </Box>
     </Draggable>
