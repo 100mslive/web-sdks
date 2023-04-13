@@ -1,4 +1,5 @@
 import { parsedUserAgent } from "@100mslive/react-sdk";
+import { isIPadOSFunc } from "./utils";
 
 export const defaultAudioList = [
   {
@@ -184,7 +185,7 @@ export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
-
+export const isIPadOS = isIPadOSFunc();
 export const FEATURE_LIST = {
   AUIDO_ONLY_SCREENSHATRE: "audioscreenshare",
   AUDIO_PLAYLIST: "audioplaylist",
