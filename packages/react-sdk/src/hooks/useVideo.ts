@@ -38,8 +38,10 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
     (async () => {
       if (track?.id && videoRef.current) {
         if (attach !== false) {
+          console.log('Attaching the video ele');
           await actions.attachVideo(track.id, videoRef.current);
         } else {
+          console.log('detaching the video ele');
           await actions.detachVideo(track.id, videoRef.current);
         }
       }

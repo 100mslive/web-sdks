@@ -30,6 +30,7 @@ export class VideoElementManager {
       if (this.track.enabled) {
         this.track.addSink(videoElement);
       } else {
+        console.log('update sink remove element ', this.videoElements);
         this.track.removeSink(videoElement);
       }
     }
@@ -56,20 +57,21 @@ export class VideoElementManager {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
-        this.track.addSink(videoElement);
+        await this.track.addSink(videoElement);
       } else {
-        this.track.removeSink(videoElement);
+        await this.track.removeSink(videoElement);
       }
     }
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      this.track.setPreferredLayer(this.track.getPreferredLayer());
+      await this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
-  removeVideoElement(videoElement: HTMLVideoElement): void {
-    this.track.removeSink(videoElement);
+  async removeVideoElement(videoElement: HTMLVideoElement): Promise<void> {
+    console.log('remove video element ', videoElement);
+    await this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
@@ -89,17 +91,18 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
+    console.log('[VideoElement handleIntersection] entry ', entry);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
       HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
-      this.track.addSink(entry.target as HTMLVideoElement);
+      await this.track.addSink(entry.target as HTMLVideoElement);
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
-      this.track.removeSink(entry.target as HTMLVideoElement);
+      await this.track.removeSink(entry.target as HTMLVideoElement);
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
-    this.selectMaxLayer();
+    await this.selectMaxLayer();
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -107,7 +110,7 @@ export class VideoElementManager {
       return;
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
-    this.selectMaxLayer();
+    await this.selectMaxLayer();
   };
 
   /**
@@ -160,6 +163,7 @@ export class VideoElementManager {
   }
 
   cleanup = () => {
+    HMSLogger.d(this.TAG, `cleanup video element`);
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
       this.resizeObserver?.unobserve(videoElement);

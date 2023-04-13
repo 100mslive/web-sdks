@@ -875,7 +875,7 @@ export class HMSSdk implements HMSInterface {
   async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
     if (config?.autoManageVideo) {
-      track.attach(videoElement);
+      await track.attach(videoElement);
     } else {
       await track.addSink(videoElement);
     }
@@ -884,7 +884,7 @@ export class HMSSdk implements HMSInterface {
   async detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
     if (config?.autoManageVideo) {
-      track.detach(videoElement);
+      await track.detach(videoElement);
     } else {
       await track.removeSink(videoElement);
     }
