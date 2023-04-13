@@ -27,7 +27,12 @@ import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownList } from "./hooks/useDropdownList";
 import { useDropdownSelection } from "./hooks/useDropdownSelection";
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE } from "../common/constants";
+import { useIsFeatureEnabled } from "./hooks/useFeatures";
+import {
+  APP_DATA,
+  FEATURE_LIST,
+  REMOTE_STOP_SCREENSHARE_TYPE,
+} from "../common/constants";
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId &&
@@ -123,8 +128,10 @@ const TileMenu = ({
 
   const isPrimaryVideoTrack =
     useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
+  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
 
-  const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);
+  const showPinAction =
+    isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack));
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers =
@@ -151,19 +158,21 @@ const TileMenu = ({
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="top" align="end">
-        {isLocal && showPinAction ? (
-          <>
-            <PinActions
-              audioTrackID={audioTrackID}
-              videoTrackID={videoTrackID}
-            />
-            {showSpotlight && (
-              <SpotlightActions
+        {isLocal ? (
+          showPinAction && (
+            <>
+              <PinActions
                 audioTrackID={audioTrackID}
                 videoTrackID={videoTrackID}
               />
-            )}
-          </>
+              {showSpotlight && (
+                <SpotlightActions
+                  audioTrackID={audioTrackID}
+                  videoTrackID={videoTrackID}
+                />
+              )}
+            </>
+          )
         ) : (
           <>
             {toggleVideo ? (

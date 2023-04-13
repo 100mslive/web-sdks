@@ -201,4 +201,5 @@ export const FEATURE_LIST = {
   BRB: "brb",
   HAND_RAISE: "handraise",
   CHAT: "chat",
+  PIN_TILE: "pintile",
 };
