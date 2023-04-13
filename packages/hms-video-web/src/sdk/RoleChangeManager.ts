@@ -3,8 +3,7 @@ import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
+import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
 
 export default class RoleChangeManager {
@@ -36,12 +35,20 @@ export default class RoleChangeManager {
     const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
     const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
 
-    await this.setVideoTrackSimulcastLayers({ oldRole, newRole });
-    await this.setScreenTrackSimulcastLayers({ oldRole, newRole });
+    const videoHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.simulcast?.video,
+      newRole.publishParams.simulcast?.video,
+    );
+    const screenHasSimulcastDifference = this.hasSimulcastDifference(
+      oldRole.publishParams.simulcast?.screen,
+      newRole.publishParams.simulcast?.screen,
+    );
+
+    const prevVideoEnabled = this.store.getLocalPeer()?.videoTrack?.enabled;
 
     await this.removeAudioTrack(removeAudio);
-    await this.removeVideoTracks(removeVideo);
-    await this.removeScreenTracks(removeScreen);
+    await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
+    await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
 
     const initialSettings = this.store.getConfig()?.settings || {
       isAudioMuted: true,
@@ -50,6 +57,11 @@ export default class RoleChangeManager {
       videoDeviceId: 'default',
       audioOutputDeviceId: 'default',
     };
+
+    if (videoHasSimulcastDifference) {
+      initialSettings.isVideoMuted = !prevVideoEnabled;
+    }
+
     // call publish with new settings, local track manager will diff policies
     await this.publish(initialSettings);
   };
@@ -112,44 +124,6 @@ export default class RoleChangeManager {
 
   private removeTrack(wasPublishing: Set<string>, isPublishing: Set<string>, type: string) {
     return wasPublishing.has(type) && !isPublishing.has(type);
-  }
-
-  private async setVideoTrackSimulcastLayers({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) {
-    const localPeer = this.store.getLocalPeer();
-
-    const videoHasSimulcastDifference = this.hasSimulcastDifference(
-      oldRole.publishParams.simulcast?.video,
-      newRole.publishParams.simulcast?.video,
-    );
-
-    if (videoHasSimulcastDifference && localPeer?.videoTrack) {
-      await this.setNewSimulcastLayersForTrack(localPeer.videoTrack);
-    }
-  }
-
-  private async setScreenTrackSimulcastLayers({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) {
-    const localPeer = this.store.getLocalPeer();
-    const screenHasSimulcastDifference = this.hasSimulcastDifference(
-      oldRole.publishParams.simulcast?.screen,
-      newRole.publishParams.simulcast?.screen,
-    );
-
-    if (screenHasSimulcastDifference && localPeer?.auxiliaryTracks) {
-      const localAuxTracks = [...localPeer.auxiliaryTracks];
-      for (const track of localAuxTracks) {
-        if (track.type === 'video' && track.source === 'screen') {
-          await this.setNewSimulcastLayersForTrack(track as HMSLocalVideoTrack);
-        }
-      }
-    }
-  }
-
-  private async setNewSimulcastLayersForTrack(videoTrack: HMSLocalVideoTrack) {
-    videoTrack?.setSimulcastDefinitons(
-      this.store.getSimulcastDefinitionsForPeer(this.store.getLocalPeer()!, videoTrack.source!),
-    );
-    const simulcastLayers = this.store.getSimulcastLayers(videoTrack.source!);
-    await (videoTrack.stream as HMSLocalStream).setSimulcastLayers(videoTrack, simulcastLayers);
   }
 
   private hasSimulcastDifference(oldLayers?: SimulcastLayers, newLayers?: SimulcastLayers) {

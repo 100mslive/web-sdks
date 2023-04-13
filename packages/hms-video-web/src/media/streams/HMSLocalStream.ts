@@ -26,15 +26,6 @@ export default class HMSLocalStream extends HMSMediaStream {
     return transceiver;
   }
 
-  async setSimulcastLayers(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
-    const sender = track.transceiver?.sender;
-    if (sender) {
-      const params = sender.getParameters();
-      params.encodings = this.getTrackEncodings(track, simulcastLayers);
-      await sender.setParameters(params);
-    }
-  }
-
   async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
     await this.connection?.setMaxBitrateAndFramerate(track);
   }
