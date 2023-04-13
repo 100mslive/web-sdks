@@ -31,7 +31,7 @@ const Conference = () => {
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
-  const performAutoHide = hideControls && (isAndroid() || isIOS());
+  const performAutoHide = hideControls && (isAndroid || isIOS);
 
   useEffect(() => {
     let timeout = null;
