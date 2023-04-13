@@ -38,6 +38,10 @@ export function InsetView() {
         sidepanePeers.push(peer);
       }
     }
+    if (centerPeers.length === 0 && sidepanePeers.length > 0) {
+      centerPeers = sidepanePeers;
+      sidepanePeers = [];
+    }
   } else {
     centerPeers = remotePeers;
   }
