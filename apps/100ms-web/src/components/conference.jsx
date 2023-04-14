@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { usePrevious } from "react-use";
 import {
   HMSRoomState,
-  parsedUserAgent,
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
