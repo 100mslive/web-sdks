@@ -31,16 +31,21 @@ export default class RoleChangeManager {
     const isPublishing = new Set(newRole.publishParams.allowed);
 
     const removeVideo = this.removeTrack(wasPublishing, isPublishing, 'video');
+
+    const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
+    const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
+
     const videoHasSimulcastDifference = this.hasSimulcastDifference(
       oldRole.publishParams.simulcast?.video,
       newRole.publishParams.simulcast?.video,
     );
-    const removeAudio = this.removeTrack(wasPublishing, isPublishing, 'audio');
-    const removeScreen = this.removeTrack(wasPublishing, isPublishing, 'screen');
     const screenHasSimulcastDifference = this.hasSimulcastDifference(
       oldRole.publishParams.simulcast?.screen,
       newRole.publishParams.simulcast?.screen,
     );
+
+    const prevVideoEnabled = this.store.getLocalPeer()?.videoTrack?.enabled;
+
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
@@ -52,8 +57,13 @@ export default class RoleChangeManager {
       videoDeviceId: 'default',
       audioOutputDeviceId: 'default',
     };
+
+    if (videoHasSimulcastDifference) {
+      initialSettings.isVideoMuted = !prevVideoEnabled;
+    }
+
     // call publish with new settings, local track manager will diff policies
-    await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
+    await this.publish(initialSettings);
   };
 
   private async removeVideoTracks(removeVideo: boolean) {
@@ -123,6 +133,11 @@ export default class RoleChangeManager {
     if (oldLayers?.layers?.length !== newLayers?.layers?.length) {
       return true;
     }
-    return false;
+
+    // return true if anyone layer has different maxBitrate/maxFramerate
+    return !!oldLayers?.layers?.some(layer => {
+      const newLayer = newLayers?.layers?.find(newLayer => newLayer.rid === layer.rid);
+      return newLayer?.maxBitrate !== layer.maxBitrate || newLayer?.maxFramerate !== layer.maxFramerate;
+    });
   }
 }
