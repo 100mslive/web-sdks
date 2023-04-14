@@ -184,9 +184,13 @@ export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
+export const isIPadOS =
+  navigator?.maxTouchPoints &&
+  navigator?.maxTouchPoints > 2 &&
+  navigator?.userAgent?.match(/Mac/);
 
 export const FEATURE_LIST = {
-  AUIDO_ONLY_SCREENSHATRE: "audioscreenshare",
+  AUDIO_ONLY_SCREENSHARE: "audioscreenshare",
   AUDIO_PLAYLIST: "audioplaylist",
   VIDEO_PLAYLIST: "videoplaylist",
   EMOJI_REACTION: "emojireaction",
@@ -201,4 +205,5 @@ export const FEATURE_LIST = {
   BRB: "brb",
   HAND_RAISE: "handraise",
   CHAT: "chat",
+  PIN_TILE: "pintile",
 };

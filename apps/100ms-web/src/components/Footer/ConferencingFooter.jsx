@@ -40,7 +40,9 @@ const ScreenshareAudio = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioScreenshare = amIScreenSharing && !video && !!audio;
   const [showModal, setShowModal] = useState(false);
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST);
+  const isFeatureEnabled = useIsFeatureEnabled(
+    FEATURE_LIST.AUDIO_ONLY_SCREENSHARE
+  );
   if (
     !isFeatureEnabled ||
     !isAllowedToPublish.screen ||
