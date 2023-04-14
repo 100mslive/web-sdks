@@ -10,14 +10,11 @@ body,
   overscroll-behavior-y: none;
   position: fixed;
   top: 0;
-  top: env(safe-area-inset-top);
   left: 0;
-  left: env(safe-area-inset-left);
   right: 0;
-  right: env(safe-area-inset-right);
   bottom: 0;
-  bottom: env(safe-area-inset-bottom);
   margin: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* scroll bar */
