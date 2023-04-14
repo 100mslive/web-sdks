@@ -6,6 +6,10 @@ body,
   height: 100%;
 }
 
+body {
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
 #root {
   overscroll-behavior-y: none;
   position: fixed;
@@ -13,7 +17,6 @@ body,
   left: 0;
   width: 100%;
   margin: 0;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 /* scroll bar */
