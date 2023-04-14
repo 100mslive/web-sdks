@@ -218,7 +218,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
-    console.error(this.TAG, data);
+    console.error(this.TAG, `error type ${data.type} with details ${data.details} is fatal ${data.fatal}`);
     const details = data.error?.message || data.err?.message || '';
     const detail = {
       details: details,
