@@ -195,7 +195,7 @@ const getPadding = ({ isHeadless, tileOffset }) => {
   if (!isHeadless || isNaN(Number(tileOffset))) {
     return undefined;
   }
-  return Number(tileOffset) === 0 ? 0 : undefined;
+  return Number(tileOffset) === 0 ? 3 : undefined;
 };
 
 export default VideoTile;
