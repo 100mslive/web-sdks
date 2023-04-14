@@ -186,6 +186,7 @@ export const isMacOS =
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
 export const isIPadOS = isIPadOSFunc();
+
 export const FEATURE_LIST = {
   AUIDO_ONLY_SCREENSHATRE: "audioscreenshare",
   AUDIO_PLAYLIST: "audioplaylist",
