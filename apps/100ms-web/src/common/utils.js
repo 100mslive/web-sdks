@@ -86,10 +86,3 @@ export const metadataPayloadParser = payload => {
     return { payload };
   }
 };
-
-export const isIPadOSFunc = () => {
-  return false;
-  // navigator?.maxTouchPoints &&
-  // navigator?.maxTouchPoints > 2 &&
-  // navigator?.userAgent?.match(/Mac/)
-};
