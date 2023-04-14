@@ -160,14 +160,15 @@ const InsetTile = ({ isMobile, roleMap }) => {
     const { x, y, node } = data;
     const container = node.parentElement || {};
     const corners = [
-      [0, 0],
-      [0, -container.clientHeight],
-      [-container.clientWidth + 48, 0],
-      [-container.clientWidth + 48, -container.clientHeight],
+      [0, 0], // bottom right
+      [0, -container.clientHeight], //top right
+      [-container.clientWidth + 48, 0], //bottom left - 48(24px padding both sides)
+      [-container.clientWidth + 48, -container.clientHeight], //top left
     ];
     let min = Number.POSITIVE_INFINITY;
     let minDistanceCorner = [];
     for (const [x1, y1] of corners) {
+      // calculate distance between the element x and corners
       const distance = Math.sqrt(
         Math.pow(x - x1 - node.clientWidth, 2) +
           Math.pow(y - y1 - node.clientHeight, 2)
