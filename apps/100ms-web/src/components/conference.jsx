@@ -18,7 +18,7 @@ import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
-import { APP_DATA, isAndroid, isIOS } from "../common/constants";
+import { APP_DATA, isAndroid, isIOS, isIPadOS } from "../common/constants";
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -32,7 +32,7 @@ const Conference = () => {
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
-  const performAutoHide = hideControls && (isAndroid || isIOS);
+  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   console.log(
     performAutoHide,
     isAndroid,
