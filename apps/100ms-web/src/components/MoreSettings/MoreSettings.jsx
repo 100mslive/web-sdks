@@ -124,7 +124,7 @@ export const MoreSettings = () => {
               <Dropdown.ItemSeparator />
             </>
           ) : null}
-          {!isChangeNameEnabled && (
+          {isChangeNameEnabled && (
             <Dropdown.Item
               onClick={() => setShowChangeNameModal(value => !value)}
               data-testid="change_name_btn"
