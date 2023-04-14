@@ -74,6 +74,8 @@ export function EdtechComponent({
   getDetails = () => {},
   authTokenByRoomCodeEndpoint = "",
 }) {
+  console.log("edtech route ", authTokenByRoomCodeEndpoint);
+
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
@@ -277,6 +279,9 @@ export default function App() {
         headerPresent: process.env.REACT_APP_HEADER_PRESENT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
+      authTokenByRoomCodeEndpoint={
+        process.env.REACT_APP_AUTH_TOKEN_BY_ROOM_CODE_ENDPOINT
+      }
     />
   );
 }
