@@ -45,7 +45,7 @@ export class NetworkTestManager {
           }
         } catch (error) {
           if ((error as Error).name !== 'AbortError') {
-            HMSLogger.e(this.TAG, error);
+            HMSLogger.w(this.TAG, error);
           }
         }
       };
@@ -63,7 +63,7 @@ export class NetworkTestManager {
         });
     } catch (error) {
       if ((error as Error).name !== 'AbortError') {
-        HMSLogger.e(this.TAG, error);
+        HMSLogger.w(this.TAG, error);
         this.updateScoreToListener(0);
         this.eventBus.analytics.publish(
           AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
