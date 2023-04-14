@@ -103,7 +103,13 @@ export const MoreSettings = () => {
         <Dropdown.Content
           sideOffset={5}
           align="center"
-          css={{ maxHeight: "$96", "@md": { w: "$64" } }}
+          css={{
+            maxHeight: "$96",
+            "@md": { w: "$64" },
+            "div[role='separator']:first-child": {
+              display: "none",
+            },
+          }}
         >
           {isMobile && permissions?.browserRecording ? (
             <>

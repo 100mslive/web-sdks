@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useRef } from "react";
 import Draggable from "react-draggable";
 import { useMedia } from "react-use";
 import {
@@ -12,6 +12,7 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
 import { useRolePreference } from "../components/hooks/useFeatures";
+import { getClosestPoint } from "../common/utils";
 import { APP_DATA } from "../common/constants";
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
@@ -165,9 +166,45 @@ const InsetTile = ({ isMobile, roleMap }) => {
   });
   const height = 180;
   const width = height * aspectRatio;
+  const nodeRef = useRef(null);
+
+  const handleStop = (_, data) => {
+    const { x, y, node } = data;
+    const [closerX, closerY] = getClosestPoint({ x, y, node });
+    node.style.transform = `translate(
+      ${closerX}px, 
+      ${closerY}px
+    )`;
+  };
+
+  useEffect(() => {
+    if (!nodeRef.current || !window.ResizeObserver) {
+      return;
+    }
+    const node = nodeRef.current;
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.target === node.parentElement) {
+          const { x, y } = node.getBoundingClientRect();
+          const [closerX, closerY] = getClosestPoint({ x, y, node });
+          node.style.transform = `translate(
+            ${closerX}px, 
+            ${closerY}px
+            )`;
+        }
+      });
+    });
+    resizeObserver.observe(node.parentElement);
+    return () => {
+      node?.parentElement && resizeObserver?.unobserve(node.parentElement);
+      resizeObserver?.disconnect();
+    };
+  }, []);
+
   return (
-    <Draggable bounds="parent">
+    <Draggable bounds="parent" nodeRef={nodeRef} onStop={handleStop}>
       <Box
+        ref={nodeRef}
         css={{
           position: "absolute",
           bottom: 0,

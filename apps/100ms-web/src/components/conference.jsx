@@ -109,7 +109,8 @@ const Conference = () => {
       <Box
         css={{
           w: "100%",
-          flex: performAutoHide ? "0 0 100%" : "1 1 0",
+          flex: performAutoHide ? undefined : "1 1 0",
+          height: performAutoHide ? "100%" : undefined,
           minHeight: 0,
         }}
         data-testid="conferencing"
