@@ -59,7 +59,7 @@ export class HMSHLSPlayerEventEmitter implements IHMSHLSPlayerEventEmitter {
     this.eventEmitter.off(eventName, listener);
   }
 
-  emit<E extends HMSHLSPlayerEvents>(eventName: E, eventObject: Parameters<HMSHLSPlayerListeners<E>>[0]): boolean {
+  emits<E extends HMSHLSPlayerEvents>(eventName: E, eventObject: Parameters<HMSHLSPlayerListeners<E>>[0]): boolean {
     return this.eventEmitter.emit(eventName, eventObject, eventName);
   }
 

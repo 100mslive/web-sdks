@@ -9,7 +9,7 @@ export class HMSHLSTimedMetadata {
   constructor(
     hls: Hls,
     private videoEl: HTMLVideoElement,
-    private emit: <E extends HMSHLSPlayerEvents>(
+    private emits: <E extends HMSHLSPlayerEvents>(
       eventName: E,
       eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
     ) => boolean,
@@ -54,7 +54,7 @@ export class HMSHLSTimedMetadata {
       const duration = new Date(endDate).getTime() - new Date(startDate).getTime();
       if (timeDiff <= tolerance) {
         setTimeout(() => {
-          this.emit(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
+          this.emits(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, {
             id: cue?.id,
             payload: data.payload,
             duration: duration,
@@ -84,13 +84,13 @@ export class HMSHLSTimedMetadata {
   /**
    * Metadata are automatically parsed and added to the video element's
    * textTrack cue by hlsjs as they come through the stream.
-   * in FRAG_CHANGED, we read the cues and emit HLS_METADATA_LOADED
+   * in FRAG_CHANGED, we read the cues and emits HLS_METADATA_LOADED
    * when the current fragment has a metadata to play.
    */
   fragChangeHandler = (_: any, { frag }: { frag: Fragment }) => {
     if (!this.videoEl) {
       const error = HMSHLSErrorFactory.HLSMediaError.videoElementNotFound();
-      this.emit(HMSHLSPlayerEvents.ERROR, error);
+      this.emits(HMSHLSPlayerEvents.ERROR, error);
     }
     try {
       if (this.videoEl.textTracks.length === 0) {
