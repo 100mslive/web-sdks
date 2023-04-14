@@ -207,9 +207,6 @@ const InsetTile = ({ isMobile, roleMap }) => {
             isMobile,
           }),
           h: 180,
-          "@ls": {
-            maxWidth: "25vw",
-          },
         }}
       >
         <VideoTile
