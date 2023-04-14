@@ -103,7 +103,13 @@ export const MoreSettings = () => {
         <Dropdown.Content
           sideOffset={5}
           align="center"
-          css={{ maxHeight: "$96", "@md": { w: "$64" } }}
+          css={{
+            maxHeight: "$96",
+            "@md": { w: "$64" },
+            "div[role='separator']:first-child": {
+              display: "none",
+            },
+          }}
         >
           {isMobile && permissions?.browserRecording ? (
             <>
@@ -118,7 +124,7 @@ export const MoreSettings = () => {
               <Dropdown.ItemSeparator />
             </>
           ) : null}
-          {isChangeNameEnabled && (
+          {!isChangeNameEnabled && (
             <Dropdown.Item
               onClick={() => setShowChangeNameModal(value => !value)}
               data-testid="change_name_btn"
