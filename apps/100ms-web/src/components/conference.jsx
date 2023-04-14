@@ -33,12 +33,6 @@ const Conference = () => {
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
-  console.log(
-    performAutoHide,
-    isAndroid,
-    isIOS,
-    parsedUserAgent.getOS()?.name?.toLowerCase()
-  );
 
   useEffect(() => {
     let timeout = null;
