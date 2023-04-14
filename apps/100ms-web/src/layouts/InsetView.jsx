@@ -185,7 +185,7 @@ const InsetTile = ({ isMobile, roleMap }) => {
     });
     resizeObserver.observe(node.parentElement);
     return () => {
-      resizeObserver?.unobserve(node?.parentElement);
+      node?.parentElement && resizeObserver?.unobserve(node.parentElement);
       resizeObserver?.disconnect();
     };
   }, []);
