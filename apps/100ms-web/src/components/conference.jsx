@@ -102,7 +102,7 @@ const Conference = () => {
         <Box
           css={{
             h: "$18",
-            transition: "transform 0.5s ease-in-out",
+            transition: "transform 0.3s ease-in-out",
             transform: performAutoHide ? "translateY(-100%)" : "none",
             "@md": {
               h: "$17",
@@ -128,7 +128,7 @@ const Conference = () => {
           css={{
             flexShrink: 0,
             maxHeight: "$24",
-            transition: "transform 0.5s ease-in-out",
+            transition: "transform 0.3s ease-in-out",
             transform: performAutoHide ? "translateY(100%)" : "none",
             "@md": {
               maxHeight: "unset",
