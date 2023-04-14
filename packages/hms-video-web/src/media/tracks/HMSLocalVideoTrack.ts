@@ -4,6 +4,7 @@ import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
 import {
+  HMSFacingMode,
   HMSSimulcastLayerDefinition,
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
@@ -18,7 +19,7 @@ import HMSLocalStream from '../streams/HMSLocalStream';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
-    prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced',
+    prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced' | 'facingMode',
   ) {
     return prop in newSettings && newSettings[prop] !== oldSettings[prop];
   };
@@ -258,17 +259,41 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   /**
+   * will change the facingMode to environment if current facing mode is user or vice versa.
+   * will be useful when on mobile web to toggle between front and back camera's
+   */
+  async switchCamera() {
+    const currentFacingMode = this.getMediaTrackSettings().facingMode;
+    if (!currentFacingMode || this.source !== 'regular') {
+      HMSLogger.d(this.TAG, 'facingMode not supported');
+      return;
+    }
+    const facingMode = currentFacingMode === HMSFacingMode.ENVIRONMENT ? HMSFacingMode.USER : HMSFacingMode.ENVIRONMENT;
+    this.nativeTrack?.stop();
+    const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
+    await this.replaceSender(track, this.enabled);
+    this.nativeTrack = track;
+    this.videoHandler.updateSinks();
+    this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
+    DeviceStorageManager.updateSelection('videoInput', {
+      deviceId: this.settings.deviceId,
+      groupId: this.nativeTrack.getSettings().groupId,
+    });
+  }
+
+  /**
    * called when the video is unmuted
    * @private
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const newTrack = await getVideoTrack(settings);
-    /*
-     * stop the previous only after acquiring the new track otherwise this can lead to
-     * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
+    /**
+     * not stopping previous track results in device in use more frequently, as many devices will not allow even if
+     * you are requesting for a new device.
+     * Note: Do not change the order of this.
      */
     prevTrack?.stop();
+    const newTrack = await getVideoTrack(settings);
     HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
@@ -301,8 +326,20 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
-    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
-    const newSettings = new HMSVideoTrackSettings(width, height, codec, maxFramerate, deviceId, advanced, maxBitrate);
+    const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode } = {
+      ...this.settings,
+      ...settings,
+    };
+    const newSettings = new HMSVideoTrackSettings(
+      width,
+      height,
+      codec,
+      maxFramerate,
+      deviceId,
+      advanced,
+      maxBitrate,
+      facingMode,
+    );
     return newSettings;
   };
 
@@ -328,6 +365,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('deviceId') && this.source === 'regular') {
       if (this.enabled) {
+        delete settings.facingMode;
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;

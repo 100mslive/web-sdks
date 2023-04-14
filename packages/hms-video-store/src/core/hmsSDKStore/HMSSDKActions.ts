@@ -343,6 +343,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
+  async switchCamera(): Promise<void> {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      if (sdkTrack) {
+        await sdkTrack.switchCamera();
+        this.syncRoomState('switchCamera');
+      }
+    }
+  }
+
   sendMessage(message: string) {
     this.sendBroadcastMessage(message);
   }
