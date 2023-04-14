@@ -877,16 +877,16 @@ export class HMSSdk implements HMSInterface {
     if (config?.autoManageVideo) {
       await track.attach(videoElement);
     } else {
-      await track.addSink(videoElement);
+      track.addSink(videoElement);
     }
   }
 
-  async detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+  detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
     if (config?.autoManageVideo) {
-      await track.detach(videoElement);
+      track.detach(videoElement);
     } else {
-      await track.removeSink(videoElement);
+      track.removeSink(videoElement);
     }
   }
 

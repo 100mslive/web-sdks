@@ -175,7 +175,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * @see attachVideo
    */
-  detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
+  detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): void;
 
   /**
    * Set the output volume of audio tracks(overall/particular audio track)

@@ -38,6 +38,7 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   async addVideoElement(videoElement: HTMLVideoElement) {
+    console.log('adding video element ', videoElement);
     if (this.videoElements.has(videoElement)) {
       return;
     }
@@ -57,9 +58,9 @@ export class VideoElementManager {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
       if (this.isElementInViewport(videoElement)) {
-        await this.track.addSink(videoElement);
+        this.track.addSink(videoElement);
       } else {
-        await this.track.removeSink(videoElement);
+        this.track.removeSink(videoElement);
       }
     }
     if (this.resizeObserver) {
@@ -69,9 +70,9 @@ export class VideoElementManager {
     }
   }
 
-  async removeVideoElement(videoElement: HTMLVideoElement): Promise<void> {
+  removeVideoElement(videoElement: HTMLVideoElement): void {
     console.log('remove video element ', videoElement);
-    await this.track.removeSink(videoElement);
+    this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);

@@ -34,8 +34,8 @@ export class HMSVideoTrack extends HMSTrack {
     await this.videoHandler.addVideoElement(videoElement);
   }
 
-  async detach(videoElement: HTMLVideoElement) {
-    await this.videoHandler.removeVideoElement(videoElement);
+  detach(videoElement: HTMLVideoElement) {
+    this.videoHandler.removeVideoElement(videoElement);
   }
 
   /**

@@ -42,7 +42,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
           await actions.attachVideo(track.id, videoRef.current);
         } else {
           console.log('detaching the video ele');
-          await actions.detachVideo(track.id, videoRef.current);
+          actions.detachVideo(track.id, videoRef.current);
         }
       }
     })();
@@ -55,7 +55,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
         if (videoRef.current && track) {
           try {
             // detach on unmount
-            await actions.detachVideo(track.id, videoRef.current);
+            actions.detachVideo(track.id, videoRef.current);
           } catch (err) {
             HMSLogger.w('detach video error for track', track.id, err);
           }
