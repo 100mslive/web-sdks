@@ -195,6 +195,7 @@ const getPadding = ({ isHeadless, tileOffset }) => {
   if (!isHeadless || isNaN(Number(tileOffset))) {
     return undefined;
   }
+  // Adding extra padding to ensure that the audio border is visible properly between tiles,
   return Number(tileOffset) === 0 ? 3 : undefined;
 };
 
