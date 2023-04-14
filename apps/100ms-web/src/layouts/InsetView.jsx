@@ -12,6 +12,7 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
 import { useRolePreference } from "../components/hooks/useFeatures";
+import { getClosestPoint } from "../common/utils";
 import { APP_DATA } from "../common/constants";
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
@@ -158,63 +159,34 @@ const InsetTile = ({ isMobile, roleMap }) => {
 
   const handleStop = (_, data) => {
     const { x, y, node } = data;
-    const container = node.parentElement || {};
-    const corners = [
-      [0, 0], // bottom right
-      [0, -container.clientHeight], //top right
-      [-container.clientWidth + 48, 0], //bottom left - 48(24px padding both sides)
-      [-container.clientWidth + 48, -container.clientHeight], //top left
-    ];
-    let min = Number.POSITIVE_INFINITY;
-    let minDistanceCorner = [];
-    for (const [x1, y1] of corners) {
-      // calculate distance between the element x and corners
-      const distance = Math.sqrt(
-        Math.pow(x - x1 - node.clientWidth, 2) +
-          Math.pow(y - y1 - node.clientHeight, 2)
-      );
-      if (distance < min) {
-        min = distance;
-        minDistanceCorner = [
-          x1 !== 0 ? x1 + node.clientWidth : x1,
-          y1 !== 0 ? y1 + node.clientHeight : y1,
-        ];
-      }
-    }
+    const [closerX, closerY] = getClosestPoint({ x, y, node });
     node.style.transform = `translate(
-      ${minDistanceCorner[0]}px, 
-      ${minDistanceCorner[1]}px
+      ${closerX}px, 
+      ${closerY}px
     )`;
   };
 
   useEffect(() => {
-    if (!nodeRef.current) {
+    if (!nodeRef.current || !window.ResizeObserver) {
       return;
     }
-    /**
-     * Taken from the discussion
-     * https://github.com/react-grid-layout/react-draggable/issues/363#issuecomment-947751127
-     */
-    const triggerMouseEvent = (element, eventType) => {
-      const mouseEvent = new Event(eventType, {
-        bubbles: true,
-        cancelable: true,
+    const node = nodeRef.current;
+    const resizeObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.target === node.parentElement) {
+          const { x, y } = node.getBoundingClientRect();
+          const [closerX, closerY] = getClosestPoint({ x, y, node });
+          node.style.transform = `translate(
+            ${closerX}px, 
+            ${closerY}px
+            )`;
+        }
       });
-      element.dispatchEvent(mouseEvent);
-    };
-    const onResize = () => {
-      triggerMouseEvent(nodeRef.current, "mouseover");
-      triggerMouseEvent(nodeRef.current, "mousedown");
-      triggerMouseEvent(document, "mousemove");
-      triggerMouseEvent(nodeRef.current, "mouseup");
-      triggerMouseEvent(nodeRef.current, "click");
-    };
-    window.addEventListener("resize", onResize);
-    if (window.ScreenOrientation) {
-      window.ScreenOrientation.onchange = onResize;
-    }
+    });
+    resizeObserver.observe(node.parentElement);
     return () => {
-      window.removeEventListener("resize", onResize);
+      resizeObserver?.unobserve(node?.parentElement);
+      resizeObserver?.disconnect();
     };
   }, []);
 
