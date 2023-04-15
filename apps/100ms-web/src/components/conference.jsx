@@ -116,6 +116,7 @@ const Conference = () => {
           w: "100%",
           flex: "1 1 0",
           minHeight: 0,
+          paddingBottom: "env(safe-area-inset-bottom)",
         }}
         data-testid="conferencing"
       >
