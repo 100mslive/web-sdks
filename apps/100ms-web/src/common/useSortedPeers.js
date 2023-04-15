@@ -6,7 +6,7 @@ function useSortedPeers(peers, tilesPerPage) {
   const [sortedPeers, setSortedPeers] = useState([]);
   const [peersSorter, setPeersSorter] = useState();
   const store = useHMSVanillaStore();
-
+  console.log(sortedPeers);
   useEffect(() => {
     setPeersSorter(new PeersSorter(store, setSortedPeers));
   }, [store]);

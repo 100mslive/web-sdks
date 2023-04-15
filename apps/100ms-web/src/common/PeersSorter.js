@@ -8,13 +8,14 @@ class PeersSorter {
     this.store = store;
     this.timePassedSinceLastSetPeers = 0;
     this.onPeersChange = onPeersChange;
-    this.peers = [];
+    this.peers = new Map();
     this.started = false;
   }
-
   setPeersAndTilesPerPage(peers, tilesPerPage) {
+    peers.forEach(peer => {
+      this.peers.set(peer.id, peer);
+    });
     this.tilesPerPage = tilesPerPage;
-    this.peers = peers;
     this.start();
     this.moveSpeakerToFront();
   }
@@ -28,19 +29,16 @@ class PeersSorter {
   }
 
   moveSpeakerToFront() {
-    let sortedPeers = this.peers;
+    let sortedPeers = Array.from(this.peers.values());
+    console.log(this.lastSpokenPeer);
     if (this.lastSpokenPeer) {
-      const dominantPeerIndex = this.peers.findIndex(
-        peer => peer.id === this.lastSpokenPeer.id
-      );
+      const dominantPeer = this.peers.get(this.lastSpokenPeer.id);
 
-      if (dominantPeerIndex !== -1) {
-        sortedPeers = [this.peers[dominantPeerIndex]];
-        for (let peer of this.peers) {
-          if (peer.id !== this.peers[dominantPeerIndex].id) {
-            sortedPeers.push(peer);
-          }
-        }
+      if (dominantPeer?.id) {
+        const sortedPeersMap = new Map();
+        sortedPeersMap.set(dominantPeer.id, dominantPeer);
+        this.peers = new Map([...sortedPeersMap, ...this.peers]);
+        sortedPeers = [...Array.from(this.peers.values())];
       }
     }
     this.onPeersChange(sortedPeers);
