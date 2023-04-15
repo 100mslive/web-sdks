@@ -29,6 +29,8 @@ const Conference = () => {
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
+  const headerRef = useRef();
+  const footerRef = useRef();
   const dropdownListRef = useRef();
   dropdownListRef.current = dropdownList;
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
@@ -93,10 +95,13 @@ const Conference = () => {
     <Flex css={{ size: "100%", overflow: "hidden" }} direction="column">
       {!isHeadless && (
         <Box
+          ref={headerRef}
           css={{
             h: "$18",
-            transition: "transform 0.3s ease-in-out",
-            transform: performAutoHide ? "translateY(-100%)" : "none",
+            transition: "margin 0.3s ease-in-out",
+            marginTop: performAutoHide
+              ? `-${headerRef.current?.clientHeight}px`
+              : "none",
             "@md": {
               h: "$17",
             },
@@ -109,8 +114,7 @@ const Conference = () => {
       <Box
         css={{
           w: "100%",
-          flex: performAutoHide ? undefined : "1 1 0",
-          height: performAutoHide ? "100%" : undefined,
+          flex: "1 1 0",
           minHeight: 0,
         }}
         data-testid="conferencing"
@@ -119,11 +123,14 @@ const Conference = () => {
       </Box>
       {!isHeadless && (
         <Box
+          ref={footerRef}
           css={{
             flexShrink: 0,
             maxHeight: "$24",
-            transition: "transform 0.3s ease-in-out",
-            transform: performAutoHide ? "translateY(100%)" : "none",
+            transition: "margin 0.3s ease-in-out",
+            marginBottom: performAutoHide
+              ? `-${footerRef.current?.clientHeight}px`
+              : undefined,
             "@md": {
               maxHeight: "unset",
             },
