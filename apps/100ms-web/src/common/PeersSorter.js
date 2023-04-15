@@ -30,7 +30,6 @@ class PeersSorter {
 
   moveSpeakerToFront() {
     let sortedPeers = Array.from(this.peers.values());
-    console.log(this.lastSpokenPeer);
     if (this.lastSpokenPeer) {
       const dominantPeer = this.peers.get(this.lastSpokenPeer.id);
 
