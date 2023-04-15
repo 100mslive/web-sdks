@@ -151,12 +151,18 @@ export function InsetView() {
           </Flex>
         )}
       </Box>
-      {!hideInset && <InsetTile roleMap={roleMap} isMobile={isMobile} />}
+      {!hideInset && (
+        <InsetTile
+          roleMap={roleMap}
+          isMobile={isMobile}
+          isLandscape={isLandscape}
+        />
+      )}
     </Fragment>
   );
 }
 
-const InsetTile = ({ isMobile, roleMap }) => {
+const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const aspectRatio = getAspectRatio({
@@ -164,8 +170,12 @@ const InsetTile = ({ isMobile, roleMap }) => {
     roleName: localPeer.roleName,
     isMobile,
   });
-  const height = 180;
-  const width = height * aspectRatio;
+  let height = 180;
+  let width = height * aspectRatio;
+  if (isLandscape && width > 240) {
+    width = 240;
+    height = width / aspectRatio;
+  }
   const nodeRef = useRef(null);
 
   const handleStop = (_, data) => {
@@ -227,6 +237,7 @@ const InsetTile = ({ isMobile, roleMap }) => {
             bg: "$surfaceDefault",
           }}
           width={width}
+          height={height}
         />
       </Box>
     </Draggable>
