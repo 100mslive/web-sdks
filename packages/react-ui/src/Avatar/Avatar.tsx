@@ -22,15 +22,15 @@ export const StyledAvatar = styled('div', {
     },
     size: {
       small: {
-        height: '$16',
+        height: '$16 !important',
         fontSize: '$space$6'
       },
       medium: {
-        height: '$18',
+        height: '$18 !important',
         fontSize: '$space$10'
       },
       large: {
-        height: '$20',
+        height: '$20 !important',
         fontSize: '$space$12',
       },
     },
