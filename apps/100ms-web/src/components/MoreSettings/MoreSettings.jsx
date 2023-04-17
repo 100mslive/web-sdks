@@ -54,6 +54,18 @@ import {
 
 const isMobileOS = isAndroid || isIOS;
 
+const MODALS = {
+  CHANGE_NAME: "changeName",
+  SELF_ROLE_CHANGE: "selfRoleChange",
+  MORE_SETTINGS: "moreSettings",
+  START_RECORDING: "startRecording",
+  DEVICE_SETTINGS: "deviceSettings",
+  STATS_FOR_NERDS: "statsForNerds",
+  BULK_ROLE_CHANGE: "bulkRoleChange",
+  MUTE_ALL: "muteAll",
+  EMBED_URL: "embedUrl",
+};
+
 export const MoreSettings = () => {
   const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -61,35 +73,32 @@ export const MoreSettings = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const [open, setOpen] = useState(false);
-  const [showChangeNameModal, setShowChangeNameModal] = useState(false);
-  const [showMuteAll, setShowMuteAll] = useState(false);
-  const [showOpenUrl, setShowOpenUrl] = useState(false);
-  const [showBulkRoleChange, setShowBulkRoleChange] = useState(false);
-  const [showDeviceSettings, setShowDeviceSettings] = useState(false);
-  const [showStatsForNerds, setShowStatsForNerds] = useState(false);
-  const [showSelfRoleChange, setShowSelfRoleChange] = useState(false);
-  const [showStartRecording, setShowStartRecording] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { isBrowserRecordingOn } = useRecordingStreaming();
   const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
   const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
-  const anyModalOpen =
-    open ||
-    showChangeNameModal ||
-    showMuteAll ||
-    showOpenUrl ||
-    showBulkRoleChange ||
-    showDeviceSettings ||
-    showStatsForNerds ||
-    showSelfRoleChange ||
-    showStartRecording;
-  useDropdownList({ open: anyModalOpen, name: "MoreSettings" });
+  const [openModals, setOpenModals] = useState(new Set());
+  useDropdownList({ open: openModals.size > 0, name: "MoreSettings" });
+
+  const updateState = (modalName, value) => {
+    setOpenModals(modals => {
+      const copy = new Set(modals);
+      if (value) {
+        copy.add(modalName);
+      } else {
+        copy.delete(modalName);
+      }
+      return copy;
+    });
+  };
 
   return (
     <Fragment>
-      <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Root
+        open={openModals.has(MODALS.MORE_SETTINGS)}
+        onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
+      >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">
@@ -114,7 +123,7 @@ export const MoreSettings = () => {
           {isMobile && permissions?.browserRecording ? (
             <>
               <Dropdown.Item
-                onClick={() => setShowStartRecording(value => !value)}
+                onClick={() => updateState(MODALS.START_RECORDING, true)}
               >
                 <RecordIcon />
                 <Text variant="sm" css={{ ml: "$4" }}>
@@ -126,7 +135,7 @@ export const MoreSettings = () => {
           ) : null}
           {isChangeNameEnabled && (
             <Dropdown.Item
-              onClick={() => setShowChangeNameModal(value => !value)}
+              onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               data-testid="change_name_btn"
             >
               <PencilIcon />
@@ -135,10 +144,12 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
-          <ChangeSelfRole onClick={() => setShowSelfRoleChange(true)} />
+          <ChangeSelfRole
+            onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)}
+          />
           {permissions?.changeRole && (
             <Dropdown.Item
-              onClick={() => setShowBulkRoleChange(true)}
+              onClick={() => updateState(MODALS.BULK_ROLE_CHANGE, true)}
               data-testid="bulk_role_change_btn"
             >
               <ChangeRoleIcon />
@@ -149,11 +160,13 @@ export const MoreSettings = () => {
           )}
           <FullScreenItem />
           {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl setShowOpenUrl={setShowOpenUrl} />
+            <EmbedUrl
+              setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)}
+            />
           )}
           {permissions.mute && (
             <Dropdown.Item
-              onClick={() => setShowMuteAll(true)}
+              onClick={() => updateState(MODALS.MUTE_ALL, true)}
               data-testid="mute_all_btn"
             >
               <MicOffIcon />
@@ -164,7 +177,7 @@ export const MoreSettings = () => {
           )}
           <Dropdown.ItemSeparator />
           <Dropdown.Item
-            onClick={() => setShowDeviceSettings(true)}
+            onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)}
             data-testid="device_settings_btn"
           >
             <SettingsIcon />
@@ -207,7 +220,7 @@ export const MoreSettings = () => {
               ) : null
             ) : (
               <Dropdown.Item
-                onClick={() => setShowStatsForNerds(true)}
+                onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)}
                 data-testid="stats_for_nreds_btn"
               >
                 <InfoIcon />
@@ -218,35 +231,51 @@ export const MoreSettings = () => {
             ))}
         </Dropdown.Content>
       </Dropdown.Root>
-      {showBulkRoleChange && (
-        <BulkRoleChangeModal onOpenChange={setShowBulkRoleChange} />
-      )}
-      {showMuteAll && <MuteAllModal onOpenChange={setShowMuteAll} />}
-      {showChangeNameModal && (
-        <ChangeNameModal onOpenChange={setShowChangeNameModal} />
-      )}
-      {showDeviceSettings && (
-        <SettingsModal open onOpenChange={setShowDeviceSettings} />
-      )}
-      {FeatureFlags.enableStatsForNerds && showStatsForNerds && (
-        <StatsForNerds
-          open={showStatsForNerds}
-          onOpenChange={setShowStatsForNerds}
+      {openModals.has(MODALS.BULK_ROLE_CHANGE) && (
+        <BulkRoleChangeModal
+          onOpenChange={value => updateState(MODALS.BULK_ROLE_CHANGE, value)}
         />
       )}
-      {showSelfRoleChange && (
+      {openModals.has(MODALS.MUTE_ALL) && (
+        <MuteAllModal
+          onOpenChange={value => updateState(MODALS.MUTE_ALL, value)}
+        />
+      )}
+      {openModals.has(MODALS.CHANGE_NAME) && (
+        <ChangeNameModal
+          onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
+        />
+      )}
+      {openModals.has(MODALS.DEVICE_SETTINGS) && (
+        <SettingsModal
+          open
+          onOpenChange={value => updateState(MODALS.DEVICE_SETTINGS, value)}
+        />
+      )}
+      {FeatureFlags.enableStatsForNerds &&
+        openModals.has(MODALS.STATS_FOR_NERDS) && (
+          <StatsForNerds
+            open
+            onOpenChange={value => updateState(MODALS.STATS_FOR_NERDS, value)}
+          />
+        )}
+      {openModals.has(MODALS.SELF_ROLE_CHANGE) && (
         <RoleChangeModal
           peerId={localPeerId}
-          onOpenChange={setShowSelfRoleChange}
+          onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)}
         />
       )}
-      {showStartRecording && (
+      {openModals.has(MODALS.START_RECORDING) && (
         <StartRecording
-          open={showStartRecording}
-          onOpenChange={setShowStartRecording}
+          open
+          onOpenChange={value => updateState(MODALS.START_RECORDING, value)}
         />
       )}
-      {showOpenUrl && <EmbedUrlModal onOpenChange={setShowOpenUrl} />}
+      {openModals.has(MODALS.EMBED_URL) && (
+        <EmbedUrlModal
+          onOpenChange={value => updateState(MODALS.EMBED_URL, value)}
+        />
+      )}
     </Fragment>
   );
 };
