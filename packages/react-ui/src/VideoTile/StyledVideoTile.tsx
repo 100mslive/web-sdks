@@ -98,8 +98,8 @@ const AvatarContainer = styled(Box, {
   left: '50%',
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  width: '35%',
-  height: '35%',
+  width: '45%',
+  height: '45%',
   '& > div': {
     maxHeight: "$20",
     height: "100%"
