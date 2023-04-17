@@ -108,7 +108,6 @@ export function EdtechComponent({
             recordingUrl={recordingUrl}
             logo={logo}
             tokenEndpoint={tokenEndpoint}
-            uiMode="inset"
           />
 
           <Init />
