@@ -35,8 +35,7 @@ class PeersSorter {
       this.onDominantSpeakerChange.bind(this),
       selectDominantSpeaker
     );
-    this.peers.clear();
-    this.LRUView.clear();
+    this.onPeersChange([...Array.from(this.peers.values())]);
   }
 
   moveSpeakerToFront() {

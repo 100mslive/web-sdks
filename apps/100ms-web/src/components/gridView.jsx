@@ -24,7 +24,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
   const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
-  const sortedPeers = useSortedPeers(peers, maxTileCount);
+  const sortedPeers = useSortedPeers(peers, maxTileCount, activeSpeakerSorting);
 
   return (
     <Fragment>
@@ -38,7 +38,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
       >
         {peers && peers.length > 0 ? (
           <VideoList
-            peers={activeSpeakerSorting ? sortedPeers : peers}
+            peers={sortedPeers}
             maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
           />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
@@ -69,7 +69,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 // Side pane shows smaller tiles
 export const GridSidePaneView = ({ peers }) => {
   const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
-  const sortedPeers = useSortedPeers(peers, 2);
+  const sortedPeers = useSortedPeers(peers, 2, activeSpeakerSorting);
   return (
     <Flex
       direction="column"
@@ -86,10 +86,7 @@ export const GridSidePaneView = ({ peers }) => {
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
-          <VideoList
-            peers={activeSpeakerSorting ? sortedPeers : peers}
-            maxColCount={2}
-          />
+          <VideoList peers={sortedPeers} maxColCount={2} />
         )}
       </Flex>
     </Flex>
