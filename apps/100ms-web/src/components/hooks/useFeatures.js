@@ -2,7 +2,9 @@ import { selectTemplateAppData, useHMSStore } from "@100mslive/react-sdk";
 
 export const useFeatures = key => {
   let features = useHMSStore(selectTemplateAppData)?.features;
-  return features ? features.split(",") : undefined;
+  return features && typeof features === "string"
+    ? features.split(",")
+    : undefined;
 };
 
 export const useIsFeatureEnabled = key => {

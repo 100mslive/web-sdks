@@ -87,8 +87,10 @@ export const metadataPayloadParser = payload => {
   }
 };
 
-export const getClosestPoint = ({ x, y, node }) => {
+export const getClosestPoint = ({ node }) => {
+  if (!node) return [0, 0];
   const container = node.parentElement || {};
+  const { x, y } = node.getBoundingClientRect();
   const corners = [
     [0, 0], // bottom right
     [0, -container.clientHeight], //top right

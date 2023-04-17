@@ -195,8 +195,7 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
     const resizeObserver = new ResizeObserver(entries => {
       entries.forEach(entry => {
         if (entry.target === node.parentElement) {
-          const { x, y } = node.getBoundingClientRect();
-          const [closerX, closerY] = getClosestPoint({ x, y, node });
+          const [closerX, closerY] = getClosestPoint({ node });
           node.style.transform = `translate(
             ${closerX}px, 
             ${closerY}px
