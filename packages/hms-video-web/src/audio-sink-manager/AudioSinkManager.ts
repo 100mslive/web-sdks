@@ -158,6 +158,10 @@ export class AudioSinkManager {
       }
     };
 
+    if (!audioEl) {
+      HMSLogger.v(this.TAG, 'audio element is null', track);
+      this.handleTrackAdd({ track, peer, callListener: false }); // adding audio again if null
+    }
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
@@ -257,6 +261,7 @@ export class AudioSinkManager {
 
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
+      HMSLogger.v(this.TAG, 'removing audio element', track);
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
