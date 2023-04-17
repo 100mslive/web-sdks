@@ -28,6 +28,7 @@ export interface IStore {
   getRoom(): HMSRoom | undefined;
   getPolicyForRole(role: string): HMSRole;
   getKnownRoles(): KnownRoles;
+  getTemplateAppData(): Record<string, string> | undefined;
   setSimulcastEnabled(enabled: boolean): void;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): HMSSimulcastLayerDefinition[];

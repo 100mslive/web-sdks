@@ -33,6 +33,7 @@ class Store implements IStore {
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
   private tracks = new Map<HMSTrack, HMSTrack>();
+  private templateAppData?: Record<string, string>;
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
@@ -74,6 +75,10 @@ class Store implements IStore {
 
   getKnownRoles() {
     return this.knownRoles;
+  }
+
+  getTemplateAppData() {
+    return this.templateAppData;
   }
 
   getLocalPeer() {
@@ -186,6 +191,7 @@ class Store implements IStore {
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
     this.roleDetailsArrived = true;
+    this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
       return;
     }
