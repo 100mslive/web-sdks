@@ -122,7 +122,7 @@ export function InsetView() {
             }}
           >
             {(hideInset ? [...sidepanePeers, localPeer] : sidepanePeers).map(
-              peer => (
+              (peer, _, arr) => (
                 <VideoTile
                   key={peer.videoTrack || peer.id}
                   peerId={peer.id}
@@ -136,11 +136,12 @@ export function InsetView() {
                     flexBasis: "100%",
                     "@ls": {
                       aspectRatio: 1,
-                      flexBasis: "45%",
+                      flexBasis: "calc(50% - $4)",
                     },
                     "@md": {
                       aspectRatio: 1,
-                      flexBasis: "45%",
+                      flexBasis:
+                        arr.length <= 4 ? "calc(50% - $4)" : "calc(33% - $4)",
                     },
                     padding: 0,
                   }}
