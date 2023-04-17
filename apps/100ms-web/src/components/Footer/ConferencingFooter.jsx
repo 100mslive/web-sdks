@@ -105,13 +105,13 @@ export const ConferencingFooter = () => {
         <ScreenshareToggle />
         <PIP />
         <MoreSettings />
-        <LeaveRoom />
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}
         >
           <ChatToggle />
         </Flex>
+        <LeaveRoom />
       </AppFooter.Center>
       <AppFooter.Right>
         <EmojiReaction />
