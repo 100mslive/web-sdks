@@ -157,9 +157,9 @@ export class AudioSinkManager {
         this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
-
+    // audio will be null when some error occurs from above block
     if (!audioEl) {
-      HMSLogger.v(this.TAG, 'audio element is null', track);
+      HMSLogger.v(this.TAG, 'audio element is null', `${track}`);
       this.handleTrackAdd({ track, peer, callListener: false }); // adding audio again if null
       return;
     }
@@ -262,7 +262,7 @@ export class AudioSinkManager {
 
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
-      HMSLogger.v(this.TAG, 'removing audio element', track);
+      HMSLogger.v(this.TAG, 'removing audio element', `${track}`);
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
