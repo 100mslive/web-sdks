@@ -147,20 +147,22 @@ export class AudioSinkManager {
     audioEl.id = track.trackId;
     audioEl.addEventListener('pause', this.handleAudioPaused);
 
-    audioEl.onerror = () => {
+    audioEl.onerror = async () => {
       HMSLogger.e(this.TAG, 'error on audio element', audioEl.error);
-      const ex = ErrorFactory.TracksErrors.AudioPlaybackError(`Audio playback error for track - ${track.trackId}`);
+      const ex = ErrorFactory.TracksErrors.AudioPlaybackError(
+        `Audio playback error for track - ${track.trackId} code - ${audioEl?.error?.code}`,
+      );
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl, track);
         this.retryCountMapping.set(track.trackId, (this.retryCountMapping.get(track.trackId) ?? 0) + 1);
-        this.handleTrackAdd({ track, peer, callListener: false });
+        await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
     // audio will be null when some error occurs from above block
     if (!audioEl) {
       HMSLogger.v(this.TAG, 'audio element is null', `${track}`);
-      this.handleTrackAdd({ track, peer, callListener: false }); // adding audio again if null
+      await this.handleTrackAdd({ track, peer, callListener: false }); // adding audio again if null
       return;
     }
     track.setAudioElement(audioEl);
