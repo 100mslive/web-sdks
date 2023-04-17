@@ -94,6 +94,7 @@ export function InsetView() {
                   height: "100%",
                   maxWidth: "100%",
                   minWidth: 0,
+                  minHeight: 0,
                   flex: remotePeers.length === 1 ? undefined : "1 1 0",
                   display: "flex",
                   alignItems: "center",
