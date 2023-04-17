@@ -12,7 +12,7 @@ function useSortedPeers(peers, tilesPerPage) {
 
   useEffect(() => {
     if (tilesPerPage && peersSorter) {
-      peersSorter.setPeersAndTilesPerPage(peers, tilesPerPage);
+      peersSorter.setPeersAndTilesPerPage({ peers, tilesPerPage });
     }
   }, [tilesPerPage, peersSorter, peers]);
   return sortedPeers;

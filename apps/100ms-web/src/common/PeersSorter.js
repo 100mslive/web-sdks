@@ -11,7 +11,7 @@ class PeersSorter {
     this.peers = new Map();
     this.started = false;
   }
-  setPeersAndTilesPerPage(peers, tilesPerPage) {
+  setPeersAndTilesPerPage({ peers, tilesPerPage }) {
     peers.forEach(peer => {
       this.peers.set(peer.id, peer);
     });
@@ -26,6 +26,17 @@ class PeersSorter {
       this.onDominantSpeakerChange.bind(this),
       selectDominantSpeaker
     );
+  }
+
+  stop() {
+    if (!this.started) return;
+    this.started = false;
+    this.store.unsubscribe(
+      this.onDominantSpeakerChange.bind(this),
+      selectDominantSpeaker
+    );
+    this.peers.clear();
+    this.LRUView.clear();
   }
 
   moveSpeakerToFront() {
