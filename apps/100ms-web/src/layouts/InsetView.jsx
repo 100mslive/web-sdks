@@ -141,6 +141,10 @@ export function InsetView() {
                     "@md": {
                       aspectRatio: 1,
                       flexBasis:
+                        arr.length < 4 ? "calc(50% - $4)" : "calc(33% - $4)",
+                    },
+                    "@sm": {
+                      flexBasis:
                         arr.length <= 4 ? "calc(50% - $4)" : "calc(33% - $4)",
                     },
                     padding: 0,
