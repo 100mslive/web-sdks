@@ -87,10 +87,8 @@ export const metadataPayloadParser = payload => {
   }
 };
 
-export const getClosestPoint = ({ node }) => {
-  if (!node) return [0, 0];
+export const getClosestPoint = ({ x, y, node }) => {
   const container = node.parentElement || {};
-  const { x, y } = node.getBoundingClientRect();
   const corners = [
     [0, 0], // bottom right
     [0, -container.clientHeight], //top right
@@ -113,5 +111,6 @@ export const getClosestPoint = ({ node }) => {
       ];
     }
   }
+  console.log(minDistanceCorner);
   return minDistanceCorner;
 };
