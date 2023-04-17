@@ -32,7 +32,7 @@ const INITIAL_STATE: AudioSinkState = {
   autoplayCheckPromise: undefined,
 };
 
-const TRACK_PLAYBACK_RETRIES = 3;
+const TRACK_PLAYBACK_RETRIES = 5;
 
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
@@ -140,6 +140,7 @@ export class AudioSinkManager {
     callListener?: boolean;
   }) => {
     if (this.retryCountMapping.get(track.trackId) ?? 0 > TRACK_PLAYBACK_RETRIES) {
+      HMSLogger.d(this.TAG, 'retry count limit reached ', `${track}`);
       return;
     }
     const audioEl = document.createElement('audio');
@@ -159,12 +160,6 @@ export class AudioSinkManager {
         await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
-    // audio will be null when some error occurs from above block
-    if (!audioEl) {
-      HMSLogger.v(this.TAG, 'audio element is null', `${track}`);
-      await this.handleTrackAdd({ track, peer, callListener: false }); // adding audio again if null
-      return;
-    }
     track.setAudioElement(audioEl);
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
