@@ -12,7 +12,6 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
 import VideoTile from "../components/VideoTile";
 import { useRolePreference } from "../components/hooks/useFeatures";
-import { getClosestPoint } from "../common/utils";
 import { APP_DATA } from "../common/constants";
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
@@ -179,15 +178,6 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
   }
   const nodeRef = useRef(null);
 
-  const handleStop = (_, data) => {
-    const { x, y, node } = data;
-    const [closerX, closerY] = getClosestPoint({ x, y, node });
-    node.style.transform = `translate(
-      ${closerX}px, 
-      ${closerY}px
-    )`;
-  };
-
   useEffect(() => {
     if (!nodeRef.current || !window.ResizeObserver) {
       return;
@@ -196,12 +186,8 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
     const resizeObserver = new ResizeObserver(entries => {
       entries.forEach(entry => {
         if (entry.target === node.parentElement) {
-          const { x, y } = node.getBoundingClientRect();
-          const [closerX, closerY] = getClosestPoint({ x, y, node });
-          node.style.transform = `translate(
-            ${closerX}px, 
-            ${closerY}px
-            )`;
+          // reset to original position on resize
+          node.style.transform = `translate(0,0)`;
         }
       });
     });
@@ -213,7 +199,7 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
   }, []);
 
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef} onStop={handleStop}>
+    <Draggable bounds="parent" nodeRef={nodeRef}>
       <Box
         ref={nodeRef}
         css={{
