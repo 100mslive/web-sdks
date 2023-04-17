@@ -86,30 +86,3 @@ export const metadataPayloadParser = payload => {
     return { payload };
   }
 };
-
-export const getClosestPoint = ({ x, y, node }) => {
-  const container = node.parentElement || {};
-  const corners = [
-    [0, 0], // bottom right
-    [0, -container.clientHeight], //top right
-    [-container.clientWidth + 48, 0], //bottom left - 48(24px padding both sides)
-    [-container.clientWidth + 48, -container.clientHeight], //top left
-  ];
-  let min = Number.POSITIVE_INFINITY;
-  let minDistanceCorner = [];
-  for (const [x1, y1] of corners) {
-    // calculate distance between the element x and corners
-    const distance = Math.sqrt(
-      Math.pow(x - x1 - node.clientWidth, 2) +
-        Math.pow(y - y1 - node.clientHeight, 2)
-    );
-    if (distance < min) {
-      min = distance;
-      minDistanceCorner = [
-        x1 !== 0 ? x1 + node.clientWidth : x1,
-        y1 !== 0 ? y1 + node.clientHeight : y1,
-      ];
-    }
-  }
-  return minDistanceCorner;
-};
