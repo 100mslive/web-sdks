@@ -111,6 +111,5 @@ export const getClosestPoint = ({ x, y, node }) => {
       ];
     }
   }
-  console.log(minDistanceCorner);
   return minDistanceCorner;
 };
