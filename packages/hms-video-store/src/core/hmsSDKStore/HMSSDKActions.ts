@@ -921,6 +921,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }

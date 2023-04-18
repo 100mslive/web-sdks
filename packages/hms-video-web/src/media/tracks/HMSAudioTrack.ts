@@ -34,7 +34,6 @@ export class HMSAudioTrack extends HMSTrack {
   setAudioElement(element: HTMLAudioElement | null) {
     HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
     this.audioElement = element;
-    this.setOutputDevice(this.outputDevice);
   }
 
   /**

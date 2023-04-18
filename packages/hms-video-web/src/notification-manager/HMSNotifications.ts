@@ -45,6 +45,7 @@ export interface PolicyParams {
     [role: string]: HMSRole;
   };
   template_id: string;
+  app_data?: Record<string, string>;
 }
 
 /**

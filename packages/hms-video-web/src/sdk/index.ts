@@ -182,6 +182,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getRoom()?.hls;
   }
 
+  getTemplateAppData() {
+    return this.store.getTemplateAppData();
+  }
+
   private handleAutoplayError = (error: HMSException) => {
     this.errorListener?.onError?.(error);
   };
