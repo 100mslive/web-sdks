@@ -25,7 +25,8 @@ import {
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
-  SessionMetadataUpdateParams,
+  SetSessionMetadataParams,
+  SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
   Track,
   TrackUpdateRequestParams,
@@ -334,12 +335,34 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
   }
 
-  async setSessionMetadata(params: SessionMetadataUpdateParams) {
-    await this.call(HMSSignalMethod.SET_METADATA, { version: '1.0', ...params });
+  setSessionMetadata(params: SetSessionMetadataParams) {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to set session store value due to network disconnection',
+      );
+    }
+    return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { version: '1.1', ...params });
   }
 
-  getSessionMetadata() {
-    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { version: '1.0' });
+  listenMetadataChange(keys: string[]): Promise<void> {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to observe session store key due to network disconnection',
+      );
+    }
+    return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { version: '1.1', keys });
+  }
+
+  getSessionMetadata(key?: string) {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to set session store value due to network disconnection',
+      );
+    }
+    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
   }
 
   private onMessageHandler(event: MessageEvent) {
@@ -434,13 +457,14 @@ export default class JsonRpcSignal implements ISignal {
     const MAX_RETRIES = 3;
     let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
 
-    for (let i = 0; i < MAX_RETRIES; i++) {
+    let retry;
+    for (retry = 1; retry <= MAX_RETRIES; retry++) {
       try {
-        HMSLogger.d(this.TAG, `Try number ${i + 1} sending ${method}`, params);
+        HMSLogger.d(this.TAG, `Try number ${retry} sending ${method}`, params);
         return await this.internalCall(method, params);
       } catch (err) {
         error = err as HMSException;
-        HMSLogger.e(this.TAG, `Failed sending ${method}`, { method, try: i + 1, params, error });
+        HMSLogger.e(this.TAG, `Failed sending ${method} try: ${retry}`, { method, params, error });
         const shouldRetry = parseInt(`${error.code / 100}`) === 5 || error.code === 429;
         if (!shouldRetry) {
           break;
@@ -450,7 +474,11 @@ export default class JsonRpcSignal implements ISignal {
         await sleep(delay);
       }
     }
-    HMSLogger.e(`Sending ${method} over WS failed after ${MAX_RETRIES} retries`, { method, params, error });
+    HMSLogger.e(`Sending ${method} over WS failed after ${Math.min(retry, MAX_RETRIES)} retries`, {
+      method,
+      params,
+      error,
+    });
     throw error;
   }
 

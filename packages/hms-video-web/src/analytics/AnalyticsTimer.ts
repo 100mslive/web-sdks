@@ -24,6 +24,7 @@ const defaultEventNames = [
   TimedEvent.LOCAL_VIDEO_TRACK,
   TimedEvent.PEER_LIST,
   TimedEvent.ROOM_STATE,
+  TimedEvent.JOIN_RESPONSE,
 ];
 
 export class AnalyticsTimer {

@@ -41,7 +41,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._volume = this._videoEl.volume * 100;
     this._hlsStats = new HlsStats(this._hls, this._videoEl);
     this.listenHLSEvent();
-    this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emit);
+    this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emitEvent);
     this.seekToLivePosition();
   }
 
@@ -70,7 +70,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   private subscribeStats = (interval = 2000) => {
     this._subscribeHlsStats = this._hlsStats.subscribe((state: HlsPlayerStats) => {
-      this.emit(HMSHLSPlayerEvents.STATS, state);
+      this.emitEvent(HMSHLSPlayerEvents.STATS, state);
     }, interval);
   };
   /**
@@ -112,11 +112,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._emitter.off(eventName, listener);
   };
 
-  emit = <E extends HMSHLSPlayerEvents>(
+  emitEvent = <E extends HMSHLSPlayerEvents>(
     eventName: E,
     eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
   ): boolean => {
-    return this._emitter.emit(eventName, eventObject);
+    return this._emitter.emitEvent(eventName, eventObject);
   };
 
   private removeAllListeners = <E extends HMSHLSPlayerEvents>(eventName?: E): void => {
@@ -194,7 +194,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     } catch (error) {
       console.debug(this.TAG, 'Play failed with error', (error as Error).message);
       if ((error as Error).name === 'NotAllowedError') {
-        this.emit(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
+        this.emitEvent(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, HMSHLSErrorFactory.HLSMediaError.autoplayFailed());
       }
     }
   };
@@ -204,12 +204,12 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     }
   };
   private playEventHandler = () => {
-    this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
+    this.emitEvent(HMSHLSPlayerEvents.PLAYBACK_STATE, {
       state: HLSPlaybackState.playing,
     });
   };
   private pauseEventHandler = () => {
-    this.emit(HMSHLSPlayerEvents.PLAYBACK_STATE, {
+    this.emitEvent(HMSHLSPlayerEvents.PLAYBACK_STATE, {
       state: HLSPlaybackState.paused,
     });
   };
@@ -218,7 +218,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
-    console.error(this.TAG, data);
+    console.error(this.TAG, `error type ${data.type} with details ${data.details} is fatal ${data.fatal}`);
     const details = data.error?.message || data.err?.message || '';
     const detail = {
       details: details,
@@ -227,63 +227,63 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.fragDecryptError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       // Below one are network related errors
       case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
       default: {
         const error = HMSHLSErrorFactory.UnknownError(detail);
-        this.emit(HMSHLSPlayerEvents.ERROR, error);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
     }
   };
   private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     const layers: HMSHLSLayer[] = mapLayers(this.removeAudioLevels(levels));
-    this.emit(HMSHLSPlayerEvents.MANIFEST_LOADED, {
+    this.emitEvent(HMSHLSPlayerEvents.MANIFEST_LOADED, {
       layers,
     });
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLayer: HMSHLSLayer = mapLayer(this._hls.levels[level]);
-    this.emit(HMSHLSPlayerEvents.LAYER_UPDATED, {
+    this.emitEvent(HMSHLSPlayerEvents.LAYER_UPDATED, {
       layer: qualityLayer,
     });
   };
 
   private handleTimeUpdateListener = (_: Event) => {
-    this.emit(HMSHLSPlayerEvents.CURRENT_TIME, this._videoEl.currentTime);
+    this.emitEvent(HMSHLSPlayerEvents.CURRENT_TIME, this._videoEl.currentTime);
     const live = this._hls.liveSyncPosition
       ? this._hls.liveSyncPosition - this._videoEl.currentTime <= HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY
       : false;
     if (this._isLive !== live) {
       this._isLive = live;
-      this.emit(HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE, {
+      this.emitEvent(HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE, {
         isLive: this._isLive,
       });
     }

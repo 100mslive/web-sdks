@@ -20,6 +20,7 @@ import {
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
+  SessionStoreUpdate,
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
@@ -27,6 +28,7 @@ import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './s
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
+import { HMSSessionStore } from './HMSSessionStore';
 import { NamedSetState } from './internalTypes';
 import * as sdkTypes from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
@@ -36,6 +38,7 @@ import { IHMSStore } from '../IHMSStore';
 import {
   createDefaultStoreState,
   HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMediaSettings,
   HMSMessage,
   HMSMessageInput,
@@ -50,6 +53,7 @@ import {
   HMSTrackSource,
   HMSVideoTrack,
   IHMSPlaylistActions,
+  IHMSSessionStoreActions,
 } from '../schema';
 import {
   HMSRoleChangeRequest,
@@ -95,23 +99,29 @@ import {
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKActions implements IHMSActions {
+export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  implements IHMSActions<T>
+{
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
-  private readonly store: IHMSStore;
+  private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
-  private hmsNotifications: HMSNotifications;
+  private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
-  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger;
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
-  constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
+  constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+
+    this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
+
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -330,6 +340,17 @@ export class HMSSDKActions implements IHMSActions {
     if (trackID) {
       await this.setSDKLocalVideoTrackSettings(trackID, settings);
       this.syncRoomState('setVideoSettings');
+    }
+  }
+
+  async switchCamera(): Promise<void> {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      if (sdkTrack) {
+        await sdkTrack.switchCamera();
+        this.syncRoomState('switchCamera');
+      }
     }
   }
 
@@ -621,6 +642,7 @@ export class HMSSDKActions implements IHMSActions {
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'setSessionMetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'setSessionMetadata');
   }
 
   async populateSessionMetadata(): Promise<void> {
@@ -628,6 +650,7 @@ export class HMSSDKActions implements IHMSActions {
     this.setState(draftStore => {
       draftStore.sessionMetadata = metadata;
     }, 'populateSessionMetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'populateSessionmetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -711,6 +734,7 @@ export class HMSSDKActions implements IHMSActions {
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
+      onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -785,6 +809,10 @@ export class HMSSDKActions implements IHMSActions {
         store.connectionQualities[peerId] = { peerID: peerId, downlinkQuality: quality };
       }
     }, 'ConnectionQuality');
+  }
+
+  private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
+    this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {
@@ -893,6 +921,7 @@ export class HMSSDKActions implements IHMSActions {
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
@@ -1379,12 +1408,24 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
+  private setSessionStoreValueLocally(
+    updates: SessionStoreUpdate | SessionStoreUpdate[],
+    actionName = 'setSessionStore',
+  ) {
+    const updatesList: SessionStoreUpdate[] = Array.isArray(updates) ? updates : [updates];
+    this.setState(store => {
+      updatesList.forEach(update => {
+        store.sessionStore[update.key as keyof T['sessionStore']] = update.value;
+      });
+    }, actionName);
+  }
+
   /**
    * setState is separate so any future changes to how state change can be done from one place.
    * @param fn
    * @param name
    */
-  private setState: NamedSetState<HMSStore> = (fn, name) => {
+  private setState: NamedSetState<HMSStore<T>> = (fn, name) => {
     return this.store.namedSetState(fn, name);
   };
 }

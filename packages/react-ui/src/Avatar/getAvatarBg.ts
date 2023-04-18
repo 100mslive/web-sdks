@@ -3,6 +3,7 @@ const getInitials = (name: string | undefined) => {
     return undefined;
   } else {
     return name
+      .trim()
       .match(/(^\S\S?|\b\S)?/g)
       ?.join('')
       ?.match(/(^\S|\S$)?/g)

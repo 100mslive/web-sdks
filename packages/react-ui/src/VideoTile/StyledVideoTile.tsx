@@ -25,6 +25,11 @@ const Container = styled('div', {
         background: 'transparent',
       },
     },
+    noRadius: {
+      true: {
+        borderRadius: 0,
+      },
+    },
   },
 });
 
@@ -93,12 +98,12 @@ const AvatarContainer = styled(Box, {
   left: '50%',
   top: '50%',
   transform: 'translateX(-50%) translateY(-50%)',
-  width: '100%',
-  height: '100%',
-  '& > * + *': {
-    marginBottom: '0',
-    marginTop: '$4',
-  },
+  width: '40%',
+  height: '40%',
+  '& > div': {
+    maxHeight: "$20",
+    height: "100%"
+  }
 });
 
 interface VideoTileType {

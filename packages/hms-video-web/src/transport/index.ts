@@ -36,6 +36,7 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  SetSessionMetadataParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
@@ -79,7 +80,7 @@ export default class HMSTransport implements ITransport {
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
   private maxSubscribeBitrate = 0;
-  private joinRetryCount = 0;
+  joinRetryCount = 0;
 
   constructor(
     private observer: ITransportObserver,
@@ -478,7 +479,7 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
-    HMSLogger.i(
+    HMSLogger.d(
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
@@ -652,12 +653,16 @@ export default class HMSTransport implements ITransport {
     });
   }
 
-  getSessionMetadata() {
-    return this.signal.getSessionMetadata();
+  getSessionMetadata(key?: string) {
+    return this.signal.getSessionMetadata(key);
   }
 
-  async setSessionMetadata(metadata: any) {
-    await this.signal.setSessionMetadata({ data: metadata });
+  setSessionMetadata(params: SetSessionMetadataParams) {
+    return this.signal.setSessionMetadata(params);
+  }
+
+  listenMetadataChange(keys: string[]): Promise<void> {
+    return this.signal.listenMetadataChange(keys);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
@@ -738,7 +743,7 @@ export default class HMSTransport implements ITransport {
     await p;
     await track.cleanup();
     // remove track from store on unpublish
-    this.store.removeTrack(track.trackId);
+    this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 

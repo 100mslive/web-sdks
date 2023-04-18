@@ -28,6 +28,7 @@ export interface IStore {
   getRoom(): HMSRoom | undefined;
   getPolicyForRole(role: string): HMSRole;
   getKnownRoles(): KnownRoles;
+  getTemplateAppData(): Record<string, string> | undefined;
   setSimulcastEnabled(enabled: boolean): void;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): HMSSimulcastLayerDefinition[];
@@ -36,7 +37,7 @@ export interface IStore {
   getRemotePeers(): HMSRemotePeer[];
   getPeers(): HMSPeer[];
 
-  getTracksMap(): Record<string, HMSTrack>;
+  getTracksMap(): Map<HMSTrack, HMSTrack>;
   getTracks(): HMSTrack[];
   getVideoTracks(): HMSVideoTrack[];
   getAudioTracks(): HMSAudioTrack[];
@@ -58,6 +59,7 @@ export interface IStore {
 
   addPeer(peer: HMSPeer): void;
   addTrack(track: HMSTrack): void;
+  hasTrack(track: HMSTrack): boolean;
 
   getTrackState(trackId: string): TrackStateEntry;
   setTrackState(trackState: TrackStateEntry): void;
@@ -66,7 +68,7 @@ export interface IStore {
   createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo): void;
 
   removePeer(peerId: string): void;
-  removeTrack(trackId: string): void;
+  removeTrack(track: HMSTrack): void;
 
   updateSpeakers(speakers: HMSSpeaker[]): void;
   updateAudioOutputVolume(volume: number): void;
