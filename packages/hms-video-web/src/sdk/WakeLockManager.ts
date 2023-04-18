@@ -9,9 +9,15 @@ export class WakeLockManager {
     document?.addEventListener('visibilitychange', this.visibilityHandler);
   };
 
-  cleanup = () => {
+  cleanup = async () => {
     if (this.wakeLock && !this.wakeLock.released) {
-      this.wakeLock.release();
+      try {
+        await this.wakeLock.release();
+        HMSLogger.d(this.TAG, 'Wake lock released');
+      } catch (err) {
+        const error = err as Error;
+        HMSLogger.e(this.TAG, 'Error while releasing wake lock', `name=${error.name}, message=${error.message}`);
+      }
     }
     this.wakeLock = null;
   };
@@ -33,7 +39,7 @@ export class WakeLockManager {
       HMSLogger.d(this.TAG, 'Wake lock acquired');
     } catch (err) {
       const error = err as Error;
-      HMSLogger.e(this.TAG, 'Error acquiring wake lock', `${error.name}, ${error.message}`);
+      HMSLogger.e(this.TAG, 'Error acquiring wake lock', `name=${error.name}, message=${error.message}`);
     }
   };
 }
