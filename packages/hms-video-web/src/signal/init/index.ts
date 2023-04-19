@@ -52,7 +52,7 @@ export default class InitService {
       }
     } catch (err) {
       const error = err as Error;
-      if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
+      if (['Failed to fetch', 'NetworkError', 'ECONNRESET'].some(message => error.message.includes(message))) {
         throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
       }
       throw error;
