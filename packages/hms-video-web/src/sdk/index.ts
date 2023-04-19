@@ -162,6 +162,14 @@ export class HMSSdk implements HMSInterface {
     return this.transport?.getWebrtcInternals();
   }
 
+  sendAnalytics(data: any) {
+    this.eventBus.analytics.publish(
+      AnalyticsEventFactory.publish({
+        devices: this.deviceManager.getDevices(),
+        error: data as Error,
+      }),
+    );
+  }
   getSessionStore() {
     return this.sessionStore;
   }

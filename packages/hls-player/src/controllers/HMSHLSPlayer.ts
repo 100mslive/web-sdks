@@ -2,12 +2,18 @@ import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
 import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
+import { HMSHLSException } from '../error/HMSHLSException';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from '../interfaces/events';
 import { HMSHLSLayer } from '../interfaces/IHMSHLSLayer';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 import { mapLayer, mapLayers } from '../utilies/utils';
 
+declare global {
+  interface Window {
+    __hms: any;
+  }
+}
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _hls: Hls;
   private _hlsUrl: string;
@@ -116,6 +122,12 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     eventName: E,
     eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
   ): boolean => {
+    if (eventName === HMSHLSPlayerEvents.ERROR) {
+      if ((eventObject as HMSHLSException)?.isTerminal) {
+        // send analytics event
+        window.__hms.actions?.sendAnalytics(eventObject);
+      }
+    }
     return this._emitter.emitEvent(eventName, eventObject);
   };
 

@@ -227,6 +227,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
+  sendAnalytics(data: any) {
+    this.sdk.sendAnalytics(data);
+  }
+
   async leave() {
     const isConnectedToRoom = this.store.getState(selectIsConnectedToRoom);
     let notifyServer = true;
