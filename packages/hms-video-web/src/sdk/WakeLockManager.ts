@@ -24,6 +24,7 @@ export class WakeLockManager {
 
   private visibilityHandler = async () => {
     if (document?.visibilityState === 'visible' && (!this.wakeLock || this.wakeLock.released)) {
+      HMSLogger.d(this.TAG, 'Re-acquiring wake lock due to visibility change');
       await this.requestWakeLock();
     }
   };
