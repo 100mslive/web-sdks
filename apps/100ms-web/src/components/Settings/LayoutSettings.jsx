@@ -66,8 +66,8 @@ export const LayoutSettings = () => {
         }}
       />
       <SwitchWithLabel
-        label="Mirror Local Video"
-        id="mirrorMode"
+        label="Hide Local Video"
+        id="hideLocalVideo"
         checked={hideLocalVideo}
         onChange={value => {
           setUISettings({
