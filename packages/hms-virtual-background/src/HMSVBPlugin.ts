@@ -16,7 +16,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
   private background: HMSVirtualBackground;
   private backgroundType: HMSVirtualBackgroundTypes = HMSVirtualBackgroundTypes.NONE;
   private segmentation!: SelfieSegmentation;
-  private outputCanvas?: HTMLCanvasElement;
 
   private gifFrames: any;
   private gifFramesIndex: number;
@@ -216,17 +215,11 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     console.debug(this.TAG, ...data);
   }
 
-  private renderBlur(_results: MediaPipeResults) {
-    if (!this.outputCanvas || this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
+  private renderBlur(results: MediaPipeResults) {
+    if (this.backgroundType !== HMSVirtualBackgroundTypes.BLUR) {
       return;
     }
-    /* this.outputCtx.filter = 'none';
-    this.outputCtx.globalCompositeOperation = 'source-out';
-    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx.globalCompositeOperation = 'destination-atop';
-    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
-    this.outputCtx.filter = `blur(${Math.floor(this.outputCanvas.width / 160) * 5}px)`;
-    this.outputCtx.drawImage(results.image, 0, 0, this.outputCanvas.width, this.outputCanvas.height); */
+    this.canvasHandler?.drawBlur(results);
   }
 
   private async renderGIF(results: MediaPipeResults) {
