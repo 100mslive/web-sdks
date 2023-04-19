@@ -65,6 +65,16 @@ export const LayoutSettings = () => {
           });
         }}
       />
+      <SwitchWithLabel
+        label="Mirror Local Video"
+        id="mirrorMode"
+        checked={mirrorLocalVideo}
+        onChange={value => {
+          setUISettings({
+            [UI_SETTINGS.hideLocalVideo]: value,
+          });
+        }}
+      />
       <Flex
         align="center"
         css={{ w: "100%", my: "$2", py: "$8", "@md": { display: "none" } }}
