@@ -103,7 +103,7 @@ function filterPeerId(peers, peerId) {
   let foundPeerToFilterOut = false;
   peers = [];
   for (let i = 0; i < oldPeers.length; i++) {
-    if (oldPeers[i].id === localPeerId) {
+    if (oldPeers[i].id === peerId) {
       foundPeerToFilterOut = true;
     } else {
       peers.push(oldPeers[i]);
