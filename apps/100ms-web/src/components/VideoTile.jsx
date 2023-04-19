@@ -47,7 +47,6 @@ const Tile = ({
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
-  const hideLocalVideo = useUISettings(UI_SETTINGS.hideLocalVideo);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const isHeadless = useIsHeadless();
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -78,10 +77,6 @@ const Tile = ({
     }
     return "large";
   }, [width, height]);
-
-  if (isLocal && hideLocalVideo) {
-    return null;
-  }
 
   return (
     <StyledVideoTile.Root
