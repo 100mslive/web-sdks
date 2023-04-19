@@ -3,6 +3,7 @@ import {
   HMSPeerID,
   HMSTrackID,
   HMSTrackStats,
+  RID,
   selectConnectionQualityByPeerID,
   selectHMSStats,
   simulcastMapping,
@@ -44,7 +45,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 if (!stat) {
                   return null;
                 }
-                const layer = stat.rid ? simulcastMapping[stat.rid] : '';
+                const layer = stat.rid ? simulcastMapping[stat.rid as RID] : '';
                 return (
                   <Fragment>
                     {layer && <StatsRow label={layer.toUpperCase()} value=""></StatsRow>}

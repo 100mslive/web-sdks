@@ -451,12 +451,21 @@ export class LocalTrackManager {
       | HMSLocalAudioTrack
       | undefined;
 
+    const screenVideoTrack = localTracks.find(t => t.type === HMSTrackType.VIDEO && t.source === 'screen') as
+      | HMSLocalVideoTrack
+      | undefined;
+
     if (trackSettings?.video) {
       await videoTrack?.setSettings(trackSettings.video);
     }
 
     if (trackSettings?.audio) {
       await audioTrack?.setSettings(trackSettings.audio);
+    }
+
+    const screenSettings = this.getScreenshareSettings(true);
+    if (screenSettings?.video) {
+      await screenVideoTrack?.setSettings(screenSettings?.video);
     }
 
     return { videoTrack, audioTrack };
