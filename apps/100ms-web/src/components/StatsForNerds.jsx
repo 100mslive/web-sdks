@@ -113,7 +113,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
                       option.layer === selectedStat.layer;
                     return (
                       <Dropdown.Item
-                        key={option.label}
+                        key={`${option.id}-${option.layer || ""}`}
                         onClick={() => {
                           setSelectedStat(option);
                         }}
@@ -190,11 +190,8 @@ const LocalPeerStats = () => {
 
   return (
     <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
-      <StatsRow
-        label="Packets Lost"
-        value={stats.subscribe?.packetsLost || "-"}
-      />
-      <StatsRow label="Jitter" value={stats.subscribe?.jitter || "-"} />
+      <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
+      <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
       <StatsRow
         label="Publish Bitrate"
         value={formatBytes(stats.publish?.bitrate, "b/s")}
@@ -210,6 +207,16 @@ const LocalPeerStats = () => {
       <StatsRow
         label="Total Bytes Received"
         value={formatBytes(stats.subscribe?.bytesReceived)}
+      />
+      <StatsRow
+        label="Round Trip Time"
+        value={`${
+          (
+            ((stats.publish?.currentRoundTripTime || 0) +
+              (stats.subscribe?.currentRoundTripTime || 0)) /
+            2
+          ).toFixed(3) * 1000
+        } ms`}
       />
     </Flex>
   );
@@ -231,8 +238,8 @@ const TrackStats = ({ trackID, layer, local }) => {
     <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
       <StatsRow label="Type" value={stats.type + " " + stats.kind} />
       <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, "b/s")} />
-      <StatsRow label="Packets Lost" value={stats.packetsLost || "-"} />
-      <StatsRow label="Jitter" value={stats.jitter?.toFixed(3) || "-"} />
+      <StatsRow label="Packets Lost" value={stats.packetsLost} />
+      <StatsRow label="Jitter" value={stats.jitter?.toFixed(3)} />
       <StatsRow
         label={inbound ? "Bytes Received" : "Bytes Sent"}
         value={formatBytes(inbound ? stats.bytesReceived : stats.bytesSent)}
@@ -243,12 +250,15 @@ const TrackStats = ({ trackID, layer, local }) => {
           {!inbound && (
             <StatsRow
               label="Quality Limitation Reason"
-              value={stats.qualityLimitationReason || "-"}
+              value={stats.qualityLimitationReason}
             />
           )}
-          {stats.rid && <StatsRow label="Rid" value={stats.rid} />}
         </>
       )}
+      <StatsRow
+        label="Round Trip Time"
+        value={`${stats.roundTripTime * 1000} ms`}
+      />
     </Flex>
   );
 };
@@ -269,7 +279,7 @@ const StatsRow = React.memo(({ label, value }) => (
       variant="sub1"
       css={{ fontWeight: "$semiBold", color: "$textHighEmp" }}
     >
-      {value}
+      {value || "-"}
     </Text>
   </Box>
 ));

@@ -10,14 +10,32 @@ import {
 } from './selectorUtils';
 // noinspection ES6PreferShortImport
 import { HMSRole } from '../hmsSDKStore/sdkTypes';
-import { HMSMessage, HMSPeer, HMSPeerID, HMSRoom, HMSRoomState, HMSStore, HMSVideoTrack } from '../schema';
+import {
+  HMSException,
+  HMSMessage,
+  HMSPeer,
+  HMSPeerID,
+  HMSRoom,
+  HMSRoomState,
+  HMSStore,
+  HMSVideoTrack,
+} from '../schema';
 
 /**
  * Select the current {@link HMSRoom} object to which you are connected.
  * @param store
  */
 export const selectRoom = (store: HMSStore): HMSRoom => store.room;
+/**
+ * Select the current {@link HMSException[]} object to monitor the error logs
+ * @param store
+ */
+export const selectErrors = (store: HMSStore): HMSException[] => store.errors;
 
+/**
+ * It will help to get the all the error
+ */
+export const selectRecentError = createSelector(selectErrors, errors => (errors.length === 0 ? null : errors.at(-1)));
 /**
  * Select the ID of the current room to which you are connected.
  */
@@ -124,7 +142,7 @@ const selectTracks = createSelector(selectTracksMap, storeTracks => {
 /**
  * Select the local peer object object assigned to you.
  */
-export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers) => {
+export const selectLocalPeer = createSelector(selectRoom, selectPeersMap, (room, peers): HMSPeer | undefined => {
   return peers[room.localPeer];
 });
 
@@ -166,7 +184,7 @@ const selectLocalAuxiliaryTrackIDs = createSelector(selectLocalPeer, peer => pee
 export const selectLocalTrackIDs = createSelector(
   [selectLocalAudioTrackID, selectLocalVideoTrackID, selectLocalAuxiliaryTrackIDs],
   (audioTrackID, videoTrackID, auxiliaryTrackIDs) => {
-    const trackIDs: string[] = [...auxiliaryTrackIDs];
+    const trackIDs: string[] = auxiliaryTrackIDs ? [...auxiliaryTrackIDs] : [];
     audioTrackID && trackIDs.unshift(audioTrackID);
     videoTrackID && trackIDs.unshift(videoTrackID);
     return trackIDs;
@@ -373,6 +391,16 @@ export const selectAvailableRoleNames = createSelector([selectRolesMap], rolesMa
  */
 export const selectLocalPeerRole = createSelector([selectLocalPeer, selectRolesMap], (localPeer, rolesMap) =>
   localPeer?.roleName ? rolesMap[localPeer.roleName] : null,
+);
+
+export const selectPreviewRoleName = (store: HMSStore) => store.preview?.asRole;
+
+/**
+ * Select the {@link HMSRole} used for preview.
+ *
+ */
+export const selectPreviewRole = createSelector([selectPreviewRoleName, selectRolesMap], (roleName, rolesMap) =>
+  roleName ? rolesMap[roleName] : null,
 );
 
 /**

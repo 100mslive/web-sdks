@@ -111,9 +111,16 @@ export class HMSVBPlugin implements HMSVideoPlugin {
         this.background.crossOrigin = 'anonymous';
         this.background.muted = true;
         this.background.loop = true;
-        this.background.autoplay = true;
-        this.background.oncanplaythrough = () => {
-          this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+        this.background.playsInline = true;
+        this.background.oncanplaythrough = async () => {
+          if (this.background && this.background instanceof HTMLVideoElement) {
+            try {
+              await this.background.play();
+              this.backgroundType = HMSVirtualBackgroundTypes.VIDEO;
+            } catch (e) {
+              this.log('failed to play background', background);
+            }
+          }
         };
         break;
       case HMSVirtualBackgroundTypes.CANVAS:
@@ -224,7 +231,6 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     ) {
       return;
     }
-    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     this.outputCtx.filter = 'none';
     this.outputCtx.imageSmoothingEnabled = true;
     this.outputCtx.imageSmoothingQuality = 'high';
@@ -244,6 +250,8 @@ export class HMSVBPlugin implements HMSVideoPlugin {
       this.outputCanvas.width,
       this.outputCanvas.height,
     );
+    this.outputCtx.globalCompositeOperation = 'destination-out';
+    this.outputCtx.drawImage(results.segmentationMask, 0, 0, this.outputCanvas.width, this.outputCanvas.height);
     // Only overwrite missing pixels.
     this.outputCtx.globalCompositeOperation = 'destination-atop';
     this.outputCtx.drawImage(this.input, 0, 0, this.outputCanvas.width, this.outputCanvas.height);

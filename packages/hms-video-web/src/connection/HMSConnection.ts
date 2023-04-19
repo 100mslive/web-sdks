@@ -1,6 +1,6 @@
 import { HMSConnectionRole } from './model';
 import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
-import { HMSLocalTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
 import HMSLogger from '../utils/logger';
@@ -91,6 +91,10 @@ export default abstract class HMSConnection {
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate signalling state closed`);
+      return;
+    }
     HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate);
   }
@@ -110,12 +114,13 @@ export default abstract class HMSConnection {
      *
      * For all peers joining after this peer, we have published and subscribed at the time of join itself
      * so we're able to log both publish and subscribe ice candidates.
+     * Added try catch for the whole section as the getSenders and getReceivers is throwing errors in load test
      */
-    const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
+    try {
+      const transmitters = this.role === HMSConnectionRole.Publish ? this.getSenders() : this.getReceivers();
 
-    transmitters.forEach(transmitter => {
-      const kindOfTrack = transmitter.track?.kind;
-      try {
+      transmitters.forEach(transmitter => {
+        const kindOfTrack = transmitter.track?.kind;
         if (transmitter.transport) {
           const iceTransport = transmitter.transport.iceTransport;
 
@@ -140,14 +145,14 @@ export default abstract class HMSConnection {
           }
           logSelectedCandidate();
         }
-      } catch (error) {
-        HMSLogger.w(
-          TAG,
-          `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
-          error,
-        );
-      }
-    });
+      });
+    } catch (error) {
+      HMSLogger.w(
+        TAG,
+        `Error in logging selected ice candidate pair for ${HMSConnectionRole[this.role]} connection`,
+        error,
+      );
+    }
   }
 
   removeTrack(sender: RTCRtpSender) {
@@ -156,13 +161,21 @@ export default abstract class HMSConnection {
     }
   }
 
-  async setMaxBitrate(maxBitrate: number, track: HMSLocalTrack) {
+  async setMaxBitrateAndFramerate(track: HMSLocalTrack) {
+    const maxBitrate = track.settings.maxBitrate;
+    const maxFramerate = track instanceof HMSLocalVideoTrack && track.settings.maxFramerate;
     const sender = this.getSenders().find(s => s?.track?.id === track.getTrackIDBeingSent());
 
     if (sender) {
       const params = sender.getParameters();
       if (params.encodings.length > 0) {
-        params.encodings[0].maxBitrate = maxBitrate * 1000;
+        if (maxBitrate) {
+          params.encodings[0].maxBitrate = maxBitrate * 1000;
+        }
+        if (maxFramerate) {
+          // @ts-ignore
+          params.encodings[0].maxFramerate = maxFramerate;
+        }
       }
       await sender.setParameters(params);
     } else {

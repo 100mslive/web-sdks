@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import create from 'zustand';
 import {
   HMSActions,
@@ -32,7 +32,6 @@ export interface HMSRoomProviderProps {
  */
 const HMSContext = createContext<HMSContextProviderProps | null>(null);
 
-let providerProps: HMSContextProviderProps;
 /**
  * top level wrapper for using react sdk hooks. This doesn't have any mandatory arguments, if you are already
  * initialising the sdk on your side, you can pass in the primitives from there as well to use hooks for
@@ -49,7 +48,8 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   isHMSStatsOn = false,
   leaveOnUnload = true,
 }) => {
-  if (!providerProps) {
+  const providerProps: HMSContextProviderProps = useMemo(() => {
+    let providerProps: HMSContextProviderProps;
     // adding a dummy function for setstate and destroy because zustan'd create expects them
     // to be present but we don't expose them from the store.
     const errFn = () => {
@@ -104,13 +104,22 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
       version: React.version,
       sdkVersion: process.env.REACT_SDK_VERSION,
     });
-  }
+
+    return providerProps;
+  }, [actions, store, notifications, stats, isHMSStatsOn]);
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      const beforeUnloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('beforeunload', beforeUnloadCallback);
+
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadCallback);
+      };
     }
-  }, [leaveOnUnload]);
+
+    return () => {};
+  }, [leaveOnUnload, providerProps]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
 };

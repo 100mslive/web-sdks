@@ -6,27 +6,27 @@ import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/
 import { HMSLocalTrack } from '../media/tracks';
 import ITransport from '../transport/ITransport';
 
-export type PublishConfig = {
-  publishAudio?: boolean;
-  publishVideo?: boolean;
-};
-
 export default class RoleChangeManager {
   constructor(
     private store: IStore,
     private transport: ITransport,
-    private publish: (settings: InitialSettings, publishConfig?: PublishConfig) => void,
+    private publish: (settings: InitialSettings) => Promise<void>,
     private removeAuxiliaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
   ) {}
 
-  public handleLocalPeerRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
+  handleLocalPeerRoleUpdate = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     const localPeer = this.store.getLocalPeer();
 
     if (!localPeer) {
       return;
     }
 
+    await this.diffRolesAndPublishTracks({ oldRole, newRole });
+    this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
+  };
+
+  diffRolesAndPublishTracks = async ({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }) => {
     const wasPublishing = new Set(oldRole.publishParams.allowed);
     const isPublishing = new Set(newRole.publishParams.allowed);
 
@@ -44,7 +44,6 @@ export default class RoleChangeManager {
     await this.removeAudioTrack(removeAudio);
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
-    this.store.setPublishParams(newRole.publishParams);
 
     const initialSettings = this.store.getConfig()?.settings || {
       isAudioMuted: true,
@@ -55,8 +54,6 @@ export default class RoleChangeManager {
     };
     // call publish with new settings, local track manager will diff policies
     await this.publish({ ...initialSettings, isAudioMuted: true, isVideoMuted: true });
-
-    this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
   private async removeVideoTracks(removeVideo: boolean) {
@@ -68,7 +65,11 @@ export default class RoleChangeManager {
     if (localPeer?.videoTrack) {
       // TODO: stop processed track and cleanup plugins loop non async
       // vb can throw change role off otherwise
-      await this.transport.unpublish([localPeer.videoTrack]);
+      if (localPeer.videoTrack.isPublished) {
+        await this.transport.unpublish([localPeer.videoTrack]);
+      } else {
+        await localPeer.videoTrack.cleanup();
+      }
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.videoTrack, localPeer);
       localPeer.videoTrack = undefined;
     }
@@ -81,7 +82,11 @@ export default class RoleChangeManager {
     }
     const localPeer = this.store.getLocalPeer();
     if (localPeer?.audioTrack) {
-      await this.transport.unpublish([localPeer.audioTrack]);
+      if (localPeer.audioTrack.isPublished) {
+        await this.transport.unpublish([localPeer.audioTrack]);
+      } else {
+        await localPeer.audioTrack.cleanup();
+      }
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, localPeer.audioTrack, localPeer);
       localPeer.audioTrack = undefined;
     }

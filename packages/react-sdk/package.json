@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.6.0",
+  "version": "0.6.4",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -19,7 +19,7 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc src/index.ts --plugin none",
+    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store",
     "test": "jest --maxWorkers=1"
   },
   "devDependencies": {
@@ -37,7 +37,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.8.0",
+    "@100mslive/hms-video-store": "0.8.4",
     "react-intersection-observer": "^8.33.1",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"

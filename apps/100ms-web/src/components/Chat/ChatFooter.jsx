@@ -14,6 +14,8 @@ const TextArea = styled("textarea", {
   color: "$textPrimary",
   resize: "none",
   lineHeight: "1rem",
+  position: "relative",
+  top: "$3",
   "&:focus": {
     boxShadow: "none",
     outline: "none",
@@ -128,6 +130,9 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         }}
         autoComplete="off"
         aria-autocomplete="none"
+        onPaste={e => e.stopPropagation()}
+        onCut={e => e.stopPropagation()}
+        onCopy={e => e.stopPropagation()}
       />
       <EmojiPicker
         onSelect={emoji => {

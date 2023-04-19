@@ -1,8 +1,6 @@
-import { Comparator } from './Comparator';
 import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
-import { SubscribeDegradationParams } from '../../interfaces/subscribe-degradation-params';
 import {
   HMSAudioTrack,
   HMSLocalTrack,
@@ -11,7 +9,7 @@ import {
   HMSTrackSource,
   HMSVideoTrack,
 } from '../../media/tracks';
-import { TrackState } from '../../notification-manager';
+import { PolicyParams, TrackState } from '../../notification-manager';
 import { ENV } from '../../utils/support';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
@@ -25,15 +23,13 @@ export interface IStore {
   getConfig(): HMSConfig | undefined;
   getEnv(): ENV;
   getPublishParams(): PublishParams | undefined;
-
-  getComparator(): Comparator;
+  getErrorListener(): IErrorListener | undefined;
 
   getRoom(): HMSRoom;
   getPolicyForRole(role: string): HMSRole;
   getKnownRoles(): KnownRoles;
   setSimulcastEnabled(enabled: boolean): void;
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[];
-  getSubscribeDegradationParams(): SubscribeDegradationParams | undefined;
   getSimulcastDefinitionsForPeer(peer: HMSPeer, source: HMSTrackSource): HMSSimulcastLayerDefinition[];
 
   getLocalPeer(): HMSLocalPeer | undefined;
@@ -56,9 +52,8 @@ export interface IStore {
   getSpeakerPeers(): HMSPeer[];
 
   setRoom(room: HMSRoom): void;
-  setKnownRoles(knownRoles: KnownRoles): void;
+  setKnownRoles(params: PolicyParams): void;
   setConfig(config: HMSConfig): void;
-  setPublishParams(params: PublishParams): void;
   setErrorListener(listener: IErrorListener): void;
 
   addPeer(peer: HMSPeer): void;

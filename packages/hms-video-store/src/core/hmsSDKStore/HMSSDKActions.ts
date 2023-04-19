@@ -147,8 +147,18 @@ export class HMSSDKActions implements IHMSActions {
           HMSLogger.w(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
           return;
         }
+        const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
+        if (alreadyInSameState) {
+          HMSLogger.w(`preferred layer is already ${layer}`);
+          return;
+        }
+        this.setState(draftStore => {
+          const track = draftStore.tracks[trackId] as HMSVideoTrack;
+          if (track) {
+            track.preferredLayer = layer;
+          }
+        }, 'setPreferredLayer');
         await track.setPreferredLayer(layer);
-        this.updateVideoLayer(trackId, 'setPreferredLayer');
       } else {
         HMSLogger.w(`track ${trackId} is not a remote video track`);
       }
@@ -157,7 +167,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  async preview(config: sdkTypes.HMSConfig) {
+  async preview(config: sdkTypes.HMSPreviewConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
       return; // ignore
@@ -384,7 +394,6 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
       (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
-      this.updateVideoLayer(trackID, 'detachVideo');
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
@@ -717,8 +726,8 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (this.hmsSDKPeers[localPeer?.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -728,7 +737,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
+  private async sdkPreviewWithListeners(config: sdkTypes.HMSPreviewConfig) {
     await this.sdk.preview(config, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
@@ -781,7 +790,6 @@ export class HMSSDKActions implements IHMSActions {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
       await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
-      this.updateVideoLayer(trackID, 'attachVideo');
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
@@ -807,6 +815,7 @@ export class HMSSDKActions implements IHMSActions {
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -827,8 +836,10 @@ export class HMSSDKActions implements IHMSActions {
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
-      if (hmsPeer.isLocal) {
-        Object.assign(newMediaSettings, this.getMediaSettings(sdkPeer));
+      if (sdkPeer.isLocal) {
+        const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
+        newPreview = this.getPreviewFields(localPeer);
+        Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
 
@@ -848,6 +859,16 @@ export class HMSSDKActions implements IHMSActions {
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+
+      /**
+       * if preview is already present merge,
+       * else set as is(which will create/delete)
+       */
+      if (draftStore.preview?.localPeer && newPreview?.localPeer) {
+        Object.assign(draftStore.preview, newPreview);
+      } else {
+        draftStore.preview = newPreview;
+      }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
@@ -1103,29 +1124,6 @@ export class HMSSDKActions implements IHMSActions {
     HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
-  /**
-   * the layer gets updated on addsink/removesink/preferlayer calls, for simulcast there
-   * can be multiple layers, while for non simulcast there will be None and High.
-   */
-  private updateVideoLayer(trackID: string, action: string) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      const storeTrack = this.store.getState(selectVideoTrackByID(trackID));
-      const hasFieldChanged =
-        storeTrack?.layer !== sdkTrack.getLayer() ||
-        storeTrack?.degraded !== sdkTrack.degraded ||
-        storeTrack?.preferredLayer !== sdkTrack.getPreferredLayer();
-      if (hasFieldChanged) {
-        this.setState(draft => {
-          const track = draft.tracks[trackID] as HMSVideoTrack;
-          track.layer = sdkTrack.getLayer();
-          track.preferredLayer = sdkTrack.getPreferredLayer();
-          track.degraded = sdkTrack.degraded;
-        }, action);
-      }
-    }
-  }
-
   private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
     this.setState(draftStore => {
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
@@ -1185,6 +1183,22 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
+  private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    // if room is not in preview, clear preview fields
+    if (!sdkLocalPeer.isInPreview()) {
+      return;
+    }
+
+    const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
+
+    return {
+      localPeer: hmsLocalPeer.id,
+      audioTrack: hmsLocalPeer.audioTrack,
+      videoTrack: hmsLocalPeer.videoTrack,
+      asRole: sdkLocalPeer.asRole?.name || sdkLocalPeer.role?.name,
+    };
+  }
+
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
@@ -1210,7 +1224,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private localAndVideoUnmuting(trackID: string) {
     const localPeer = this.store.getState(selectLocalPeer);
-    if (localPeer.videoTrack !== trackID) {
+    if (localPeer?.videoTrack !== trackID) {
       return false;
     }
     const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);

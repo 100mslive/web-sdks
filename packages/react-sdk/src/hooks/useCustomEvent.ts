@@ -6,7 +6,7 @@ import { logErrorHandler } from '../utils/commons';
 
 export interface useCustomEventInput<T> {
   /**
-   * type of the event, e.g. MODERATOR_EVENT, EMOJI_REACTIONS etc.
+   * type of the event, for example, MODERATOR_EVENT, EMOJI_REACTIONS etc.
    */
   type: string;
   /**

@@ -28,7 +28,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private pluginsManager: HMSVideoPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
-  private TAG = '[LocalVideoTrack]';
+  private TAG = '[HMSLocalVideoTrack]';
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -48,6 +48,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * This will only be available if the track was actually published and won't be set for preview tracks.
    */
   publishedTrackId?: string;
+
+  /**
+   * will be false for preview tracks
+   */
+  isPublished = false;
 
   constructor(
     stream: HMSLocalStream,
@@ -97,6 +102,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         track = await this.replaceTrackWithBlank();
       }
       await this.replaceSender(track, value);
+      this.nativeTrack?.stop();
       this.nativeTrack = track;
       if (value) {
         await this.pluginsManager.waitForRestart();
@@ -176,6 +182,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
+    this.isPublished = false;
   }
 
   /**
@@ -270,8 +277,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWith(settings: HMSVideoTrackSettings) {
     const prevTrack = this.nativeTrack;
-    prevTrack?.stop();
     const newTrack = await getVideoTrack(settings);
+    /*
+     * stop the previous only after acquiring the new track otherwise this can lead to
+     * no video(black tile) when the above getAudioTrack throws an error. ex: DeviceInUse error
+     */
+    prevTrack?.stop();
+    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
     // Replace deviceId with actual deviceId when it is default
     if (this.settings.deviceId === 'default') {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
@@ -286,8 +298,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
+    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
     prevTrack?.stop();
-    return LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
+    return newTrack;
   }
 
   private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
@@ -310,7 +324,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrate(settings.maxBitrate, this);
+      await stream.setMaxBitrateAndFramerate(this);
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {

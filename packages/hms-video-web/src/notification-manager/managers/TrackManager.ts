@@ -64,12 +64,12 @@ export class TrackManager {
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+    this.store.removeTrack(track.trackId);
     const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
     if (!hmsPeer) {
       return;
     }
     this.removePeerTracks(hmsPeer, track);
-    this.store.removeTrack(track.trackId);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
   };
 
@@ -95,6 +95,7 @@ export class TrackManager {
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
+      HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
       return;
     }
 
@@ -124,15 +125,16 @@ export class TrackManager {
 
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
-
     tracksCopy.forEach(track => {
       const state = this.store.getTrackState(track.trackId);
       if (!state) {
+        HMSLogger.d(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
         return;
       }
 
       const hmsPeer = this.store.getPeerById(state.peerId);
       if (!hmsPeer) {
+        HMSLogger.d(this.TAG, 'Peer not added to store, peerId', state.peerId);
         return;
       }
 
@@ -207,7 +209,6 @@ export class TrackManager {
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {
     let eventType;
-    track.setEnabled(!trackState.mute);
     if (currentTrackState.mute !== trackState.mute) {
       eventType = trackState.mute ? HMSTrackUpdate.TRACK_MUTED : HMSTrackUpdate.TRACK_UNMUTED;
       track.type === HMSTrackType.AUDIO &&
