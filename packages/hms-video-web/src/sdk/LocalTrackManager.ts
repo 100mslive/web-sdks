@@ -465,7 +465,7 @@ export class LocalTrackManager {
 
     const screenSettings = this.getScreenshareSettings(true);
     if (screenSettings?.video) {
-      screenVideoTrack?.setSettings(screenSettings?.video);
+      await screenVideoTrack?.setSettings(screenSettings?.video);
     }
 
     return { videoTrack, audioTrack };
