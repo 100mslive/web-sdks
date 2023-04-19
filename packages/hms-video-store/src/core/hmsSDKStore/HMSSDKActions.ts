@@ -424,10 +424,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  detachVideo(trackID: string, videoElement: HTMLVideoElement) {
+  async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
+      await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up

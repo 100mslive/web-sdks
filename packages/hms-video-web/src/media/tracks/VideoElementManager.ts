@@ -30,7 +30,6 @@ export class VideoElementManager {
       if (this.track.enabled) {
         this.track.addSink(videoElement);
       } else {
-        console.log('update sink remove element ', this.videoElements);
         this.track.removeSink(videoElement);
       }
     }
@@ -38,7 +37,6 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   async addVideoElement(videoElement: HTMLVideoElement) {
-    console.log('adding video element ', videoElement, this.videoElements.size, this.videoElements);
     if (this.videoElements.has(videoElement)) {
       return;
     }
@@ -71,7 +69,6 @@ export class VideoElementManager {
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    console.log('remove video element ', videoElement);
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
@@ -92,7 +89,6 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
-    console.log('[VideoElement handleIntersection] entry ', entry);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {

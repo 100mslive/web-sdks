@@ -163,12 +163,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private async requestLayer(layer: HMSSimulcastLayer, source: string) {
     try {
-      HMSLogger.d(
-        `[Remote Track] 1 ${this.logIdentifier} 
-      streamId=${this.stream.id}
-      trackId=${this.trackId}
-      Requested layer ${layer}, source=${source}`,
-      );
       const response = await (this.stream as HMSRemoteStream).setVideoLayer(
         layer,
         this.trackId,

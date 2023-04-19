@@ -44,7 +44,6 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   addSink(videoElement: HTMLVideoElement) {
-    console.log('adding sink ', videoElement);
     this.addSinkInternal(videoElement, this.nativeTrack);
   }
 
@@ -53,7 +52,7 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   removeSink(videoElement: HTMLVideoElement) {
-    console.log('removing sink ', videoElement);
+    HMSLogger.v(`[HMSVideoTrack] removing sink video element - ${videoElement}`);
     if (videoElement.srcObject !== null) {
       videoElement.srcObject = null;
       if (this.sinkCount > 0) {
