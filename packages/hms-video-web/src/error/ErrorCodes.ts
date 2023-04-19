@@ -18,7 +18,7 @@ export const ErrorCodes = {
     ABNORMAL_CLOSE: 1006,
   },
 
-  InitAPIErrors: {
+  APIErrors: {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
     //init config not available

@@ -7,11 +7,11 @@ export default class InitService {
   private static handleError(response: Response, body: { code: number; message: string }) {
     switch (response.status) {
       case 404:
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
+        throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.INIT, body.message || response.statusText);
       case 200:
         break;
       default:
-        throw ErrorFactory.InitAPIErrors.ServerErrors(
+        throw ErrorFactory.APIErrors.ServerErrors(
           body.code || response.status,
           HMSAction.INIT,
           body.message || response?.statusText,
@@ -40,14 +40,20 @@ export default class InitService {
           Authorization: `Bearer ${token}`,
         },
       });
-      const config = await response.json();
-      this.handleError(response, config);
-      HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
-      return transformInitConfig(config);
+      try {
+        const config = await response.clone().json();
+        this.handleError(response, config);
+        HMSLogger.d(TAG, `config is ${JSON.stringify(config, null, 2)}`);
+        return transformInitConfig(config);
+      } catch (err) {
+        const text = await response.text();
+        HMSLogger.e(TAG, 'json error', (err as Error).message, text);
+        throw ErrorFactory.APIErrors.ServerErrors(response.status, HMSAction.INIT, text);
+      }
     } catch (err) {
       const error = err as Error;
-      if (['Failed to fetch', 'NetworkError'].some(message => error.message.includes(message))) {
-        throw ErrorFactory.InitAPIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
+      if (['Failed to fetch', 'NetworkError', 'ECONNRESET'].some(message => error.message.includes(message))) {
+        throw ErrorFactory.APIErrors.EndpointUnreachable(HMSAction.INIT, error.message);
       }
       throw error;
     }

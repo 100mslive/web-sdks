@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
@@ -10,6 +9,7 @@ import {
   mapFromBackend,
   mapTileShape,
   storeRoomSettings,
+  getAuthTokenByRoomCodeEndpoint,
 } from './utils/utils';
 
 import logoLight from './assets/images/logo-on-white.png';
@@ -99,46 +99,6 @@ const App = () => {
         console.error(error);
       }
     };
-  };
-
-  const getRoomDetails = async name => {
-    const code = getRoomCodeFromUrl();
-    if (!code) {
-      logError('roomIdNull', '', undefined, { pathname: window.location.pathname });
-      return;
-    }
-    const jwt = getAuthInfo().token;
-    const url = `${apiBasePath}get-token`;
-    let headers;
-    if (jwt) {
-      headers = {
-        Authorization: `Bearer ${jwt}`,
-        'Content-Type': 'application/json',
-        subdomain: hostname,
-      };
-    } else {
-      headers = {
-        'Content-Type': 'application/json',
-        subdomain: hostname,
-      };
-    }
-
-    let formData = new FormData();
-    formData.append('code', code);
-    formData.append('user_id', name);
-
-    return await axios
-      .post(url, formData, { headers: headers })
-      .then(res => {
-        try {
-          return res.data.token;
-        } catch (err) {
-          throw Error(err);
-        }
-      })
-      .catch(err => {
-        throw err;
-      });
   };
 
   const fetchData = async () => {
@@ -282,7 +242,7 @@ const App = () => {
               metadata: settings.metadataFields.metadata,
               recordingUrl: settings.recording_url,
             }}
-            getUserToken={getRoomDetails}
+            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
             getDetails={fetchData}
           />
         </Suspense>

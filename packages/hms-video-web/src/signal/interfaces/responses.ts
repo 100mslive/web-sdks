@@ -3,5 +3,16 @@ export interface BroadcastResponse {
 }
 
 export interface GetSessionMetadataResponse {
-  data?: any;
+  change_version?: number;
+  updated_by?: string;
+  data: any;
+  key?: string;
+  updated_at?: number;
+}
+
+export interface SetSessionMetadataResponse {
+  change_version?: number;
+  data: any;
+  key: string;
+  updated_at?: number;
 }

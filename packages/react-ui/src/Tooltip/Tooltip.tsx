@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useState } from 'react';
 import * as BaseTooltip from '@radix-ui/react-tooltip';
-import { styled } from '../Theme';
+import { CSS, styled } from '../Theme';
 import { slideDownAndFade, slideLeftAndFade, slideRightAndFade, slideUpAndFade } from '../utils';
 
 const TooltipBox = styled(BaseTooltip.Content, {
@@ -47,15 +47,30 @@ export const Tooltip: React.FC<
     side?: sideTooltip;
     align?: alignTooltip;
     disabled?: boolean;
+    triggerCss?: CSS;
+    boxCss?: CSS;
+    delayDuration?: number;
   }>
-> = ({ children, title, outlined = true, side = 'bottom', align = 'center', disabled = false }) => {
+> = ({
+  children,
+  title,
+  triggerCss,
+  boxCss,
+  outlined = true,
+  side = 'bottom',
+  align = 'center',
+  disabled = false,
+  delayDuration = 200,
+}) => {
   const [open, setOpen] = useState(false);
 
   return (
     <BaseTooltip.Provider>
-      <TooltipRoot delayDuration={200} open={open && !disabled} onOpenChange={setOpen}>
-        <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined}>
+      <TooltipRoot delayDuration={delayDuration} open={open && !disabled} onOpenChange={setOpen}>
+        <TooltipTrigger css={{ ...triggerCss }} asChild>
+          {children}
+        </TooltipTrigger>
+        <TooltipBox sideOffset={10} side={side} align={align} outlined={outlined} css={{ ...boxCss }}>
           {title}
         </TooltipBox>
       </TooltipRoot>

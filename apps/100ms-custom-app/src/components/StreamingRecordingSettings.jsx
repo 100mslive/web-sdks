@@ -77,7 +77,10 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             type="number"
             value={headlessConfig?.tileOffset}
             onChange={e => {
-              change('metadataFields', handleSettingsMetaData('tileOffset', e.target.value));
+              change(
+                'metadataFields',
+                handleSettingsMetaData('tileOffset', e.target.value === '' ? undefined : Number(e.target.value)),
+              );
             }}
           />
         </Flex>

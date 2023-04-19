@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Navigate,
@@ -14,6 +14,7 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, HMSThemeProvider } from "@100mslive/react-ui";
 import { AppData } from "./components/AppData/AppData.jsx";
+import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import FullPageProgress from "./components/FullPageProgress";
@@ -27,23 +28,13 @@ import { Confetti } from "./plugins/confetti";
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
 import { getRoutePrefix, shadeColor } from "./common/utils";
 import { FeatureFlags } from "./services/FeatureFlags";
-import {
-  getBackendEndpoint,
-  getUserToken as defaultGetUserToken,
-} from "./services/tokenService";
 import "./base.css";
 import "./index.css";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
 
-const defaultTokenEndpoint = process.env
-  .REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
-  ? `${getBackendEndpoint()}${
-      process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT_DOMAIN
-    }/`
-  : process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
-
+const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 
 let appName;
@@ -68,7 +59,6 @@ const getAspectRatio = ({ width, height }) => {
 };
 
 export function EdtechComponent({
-  roomId = "",
   tokenEndpoint = defaultTokenEndpoint,
   themeConfig: {
     aspectRatio = "1-1",
@@ -80,15 +70,13 @@ export function EdtechComponent({
     metadata = "",
     recordingUrl = "",
   },
-  getUserToken = defaultGetUserToken,
   policyConfig = envPolicyConfig,
   getDetails = () => {},
+  authTokenByRoomCodeEndpoint = "",
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
-
-  const getUserTokenCallback = useCallback(getUserToken, []); //eslint-disable-line
 
   return (
     <ErrorBoundary>
@@ -133,8 +121,8 @@ export function EdtechComponent({
             }}
           >
             <AppRoutes
-              getUserToken={getUserTokenCallback}
               getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
             />
           </Box>
         </HMSRoomProvider>
@@ -166,7 +154,7 @@ const RedirectToPreview = ({ getDetails }) => {
   );
 };
 
-const RouteList = ({ getUserToken, getDetails }) => {
+const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
   return (
     <Routes>
       <Route path="preview">
@@ -174,7 +162,9 @@ const RouteList = ({ getUserToken, getDetails }) => {
           path=":roomId/:role"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen getUserToken={getUserToken} />
+              <PreviewScreen
+                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              />
             </Suspense>
           }
         />
@@ -182,7 +172,9 @@ const RouteList = ({ getUserToken, getDetails }) => {
           path=":roomId"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen getUserToken={getUserToken} />
+              <PreviewScreen
+                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              />
             </Suspense>
           }
         />
@@ -239,7 +231,7 @@ const BackSwipe = () => {
   return null;
 };
 
-function AppRoutes({ getUserToken, getDetails }) {
+function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
   return (
     <Router>
       <ToastContainer />
@@ -248,17 +240,24 @@ function AppRoutes({ getUserToken, getDetails }) {
       <Confetti />
       <RemoteStopScreenshare />
       <KeyboardHandler />
+      <BeamSpeakerLabelsLogging />
       <Routes>
         <Route
           path="/*"
           element={
-            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+            <RouteList
+              getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+            />
           }
         />
         <Route
           path="/streaming/*"
           element={
-            <RouteList getUserToken={getUserToken} getDetails={getDetails} />
+            <RouteList
+              getDetails={getDetails}
+              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+            />
           }
         />
       </Routes>
@@ -278,7 +277,6 @@ export default function App() {
         headerPresent: process.env.REACT_APP_HEADER_PRESENT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
-      getUserToken={defaultGetUserToken}
     />
   );
 }

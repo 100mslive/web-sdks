@@ -32,6 +32,7 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   setAudioElement(element: HTMLAudioElement | null) {
+    HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
     this.audioElement = element;
   }
 
@@ -56,9 +57,14 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  async setOutputDevice(device: MediaDeviceInfo) {
+  async setOutputDevice(device?: MediaDeviceInfo) {
+    if (!device) {
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'device is null', `${this}`);
+      return;
+    }
     if (!this.audioElement) {
-      HMSLogger.d('audio-track', 'no audio element to set output');
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'no audio element to set output', `${this}`);
+      this.outputDevice = device;
       return;
     }
     try {
@@ -69,7 +75,7 @@ export class HMSAudioTrack extends HMSTrack {
         this.outputDevice = device;
       }
     } catch (error) {
-      HMSLogger.d('audio-track', error);
+      HMSLogger.d('[HMSAudioTrack]', 'error in setSinkId', error);
     }
   }
 

@@ -87,6 +87,19 @@ export const defaultVideoList = [
   },
 ];
 
+export const emojiIdMapping = [
+  { emojiId: "+1", emoji: "👍" },
+  { emojiId: "-1", emoji: "👎" },
+  { emojiId: "wave", emoji: "👋" },
+  { emojiId: "clap", emoji: "👏" },
+  { emojiId: "fire", emoji: "🔥" },
+  { emojiId: "tada", emoji: "🎉" },
+  { emojiId: "heart_eyes", emoji: "😍" },
+  { emojiId: "joy", emoji: "😂" },
+  { emojiId: "open_mouth", emoji: "😮" },
+  { emojiId: "sob", emoji: "😭" },
+];
+
 export const DEFAULT_HLS_ROLE_KEY = "HLS_VIEWER_ROLE";
 export const DEFAULT_HLS_VIEWER_ROLE = "hls-viewer";
 export const DEFAULT_WAITING_VIEWER_ROLE = "waiting-room";
@@ -131,6 +144,7 @@ export const APP_DATA = {
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
   pinnedTrackId: "pinnedTrackId",
+  dropdownList: "dropdownList",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
@@ -161,11 +175,38 @@ export const SUBSCRIBED_NOTIFICATIONS = {
 
 export const CREATE_ROOM_DOC_URL =
   "https://github.com/100mslive/100ms-web/wiki/Creating-and-joining-a-room";
+export const HLS_TIMED_METADATA_DOC_URL =
+  "https://www.100ms.live/docs/javascript/v2/how--to-guides/record-and-live-stream/hls/hls-timed-metadata";
 
 export const REMOTE_STOP_SCREENSHARE_TYPE = "REMOTE_STOP_SCREENSHARE";
 
+export const isSafari =
+  parsedUserAgent.getBrowser()?.name?.toLowerCase() === "safari";
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === "ios";
 export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
+export const isIPadOS =
+  navigator?.maxTouchPoints &&
+  navigator?.maxTouchPoints > 2 &&
+  navigator?.userAgent?.match(/Mac/);
+
+export const FEATURE_LIST = {
+  AUDIO_ONLY_SCREENSHARE: "audioscreenshare",
+  AUDIO_PLAYLIST: "audioplaylist",
+  VIDEO_PLAYLIST: "videoplaylist",
+  EMOJI_REACTION: "emojireaction",
+  AUDIO_PLUGINS: "audioplugins",
+  VIDEO_PLUGINS: "videoplugins",
+  WHITEBOARD: "whiteboard",
+  CHANGE_NAME: "changename",
+  FULLSCREEN: "fullscreen",
+  PICTURE_IN_PICTURE: "pip",
+  STARTS_FOR_NERDS: "statsfornerds",
+  EMBED_URL: "embedurl",
+  BRB: "brb",
+  HAND_RAISE: "handraise",
+  CHAT: "chat",
+  PIN_TILE: "pintile",
+};

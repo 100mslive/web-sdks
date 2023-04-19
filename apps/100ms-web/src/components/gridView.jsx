@@ -7,6 +7,8 @@ import VideoList from "./VideoList";
 import useSortedPeers from "../common/useSortedPeers";
 import { useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
+import { useAppConfig } from "./AppData/useAppConfig";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -26,13 +28,16 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
   const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
   const sortedPeers = useSortedPeers(peers, maxTileCount, activeSpeakerSorting);
 
+  const headlessConfig = useAppConfig("headlessConfig");
+  const isHeadless = useIsHeadless();
   return (
     <Fragment>
       <Box
         css={{
           flex: "1 1 0",
           height: "100%",
-          mx: "$8",
+          mx:
+            isHeadless && Number(headlessConfig?.tileOffset) === 0 ? "0" : "$8",
           "@md": { flex: "2 1 0" },
         }}
       >
@@ -70,12 +75,14 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 export const GridSidePaneView = ({ peers }) => {
   const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
   const sortedPeers = useSortedPeers(peers, 2, activeSpeakerSorting);
+  const headlessConfig = useAppConfig("headlessConfig");
+  const isHeadless = useIsHeadless();
   return (
     <Flex
       direction="column"
       css={{
         flex: "0 0 20%",
-        mx: "$8",
+        mx: isHeadless && Number(headlessConfig?.tileOffset) === 0 ? "0" : "$8",
         "@lg": {
           flex: "0 0 25%",
         },

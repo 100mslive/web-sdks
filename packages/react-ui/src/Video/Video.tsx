@@ -11,6 +11,7 @@ export const StyledVideo = styled('video', {
   alignItems: 'center',
   borderRadius: '$2',
   objectFit: 'cover',
+  background: '$tileBg',
   variants: {
     mirror: {
       true: {
@@ -27,6 +28,11 @@ export const StyledVideo = styled('video', {
       // not hiding by using display none, because it will lead it to be detached as it will no longer be in view.
       true: {
         zIndex: -100,
+      },
+    },
+    noRadius: {
+      true: {
+        borderRadius: 0,
       },
     },
   },
@@ -47,14 +53,10 @@ interface Props {
    * when attach is false, even if tile is inView or enabled, it won't be rendered
    */
   attach?: boolean;
-  /**
-   * Number between 0 and 1 indication when the element is considered inView
-   */
-  threshold?: number;
 }
 
-export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, threshold, ...props }) => {
-  const { videoRef } = useVideo({ trackId, attach, threshold });
+export const Video: React.FC<Props & StyledProps> = ({ trackId, attach, ...props }) => {
+  const { videoRef } = useVideo({ trackId, attach });
   return <StyledVideo autoPlay muted playsInline controls={false} ref={videoRef} {...props} />;
 };
 

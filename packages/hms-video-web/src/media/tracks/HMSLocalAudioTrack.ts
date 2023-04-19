@@ -68,13 +68,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private async replaceTrackWith(settings: HMSAudioTrackSettings) {
     const prevTrack = this.nativeTrack;
-    const isLevelMonitored = Boolean(this.audioLevelMonitor);
-    const newTrack = await getAudioTrack(settings);
     /*
-     * stop the previous only after acquiring the new track otherwise this can lead to
+     * Note: Do not change the order of this.
+     * stop the previous before acquiring the new track otherwise this can lead to
      * no audio when the above getAudioTrack throws an error. ex: DeviceInUse error
      */
     prevTrack?.stop();
+    const isLevelMonitored = Boolean(this.audioLevelMonitor);
+    const newTrack = await getAudioTrack(settings);
     newTrack.enabled = this.enabled;
     HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
 
@@ -105,7 +106,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
     }
     this.eventBus.localAudioEnabled.publish({ enabled: value, track: this });
-    (this.stream as HMSLocalStream).trackUpdate(this);
   }
 
   /**
@@ -204,6 +204,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     super.cleanup();
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
+    this.transceiver = undefined;
     this.processedTrack?.stop();
     this.isPublished = false;
     this.destroyAudioLevelMonitor();

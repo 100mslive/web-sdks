@@ -2,6 +2,7 @@ import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo
 import create from 'zustand';
 import {
   HMSActions,
+  HMSGenericTypes,
   HMSNotificationInCallback,
   HMSNotifications,
   HMSNotificationTypeParam,
@@ -14,9 +15,9 @@ import {
 import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
-export interface HMSRoomProviderProps {
-  actions?: HMSActions;
-  store?: HMSStoreWrapper;
+export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
+  actions?: HMSActions<T>;
+  store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
   stats?: HMSStats;
   /**
@@ -39,7 +40,7 @@ const HMSContext = createContext<HMSContextProviderProps | null>(null);
  * @constructor
  */
 // eslint-disable-next-line complexity
-export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> = ({
+export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Record<string, any> }>({
   children,
   actions,
   store,
@@ -47,7 +48,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   stats,
   isHMSStatsOn = false,
   leaveOnUnload = true,
-}) => {
+}: PropsWithChildren<HMSRoomProviderProps<T>>) => {
   const providerProps: HMSContextProviderProps = useMemo(() => {
     let providerProps: HMSContextProviderProps;
     // adding a dummy function for setstate and destroy because zustan'd create expects them
@@ -58,7 +59,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     if (actions && store) {
       providerProps = {
         actions: actions,
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...store,
           setState: errFn,
           destroy: errFn,
@@ -76,10 +77,10 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
         });
       }
     } else {
-      const hmsReactiveStore = new HMSReactiveStore();
+      const hmsReactiveStore = new HMSReactiveStore<T>();
       providerProps = {
         actions: hmsReactiveStore.getActions(),
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...hmsReactiveStore.getStore(),
           setState: errFn,
           destroy: errFn,
