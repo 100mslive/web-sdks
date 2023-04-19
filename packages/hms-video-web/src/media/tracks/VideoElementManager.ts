@@ -38,7 +38,7 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   async addVideoElement(videoElement: HTMLVideoElement) {
-    console.log('adding video element ', videoElement);
+    console.log('adding video element ', videoElement, this.videoElements.size, this.videoElements);
     if (this.videoElements.has(videoElement)) {
       return;
     }
