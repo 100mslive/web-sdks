@@ -405,7 +405,10 @@ export class HMSSdk implements HMSInterface {
     this.store.createAndSetUserAgent(this.frameworkInfo);
     HMSAudioContextHandler.resumeContext();
     // acquire screen lock to stay awake while in call
-    this.wakeLockManager.acquireLock();
+    const storeConfig = this.store.getConfig();
+    if (storeConfig?.autoManageWakeLock) {
+      this.wakeLockManager.acquireLock();
+    }
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
