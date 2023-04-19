@@ -5,10 +5,9 @@ import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
 import useSortedPeers from "../common/useSortedPeers";
-import { useUISettings } from "./AppData/useUISettings";
-import { UI_SETTINGS } from "../common/constants";
 import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless } from "./AppData/useUISettings";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
+import { UI_SETTINGS } from "../common/constants";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
