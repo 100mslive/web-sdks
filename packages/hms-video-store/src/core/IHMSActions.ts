@@ -170,12 +170,12 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param localTrackID trackID as stored in the store for the peer
    * @param videoElement HTML native element where the video has to be shown
    */
-  attachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
+  attachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): void;
 
   /**
    * @see attachVideo
    */
-  detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): Promise<void>;
+  detachVideo(localTrackID: HMSTrackID, videoElement: HTMLVideoElement): void;
 
   /**
    * Set the output volume of audio tracks(overall/particular audio track)

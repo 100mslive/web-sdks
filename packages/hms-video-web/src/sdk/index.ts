@@ -459,6 +459,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
+    HMSLogger.d(this.TAG, 'clean up sdk', this.localPeer);
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanUp();
@@ -876,10 +877,11 @@ export class HMSSdk implements HMSInterface {
     this.frameworkInfo = frameworkInfo;
   }
 
-  async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
+  attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
+    HMSLogger.v(`[SDK index.ts] attaching the video element `, track, videoElement, config);
     if (config?.autoManageVideo) {
-      await track.attach(videoElement);
+      track.attach(videoElement);
     } else {
       track.addSink(videoElement);
     }
@@ -887,6 +889,7 @@ export class HMSSdk implements HMSInterface {
 
   detachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
     const config = this.store.getConfig();
+    HMSLogger.v(`[SDK index.ts] detaching the video element `, track, videoElement, config);
     if (config?.autoManageVideo) {
       track.detach(videoElement);
     } else {

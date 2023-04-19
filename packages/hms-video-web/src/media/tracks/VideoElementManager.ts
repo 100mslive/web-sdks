@@ -27,6 +27,7 @@ export class VideoElementManager {
 
   updateSinks() {
     for (const videoElement of this.videoElements) {
+      console.log('video element ', videoElement, this.track);
       if (this.track.enabled) {
         this.track.addSink(videoElement);
       } else {
@@ -36,22 +37,23 @@ export class VideoElementManager {
   }
 
   // eslint-disable-next-line complexity
-  async addVideoElement(videoElement: HTMLVideoElement) {
-    if (this.videoElements.has(videoElement)) {
-      return;
+  addVideoElement(videoElement: HTMLVideoElement) {
+    console.log('add video element ', videoElement, this.track, this.videoElements);
+    if (!this.videoElements.has(videoElement)) {
+      // Call init again, to initialize again if for some reason it failed in constructor
+      // it will be a no-op if initialize already
+      this.init();
+      HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
+      this.videoElements.add(videoElement);
+      if (this.videoElements.size >= 10) {
+        HMSLogger.w(
+          this.TAG,
+          `${this.track}`,
+          `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
+        );
+      }
     }
-    // Call init again, to initialize again if for some reason it failed in constructor
-    // it will be a no-op if initialize already
-    this.init();
-    HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
-    this.videoElements.add(videoElement);
-    if (this.videoElements.size >= 10) {
-      HMSLogger.w(
-        this.TAG,
-        `${this.track}`,
-        `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
-      );
-    }
+
     if (this.intersectionObserver?.isSupported()) {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
@@ -64,11 +66,12 @@ export class VideoElementManager {
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      await this.track.setPreferredLayer(this.track.getPreferredLayer());
+      this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
+    console.log('remove video element ', videoElement, this.track, this.videoElements);
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
@@ -89,6 +92,7 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
+    HMSLogger.d(this.TAG, 'handle intersection', this.track, this.id, entry);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
@@ -103,6 +107,7 @@ export class VideoElementManager {
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
+    HMSLogger.d(this.TAG, 'handle resize', this.track, this.id, entry);
     if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
@@ -161,11 +166,11 @@ export class VideoElementManager {
 
   cleanup = () => {
     HMSLogger.d(this.TAG, `cleanup video element`);
-    this.videoElements.forEach(videoElement => {
-      videoElement.srcObject = null;
-      this.resizeObserver?.unobserve(videoElement);
-      this.intersectionObserver?.unobserve(videoElement);
-    });
+    // this.videoElements.forEach(videoElement => {
+    //   videoElement.srcObject = null;
+    //   this.resizeObserver?.unobserve(videoElement);
+    //   this.intersectionObserver?.unobserve(videoElement);
+    // });
     this.videoElements.clear();
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;

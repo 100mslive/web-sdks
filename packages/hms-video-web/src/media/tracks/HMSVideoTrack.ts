@@ -31,8 +31,8 @@ export class HMSVideoTrack extends HMSTrack {
     return this.videoHandler.getVideoElements() || [];
   }
 
-  async attach(videoElement: HTMLVideoElement) {
-    await this.videoHandler.addVideoElement(videoElement);
+  attach(videoElement: HTMLVideoElement) {
+    this.videoHandler.addVideoElement(videoElement);
   }
 
   detach(videoElement: HTMLVideoElement) {

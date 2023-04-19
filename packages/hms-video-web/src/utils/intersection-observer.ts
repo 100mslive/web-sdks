@@ -26,10 +26,13 @@ class HMSIntersectionObserverWrapper {
   }
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
+    HMSLogger.d(this.TAG, 'intersection observe element ', element);
     this.createObserver();
     this.unobserve(element);
     this.intersectionObserver?.observe(element);
-    this.listeners.set(element, onIntersection);
+    if (!this.listeners.has(element)) {
+      this.listeners.set(element, onIntersection);
+    }
   };
 
   unobserve = (element: HTMLElement) => {
