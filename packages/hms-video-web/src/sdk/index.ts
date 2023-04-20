@@ -5,6 +5,7 @@ import { LocalTrackManager } from './LocalTrackManager';
 import { NetworkTestManager } from './NetworkTestManager';
 import RoleChangeManager from './RoleChangeManager';
 import { IStore, Store } from './store';
+import { WakeLockManager } from './WakeLockManager';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -95,6 +96,7 @@ export class HMSSdk implements HMSInterface {
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
+  private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
@@ -112,6 +114,7 @@ export class HMSSdk implements HMSInterface {
     this.sdkState.isInitialised = true;
     this.store = new Store();
     this.eventBus = new EventBus();
+    this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
@@ -401,6 +404,11 @@ export class HMSSdk implements HMSInterface {
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
     HMSAudioContextHandler.resumeContext();
+    // acquire screen lock to stay awake while in call
+    const storeConfig = this.store.getConfig();
+    if (storeConfig?.autoManageWakeLock) {
+      this.wakeLockManager.acquireLock();
+    }
 
     if (!this.localPeer) {
       this.createAndAddLocalPeerToStore(config, role, userId);
@@ -464,6 +472,7 @@ export class HMSSdk implements HMSInterface {
     this.analyticsTimer.cleanUp();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
+    this.wakeLockManager?.cleanup();
     HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**

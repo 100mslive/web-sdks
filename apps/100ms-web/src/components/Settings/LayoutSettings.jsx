@@ -26,6 +26,7 @@ export const LayoutSettings = () => {
       maxTileCount,
       mirrorLocalVideo,
       activeSpeakerSorting,
+      hideLocalVideo,
     },
     setUISettings,
   ] = useSetUiSettings();
@@ -78,6 +79,16 @@ export const LayoutSettings = () => {
         onChange={value => {
           setUISettings({
             [UI_SETTINGS.mirrorLocalVideo]: value,
+          });
+        }}
+      />
+      <SwitchWithLabel
+        label="Hide Local Video"
+        id="hideLocalVideo"
+        checked={hideLocalVideo}
+        onChange={value => {
+          setUISettings({
+            [UI_SETTINGS.hideLocalVideo]: value,
           });
         }}
       />

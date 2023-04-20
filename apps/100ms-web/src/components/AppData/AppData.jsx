@@ -57,6 +57,7 @@ const initialAppData = {
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
     [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === "qa",
+    [UI_SETTINGS.hideLocalVideo]: false,
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,
@@ -110,7 +111,7 @@ export const AppData = React.memo(
     }, [hmsActions]);
 
     useEffect(() => {
-      const uiSettings = preferences.uiSettings || {};
+      const uiSettings = preferences || {};
       const updatedSettings = {
         ...uiSettings,
         [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
@@ -118,7 +119,7 @@ export const AppData = React.memo(
           : uiSettings.uiViewMode || UI_MODE_GRID,
       };
       hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-    }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
+    }, [preferences, isDefaultModeActiveSpeaker, hmsActions]);
 
     useEffect(() => {
       const appData = {
