@@ -11,6 +11,7 @@ export const StyledVideo = styled('video', {
   alignItems: 'center',
   borderRadius: '$2',
   objectFit: 'cover',
+  background: '$tileBg',
   variants: {
     mirror: {
       true: {
@@ -27,6 +28,11 @@ export const StyledVideo = styled('video', {
       // not hiding by using display none, because it will lead it to be detached as it will no longer be in view.
       true: {
         zIndex: -100,
+      },
+    },
+    noRadius: {
+      true: {
+        borderRadius: 0,
       },
     },
   },

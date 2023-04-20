@@ -41,6 +41,7 @@ export type {
   HMSPreferredSimulcastLayer,
   TokenRequest,
   TokenRequestOptions,
+  RID,
 } from './hmsSDKStore/sdkTypes';
 
 export * from '../controller/beam/BeamController';

@@ -6,6 +6,10 @@ body,
   height: 100%;
 }
 
+body {
+  padding: env(safe-area-inset);
+}
+
 #root {
   overscroll-behavior-y: none;
   position: fixed;

@@ -1,3 +1,4 @@
+import { v4 as uuid } from 'uuid';
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
@@ -17,9 +18,11 @@ export class VideoElementManager {
   private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
   private entries = new Map<HTMLVideoElement, DOMRectReadOnly>();
+  private id: string;
 
   constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
     this.init();
+    this.id = uuid();
   }
 
   updateSinks() {
@@ -40,6 +43,7 @@ export class VideoElementManager {
     // Call init again, to initialize again if for some reason it failed in constructor
     // it will be a no-op if initialize already
     this.init();
+    HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
@@ -70,6 +74,7 @@ export class VideoElementManager {
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
+    HMSLogger.d(this.TAG, `Removing video element: ${videoElement} for ${this.track}`);
   }
 
   getVideoElements(): HTMLVideoElement[] {
@@ -87,8 +92,10 @@ export class VideoElementManager {
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
+      HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
       this.track.addSink(entry.target as HTMLVideoElement);
     } else {
+      HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
       this.track.removeSink(entry.target as HTMLVideoElement);
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
@@ -155,6 +162,8 @@ export class VideoElementManager {
   cleanup = () => {
     this.videoElements.forEach(videoElement => {
       videoElement.srcObject = null;
+      this.resizeObserver?.unobserve(videoElement);
+      this.intersectionObserver?.unobserve(videoElement);
     });
     this.videoElements.clear();
     this.resizeObserver = undefined;

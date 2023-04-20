@@ -149,7 +149,7 @@ const App = () => {
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
-            body: 'Please make sure the domain name is right',
+            body: err.response.data?.msg || 'Please make sure that link is valid.',
           };
         }
         setError(error);

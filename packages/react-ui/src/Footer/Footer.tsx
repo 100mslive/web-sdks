@@ -4,7 +4,7 @@ import { styled } from '../Theme';
 const Root = styled(Flex, {
   justifyContent: 'space-between',
   alignItems: 'center',
-  py: '$2',
+  py: '$4',
   position: 'relative',
   height: '100%',
   '@md': { flexWrap: 'wrap', gap: '$4' },
@@ -19,7 +19,6 @@ const Left = styled(Flex, {
     position: 'unset',
     justifyContent: 'center',
     w: '100%',
-    p: '$4 0',
   },
 });
 

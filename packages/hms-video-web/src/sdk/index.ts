@@ -53,6 +53,7 @@ import {
 } from '../media/tracks';
 import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
 import { PlaylistManager } from '../playlist-manager';
+import { SessionStore } from '../session-store';
 import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -94,6 +95,7 @@ export class HMSSdk implements HMSInterface {
   private analyticsTimer = new AnalyticsTimer();
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
+  private sessionStore!: SessionStore;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
 
@@ -134,6 +136,7 @@ export class HMSSdk implements HMSInterface {
       this.analyticsEventsService,
       this.analyticsTimer,
     );
+    this.sessionStore = new SessionStore(this.transport);
 
     /**
      * Note: Subscribe to events here right after creating stores and managers
@@ -159,6 +162,10 @@ export class HMSSdk implements HMSInterface {
     return this.transport?.getWebrtcInternals();
   }
 
+  getSessionStore() {
+    return this.sessionStore;
+  }
+
   getPlaylistManager(): PlaylistManager {
     return this.playlistManager;
   }
@@ -173,6 +180,10 @@ export class HMSSdk implements HMSInterface {
 
   getHLSState() {
     return this.store.getRoom()?.hls;
+  }
+
+  getTemplateAppData() {
+    return this.store.getTemplateAppData();
   }
 
   private handleAutoplayError = (error: HMSException) => {
@@ -807,11 +818,11 @@ export class HMSSdk implements HMSInterface {
   }
 
   async setSessionMetadata(metadata: any) {
-    await this.transport.setSessionMetadata(metadata);
+    await this.transport.setSessionMetadata({ key: 'default', data: metadata });
   }
 
   async getSessionMetadata() {
-    const response = await this.transport.getSessionMetadata();
+    const response = await this.transport.getSessionMetadata('default');
     return response.data;
   }
 
@@ -1158,6 +1169,7 @@ export class HMSSdk implements HMSInterface {
         ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.JOIN),
         is_preview_called,
+        retries_join: this.transport.joinRetryCount,
       }),
     );
   };
@@ -1166,7 +1178,7 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.preview({
         error,
-        ...this.analyticsTimer.getTimes(TimedEvent.ROOM_STATE),
+        ...this.analyticsTimer.getTimes(),
         time: this.analyticsTimer.getTimeTaken(TimedEvent.PREVIEW),
       }),
     );

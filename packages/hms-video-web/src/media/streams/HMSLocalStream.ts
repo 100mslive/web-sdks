@@ -16,26 +16,13 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
-    const trackEncodings: RTCRtpEncodingParameters[] = [];
-    if (track instanceof HMSLocalVideoTrack) {
-      if (simulcastLayers.length > 0) {
-        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
-        trackEncodings.push(...simulcastLayers);
-      } else {
-        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
-        if (track.settings.maxBitrate && !isNode) {
-          encodings.maxBitrate = track.settings.maxBitrate;
-        }
-        trackEncodings.push(encodings);
-      }
-    }
-
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
       direction: 'sendonly',
-      sendEncodings: trackEncodings,
+      sendEncodings: this.getTrackEncodings(track, simulcastLayers),
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
+    track.transceiver = transceiver;
     return transceiver;
   }
 
@@ -82,32 +69,38 @@ export default class HMSLocalStream extends HMSMediaStream {
   }
 
   removeSender(track: HMSLocalTrack) {
-    let removedSenderCount = 0;
-    this.connection?.getSenders().forEach(sender => {
-      if (sender.track?.id === track.trackId || sender.track?.id === track.getTrackIDBeingSent()) {
-        this.connection!.removeTrack(sender);
-        removedSenderCount += 1;
-
-        // Remove the local reference as well
-        const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
-        if (toRemoveLocalTrackIdx !== -1) {
-          this.tracks.splice(toRemoveLocalTrackIdx, 1);
-        } else {
-          HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
-        }
-      }
-    });
-    if (removedSenderCount !== 1) {
-      HMSLogger.e(this.TAG, `Removed ${removedSenderCount} sender's, expected to remove 1`);
+    if (!this.connection || this.connection.connectionState === 'closed') {
+      HMSLogger.d(this.TAG, `publish connection is not initialised or closed`);
+      return;
+    }
+    const sender = track.transceiver?.sender;
+    if (!sender) {
+      HMSLogger.e(this.TAG, `No sender found for trackId=${track.trackId}`);
+      return;
+    }
+    this.connection?.removeTrack(sender);
+    const toRemoveLocalTrackIdx = this.tracks.indexOf(track);
+    if (toRemoveLocalTrackIdx !== -1) {
+      this.tracks.splice(toRemoveLocalTrackIdx, 1);
+    } else {
+      HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
     }
   }
 
-  hasSender(track: HMSLocalTrack): boolean {
-    return !!this.connection
-      ?.getSenders()
-      .find(
-        sender =>
-          sender.track && (sender.track.id === track.trackId || sender.track.id === track.getTrackIDBeingSent()),
-      );
+  private getTrackEncodings(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+    const trackEncodings: RTCRtpEncodingParameters[] = [];
+    if (track instanceof HMSLocalVideoTrack) {
+      if (simulcastLayers.length > 0) {
+        HMSLogger.v(this.TAG, 'Simulcast enabled with layers', simulcastLayers);
+        trackEncodings.push(...simulcastLayers);
+      } else {
+        const encodings: RTCRtpEncodingParameters = { active: this.nativeStream.active };
+        if (track.settings.maxBitrate && !isNode) {
+          encodings.maxBitrate = track.settings.maxBitrate;
+        }
+        trackEncodings.push(encodings);
+      }
+    }
+    return trackEncodings;
   }
 }
