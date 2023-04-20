@@ -42,16 +42,16 @@ export const ReconnectNotifications = () => {
             p: "$4 $8",
             position: "relative",
             top: "unset",
-            bottom: "20px",
+            bottom: "$9",
             transform: "translate(-50%, -100%)",
             animation: "none !important",
           }}
         >
           <Flex align="center">
-            <div style={{ display: "inline", margin: "4px" }}>
+            <div style={{ display: "inline", margin: "0.25rem" }}>
               <Loading size={16} />
             </div>
-            <Text css={{ fontSize: "$8", color: "$textHighEmp" }}>
+            <Text css={{ fontSize: "$space$8", color: "$textHighEmp" }}>
               You lost your network connection. Trying to reconnect.
             </Text>
           </Flex>
