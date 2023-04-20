@@ -6,6 +6,7 @@ import ScreenshareTile from "./ScreenshareTile";
 import VideoTile from "./VideoTile";
 import { useAppConfig } from "./AppData/useAppConfig";
 import { useIsHeadless } from "./AppData/useUISettings";
+import useSortedPeers from "../common/useSortedPeers";
 
 const List = ({
   maxTileCount,
@@ -17,8 +18,9 @@ const List = ({
   const { aspectRatio } = useTheme();
   const tileOffset = useAppConfig("headlessConfig", "tileOffset");
   const isHeadless = useIsHeadless();
+  const sortedPeers = useSortedPeers(peers, maxTileCount);
   const { ref, pagesWithTiles } = useVideoList({
-    peers,
+    peers: sortedPeers,
     maxTileCount,
     maxColCount,
     maxRowCount,
