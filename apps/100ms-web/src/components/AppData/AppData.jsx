@@ -56,7 +56,7 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
-    [UI_SETTINGS.activeSpeakerSorting]: true,
+    [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === "qa",
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,
