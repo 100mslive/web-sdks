@@ -37,6 +37,7 @@
   },
   "author": "100ms <tech-common@100ms.live>",
   "devDependencies": {
+    "@types/dom-screen-wake-lock": "^1.0.1",
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",
