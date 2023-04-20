@@ -4,19 +4,23 @@ class PeersSorter {
   //for that we are creating a map between different peers and the time they spoke a true LRU cache
 
   constructor(store, onPeersChange) {
-    this.LRUView = new Map();
     this.store = store;
     this.timePassedSinceLastSetPeers = 0;
     this.onPeersChange = onPeersChange;
+    this.peers = [];
+    this.LRUView = new Set();
 
     this.started = false;
     this.speaker = undefined;
   }
   setPeersAndTilesPerPage({ peers, tilesPerPage }) {
     this.tilesPerPage = tilesPerPage;
+    this.peers = [...peers];
+    for (let i = 0; i < tilesPerPage; i++) {
+      this.LRUView.add(peers[i]);
+    }
     this.start();
-
-    this.moveSpeakerToFront(tilesPerPage, this.speaker);
+    this.moveSpeakerToFront(this.speaker);
   }
   start() {
     if (this.started) return;
@@ -34,58 +38,40 @@ class PeersSorter {
       this.onDominantSpeakerChange.bind(this),
       selectDominantSpeaker
     );
-    this.onPeersChange([...Array.from(this.peers.values())]);
+    this.onPeersChange([...this.peers]);
   }
   // you are given a 2d array u need to sort them in a way that the dominant speaker is always in the first page
   // tilesPerpage is 2d array of pages with every page being array of peers
   //speaker is recent dominant speaker
-  moveSpeakerToFront(tilesPerPage, speaker) {
-    if (!speaker || !tilesPerPage) {
-      this.onPeersChange(tilesPerPage);
+  moveSpeakerToFront(speaker) {
+    if (!speaker) {
+      this.onPeersChange(this.peers);
       return;
     }
-    const page0 = tilesPerPage[0];
-    // you have to check if the speaker is in the zero page then return else move it to the first page
-    const isSpeakerInPage0 = page0.find(peer => peer.id === speaker.id);
-    if (isSpeakerInPage0) {
-      this.onPeersChange(tilesPerPage);
+    const speakerPeer = this.peers.find(peer => peer.id === speaker.id);
+    if (
+      this.LRUView.has(speakerPeer) &&
+      this.LRUView.size <= this.tilesPerPage
+    ) {
+      console.log("already exists");
       return;
     }
-    // if the speaker is not in the first page then we need to move it to the first page
-    // we need to find the page where the speaker is present
-    let pageIndex = -1;
-    let peerIndex = -1;
-    for (let i = 0; i < tilesPerPage.length; i++) {
-      const page = tilesPerPage[i];
-      for (let j = 0; j < page.length; j++) {
-        const peer = page[j];
-        if (peer.id === speaker.id) {
-          pageIndex = i;
-          peerIndex = j;
-          break;
-        }
-      }
-      if (pageIndex !== -1) break;
+    const array = Array.from(this.LRUView);
+    while (array.length >= this.tilesPerPage) {
+      array.pop();
     }
-    // if the speaker is not present in any page then return
-    if (pageIndex === -1) {
-      this.onPeersChange(tilesPerPage);
-      return;
-    }
-    //move the speaker to the first page first index
-    //move peer on first page last index to the page where the speaker was present
-    const page = tilesPerPage[pageIndex];
-    const peer = page[peerIndex];
-    tilesPerPage[0].unshift(peer);
-    tilesPerPage[pageIndex].splice(peerIndex, 1);
-    tilesPerPage[pageIndex].push(page0.pop());
-
-    this.onPeersChange([...tilesPerPage]);
+    array.unshift(speakerPeer);
+    this.LRUView = new Set(array);
+    this.onPeersChange([
+      ...array,
+      ...this.peers.filter(peer => !this.LRUView.has(peer)),
+    ]);
   }
+
   onDominantSpeakerChange(speaker) {
     if (speaker && speaker.id !== this?.lastSpokenPeer?.id) {
       this.lastSpokenPeer = speaker;
-      this.moveSpeakerToFront(this.tilesPerPage, speaker);
+      this.moveSpeakerToFront(speaker);
     }
   }
 }

@@ -1,26 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useHMSVanillaStore } from "@100mslive/react-sdk";
 import PeersSorter from "./PeersSorter";
+import { useActiveSpeakerSorting } from "../components/AppData/useUISettings";
 
-function useSortedPeers(peers, tilesPerPage, activeSpeakerSorting) {
+function useSortedPeers({ peers, maxTileCount }) {
   const [sortedPeers, setSortedPeers] = useState([]);
-  const [peersSorter, setPeersSorter] = useState();
   const store = useHMSVanillaStore();
-  useEffect(() => {
-    setPeersSorter(new PeersSorter(store, setSortedPeers));
-  }, [store]);
+  const activeSpeakerSorting = useActiveSpeakerSorting();
+  const peerSortedRef = useRef(new PeersSorter(store, setSortedPeers));
 
   useEffect(() => {
-    if (tilesPerPage && peersSorter) {
-      peersSorter.setPeersAndTilesPerPage({ peers, tilesPerPage });
-    }
-  }, [tilesPerPage, peersSorter, peers]);
-
-  useEffect(() => {
-    if (!activeSpeakerSorting && peersSorter) {
+    const peersSorter = peerSortedRef.current;
+    if (
+      peers?.length > 0 &&
+      maxTileCount &&
+      peersSorter &&
+      activeSpeakerSorting
+    ) {
+      peersSorter.setPeersAndTilesPerPage({
+        peers,
+        tilesPerPage: maxTileCount,
+      });
+    } else if (peersSorter && !activeSpeakerSorting) {
       peersSorter.stop();
     }
-  }, [activeSpeakerSorting, peersSorter]);
+  }, [maxTileCount, peers, activeSpeakerSorting]);
 
   return sortedPeers;
 }

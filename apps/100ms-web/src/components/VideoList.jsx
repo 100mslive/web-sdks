@@ -25,7 +25,7 @@ const List = ({
   const isHeadless = useIsHeadless();
   const hideLocalVideo = useUISettings(UI_SETTINGS.hideLocalVideo);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  let sortedPeers = useSortedPeers(peers, maxTileCount);
+  let sortedPeers = useSortedPeers({ peers, maxTileCount });
   if (hideLocalVideo && sortedPeers.length > 1) {
     sortedPeers = filterPeerId(sortedPeers, localPeerId);
   }

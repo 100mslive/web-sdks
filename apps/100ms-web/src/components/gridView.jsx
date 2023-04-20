@@ -24,8 +24,6 @@ const webinarInfoLink = webinarProps?.LINK_HREF || "https://100ms.live/";
 export const GridCenterView = ({ peers, maxTileCount }) => {
   const mediaQueryLg = cssConfig.media.md;
   const limitMaxTiles = useMedia(mediaQueryLg);
-  const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
-  const sortedPeers = useSortedPeers(peers, maxTileCount, activeSpeakerSorting);
 
   const headlessConfig = useAppConfig("headlessConfig");
   const isHeadless = useIsHeadless();
@@ -42,7 +40,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
       >
         {peers && peers.length > 0 ? (
           <VideoList
-            peers={sortedPeers}
+            peers={peers}
             maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
           />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
