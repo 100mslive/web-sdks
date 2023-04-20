@@ -35,7 +35,7 @@ const Conference = () => {
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
 
   const toggleControls = e => {
-    if (dropdownListRef.current.length === 0) {
+    if (dropdownListRef.current?.length === 0) {
       setHideControls(value => !value);
     }
   };
