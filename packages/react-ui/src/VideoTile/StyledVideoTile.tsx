@@ -70,6 +70,25 @@ const AudioIndicator = styled('div', {
   height: '$13',
   mb: '5px',
   ...flexCenter,
+  variants: {
+    size: {
+      small: {
+        width: "$10",
+        height: "$10",
+         '& > svg': {
+           width: '$8',
+           height: '$8'
+         } 
+      },
+      medium: {
+        width: '$13',
+        height: '$13',
+      }
+    }
+  },
+  defaultVariants: {
+    size: 'medium'
+  }
 });
 
 const FullScreenButton = styled('button', {
