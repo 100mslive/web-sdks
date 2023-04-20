@@ -15,6 +15,7 @@ import {
 import {
   HMSAudioTrack,
   HMSLocalTrack,
+  HMSRemoteAudioTrack,
   HMSRemoteVideoTrack,
   HMSTrack,
   HMSTrackSource,
@@ -278,7 +279,9 @@ class Store implements IStore {
   async updateAudioOutputDevice(device: MediaDeviceInfo) {
     const promises: Promise<void>[] = [];
     this.getAudioTracks().forEach(track => {
-      promises.push(track.setOutputDevice(device));
+      if (track instanceof HMSRemoteAudioTrack) {
+        promises.push(track.setOutputDevice(device));
+      }
     });
     await Promise.all(promises);
   }
