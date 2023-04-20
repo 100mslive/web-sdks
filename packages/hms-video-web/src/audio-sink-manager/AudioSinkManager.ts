@@ -41,7 +41,7 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private retryCountMapping = new Map<string, number>();
+  private retryCountMapping = new Map<HMSRemoteAudioTrack, number>();
 
   constructor(private store: IStore, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -139,8 +139,8 @@ export class AudioSinkManager {
     peer: HMSRemotePeer;
     callListener?: boolean;
   }) => {
-    if (this.retryCountMapping.get(track.trackId) ?? 0 > TRACK_PLAYBACK_RETRIES) {
-      HMSLogger.d(this.TAG, 'retry count limit reached ', `${track}`);
+    if (this.retryCountMapping.get(track) ?? 0 > TRACK_PLAYBACK_RETRIES) {
+      HMSLogger.d(this.TAG, 'retry count limit reached -', this.retryCountMapping.get(track), `for - ${track}`);
       return;
     }
     const audioEl = document.createElement('audio');
@@ -156,7 +156,8 @@ export class AudioSinkManager {
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl, track);
-        this.retryCountMapping.set(track.trackId, (this.retryCountMapping.get(track.trackId) ?? 0) + 1);
+        this.retryCountMapping.set(track, (this.retryCountMapping.get(track) ?? 0) + 1);
+        await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
@@ -259,7 +260,7 @@ export class AudioSinkManager {
 
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
-      HMSLogger.v(this.TAG, 'removing audio element', `${track}`);
+      HMSLogger.d(this.TAG, 'removing audio element', `${track}`);
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
