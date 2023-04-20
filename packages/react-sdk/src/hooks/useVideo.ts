@@ -39,6 +39,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
     if (!prevTrackId.current) {
       prevTrackId.current = track?.id;
     } else if (track?.id && prevTrackId.current !== track?.id) {
+      // Remove video element reference from previous track by detaching
       (async () => {
         if (videoRef.current) {
           try {
