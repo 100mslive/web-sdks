@@ -34,18 +34,8 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
 
-  const isClickedOnTileMenu = element => {
-    if (element?.tagName === "path") {
-      return isClickedOnTileMenu(element?.parentNode);
-    }
-    return element?.classList?.contains("tileMenu") ? true : false;
-  };
-
   const toggleControls = e => {
-    if (
-      dropdownListRef.current.length === 0 &&
-      !isClickedOnTileMenu(e.target)
-    ) {
+    if (dropdownListRef.current.length === 0) {
       setHideControls(value => !value);
     }
   };
