@@ -35,9 +35,7 @@ class HMSResizeObserverWrapper {
     // unobserve before observing the element
     this.unobserve(element);
     this.resizeObserver?.observe(element, options);
-    if (!this.listeners.has(element)) {
-      this.listeners.set(element, onResize);
-    }
+    this.listeners.set(element, onResize);
   };
 
   unobserve = (element: HTMLElement) => {
