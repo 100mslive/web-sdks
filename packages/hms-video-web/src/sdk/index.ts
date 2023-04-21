@@ -459,7 +459,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private cleanUp() {
-    HMSLogger.d(this.TAG, 'clean up sdk', this.localPeer);
+    HMSLogger.d(this.TAG, 'clean up sdk', `${this.localPeer}`);
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
     this.analyticsTimer.cleanUp();

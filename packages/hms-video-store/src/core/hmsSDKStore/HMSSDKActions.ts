@@ -408,7 +408,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    HMSLogger.v(`[HMSSDKAction] attaching the video element `, trackID, videoElement);
+    HMSLogger.v(`[HMSSDKAction] attaching the video element ${trackID} ${videoElement}`);
     if (this.localAndVideoUnmuting(trackID)) {
       // wait till video unmute has finished
       return new Promise<void>(resolve => {
@@ -426,7 +426,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    HMSLogger.v(`[HMSSDKAction] detaching the video element `, trackID, videoElement);
+    HMSLogger.v(`[HMSSDKAction] detaching the video element ${trackID} ${videoElement}`);
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
       await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
