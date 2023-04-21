@@ -52,6 +52,7 @@ export class VideoElementManager {
         `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
       );
     }
+
     if (this.intersectionObserver?.isSupported()) {
       this.intersectionObserver.observe(videoElement, this.handleIntersection);
     } else if (isBrowser) {
@@ -64,7 +65,7 @@ export class VideoElementManager {
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      this.track.setPreferredLayer(this.track.getPreferredLayer());
+      await this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
@@ -93,13 +94,13 @@ export class VideoElementManager {
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
       HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
-      this.track.addSink(entry.target as HTMLVideoElement);
+      await this.track.addSink(entry.target as HTMLVideoElement);
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
-      this.track.removeSink(entry.target as HTMLVideoElement);
+      await this.track.removeSink(entry.target as HTMLVideoElement);
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
-    this.selectMaxLayer();
+    await this.selectMaxLayer();
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -107,7 +108,7 @@ export class VideoElementManager {
       return;
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.contentRect);
-    this.selectMaxLayer();
+    await this.selectMaxLayer();
   };
 
   /**
