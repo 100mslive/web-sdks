@@ -27,7 +27,6 @@ export class VideoElementManager {
 
   updateSinks() {
     for (const videoElement of this.videoElements) {
-      console.log('video element ', videoElement, this.track);
       if (this.track.enabled) {
         this.track.addSink(videoElement);
       } else {
@@ -38,7 +37,6 @@ export class VideoElementManager {
 
   // eslint-disable-next-line complexity
   addVideoElement(videoElement: HTMLVideoElement) {
-    console.log('add video element ', videoElement, this.track, this.videoElements);
     if (!this.videoElements.has(videoElement)) {
       // Call init again, to initialize again if for some reason it failed in constructor
       // it will be a no-op if initialize already
@@ -71,7 +69,6 @@ export class VideoElementManager {
   }
 
   removeVideoElement(videoElement: HTMLVideoElement): void {
-    console.log('remove video element ', videoElement, this.track, this.videoElements);
     this.track.removeSink(videoElement);
     this.videoElements.delete(videoElement);
     this.entries.delete(videoElement);
@@ -92,7 +89,6 @@ export class VideoElementManager {
   }
 
   private handleIntersection = async (entry: IntersectionObserverEntry) => {
-    HMSLogger.d(this.TAG, 'handle intersection', this.track, this.id, entry);
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
@@ -107,7 +103,6 @@ export class VideoElementManager {
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
-    HMSLogger.d(this.TAG, 'handle resize', this.track, this.id, entry);
     if (!this.track.enabled || !(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }

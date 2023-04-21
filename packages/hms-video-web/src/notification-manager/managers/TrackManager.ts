@@ -103,7 +103,6 @@ export class TrackManager {
   };
 
   handleTrackUpdate = (params: TrackStateNotification) => {
-    console.log('track update ', params);
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
       HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
@@ -212,7 +211,6 @@ export class TrackManager {
   }
 
   private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    console.log('adding video track ', track, hmsPeer.peerId);
     if (track.type !== HMSTrackType.VIDEO) {
       return;
     }

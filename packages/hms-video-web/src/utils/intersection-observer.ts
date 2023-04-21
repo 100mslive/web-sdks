@@ -26,8 +26,8 @@ class HMSIntersectionObserverWrapper {
   }
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
-    HMSLogger.d(this.TAG, 'intersection observe element ', element);
     this.createObserver();
+    // unobserve before observing the element
     this.unobserve(element);
     this.intersectionObserver?.observe(element);
     if (!this.listeners.has(element)) {

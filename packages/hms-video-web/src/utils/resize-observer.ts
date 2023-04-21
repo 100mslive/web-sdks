@@ -31,8 +31,8 @@ class HMSResizeObserverWrapper {
     onResize: HMSResizeObserverCallback,
     options: ResizeObserverOptions = { box: 'border-box' },
   ) => {
-    HMSLogger.d(this.TAG, 'resize observe element ', element);
     this.createObserver();
+    // unobserve before observing the element
     this.unobserve(element);
     this.resizeObserver?.observe(element, options);
     if (!this.listeners.has(element)) {

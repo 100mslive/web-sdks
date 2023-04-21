@@ -845,7 +845,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack: SDKHMSTrack = this.hmsSDKTracks[trackID];
-    console.log('attach video track ', trackID, this.hmsSDKTracks, videoElement);
     if (sdkTrack && sdkTrack.type === 'video') {
       this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -886,7 +885,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (const sdkTrack of sdkTracks) {
-        console.log('[HMSSDKACtion] peer with track ', sdkPeer, sdkTrack);
         if (!sdkTrack) {
           continue;
         }
