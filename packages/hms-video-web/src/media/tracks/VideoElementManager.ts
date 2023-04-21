@@ -36,20 +36,21 @@ export class VideoElementManager {
   }
 
   // eslint-disable-next-line complexity
-  addVideoElement(videoElement: HTMLVideoElement) {
-    if (!this.videoElements.has(videoElement)) {
-      // Call init again, to initialize again if for some reason it failed in constructor
-      // it will be a no-op if initialize already
-      this.init();
-      HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
-      this.videoElements.add(videoElement);
-      if (this.videoElements.size >= 10) {
-        HMSLogger.w(
-          this.TAG,
-          `${this.track}`,
-          `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
-        );
-      }
+  async addVideoElement(videoElement: HTMLVideoElement) {
+    if (this.videoElements.has(videoElement)) {
+      return;
+    }
+    // Call init again, to initialize again if for some reason it failed in constructor
+    // it will be a no-op if initialize already
+    this.init();
+    HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
+    this.videoElements.add(videoElement);
+    if (this.videoElements.size >= 10) {
+      HMSLogger.w(
+        this.TAG,
+        `${this.track}`,
+        `the track is added to ${this.videoElements.size} video elements, while this may be intentional, it's likely that there is a bug leading to unnecessary creation of video elements in the UI`,
+      );
     }
 
     if (this.intersectionObserver?.isSupported()) {
@@ -160,12 +161,11 @@ export class VideoElementManager {
   }
 
   cleanup = () => {
-    HMSLogger.d(this.TAG, `cleanup video element`);
-    // this.videoElements.forEach(videoElement => {
-    //   videoElement.srcObject = null;
-    //   this.resizeObserver?.unobserve(videoElement);
-    //   this.intersectionObserver?.unobserve(videoElement);
-    // });
+    this.videoElements.forEach(videoElement => {
+      videoElement.srcObject = null;
+      this.resizeObserver?.unobserve(videoElement);
+      this.intersectionObserver?.unobserve(videoElement);
+    });
     this.videoElements.clear();
     this.resizeObserver = undefined;
     this.intersectionObserver = undefined;
