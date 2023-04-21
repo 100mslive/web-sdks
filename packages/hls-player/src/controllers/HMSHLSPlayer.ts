@@ -123,9 +123,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
   ): boolean => {
     if (eventName === HMSHLSPlayerEvents.ERROR) {
-      if ((eventObject as HMSHLSException)?.isTerminal) {
+      const hlsError = eventObject as HMSHLSException;
+      if (hlsError?.isTerminal) {
         // send analytics event
-        window.__hms.sdk?.sendAnalytics(eventObject);
+        window.__hms.sdk?.sendAnalytics(hlsError.toAnalyticsProperties());
       }
     }
     return this._emitter.emitEvent(eventName, eventObject);
