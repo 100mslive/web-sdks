@@ -407,35 +407,29 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, 'setMessageRead');
   }
 
-  attachVideo(trackID: string, videoElement: HTMLVideoElement) {
+  async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
     HMSLogger.v(`[HMSSDKAction] attaching the video element `, trackID, videoElement);
     if (this.localAndVideoUnmuting(trackID)) {
       // wait till video unmute has finished
-      // return new Promise<void>(resolve => {
-      //   const unsub = this.store.subscribe(async enabled => {
-      //     if (enabled) {
-      //       this.attachVideoInternal(trackID, videoElement);
-      //       unsub();
-      //       resolve();
-      //     }
-      //   }, selectIsLocalVideoEnabled);
-      // });
-      const unsub = this.store.subscribe(enabled => {
-        if (enabled) {
-          this.attachVideoInternal(trackID, videoElement);
-          unsub();
-        }
-      }, selectIsLocalVideoEnabled);
+      return new Promise<void>(resolve => {
+        const unsub = this.store.subscribe(async enabled => {
+          if (enabled) {
+            await this.attachVideoInternal(trackID, videoElement);
+            unsub();
+            resolve();
+          }
+        }, selectIsLocalVideoEnabled);
+      });
     } else {
-      this.attachVideoInternal(trackID, videoElement);
+      await this.attachVideoInternal(trackID, videoElement);
     }
   }
 
-  detachVideo(trackID: string, videoElement: HTMLVideoElement) {
+  async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
     HMSLogger.v(`[HMSSDKAction] detaching the video element `, trackID, videoElement);
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
-      this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
+      await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       if (videoElement) {
         videoElement.srcObject = null; // so chrome can clean up
@@ -843,10 +837,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  private attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack: SDKHMSTrack = this.hmsSDKTracks[trackID];
+  private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
+    const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
+      await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }

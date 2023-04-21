@@ -1,8 +1,8 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
-import HMSMediaStream from '../streams/HMSMediaStream';
 import HMSLogger from '../../utils/logger';
+import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
@@ -31,8 +31,8 @@ export class HMSVideoTrack extends HMSTrack {
     return this.videoHandler.getVideoElements() || [];
   }
 
-  attach(videoElement: HTMLVideoElement) {
-    this.videoHandler.addVideoElement(videoElement);
+  async attach(videoElement: HTMLVideoElement) {
+    await this.videoHandler.addVideoElement(videoElement);
   }
 
   detach(videoElement: HTMLVideoElement) {

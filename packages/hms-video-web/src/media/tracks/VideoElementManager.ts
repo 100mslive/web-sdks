@@ -65,7 +65,7 @@ export class VideoElementManager {
     if (this.resizeObserver) {
       this.resizeObserver.observe(videoElement, this.handleResize);
     } else if (this.track instanceof HMSRemoteVideoTrack) {
-      this.track.setPreferredLayer(this.track.getPreferredLayer());
+      await this.track.setPreferredLayer(this.track.getPreferredLayer());
     }
   }
 
