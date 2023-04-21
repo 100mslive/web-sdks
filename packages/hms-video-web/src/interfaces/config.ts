@@ -52,6 +52,11 @@ export interface HMSConfig {
    * dimensions of the video element to conserve bandwidth.
    */
   autoManageVideo?: boolean;
+  /**
+   * if this flag is enabled, wake lock will be acquired automatically(if supported) when joining the room, so the device
+   * will be kept awake.
+   */
+  autoManageWakeLock?: boolean;
 }
 
 /**
