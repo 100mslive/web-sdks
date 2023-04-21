@@ -32,8 +32,6 @@ const INITIAL_STATE: AudioSinkState = {
   autoplayCheckPromise: undefined,
 };
 
-const TRACK_PLAYBACK_RETRIES = 5;
-
 export class AudioSinkManager {
   private audioSink?: HTMLElement;
   private autoPausedTracks: Set<HMSRemoteAudioTrack> = new Set();
@@ -41,7 +39,6 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
-  private retryCountMapping = new Map<string, number>();
 
   constructor(private store: IStore, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
@@ -95,7 +92,6 @@ export class AudioSinkManager {
   cleanUp() {
     this.audioSink?.remove();
     this.audioSink = undefined;
-    this.retryCountMapping.clear();
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -139,10 +135,6 @@ export class AudioSinkManager {
     peer: HMSRemotePeer;
     callListener?: boolean;
   }) => {
-    if (this.retryCountMapping.get(track.trackId) ?? 0 > TRACK_PLAYBACK_RETRIES) {
-      HMSLogger.d(this.TAG, 'retry count limit reached ', `${track}`);
-      return;
-    }
     const audioEl = document.createElement('audio');
     audioEl.style.display = 'none';
     audioEl.id = track.trackId;
@@ -156,7 +148,7 @@ export class AudioSinkManager {
       this.eventBus.analytics.publish(AnalyticsEventFactory.audioPlaybackError(ex));
       if (audioEl?.error?.code === MediaError.MEDIA_ERR_DECODE) {
         this.removeAudioElement(audioEl, track);
-        this.retryCountMapping.set(track.trackId, (this.retryCountMapping.get(track.trackId) ?? 0) + 1);
+        await sleep(500);
         await this.handleTrackAdd({ track, peer, callListener: false });
       }
     };
@@ -259,7 +251,7 @@ export class AudioSinkManager {
 
   private removeAudioElement = (audioEl: HTMLAudioElement, track: HMSRemoteAudioTrack) => {
     if (audioEl) {
-      HMSLogger.v(this.TAG, 'removing audio element', `${track}`);
+      HMSLogger.d(this.TAG, 'removing audio element', `${track}`);
       audioEl.removeEventListener('pause', this.handleAudioPaused);
       audioEl.srcObject = null;
       audioEl.remove();
