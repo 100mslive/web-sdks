@@ -63,13 +63,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   leave(): Promise<void>;
 
   /**
-   * @remarks
-   * use if when need to send analytics data to sdk
-   * @param data any data which need to send to analytics
-   */
-  sendAnalytics(data: any): void;
-
-  /**
    * If you want to enable screenshare for the local peer this class can be called.
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered

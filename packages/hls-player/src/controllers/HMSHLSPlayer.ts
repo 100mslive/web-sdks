@@ -125,7 +125,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     if (eventName === HMSHLSPlayerEvents.ERROR) {
       if ((eventObject as HMSHLSException)?.isTerminal) {
         // send analytics event
-        window.__hms.actions?.sendAnalytics(eventObject);
+        window.__hms.sdk?.sendAnalytics(eventObject);
       }
     }
     return this._emitter.emitEvent(eventName, eventObject);
