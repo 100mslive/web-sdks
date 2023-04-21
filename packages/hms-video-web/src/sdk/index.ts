@@ -156,9 +156,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  sendAnalytics(data: any) {
-    this.eventBus.analytics.publish(AnalyticsEventFactory.hlsPlayerError(data));
+  // @ts-ignore
+  private sendAnalytics(data: HMSException) {
+    this.sendAnalyticsEvent(AnalyticsEventFactory.hlsPlayerError(data));
   }
+
   async refreshDevices() {
     this.validateJoined('refreshDevices');
     await this.deviceManager.init(true);

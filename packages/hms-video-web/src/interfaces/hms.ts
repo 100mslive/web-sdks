@@ -23,7 +23,6 @@ export default interface HMS {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
-  sendAnalytics(data: any): void;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
