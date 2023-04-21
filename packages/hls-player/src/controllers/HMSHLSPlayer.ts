@@ -11,7 +11,13 @@ import { mapLayer, mapLayers } from '../utilies/utils';
 
 declare global {
   interface Window {
-    __hms: any;
+    __hms: {
+      sdk:
+        | {
+            sendHLSAnalytics: any;
+          }
+        | undefined;
+    };
   }
 }
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
@@ -126,7 +132,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       const hlsError = eventObject as HMSHLSException;
       if (hlsError?.isTerminal) {
         // send analytics event
-        window?.__hms.sdk?.sendAnalytics(hlsError.toAnalyticsProperties());
+        window?.__hms.sdk?.sendHLSAnalytics(hlsError.toAnalyticsProperties());
       }
     }
     return this._emitter.emitEvent(eventName, eventObject);
