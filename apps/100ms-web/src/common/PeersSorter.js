@@ -8,7 +8,7 @@ class PeersSorter {
     this.timePassedSinceLastSetPeers = 0;
     this.onPeersChange = onPeersChange;
     this.peers = [];
-    this.LRUView = new Set();
+    this.lruPeers = new Set();
 
     this.started = false;
     this.speaker = undefined;
@@ -17,7 +17,7 @@ class PeersSorter {
     this.tilesPerPage = tilesPerPage;
     this.peers = [...peers];
     for (let i = 0; i < tilesPerPage; i++) {
-      this.LRUView.add(peers[i]);
+      this.lruPeers.add(peers[i]);
     }
     this.start();
     this.moveSpeakerToFront(this.speaker);
@@ -50,21 +50,21 @@ class PeersSorter {
     }
     const speakerPeer = this.peers.find(peer => peer.id === speaker.id);
     if (
-      this.LRUView.has(speakerPeer) &&
-      this.LRUView.size <= this.tilesPerPage
+      this.lruPeers.has(speakerPeer) &&
+      this.lruPeers.size <= this.tilesPerPage
     ) {
       console.log("already exists");
       return;
     }
-    const array = Array.from(this.LRUView);
+    const array = Array.from(this.lruPeers);
     while (array.length >= this.tilesPerPage) {
       array.pop();
     }
     array.unshift(speakerPeer);
-    this.LRUView = new Set(array);
+    this.lruPeers = new Set(array);
     this.onPeersChange([
       ...array,
-      ...this.peers.filter(peer => !this.LRUView.has(peer)),
+      ...this.peers.filter(peer => !this.lruPeers.has(peer)),
     ]);
   }
 
