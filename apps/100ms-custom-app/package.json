@@ -18,9 +18,9 @@
     "start": "webpack serve",
     "prebuild": "cd ../100ms-web && yarn esbuild",
     "build": "webpack --node-env production",
-    "lint": "eslint src/**/*.js",
+    "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
     "lint:fix": "yarn lint --fix",
-    "format": "prettier --write src/**/*.js"
+    "format": "prettier -w src"
   },
   "browserslist": {
     "production": [

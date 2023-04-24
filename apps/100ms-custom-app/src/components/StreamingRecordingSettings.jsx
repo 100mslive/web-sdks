@@ -1,6 +1,14 @@
 import React, { Fragment } from 'react';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Label, RadioGroup, Input, Flex, Checkbox, HorizontalDivider, Text } from '@100mslive/react-ui';
+import {
+  Checkbox,
+  Flex,
+  HorizontalDivider,
+  Input,
+  Label,
+  RadioGroup,
+  Text,
+} from '@100mslive/react-ui';
 
 const CheckboxItem = ({ onClick, type, label, checked }) => {
   return (
@@ -10,7 +18,10 @@ const CheckboxItem = ({ onClick, type, label, checked }) => {
           <CheckIcon width={16} height={16} />
         </Checkbox.Indicator>
       </Checkbox.Root>
-      <Label htmlFor={label} css={{ ml: '$4', fontSize: '$sm', cursor: 'pointer' }}>
+      <Label
+        htmlFor={label}
+        css={{ ml: '$4', fontSize: '$sm', cursor: 'pointer' }}
+      >
         {label}
       </Label>
     </Flex>
@@ -50,25 +61,45 @@ const StreamingRecordingSettings = ({ change, settings }) => {
           checked={!headlessConfig?.hideAudioLevel}
           label="Audio Level Border"
           onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideAudioLevel', !headlessConfig?.hideAudioLevel));
+            change(
+              'metadataFields',
+              handleSettingsMetaData(
+                'hideAudioLevel',
+                !headlessConfig?.hideAudioLevel
+              )
+            );
           }}
         />
         <CheckboxItem
           checked={!headlessConfig?.hideTileAudioMute}
           label="Audio Mute on Tile"
           onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideTileAudioMute', !headlessConfig?.hideTileAudioMute));
+            change(
+              'metadataFields',
+              handleSettingsMetaData(
+                'hideTileAudioMute',
+                !headlessConfig?.hideTileAudioMute
+              )
+            );
           }}
         />
         <CheckboxItem
           checked={!headlessConfig?.hideTileName}
           label="Name on Tile"
           onClick={() => {
-            change('metadataFields', handleSettingsMetaData('hideTileName', !headlessConfig?.hideTileName));
+            change(
+              'metadataFields',
+              handleSettingsMetaData(
+                'hideTileName',
+                !headlessConfig?.hideTileName
+              )
+            );
           }}
         />
         <Flex align="center" justify="between">
-          <Label htmlFor="tileOffset">Space around VideoTile in px (0-40)</Label>
+          <Label htmlFor="tileOffset">
+            Space around VideoTile in px (0-40)
+          </Label>
           <Input
             id="tileOffset"
             css={{ width: '25%', '@sm': { width: '100%' }, ml: '$4', my: '$4' }}
@@ -79,7 +110,10 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             onChange={e => {
               change(
                 'metadataFields',
-                handleSettingsMetaData('tileOffset', e.target.value === '' ? undefined : Number(e.target.value)),
+                handleSettingsMetaData(
+                  'tileOffset',
+                  e.target.value === '' ? undefined : Number(e.target.value)
+                )
               );
             }}
           />
@@ -100,7 +134,11 @@ const StreamingRecordingSettings = ({ change, settings }) => {
             <Label htmlFor="gridView">Grid View</Label>
           </Flex>
           <Flex align="center" css={{ cursor: 'pointer' }}>
-            <RadioGroup.Item value="activespeaker" id="activeSpeaker" css={{ mr: '$4' }}>
+            <RadioGroup.Item
+              value="activespeaker"
+              id="activeSpeaker"
+              css={{ mr: '$4' }}
+            >
               <RadioGroup.Indicator />
             </RadioGroup.Item>
             <Label htmlFor="activeSpeaker">Active Speaker</Label>
