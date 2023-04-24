@@ -6,9 +6,11 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import { config as cssConfig } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex, Text } from "@100mslive/react-ui";
 import { emojiIdMapping } from "../common/constants";
 import "./FlyingEmoji.css";
+
+let emojiId = 1;
 
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -17,49 +19,31 @@ export function FlyingEmoji() {
   const [emojis, setEmojis] = useState([]);
   const isMobile = useMedia(cssConfig.media.md);
 
-  const handleRemoveFlyingEmoji = useCallback(node => {
-    if (!flyingEmojisContainerRef.current) return;
-    flyingEmojisContainerRef.current.removeChild(node);
-  }, []);
-
   const showFlyingEmoji = useCallback(
     config => {
-      if (!flyingEmojisContainerRef.current || !config?.emoji || !config?.name)
+      if (
+        !flyingEmojisContainerRef.current ||
+        !config?.emoji ||
+        !config?.senderName
+      ) {
         return;
+      }
+
       setEmojis([
         ...emojis,
         {
-          ...config,
+          id: emojiId++,
+          emoji: config.emoji,
+          senderName: config.senderName,
+          startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
           wiggleClass:
             Math.random() < 0.5
               ? "emoji wiggle-left-right"
               : "emoji wiggle-right-left",
-          startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
         },
       ]);
-      const node = document.createElement("div");
-      const emojiElement = document.createElement("div");
-      emojiElement.innerHTML = config.emoji;
-      const senderNameElement = document.createElement("div");
-      senderNameElement.innerHTML = config.name;
-      senderNameElement.className = "reaction-sender-name";
-
-      node.className =
-        Math.random() < 0.5
-          ? "emoji wiggle-left-right"
-          : "emoji wiggle-right-left";
-      node.style.left = `${5 + Math.random() * 20}%`;
-      node.src = "";
-
-      node.appendChild(emojiElement);
-      node.appendChild(senderNameElement);
-      flyingEmojisContainerRef.current.appendChild(node);
-
-      node.addEventListener("animationend", e => {
-        handleRemoveFlyingEmoji(e.target);
-      });
     },
-    [handleRemoveFlyingEmoji, isMobile, emojis]
+    [isMobile, emojis]
   );
 
   const showFlyingEmojiUsingEmojiId = useCallback(
@@ -70,7 +54,7 @@ export function FlyingEmoji() {
       );
       const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
 
-      const config = { emoji: emoji?.emoji, name: nameToShow };
+      const config = { emoji: emoji?.emoji, senderName: nameToShow };
       showFlyingEmoji(config);
     },
     [showFlyingEmoji, localPeerId, vanillaStore]
@@ -82,9 +66,61 @@ export function FlyingEmoji() {
   }, [showFlyingEmojiUsingEmojiId]);
 
   return (
-    <div
+    <Box
+      css={{
+        position: "fixed",
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+        userSelect: "none",
+        zIndex: 999,
+      }}
       className="flying-emojis-container"
       ref={flyingEmojisContainerRef}
-    ></div>
+    >
+      {emojis.map(emoji => {
+        return (
+          <Flex
+            key={emoji.id}
+            className={emoji.wiggleClass}
+            css={{
+              left: emoji.startingPoint,
+              flexDirection: "column",
+              alignItems: "center",
+              position: "absolute",
+              bottom: 0,
+              fontSize: "$space$17",
+              lineHeight: 1,
+            }}
+            onAnimationEnd={() => {
+              setEmojis(emojis.filter(item => item.id !== emoji.id));
+            }}
+          >
+            <Box>{emoji.emoji}</Box>
+            <Box
+              css={{
+                width: "fit-content",
+                padding: "$2 $4",
+                background: "$surfaceLight",
+                borderRadius: "$1",
+              }}
+            >
+              <Text
+                css={{
+                  fontSize: "$space$6",
+                  lineHeight: "$xs",
+                  color: "$textHighEmp",
+                }}
+              >
+                {emoji.senderName}
+              </Text>
+            </Box>
+          </Flex>
+        );
+      })}
+    </Box>
   );
 }
