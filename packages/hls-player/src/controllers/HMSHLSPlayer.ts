@@ -9,17 +9,6 @@ import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
 import { HLS_DEFAULT_ALLOWED_MAX_LATENCY_DELAY, HLSPlaybackState, HMSHLSPlayerEvents } from '../utilies/constants';
 import { mapLayer, mapLayers } from '../utilies/utils';
 
-declare global {
-  interface Window {
-    __hms: {
-      sdk:
-        | {
-            sendHLSAnalytics: (error: HMSHLSException) => void;
-          }
-        | undefined;
-    };
-  }
-}
 export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _hls: Hls;
   private _hlsUrl: string;
@@ -132,7 +121,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       const hlsError = eventObject as HMSHLSException;
       if (hlsError?.isTerminal) {
         // send analytics event
-        window?.__hms.sdk?.sendHLSAnalytics(hlsError);
+        window?.__hms?.sdk?.sendHLSAnalytics(hlsError);
       }
     }
     return this._emitter.emitEvent(eventName, eventObject);
