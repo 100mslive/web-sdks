@@ -3,6 +3,7 @@ import data from "@emoji-mart/data/sets/14/apple.json";
 import { init } from "emoji-mart";
 import {
   selectAvailableRoleNames,
+  selectLocalPeerID,
   selectLocalPeerRoleName,
   useCustomEvent,
   useHMSActions,
@@ -46,6 +47,7 @@ export const EmojiReaction = () => {
   const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const hlsViewerRole = useHLSViewerRole();
   const { isStreamingOn } = useRecordingStreaming();
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.EMOJI_REACTION);
@@ -55,7 +57,7 @@ export const EmojiReaction = () => {
   );
 
   const onEmojiEvent = useCallback(data => {
-    window.showConfettiUsingEmojiId(data.emojiId);
+    window.showFlyingEmojiUsingEmojiId(data?.emojiId, data?.senderPeerId);
   }, []);
 
   const { sendEvent } = useCustomEvent({
@@ -64,7 +66,11 @@ export const EmojiReaction = () => {
   });
 
   const sendReaction = async emojiId => {
-    const data = { type: "EMOJI_REACTION", emojiId: emojiId };
+    const data = {
+      type: "EMOJI_REACTION",
+      emojiId: emojiId,
+      senderPeerId: localPeerId,
+    };
     sendEvent(data, { roleNames: filteredRoles });
     if (isStreamingOn) {
       await hmsActions.sendHLSTimedMetadata([

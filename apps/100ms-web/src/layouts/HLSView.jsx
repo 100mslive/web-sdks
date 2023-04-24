@@ -75,7 +75,10 @@ const HLSView = () => {
       const parsedPayload = parsePayload(payload);
       switch (parsedPayload.type) {
         case "EMOJI_REACTION":
-          window.showConfettiUsingEmojiId(parsedPayload?.emojiId);
+          window.showFlyingEmojiUsingEmojiId(
+            parsedPayload?.emojiId,
+            parsedPayload?.senderPeerId
+          );
           break;
         default: {
           const toast = {
