@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMedia } from "react-use";
+import data from "@emoji-mart/data/sets/14/apple.json";
+import { init } from "emoji-mart";
 import {
   selectLocalPeerID,
   selectPeerNameByID,
@@ -7,10 +9,11 @@ import {
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex, Text } from "@100mslive/react-ui";
-import { emojiIdMapping } from "../common/constants";
 import "./FlyingEmoji.css";
 
-let emojiId = 1;
+init({ data });
+
+let emojiCount = 1;
 
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -20,21 +23,21 @@ export function FlyingEmoji() {
   const isMobile = useMedia(cssConfig.media.md);
 
   const showFlyingEmoji = useCallback(
-    config => {
-      if (
-        !flyingEmojisContainerRef.current ||
-        !config?.emoji ||
-        !config?.senderName
-      ) {
+    (emojiId, senderPeerId) => {
+      if (!emojiId || !senderPeerId) {
         return;
       }
+      const senderPeerName = vanillaStore.getState(
+        selectPeerNameByID(senderPeerId)
+      );
+      const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
 
       setEmojis([
         ...emojis,
         {
-          id: emojiId++,
-          emoji: config.emoji,
-          senderName: config.senderName,
+          id: emojiCount++,
+          emojiId: emojiId,
+          senderName: nameToShow,
           startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
           wiggleClass:
             Math.random() < 0.5
@@ -43,27 +46,12 @@ export function FlyingEmoji() {
         },
       ]);
     },
-    [isMobile, emojis]
+    [localPeerId, vanillaStore, isMobile, emojis]
   );
 
-  const showFlyingEmojiUsingEmojiId = useCallback(
-    (emojiId, senderPeerId) => {
-      const emoji = emojiIdMapping.find(emoji => emoji.emojiId === emojiId);
-      const senderPeerName = vanillaStore.getState(
-        selectPeerNameByID(senderPeerId)
-      );
-      const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
-
-      const config = { emoji: emoji?.emoji, senderName: nameToShow };
-      showFlyingEmoji(config);
-    },
-    [showFlyingEmoji, localPeerId, vanillaStore]
-  );
-
-  // putting the function to send on window for quick access
   useEffect(() => {
-    window.showFlyingEmojiUsingEmojiId = showFlyingEmojiUsingEmojiId;
-  }, [showFlyingEmojiUsingEmojiId]);
+    window.showFlyingEmoji = showFlyingEmoji;
+  }, [showFlyingEmoji]);
 
   return (
     <Box
@@ -99,7 +87,9 @@ export function FlyingEmoji() {
               setEmojis(emojis.filter(item => item.id !== emoji.id));
             }}
           >
-            <Box>{emoji.emoji}</Box>
+            <Box>
+              <em-emoji id={emoji.emojiId} size="56px" set="apple"></em-emoji>
+            </Box>
             <Box
               css={{
                 width: "fit-content",

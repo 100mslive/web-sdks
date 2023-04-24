@@ -57,7 +57,7 @@ export const EmojiReaction = () => {
   );
 
   const onEmojiEvent = useCallback(data => {
-    window.showFlyingEmojiUsingEmojiId(data?.emojiId, data?.senderPeerId);
+    window.showFlyingEmoji(data?.emojiId, data?.senderPeerId);
   }, []);
 
   const { sendEvent } = useCustomEvent({

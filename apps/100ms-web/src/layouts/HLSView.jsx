@@ -75,7 +75,7 @@ const HLSView = () => {
       const parsedPayload = parsePayload(payload);
       switch (parsedPayload.type) {
         case "EMOJI_REACTION":
-          window.showFlyingEmojiUsingEmojiId(
+          window.showFlyingEmoji(
             parsedPayload?.emojiId,
             parsedPayload?.senderPeerId
           );
