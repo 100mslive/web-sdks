@@ -80,8 +80,6 @@ export function FlyingEmoji() {
               alignItems: "center",
               position: "absolute",
               bottom: 0,
-              fontSize: "$space$17",
-              lineHeight: 1,
             }}
             onAnimationEnd={() => {
               setEmojis(emojis.filter(item => item.id !== emoji.id));

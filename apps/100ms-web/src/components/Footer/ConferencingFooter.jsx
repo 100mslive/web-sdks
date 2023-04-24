@@ -94,9 +94,11 @@ export const ConferencingFooter = () => {
             display: "none",
             "@md": {
               display: "flex",
+              gap: "$8",
             },
           }}
         >
+          <EmojiReaction />
           <MetaActions isMobile />
         </Flex>
       </AppFooter.Left>

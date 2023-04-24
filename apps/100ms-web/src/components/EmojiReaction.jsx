@@ -122,7 +122,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: "$textAccentMedium",
+                color: "$textSecondary",
               }}
             >
               Reactions will be timed for Live Streaming viewers.{" "}
