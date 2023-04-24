@@ -1,39 +1,49 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import merge from 'lodash.merge';
-import { Flex, Loading, Box } from '@100mslive/react-ui';
+import { logError } from 'zipyai';
+import { Box, Flex, Loading } from '@100mslive/react-ui';
 import {
   apiBasePath,
   getAuthInfo,
+  getAuthTokenByRoomCodeEndpoint,
   getRoomCodeFromUrl,
   getWithRetry,
   mapFromBackend,
   mapTileShape,
   storeRoomSettings,
-  getAuthTokenByRoomCodeEndpoint,
 } from './utils/utils';
-
-import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
-import { logError } from 'zipyai';
+import logoLight from './assets/images/logo-on-white.png';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSMeetingComponent = React.lazy(() =>
-  import('@100mslive/meeting-component').then(module => ({ default: module.HMSMeetingComponent })),
+  import('@100mslive/meeting-component').then(module => ({
+    default: module.HMSMeetingComponent,
+  }))
 );
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;
 } else if (hostname.endsWith('dev-app.100ms.live')) {
   // route dev-app appropriately to qa or prod
-  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  const envSuffix =
+    process.env.REACT_APP_ENV === 'prod'
+      ? 'app.100ms.live'
+      : 'qa-app.100ms.live';
   hostname = hostname.replace('dev-app.100ms.live', envSuffix);
 } else if (hostname.endsWith('staging-app.100ms.live')) {
   // route staging-app appropriately to qa or prod
-  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  const envSuffix =
+    process.env.REACT_APP_ENV === 'prod'
+      ? 'app.100ms.live'
+      : 'qa-app.100ms.live';
   hostname = hostname.replace('staging-app.100ms.live', envSuffix);
-} else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
+} else if (
+  hostname.endsWith('qa-app.100ms.live') &&
+  process.env.REACT_APP_ENV === 'prod'
+) {
   hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
 }
 
@@ -77,7 +87,9 @@ const App = () => {
     }
     window.__hmsApp.updateMetadata = async metadata => {
       try {
-        const currentMetadata = !settings.metadataFields.metadata ? {} : JSON.parse(settings.metadataFields.metadata);
+        const currentMetadata = !settings.metadataFields.metadata
+          ? {}
+          : JSON.parse(settings.metadataFields.metadata);
         const metaUpdate = JSON.stringify(merge(currentMetadata, metadata));
         console.log(metaUpdate);
         await storeRoomSettings({
@@ -149,7 +161,8 @@ const App = () => {
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
-            body: err.response.data?.msg || 'Please make sure that link is valid.',
+            body:
+              err.response.data?.msg || 'Please make sure that link is valid.',
           };
         }
         setError(error);
@@ -203,13 +216,16 @@ const App = () => {
   };
 
   return (
-    <Flex direction="column" css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}>
+    <Flex
+      direction="column"
+      css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}
+    >
       {error && (
         <Suspense fallback={null}>
           <ErrorModal title={error.title} body={error.body} />
         </Suspense>
       )}
-    {onlyEmail && (
+      {onlyEmail && (
         <Suspense fallback={null}>
           <Header
             savingData={savingSettings}
@@ -238,7 +254,9 @@ const App = () => {
                 font: settings.font,
                 color: settings.brand_color,
                 theme: settings.theme,
-                logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
+                logo:
+                  settings.logo_url ||
+                  (settings.theme === 'dark' ? logoDark : logoLight),
                 metadata: settings.metadataFields.metadata,
                 recordingUrl: settings.recording_url,
               }}

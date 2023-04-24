@@ -127,6 +127,8 @@ export function HMSMeetingComponent({
   );
 }
 
+HMSMeetingComponent.displayName = "HMSMeetingComponent";
+
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
   useEffect(() => {
@@ -270,7 +272,6 @@ export default function App() {
         color: process.env.REACT_APP_COLOR,
         logo: process.env.REACT_APP_LOGO,
         font: process.env.REACT_APP_FONT,
-        headerPresent: process.env.REACT_APP_HEADER_PRESENT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
     />
