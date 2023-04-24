@@ -66,7 +66,6 @@ export function HMSMeetingComponent({
     color = "#2F80FF",
     theme = "dark",
     logo = "",
-    headerPresent = "false",
     metadata = "",
     recordingUrl = "",
   },
@@ -114,10 +113,7 @@ export function HMSMeetingComponent({
           <Box
             css={{
               bg: "$mainBg",
-              w: "100%",
-              ...(headerPresent === "true"
-                ? { flex: "1 1 0", minHeight: 0 }
-                : { h: "100%" }),
+              size: "100%",
             }}
           >
             <AppRoutes

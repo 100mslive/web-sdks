@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import merge from 'lodash.merge';
-import { Flex, Loading } from '@100mslive/react-ui';
+import { Flex, Loading, Box } from '@100mslive/react-ui';
 import {
   apiBasePath,
   getAuthInfo,
@@ -209,7 +209,7 @@ const App = () => {
           <ErrorModal title={error.title} body={error.body} />
         </Suspense>
       )}
-      {onlyEmail && (
+    {onlyEmail && (
         <Suspense fallback={null}>
           <Header
             savingData={savingSettings}
@@ -230,21 +230,22 @@ const App = () => {
             </Flex>
           }
         >
-          <HMSMeetingComponent
-            tokenEndpoint={`${apiBasePath + hostname}/`}
-            themeConfig={{
-              aspectRatio: settings.tile_shape,
-              font: settings.font,
-              color: settings.brand_color,
-              theme: settings.theme,
-              logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
-              headerPresent: String(!!getAuthInfo().userEmail),
-              metadata: settings.metadataFields.metadata,
-              recordingUrl: settings.recording_url,
-            }}
-            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
-            getDetails={fetchData}
-          />
+          <Box css={{ flex: '1 1 0', minHeight: 0 }}>
+            <HMSMeetingComponent
+              tokenEndpoint={`${apiBasePath + hostname}/`}
+              themeConfig={{
+                aspectRatio: settings.tile_shape,
+                font: settings.font,
+                color: settings.brand_color,
+                theme: settings.theme,
+                logo: settings.logo_url || (settings.theme === 'dark' ? logoDark : logoLight),
+                metadata: settings.metadataFields.metadata,
+                recordingUrl: settings.recording_url,
+              }}
+              authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
+              getDetails={fetchData}
+            />
+          </Box>
         </Suspense>
       )}
       {showSettingsModal && (
