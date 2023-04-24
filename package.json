@@ -48,7 +48,7 @@
     "format": "lerna run format --stream",
     "test": "yarn build --no-private && lerna run test --stream",
     "start": "lerna run start --stream",
-    "build": "lerna run build --stream --ignore 100ms_edtech_template",
+    "build": "lerna run build --stream --ignore @100mslive/meeting-component",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",

@@ -20,7 +20,7 @@ const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSMeetingComponent = React.lazy(() =>
-  import('100ms_edtech_template').then(module => ({ default: module.HMSMeetingComponent })),
+  import('@100mslive/meeting-component').then(module => ({ default: module.HMSMeetingComponent })),
 );
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
