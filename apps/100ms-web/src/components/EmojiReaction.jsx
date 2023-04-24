@@ -22,9 +22,14 @@ import {
 import IconButton from "../IconButton";
 import { useHLSViewerRole } from "./AppData/useUISettings";
 import { useIsFeatureEnabled } from "./hooks/useFeatures";
-import { FEATURE_LIST, HLS_TIMED_METADATA_DOC_URL } from "../common/constants";
+import {
+  EMOJI_REACTION_TYPE,
+  FEATURE_LIST,
+  HLS_TIMED_METADATA_DOC_URL,
+} from "../common/constants";
 
 init({ data });
+
 const emojiReactionList = [
   [
     { emojiId: "+1" },
@@ -57,17 +62,18 @@ export const EmojiReaction = () => {
   );
 
   const onEmojiEvent = useCallback(data => {
+    console.log("Luffy", data);
     window.showFlyingEmoji(data?.emojiId, data?.senderPeerId);
   }, []);
 
   const { sendEvent } = useCustomEvent({
-    type: "EMOJI_REACTION",
+    type: EMOJI_REACTION_TYPE,
     onEvent: onEmojiEvent,
   });
 
   const sendReaction = async emojiId => {
     const data = {
-      type: "EMOJI_REACTION",
+      type: EMOJI_REACTION_TYPE,
       emojiId: emojiId,
       senderPeerId: localPeerId,
     };
@@ -81,6 +87,7 @@ export const EmojiReaction = () => {
       ]);
     }
   };
+
   if (localPeerRole === hlsViewerRole || !isFeatureEnabled) {
     return null;
   }
