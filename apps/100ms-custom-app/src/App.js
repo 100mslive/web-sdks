@@ -19,8 +19,8 @@ import { logError } from 'zipyai';
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
-const HMSEdtechTemplate = React.lazy(() =>
-  import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
+const HMSMeetingComponent = React.lazy(() =>
+  import('100ms_edtech_template').then(module => ({ default: module.HMSMeetingComponent })),
 );
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
@@ -230,7 +230,7 @@ const App = () => {
             </Flex>
           }
         >
-          <HMSEdtechTemplate
+          <HMSMeetingComponent
             tokenEndpoint={`${apiBasePath + hostname}/`}
             themeConfig={{
               aspectRatio: settings.tile_shape,

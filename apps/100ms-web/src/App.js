@@ -58,7 +58,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export function EdtechComponent({
+export function HMSMeetingComponent({
   tokenEndpoint = defaultTokenEndpoint,
   themeConfig: {
     aspectRatio = "1-1",
@@ -267,7 +267,7 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
 
 export default function App() {
   return (
-    <EdtechComponent
+    <HMSMeetingComponent
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
         theme: process.env.REACT_APP_THEME,
