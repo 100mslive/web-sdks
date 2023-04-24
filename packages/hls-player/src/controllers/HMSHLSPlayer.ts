@@ -14,7 +14,7 @@ declare global {
     __hms: {
       sdk:
         | {
-            sendHLSAnalytics: any;
+            sendHLSAnalytics: (error: HMSHLSException) => void;
           }
         | undefined;
     };
