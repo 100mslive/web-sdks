@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useMedia } from "react-use";
-import data from "@emoji-mart/data/sets/14/apple.json";
-import { init } from "emoji-mart";
 import {
   selectLocalPeerID,
   selectPeerNameByID,
@@ -11,14 +9,11 @@ import {
 import { Box, config as cssConfig, Flex, Text } from "@100mslive/react-ui";
 import "./FlyingEmoji.css";
 
-init({ data });
-
 let emojiCount = 1;
 
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const vanillaStore = useHMSVanillaStore();
-  const flyingEmojisContainerRef = useRef();
   const [emojis, setEmojis] = useState([]);
   const isMobile = useMedia(cssConfig.media.md);
 
@@ -32,21 +27,23 @@ export function FlyingEmoji() {
       );
       const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
 
-      setEmojis([
-        ...emojis,
-        {
-          id: emojiCount++,
-          emojiId: emojiId,
-          senderName: nameToShow,
-          startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
-          wiggleClass:
-            Math.random() < 0.5
-              ? "emoji wiggle-left-right"
-              : "emoji wiggle-right-left",
-        },
-      ]);
+      setEmojis(emojis => {
+        return [
+          ...emojis,
+          {
+            id: emojiCount++,
+            emojiId: emojiId,
+            senderName: nameToShow,
+            startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
+            wiggleClass:
+              Math.random() < 0.5
+                ? "emoji wiggle-left-right"
+                : "emoji wiggle-right-left",
+          },
+        ];
+      });
     },
-    [localPeerId, vanillaStore, isMobile, emojis]
+    [localPeerId, vanillaStore, isMobile]
   );
 
   useEffect(() => {
@@ -67,7 +64,6 @@ export function FlyingEmoji() {
         zIndex: 999,
       }}
       className="flying-emojis-container"
-      ref={flyingEmojisContainerRef}
     >
       {emojis.map(emoji => {
         return (
