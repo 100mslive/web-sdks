@@ -4,10 +4,8 @@ import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
-import useSortedPeers from "../common/useSortedPeers";
 import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { UI_SETTINGS } from "../common/constants";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 const MAX_TILES_FOR_MOBILE = 4;
 
@@ -70,8 +68,6 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
 
 // Side pane shows smaller tiles
 export const GridSidePaneView = ({ peers }) => {
-  const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
-  const sortedPeers = useSortedPeers(peers, 2, activeSpeakerSorting);
   const headlessConfig = useAppConfig("headlessConfig");
   const isHeadless = useIsHeadless();
   return (
@@ -90,7 +86,7 @@ export const GridSidePaneView = ({ peers }) => {
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
-          <VideoList peers={sortedPeers} maxColCount={2} />
+          <VideoList peers={peers} maxColCount={2} />
         )}
       </Flex>
     </Flex>
