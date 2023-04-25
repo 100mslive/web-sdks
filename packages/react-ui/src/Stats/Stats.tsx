@@ -12,6 +12,7 @@ import {
 } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
+import { Tooltip } from '../Tooltip';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
@@ -31,6 +32,8 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
   const remoteVideoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
   const videoTrackStats = isLocal ? localVideoTrackStats?.[0] : remoteVideoTrackStats;
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
+  const availableOutgoingBitrate = useHMSStatsStore(selectHMSStats.availablePublishBitrate);
+
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
@@ -41,6 +44,12 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
         <tbody>
           {isLocal ? (
             <Fragment>
+              <StatsRow
+                show={isNotNullishAndNot0(availableOutgoingBitrate)}
+                label="AOBR"
+                tooltip="Available Outgoing Bitrate"
+                value={formatBytes(availableOutgoingBitrate, 'b/s')}
+              />
               {localVideoTrackStats?.map(stat => {
                 if (!stat) {
                   return null;
@@ -165,12 +174,20 @@ const TrackPacketsLostRow = ({
   );
 };
 
-const RawStatsRow = ({ label = '', value = '', show = true }) => {
+const RawStatsRow = ({ label = '', value = '', tooltip = '', show = true }) => {
+  const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
+
   return (
     <>
       {show ? (
         <Stats.Row>
-          <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>
+          {tooltip ? (
+            <Tooltip side="top" title={tooltip}>
+              {statsLabel}
+            </Tooltip>
+          ) : (
+            statsLabel
+          )}
           {value === '' ? <Stats.Value /> : <Stats.Value>{value}</Stats.Value>}
         </Stats.Row>
       ) : null}
