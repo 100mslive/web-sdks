@@ -13,7 +13,6 @@ import {
   keyframes,
   Text,
 } from "@100mslive/react-ui";
-import "./FlyingEmoji.css";
 
 let emojiCount = 1;
 
