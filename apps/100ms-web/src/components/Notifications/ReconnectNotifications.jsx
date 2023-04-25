@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import { logMessage } from "zipyai";
 import {
   HMSNotificationTypes,
+  selectIsConnectedToRoom,
   useHMSNotifications,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { Dialog, Flex, Loading, Text } from "@100mslive/react-ui";
 import { ToastConfig } from "../Toast/ToastConfig";
@@ -15,7 +17,11 @@ const notificationTypes = [
 let notificationId = null;
 export const ReconnectNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    console.log("Luffy: ", isConnected);
+  }, [isConnected]);
   useEffect(() => {
     if (notification?.type === HMSNotificationTypes.RECONNECTED) {
       logMessage("Reconnected");

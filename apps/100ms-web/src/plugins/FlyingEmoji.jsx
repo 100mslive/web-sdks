@@ -80,7 +80,6 @@ export function FlyingEmoji() {
         userSelect: "none",
         zIndex: 999,
       }}
-      className="flying-emojis-container"
     >
       {emojis.map(emoji => {
         return (
