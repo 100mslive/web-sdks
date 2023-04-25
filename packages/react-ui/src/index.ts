@@ -15,7 +15,7 @@ export * from './VideoTile';
 export * from './VideoList';
 export * from './Pagination';
 export * from './Dropdown';
-export { textEllipsis, flexCenter, slideLeftAndFade } from './utils';
+export { textEllipsis, flexCenter, slideLeftAndFade, flyAndFade, wiggleLeftRight, wiggleRightLeft } from './utils';
 export * from './Video';
 export * from './TileMenu';
 export * from './AudioLevel';

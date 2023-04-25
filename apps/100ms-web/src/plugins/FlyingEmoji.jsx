@@ -6,7 +6,15 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import { Box, config as cssConfig, Flex, Text } from "@100mslive/react-ui";
+import {
+  Box,
+  config as cssConfig,
+  Flex,
+  flyAndFade,
+  Text,
+  wiggleLeftRight,
+  wiggleRightLeft,
+} from "@100mslive/react-ui";
 import "./FlyingEmoji.css";
 
 let emojiCount = 1;
@@ -19,7 +27,7 @@ export function FlyingEmoji() {
 
   const showFlyingEmoji = useCallback(
     (emojiId, senderPeerId) => {
-      if (!emojiId || !senderPeerId) {
+      if (!emojiId || !senderPeerId || document.hidden) {
         return;
       }
       const senderPeerName = vanillaStore.getState(
@@ -35,10 +43,7 @@ export function FlyingEmoji() {
             emojiId: emojiId,
             senderName: nameToShow,
             startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
-            wiggleClass:
-              Math.random() < 0.5
-                ? "emoji wiggle-left-right"
-                : "emoji wiggle-right-left",
+            wiggleType: Math.random() < 0.5 ? 0 : 1,
           },
         ];
       });
@@ -69,13 +74,15 @@ export function FlyingEmoji() {
         return (
           <Flex
             key={emoji.id}
-            className={emoji.wiggleClass}
             css={{
               left: emoji.startingPoint,
               flexDirection: "column",
               alignItems: "center",
               position: "absolute",
               bottom: 0,
+              animation: `${flyAndFade()} 3s forwards, ${
+                emoji.wiggleType === 0 ? wiggleLeftRight() : wiggleRightLeft()
+              } 1s ease-in-out infinite alternate`,
             }}
             onAnimationEnd={() => {
               setEmojis(emojis.filter(item => item.id !== emoji.id));
