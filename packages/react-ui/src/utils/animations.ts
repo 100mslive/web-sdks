@@ -22,21 +22,6 @@ export const dialogClose = keyframes({
   '100%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
 });
 
-export const flyAndFade = keyframes({
-  '20%': { opacity: 1 },
-  '100%': { bottom: '70%', opacity: 0 },
-});
-
-export const wiggleLeftRight = keyframes({
-  '0%': { marginLeft: '-50px' },
-  '100%': { marginLeft: '50px' },
-});
-
-export const wiggleRightLeft = keyframes({
-  '0%': { marginLeft: '50px' },
-  '100%': { marginLeft: '-50px' },
-});
-
 export const slideUpAndFade = (start = '2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateY(${start})` },

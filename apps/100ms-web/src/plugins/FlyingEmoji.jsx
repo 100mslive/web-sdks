@@ -10,14 +10,27 @@ import {
   Box,
   config as cssConfig,
   Flex,
-  flyAndFade,
+  keyframes,
   Text,
-  wiggleLeftRight,
-  wiggleRightLeft,
 } from "@100mslive/react-ui";
 import "./FlyingEmoji.css";
 
 let emojiCount = 1;
+
+const flyAndFade = keyframes({
+  "20%": { opacity: 1 },
+  "100%": { bottom: "70%", opacity: 0 },
+});
+
+const wiggleLeftRight = keyframes({
+  "0%": { marginLeft: "-50px" },
+  "100%": { marginLeft: "50px" },
+});
+
+const wiggleRightLeft = keyframes({
+  "0%": { marginLeft: "50px" },
+  "100%": { marginLeft: "-50px" },
+});
 
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);

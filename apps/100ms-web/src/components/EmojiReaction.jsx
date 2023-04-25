@@ -62,7 +62,6 @@ export const EmojiReaction = () => {
   );
 
   const onEmojiEvent = useCallback(data => {
-    console.log("Luffy", data);
     window.showFlyingEmoji(data?.emojiId, data?.senderPeerId);
   }, []);
 
