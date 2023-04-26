@@ -67,6 +67,7 @@ export { default as CopyIcon } from './CopyIcon';
 export { default as CropIcon } from './CropIcon';
 export { default as CrossCircleIcon } from './CrossCircleIcon';
 export { default as CrossIcon } from './CrossIcon';
+export { default as DiscordColoredIcon } from './DiscordColoredIcon';
 export { default as DiscordIcon } from './DiscordIcon';
 export { default as DividerIcon } from './DividerIcon';
 export { default as DoorIcon } from './DoorIcon';
