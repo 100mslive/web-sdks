@@ -51,7 +51,8 @@ export class HMSWebrtcStats {
   }
 
   private async updateLocalPeerStats() {
-    const prevLocalPeerStats = this.getLocalPeerStats();
+    HMSLogger.d(this.TAG, 'update local peer stats ', `${this}`);
+    const prevLocalPeerStats = this?.getLocalPeerStats();
     let publishReport: RTCStatsReport | undefined;
     try {
       publishReport = await this.getStats.publish?.();
