@@ -8,6 +8,7 @@ export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
   private audioElement: HTMLAudioElement | null = null;
   private outputDevice?: MediaDeviceInfo;
+  private volume: number | null = null;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
@@ -27,15 +28,18 @@ export class HMSAudioTrack extends HMSTrack {
     // Don't subscribe to audio when volume is 0
     await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
+      this.volume = value / 100;
       this.audioElement.volume = value / 100;
     }
   }
-
   setAudioElement(element: HTMLAudioElement | null) {
     HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
     this.audioElement = element;
+    console.log('setAudioElement::volume::', this.audioElement?.volume, this.volume);
+    if (this.audioElement !== null && this.volume !== null) {
+      this.audioElement.volume = this.volume;
+    }
   }
-
   /**
    * @internal
    * @returns {HTMLAudioElement | null}
