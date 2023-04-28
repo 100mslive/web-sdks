@@ -82,9 +82,9 @@ export const HMSHLSErrorFactory = {
       );
     },
   },
-  UnknownError: (
+  GenericError: (
     data: HMSHLSErrorDetails,
-    name: string | HMSHLSExceptionEvents = HMSHLSExceptionEvents.UNKNOWN_ERROR,
+    name: string | HMSHLSExceptionEvents = HMSHLSExceptionEvents.GENERIC_ERROR,
     description = 'Unknown error',
   ): HMSHLSException => {
     return new HMSHLSException(name, data.details, description, data.fatal);
