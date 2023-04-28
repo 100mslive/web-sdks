@@ -85,7 +85,7 @@ export const HMSHLSErrorFactory = {
   GenericError: (
     data: HMSHLSErrorDetails,
     name: string | HMSHLSExceptionEvents = HMSHLSExceptionEvents.GENERIC_ERROR,
-    description = 'Unknown error',
+    description = 'Generic error',
   ): HMSHLSException => {
     return new HMSHLSException(name, data.details, description, data.fatal);
   },
