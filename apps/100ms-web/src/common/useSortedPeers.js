@@ -7,21 +7,17 @@ function useSortedPeers({ peers, maxTileCount = 9 }) {
   const [sortedPeers, setSortedPeers] = useState([]);
   const store = useHMSVanillaStore();
   const activeSpeakerSorting = useActiveSpeakerSorting();
-  const peerSortedRef = useRef(new PeersSorter(store, setSortedPeers));
+  const peerSortedRef = useRef(new PeersSorter(store));
+  peerSortedRef.current.onUpdate(setSortedPeers);
 
   useEffect(() => {
     const peersSorter = peerSortedRef.current;
-    if (
-      peers?.length > 0 &&
-      maxTileCount &&
-      peersSorter &&
-      activeSpeakerSorting
-    ) {
+    if (peers?.length > 0 && maxTileCount && activeSpeakerSorting) {
       peersSorter.setPeersAndTilesPerPage({
         peers,
         tilesPerPage: maxTileCount,
       });
-    } else if (peersSorter && !activeSpeakerSorting) {
+    } else if (!activeSpeakerSorting) {
       peersSorter.stop();
     }
   }, [maxTileCount, peers, activeSpeakerSorting]);
