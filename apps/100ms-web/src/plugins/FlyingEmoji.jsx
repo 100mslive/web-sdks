@@ -100,7 +100,7 @@ export function FlyingEmoji() {
             }}
           >
             <Box>
-              <em-emoji id={emoji.emojiId} size="56px" set="apple"></em-emoji>
+              <em-emoji id={emoji.emojiId} size="48px" set="apple"></em-emoji>
             </Box>
             <Box
               css={{
