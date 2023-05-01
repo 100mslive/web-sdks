@@ -18,7 +18,7 @@ let emojiCount = 1;
 
 const flyAndFade = keyframes({
   "20%": { opacity: 1 },
-  "100%": { bottom: "70%", opacity: 0 },
+  "100%": { bottom: "60%", opacity: 0 },
 });
 
 const wiggleLeftRight = keyframes({
@@ -54,7 +54,7 @@ export function FlyingEmoji() {
             id: emojiCount++,
             emojiId: emojiId,
             senderName: nameToShow,
-            startingPoint: `${5 + Math.random() * (isMobile ? 40 : 20)}%`,
+            startingPoint: `${5 + Math.random() * (isMobile ? 25 : 15)}%`,
             wiggleType: Math.random() < 0.5 ? 0 : 1,
           },
         ];
