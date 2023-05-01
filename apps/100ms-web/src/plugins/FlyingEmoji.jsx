@@ -49,14 +49,14 @@ export function FlyingEmoji() {
   }, [isMobile]);
 
   const showFlyingEmoji = useCallback(
-    (emojiId, senderPeerId) => {
-      if (!emojiId || !senderPeerId || document.hidden) {
+    (emojiId, senderId) => {
+      if (!emojiId || !senderId || document.hidden) {
         return;
       }
       const senderPeerName = vanillaStore.getState(
-        selectPeerNameByID(senderPeerId)
+        selectPeerNameByID(senderId)
       );
-      const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
+      const nameToShow = localPeerId === senderId ? "You" : senderPeerName;
       const startingPoint = startingPoints[emojiCount % startingPoints.length];
       const id = emojiCount++;
 
