@@ -28,7 +28,12 @@ export function TranscriptionButton() {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
   useEffect(() => {
-    hmsActions.sessionStore.observe(SESSION_STORE_KEY);
+    // add other observer too
+    hmsActions.sessionStore.observe([
+      "pinnedMessage",
+      "spotlight",
+      SESSION_STORE_KEY,
+    ]);
   }, [hmsActions]);
 
   useEffect(() => {
