@@ -71,7 +71,6 @@ export const EmojiReaction = () => {
   });
 
   const sendReaction = async emojiId => {
-    setOpen(false);
     const data = {
       type: EMOJI_REACTION_TYPE,
       emojiId: emojiId,
