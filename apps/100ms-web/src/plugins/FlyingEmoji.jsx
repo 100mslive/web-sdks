@@ -91,7 +91,7 @@ export function FlyingEmoji() {
               alignItems: "center",
               position: "absolute",
               bottom: 0,
-              animation: `${flyAndFade()} 4s forwards, ${
+              animation: `${flyAndFade()} 5s forwards, ${
                 emoji.wiggleType === 0 ? wiggleLeftRight() : wiggleRightLeft()
               } 1s ease-in-out infinite alternate`,
             }}
