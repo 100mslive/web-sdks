@@ -3,6 +3,7 @@ import data from "@emoji-mart/data/sets/14/apple.json";
 import { init } from "emoji-mart";
 import {
   selectAvailableRoleNames,
+  selectIsConnectedToRoom,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   useCustomEvent,
@@ -21,6 +22,7 @@ import {
 } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
 import { useHLSViewerRole } from "./AppData/useUISettings";
+import { useDropdownList } from "./hooks/useDropdownList";
 import { useIsFeatureEnabled } from "./hooks/useFeatures";
 import {
   EMOJI_REACTION_TYPE,
@@ -51,6 +53,7 @@ const emojiReactionList = [
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const hmsActions = useHMSActions();
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -61,6 +64,7 @@ export const EmojiReaction = () => {
     () => roles.filter(role => role !== hlsViewerRole),
     [roles, hlsViewerRole]
   );
+  useDropdownList({ open: open, name: "EmojiReaction" });
 
   const onEmojiEvent = useCallback(data => {
     window.showFlyingEmoji(data?.emojiId, data?.senderId);
@@ -88,7 +92,7 @@ export const EmojiReaction = () => {
     }
   };
 
-  if (localPeerRole === hlsViewerRole || !isFeatureEnabled) {
+  if (!isConnected || localPeerRole === hlsViewerRole || !isFeatureEnabled) {
     return null;
   }
   return (
