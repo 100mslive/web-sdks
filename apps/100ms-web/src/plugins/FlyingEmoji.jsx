@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMedia } from "react-use";
 import {
   selectLocalPeerID,
@@ -37,6 +37,17 @@ export function FlyingEmoji() {
   const [emojis, setEmojis] = useState([]);
   const isMobile = useMedia(cssConfig.media.md);
 
+  const startingPoints = useMemo(() => {
+    let arr = [];
+    const min = 5;
+    const max = isMobile ? 30 : 20;
+    const inc = isMobile ? 8 : 5;
+    for (let i = min; i <= max; i += inc) {
+      arr.push(i);
+    }
+    return arr;
+  }, [isMobile]);
+
   const showFlyingEmoji = useCallback(
     (emojiId, senderPeerId) => {
       if (!emojiId || !senderPeerId || document.hidden) {
@@ -46,21 +57,23 @@ export function FlyingEmoji() {
         selectPeerNameByID(senderPeerId)
       );
       const nameToShow = localPeerId === senderPeerId ? "You" : senderPeerName;
+      const startingPoint = startingPoints[emojiCount % startingPoints.length];
+      const id = emojiCount++;
 
       setEmojis(emojis => {
         return [
           ...emojis,
           {
-            id: emojiCount++,
+            id: id,
             emojiId: emojiId,
             senderName: nameToShow,
-            startingPoint: `${5 + Math.random() * (isMobile ? 25 : 15)}%`,
+            startingPoint: `${startingPoint}%`,
             wiggleType: Math.random() < 0.5 ? 0 : 1,
           },
         ];
       });
     },
-    [localPeerId, vanillaStore, isMobile]
+    [localPeerId, vanillaStore, startingPoints]
   );
 
   useEffect(() => {
