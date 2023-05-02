@@ -204,5 +204,3 @@ export const SESSION_STORE_KEY = {
   PINNED_MESSAGE: "pinnedMessage",
   SPOTLIGHT: "spotlight",
 };
-
-export const SESSION_STORE_KEYS = Object.values(SESSION_STORE_KEY);

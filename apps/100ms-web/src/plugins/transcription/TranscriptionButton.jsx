@@ -29,6 +29,10 @@ export function TranscriptionButton() {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
 
   useEffect(() => {
+    hmsActions.sessionStore.observe(SESSION_STORE_KEY.TRANSCRIPTION_STATE);
+  }, [hmsActions]);
+
+  useEffect(() => {
     if (!transcriber.current) {
       transcriber.current = new Transcriber(
         rawStore,
