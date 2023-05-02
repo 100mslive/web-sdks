@@ -82,10 +82,10 @@ export const HMSHLSErrorFactory = {
       );
     },
   },
-  GenericError: (
+  HLSError: (
     data: HMSHLSErrorDetails,
     name: string | HMSHLSExceptionEvents = HMSHLSExceptionEvents.HLS_ERROR,
-    description = 'Generic error',
+    description = 'Hls error',
   ): HMSHLSException => {
     return new HMSHLSException(name, data.details, description, data.fatal);
   },
