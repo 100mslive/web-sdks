@@ -31,22 +31,24 @@ const wiggleRightLeft = keyframes({
   "100%": { marginLeft: "-50px" },
 });
 
+const getStartingPoints = isMobile => {
+  let arr = [];
+  const min = 5;
+  const max = isMobile ? 30 : 20;
+  const inc = isMobile ? 8 : 5;
+  for (let i = min; i <= max; i += inc) {
+    arr.push(i);
+  }
+  return arr;
+};
+
 export function FlyingEmoji() {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const vanillaStore = useHMSVanillaStore();
   const [emojis, setEmojis] = useState([]);
   const isMobile = useMedia(cssConfig.media.md);
 
-  const startingPoints = useMemo(() => {
-    let arr = [];
-    const min = 5;
-    const max = isMobile ? 30 : 20;
-    const inc = isMobile ? 8 : 5;
-    for (let i = min; i <= max; i += inc) {
-      arr.push(i);
-    }
-    return arr;
-  }, [isMobile]);
+  const startingPoints = useMemo(() => getStartingPoints(isMobile), [isMobile]);
 
   const showFlyingEmoji = useCallback(
     (emojiId, senderId) => {
