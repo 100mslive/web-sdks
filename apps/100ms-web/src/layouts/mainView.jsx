@@ -27,7 +27,10 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from "../components/AppData/useUISettings";
-import { UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
+import {
+  SESSION_STORE_KEYS,
+  UI_MODE_ACTIVE_SPEAKER,
+} from "../common/constants";
 
 const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
@@ -67,7 +70,7 @@ export const ConferenceMainView = () => {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
 
-    hmsActions.sessionStore.observe(["pinnedMessage", "spotlight"]);
+    hmsActions.sessionStore.observe(SESSION_STORE_KEYS);
   }, [isConnected, hmsActions]);
 
   if (!localPeerRole) {

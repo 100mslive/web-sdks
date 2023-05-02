@@ -198,3 +198,11 @@ export const FEATURE_LIST = {
   CHAT: "chat",
   PIN_TILE: "pintile",
 };
+
+export const SESSION_STORE_KEY = {
+  TRANSCRIPTION_STATE: "transcriptionState",
+  PINNED_MESSAGE: "pinnedMessage",
+  SPOTLIGHT: "spotlight",
+};
+
+export const SESSION_STORE_KEYS = Object.values(SESSION_STORE_KEY);
