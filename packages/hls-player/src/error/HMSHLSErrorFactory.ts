@@ -82,7 +82,11 @@ export const HMSHLSErrorFactory = {
       );
     },
   },
-  UnknownError: (data: HMSHLSErrorDetails): HMSHLSException => {
-    return new HMSHLSException(HMSHLSExceptionEvents.UNKNOWN_ERROR, data.details, 'Unknown error', data.fatal);
+  HLSError: (
+    data: HMSHLSErrorDetails,
+    name: string | HMSHLSExceptionEvents = HMSHLSExceptionEvents.HLS_ERROR,
+    description = 'Hls error',
+  ): HMSHLSException => {
+    return new HMSHLSException(name, data.details, description, data.fatal);
   },
 };
