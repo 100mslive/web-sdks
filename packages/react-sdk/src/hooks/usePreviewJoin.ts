@@ -41,7 +41,7 @@ export interface usePreviewInput {
   captureNetworkQualityInPreview?: boolean;
   asRole?: string;
   /**
-   * if this flag is enabled, the sdk takes care of unsubscribing to the video when it goes out of view.
+   * if this flag is enabled, the SDK takes care of unsubscribing to the video when it goes out of view.
    * Additionally if simulcast is enabled, it takes care of auto managing simulcast layers based on the
    * dimensions of the video element to conserve bandwidth.
    */
