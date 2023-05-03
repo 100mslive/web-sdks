@@ -27,12 +27,31 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
   const actions = useHMSActions();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const track = useHMSStore(selectVideoTrackByID(trackId));
+  const prevTrackId = useRef<HMSTrackID | undefined>();
 
   const setRefs = useCallback((node: HTMLVideoElement) => {
     if (node) {
       videoRef.current = node;
     }
   }, []);
+
+  useEffect(() => {
+    if (!prevTrackId.current) {
+      prevTrackId.current = track?.id;
+    } else if (track?.id && prevTrackId.current !== track?.id) {
+      // Remove video element reference from previous track by detaching
+      (async () => {
+        if (videoRef.current) {
+          try {
+            HMSLogger.d('detaching because different track is passed');
+            await actions.detachVideo(prevTrackId.current!, videoRef.current);
+          } catch (err) {
+            HMSLogger.w('detach video error for track', prevTrackId.current, err);
+          }
+        }
+      })();
+    }
+  }, [track?.id, actions]);
 
   useEffect(() => {
     (async () => {

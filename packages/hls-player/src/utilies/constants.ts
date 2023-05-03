@@ -27,7 +27,7 @@ export enum HMSHLSExceptionEvents {
   VIDEO_ELEMENT_NOT_FOUND = 'video-element-not-found',
   HLS_AUTOPLAY_FAILED = 'hls-autoplay-failed',
   HLS_URL_NOT_FOUND = 'hls-url-not-found',
-  UNKNOWN_ERROR = 'unknown-error',
+  HLS_ERROR = 'hls-error',
 }
 
 export enum HLSPlaybackState {

@@ -32,6 +32,8 @@ class HMSResizeObserverWrapper {
     options: ResizeObserverOptions = { box: 'border-box' },
   ) => {
     this.createObserver();
+    // unobserve before observing the element
+    this.unobserve(element);
     this.resizeObserver?.observe(element, options);
     this.listeners.set(element, onResize);
   };

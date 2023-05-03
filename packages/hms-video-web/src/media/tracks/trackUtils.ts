@@ -12,6 +12,7 @@ const DELTA_THRESHOLD = 0.5;
  * Given the simulcast layers and the current video element dimensions, this function finds the
  * layer with dimensions closer to the video element dimensions.
  */
+// eslint-disable-next-line complexity
 export const getClosestLayer = (
   simulcastLayers: HMSSimulcastLayerDefinition[],
   videoElementDimensions: { width: number; height: number },
@@ -20,7 +21,7 @@ export const getClosestLayer = (
   // when both width and height are equal pick height to select a better quality
   const maxDimension = videoElementDimensions.width > videoElementDimensions.height ? 'width' : 'height';
   const layers = [...simulcastLayers].sort((a, b) => layerToIntMapping[a.layer] - layerToIntMapping[b.layer]);
-  const videoDimesion = videoElementDimensions[maxDimension];
+  const videoDimesion = videoElementDimensions[maxDimension] * (window?.devicePixelRatio || 1);
   for (let i = 0; i < layers.length; i++) {
     const { resolution, layer } = layers[i];
     const layerDimension = resolution[maxDimension];
