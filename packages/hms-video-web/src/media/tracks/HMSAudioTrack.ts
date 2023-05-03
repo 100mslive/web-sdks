@@ -22,6 +22,7 @@ export class HMSAudioTrack extends HMSTrack {
   }
 
   getVolume() {
+    console.log('getVolume::volume:: ', this.audioElement?.volume, this.gainNode?.gain?.value);
     return this.gainNode ? this.gainNode.gain.value * 100 : null;
   }
 
