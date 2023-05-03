@@ -54,3 +54,19 @@ test(`Verify network on tile and peerlist`, async ({ context }) => {
   await pages[0].endRoom();
   await context.close();
 });
+
+test(`Verify emoji container is clickable`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.assertVisible(page.footer.emoji_btn);
+  await page.click(page.footer.emoji_btn)
+  await page.assertVisible(page.footer.emoji_container);
+  let emojis = page.locator(page.footer.emoji_container);
+  let emojiCount = await emojis.count();
+  for (let emoji = 0; emoji < emojiCount; emoji++) {
+   await emojis.nth(emoji).click();
+  }
+  // close the emoji container
+  await page.click("html");
+  await page.endRoom();
+  await page.close();
+});

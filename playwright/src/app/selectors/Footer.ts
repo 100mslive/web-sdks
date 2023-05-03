@@ -56,6 +56,8 @@ export class Footer {
   brb_btn = '(//button[@data-testid="brb_btn"])[2]';
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
   chat_placeholder = 'css=[placeholder="Write something here"]';
+  emoji_btn = '[data-testid="emoji_reaction_btn"]'
+  emoji_container = '[class="emoji-mart-emoji"]'
 
   first_chat_msg = 'div[data-testid="chat_msg"]';
 
