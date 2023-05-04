@@ -77,7 +77,7 @@ const HLSView = () => {
         case EMOJI_REACTION_TYPE:
           window.showFlyingEmoji(
             parsedPayload?.emojiId,
-            parsedPayload?.senderPeerId
+            parsedPayload?.senderId
           );
           break;
         default: {
@@ -92,7 +92,7 @@ const HLSView = () => {
       }
     };
     const handleError = data => {
-      console.error("[HLSView] error in hls", data);
+      console.error("[HLSView] error in hls", `${data}`);
     };
     const handleNoLongerLive = ({ isLive }) => {
       setIsVideoLive(isLive);

@@ -265,7 +265,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         break;
       }
       default: {
-        const error = HMSHLSErrorFactory.UnknownError(detail);
+        const error = HMSHLSErrorFactory.HLSError(detail, data.type, data.details);
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }
