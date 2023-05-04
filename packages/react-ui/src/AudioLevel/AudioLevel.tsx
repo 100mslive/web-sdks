@@ -17,7 +17,7 @@ export function useBorderAudioLevel(audioTrackId?: HMSTrackID) {
       };
       style['outline'] = level
         ? `${sigmoid(level) * 4}px solid ${color}`
-        : '';
+        : '0px solid transparent';
       return style;
     },
     [color],
