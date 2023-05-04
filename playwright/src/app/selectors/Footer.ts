@@ -27,6 +27,15 @@ export class Footer {
   change_name_field = 'input[data-testid="change_name_field"]';
   popup_change_btn = 'button[data-testid="popup_change_btn"]';
 
+  //bulk role ids
+  bulk_role_change_btn = 'div[data-testid="bulk_role_change_btn"]';
+  for_role_dropdown = 'div[data-testid="Select Multiple Roles_selector"]';
+  for_role_checkbox = "text='audio-video-sshare'"
+  for_role_label = "text='For Roles:'"
+  to_role_dropdown = 'div[data-testid="Select Role_selector"]';
+  to_role = "text='audio-video'"
+  apply_btn = "text='Apply'";
+
   streaming_recording_btn = 'div[data-testid="streaming_recording_btn"]';
   streaming_metting_url_field = 'input[data-testid="metting_url_field"]';
   streaming_rtmp_url_field = 'input[data-testid="rtmp_url_field"]';
@@ -142,4 +151,29 @@ export class Footer {
   async openMoreSettings() {
     await this.page.click(this.more_settings_btn);
   }
+
+  async openBulkRoleChange(){
+    await this.page.click(this.bulk_role_change_btn);
+  }
+
+  async openRoleForChange(){
+    await this.page.click(this.for_role_dropdown);
+  }
+
+  async selectForRoleForChange(){
+    await this.page.click(this.for_role_checkbox);
+  }
+
+  async selectToRoleDropdown(){
+    await this.page.click(this.to_role_dropdown);
+  }
+
+  async selectToRole(){
+    await this.page.click(this.to_role);
+  }
+
+  async clickApplyButton(){
+    await this.page.click(this.apply_btn);
+  }
+
 }
