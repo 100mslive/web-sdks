@@ -121,6 +121,11 @@ export class PageWrapper {
     expect(innerText.includes(msgSent)).toBeTruthy();
   }
 
+  async hasLink(elementId: string, hrefLink: string){
+    const emojiHref = await this.page.locator(elementId).getAttribute('href');
+    expect(emojiHref?.includes(hrefLink))
+  }
+
   /**
    * @returns {String}
    */
