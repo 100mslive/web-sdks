@@ -44,7 +44,8 @@ export class HMSHLSTimedMetadata {
         value: { data: string };
       };
       if (cue.queued) {
-        return;
+        cueIndex++;
+        continue;
       }
       // here we are converting base64 to actual data.
       const data: Record<string, any> = metadataPayloadParser(cue.value.data);
