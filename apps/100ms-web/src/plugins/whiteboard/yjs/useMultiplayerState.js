@@ -3,8 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import throttle from "lodash.throttle";
 import {
   doc,
-  room,
   provider,
+  room,
   setupProviderAndRoom,
   undoManager,
   yBindings,

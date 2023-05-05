@@ -1,7 +1,7 @@
 // @ts-check
-import * as Y from "yjs";
-import { WebsocketProvider } from "y-websocket";
 import { Room } from "@y-presence/client";
+import { WebsocketProvider } from "y-websocket";
+import * as Y from "yjs";
 
 // Create the doc
 export const doc = new Y.Doc();

@@ -76,7 +76,8 @@ export default function useMultiplayerState(roomId) {
     state => {
       app === null || app === void 0
         ? void 0
-        : app.replacePageContent(
+        : // @ts-ignore
+          app.replacePageContent(
             state.shapes,
             state.bindings,
             {} // Object.fromEntries(lAssets.entries())
