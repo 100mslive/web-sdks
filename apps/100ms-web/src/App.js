@@ -300,7 +300,6 @@ export default function App() {
         font: process.env.REACT_APP_FONT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
-      roomCode="fuzzy-maroon-stingray"
     />
   );
 }
