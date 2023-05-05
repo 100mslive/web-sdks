@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect } from "react";
 import {
-  BrowserRouter as Router,
+  MemoryRouter as Router,
   Navigate,
   Route,
   Routes,
@@ -71,7 +71,10 @@ export function HMSMeetingComponent({
   },
   policyConfig = envPolicyConfig,
   getDetails = () => {},
-  authTokenByRoomCodeEndpoint = "",
+  authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
+  roomId,
+  role,
+  roomCode,
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
@@ -119,6 +122,9 @@ export function HMSMeetingComponent({
             <AppRoutes
               getDetails={getDetails}
               authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              roomId={roomId}
+              role={role}
+              roomCode={roomCode}
             />
           </Box>
         </HMSRoomProvider>
@@ -229,9 +235,18 @@ const BackSwipe = () => {
   return null;
 };
 
-function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
+function AppRoutes({
+  getDetails,
+  authTokenByRoomCodeEndpoint,
+  roomId,
+  role,
+  roomCode,
+}) {
   return (
-    <Router>
+    <Router
+      initialEntries={[`/preview/${roomCode ? roomCode : `${roomId}/${role}`}`]}
+      initialIndex={0}
+    >
       <ToastContainer />
       <Notifications />
       <BackSwipe />
