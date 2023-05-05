@@ -63,7 +63,7 @@ export default function useMultiplayerState(roomId) {
   const onChangePresence = useCallback(
     throttle((app, user) => {
       if (!app.room) return;
-      room.setPresence({ id: app.room.userId, tdUser: user });
+      room?.setPresence({ id: app.room.userId, tdUser: user });
     }, 150),
     []
   );
