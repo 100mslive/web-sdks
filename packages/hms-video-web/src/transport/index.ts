@@ -47,6 +47,7 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
+  PUBLISH_STATS_SEND_INTERVAL,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
@@ -1041,7 +1042,10 @@ export default class HMSTransport implements ITransport {
     });
 
     if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
-      new PublishStatsAnalytics(this.store, this.eventBus);
+      const publishStatsAnalytics = new PublishStatsAnalytics(this.store, this.eventBus);
+      setInterval(() => {
+        console.log('Publish Stats Analytics', publishStatsAnalytics.toAnalytics());
+      }, PUBLISH_STATS_SEND_INTERVAL);
     }
   }
 

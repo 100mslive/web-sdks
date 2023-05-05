@@ -1,37 +1,54 @@
-import { BaseSample, TrackAnalytics, VideoSample } from './interfaces';
+import { BaseSample, PublishAnalyticPayload, TrackAnalytics, VideoSample } from './interfaces';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalTrackStats, HMSTrackStats, RTCRemoteInboundRtpStreamStats } from '../../interfaces';
+import { HMSLocalTrack } from '../../media/tracks';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { IStore } from '../../sdk/store';
-
-const SAMPLE_WINDOW = 30;
+import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 
 export class PublishStatsAnalytics {
+  private sequenceNum = 1;
   private trackAnalytics: Map<string, RunningTrackAnalytics> = new Map();
 
   constructor(private store: IStore, private eventBus: EventBus) {
     this.eventBus.statsUpdate.subscribe(hmsStats => this.handleStatsUpdate(hmsStats));
   }
 
+  toAnalytics(): PublishAnalyticPayload {
+    const trackAnalyticValues = Array.from(this.trackAnalytics.values());
+    return {
+      audio: trackAnalyticValues
+        .filter(trackAnalytic => trackAnalytic.track.type === 'audio')
+        .map(trackAnalytic => trackAnalytic.toAnalytics()),
+      video: trackAnalyticValues
+        .filter(trackAnalytic => trackAnalytic.track.type === 'video')
+        .map(trackAnalytic => trackAnalytic.toAnalytics()),
+      joined_at: this.store.getRoom()?.joinedAt?.getMilliseconds()!,
+      sequence_num: this.sequenceNum++,
+      max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
+    };
+  }
+
   private handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     const localTracksStats = hmsStats.getLocalTrackStats();
-    Object.keys(localTracksStats).forEach(trackId => {
-      const trackStats = localTracksStats[trackId];
+    Object.keys(localTracksStats).forEach(trackIDBeingSent => {
+      const trackStats = localTracksStats[trackIDBeingSent];
+      const track = this.store.getLocalPeerTracks().find(track => track.getTrackIDBeingSent() === trackIDBeingSent);
       Object.keys(trackStats).forEach(statId => {
         const layerStats = trackStats[statId];
-        const identifier = this.getTrackIdentifier(trackId, layerStats);
-        if (this.trackAnalytics.has(identifier)) {
+        const identifier = track && this.getTrackIdentifier(track?.trackId, layerStats);
+        if (identifier && this.trackAnalytics.has(identifier)) {
           this.trackAnalytics.get(identifier)?.push(layerStats);
         } else {
-          const source = this.store.getTrackById(trackId)?.source!;
-          const trackAnalytics = new RunningTrackAnalytics({
-            trackId,
-            rid: layerStats.rid,
-            ssrc: layerStats.ssrc.toString(),
-            kind: layerStats.kind,
-            source,
-          });
-          this.trackAnalytics.set(identifier, trackAnalytics);
+          if (track) {
+            const trackAnalytics = new RunningTrackAnalytics({
+              track,
+              rid: layerStats.rid,
+              ssrc: layerStats.ssrc.toString(),
+              kind: layerStats.kind,
+            });
+            this.trackAnalytics.set(this.getTrackIdentifier(track?.trackId, layerStats), trackAnalytics);
+          }
         }
       });
     });
@@ -42,34 +59,24 @@ export class PublishStatsAnalytics {
   }
 }
 
-class RunningTrackAnalytics implements TrackAnalytics {
+class RunningTrackAnalytics {
+  track: HMSLocalTrack;
   track_id: string;
-  ssrc: string;
   source: string;
+  ssrc: string;
   kind: string;
   rid?: string;
   samples: BaseSample[] = [];
 
   private tempStats: HMSLocalTrackStats[] = [];
 
-  constructor({
-    trackId,
-    ssrc,
-    source,
-    rid,
-    kind,
-  }: {
-    trackId: string;
-    ssrc: string;
-    source: string;
-    kind: string;
-    rid?: string;
-  }) {
-    this.track_id = trackId;
+  constructor({ track, ssrc, rid, kind }: { track: HMSLocalTrack; ssrc: string; kind: string; rid?: string }) {
+    this.track = track;
     this.ssrc = ssrc;
-    this.source = source;
     this.rid = rid;
     this.kind = kind;
+    this.track_id = this.track.trackId;
+    this.source = this.track.source!;
   }
 
   push(stat: HMSLocalTrackStats) {
@@ -79,6 +86,16 @@ class RunningTrackAnalytics implements TrackAnalytics {
       this.samples.push(this.createSample());
       this.tempStats.length = 0;
     }
+  }
+
+  toAnalytics(): TrackAnalytics {
+    return {
+      track_id: this.track_id,
+      ssrc: this.ssrc,
+      source: this.source,
+      rid: this.rid,
+      samples: this.samples,
+    };
   }
 
   private createSample(): BaseSample | VideoSample {
@@ -115,7 +132,9 @@ class RunningTrackAnalytics implements TrackAnalytics {
       prevStat &&
       (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-    return length === SAMPLE_WINDOW || (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat));
+    return (
+      length === PUBLISH_STATS_SAMPLE_WINDOW || (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
+    );
   }
 
   private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats) {

@@ -28,6 +28,9 @@ export const CLIENT_ANAYLTICS_PROD_ENDPOINT = 'https://event.100ms.live/v2/clien
 export const CLIENT_ANAYLTICS_QA_ENDPOINT = 'https://event-nonprod.100ms.live/v2/client/report';
 export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 
+export const PUBLISH_STATS_SAMPLE_WINDOW = 30;
+export const PUBLISH_STATS_SEND_INTERVAL = 300000;
+
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
