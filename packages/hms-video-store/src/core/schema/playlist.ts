@@ -93,6 +93,8 @@ export interface IHMSPlaylistActions {
    * @param playbackRate - value from 0.25 and 2.0
    */
   setPlaybackRate(playbackRate: number): void;
+  removeItem(id: string): Promise<boolean>;
+  clearList(): Promise<void>;
 }
 
 /**
@@ -104,7 +106,7 @@ export interface HMSPlaylistSelector {
    */
   list: <T>(store: HMSStore) => HMSPlaylistItem<T>[];
   /**
-   * This returns playlist selection with {id, hasNext, hasPrev}
+   * This returns playlist selection with `{ id, hasNext, hasPrev }`
    * @returns {HMSPlaylistSelection}
    */
   selection: (store: HMSStore) => HMSPlaylistSelection;

@@ -1,18 +1,32 @@
 import React, { Fragment } from "react";
 import {
-  VideoOffIcon,
-  VideoOnIcon,
+  selectIsConnectedToRoom,
+  selectLocalVideoTrackID,
+  selectVideoTrackByID,
+  useAVToggle,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import {
+  CameraFlipIcon,
   MicOffIcon,
   MicOnIcon,
+  VideoOffIcon,
+  VideoOnIcon,
 } from "@100mslive/react-icons";
-import { Tooltip, IconButton } from "@100mslive/react-ui";
-import { useAVToggle, parsedUserAgent } from "@100mslive/react-sdk";
+import { Tooltip } from "@100mslive/react-ui";
+import { ToastManager } from "./Toast/ToastManager";
+import IconButton from "../IconButton";
+import { isMacOS } from "../common/constants";
 
-const isMacOS = parsedUserAgent.getOS().name.toLowerCase() === "mac os";
-
-export const AudioVideoToggle = ({ compact = false }) => {
+export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
     useAVToggle();
+  const actions = useHMSActions();
+  const videoTracKId = useHMSStore(selectLocalVideoTrackID);
+  const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTracKId));
+  const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
+
   return (
     <Fragment>
       {toggleAudio ? (
@@ -22,7 +36,6 @@ export const AudioVideoToggle = ({ compact = false }) => {
           } + d)`}
         >
           <IconButton
-            css={{ mr: compact ? "$2" : "$4" }}
             active={isLocalAudioEnabled}
             onClick={toggleAudio}
             key="toggleAudio"
@@ -43,7 +56,6 @@ export const AudioVideoToggle = ({ compact = false }) => {
           } + e)`}
         >
           <IconButton
-            css={compact ? { ml: "$2" } : { mx: "$4" }}
             key="toggleVideo"
             active={isLocalVideoEnabled}
             onClick={toggleVideo}
@@ -54,6 +66,24 @@ export const AudioVideoToggle = ({ compact = false }) => {
             ) : (
               <VideoOnIcon data-testid="video_on_btn" />
             )}
+          </IconButton>
+        </Tooltip>
+      ) : null}
+      {localVideoTrack?.facingMode && isConnectedToRoom ? (
+        <Tooltip title="Switch Camera" key="switchCamera">
+          <IconButton
+            onClick={async () => {
+              try {
+                await actions.switchCamera();
+              } catch (e) {
+                ToastManager.addToast({
+                  title: `Error while flipping camera ${e.message || ""}`,
+                  variant: "error",
+                });
+              }
+            }}
+          >
+            <CameraFlipIcon />
           </IconButton>
         </Tooltip>
       ) : null}

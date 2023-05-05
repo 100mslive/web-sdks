@@ -1,5 +1,6 @@
-import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
 import { HMSAction } from './ErrorFactory';
+import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
+import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
 export class HMSException extends Error implements IAnalyticsPropertiesProvider {
   action: string;
@@ -8,7 +9,7 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
   constructor(
     public readonly code: number,
     public name: string,
-    action: HMSAction,
+    action: HMSAction | HMSSignalMethod,
     public message: string,
     public description: string,
     public isTerminal: boolean = false,
@@ -33,5 +34,17 @@ export class HMSException extends Error implements IAnalyticsPropertiesProvider 
 
   addNativeError(error: Error) {
     this.nativeError = error;
+  }
+
+  toString() {
+    return `{
+      code: ${this.code};
+      name: ${this.name};
+      action: ${this.action};
+      message: ${this.message};
+      description: ${this.description};
+      isTerminal: ${this.isTerminal};
+      nativeError: ${this.nativeError?.message};
+    }`;
   }
 }

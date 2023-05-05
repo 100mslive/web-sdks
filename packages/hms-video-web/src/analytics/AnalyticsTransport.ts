@@ -1,12 +1,13 @@
+import AnalyticsEvent from './AnalyticsEvent';
+import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
+import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 import HMSLogger from '../utils/logger';
 import { Queue } from '../utils/queue';
-import AnalyticsEvent from './AnalyticsEvent';
-import { IAnalyticsTransportProvider } from './IAnalyticsTransportProvider';
 
 export abstract class AnalyticsTransport {
   abstract transportProvider: IAnalyticsTransportProvider;
   abstract failedEvents: Queue<AnalyticsEvent>;
-  private TAG = 'AnalyticsTransport';
+  private readonly TAG = '[AnalyticsTransport]';
 
   sendEvent(event: AnalyticsEvent) {
     try {
@@ -17,13 +18,18 @@ export abstract class AnalyticsTransport {
     }
   }
 
-  flushFailedEvents() {
+  flushFailedEvents(currentPeerId?: string) {
     try {
       HMSLogger.d(this.TAG, 'Flushing failed events', this.failedEvents);
       while (this.failedEvents.size() > 0) {
         const event = this.failedEvents.dequeue();
         if (event) {
-          this.sendSingleEvent(event);
+          const isEventFromCurrentPeer = event.metadata?.peer.peer_id === currentPeerId;
+          if (isEventFromCurrentPeer || !event.metadata.peer.peer_id) {
+            this.sendSingleEvent(event);
+          } else {
+            HTTPAnalyticsTransport.sendEvent(event);
+          }
         }
       }
     } catch (error) {

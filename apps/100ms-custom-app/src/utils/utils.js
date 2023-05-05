@@ -3,20 +3,8 @@ import axios from 'axios';
 
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
-  let roomCode = null;
-  if (path.startsWith('/preview/') || path.startsWith('/meeting/')) {
-    roomCode = '';
-    for (let i = 9; i < path.length; i++) {
-      if (path[i] === '/') {
-        break;
-      }
-      roomCode += path[i];
-    }
-    if (roomCode.trim() === '') {
-      roomCode = null;
-    }
-  }
-  return roomCode;
+  const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
+  return path.match(regex)?.groups?.code || null;
 };
 
 export const getAuthInfo = () => {
@@ -33,12 +21,27 @@ export const getAuthInfo = () => {
   return info;
 };
 
+const tileShapeMapping = {
+  '1-1': 'SQUARE',
+  '4-3': 'LANDSCAPE',
+  '16-9': 'WIDE',
+  '3-4': '3-4',
+  '9-16': '9-16',
+};
+
+const env = process.env.REACT_APP_ENV || 'prod';
+export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
+const authTokenEndpointByRoomCode = {
+  qa: 'https://auth-nonprod.100ms.live/v2/token',
+  dev: 'https://auth-nonprod.100ms.live/v2/token',
+};
+
+export const getAuthTokenByRoomCodeEndpoint = () => {
+  return authTokenEndpointByRoomCode[env] || '';
+};
+
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
-  const mapTileShape = value => {
-    return value === '1-1' ? 'SQUARE' : value === '16-9' ? 'WIDE' : 'LANDSCAPE';
-  };
-
   const formData = new FormData();
   const logoFile = settings.logo_obj;
   if (logoFile) {
@@ -47,15 +50,14 @@ export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
 
   formData.append('color', settings.brand_color);
   formData.append('font', settings.font.toUpperCase());
-  formData.append('tile_shape', mapTileShape(settings.tile_shape));
+  formData.append('tile_shape', tileShapeMapping[settings.tile_shape]);
   formData.append('theme', settings.theme.toUpperCase());
   formData.append('app_type', appInfo.app_type);
   formData.append('app_name', appInfo.app_name);
   formData.append('subdomain', hostname);
   formData.append('metadata', settings.metadataFields.metadata);
 
-  axios.create({ baseURL: process.env.REACT_APP_BACKEND_API, timeout: 2000 });
-  const url = `${process.env.REACT_APP_BACKEND_API}apps/details`;
+  const url = `${apiBasePath}apps/details`;
 
   const headers = {
     Authorization: `Bearer ${jwt}`,

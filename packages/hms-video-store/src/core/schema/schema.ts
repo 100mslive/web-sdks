@@ -1,18 +1,22 @@
-import { HMSPeer, HMSPeerID, HMSTrackID, HMSTrack, HMSSpeaker } from './peer';
+import { HMSException } from './error';
 import { HMSMessage, HMSMessageID } from './message';
+import { HMSPeer, HMSPeerID, HMSSpeaker, HMSTrack, HMSTrackID } from './peer';
+import { HMSPlaylist } from './playlist';
+import { HMSRoleChangeStoreRequest } from './requests';
+import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSPeerStats, HMSTrackStats, HMSConnectionQuality } from '../hmsSDKStore/sdkTypes';
-import { HMSRole } from './role';
-import { HMSRoleChangeStoreRequest } from './requests';
-import { HMSException } from './error';
-import { HMSPlaylist } from './playlist';
+import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
+
+export interface HMSGenericTypes {
+  sessionStore: Record<string, any>;
+}
 
 /*
  * Defines the schema of the central store. UI Components are aware of the presence
  * of this central store. This is the global state - the single source of immutable truth.
  */
-export interface HMSStore {
+export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   room: HMSRoom;
   peers: Record<HMSPeerID, HMSPeer>;
   speakers: Record<HMSTrackID, HMSSpeaker>;
@@ -26,13 +30,24 @@ export interface HMSStore {
   settings: HMSMediaSettings;
   devices: DeviceMap;
   roles: Record<string, HMSRole>;
+  templateAppData: Record<string, string>;
   appData?: Record<string, any>;
   roleChangeRequests: HMSRoleChangeStoreRequest[];
+  /** @deprecated use `sessionStore` instead */
+  sessionMetadata?: any;
+  preview?: {
+    localPeer?: HMSPeerID;
+    asRole?: string;
+    videoTrack?: HMSTrackID;
+    audioTrack?: HMSTrackID;
+  };
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
+  sessionStore: T['sessionStore'];
 }
 
 export interface HMSStatsStore {
-  trackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  remoteTrackStats: Record<HMSTrackID, HMSTrackStats | undefined>;
+  localTrackStats: Record<HMSTrackID, HMSTrackStats[] | undefined>;
   peerStats: Record<HMSPeerID, HMSPeerStats | undefined>;
   localPeer: {
     id: HMSPeerID;
@@ -44,16 +59,14 @@ export interface HMSStatsStore {
 /**
  * @internal
  */
-export const createDefaultStoreState = (): HMSStore => {
+export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T> => {
   return {
     room: {
       id: '',
       isConnected: false,
       name: '',
       peers: [],
-      shareableLink: '',
       localPeer: '',
-      hasWaitingRoom: false,
       roomState: HMSRoomState.Disconnected,
       recording: {
         browser: {
@@ -109,13 +122,16 @@ export const createDefaultStoreState = (): HMSStore => {
     roles: {},
     roleChangeRequests: [],
     errors: [],
+    sessionStore: {},
+    templateAppData: {},
   };
 };
 
 export const createDefaultStatsStore = (): HMSStatsStore => {
   return {
     peerStats: {},
-    trackStats: {},
+    remoteTrackStats: {},
+    localTrackStats: {},
     localPeer: { id: '' },
   };
 };

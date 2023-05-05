@@ -1,12 +1,13 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.1.54",
-  "license": "UNLICENSED",
+  "version": "0.9.2",
+  "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
   "module": "dist/index.js",
   "files": [
-    "dist/**/*"
+    "dist",
+    "src"
   ],
   "engines": {
     "node": ">=10"
@@ -36,6 +37,7 @@
   },
   "author": "100ms <tech-common@100ms.live>",
   "devDependencies": {
+    "@types/dom-screen-wake-lock": "^1.0.1",
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",
@@ -43,7 +45,7 @@
     "tslib": "^2.2.0"
   },
   "dependencies": {
-    "eventemitter2": "^6.4.5",
+    "eventemitter2": "^6.4.7",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^1.0.1",
     "uuid": "^8.3.2",

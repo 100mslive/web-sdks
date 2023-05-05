@@ -1,6 +1,9 @@
-import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
-import { domainCategory } from './domain-analytics';
+import { v4 as uuid } from 'uuid';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
+import { domainCategory } from './domain-analytics';
+import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
+import { getAnalyticsDeviceId } from '../utils/support';
+import { createUserAgent } from '../utils/user-agent';
 
 interface AnalyticsEventInit {
   name: string;
@@ -21,7 +24,28 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
   level: AnalyticsEventLevel;
   includesPII: boolean;
   properties: Record<string, any>;
+  metadata: {
+    token?: string;
+    peer: {
+      peer_id?: string;
+      session_id?: string;
+      room_id?: string;
+      role?: string;
+      room_name?: string;
+      joined_at?: number;
+      template_id?: string;
+      session_started_at?: number;
+      user_name?: string;
+      user_data?: string;
+    };
+    userAgent: string;
+  } = {
+    peer: {},
+    userAgent: createUserAgent(),
+  };
   timestamp: number;
+  event_id: string;
+  device_id: string;
 
   constructor({ name, level, properties, includesPII, timestamp }: AnalyticsEventInit) {
     this.name = name;
@@ -29,6 +53,8 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     this.includesPII = includesPII || false;
     this.properties = properties || {};
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
+    this.event_id = uuid();
+    this.device_id = getAnalyticsDeviceId();
   }
 
   toSignalParams() {

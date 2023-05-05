@@ -6,28 +6,42 @@ export type {
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
 export type { IHMSActions as HMSActions } from './IHMSActions';
-export type { IHMSNotifications as HMSNotifications } from './IHMSNotifications';
-export type { HMSNotificationCallback } from './IHMSNotifications';
+export type { IHMSNotifications as HMSNotifications } from './schema/notification';
+export type { HMSNotificationInCallback, HMSNotificationCallback } from './schema/notification';
 export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
 export * from './selectors';
-export { HMSLogLevel, HMSAudioPluginType, HMSVideoPluginType, parsedUserAgent } from './hmsSDKStore/sdkTypes';
+export {
+  HMSLogLevel,
+  HMSAudioPluginType,
+  HMSVideoPluginType,
+  HMSVideoPluginCanvasContextType,
+  parsedUserAgent,
+  HMSSimulcastLayer,
+  simulcastMapping,
+  DeviceType,
+} from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 
 export type {
   HMSConfig,
+  HMSPreviewConfig,
   HMSConfigInitialSettings,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
-  HMSSimulcastLayer,
-  SimulcastLayerDefinition,
-  DeviceMap,
   RTMPRecordingConfig,
-  HMSRecording,
-  HMSRTMP,
   HMSPeerStats,
   HMSTrackStats,
   HMSLocalTrackStats,
   HMSRemoteTrackStats,
   HLSConfig,
+  HLSMeetingURLVariant,
+  HMSScreenShareConfig,
+  ScreenCaptureHandle,
+  HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
+  RID,
 } from './hmsSDKStore/sdkTypes';
+
+export * from '../controller/beam/BeamController';

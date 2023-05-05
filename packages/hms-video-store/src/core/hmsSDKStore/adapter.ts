@@ -6,7 +6,10 @@ import {
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSTrack as SDKHMSTrack,
 } from '@100mslive/hms-video';
+import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+import * as sdkTypes from './sdkTypes';
 import {
+  HMSAudioTrack,
   HMSDeviceChangeEvent,
   HMSException,
   HMSMessage,
@@ -18,11 +21,11 @@ import {
   HMSRoleChangeStoreRequest,
   HMSRoleName,
   HMSRoom,
+  HMSScreenVideoTrack,
   HMSTrack,
+  HMSTrackFacingMode,
+  HMSVideoTrack,
 } from '../schema';
-
-import * as sdkTypes from './sdkTypes';
-import { areArraysEqual } from './sdkUtils/storeMergeUtils';
 
 /**
  * This file has conversion functions from schema defined in sdk to normalised schema defined in store.
@@ -43,7 +46,6 @@ export class SDKToHMS {
       audioTrack: sdkPeer.audioTrack?.trackId,
       auxiliaryTracks: sdkPeer.auxiliaryTracks.map(track => track.trackId),
       customerUserId: sdkPeer.customerUserId,
-      customerDescription: sdkPeer.metadata,
       metadata: sdkPeer.metadata,
       joinedAt: sdkPeer.joinedAt,
     };
@@ -57,25 +59,38 @@ export class SDKToHMS {
       enabled: sdkTrack.enabled,
       displayEnabled: sdkTrack.enabled,
       peerId: sdkTrack.peerId || peerId,
-    };
+    } as HMSTrack;
     this.enrichTrack(track, sdkTrack);
     return track;
   }
 
   static enrichTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
     const mediaSettings = sdkTrack.getMediaTrackSettings();
-    if (track.source === 'screen' && track.type === 'video') {
-      // @ts-ignore
-      track.displaySurface = mediaSettings.displaySurface;
-    }
-    track.height = mediaSettings.height;
-    track.width = mediaSettings.width;
+
     if (sdkTrack instanceof SDKHMSRemoteAudioTrack) {
-      track.volume = sdkTrack.getVolume() || 0;
+      (track as HMSAudioTrack).volume = sdkTrack.getVolume() || 0;
     }
     SDKToHMS.updateDeviceID(track, sdkTrack);
-    SDKToHMS.enrichVideoTrack(track, sdkTrack);
+    SDKToHMS.enrichLocalTrack(track, sdkTrack);
+    if (track.type === 'video') {
+      if (track.source === 'screen') {
+        // @ts-ignore
+        track.displaySurface = mediaSettings.displaySurface;
+        SDKToHMS.enrichScreenTrack(track as HMSScreenVideoTrack, sdkTrack);
+      } else if (track.source === 'regular') {
+        (track as HMSVideoTrack).facingMode = mediaSettings.facingMode as HMSTrackFacingMode;
+      }
+      track.height = mediaSettings.height;
+      track.width = mediaSettings.width;
+      SDKToHMS.enrichVideoTrack(track as HMSVideoTrack, sdkTrack);
+    }
     SDKToHMS.enrichPluginsDetails(track, sdkTrack);
+  }
+
+  static enrichLocalTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack || sdkTrack instanceof SDKHMSLocalAudioTrack) {
+      track.isPublished = sdkTrack.isPublished;
+    }
   }
 
   static updateDeviceID(track: HMSTrack, sdkTrack: SDKHMSTrack) {
@@ -86,12 +101,27 @@ export class SDKToHMS {
     }
   }
 
-  static enrichVideoTrack(track: HMSTrack, sdkTrack: SDKHMSTrack) {
+  static enrichVideoTrack(track: HMSVideoTrack, sdkTrack: SDKHMSTrack) {
     if (sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      track.layer = sdkTrack.getSimulcastLayer();
+      track.layer = sdkTrack.getLayer();
+      track.preferredLayer = sdkTrack.getPreferredLayer();
       track.degraded = sdkTrack.degraded;
+    }
+    if (sdkTrack instanceof SDKHMSRemoteVideoTrack || sdkTrack instanceof SDKHMSLocalVideoTrack) {
       if (!areArraysEqual(sdkTrack.getSimulcastDefinitions(), track.layerDefinitions)) {
         track.layerDefinitions = sdkTrack.getSimulcastDefinitions();
+      }
+    }
+  }
+
+  static enrichScreenTrack(track: HMSScreenVideoTrack, sdkTrack: SDKHMSTrack) {
+    if (sdkTrack instanceof SDKHMSLocalVideoTrack) {
+      const newCaptureHandle = sdkTrack.getCaptureHandle?.();
+      if (newCaptureHandle?.handle !== track.captureHandle?.handle) {
+        track.captureHandle = newCaptureHandle;
+      }
+      if (sdkTrack.isCurrentTab) {
+        track.displaySurface = 'selfBrowser';
       }
     }
   }
@@ -114,8 +144,6 @@ export class SDKToHMS {
       id: sdkRoom.id,
       name: sdkRoom.name,
       localPeer: sdkRoom.localPeer?.peerId ?? '',
-      hasWaitingRoom: sdkRoom.hasWaitingRoom,
-      shareableLink: sdkRoom.shareableLink,
       recording,
       rtmp,
       hls,
@@ -128,10 +156,10 @@ export class SDKToHMS {
 
   static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender.peerId,
-      senderName: sdkMessage.sender.name,
-      senderRole: sdkMessage.sender.role?.name,
-      senderUserId: sdkMessage.sender.customerUserId,
+      sender: sdkMessage.sender?.peerId,
+      senderName: sdkMessage.sender?.name,
+      senderRole: sdkMessage.sender?.role?.name,
+      senderUserId: sdkMessage.sender?.customerUserId,
       recipientPeer: sdkMessage.recipientPeer?.peerId,
       recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
       time: sdkMessage.time,

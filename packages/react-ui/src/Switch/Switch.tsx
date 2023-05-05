@@ -1,16 +1,20 @@
-import * as BaseSwitch from '@radix-ui/react-switch';
 import React from 'react';
+import * as BaseSwitch from '@radix-ui/react-switch';
 import { styled } from '../Theme';
 
 const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
-  width: 34,
-  height: 14,
-  backgroundColor: '$bgSecondary',
-  borderRadius: '9999px',
+  width: '30px',
+  height: '14px',
+  border: 'solid $space$px $secondaryDefault',
+  borderRadius: '$3',
+  p: '$2',
   position: 'relative',
   cursor: 'pointer',
-  '&[data-state="checked"]': { backgroundColor: '$bgPrimary' },
+  '&[data-state="checked"]': {
+    backgroundColor: '$primaryDefault',
+    border: 'solid $space$px $primaryDefault',
+  },
   '&:focus': {
     outline: 'none',
   },
@@ -22,17 +26,19 @@ const SwitchRoot = styled(BaseSwitch.Root, {
 
 const SwitchThumb = styled(BaseSwitch.Thumb, {
   display: 'block',
+  top: '3px',
   position: 'absolute',
-  top: -3,
-  left: -3,
-  width: 20,
-  height: 20,
-  backgroundColor: '$grayDefault',
+  width: '$md',
+  height: '$md',
+  backgroundColor: '$secondaryDefault',
   borderRadius: '$round',
-  transition: 'transform 100ms',
-  transform: 'translateX(2px)',
-  willChange: 'transform',
-  '&[data-state="checked"]': { transform: 'translateX(18px)', backgroundColor: '$brandDefault' },
+  transition: 'right 500ms ease-in',
+  left: '$2',
+  '&[data-state="checked"]': {
+    left: 'unset',
+    right: '$2',
+    backgroundColor: '$textAccentHigh',
+  },
 });
 
 type SwitchProps = React.ComponentProps<typeof SwitchRoot>;

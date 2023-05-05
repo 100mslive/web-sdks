@@ -1,18 +1,18 @@
-import type { DeviceMap } from '../interfaces/HMSDeviceManager';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
-import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
-import { HMSDeviceChangeEvent } from '../interfaces';
-import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from './DeviceStorage';
-import { IStore } from '../sdk/store';
-import HMSLogger from '../utils/logger';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
+import { DeviceMap, DeviceType, HMSDeviceChangeEvent } from '../interfaces';
+import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
+import { IStore } from '../sdk/store';
+import HMSLogger from '../utils/logger';
+import { debounce } from '../utils/timer-utils';
 
 export type SelectedDevices = {
-  audioInput?: MediaDeviceInfo;
-  videoInput?: MediaDeviceInfo;
-  audioOutput?: MediaDeviceInfo;
+  [DeviceType.audioInput]?: MediaDeviceInfo;
+  [DeviceType.videoInput]?: MediaDeviceInfo;
+  [DeviceType.audioOutput]?: MediaDeviceInfo;
 };
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
@@ -34,7 +34,7 @@ export class DeviceManager implements HMSDeviceManager {
   hasWebcamPermission = false;
   hasMicrophonePermission = false;
 
-  private TAG = '[Device Manager]:';
+  private readonly TAG = '[Device Manager]:';
   private initialized = false;
   private videoInputChanged = false;
   private audioInputChanged = false;
@@ -56,11 +56,11 @@ export class DeviceManager implements HMSDeviceManager {
     });
   }
 
-  updateOutputDevice = (deviceId?: string) => {
+  updateOutputDevice = async (deviceId?: string) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
-      this.store.updateAudioOutputDevice(newDevice);
+      await this.store.updateAudioOutputDevice(newDevice);
       DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
@@ -74,7 +74,7 @@ export class DeviceManager implements HMSDeviceManager {
     this.initialized = true;
     await this.enumerateDevices();
     this.logDevices('Init');
-    this.setOutputDevice();
+    await this.setOutputDevice();
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
@@ -166,21 +166,21 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = async () => {
+  private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
+    this.logDevices('After Device Change');
+    const localPeer = this.store.getLocalPeer();
+    await this.setOutputDevice(true);
+    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
+    await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
         selection: this.getCurrentSelection(),
-        type: 'list',
+        type: 'change',
         devices: this.getDevices(),
       }),
     );
-    this.logDevices('After Device Change');
-    const localPeer = this.store.getLocalPeer();
-    this.setOutputDevice(true);
-    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
-    await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
-  };
+  }, 500).bind(this);
 
   /**
    * Function to get the device after device change
@@ -195,7 +195,7 @@ export class DeviceManager implements HMSDeviceManager {
       // false positives when device is removed, because the other available device
       // get's the deviceId as default once this device is removed
       const nextDevice = this.audioInput.find(device => {
-        return device.label !== defaultDevice.label && defaultDevice.label.includes(device.label);
+        return device.deviceId !== 'default' && defaultDevice.label.includes(device.label);
       });
       return nextDevice;
     }
@@ -210,27 +210,32 @@ export class DeviceManager implements HMSDeviceManager {
    * Algo:
    * 1. find the non default input device if selected one is default by matching device label
    * 2. find the corresponding output device which has the same group id or same label
-   * 3. select the default one if nothing was found
-   * 4. select the first option if there is no default
+   * 3. select the previous selected device if nothing was found
+   * 4. select the default one if no matching device was found and previous device doesn't exist anymore
+   * 5. select the first option if there is no default
    */
-  setOutputDevice(deviceChange = false) {
+  async setOutputDevice(deviceChange = false) {
     const inputDevice = this.getNewAudioInputDevice();
     const prevSelection = this.createIdentifier(this.outputDevice);
-    this.outputDevice = undefined;
-    if (inputDevice?.groupId) {
-      // only check for label because if groupId check is added it will select speaker
-      // when an external earphone without microphone is added
-      this.outputDevice = this.audioOutput.find(
-        device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
-      );
-    }
+    this.outputDevice = this.getAudioOutputDeviceMatchingInput(inputDevice);
     if (!this.outputDevice) {
-      // select default deviceId device if available, otherwise select 0th device
-      this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
+      // there is no matching device, let's revert back to the prev selected device
+      this.outputDevice = this.audioOutput.find(device => this.createIdentifier(device) === prevSelection);
+      if (!this.outputDevice) {
+        // prev device doesn't exist as well, select default deviceId device if available, otherwise select 0th device
+        this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
+      }
     }
-    this.store.updateAudioOutputDevice(this.outputDevice);
+    await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioOutput: this.outputDevice },
+          devices: this.getDevices(),
+          type: 'audioOutput',
+        }),
+      );
       this.eventBus.deviceChange.publish({
         selection: this.outputDevice,
         type: 'audioOutput',
@@ -251,6 +256,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.getNewAudioInputDevice();
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { audioInput: newSelection },
+          error: new Error('Audio device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'audioInput',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
@@ -274,6 +287,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
           devices: this.getDevices(),
+          type: 'audioInput',
           error: error as HMSException,
         }),
       );
@@ -298,6 +312,14 @@ export class DeviceManager implements HMSDeviceManager {
     }
     const newSelection = this.videoInput[0];
     if (!newSelection || !newSelection.deviceId) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { videoInput: newSelection },
+          error: new Error('Video device not found') as HMSException,
+          devices: this.getDevices(),
+          type: 'video',
+        }),
+      );
       HMSLogger.w(this.TAG, 'Video device not found');
       return;
     }
@@ -326,6 +348,7 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
           devices: this.getDevices(),
+          type: 'video',
           error: error as HMSException,
         }),
       );
@@ -337,6 +360,26 @@ export class DeviceManager implements HMSDeviceManager {
       } as HMSDeviceChangeEvent);
     }
   };
+
+  private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {
+    const blacklist = this.store.getConfig()?.settings?.speakerAutoSelectionBlacklist || [];
+    if (blacklist === 'all') {
+      return;
+    }
+
+    const inputLabel = inputDevice?.label.toLowerCase() || '';
+    if (blacklist.some(label => inputLabel.includes(label.toLowerCase()))) {
+      return;
+    }
+
+    if (inputDevice?.groupId) {
+      // only check for label because if groupId check is added it will select speaker
+      // when an external earphone without microphone is added
+      return this.audioOutput.find(device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label);
+    }
+
+    return;
+  }
 
   private logDevices(label = '') {
     HMSLogger.d(

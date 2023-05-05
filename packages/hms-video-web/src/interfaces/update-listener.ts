@@ -1,30 +1,22 @@
+import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
+import { DeviceChangeListener } from './devices';
+import { HMSLeaveRoomRequest } from './leave-room-request';
+import { HMSMessage } from './message';
+import { HMSConnectionQuality } from './peer';
+import { HMSRoleChangeRequest } from './role-change-request';
+import { HMSRoom } from './room';
+import { SessionStoreUpdate } from './session-store';
+import { HMSSpeaker } from './speaker';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
 import { HMSPeer } from '../sdk/models/peer';
-import { HMSRoleChangeRequest } from './role-change-request';
-import { HMSMessage } from './message';
-import { HMSRoom } from './room';
-import { HMSSpeaker } from './speaker';
-import { DeviceChangeListener } from './device-change-listener';
-import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
-import { HMSLeaveRoomRequest } from './leave-room-request';
-import { HMSConnectionQuality } from './peer';
 
 export enum HMSRoomUpdate {
-  PEER_ADDED,
-  PEER_REMOVED,
-  PEER_KNOCKED,
-  ROOM_TYPE_CHANGED,
-  METADATA_UPDATED,
-  SCREENSHARE_STARTED,
-  SCREENSHARE_STOPPED,
-  DEFAULT_UPDATE,
-  RECORDING_STATE_UPDATED,
-  BROWSER_RECORDING_STATE_UPDATED,
-  SERVER_RECORDING_STATE_UPDATED,
-  RTMP_STREAMING_STATE_UPDATED,
-  HLS_STREAMING_STATE_UPDATED,
-  ROOM_STATE,
+  RECORDING_STATE_UPDATED = 'RECORDING_STATE_UPDATED',
+  BROWSER_RECORDING_STATE_UPDATED = 'BROWSER_RECORDING_STATE_UPDATED',
+  SERVER_RECORDING_STATE_UPDATED = 'SERVER_RECORDING_STATE_UPDATED',
+  RTMP_STREAMING_STATE_UPDATED = 'RTMP_STREAMING_STATE_UPDATED',
+  HLS_STREAMING_STATE_UPDATED = 'HLS_STREAMING_STATE_UPDATED',
 }
 
 export enum HMSPeerUpdate {
@@ -60,7 +52,11 @@ export interface HMSConnectionQualityListener {
   onConnectionQualityUpdate(qualityUpdates: HMSConnectionQuality[]): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener {
+export interface SessionStoreListener {
+  onSessionStoreUpdate(values: SessionStoreUpdate[]): void;
+}
+
+export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;

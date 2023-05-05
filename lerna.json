@@ -1,8 +1,9 @@
 {
-  "packages": ["packages/*", "apps/*"],
+  "packages": ["packages/*", "apps/*", "playwright/*"],
   "version": "independent",
   "npmClient": "yarn",
   "useWorkspaces": true,
+  "useNx": true,
   "command": {
     "version": {
       "message": "build: update version"

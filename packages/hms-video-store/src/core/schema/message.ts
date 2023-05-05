@@ -12,8 +12,8 @@ export enum HMSMessageType {
 
 export interface HMSMessage {
   id: HMSMessageID;
-  sender: HMSPeerID;
-  senderName: string;
+  sender?: HMSPeerID;
+  senderName?: string;
   senderUserId?: string;
   senderRole?: string;
   recipientPeer?: HMSPeerID;

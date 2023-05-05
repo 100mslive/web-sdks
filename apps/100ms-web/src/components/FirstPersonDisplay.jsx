@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/react-ui";
 import PlaceholderBg from "../images/first_person.png";
 
 export const FirstPersonDisplay = React.memo(() => {
@@ -16,6 +16,10 @@ export const FirstPersonDisplay = React.memo(() => {
         backgroundImage: `url(${PlaceholderBg})`,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
+        "@md": {
+          w: "100%",
+          maxWidth: "unset",
+        },
       }}
       data-testid="first_person_img"
     >

@@ -1,4 +1,5 @@
 import adapter from 'webrtc-adapter';
+import './utils/local-storage-polyfill';
 import HMSLogger from './utils/logger';
 
 HMSLogger.i('adapter', `${adapter.browserDetails.browser} v${adapter.browserDetails.version}`);

@@ -1,8 +1,8 @@
-import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
+import { VideoTrackLayerUpdate } from '../connection/channel-messages';
 import { HMSRole } from '../interfaces/role';
-import { Track } from '../signal/interfaces';
 import { HMSLocalTrack } from '../media/tracks';
-import { HMSSimulcastLayer } from '../interfaces';
+import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
+import { Track } from '../signal/interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -24,11 +24,7 @@ export interface TrackStateNotification {
 
 export interface OnTrackLayerUpdateNotification {
   tracks: {
-    [track_id: string]: {
-      current_layer: HMSSimulcastLayer;
-      expected_layer: HMSSimulcastLayer;
-      track_id: string;
-    };
+    [track_id: string]: VideoTrackLayerUpdate;
   };
 }
 
@@ -48,6 +44,8 @@ export interface PolicyParams {
   known_roles: {
     [role: string]: HMSRole;
   };
+  template_id: string;
+  app_data?: Record<string, string>;
 }
 
 /**
@@ -155,20 +153,20 @@ export interface ConnectionQualityList {
  * Represents the role change request received from the server
  */
 export interface RoleChangeRequestParams {
-  requested_by: string;
+  requested_by?: string;
   role: string;
   token: string;
 }
 
 export interface TrackUpdateRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   track_id: string;
   stream_id: string;
   mute: boolean;
 }
 
 export interface ChangeTrackMuteStateNotification {
-  requested_by: string;
+  requested_by?: string;
   roles?: string[];
   type?: 'audio' | 'video';
   source?: HMSTrackSource;
@@ -176,13 +174,13 @@ export interface ChangeTrackMuteStateNotification {
 }
 
 export interface PeerLeaveRequestNotification {
-  requested_by: string;
+  requested_by?: string;
   reason: string;
   room_end: boolean;
 }
 
 export interface MessageNotification {
-  peer: {
+  peer?: {
     peer_id: string;
     info: {
       name: string;
@@ -203,21 +201,19 @@ export interface SendMessage {
 }
 
 export interface MessageNotificationInfo {
-  sender: string;
   message: any;
   type: string;
-  time?: string;
 }
 
 export interface RecordingNotification {
   type: 'sfu' | 'Browser';
   started_at?: number;
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   error?: ServerError;
 }
 
 export interface RTMPNotification {
-  peer: PeerNotificationInfo;
+  peer?: PeerNotificationInfo;
   started_at?: number;
   error?: ServerError;
 }
@@ -237,4 +233,14 @@ export interface HLSVariantInfo {
   meeting_url?: string;
   metadata?: string;
   started_at?: number;
+}
+
+export interface MetadataChangeNotification {
+  values: {
+    change_version?: number;
+    updated_by?: string;
+    data: any;
+    key: string;
+    updated_at?: number;
+  }[];
 }

@@ -1,12 +1,12 @@
 import {
+  createDefaultStoreState,
+  HMSException,
   HMSNotificationSeverity,
   HMSNotificationTypes,
   HMSPeer,
   HMSReactiveStore,
   HMSStore,
   HMSTrack,
-  HMSException,
-  createDefaultStoreState,
 } from '../../core';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../core/hmsSDKStore/common/mapping';
 import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
@@ -56,11 +56,6 @@ describe('hms notifications tests', () => {
     expect(cb.mock.results[0].value.type).toBe(PEER_NOTIFICATION_TYPES[sdkTypes.HMSPeerUpdate.PEER_LEFT]);
     expect(cb.mock.results[0].value.data).toBe(peer);
     expect(cb.mock.results[0].value.severity).toBe(HMSNotificationSeverity.INFO);
-  });
-
-  test('when unhandled track event on Notification not to be called', () => {
-    notifications.sendTrackUpdate(sdkTypes.HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED, track.id);
-    expect(cb.mock.calls.length).toBe(0);
   });
 
   test('when track added on Notification to be called', () => {

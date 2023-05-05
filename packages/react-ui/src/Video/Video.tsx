@@ -1,7 +1,7 @@
 import React from 'react';
+import type { VariantProps } from '@stitches/react';
 import { HMSPeer, useVideo } from '@100mslive/react-sdk';
 import { styled } from '../Theme';
-import type { VariantProps } from '@stitches/react';
 
 export const StyledVideo = styled('video', {
   width: '100%',
@@ -11,6 +11,7 @@ export const StyledVideo = styled('video', {
   alignItems: 'center',
   borderRadius: '$2',
   objectFit: 'cover',
+  background: '$tileBg',
   variants: {
     mirror: {
       true: {
@@ -29,6 +30,11 @@ export const StyledVideo = styled('video', {
         zIndex: -100,
       },
     },
+    noRadius: {
+      true: {
+        borderRadius: 0,
+      },
+    },
   },
   defaultVariants: {
     mirror: false,
@@ -42,6 +48,10 @@ interface Props {
    * trackID for peer (videoTrack)
    */
   trackId: HMSPeer['videoTrack'];
+  /**
+   * Boolean stating whether to override the internal behaviour.
+   * when attach is false, even if tile is inView or enabled, it won't be rendered
+   */
   attach?: boolean;
 }
 

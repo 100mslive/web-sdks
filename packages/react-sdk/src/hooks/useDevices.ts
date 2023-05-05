@@ -1,14 +1,13 @@
-import { selectDevices, selectIsAllowedToPublish, selectLocalMediaSettings } from '@100mslive/hms-video-store';
 import { useCallback } from 'react';
+import {
+  DeviceType,
+  selectDevices,
+  selectIsAllowedToPublish,
+  selectLocalMediaSettings,
+} from '@100mslive/hms-video-store';
+import { hooksErrHandler } from '../hooks/types';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { logErrorHandler } from '../utils/commons';
-import { hooksErrHandler } from '../hooks/types';
-
-export enum DeviceType {
-  videoInput = 'videoInput',
-  audioInput = 'audioInput',
-  audioOutput = 'audioOutput',
-}
 
 export type DeviceTypeAndInfo<T> = {
   [key in DeviceType]?: T;
@@ -75,7 +74,7 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
             await actions.setVideoSettings({ deviceId });
             break;
           case DeviceType.audioOutput:
-            actions.setAudioOutputDevice(deviceId);
+            await actions.setAudioOutputDevice(deviceId);
             break;
         }
       } catch (err) {

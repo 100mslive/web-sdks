@@ -1,4 +1,4 @@
-const pkg = require("../package.json")
+const pkg = require('../package.json');
 const BASE_URL = `https://unpkg.com/${pkg.name}/src`;
 const TAG = 'VBProcessor';
 const TFLITE_JS_FILE = 'tflite/tflite.js';
@@ -15,16 +15,16 @@ const loadScript = (src: string) => {
   });
 };
 
-const loadTFLiteModel = async() =>{
+const loadTFLiteModel = async () => {
   let tfLite: any;
-  let path = BASE_URL + "/" + TFLITE_SIMD_JS_FILE;
+  let path = `${BASE_URL}/${TFLITE_SIMD_JS_FILE}`;
   await loadScript(path);
-  try{
+  try {
     //@ts-ignore
     tfLite = await createTFLiteSIMDModule();
-  }catch{
+  } catch {
     console.warn('SIMD not supported. You may experience poor virtual background effect.');
-    path = BASE_URL + "/" + TFLITE_JS_FILE;
+    path = `${BASE_URL}/${TFLITE_JS_FILE}`;
     await loadScript(path);
     // @ts-ignore
     tfLite = await createTFLiteModule();
@@ -33,7 +33,7 @@ const loadTFLiteModel = async() =>{
 };
 
 const loadTFLite = async () => {
-  const modelPath = BASE_URL + "/" + MODEL_FILE_NAME;
+  const modelPath = `${BASE_URL}/${MODEL_FILE_NAME}`;
   const [tfLite, modelResponse] = await Promise.all([loadTFLiteModel(), fetch(modelPath)]);
 
   const model = await modelResponse.arrayBuffer();
@@ -41,12 +41,12 @@ const loadTFLite = async () => {
   tfLite.HEAPU8.set(new Uint8Array(model), modelBufferOffset);
   tfLite._loadModel(model.byteLength);
 
-  console.debug(TAG,'Input memory offset:', tfLite._getInputMemoryOffset())
-  console.debug(TAG,'Input height:', tfLite._getInputHeight())
-  console.debug(TAG,'Input width:', tfLite._getInputWidth())
-  console.debug(TAG,'Input channels:', tfLite._getInputChannelCount())
+  console.debug(TAG, 'Input memory offset:', tfLite._getInputMemoryOffset());
+  console.debug(TAG, 'Input height:', tfLite._getInputHeight());
+  console.debug(TAG, 'Input width:', tfLite._getInputWidth());
+  console.debug(TAG, 'Input channels:', tfLite._getInputChannelCount());
 
   return tfLite;
-}
+};
 
 export { loadTFLite };

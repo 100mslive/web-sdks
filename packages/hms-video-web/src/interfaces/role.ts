@@ -1,5 +1,4 @@
 import { SimulcastLayers } from './simulcast-layers';
-import { SubscribeDegradationParams } from './subscribe-degradation-params';
 
 export interface HMSRole {
   name: string;
@@ -7,7 +6,6 @@ export interface HMSRole {
   subscribeParams: {
     subscribeToRoles: string[];
     maxSubsBitRate: number;
-    subscribeDegradation?: SubscribeDegradationParams;
   };
   permissions: {
     endRoom: boolean;
@@ -15,8 +13,9 @@ export interface HMSRole {
     unmute: boolean;
     mute: boolean;
     changeRole: boolean;
-    streaming: boolean;
-    recording: boolean;
+    hlsStreaming: boolean;
+    rtmpStreaming: boolean;
+    browserRecording: boolean;
   };
   priority: number;
 }
@@ -41,6 +40,8 @@ export interface PublishParams {
     height: number;
   };
   allowed: string[];
-  videoSimulcastLayers: SimulcastLayers;
-  screenSimulcastLayers: SimulcastLayers;
+  simulcast?: {
+    video: SimulcastLayers;
+    screen: SimulcastLayers;
+  };
 }

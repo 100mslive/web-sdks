@@ -1,24 +1,31 @@
 import {
-  HMSConfig,
-  HMSSimulcastLayer,
-  HMSAudioTrackSettings,
-  HMSVideoTrackSettings,
-  HMSLogLevel,
-  HMSVideoPlugin,
+  HLSTimedMetadata,
   HMSAudioPlugin,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSLogLevel,
   HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
+  HMSScreenShareConfig,
+  HMSVideoPlugin,
+  HMSVideoTrackSettings,
+  TokenRequest,
+  TokenRequestOptions,
 } from '@100mslive/hms-video';
+import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
+  HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
-  HMSChangeMultiTrackStateParams,
+  IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
-import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.
@@ -36,8 +43,8 @@ import { RTMPRecordingConfig, HLSConfig } from './hmsSDKStore/sdkTypes';
  *
  * @category Core
  */
-export interface IHMSActions {
-  preview(config: HMSConfig): Promise<void>;
+export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
+  preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -48,7 +55,7 @@ export interface IHMSActions {
    *
    * @param config join config with room id, required for joining the room
    */
-  join(config: HMSConfig): void;
+  join(config: HMSConfig): Promise<void>;
 
   /**
    * This function can be used to leave the room, if the call is repeated it's ignored.
@@ -60,13 +67,9 @@ export interface IHMSActions {
    * The store will be populated with the incoming track, and the subscriber(or
    * react component if our hook is used) will be notified/rerendered
    * @param enabled boolean
-   * @param config it can also be boolean to ensure backward compatibility where it stands
-   * for audioOnly flag
+   * @param config check the config object for details about the fields
    */
-  setScreenShareEnabled(
-    enabled: boolean,
-    config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean,
-  ): Promise<void>;
+  setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig): Promise<void>;
 
   /**
    * You can use the addTrack method to add an auxiliary track(canvas capture, electron screen-share, etc...)
@@ -145,15 +148,19 @@ export interface IHMSActions {
   /**
    * Change settings of the local peer's audio track
    * @param settings HMSAudioTrackSettings
-   * ({ volume, codec, maxBitrate, deviceId, advanced })
+   * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
-   * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
+   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+  /**
+   * Toggle the camera between front and back if the both the camera's exist
+   */
+  switchCamera(): Promise<void>;
 
   /**
    * You can use the attach and detach video function
@@ -176,24 +183,25 @@ export interface IHMSActions {
    * @param trackId string If undefined sets the overall volume(of every audio track in the room); If valid - set the volume of particular audio track
    *
    */
-  setVolume(value: number, trackId?: HMSTrackID): void;
+  setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */
-  setAudioOutputDevice(deviceId: string): void;
+  setAudioOutputDevice(deviceId: string): Promise<void>;
 
   refreshDevices(): Promise<void>;
+
   /**
    * set the quality of the selected videoTrack for simulcast.
    * @alpha
    */
-  setPreferredLayer(trackId: HMSTrackID, layer: HMSSimulcastLayer): void;
+  setPreferredLayer(trackId: HMSTrackID, layer: HMSPreferredSimulcastLayer): Promise<void>;
 
   /**
    * Add or remove a video plugin from/to the local peer video track. Eg. Virtual Background, Face Filters etc.
-   * Video plugins can be added/removed at any time after the join is successful.
+   * Video plugins can be added/removed at any time after the video track is available.
    * pluginFrameRate is the rate at which the output plugin will do processing
    * @param plugin HMSVideoPlugin
    * @param pluginFrameRate number
@@ -210,7 +218,7 @@ export interface IHMSActions {
 
   /**
    * Add or remove a audio plugin from/to the local peer audio track. Eg. gain filter, noise suppression etc.
-   * Audio plugins can be added/removed at any time after the join is successful.
+   * Audio plugins can be added/removed at any time after the audio track is available
    * @param plugin HMSAudioPlugin
    * @see HMSAudioPlugin
    */
@@ -228,7 +236,19 @@ export interface IHMSActions {
    */
   removePluginFromVideoTrack(plugin: HMSVideoPlugin): Promise<void>;
 
+  /**
+   * @see addPluginToAudioTrack
+   */
   removePluginFromAudioTrack(plugin: HMSAudioPlugin): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @deprecated Use `changeRoleOfPeer`
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
 
   /**
    * Request for a role change of a remote peer. Can be forced.
@@ -236,7 +256,14 @@ export interface IHMSActions {
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
-  changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+  changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param roles List of roles whose role needs to be changed
+   * @param toRole The name of the new role.
+   */
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received
@@ -303,17 +330,35 @@ export interface IHMSActions {
   stopRTMPAndRecording(): Promise<void>;
 
   /**
-   * If you want to start HLS streaming.
-   * @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
+   * If you have configured HLS streaming from dashboard, no params are required.
+   * otherwise @param params.variants.meetingURL This is the meeting url which is opened in a headless chrome instance for generating the HLS feed.
    * Make sure this url leads the joiner straight to the room without any preview screen or requiring additional clicks.
    * Note that streaming of only one url is currently supported and only the first variant passed will be honored.
    */
-  startHLSStreaming(params: HLSConfig): Promise<void>;
-
+  startHLSStreaming(params?: HLSConfig): Promise<void>;
   /**
    * If you want to stop HLS streaming. The passed in arguments is not considered at the moment, and everything related to HLS is stopped.
    */
   stopHLSStreaming(params?: HLSConfig): Promise<void>;
+
+  /**
+   * @alpha
+   * Used to define date range metadata in a media playlist.
+   * This api adds EXT-X-DATERANGE tags to the media playlist.
+   * It is useful for defining timed metadata for interstitial regions such as advertisements,
+   * but can be used to define any timed metadata needed by your stream.
+   * usage (e.g)
+   * const metadataList = `[{
+   *  payload: "some string 1",
+   *  duration: 2
+   * },
+   * {
+   *  payload: "some string 2",
+   *  duration: 3
+   * }]`
+   * sendHLSTimedMetadata(metadataList);
+   */
+  sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
 
   /**
    * If you want to update the name of peer.
@@ -325,6 +370,24 @@ export interface IHMSActions {
    * JSON.stringify.
    */
   changeMetadata(metadata: string | any): Promise<void>;
+
+  /**
+   * If you want to update the metadata of the session. If an object is passed, it should be serializable using
+   * JSON.stringify.
+   *
+   * Session metadata is available to every peer in the room and is persisted throughout a session
+   * till the last peer leaves a room
+   *
+   * @deprecated use `actions.sessionStore.set` instead
+   */
+  setSessionMetadata(metadata: any): Promise<void>;
+
+  /**
+   * Fetch the current room metadata from the server and populate it in store
+   *
+   * @deprecated use `actions.sessionStore.observe` instead
+   */
+  populateSessionMetadata(): Promise<void>;
 
   /**
    * Set the type of logs from the SDK you want to be logged in the browser console.
@@ -388,20 +451,20 @@ export interface IHMSActions {
    *            than a plain object (i.e) JSON.parse()able.
    *          - If set to true on non-plain objects, this is ignored.
    * @example
-   * assume appdata is initially
-   *  {
+   * assume appData is initially
+   *  `{
    *     mySettings: {
    *       setting1: 'val1',
    *       setting2: 'val2',
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * after calling,
-   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * `setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);`
    * it becomes
-   *  {
+   *  `{
    *     mySettings: {
    *       setting1: 'val1-edit',
    *       setting2: 'val2',
@@ -409,7 +472,7 @@ export interface IHMSActions {
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * Note: This is not suitable for keeping large data or data which updates
    * at a high frequency, it is recommended to use app side store for those
@@ -417,4 +480,20 @@ export interface IHMSActions {
    **/
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
+
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
+
+  /**
+   * enable sending audio speaker data to beam
+   * @alpha
+   */
+  enableBeamSpeakerLabelsLogging(): Promise<void>;
+
+  /**
+   * actions that can be performed on the real-time key-value store
+   *
+   * Values in the session store are available to every peer in the room(who have observed the relevant keys) and
+   * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
+   */
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 }

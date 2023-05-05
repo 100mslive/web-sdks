@@ -18,9 +18,15 @@ export const PONG_RESPONSE_TIMES_SIZE = 5;
 export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID';
 export const SUBSCRIBE_TIMEOUT = 60000;
 
+export const ICE_DISCONNECTION_TIMEOUT = 5000;
+
 export const RTC_STATS_MONITOR_INTERVAL = 1000;
 
 export const MAINTAIN_TRACK_HISTORY = false;
+
+export const CLIENT_ANAYLTICS_PROD_ENDPOINT = 'https://event.100ms.live/v2/client/report';
+export const CLIENT_ANAYLTICS_QA_ENDPOINT = 'https://event-nonprod.100ms.live/v2/client/report';
+export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
@@ -40,4 +46,5 @@ export const HMSEvents = {
   AUDIO_TRACK_ADDED: 'audio-track-added',
   AUDIO_TRACK_REMOVED: 'audio-track-removed',
   AUTOPLAY_ERROR: 'autoplay-error',
+  LEAVE: 'leave',
 };

@@ -1,10 +1,24 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
+import { VideoElementManager } from './VideoElementManager';
+import HMSLogger from '../../utils/logger';
 import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
+  videoHandler!: VideoElementManager;
+
+  constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
+    super(stream, track, source as HMSTrackSource);
+    if (track.kind !== 'video') {
+      throw new Error("Expected 'track' kind = 'video'");
+    }
+  }
+
+  setVideoHandler(videoHandler: VideoElementManager) {
+    this.videoHandler = videoHandler;
+  }
 
   /**
    * sink=video element rendering the video
@@ -13,11 +27,16 @@ export class HMSVideoTrack extends HMSTrack {
     return this.sinkCount > 0;
   }
 
-  constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
-    super(stream, track, source as HMSTrackSource);
-    if (track.kind !== 'video') {
-      throw new Error("Expected 'track' kind = 'video'");
-    }
+  getSinks() {
+    return this.videoHandler.getVideoElements() || [];
+  }
+
+  attach(videoElement: HTMLVideoElement) {
+    this.videoHandler.addVideoElement(videoElement);
+  }
+
+  detach(videoElement: HTMLVideoElement) {
+    this.videoHandler.removeVideoElement(videoElement);
   }
 
   /**
@@ -33,13 +52,22 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   removeSink(videoElement: HTMLVideoElement) {
-    videoElement.srcObject = null;
-    if (this.sinkCount > 0) {
-      this.sinkCount--;
+    HMSLogger.d(`[HMSVideoTrack] removing sink video element - ${videoElement}`);
+    if (videoElement.srcObject !== null) {
+      videoElement.srcObject = null;
+      if (this.sinkCount > 0) {
+        this.sinkCount--;
+      }
     }
   }
 
+  cleanup(): void {
+    super.cleanup();
+    this.videoHandler.cleanup();
+  }
+
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
+    HMSLogger.d(`[HMSVideoTrack] adding sink internal video - ${videoElement} track - ${track}`);
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
       const existingTrackID = srcObject.getVideoTracks()[0]?.id;

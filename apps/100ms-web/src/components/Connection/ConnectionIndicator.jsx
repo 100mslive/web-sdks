@@ -1,11 +1,11 @@
 import React from "react";
 import {
-  useHMSStore,
   selectConnectionQualityByPeerID,
+  useHMSStore,
 } from "@100mslive/react-sdk";
+import { PoorConnectivityIcon } from "@100mslive/react-icons";
 import { styled, Tooltip, useTheme } from "@100mslive/react-ui";
 import { getColor, getTooltipText } from "./connectionQualityUtils";
-import { PoorConnectivityIcon } from "@100mslive/react-icons";
 
 const Wrapper = styled("span", {
   width: "28px",
@@ -18,10 +18,8 @@ const Wrapper = styled("span", {
   variants: {
     isTile: {
       true: {
-        position: "absolute",
-        top: "2px",
-        left: "2px",
-        zIndex: 10,
+        width: "unset",
+        height: "unset",
       },
     },
   },
@@ -49,12 +47,13 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
       </Tooltip>
     );
   }
+  const size = isTile ? 12 : 16;
   return (
     <Tooltip title={getTooltipText(downlinkQuality)}>
       <Wrapper isTile={isTile} data-testid="tile_network">
         <svg
-          width={16}
-          height={16}
+          width={size}
+          height={size}
           viewBox="0 0 14 12"
           xmlns="http://www.w3.org/2000/svg"
           xmlSpace="preserve"

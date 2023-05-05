@@ -1,103 +1,161 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Button, Flex } from "@100mslive/react-ui";
-import { ChatFooter } from "./ChatFooter";
-import { ChatHeader } from "./ChatHeader";
-import { ChatBody } from "./ChatBody";
-import { ChatSelector } from "./ChatSelector";
 import {
-  selectMessagesUnreadCountByPeerID,
-  selectMessagesUnreadCountByRole,
-  selectUnreadHMSMessagesCount,
+  HMSNotificationTypes,
+  selectHMSMessagesCount,
+  selectPeerNameByID,
+  selectPermissions,
+  selectSessionStore,
   useHMSActions,
+  useHMSNotifications,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { ChevronDownIcon } from "@100mslive/react-icons";
+import { ChevronDownIcon, CrossIcon, PinIcon } from "@100mslive/react-icons";
+import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
+import { AnnotisedMessage, ChatBody } from "./ChatBody";
+import { ChatFooter } from "./ChatFooter";
+import { ChatHeader } from "./ChatHeader";
+import { useSetSubscribedChatSelector } from "../AppData/useUISettings";
+import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+import { useUnreadCount } from "./useUnreadCount";
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from "../../common/constants";
 
-export const Chat = () => {
-  const [chatOptions, setChatOptions] = useState({
-    role: "",
-    peerId: "",
-    selection: "Everyone",
-  });
-  const [isSelectorOpen, setSelectorOpen] = useState(false);
-  const bodyRef = useRef(null);
-  const hmsActions = useHMSActions();
-  const scrollToBottom = useCallback(
-    (instant = false) => {
-      if (!bodyRef.current) {
-        return;
-      }
-      bodyRef.current.scrollTo({
-        top: bodyRef.current.scrollHeight,
-        behavior: instant ? "instant" : "smooth",
-      });
-      hmsActions.setMessageRead(true);
-    },
-    [hmsActions]
+const PinnedMessage = ({ clearPinnedMessage }) => {
+  const permissions = useHMSStore(selectPermissions);
+  const pinnedMessage = useHMSStore(
+    selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE)
   );
 
+  return pinnedMessage ? (
+    <Flex
+      css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
+      align="center"
+      justify="between"
+    >
+      <Box>
+        <PinIcon />
+      </Box>
+      <Box
+        css={{
+          ml: "$8",
+          color: "$textMedEmp",
+          w: "100%",
+          maxHeight: "$18",
+          overflowY: "auto",
+        }}
+      >
+        <Text variant="sm">
+          <AnnotisedMessage message={pinnedMessage} />
+        </Text>
+      </Box>
+      {permissions.removeOthers && (
+        <IconButton onClick={() => clearPinnedMessage()}>
+          <CrossIcon />
+        </IconButton>
+      )}
+    </Flex>
+  ) : null;
+};
+
+export const Chat = () => {
+  const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
+  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(
+    CHAT_SELECTOR.PEER_ID
+  );
+  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(
+    CHAT_SELECTOR.ROLE
+  );
+  const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const [chatOptions, setChatOptions] = useState({
+    role: roleSelector || "",
+    peerId: peerSelector && peerName ? peerSelector : "",
+    selection: roleSelector
+      ? roleSelector
+      : peerSelector && peerName
+      ? peerName
+      : "Everyone",
+  });
+  const [isSelectorOpen, setSelectorOpen] = useState(false);
+  const listRef = useRef(null);
+  const hmsActions = useHMSActions();
+  const { setPinnedMessage } = useSetPinnedMessage();
   useEffect(() => {
-    scrollToBottom(true);
-  }, [scrollToBottom]);
+    if (
+      notification &&
+      notification.data &&
+      peerSelector === notification.data.id
+    ) {
+      setPeerSelector("");
+      setChatOptions({
+        role: "",
+        peerId: "",
+        selection: "Everyone",
+      });
+    }
+  }, [notification, peerSelector, setPeerSelector]);
+
+  const storeMessageSelector = selectHMSMessagesCount;
+
+  const messagesCount = useHMSStore(storeMessageSelector) || 0;
+  const scrollToBottom = useCallback(
+    (unreadCount = 0) => {
+      if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
+        listRef.current?.scrollToItem(messagesCount, "end");
+        requestAnimationFrame(() => {
+          listRef.current?.scrollToItem(messagesCount, "end");
+        });
+        hmsActions.setMessageRead(true);
+      }
+    },
+    [hmsActions, messagesCount]
+  );
 
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <ChatHeader
         selectorOpen={isSelectorOpen}
         selection={chatOptions.selection}
+        onSelect={({ role, peerId, selection }) => {
+          setChatOptions({
+            role,
+            peerId,
+            selection,
+          });
+          setPeerSelector(peerId);
+          setRoleSelector(role);
+        }}
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
         onToggle={() => {
           setSelectorOpen(value => !value);
         }}
       />
-      <Box
-        css={{
-          flex: "1 1 0",
-          overflowY: isSelectorOpen ? "hidden" : "auto",
-          bg: "$bgSecondary",
-          pt: "$4",
-          position: "relative",
-        }}
-        ref={bodyRef}
-      >
-        <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} />
-        {isSelectorOpen && (
-          <ChatSelector
-            role={chatOptions.role}
-            peerId={chatOptions.peerId}
-            onSelect={data => {
-              setChatOptions(state => ({
-                ...state,
-                ...data,
-              }));
-              setSelectorOpen(false);
-            }}
-          />
-        )}
-      </Box>
+      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
 
+      <ChatBody
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        ref={listRef}
+        scrollToBottom={scrollToBottom}
+      />
       <ChatFooter
         role={chatOptions.role}
         peerId={chatOptions.peerId}
-        onSend={scrollToBottom}
+        onSend={() => scrollToBottom(1)}
       >
-        <NewMessageIndicator
-          role={chatOptions.role}
-          peerId={chatOptions.peerId}
-          onClick={() => scrollToBottom()}
-        />
+        {!isSelectorOpen && (
+          <NewMessageIndicator
+            role={chatOptions.role}
+            peerId={chatOptions.peerId}
+            scrollToBottom={scrollToBottom}
+          />
+        )}
       </ChatFooter>
     </Flex>
   );
 };
 
-const NewMessageIndicator = ({ role, peerId, onClick }) => {
-  const unreadCountSelector = role
-    ? selectMessagesUnreadCountByRole(role)
-    : peerId
-    ? selectMessagesUnreadCountByPeerID(peerId)
-    : selectUnreadHMSMessagesCount;
-
-  const unreadCount = useHMSStore(unreadCountSelector);
+const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
+  const unreadCount = useUnreadCount({ role, peerId });
   if (!unreadCount) {
     return null;
   }
@@ -111,7 +169,12 @@ const NewMessageIndicator = ({ role, peerId, onClick }) => {
         position: "absolute",
       }}
     >
-      <Button onClick={onClick} css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}>
+      <Button
+        onClick={() => {
+          scrollToBottom(unreadCount);
+        }}
+        css={{ p: "$2 $4", "& > svg": { ml: "$4" } }}
+      >
         New Messages
         <ChevronDownIcon width={16} height={16} />
       </Button>

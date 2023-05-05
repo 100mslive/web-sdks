@@ -11,8 +11,9 @@
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
-require('dotenv').config();
-
+const cwd = process.cwd();
+const envPath = cwd.endsWith('web-sdks') ? 'cypress/.env' : '.env';
+require('dotenv').config({ path: envPath });
 const keys = ['CYPRESS_TOKEN_ENDPOINT', 'CYPRESS_ROOM_ID', 'CYPRESS_ROLE', 'CYPRESS_API_ENV', 'CYPRESS_INIT_ENDPOINT'];
 /**
  * @type {Cypress.PluginConfig}

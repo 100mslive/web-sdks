@@ -15,16 +15,17 @@ const Root = styled('div', {
 
 // TODO: replace these with tokens
 const SelectRoot = styled('select', {
+  h: '$16',
   fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
-  color: '$textPrimary',
+  color: '$textAccentHigh',
   padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: '$bgSecondary',
+  backgroundColor: '$secondaryDefault',
   '&:not([disabled]):focus-visible': {
     boxShadow: '0 0 0 3px $colors$brandDefault',
   },
@@ -35,7 +36,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$grayDefault',
+  color: '$textAccentMedium',
   width: '30px',
   height: '100%',
   position: 'absolute',

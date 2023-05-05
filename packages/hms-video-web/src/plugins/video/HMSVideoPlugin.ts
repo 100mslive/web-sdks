@@ -36,6 +36,8 @@ export interface HMSVideoPlugin {
    */
   getPluginType(): HMSVideoPluginType;
 
+  getContextType?(): HMSVideoPluginCanvasContextType;
+
   /**
    * This function will be called by the SDK for every video frame which the plugin needs to process.
    * PluginFrameRate - the rate at which the plugin is expected to process the video frames. This is not necessarily
@@ -70,4 +72,10 @@ export interface HMSVideoPlugin {
 export enum HMSVideoPluginType {
   TRANSFORM = 'TRANSFORM',
   ANALYZE = 'ANALYZE',
+}
+
+export enum HMSVideoPluginCanvasContextType {
+  '2D' = '2d',
+  WEBGL = 'webgl',
+  'WEBGL2' = 'webgl2',
 }

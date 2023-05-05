@@ -1,6 +1,11 @@
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import { PencilDrawIcon } from "@100mslive/react-icons";
+import { Tooltip } from "@100mslive/react-ui";
+import IconButton from "../../IconButton";
+import { useHLSViewerRole } from "../../components/AppData/useUISettings";
+import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";
 import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
+import { FEATURE_LIST } from "../../common/constants";
 
 export const ToggleWhiteboard = () => {
   const {
@@ -9,8 +14,15 @@ export const ToggleWhiteboard = () => {
     amIWhiteboardOwner,
     toggleWhiteboard,
   } = useWhiteboardMetadata();
+  const hlsViewerRole = useHLSViewerRole();
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.WHITEBOARD);
 
-  if (!whiteboardEnabled) {
+  if (
+    !whiteboardEnabled ||
+    localPeerRole === hlsViewerRole ||
+    !isFeatureEnabled
+  ) {
     return null;
   }
 
@@ -26,9 +38,6 @@ export const ToggleWhiteboard = () => {
       key="whiteboard"
     >
       <IconButton
-        css={{
-          mx: "$4",
-        }}
         onClick={toggleWhiteboard}
         active={!whiteboardActive}
         disabled={whiteboardActive && !amIWhiteboardOwner}

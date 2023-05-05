@@ -6,14 +6,17 @@ export interface AuthToken {
   role: string;
 }
 
-export default function decodeJWT(token: string): AuthToken {
-  if (token.length === 0) {
-    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(HMSAction.INIT, 'Token cannot be an empty string');
+export default function decodeJWT(token?: string): AuthToken {
+  if (!token || token.length === 0) {
+    throw ErrorFactory.APIErrors.InvalidTokenFormat(
+      HMSAction.INIT,
+      'Token cannot be an empty string or undefined or null',
+    );
   }
 
   const parts = token.split('.');
   if (parts.length !== 3) {
-    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(
+    throw ErrorFactory.APIErrors.InvalidTokenFormat(
       HMSAction.INIT,
       `Expected 3 '.' separate fields - header, payload and signature respectively`,
     );
@@ -28,7 +31,7 @@ export default function decodeJWT(token: string): AuthToken {
       role: payload.role,
     } as AuthToken;
   } catch (err) {
-    throw ErrorFactory.InitAPIErrors.InvalidTokenFormat(
+    throw ErrorFactory.APIErrors.InvalidTokenFormat(
       HMSAction.INIT,
       `couldn't parse to json - ${(err as Error).message}`,
     );

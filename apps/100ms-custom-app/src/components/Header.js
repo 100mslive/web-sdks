@@ -2,7 +2,7 @@ import React, { useState, Suspense, useCallback } from 'react';
 import { InviteIcon, CodeIcon, EditIcon } from '@100mslive/react-icons';
 import { Button, Flex, styled, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../utils/analytics';
-import { getInitialsFromEmail, getRandomColor } from '../utils/utils';
+import { apiBasePath, getInitialsFromEmail, getRandomColor } from '../utils/utils';
 import logo from '../assets/images/100ms_logo.svg';
 import darkLogo from '../assets/images/100ms_dark.svg';
 
@@ -27,8 +27,8 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
       return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
         settings.brand_color
       }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
-        process.env.REACT_APP_BACKEND_API + window.location.hostname
-      }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\nREACT_APP_LOGROCKET_ID=<Your Logrocket project ID>`;
+        apiBasePath + window.location.hostname
+      }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\n`;
     },
     [settings.tile_shape, settings.brand_color, settings.theme, settings.font],
   );

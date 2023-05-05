@@ -7,14 +7,15 @@ const Root = Popover.Root;
 
 const StyledTrigger = styled(Popover.Trigger, {
   position: 'absolute',
-  top: '10px',
-  right: '10px',
-  zIndex: 20,
-  width: '36px',
-  height: '36px',
-  color: 'white',
+  bottom: '$2',
+  right: '$2',
+  zIndex: 10,
+  width: '$13',
+  height: '$13',
+  color: '$textPrimary',
   borderRadius: '$round',
   backgroundColor: '$menuBg',
+  border: 'none',
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
@@ -23,11 +24,14 @@ const StyledTrigger = styled(Popover.Trigger, {
 });
 
 const StyledContent = styled(Popover.Content, {
+  fontFamily: '$sans',
   backgroundColor: '$menuBg',
-  padding: '10px 0px',
+  padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
-  borderRadius: '12px',
+  borderRadius: '$space$6',
+  zIndex: 11,
+  width: '$60',
   ...popoverAnimation,
 });
 
@@ -36,13 +40,13 @@ const styledItem = {
   color: '$textPrimary',
   display: 'flex',
   alignItems: 'center',
-  padding: '8px 12px',
+  padding: '$4 $6',
   width: '100%',
 };
 
 const StyledItemButton = styled('button', {
   ...styledItem,
-  height: '40px',
+  height: '$14',
   '&:hover': {
     backgroundColor: '$menuBg',
   },
@@ -53,7 +57,7 @@ const StyledItemButton = styled('button', {
   },
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '0.5rem',
+    marginLeft: '$4',
   },
 });
 
@@ -69,7 +73,7 @@ export const Flex = styled('div', {
   display: 'flex',
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '0.5rem',
+    marginLeft: '$4',
   },
 });
 

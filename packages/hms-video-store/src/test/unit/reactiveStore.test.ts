@@ -1,8 +1,8 @@
 import {
+  createDefaultStoreState,
   HMSReactiveStore,
   HMSStore,
   IHMSStore,
-  createDefaultStoreState,
   selectLocalPeer,
   selectPeers,
 } from '../../core';
@@ -78,7 +78,9 @@ describe('test reactive store', () => {
     store.subscribe(cb, selectLocalPeer);
     const oldPeer = store.getState(selectLocalPeer);
     store.setState(draft => {
-      draft.peers[localPeer.id].name = oldPeer.name;
+      if (oldPeer?.name) {
+        draft.peers[localPeer.id].name = oldPeer.name;
+      }
     });
     doUnrelatedChange();
     expectStoreChanged();

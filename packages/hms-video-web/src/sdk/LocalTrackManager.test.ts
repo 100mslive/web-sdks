@@ -1,14 +1,16 @@
+import { HMSLocalPeer } from './models/peer';
 import { LocalTrackManager } from './LocalTrackManager';
 import { Store } from './store';
-import ITransportObserver from '../transport/ITransportObserver';
-import { HMSRemoteVideoTrack, HMSTrack } from '../media/tracks';
-import { HMSException } from '../error/HMSException';
-import { TransportState } from '../transport/models/TransportState';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
-import { HMSLocalVideoTrack, HMSTrackType, PublishParams } from '..';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalPeer } from './models/peer';
+import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
+import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSTrack } from '../media/tracks';
+import { PolicyParams } from '../notification-manager';
+import ITransportObserver from '../transport/ITransportObserver';
+import { TransportState } from '../transport/models/TransportState';
+import { HMSLocalVideoTrack, HMSTrackType } from '..';
 
 const testObserver: ITransportObserver = {
   onNotification(_: any): void {},
@@ -16,10 +18,6 @@ const testObserver: ITransportObserver = {
   onTrackAdd(_: HMSTrack): void {},
 
   onTrackRemove(_: HMSTrack): void {},
-
-  onTrackDegrade(_: HMSRemoteVideoTrack): void {},
-
-  onTrackRestore(_: HMSRemoteVideoTrack): void {},
 
   onFailure(_: HMSException): void {
     // console.log('sdk Failure Callback', _s);
@@ -31,33 +29,68 @@ const testObserver: ITransportObserver = {
 let testStore = new Store();
 let testEventBus = new EventBus();
 
-const hostPublishParams: PublishParams = {
-  allowed: ['audio', 'video', 'screen'],
-  audio: {
-    bitRate: 32,
-    codec: 'opus',
-  },
-  video: {
-    bitRate: 400,
-    codec: 'vp8',
-    frameRate: 30,
-    width: 640,
-    height: 480,
-  },
-  screen: {
-    codec: 'vp8',
-    frameRate: 10,
-    width: 1920,
-    height: 1080,
-    bitRate: 400,
-  },
-  videoSimulcastLayers: {
-    layers: [],
-  },
-  screenSimulcastLayers: {
-    layers: [],
+const policyParams: PolicyParams = {
+  name: 'host',
+  template_id: '1',
+  known_roles: {
+    host: {
+      name: 'host',
+      subscribeParams: {
+        maxSubsBitRate: 1000,
+        subscribeToRoles: ['host'],
+      },
+      priority: 1,
+      permissions: {
+        endRoom: false,
+        removeOthers: false,
+        unmute: false,
+        mute: false,
+        changeRole: false,
+        hlsStreaming: false,
+        rtmpStreaming: false,
+        browserRecording: false,
+      },
+      publishParams: {
+        allowed: ['audio', 'video', 'screen'],
+        audio: {
+          bitRate: 32,
+          codec: 'opus',
+        },
+        video: {
+          bitRate: 400,
+          codec: 'vp8',
+          frameRate: 30,
+          width: 640,
+          height: 480,
+        },
+        screen: {
+          codec: 'vp8',
+          frameRate: 10,
+          width: 1920,
+          height: 1080,
+          bitRate: 400,
+        },
+        simulcast: {
+          video: {
+            layers: [],
+          },
+          screen: {
+            layers: [],
+          },
+        },
+      },
+    },
   },
 };
+
+const hostRole = policyParams.known_roles[policyParams.name];
+const publishParams = hostRole.publishParams;
+
+let localPeer = new HMSLocalPeer({
+  name: 'test',
+  role: hostRole,
+});
+testStore.addPeer(localPeer);
 
 const mockMediaStream = {
   id: 'native-stream-id',
@@ -67,6 +100,7 @@ const mockMediaStream = {
   getAudioTracks: jest.fn(() => [
     { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
   ]),
+  addTrack: jest.fn(() => {}),
 };
 
 const gumSuccess = (constraints: any) => {
@@ -139,6 +173,8 @@ const mockMediaDevices = {
 // @ts-ignore
 global.navigator.mediaDevices = mockMediaDevices;
 global.MediaStream = jest.fn().mockImplementation(() => mockMediaStream);
+global.performance.mark = require('perf_hooks').performance.mark;
+global.performance.measure = require('perf_hooks').performance.measure;
 
 const mockAudioContext = {
   createOscillator() {
@@ -175,6 +211,11 @@ describe('LocalTrackManager', () => {
   beforeEach(() => {
     testStore = new Store();
     testEventBus = new EventBus();
+    localPeer = new HMSLocalPeer({
+      name: 'test',
+      role: hostRole,
+    });
+    testStore.addPeer(localPeer);
   });
 
   it('instantiates without any issues', () => {
@@ -183,6 +224,7 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
     expect(manager).toBeDefined();
   });
@@ -193,8 +235,9 @@ describe('LocalTrackManager', () => {
       testObserver,
       new DeviceManager(testStore, testEventBus),
       testEventBus,
+      new AnalyticsTimer(),
     );
-    testStore.setPublishParams(hostPublishParams);
+    testStore.setKnownRoles(policyParams);
     await manager.getTracksToPublish({});
 
     const constraints = mockGetUserMedia.mock.calls[0][0];
@@ -214,9 +257,10 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
       global.navigator.mediaDevices.getUserMedia = mockDenyGetUserMedia as any;
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
     });
 
     afterEach(() => {
@@ -315,13 +359,15 @@ describe('LocalTrackManager', () => {
       const droppedConstraints = mockOverConstrainedGetUserMedia.mock.calls[1][0];
 
       for (const constraint in audioContraints) {
-        if (constraint in hostPublishParams.audio) {
-          expect(audioContraints[constraint]).toEqual((hostPublishParams.audio as any)[constraint]);
+        if (constraint in publishParams.audio) {
+          expect(audioContraints[constraint]).toEqual((publishParams.audio as any)[constraint]);
         }
       }
       for (const constraint in videoConstraints) {
-        if (constraint in hostPublishParams.video) {
-          expect(videoConstraints[constraint]).toEqual((hostPublishParams.video as any)[constraint]);
+        if (constraint in publishParams.video) {
+          const constraintValue = videoConstraints[constraint];
+          const value = typeof constraintValue === 'object' ? constraintValue?.ideal : constraintValue;
+          expect(value).toEqual((publishParams.video as any)[constraint]);
         }
       }
       for (const constraint in droppedConstraints.audio) {
@@ -342,13 +388,15 @@ describe('LocalTrackManager', () => {
     beforeEach(() => {
       testStore = new Store();
       testEventBus = new EventBus();
+      localPeer = new HMSLocalPeer({
+        name: 'test',
+        role: hostRole,
+      });
+      testStore.addPeer(localPeer);
       mockGetUserMedia.mockClear();
     });
 
     it('diffs the local tracks to publish', async () => {
-      const localPeer = new HMSLocalPeer({
-        name: 'test',
-      });
       const mockVideoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         {
@@ -361,7 +409,6 @@ describe('LocalTrackManager', () => {
       );
       localPeer.videoTrack = mockVideoTrack;
 
-      testStore.addPeer(localPeer);
       testStore.addTrack(mockVideoTrack);
 
       const manager = new LocalTrackManager(
@@ -369,8 +416,9 @@ describe('LocalTrackManager', () => {
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 
       expect(mockGetUserMedia).toHaveBeenCalledTimes(1);
@@ -381,9 +429,6 @@ describe('LocalTrackManager', () => {
     });
 
     it("doesn't fetch tracks if already present", async () => {
-      const localPeer = new HMSLocalPeer({
-        name: 'test',
-      });
       localPeer.videoTrack = new HMSLocalVideoTrack(
         new HMSLocalStream(mockMediaStream as unknown as MediaStream),
         {
@@ -395,15 +440,14 @@ describe('LocalTrackManager', () => {
         testEventBus,
       );
 
-      testStore.addPeer(localPeer);
-
       const manager = new LocalTrackManager(
         testStore,
         testObserver,
         new DeviceManager(testStore, testEventBus),
         testEventBus,
+        new AnalyticsTimer(),
       );
-      testStore.setPublishParams(hostPublishParams);
+      testStore.setKnownRoles(policyParams);
       const tracksToPublish = await manager.getTracksToPublish({});
 
       expect(mockGetUserMedia).toHaveBeenCalledTimes(1);

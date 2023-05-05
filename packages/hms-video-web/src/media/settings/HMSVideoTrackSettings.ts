@@ -1,5 +1,5 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { HMSVideoTrackSettings as IHMSVideoTrackSettings, HMSVideoCodec } from '../../interfaces';
+import { HMSFacingMode, HMSVideoCodec, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width?: number = 320;
@@ -8,6 +8,7 @@ export class HMSVideoTrackSettingsBuilder {
   private _maxFramerate?: number = 30;
   private _maxBitrate?: number = 150;
   private _deviceId?: string;
+  private _facingMode?: HMSFacingMode;
   private _advanced: Array<MediaTrackConstraintSet> = [];
 
   setWidth(width?: number) {
@@ -60,6 +61,11 @@ export class HMSVideoTrackSettingsBuilder {
     return this;
   }
 
+  facingMode(mode: HMSFacingMode) {
+    this._facingMode = mode;
+    return this;
+  }
+
   build() {
     return new HMSVideoTrackSettings(
       this._width,
@@ -69,6 +75,7 @@ export class HMSVideoTrackSettingsBuilder {
       this._deviceId,
       this._advanced,
       this._maxBitrate,
+      this._facingMode,
     );
   }
 }
@@ -81,6 +88,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
   readonly maxBitrate?: number;
   readonly deviceId?: string;
   readonly advanced?: Array<MediaTrackConstraintSet>;
+  facingMode?: HMSFacingMode;
 
   constructor(
     width?: number,
@@ -90,6 +98,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     deviceId?: string | undefined,
     advanced?: Array<MediaTrackConstraintSet>,
     maxBitrate?: number,
+    facingMode?: HMSFacingMode,
   ) {
     this.width = width;
     this.height = height;
@@ -98,14 +107,20 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     this.maxBitrate = maxBitrate;
     this.deviceId = deviceId;
     this.advanced = advanced;
+    this.facingMode = facingMode;
   }
 
-  toConstraints(): MediaTrackConstraints {
+  toConstraints(isScreenShare?: boolean): MediaTrackConstraints {
+    let dimensionConstraintKey = 'ideal';
+    if (isScreenShare) {
+      dimensionConstraintKey = 'max';
+    }
     return {
-      width: this.width,
-      height: this.height,
+      width: { [dimensionConstraintKey]: this.width },
+      height: { [dimensionConstraintKey]: this.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
+      facingMode: this.facingMode,
     };
   }
 
@@ -116,6 +131,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
       video_bitrate: this.maxBitrate,
       framerate: this.maxFramerate,
       video_codec: this.codec,
+      facingMode: this.facingMode,
     };
   }
 }

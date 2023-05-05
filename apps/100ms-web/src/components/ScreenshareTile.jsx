@@ -1,19 +1,19 @@
-// @ts-check
 import React, { useRef, useState } from "react";
-import { StyledVideoTile, Video, VideoTileStats } from "@100mslive/react-ui";
+import { useFullscreen } from "react-use";
+import screenfull from "screenfull";
 import {
-  useHMSStore,
+  selectLocalPeerID,
   selectPeerByID,
   selectScreenShareAudioByPeerID,
   selectScreenShareByPeerID,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
-import { useFullscreen } from "react-use";
-import TileMenu from "./TileMenu";
+import { StyledVideoTile, Video, VideoTileStats } from "@100mslive/react-ui";
 import { getVideoTileLabel } from "./peerTileUtils";
-import screenfull from "screenfull";
+import TileMenu from "./TileMenu";
+import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
-import { useUISettings } from "./AppData/useUISettings";
 
 const labelStyles = {
   position: "unset",
@@ -24,16 +24,14 @@ const labelStyles = {
   flexShrink: 0,
 };
 
-const Tile = ({
-  peerId,
-  showStatsOnTiles,
-  width = "100%",
-  height = "100%",
-}) => {
+const Tile = ({ peerId, width = "100%", height = "100%" }) => {
+  const isLocal = useHMSStore(selectLocalPeerID) === peerId;
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  const isHeadless = useIsHeadless();
   const [isMouseHovered, setIsMouseHovered] = useState(false);
+  const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const label = getVideoTileLabel({
     peerName: peer.name,
     isLocal: false,
@@ -67,9 +65,11 @@ const Tile = ({
             <VideoTileStats
               audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
+              peerID={peerId}
+              isLocal={isLocal}
             />
           ) : null}
-          {isFullScreenSupported ? (
+          {isFullScreenSupported && !isHeadless ? (
             <StyledVideoTile.FullScreenButton
               onClick={() => setFullscreen(!fullscreen)}
             >
@@ -85,7 +85,7 @@ const Tile = ({
             />
           ) : null}
           <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
-          {isMouseHovered && !peer?.isLocal ? (
+          {isMouseHovered && !isHeadless && !peer?.isLocal ? (
             <TileMenu
               isScreenshare
               peerID={peer?.id}

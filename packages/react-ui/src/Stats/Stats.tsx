@@ -1,30 +1,39 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import {
-  useHMSStatsStore,
+  HMSPeerID,
   HMSTrackID,
   HMSTrackStats,
+  RID,
+  selectConnectionQualityByPeerID,
   selectHMSStats,
-  HMSPeerID,
+  simulcastMapping,
+  useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
-import { selectConnectionQualityByPeerID } from '@100mslive/react-sdk';
+import { Tooltip } from '../Tooltip';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
   audioTrackID?: HMSTrackID;
   peerID?: HMSPeerID;
+  isLocal: boolean;
 }
 
 /**
  * This component can be used to overlay webrtc stats over the Video Tile. For the local tracks it also includes
  * remote inbound stats as sent by the SFU in receiver report.
  */
-export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTileStatsProps) {
-  const audioTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(audioTrackID));
-  const videoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = false }: VideoTileStatsProps) {
+  const audioSelector = isLocal ? selectHMSStats.localAudioTrackStatsByID : selectHMSStats.trackStatsByID;
+  const audioTrackStats = useHMSStatsStore(audioSelector(audioTrackID));
+  const localVideoTrackStats = useHMSStatsStore(selectHMSStats.localVideoTrackStatsByID(videoTrackID));
+  const remoteVideoTrackStats = useHMSStatsStore(selectHMSStats.trackStatsByID(videoTrackID));
+  const videoTrackStats = isLocal ? localVideoTrackStats?.[0] : remoteVideoTrackStats;
   const downlinkScore = useHMSStore(selectConnectionQualityByPeerID(peerID))?.downlinkQuality;
+  const availableOutgoingBitrate = useHMSStatsStore(selectHMSStats.availablePublishBitrate);
+
   // Viewer role - no stats to show
   if (!(audioTrackStats || videoTrackStats)) {
     return null;
@@ -33,29 +42,77 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
     <Stats.Root>
       <table>
         <tbody>
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
-            label="Width"
-            value={videoTrackStats?.frameWidth?.toString()}
-          />
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
-            label="Height"
-            value={videoTrackStats?.frameHeight?.toString()}
-          />
-          <StatsRow
-            show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
-            label="FPS"
-            value={`${videoTrackStats?.framesPerSecond} ${
-              isNotNullishAndNot0(videoTrackStats?.framesDropped) ? `(${videoTrackStats?.framesDropped} dropped)` : ''
-            }`}
-          />
-
-          <StatsRow
-            show={isNotNullish(videoTrackStats?.bitrate)}
-            label="Bitrate(V)"
-            value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
-          />
+          {isLocal ? (
+            <Fragment>
+              <StatsRow
+                show={isNotNullishAndNot0(availableOutgoingBitrate)}
+                label="AOBR"
+                tooltip="Available Outgoing Bitrate"
+                value={formatBytes(availableOutgoingBitrate, 'b/s')}
+              />
+              {localVideoTrackStats?.map(stat => {
+                if (!stat) {
+                  return null;
+                }
+                const layer = stat.rid ? simulcastMapping[stat.rid as RID] : '';
+                return (
+                  <Fragment>
+                    {layer && <StatsRow label={layer.toUpperCase()} value=""></StatsRow>}
+                    <StatsRow
+                      show={isNotNullishAndNot0(stat.frameWidth)}
+                      label="Width"
+                      value={stat.frameWidth?.toString()}
+                    />
+                    <StatsRow
+                      show={isNotNullishAndNot0(stat.frameHeight)}
+                      label="Height"
+                      value={stat.frameHeight?.toString()}
+                    />
+                    <StatsRow
+                      show={isNotNullishAndNot0(stat.framesPerSecond)}
+                      label="FPS"
+                      value={`${stat.framesPerSecond} ${
+                        isNotNullishAndNot0(stat.framesDropped) ? `(${stat.framesDropped} dropped)` : ''
+                      }`}
+                    />
+                    <StatsRow
+                      show={isNotNullish(stat.bitrate)}
+                      label="Bitrate(V)"
+                      value={formatBytes(stat.bitrate, 'b/s')}
+                    />
+                    <Stats.Gap />
+                  </Fragment>
+                );
+              })}
+            </Fragment>
+          ) : (
+            <Fragment>
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.frameWidth)}
+                label="Width"
+                value={videoTrackStats?.frameWidth?.toString()}
+              />
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.frameHeight)}
+                label="Height"
+                value={videoTrackStats?.frameHeight?.toString()}
+              />
+              <StatsRow
+                show={isNotNullishAndNot0(videoTrackStats?.framesPerSecond)}
+                label="FPS"
+                value={`${videoTrackStats?.framesPerSecond} ${
+                  isNotNullishAndNot0(videoTrackStats?.framesDropped)
+                    ? `(${videoTrackStats?.framesDropped} dropped)`
+                    : ''
+                }`}
+              />
+              <StatsRow
+                show={isNotNullish(videoTrackStats?.bitrate)}
+                label="Bitrate(V)"
+                value={formatBytes(videoTrackStats?.bitrate, 'b/s')}
+              />
+            </Fragment>
+          )}
 
           <StatsRow
             show={isNotNullish(audioTrackStats?.bitrate)}
@@ -64,6 +121,10 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID }: VideoTile
           />
 
           <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
+
+          <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
+
+          <StatsRow show={isNotNullish(audioTrackStats?.codec)} label="Codec(A)" value={audioTrackStats?.codec} />
 
           <PacketLostAndJitter audioTrackStats={audioTrackStats} videoTrackStats={videoTrackStats} />
         </tbody>
@@ -102,7 +163,7 @@ const TrackPacketsLostRow = ({
   stats?: Pick<HMSTrackStats, 'packetsLost' | 'packetsLostRate'>;
   label: string;
 }) => {
-  const packetsLostRate = (stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0) + '/s';
+  const packetsLostRate = `${stats?.packetsLostRate ? stats.packetsLostRate.toFixed(2) : 0}/s`;
 
   return (
     <StatsRow
@@ -113,12 +174,20 @@ const TrackPacketsLostRow = ({
   );
 };
 
-const RawStatsRow = ({ label = '', value = '', show = true }) => {
+const RawStatsRow = ({ label = '', value = '', tooltip = '', show = true }) => {
+  const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
+
   return (
     <>
       {show ? (
         <Stats.Row>
-          <Stats.Label>{label}</Stats.Label>
+          {tooltip ? (
+            <Tooltip side="top" title={tooltip}>
+              {statsLabel}
+            </Tooltip>
+          ) : (
+            statsLabel
+          )}
           {value === '' ? <Stats.Value /> : <Stats.Value>{value}</Stats.Value>}
         </Stats.Row>
       ) : null}
@@ -137,6 +206,6 @@ export function isNotNullishAndNot0(value: number | undefined | null) {
  * Check only for presence(not truthy) of a value.
  * Use in places where 0, false need to be considered valid.
  */
-export function isNotNullish(value: number | undefined | null) {
+export function isNotNullish(value: number | string | undefined | null) {
   return value !== undefined && value !== null;
 }

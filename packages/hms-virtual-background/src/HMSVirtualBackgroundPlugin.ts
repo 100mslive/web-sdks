@@ -1,13 +1,13 @@
 /* eslint-disable complexity */
-import { loadTFLite } from './defineTFLite';
-import '@tensorflow/tfjs-backend-webgl';
-import { parseGIF, decompressFrames } from 'gifuct-js';
+import { decompressFrames, parseGIF } from 'gifuct-js';
 import {
   HMSPluginSupportResult,
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
 } from '@100mslive/hms-video';
+import '@tensorflow/tfjs-backend-webgl';
+import { loadTFLite } from './defineTFLite';
 
 const TAG = 'VBProcessor';
 const DEFAULT_DELAY = 33;

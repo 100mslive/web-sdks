@@ -11,9 +11,10 @@ async function main() {
   }
   const commonOptions = {
     entryPoints: [source],
-    minify: true,
+    minify: false,
     bundle: true,
-    target: 'es6',
+    sourcemap: true,
+    target: 'esnext',
     tsconfig: 'tsconfig.json',
     external,
   };

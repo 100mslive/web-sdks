@@ -3,9 +3,11 @@ import { styled } from '@stitches/react';
 import {
   DialogClose,
   DialogDefaultCloseIcon,
+  DialogDescription,
   DialogTitle,
   StyledDialogContent,
   StyledDialogOverlay,
+  StyledDialogPortal,
   StyledDialogTrigger,
 } from './DialogContent';
 
@@ -17,6 +19,8 @@ export const Dialog = {
   Overlay: StyledDialogOverlay,
   Content: StyledDialogContent,
   Title: DialogTitle,
+  Description: DialogDescription,
   Close: DialogClose,
   DefaultClose: DialogDefaultCloseIcon,
+  Portal: StyledDialogPortal,
 };

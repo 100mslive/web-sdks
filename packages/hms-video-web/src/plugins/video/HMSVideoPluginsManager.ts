@@ -1,17 +1,16 @@
 /* eslint-disable complexity */
-import { HMSVideoPlugin, HMSVideoPluginType } from './HMSVideoPlugin';
-import { HMSLocalVideoTrack } from '../../media/tracks';
-import HMSLogger from '../../utils/logger';
-import { sleep } from '../../utils/timer-utils';
+import { HMSVideoPlugin, HMSVideoPluginCanvasContextType, HMSVideoPluginType } from './HMSVideoPlugin';
 import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 import { EventBus } from '../../events/EventBus';
+import { HMSLocalVideoTrack } from '../../media/tracks';
+import HMSLogger from '../../utils/logger';
+import { sleep } from '../../utils/timer-utils';
 import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;
 const DEFAULT_WIDTH = 320;
 const DEFAULT_HEIGHT = 240;
-const TAG = 'VideoPluginsManager';
 
 interface CanvasElement extends HTMLCanvasElement {
   captureStream(frameRate?: number): MediaStream;
@@ -39,14 +38,15 @@ interface CanvasElement extends HTMLCanvasElement {
  * @see HMSVideoPlugin
  */
 export class HMSVideoPluginsManager {
+  private readonly TAG = '[VideoPluginsManager]';
+
   /**
    * plugins loop is the loop in which all plugins are applied
    */
   private pluginsLoopRunning = false;
   private pluginsLoopState: 'paused' | 'running' = 'paused';
   private readonly hmsTrack: HMSLocalVideoTrack;
-  private readonly plugins: string[]; // plugin names in order they were added
-  private readonly pluginsMap: Record<string, HMSVideoPlugin>; // plugin names to their instance mapping
+  private readonly pluginsMap: Map<string, HMSVideoPlugin>; // plugin names to their instance mapping
   private inputVideo?: HTMLVideoElement;
   private inputCanvas?: CanvasElement;
   private outputCanvas?: CanvasElement;
@@ -59,8 +59,7 @@ export class HMSVideoPluginsManager {
 
   constructor(track: HMSLocalVideoTrack, eventBus: EventBus) {
     this.hmsTrack = track;
-    this.plugins = [];
-    this.pluginsMap = {};
+    this.pluginsMap = new Map();
     this.pluginNumFramesToSkip = {};
     this.pluginNumFramesSkipped = {};
     this.analytics = new VideoPluginsAnalytics(eventBus);
@@ -68,7 +67,7 @@ export class HMSVideoPluginsManager {
   }
 
   getPlugins(): string[] {
-    return [...this.plugins];
+    return Array.from(this.pluginsMap.keys());
   }
 
   /**
@@ -108,8 +107,8 @@ export class HMSVideoPluginsManager {
       HMSLogger.w('no name provided by the plugin');
       return;
     }
-    if (this.pluginsMap[name]) {
-      HMSLogger.w(TAG, `plugin - ${plugin.getName()} already added.`);
+    if (this.pluginsMap.has(name)) {
+      HMSLogger.w(this.TAG, `plugin - ${plugin.getName()} already added.`);
       return;
     }
     //TODO: assuming this inputFrameRate from getMediaTrackSettings will not change once set
@@ -118,17 +117,17 @@ export class HMSVideoPluginsManager {
 
     let numFramesToSkip = 0;
     if (pluginFrameRate && pluginFrameRate > 0) {
-      HMSLogger.i(TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
+      HMSLogger.i(this.TAG, `adding plugin ${plugin.getName()} with framerate ${pluginFrameRate}`);
       if (pluginFrameRate < inputFrameRate) {
         numFramesToSkip = Math.ceil(inputFrameRate / pluginFrameRate) - 1;
       }
       this.analytics.added(name, inputFrameRate, pluginFrameRate);
     } else {
-      HMSLogger.i(TAG, `adding plugin ${plugin.getName()}`);
+      HMSLogger.i(this.TAG, `adding plugin ${plugin.getName()}`);
       this.analytics.added(name, inputFrameRate);
     }
 
-    HMSLogger.i(TAG, 'numFrames to skip processing', numFramesToSkip);
+    HMSLogger.i(this.TAG, 'numFrames to skip processing', numFramesToSkip);
     this.pluginNumFramesToSkip[name] = numFramesToSkip;
     this.pluginNumFramesSkipped[name] = numFramesToSkip;
 
@@ -136,17 +135,16 @@ export class HMSVideoPluginsManager {
 
     try {
       await this.analytics.initWithTime(name, async () => await plugin.init());
-      this.plugins.push(name);
-      this.pluginsMap[name] = plugin;
+      this.pluginsMap.set(name, plugin);
       // add new canvases according to new added plugins
-      if (this.plugins.length + 1 > this.canvases.length) {
-        for (let i = this.canvases.length; i <= this.plugins.length; i++) {
+      if (this.pluginsMap.size + 1 > this.canvases.length) {
+        for (let i = this.canvases.length; i <= this.pluginsMap.size; i++) {
           this.canvases[i] = document.createElement('canvas') as CanvasElement;
         }
       }
-      await this.startPluginsLoop();
+      await this.startPluginsLoop(plugin.getContextType?.());
     } catch (err) {
-      HMSLogger.e(TAG, 'failed to add plugin', err);
+      HMSLogger.e(this.TAG, 'failed to add plugin', err);
       await this.removePlugin(plugin);
       throw err;
     }
@@ -159,37 +157,38 @@ export class HMSVideoPluginsManager {
   validateAndThrow(name: string, plugin: HMSVideoPlugin) {
     const result = this.validatePlugin(plugin);
     if (result.isSupported) {
-      HMSLogger.i(TAG, `plugin is supported,- ${plugin.getName()}`);
+      HMSLogger.i(this.TAG, `plugin is supported,- ${plugin.getName()}`);
     } else {
+      let error;
       switch (result.errType) {
         case HMSPluginUnsupportedTypes.PLATFORM_NOT_SUPPORTED:
-          const error = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
+          error = ErrorFactory.MediaPluginErrors.PlatformNotSupported(
             HMSAction.VIDEO_PLUGINS,
             'platform not supported, see docs',
           );
           this.analytics.failure(name, error);
           throw error;
         case HMSPluginUnsupportedTypes.DEVICE_NOT_SUPPORTED:
-          const err = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
+          error = ErrorFactory.MediaPluginErrors.DeviceNotSupported(
             HMSAction.VIDEO_PLUGINS,
             'video device not supported, see docs',
           );
-          this.analytics.failure(name, err);
-          throw err;
+          this.analytics.failure(name, error);
+          throw error;
       }
     }
   }
 
   async removePlugin(plugin: HMSVideoPlugin) {
     const name = plugin.getName();
-    if (!this.pluginsMap[name]) {
-      HMSLogger.w(TAG, `plugin - ${name} not found to remove.`);
+    if (!this.pluginsMap.get(name)) {
+      HMSLogger.w(this.TAG, `plugin - ${name} not found to remove.`);
       return;
     }
-    HMSLogger.i(TAG, `removing plugin ${name}`);
+    HMSLogger.i(this.TAG, `removing plugin ${name}`);
     this.removePluginEntry(name);
-    if (this.plugins.length === 0) {
-      HMSLogger.i(TAG, `No plugins left, stopping plugins loop`);
+    if (this.pluginsMap.size === 0) {
+      HMSLogger.i(this.TAG, `No plugins left, stopping plugins loop`);
       await this.stopPluginsLoop();
     }
     plugin.stop();
@@ -197,13 +196,7 @@ export class HMSVideoPluginsManager {
   }
 
   removePluginEntry(name: string) {
-    const index = this.plugins.indexOf(name);
-    if (index !== -1) {
-      this.plugins.splice(index, 1);
-    }
-    if (this.pluginsMap[name]) {
-      delete this.pluginsMap[name];
-    }
+    this.pluginsMap.delete(name);
     if (this.pluginNumFramesToSkip[name]) {
       delete this.pluginNumFramesToSkip[name];
     }
@@ -230,14 +223,14 @@ export class HMSVideoPluginsManager {
    * remove every plugin one by one
    */
   async cleanup() {
-    for (const name of this.plugins) {
-      await this.removePlugin(this.pluginsMap[name]);
+    for (const plugin of this.pluginsMap.values()) {
+      await this.removePlugin(plugin);
     }
     // memory cleanup
     this.outputTrack?.stop();
   }
 
-  private initElementsAndStream() {
+  private initElementsAndStream(contextType?: HMSVideoPluginCanvasContextType) {
     if (!this.inputCanvas) {
       this.inputCanvas = document.createElement('canvas') as CanvasElement;
     }
@@ -247,28 +240,28 @@ export class HMSVideoPluginsManager {
     }
     // FF issue https://bugzilla.mozilla.org/show_bug.cgi?id=1388974
     this.inputCanvas.getContext('2d');
-    this.outputCanvas.getContext('2d');
+    this.outputCanvas.getContext(contextType || HMSVideoPluginCanvasContextType['2D']);
     // capture stream automatically uses the framerate at which the output canvas is changing
     const outputStream = this.outputCanvas.captureStream();
     this.outputTrack = outputStream.getVideoTracks()[0];
   }
 
-  private async startPluginsLoop() {
+  private async startPluginsLoop(contextType?: HMSVideoPluginCanvasContextType) {
     if (this.pluginsLoopRunning) {
       return;
     }
-    this.initElementsAndStream();
+    this.initElementsAndStream(contextType);
     this.pluginsLoopRunning = true;
     try {
       await this.hmsTrack.setProcessedTrack(this.outputTrack);
     } catch (err) {
       this.pluginsLoopRunning = false;
-      HMSLogger.e(TAG, 'error in setting processed track', err);
+      HMSLogger.e(this.TAG, 'error in setting processed track', err);
       throw err;
     }
     // can't await on pluginsLoop as it'll run for a long long time
     this.pluginsLoop().then(() => {
-      HMSLogger.d(TAG, 'processLoop stopped');
+      HMSLogger.d(this.TAG, 'processLoop stopped');
     });
   }
 
@@ -308,7 +301,7 @@ export class HMSVideoPluginsManager {
         }
       } catch (err) {
         // TODO: handle failures properly, detect which plugin failed, stop it and notify back to the UI
-        HMSLogger.e(TAG, 'error in plugins loop', err);
+        HMSLogger.e(this.TAG, 'error in plugins loop', err);
       }
       this.pluginsLoopState = 'running';
       // take into account processing time to decide time to wait for the next loop
@@ -327,9 +320,9 @@ export class HMSVideoPluginsManager {
    */
   private async processFramesThroughPlugins() {
     this.canvases[0] = this.inputCanvas!;
-    for (let i = 0; i < this.plugins.length; i++) {
-      const name = this.plugins[i];
-      const plugin = this.pluginsMap[name];
+    let i = 0;
+    for (const plugin of this.pluginsMap.values()) {
+      const name = plugin.getName();
       if (!plugin) {
         continue;
       }
@@ -341,20 +334,22 @@ export class HMSVideoPluginsManager {
             try {
               await plugin.processVideoFrame(input, output, skipProcessing);
             } catch (err) {
-              HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+              HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
             }
           };
           if (!skipProcessing) {
-            if (i === this.plugins.length - 1) {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.outputCanvas!));
+            const currentCanvas = this.canvases[i];
+            const nextCanvas = this.canvases[i + 1];
+            if (i === this.pluginsMap.size - 1) {
+              await this.analytics.processWithTime(name, async () => process(currentCanvas, this.outputCanvas!));
             } else {
-              await this.analytics.processWithTime(name, async () => process(this.canvases[i]!, this.canvases[i + 1]!));
+              await this.analytics.processWithTime(name, async () => process(currentCanvas, nextCanvas));
             }
           } else {
-            if (i === this.plugins.length - 1) {
-              await process(this.canvases[i]!, this.outputCanvas!);
+            if (i === this.pluginsMap.size - 1) {
+              await process(this.canvases[i], this.outputCanvas!);
             } else {
-              await process(this.canvases[i]!, this.canvases[i + 1]!);
+              await process(this.canvases[i], this.canvases[i + 1]);
             }
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
@@ -363,10 +358,11 @@ export class HMSVideoPluginsManager {
         }
       } catch (err) {
         //TODO error happened on processing of plugin notify UI
-        HMSLogger.e(TAG, `error in processing plugin ${name}`, err);
+        HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
         //remove plugin from loop and stop analytics for it
         await this.removePlugin(plugin);
       }
+      i++;
     }
   }
 
@@ -390,11 +386,7 @@ export class HMSVideoPluginsManager {
     this.inputVideo.srcObject = new MediaStream([this.hmsTrack.nativeTrack]);
     this.inputVideo.muted = true;
     this.inputVideo.playsInline = true;
-    if (this.inputVideo) {
-      this.inputVideo.oncanplaythrough = () => {
-        this.inputVideo?.play();
-      };
-    }
+    await this.inputVideo.play();
   }
 
   /**
@@ -420,11 +412,6 @@ export class HMSVideoPluginsManager {
   private resetCanvases() {
     if (!this.outputCanvas || !this.inputCanvas) {
       return;
-    }
-    const outputCtx = this.outputCanvas.getContext('2d');
-    if (outputCtx) {
-      outputCtx.fillStyle = `rgb(0, 0, 0)`;
-      outputCtx.fillRect(0, 0, this.outputCanvas.width, this.outputCanvas.height);
     }
     const inputCtx = this.inputCanvas.getContext('2d');
     if (inputCtx) {

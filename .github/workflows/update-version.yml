@@ -30,6 +30,10 @@ jobs:
               - 'packages/react-ui/src/**'
             react-icons:
               - 'packages/react-icons/src/**'
+            hls-stats:
+              - 'packages/hls-stats/src/**'
+            hls-player:
+              - 'packages/hls-player/src/**'
 
   #   # run this job only if the above job succeeds
   #   update-version:

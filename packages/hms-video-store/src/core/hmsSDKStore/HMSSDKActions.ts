@@ -1,43 +1,4 @@
 import {
-  createDefaultStoreState,
-  HMSChangeMultiTrackStateParams,
-  HMSMediaSettings,
-  HMSMessage,
-  HMSMessageInput,
-  HMSPeer,
-  HMSPeerID,
-  HMSPlaylistType,
-  HMSRoomState,
-  HMSStore,
-  HMSTrack,
-  HMSTrackID,
-  HMSTrackSource,
-  IHMSPlaylistActions,
-} from '../schema';
-import { IHMSActions } from '../IHMSActions';
-import * as sdkTypes from './sdkTypes';
-import { SDKToHMS } from './adapter';
-import {
-  HMSRoleChangeRequest,
-  selectHMSMessagesCount,
-  selectIsLocalScreenShared,
-  selectIsLocalVideoDisplayEnabled,
-  selectIsLocalVideoEnabled,
-  selectLocalAudioTrackID,
-  selectLocalMediaSettings,
-  selectLocalPeer,
-  selectLocalTrackIDs,
-  selectLocalVideoTrackID,
-  selectPeerByID,
-  selectPermissions,
-  selectRolesMap,
-  selectRoomStarted,
-  selectRoomState,
-  selectTrackByID,
-  selectTracksMap,
-} from '../selectors';
-import { HMSLogger } from '../../common/ui-logger';
-import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
   HMSChangeMultiTrackStateParams as SDKHMSChangeMultiTrackStateParams,
@@ -53,20 +14,68 @@ import {
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
+  HMSScreenShareConfig,
   HMSSdk,
   HMSSimulcastLayer,
   HMSTrack as SDKHMSTrack,
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
+  SessionStoreUpdate,
 } from '@100mslive/hms-video';
-import { IHMSStore } from '../IHMSStore';
-
-import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
-import { HMSNotifications } from './HMSNotifications';
-import { NamedSetState } from './internalTypes';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
+import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import { SDKToHMS } from './adapter';
+import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
-import { ACTION_TYPES } from './common/mapping';
+import { HMSSessionStore } from './HMSSessionStore';
+import { NamedSetState } from './internalTypes';
+import * as sdkTypes from './sdkTypes';
+import { HMSLogger } from '../../common/ui-logger';
+import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
+import { IHMSActions } from '../IHMSActions';
+import { IHMSStore } from '../IHMSStore';
+import {
+  createDefaultStoreState,
+  HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
+  HMSMediaSettings,
+  HMSMessage,
+  HMSMessageInput,
+  HMSPeer,
+  HMSPeerID,
+  HMSPlaylistType,
+  HMSRoleName,
+  HMSRoomState,
+  HMSStore,
+  HMSTrack,
+  HMSTrackID,
+  HMSTrackSource,
+  HMSVideoTrack,
+  IHMSPlaylistActions,
+  IHMSSessionStoreActions,
+} from '../schema';
+import {
+  HMSRoleChangeRequest,
+  selectHMSMessagesCount,
+  selectIsConnectedToRoom,
+  selectIsLocalScreenShared,
+  selectIsLocalVideoDisplayEnabled,
+  selectIsLocalVideoEnabled,
+  selectLocalAudioTrackID,
+  selectLocalMediaSettings,
+  selectLocalPeer,
+  selectLocalTrackIDs,
+  selectLocalVideoTrackID,
+  selectPeerByID,
+  selectPeersMap,
+  selectPermissions,
+  selectRolesMap,
+  selectRoomState,
+  selectTrackByID,
+  selectTracksMap,
+  selectVideoTrackByID,
+} from '../selectors';
 
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
@@ -90,22 +99,29 @@ import { ACTION_TYPES } from './common/mapping';
  * 5. State is immutable, a new copy with new references is created when there is a change,
  *    if you try to modify state outside of setState, there'll be an error.
  */
-export class HMSSDKActions implements IHMSActions {
+export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  implements IHMSActions<T>
+{
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
-  private readonly store: IHMSStore;
+  private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
-  private hmsNotifications: HMSNotifications;
+  private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
-  constructor(store: IHMSStore, sdk: HMSSdk, notificationManager: HMSNotifications) {
+  constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
     this.store = store;
     this.sdk = sdk;
     this.hmsNotifications = notificationManager;
+
+    this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
+
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -117,17 +133,17 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
-  setVolume(value: number, trackId?: HMSTrackID): void {
+  async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
-      this.setTrackVolume(value, trackId);
+      await this.setTrackVolume(value, trackId);
     } else {
-      this.sdk.getAudioOutput().setVolume(value);
+      await this.sdk.getAudioOutput().setVolume(value);
       this.syncRoomState('setOutputVolume');
     }
   }
 
-  setAudioOutputDevice(deviceId: string): void {
-    const deviceInfo = this.sdk.getAudioOutput().setDevice(deviceId);
+  async setAudioOutputDevice(deviceId: string): Promise<void> {
+    const deviceInfo = await this.sdk.getAudioOutput().setDevice(deviceId);
     if (deviceInfo) {
       this.setState(draftStore => {
         draftStore.settings.audioOutputDeviceId = deviceId;
@@ -135,21 +151,43 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  setPreferredLayer(trackId: string, layer: HMSSimulcastLayer) {
+  async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
-        track.preferLayer(layer);
-        this.updateVideoLayer(trackId, 'setPreferredLayer');
+        //@ts-ignore
+        if (layer === HMSSimulcastLayer.NONE) {
+          HMSLogger.d(`layer ${HMSSimulcastLayer.NONE} will be ignored`);
+          return;
+        }
+        const alreadyInSameState = this.store.getState(selectVideoTrackByID(trackId))?.preferredLayer === layer;
+        if (alreadyInSameState) {
+          HMSLogger.d(`preferred layer is already ${layer}`);
+          return;
+        }
+        this.setState(draftStore => {
+          const track = draftStore.tracks[trackId] as HMSVideoTrack;
+          if (track) {
+            track.preferredLayer = layer;
+          }
+        }, 'setPreferredLayer');
+        await track.setPreferredLayer(layer);
       } else {
-        HMSLogger.w(`track ${trackId} is not an video track`);
+        HMSLogger.d(`track ${trackId} is not a remote video track`);
       }
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
     }
   }
 
-  async preview(config: sdkTypes.HMSConfig) {
+  getAuthTokenByRoomCode(
+    tokenRequest: sdkTypes.TokenRequest,
+    tokenRequestOptions?: sdkTypes.TokenRequestOptions,
+  ): Promise<string> {
+    return this.sdk.getAuthTokenByRoomCode(tokenRequest, tokenRequestOptions);
+  }
+
+  async preview(config: sdkTypes.HMSPreviewConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('attempting to call preview after join was called');
       return; // ignore
@@ -171,7 +209,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  join(config: sdkTypes.HMSConfig) {
+  async join(config: sdkTypes.HMSConfig) {
     if (this.isRoomJoinCalled) {
       this.logPossibleInconsistency('room join is called again');
       return; // ignore
@@ -181,7 +219,7 @@ export class HMSSDKActions implements IHMSActions {
       this.setState(store => {
         store.room.roomState = HMSRoomState.Connecting;
       }, 'join');
-      this.sdkJoinWithListeners(config);
+      await this.sdkJoinWithListeners(config);
     } catch (err) {
       this.isRoomJoinCalled = false; // so it can be called again if needed
       HMSLogger.e('Failed to connect to room - ', err);
@@ -190,19 +228,23 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async leave() {
-    const hasRoomStarted = this.store.getState(selectRoomStarted);
-    if (!hasRoomStarted) {
+    const isConnectedToRoom = this.store.getState(selectIsConnectedToRoom);
+    let notifyServer = true;
+    if (!isConnectedToRoom) {
+      notifyServer = false;
       this.logPossibleInconsistency('room leave is called when no room is connected');
-      return; // ignore
     }
     const currentRoomState = this.store.getState(selectRoomState);
     this.setState(store => {
       store.room.roomState = HMSRoomState.Disconnecting;
     }, 'leaving');
     return this.sdk
-      .leave()
+      .leave(notifyServer)
       .then(() => {
         this.resetState('leave');
+        if (this.beamSpeakerLabelsLogger) {
+          this.beamSpeakerLabelsLogger.stop().catch(HMSLogger.e);
+        }
         HMSLogger.i('left room');
       })
       .catch(err => {
@@ -213,17 +255,14 @@ export class HMSSDKActions implements IHMSActions {
       });
   }
 
-  async setScreenShareEnabled(enabled: boolean, config?: { audioOnly?: boolean; videoOnly?: boolean } | boolean) {
-    const sdkConfig = { audioOnly: false, videoOnly: false };
-    if (typeof config === 'object') {
-      Object.assign(sdkConfig, config);
-    } else if (typeof config === 'boolean') {
-      // for backward compatibility
-      sdkConfig.audioOnly = config;
+  async setScreenShareEnabled(enabled: boolean, config?: HMSScreenShareConfig) {
+    // TODO: remove this, purely for backward compatibility
+    if (typeof config === 'boolean') {
+      config = { audioOnly: config };
     }
     try {
       if (enabled) {
-        await this.startScreenShare(sdkConfig);
+        await this.startScreenShare(config);
       } else {
         await this.stopScreenShare();
       }
@@ -304,6 +343,17 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async switchCamera(): Promise<void> {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      if (sdkTrack) {
+        await sdkTrack.switchCamera();
+        this.syncRoomState('switchCamera');
+      }
+    }
+  }
+
   sendMessage(message: string) {
     this.sendBroadcastMessage(message);
   }
@@ -358,6 +408,7 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
+    HMSLogger.d(`[HMSSDKAction] attaching the video element ${trackID} ${videoElement}`);
     if (this.localAndVideoUnmuting(trackID)) {
       // wait till video unmute has finished
       return new Promise<void>(resolve => {
@@ -375,12 +426,15 @@ export class HMSSDKActions implements IHMSActions {
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
+    HMSLogger.d(`[HMSSDKAction] detaching the video element ${trackID} ${videoElement}`);
     const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).removeSink(videoElement);
-      this.updateVideoLayer(trackID, 'detachVideo');
+    if (sdkTrack?.type === 'video') {
+      await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
-      this.logPossibleInconsistency('no video track found to remove sink');
+      if (videoElement) {
+        videoElement.srcObject = null; // so chrome can clean up
+      }
+      HMSLogger.d('possible inconsistency detected - no video track found to remove sink');
     }
   }
 
@@ -400,14 +454,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('video Track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has video track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -422,14 +479,17 @@ export class HMSSDKActions implements IHMSActions {
       return result;
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
-    if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
-      if (sdkTrack) {
-        result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
-      } else {
-        HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
-        result.errMsg = `track ${trackID} not present, unable to validate plugin`;
-      }
+    if (!trackID) {
+      HMSLogger.w('audio track not added to local peer yet');
+      result.errMsg = 'call this function only after local peer has audio track';
+      return result;
+    }
+    const sdkTrack = this.hmsSDKTracks[trackID];
+    if (sdkTrack) {
+      result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
+    } else {
+      HMSLogger.w(`track ${trackID} not present, unable to validate plugin`);
+      result.errMsg = `track ${trackID} not present, unable to validate plugin`;
     }
 
     return result;
@@ -449,7 +509,22 @@ export class HMSSDKActions implements IHMSActions {
       return;
     }
 
-    await this.sdk.changeRole(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+  }
+
+  async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
+    const peer = this.hmsSDKPeers[forPeerId];
+    if (!peer) {
+      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
+      return;
+    }
+
+    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+  }
+
+  async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName) {
+    const rolesToBeChanged = this.sdk.getRoles().filter(role => roles.includes(role.name));
+    await this.sdk.changeRoleOfPeersWithRoles(rolesToBeChanged, toRole);
   }
 
   // TODO: separate out role related things in another file
@@ -542,7 +617,7 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopRTMPAndRecording();
   }
 
-  async startHLSStreaming(params: sdkTypes.HLSConfig): Promise<void> {
+  async startHLSStreaming(params?: sdkTypes.HLSConfig) {
     await this.sdk.startHLSStreaming(params);
   }
 
@@ -550,6 +625,9 @@ export class HMSSDKActions implements IHMSActions {
     await this.sdk.stopHLSStreaming(params);
   }
 
+  async sendHLSTimedMetadata(metadataList: sdkTypes.HLSTimedMetadata[]): Promise<void> {
+    await this.sdk.sendHLSTimedMetadata(metadataList);
+  }
   async changeName(name: string) {
     await this.sdk.changeName(name);
   }
@@ -559,6 +637,22 @@ export class HMSSDKActions implements IHMSActions {
       metadata = JSON.stringify(metadata);
     }
     await this.sdk.changeMetadata(metadata);
+  }
+
+  async setSessionMetadata(metadata: any) {
+    await this.sdk.setSessionMetadata(metadata);
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'setSessionMetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'setSessionMetadata');
+  }
+
+  async populateSessionMetadata(): Promise<void> {
+    const metadata = await this.sdk.getSessionMetadata();
+    this.setState(draftStore => {
+      draftStore.sessionMetadata = metadata;
+    }, 'populateSessionMetadata');
+    this.setSessionStoreValueLocally({ key: 'default', value: metadata }, 'populateSessionmetadata');
   }
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
@@ -592,6 +686,10 @@ export class HMSSDKActions implements IHMSActions {
     this.sdk.setLogLevel(level);
   }
 
+  setFrameworkInfo(frameworkInfo: sdkTypes.HMSFrameworkInfo) {
+    this.sdk.setFrameworkInfo(frameworkInfo);
+  }
+
   ignoreMessageTypes(msgTypes: string[], replace = false) {
     if (replace) {
       this.ignoredMessageTypes = msgTypes;
@@ -604,17 +702,25 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
+  async enableBeamSpeakerLabelsLogging() {
+    if (!this.beamSpeakerLabelsLogger) {
+      HMSLogger.i('enabling beam speaker labels logging');
+      this.beamSpeakerLabelsLogger = new BeamSpeakerLabelsLogger(this.store, this);
+      await this.beamSpeakerLabelsLogger.start();
+    }
+  }
+
   private resetState(reason = 'resetState') {
-    this.setState(store => {
-      Object.assign(store, createDefaultStoreState());
-    }, reason);
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
     HMSLogger.cleanUp();
+    this.setState(store => {
+      Object.assign(store, createDefaultStoreState());
+    }, reason);
   }
 
-  private sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
-    this.sdk.join(config, {
+  private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
+    await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
@@ -630,6 +736,7 @@ export class HMSSDKActions implements IHMSActions {
       onChangeMultiTrackStateRequest: this.onChangeMultiTrackStateRequest.bind(this),
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
+      onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -666,12 +773,10 @@ export class HMSSDKActions implements IHMSActions {
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (this.hmsSDKPeers[localPeer?.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer?.id]));
+      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
+        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
       }
     }, 'deviceChange');
-    // sync is needed to update the current selected device
-    // this.syncRoomState('deviceChangeSync');
     // send notification only on device change - selection is present
     if (event.selection) {
       const notification = SDKToHMS.convertDeviceChangeUpdate(event);
@@ -679,7 +784,7 @@ export class HMSSDKActions implements IHMSActions {
     }
   }
 
-  private async sdkPreviewWithListeners(config: sdkTypes.HMSConfig) {
+  private async sdkPreviewWithListeners(config: sdkTypes.HMSPreviewConfig) {
     await this.sdk.preview(config, {
       onPreview: this.onPreview.bind(this),
       onError: this.onError.bind(this),
@@ -708,7 +813,11 @@ export class HMSSDKActions implements IHMSActions {
     }, 'ConnectionQuality');
   }
 
-  private async startScreenShare(config?: { audioOnly: boolean; videoOnly: boolean }) {
+  private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
+    this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
+  }
+
+  private async startScreenShare(config?: HMSScreenShareConfig) {
     const isScreenShared = this.store.getState(selectIsLocalScreenShared);
     if (!isScreenShared) {
       await this.sdk.startScreenShare(() => this.syncRoomState('screenshareStopped'), config);
@@ -731,8 +840,7 @@ export class HMSSDKActions implements IHMSActions {
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack && sdkTrack.type === 'video') {
-      await (sdkTrack as SDKHMSVideoTrack).addSink(videoElement);
-      this.updateVideoLayer(trackID, 'attachVideo');
+      await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
       this.logPossibleInconsistency('no video track found to add sink');
     }
@@ -750,13 +858,15 @@ export class HMSSDKActions implements IHMSActions {
    * interested in with a new reference.
    * @protected
    */
-  protected syncRoomState(action?: string) {
+  protected syncRoomState(action: string) {
+    action = `${action}_fullSync`;
     HMSLogger.time(`store-sync-${action}`);
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
 
@@ -777,8 +887,10 @@ export class HMSSDKActions implements IHMSActions {
         newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
-      if (hmsPeer.isLocal) {
-        Object.assign(newMediaSettings, this.getMediaSettings(sdkPeer));
+      if (sdkPeer.isLocal) {
+        const localPeer = sdkPeer as sdkTypes.HMSLocalPeer;
+        newPreview = this.getPreviewFields(localPeer);
+        Object.assign(newMediaSettings, this.getMediaSettings(localPeer));
       }
     }
 
@@ -798,9 +910,20 @@ export class HMSSDKActions implements IHMSActions {
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       this.hmsSDKTracks = newHmsSDkTracks;
+
+      /**
+       * if preview is already present merge,
+       * else set as is(which will create/delete)
+       */
+      if (draftStore.preview?.localPeer && newPreview?.localPeer) {
+        Object.assign(draftStore.preview, newPreview);
+      } else {
+        draftStore.preview = newPreview;
+      }
       Object.assign(draftStore.roles, SDKToHMS.convertRoles(this.sdk.getRoles()));
       Object.assign(draftStore.playlist, SDKToHMS.convertPlaylist(this.sdk.getPlaylistManager()));
       Object.assign(draftStore.room, SDKToHMS.convertRecordingStreamingState(recording, rtmp, hls));
+      Object.assign(draftStore.templateAppData, this.sdk.getTemplateAppData());
     }, action);
     HMSLogger.timeEnd(`store-sync-${action}`);
   }
@@ -846,11 +969,10 @@ export class HMSSDKActions implements IHMSActions {
     });
   }
 
-  //@ts-ignore
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(room));
-    }, 'RoomUpdate');
+    }, type);
   }
 
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
@@ -860,15 +982,29 @@ export class HMSSDKActions implements IHMSActions {
       return; // ignore, high frequency update so no point of syncing peers
     }
     if (Array.isArray(sdkPeer)) {
+      const storePeers = this.store.getState(selectPeersMap);
+      const newPeerIds = sdkPeer.filter(peer => !storePeers[peer.peerId]);
       this.syncRoomState('peersJoined');
-      const hmsPeers = [];
-      for (const peer of sdkPeer) {
-        const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
-        if (hmsPeer) {
-          hmsPeers.push(hmsPeer);
+      const connected = this.store.getState(selectIsConnectedToRoom);
+      // This is not send unnecessary notifications while in preview
+      // now room state also call peer list to handle large peers
+      if (connected) {
+        const hmsPeers = [];
+        for (const peer of sdkPeer) {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            hmsPeers.push(hmsPeer);
+          }
         }
+        this.hmsNotifications.sendPeerList(hmsPeers);
+      } else {
+        newPeerIds.forEach(peer => {
+          const hmsPeer = this.store.getState(selectPeerByID(peer.peerId));
+          if (hmsPeer) {
+            this.hmsNotifications.sendPeerUpdate(sdkTypes.HMSPeerUpdate.PEER_JOINED, hmsPeer);
+          }
+        });
       }
-      this.hmsNotifications.sendPeerList(hmsPeers);
       return;
     }
     this.sendPeerUpdateNotification(type, sdkPeer);
@@ -881,7 +1017,7 @@ export class HMSSDKActions implements IHMSActions {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
     } else {
-      const actionName = type === sdkTypes.HMSTrackUpdate.TRACK_ADDED ? 'trackAdded' : 'trackUpdate';
+      const actionName = TRACK_NOTIFICATION_TYPES[type] || 'trackUpdate';
       this.syncRoomState(actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
@@ -1051,21 +1187,7 @@ export class HMSSDKActions implements IHMSActions {
     this.syncRoomState('errorSync'); //TODO: check if need to be done in a different way
     // send notification
     this.hmsNotifications.sendError(error);
-    HMSLogger.e('received error from sdk', error);
-  }
-
-  /**
-   * the layer gets updated on addsink/removesink/preferlayer calls, for simulcast there
-   * can be multiple layers, while for non simulcast there will be None and High.
-   */
-  private updateVideoLayer(trackID: string, action: string) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
-    if (sdkTrack && sdkTrack instanceof SDKHMSRemoteVideoTrack) {
-      this.setState(draft => {
-        draft.tracks[trackID].layer = sdkTrack.getSimulcastLayer();
-        draft.tracks[trackID].degraded = sdkTrack.degraded;
-      }, action);
-    }
+    HMSLogger.e('received error from sdk', error instanceof SDKHMSException ? `${error}` : error);
   }
 
   private handleTrackRemove(sdkTrack: SDKHMSTrack, sdkPeer: sdkTypes.HMSPeer) {
@@ -1127,14 +1249,30 @@ export class HMSSDKActions implements IHMSActions {
     };
   }
 
-  private setTrackVolume(value: number, trackId: HMSTrackID) {
+  private getPreviewFields(sdkLocalPeer: sdkTypes.HMSLocalPeer): HMSStore['preview'] {
+    // if room is not in preview, clear preview fields
+    if (!sdkLocalPeer.isInPreview()) {
+      return;
+    }
+
+    const hmsLocalPeer = SDKToHMS.convertPeer(sdkLocalPeer);
+
+    return {
+      localPeer: hmsLocalPeer.id,
+      audioTrack: hmsLocalPeer.audioTrack,
+      videoTrack: hmsLocalPeer.videoTrack,
+      asRole: sdkLocalPeer.asRole?.name || sdkLocalPeer.role?.name,
+    };
+  }
+
+  private async setTrackVolume(value: number, trackId: HMSTrackID) {
     const track = this.hmsSDKTracks[trackId];
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
-        track.setVolume(value);
+        await track.setVolume(value);
         this.setState(draftStore => {
           const track = draftStore.tracks[trackId];
-          if (track) {
+          if (track && track.type === 'audio') {
             track.volume = value;
           }
         }, 'trackVolume');
@@ -1152,7 +1290,7 @@ export class HMSSDKActions implements IHMSActions {
    */
   private localAndVideoUnmuting(trackID: string) {
     const localPeer = this.store.getState(selectLocalPeer);
-    if (localPeer.videoTrack !== trackID) {
+    if (localPeer?.videoTrack !== trackID) {
       return false;
     }
     const displayEnabled = this.store.getState(selectIsLocalVideoDisplayEnabled);
@@ -1263,7 +1401,7 @@ export class HMSSDKActions implements IHMSActions {
 
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
-    const actionName = ACTION_TYPES[type];
+    const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
     this.syncRoomState(actionName);
     // if peer wasn't available before sync(will happen if event is peer join)
     if (!peer) {
@@ -1272,12 +1410,24 @@ export class HMSSDKActions implements IHMSActions {
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
+  private setSessionStoreValueLocally(
+    updates: SessionStoreUpdate | SessionStoreUpdate[],
+    actionName = 'setSessionStore',
+  ) {
+    const updatesList: SessionStoreUpdate[] = Array.isArray(updates) ? updates : [updates];
+    this.setState(store => {
+      updatesList.forEach(update => {
+        store.sessionStore[update.key as keyof T['sessionStore']] = update.value;
+      });
+    }, actionName);
+  }
+
   /**
    * setState is separate so any future changes to how state change can be done from one place.
    * @param fn
    * @param name
    */
-  private setState: NamedSetState<HMSStore> = (fn, name) => {
+  private setState: NamedSetState<HMSStore<T>> = (fn, name) => {
     return this.store.namedSetState(fn, name);
   };
 }

@@ -16,12 +16,23 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: 14
+          node-version: 16
           registry-url: https://registry.npmjs.org/
 
       - name: Check for main branch if latest
         if: (github.event.inputs.publishFlag == 'latest' || github.event.client_payload.slash_command.args.unnamed.arg1 == 'latest') && github.ref_name != 'main'
         run: exit 1
+
+      - name: Notify slack starting
+        if: github.event.inputs.publishFlag == 'latest' && success()
+        id: slack # IMPORTANT: reference this step ID value in future Slack steps
+        env: 
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Start
+          color: warning
 
       - name: Install packages
         run: yarn install
@@ -34,6 +45,17 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
 
+      - name: Notify slack publish
+        if: github.event.inputs.publishFlag == 'latest' && success()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Publishing
+          color: "#bada55"
+
         # from-package will publish whatever version is present in each package's package.json
         # it will not publish if the version is already published in npm
       - name: Publish
@@ -42,3 +64,25 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           PUBLISH_FLAG: ${{ github.event.inputs.publishFlag || github.event.client_payload.slash_command.args.unnamed.arg1  || 'alpha' }}
+
+      - name: Notify slack success
+        if: github.event.inputs.publishFlag == 'latest' && success()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Success
+          color: good
+
+      - name: Notify slack fail
+        if: github.event.inputs.publishFlag == 'latest' && failure()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_DEPLOY_BOT_TOKEN }}
+        uses: voxmedia/github-action-slack-notify-build@v1
+        with:
+          message_id: ${{ steps.slack.outputs.message_id }}
+          channel_id: ${{ secrets.SLACK_DEPLOY_PROD_CHANNEL_ID }}
+          status: Failed
+          color: danger

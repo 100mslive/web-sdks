@@ -1,31 +1,31 @@
 import React from 'react';
 import {
+  HMSPeerID,
+  HMSTrack,
+  selectAudioTrackByPeerID,
+  selectAudioVolumeByPeerID,
+  selectPermissions,
+  selectVideoTrackByPeerID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
+import {
   HorizontalMenuIcon,
   MicOffIcon,
+  MicOnIcon,
+  RemoveUserIcon,
+  SpeakerIcon,
   VideoOffIcon,
   VideoOnIcon,
-  MicOnIcon,
-  SpeakerIcon,
-  RemoveUserIcon,
 } from '@100mslive/react-icons';
-import {
-  useHMSStore,
-  selectVideoTrackByPeerID,
-  HMSPeerID,
-  selectPermissions,
-  selectAudioTrackByPeerID,
-  useHMSActions,
-  HMSTrack,
-  selectAudioVolumeByPeerID,
-} from '@100mslive/react-sdk';
-import { Slider } from '../Slider';
 import { Flex, StyledMenuTile } from './StyledMenuTile';
+import { Slider } from '../Slider';
 
-interface Props {
+export interface TileMenuProps {
   peerId: HMSPeerID;
 }
 
-export const TileMenu: React.FC<Props> = ({ peerId }) => {
+export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
   const actions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   // TODO: selectTrackByID vs selectVideoTrackByPeerID

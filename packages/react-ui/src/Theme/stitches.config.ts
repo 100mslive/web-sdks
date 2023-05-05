@@ -1,5 +1,5 @@
-import { createStitches } from '@stitches/react';
 import type * as Stitches from '@stitches/react';
+import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
 import { darkTheme, lightTheme } from './themes';
@@ -18,7 +18,16 @@ const HmsStitches = createStitches({
   themeMap: defaultThemeMap,
 });
 
-export const { theme, createTheme: createThemeBase, styled, globalCss, keyframes, getCssText, config } = HmsStitches;
+export const {
+  theme,
+  createTheme: createThemeBase,
+  styled,
+  globalCss,
+  keyframes,
+  css,
+  getCssText,
+  config,
+} = HmsStitches;
 
 export const globalStyles = globalCss({
   '*': {

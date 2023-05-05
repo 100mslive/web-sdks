@@ -1,7 +1,7 @@
-import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
+import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();
@@ -46,13 +46,13 @@ export class HMSTrackSettingsBuilder {
 }
 
 export class HMSTrackSettings implements IAnalyticsPropertiesProvider {
-  readonly video: HMSVideoTrackSettings | null;
+  readonly video: HMSVideoTrackSettings | null | undefined;
   readonly audio: HMSAudioTrackSettings | null | undefined;
   readonly screen: HMSVideoTrackSettings | null;
   readonly simulcast: boolean;
 
   constructor(
-    video: HMSVideoTrackSettings | null,
+    video: HMSVideoTrackSettings | null | undefined,
     audio: HMSAudioTrackSettings | null | undefined,
     simulcast: boolean,
     screen: HMSVideoTrackSettings | null = null,

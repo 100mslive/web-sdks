@@ -1,15 +1,36 @@
-import React, { Fragment, useEffect } from "react";
+import React, {
+  Fragment,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useInView } from "react-intersection-observer";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { VariableSizeList } from "react-window";
 import {
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
   selectPeerNameByID,
+  selectPermissions,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Flex, styled, Text } from "@100mslive/react-ui";
+import { HorizontalMenuIcon, PinIcon } from "@100mslive/react-icons";
+import {
+  Box,
+  Dropdown,
+  Flex,
+  IconButton,
+  styled,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
+import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -17,65 +38,93 @@ const formatTime = date => {
   }
   let hours = date.getHours();
   let mins = date.getMinutes();
+  const suffix = hours > 11 ? "PM" : "AM";
   if (hours < 10) {
     hours = "0" + hours;
   }
   if (mins < 10) {
     mins = "0" + mins;
   }
-  return `${hours}:${mins}`;
+  return `${hours}:${mins} ${suffix}`;
+};
+
+const MessageTypeContainer = ({ left, right }) => {
+  return (
+    <Flex
+      align="center"
+      css={{
+        ml: "auto",
+        mr: "$4",
+        p: "$2 $4",
+        border: "1px solid $textDisabled",
+        r: "$0",
+      }}
+    >
+      {left && (
+        <SenderName variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
+          {left}
+        </SenderName>
+      )}
+      {left && right && (
+        <Box
+          css={{ borderLeft: "1px solid $textDisabled", mx: "$4", h: "$8" }}
+        />
+      )}
+      {right && (
+        <SenderName as="span" variant="tiny">
+          {right}
+        </SenderName>
+      )}
+    </Flex>
+  );
 };
 
 const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   const peerName = useHMSStore(selectPeerNameByID(receiver));
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   if (receiver) {
     return (
-      <Text variant="sm" css={{ mx: "$4" }}>
-        {hasCurrentUserSent ? `to ${peerName}` : "to me"}
-        <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
-          (Privately)
-        </Text>
-      </Text>
+      <MessageTypeContainer
+        left={
+          hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ""}` : "TO YOU"
+        }
+        right="PRIVATE"
+      />
     );
   }
 
   if (roles && roles.length) {
     return (
-      <Text variant="sm" css={{ mx: "$4" }}>
-        to
-        <Text as="span" variant="sm" css={{ color: "$error", mx: "$4" }}>
-          ({roles.join(",")})
-        </Text>
-      </Text>
+      <MessageTypeContainer
+        left="TO"
+        right={hasCurrentUserSent ? roles.join(",") : localPeerRoleName}
+      />
     );
   }
-  return (
-    <Text variant="sm" css={{ mx: "$4" }}>
-      to
-      <Text as="span" variant="sm" css={{ color: "$brandDefault", mx: "$4" }}>
-        Everyone
-      </Text>
-    </Text>
-  );
+  return null;
 };
 
 const URL_REGEX =
-  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+  /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 const Link = styled("a", {
   color: "$brandDefault",
-  wordBreak: "break-all",
+  wordBreak: "break-word",
   "&:hover": {
     textDecoration: "underline",
   },
 });
 
-const AnnotisedChat = ({ message }) => {
+export const AnnotisedMessage = ({ message }) => {
+  if (!message) {
+    return <Fragment />;
+  }
+
   return (
     <Fragment>
       {message
         .trim()
-        .split(" ")
+        .split(/(\s)/)
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link
@@ -84,72 +133,276 @@ const AnnotisedChat = ({ message }) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {part}{" "}
+              {part}
             </Link>
           ) : (
-            `${part} `
+            part
           )
         )}
     </Fragment>
   );
 };
 
-const ChatMessage = React.memo(({ message }) => {
-  const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-  const hmsActions = useHMSActions();
-  const localPeerId = useHMSStore(selectLocalPeerID);
-
-  useEffect(() => {
-    if (message.id && !message.read && inView) {
-      hmsActions.setMessageRead(true, message.id);
-    }
-  }, [message.read, hmsActions, inView, message.id]);
-
-  return (
-    <Flex ref={ref} css={{ flexWrap: "wrap", p: "$4 $8" }} key={message.time}>
-      <Text variant="sm" css={{ color: "$textSecondary" }}>
-        {message.senderName}
-      </Text>
-      <MessageType
-        hasCurrentUserSent={message.sender === localPeerId}
-        receiver={message.recipientPeer}
-        roles={message.recipientRoles}
-      />
-      <Text variant="sm" css={{ ml: "auto", color: "$textSecondary" }}>
-        {formatTime(message.time)}
-      </Text>
-      <Text css={{ w: "100%", my: "$2", wordBreak: "break-word" }}>
-        <AnnotisedChat message={message.message} />
-      </Text>
-    </Flex>
-  );
-});
-
-export const ChatBody = ({ role, peerId }) => {
-  const storeMessageSelector = role
-    ? selectMessagesByRole(role)
-    : peerId
-    ? selectMessagesByPeerID(peerId)
-    : selectHMSMessages;
-  const messages = useHMSStore(storeMessageSelector) || [];
-
-  if (messages.length === 0) {
-    return (
-      <Flex
-        css={{ size: "100%", textAlign: "center", px: "$4" }}
-        align="center"
-        justify="center"
-      >
-        <Text>There are no messages here</Text>
-      </Flex>
-    );
+const getMessageType = ({ roles, receiver }) => {
+  if (roles && roles.length > 0) {
+    return "role";
   }
+  return receiver ? "private" : "";
+};
+
+const ChatActions = ({ onPin }) => {
+  const [open, setOpen] = useState(false);
 
   return (
-    <Fragment>
-      {messages.map(message => {
-        return <ChatMessage key={message.id} message={message} />;
-      })}
-    </Fragment>
+    <Dropdown.Root open={open} onOpenChange={setOpen}>
+      <Dropdown.Trigger asChild>
+        <IconButton>
+          <Tooltip title="More options">
+            <Box>
+              <HorizontalMenuIcon />
+            </Box>
+          </Tooltip>
+        </IconButton>
+      </Dropdown.Trigger>
+      <Dropdown.Portal>
+        <Dropdown.Content sideOffset={5} align="end" css={{ width: "$48" }}>
+          <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
+            <PinIcon />
+            <Text variant="sm" css={{ ml: "$4" }}>
+              Pin Message
+            </Text>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Portal>
+    </Dropdown.Root>
   );
 };
+
+const SenderName = styled(Text, {
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
+  maxWidth: "24ch",
+  minWidth: 0,
+});
+
+const ChatMessage = React.memo(
+  ({ index, style = {}, message, setRowHeight, onPin }) => {
+    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+    const rowRef = useRef(null);
+    useEffect(() => {
+      if (rowRef.current) {
+        setRowHeight(index, rowRef.current.clientHeight);
+      }
+    }, [index, setRowHeight]);
+
+    const hmsActions = useHMSActions();
+    const localPeerId = useHMSStore(selectLocalPeerID);
+    const permissions = useHMSStore(selectPermissions);
+    const messageType = getMessageType({
+      roles: message.recipientRoles,
+      receiver: message.recipientPeer,
+    });
+    // show pin action only if peer has remove others permission and the message is of broadcast type
+    const showPinAction = permissions.removeOthers && !messageType;
+
+    useEffect(() => {
+      if (message.id && !message.read && inView) {
+        hmsActions.setMessageRead(true, message.id);
+      }
+    }, [message.read, hmsActions, inView, message.id]);
+
+    return (
+      <Box ref={ref} as="div" css={{ mb: "$10", pr: "$10" }} style={style}>
+        <Flex
+          ref={rowRef}
+          align="center"
+          css={{
+            flexWrap: "wrap",
+            bg: messageType ? "$surfaceLight" : undefined,
+            r: messageType ? "$1" : undefined,
+            px: messageType ? "$4" : "$2",
+            py: messageType ? "$4" : 0,
+          }}
+          key={message.time}
+          data-testid="chat_msg"
+        >
+          <Text
+            css={{
+              color: "$textHighEmp",
+              fontWeight: "$semiBold",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+            as="div"
+          >
+            <Flex align="center">
+              {message.senderName === "You" || !message.senderName ? (
+                <SenderName as="span">
+                  {message.senderName || "Anonymous"}
+                </SenderName>
+              ) : (
+                <Tooltip title={message.senderName} side="top" align="start">
+                  <SenderName as="span">{message.senderName}</SenderName>
+                </Tooltip>
+              )}
+              <Text
+                as="span"
+                variant="sm"
+                css={{
+                  ml: "$4",
+                  color: "$textSecondary",
+                  flexShrink: 0,
+                }}
+              >
+                {formatTime(message.time)}
+              </Text>
+            </Flex>
+            <MessageType
+              hasCurrentUserSent={message.sender === localPeerId}
+              receiver={message.recipientPeer}
+              roles={message.recipientRoles}
+            />
+            {showPinAction && <ChatActions onPin={onPin} />}
+          </Text>
+          <Text
+            variant="body2"
+            css={{
+              w: "100%",
+              mt: "$2",
+              wordBreak: "break-word",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            <AnnotisedMessage message={message.message} />
+          </Text>
+        </Flex>
+      </Box>
+    );
+  }
+);
+const ChatList = React.forwardRef(
+  (
+    { width, height, setRowHeight, getRowHeight, messages, scrollToBottom },
+    listRef
+  ) => {
+    const { setPinnedMessage } = useSetPinnedMessage();
+    useLayoutEffect(() => {
+      if (listRef.current && listRef.current.scrollToItem) {
+        scrollToBottom(1);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [listRef]);
+
+    return (
+      <VariableSizeList
+        ref={listRef}
+        itemCount={messages.length}
+        itemSize={getRowHeight}
+        width={width}
+        height={height - 1}
+        style={{
+          overflowX: "hidden",
+        }}
+      >
+        {({ index, style }) => (
+          <ChatMessage
+            style={style}
+            index={index}
+            key={messages[index].id}
+            message={messages[index]}
+            setRowHeight={setRowHeight}
+            onPin={() => setPinnedMessage(messages[index])}
+          />
+        )}
+      </VariableSizeList>
+    );
+  }
+);
+const VirtualizedChatMessages = React.forwardRef(
+  ({ messages, setPinnedMessage, scrollToBottom }, listRef) => {
+    const rowHeights = useRef({});
+
+    function getRowHeight(index) {
+      // 72 will be default row height for any message length
+      // 16 will add margin value as clientHeight don't include margin
+      return rowHeights.current[index] + 16 || 72;
+    }
+
+    const setRowHeight = useCallback(
+      (index, size) => {
+        listRef.current.resetAfterIndex(0);
+        rowHeights.current = { ...rowHeights.current, [index]: size };
+      },
+      [listRef]
+    );
+
+    return (
+      <Box
+        css={{
+          mr: "-$10",
+          h: "100%",
+        }}
+        as="div"
+      >
+        <AutoSizer
+          style={{
+            width: "90%",
+          }}
+        >
+          {({ height, width }) => (
+            <ChatList
+              width={width}
+              height={height}
+              messages={messages}
+              setRowHeight={setRowHeight}
+              getRowHeight={getRowHeight}
+              scrollToBottom={scrollToBottom}
+              ref={listRef}
+            />
+          )}
+        </AutoSizer>
+      </Box>
+    );
+  }
+);
+
+export const ChatBody = React.forwardRef(
+  ({ role, peerId, scrollToBottom }, listRef) => {
+    const storeMessageSelector = role
+      ? selectMessagesByRole(role)
+      : peerId
+      ? selectMessagesByPeerID(peerId)
+      : selectHMSMessages;
+    const messages = useHMSStore(storeMessageSelector) || [];
+
+    if (messages.length === 0) {
+      return (
+        <Flex
+          css={{
+            width: "100%",
+            height: "100%",
+            textAlign: "center",
+            px: "$4",
+          }}
+          align="center"
+          justify="center"
+        >
+          <Text>There are no messages here</Text>
+        </Flex>
+      );
+    }
+
+    return (
+      <Fragment>
+        <VirtualizedChatMessages
+          messages={messages}
+          scrollToBottom={scrollToBottom}
+          ref={listRef}
+        />
+      </Fragment>
+    );
+  }
+);

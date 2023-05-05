@@ -12,7 +12,7 @@ const getHorizontalSpace = (space: string) => ({
 export const VerticalDivider = styled('span', {
   height: '25px',
   width: '1px',
-  backgroundColor: '$grayDefault',
+  backgroundColor: '$borderLight',
   variants: {
     space: {
       1: getVerticalSpace('$1'),
@@ -30,7 +30,7 @@ export const HorizontalDivider = styled('span', {
   height: '1px',
   width: '100%',
   display: 'block',
-  backgroundColor: '$grayDefault',
+  backgroundColor: '$borderLight',
   variants: {
     space: {
       1: getHorizontalSpace('$1'),

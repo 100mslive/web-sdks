@@ -1,6 +1,6 @@
+import { HMSRemotePeer } from './peer';
 import { HMSRole } from './role';
 import { HMSLocalTrack, HMSTrackSource } from '../media/tracks';
-import { HMSRemotePeer } from './peer';
 
 export interface HMSChangeTrackStateRequest {
   requestedBy?: HMSRemotePeer;

@@ -1,8 +1,8 @@
-import { EventBus } from '../events/EventBus';
 import { HMSWebrtcStats } from './HMSWebrtcStats';
+import { EventBus } from '../events/EventBus';
 import { IStore } from '../sdk/store';
-import HMSLogger from '../utils/logger';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
+import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
 
 export class HMSWebrtcInternals {
@@ -63,6 +63,10 @@ export class HMSWebrtcInternals {
    * @internal
    */
   async start() {
+    if (this.isMonitored) {
+      HMSLogger.d(this.TAG, 'Already started');
+      return;
+    }
     this.stop();
     this.isMonitored = true;
     HMSLogger.d(this.TAG, 'Starting Webrtc Stats Monitor');

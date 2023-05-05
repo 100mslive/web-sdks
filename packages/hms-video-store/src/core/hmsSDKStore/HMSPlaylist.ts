@@ -1,16 +1,16 @@
-import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { HMSPlaylistManager } from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { IHMSStore } from '../IHMSStore';
-import { selectVideoPlaylist, selectAudioPlaylist } from '../selectors';
+import { HMSGenericTypes, HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
+import { selectAudioPlaylist, selectVideoPlaylist } from '../selectors';
 
-export class HMSPlaylist implements IHMSPlaylistActions {
+export class HMSPlaylist<T extends HMSGenericTypes> implements IHMSPlaylistActions {
   private type: HMSPlaylistType;
   constructor(
     private playlistManager: HMSPlaylistManager,
     type: HMSPlaylistType,
     private syncPlaylistState: (action: string) => void,
-    private store: IHMSStore,
+    private store: IHMSStore<T>,
   ) {
     this.type = type;
   }
@@ -73,5 +73,18 @@ export class HMSPlaylist implements IHMSPlaylistActions {
   setPlaybackRate(playbackRate: number) {
     this.playlistManager.setPlaybackRate(this.type, playbackRate);
     this.syncPlaylistState(`set${this.type}PlaybackRate`);
+  }
+
+  async removeItem(id: string) {
+    const removed = await this.playlistManager.removeItem(id, this.type);
+    if (removed) {
+      this.syncPlaylistState(`remove${this.type}PlaylistItem`);
+    }
+    return removed;
+  }
+
+  async clearList() {
+    await this.playlistManager.clearList(this.type);
+    this.syncPlaylistState(`clear${this.type}Playlist`);
   }
 }

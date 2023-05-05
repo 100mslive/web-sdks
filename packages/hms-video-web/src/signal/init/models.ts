@@ -27,7 +27,7 @@ export interface InitConfig {
   readonly rtcConfiguration: RTCConfiguration;
   readonly pingTimeout?: number;
   readonly config: {
-    readonly enabledFlags?: Array<`${InitFlags}`>;
+    readonly enabledFlags?: Array<InitFlags>;
     readonly networkHealth: NetworkHealth;
   };
 }
@@ -35,4 +35,5 @@ export interface InitConfig {
 export enum InitFlags {
   FLAG_SERVER_SUB_DEGRADATION = 'subscribeDegradation',
   FLAG_SERVER_SIMULCAST = 'simulcast',
+  FLAG_NON_WEBRTC_DISABLE_OFFER = 'nonWebRTCDisableOffer',
 }

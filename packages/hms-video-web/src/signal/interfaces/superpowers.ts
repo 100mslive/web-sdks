@@ -1,5 +1,5 @@
 import { HMSTrackSource } from '../..';
-import { RTMPRecordingResolution } from '../../interfaces';
+import { HLSTimedMetadata, RTMPRecordingResolution } from '../../interfaces';
 
 /**
  * Parameteres for the role change request sent to the server.
@@ -10,10 +10,17 @@ export interface RequestForRoleChangeParams {
   role: string;
 }
 
+export interface RequestForBulkRoleChangeParams {
+  roles: string[];
+  force: boolean;
+  role: string;
+}
+
 /**
  * Parameters for accepting a role change request sent to the server.
  */
 export interface AcceptRoleChangeParams {
+  requested_by?: string;
   role: string;
   token: string;
 }
@@ -50,12 +57,23 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
+export interface SetSessionMetadataParams {
+  key?: string;
+  data: any;
+  if_change_version?: number;
+}
+
 export interface HLSRequestParams {
-  variants: Array<HLSVariant>;
+  variants?: Array<HLSVariant>;
   hls_recording?: {
     single_file_per_layer?: boolean; // false by default on server
     hls_vod?: boolean; // false by default on server
   };
+}
+
+export interface HLSTimedMetadataParams {
+  metadata_objs: HLSTimedMetadata[];
+  metadata_id?: string;
 }
 
 export interface HLSVariant {

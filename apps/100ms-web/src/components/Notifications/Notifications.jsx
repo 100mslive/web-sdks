@@ -1,29 +1,37 @@
 /* eslint-disable no-case-declarations */
-import React, { useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import LogRocket from "logrocket";
+import React, { useEffect } from "react";
+import { logMessage } from "zipyai";
 import {
-  useHMSNotifications,
   HMSNotificationTypes,
+  useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { Flex, Text, Button } from "@100mslive/react-ui";
-import { TrackUnmuteModal } from "./TrackUnmuteModal";
+import { Button } from "@100mslive/react-ui";
+import { ToastBatcher } from "../Toast/ToastBatcher";
+import { ToastManager } from "../Toast/ToastManager";
 import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
 import { InitErrorModal } from "./InitErrorModal";
-import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
-import { ToastManager } from "../Toast/ToastManager";
-import { AppContext } from "../context/AppContext";
-import { TrackNotifications } from "./TrackNotifications";
+import { MessageNotifications } from "./MessageNotifications";
 import { PeerNotifications } from "./PeerNotifications";
+import { PermissionErrorModal } from "./PermissionErrorModal";
 import { ReconnectNotifications } from "./ReconnectNotifications";
+import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
+import { TrackNotifications } from "./TrackNotifications";
+import { TrackUnmuteModal } from "./TrackUnmuteModal";
+import {
+  useHLSViewerRole,
+  useIsHeadless,
+  useSubscribedNotifications,
+} from "../AppData/useUISettings";
+import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
-import { ToastBatcher } from "../Toast/ToastBatcher";
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const navigate = useNavigate();
-  const { subscribedNotifications, isHeadless, HLS_VIEWER_ROLE } =
-    useContext(AppContext);
+  const navigate = useNavigation();
+  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const subscribedNotifications = useSubscribedNotifications() || {};
+  const isHeadless = useIsHeadless();
+
   useEffect(() => {
     if (!notification) {
       return;
@@ -33,7 +41,8 @@ export function Notifications() {
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal) return;
+        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless)
+          return;
 
         console.debug("Metadata updated", notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
@@ -46,11 +55,6 @@ export function Notifications() {
             notification.data.name
         );
         break;
-      case HMSNotificationTypes.NEW_MESSAGE:
-        if (!subscribedNotifications.NEW_MESSAGE || notification.data?.ignored)
-          return;
-        ToastBatcher.showToast({ notification });
-        break;
       case HMSNotificationTypes.ERROR:
         if (
           notification.data?.isTerminal &&
@@ -61,25 +65,24 @@ export function Notifications() {
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            LogRocket.track("Disconnected");
+            logMessage("Disconnected");
             // show button action when the error is terminal
-            ToastManager.addToast({
-              title: (
-                <Flex justify="between" css={{ w: "100%" }}>
-                  <Text css={{ mr: "$4" }}>
-                    {notification.data?.message ||
-                      "We couldn’t reconnect you. When you’re back online, try joining the room."}
-                  </Text>
-                  <Button
-                    variant="primary"
-                    css={{ mr: "$4" }}
-                    onClick={() => {
-                      window.location.reload();
-                    }}
-                  >
-                    Rejoin
-                  </Button>
-                </Flex>
+            const toastId = ToastManager.addToast({
+              title:
+                notification.data?.message ||
+                "We couldn’t reconnect you. When you’re back online, try joining the room.",
+              inlineAction: true,
+              action: (
+                <Button
+                  as="div"
+                  variant="primary"
+                  onClick={() => {
+                    ToastManager.removeToast(toastId);
+                    window.location.reload();
+                  }}
+                >
+                  Rejoin
+                </Button>
               ),
               close: false,
             });
@@ -91,6 +94,7 @@ export function Notifications() {
               "meeting",
               "leave"
             );
+            ToastManager.clearAllToast();
             navigate(previewLocation);
           }, 2000);
           return;
@@ -98,8 +102,8 @@ export function Notifications() {
         // Autoplay error or user denied screen share(cancelled browser pop-up)
         if (
           notification.data?.code === 3008 ||
-          (notification.data?.code === 3001 &&
-            notification.data?.message.includes("screen"))
+          notification.data?.code === 3001 ||
+          notification.data?.code === 3011
         ) {
           return;
         }
@@ -145,6 +149,7 @@ export function Notifications() {
             "leave"
           );
           navigate(leaveLocation);
+          ToastManager.clearAllToast();
         }, 2000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
@@ -159,7 +164,6 @@ export function Notifications() {
   }, [
     notification,
     subscribedNotifications.ERROR,
-    subscribedNotifications.NEW_MESSAGE,
     subscribedNotifications.METADATA_UPDATED,
     HLS_VIEWER_ROLE,
   ]);
@@ -172,6 +176,8 @@ export function Notifications() {
       <PeerNotifications />
       <ReconnectNotifications />
       <AutoplayBlockedModal />
+      <PermissionErrorModal />
+      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );

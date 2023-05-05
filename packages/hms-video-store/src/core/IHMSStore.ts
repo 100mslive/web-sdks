@@ -6,9 +6,9 @@
  * are exported as interfaces to include tsdoc comments with them.
  */
 
-import { HMSStore, HMSStatsStore } from './schema';
-import { StateSelector, StoreApi, Subscribe, State } from 'zustand/vanilla';
+import { State, StateSelector, StoreApi, Subscribe } from 'zustand/vanilla';
 import { NamedSetState } from './hmsSDKStore/internalTypes';
+import { HMSGenericTypes, HMSStatsStore, HMSStore } from './schema';
 
 /**
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
@@ -59,7 +59,8 @@ export type IStoreReadOnly<T extends State> = Omit<IStore<T>, 'setState' | 'name
  * HMS Reactive store can be used to subscribe to different parts of the store using selectors
  * and get a callback when the value changes.
  */
-export interface IHMSStore extends IStore<HMSStore> {}
+export interface IHMSStore<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  extends IStore<HMSStore<T>> {}
 
 /**
  * HMS store can be used to:
@@ -75,7 +76,8 @@ export interface IHMSStore extends IStore<HMSStore> {}
  *
  * @category Core
  */
-export interface IHMSStoreReadOnly extends IStoreReadOnly<HMSStore> {}
+export interface IHMSStoreReadOnly<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  extends IStoreReadOnly<HMSStore<T>> {}
 
 export interface IHMSStatsStore extends IStore<HMSStatsStore> {}
 export interface IHMSStatsStoreReadOnly extends IStoreReadOnly<HMSStatsStore> {}

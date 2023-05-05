@@ -1,5 +1,5 @@
 import { HMSTrack as SDKTrack } from '@100mslive/hms-video';
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID } from '../../core';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../core';
 import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../core/hmsSDKStore/sdkUtils/storeMergeUtils';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 
@@ -8,14 +8,14 @@ type peerMap = Record<HMSTrackID, HMSPeer>;
 let newTracks: Record<HMSTrackID, Partial<HMSTrack>>;
 
 describe('tracks merge is happening properly', () => {
-  let fakeTrack: HMSTrack;
+  let fakeTrack: HMSVideoTrack;
   let draftTracksCopy: Record<HMSTrackID, Partial<HMSTrack>>;
   let draftTracks: Record<HMSTrackID, Partial<HMSTrack>>;
   beforeEach(() => {
     draftTracks = {};
     newTracks = {};
     draftTracksCopy = draftTracks;
-    fakeTrack = makeFakeTrack();
+    fakeTrack = makeFakeTrack('video');
   });
 
   const expectNoReferenceChange = () => {

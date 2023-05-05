@@ -1,16 +1,15 @@
-import React, { useContext } from "react";
+import React from "react";
 import {
-  useHMSActions,
   selectRoleChangeRequest,
+  useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { PersonIcon } from "@100mslive/react-icons";
 import { RequestDialog } from "../primitives/DialogContent";
-import { AppContext } from "./context/AppContext";
+import { useIsHeadless } from "./AppData/useUISettings";
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
-  const { isHeadless } = useContext(AppContext);
+  const isHeadless = useIsHeadless();
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
 
   if (!roleChangeRequest?.role || isHeadless) {
@@ -27,7 +26,6 @@ export const RoleChangeRequestModal = () => {
       onAction={() => {
         hmsActions.acceptChangeRole(roleChangeRequest);
       }}
-      Icon={PersonIcon}
       actionText="Accept"
     />
   );

@@ -6,6 +6,10 @@ body,
   height: 100%;
 }
 
+body {
+  padding: env(safe-area-inset);
+}
+
 #root {
   overscroll-behavior-y: none;
   position: fixed;
@@ -24,6 +28,7 @@ body,
 
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
   background-color: transparent;
 }
 

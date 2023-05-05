@@ -1,0 +1,82 @@
+name: Web Automation Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Region to run the test for'
+        required: true
+        default: 'prod-in'
+  schedule:
+    # prod-in
+    - cron: '20 9 * * *'
+
+  push:
+    branches: [main]
+    paths:
+      - 'playwright/*'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'playwright/*'
+  repository_dispatch:
+    types: [automation]
+
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    steps:
+      # Figure out the region where test needs to be run
+
+      - name: Input from workflow dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "REGION=${{ github.event.inputs.region }}" >> $GITHUB_ENV
+
+      - name: (From Cron) PROD-IN
+        if: github.event.schedule == '20 9 * * *'
+        run: echo "REGION=prod-in" >> $GITHUB_ENV
+
+      - name: print selected region
+        run: echo "selected region for test = ${{ env.REGION }}"
+
+      # Run test in the above selected region
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '17.x'
+      - run: |
+          cd playwright
+          yarn install
+          npx playwright install
+
+      - name: Test in Region - "${{ env.REGION }}"
+        run: |
+          cd playwright
+          yarn "${{ env.REGION }}"
+
+      - name: Push test result
+        if: always()
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.DOCKER_GIT_TOKEN }}
+        with:
+          source-directory: 'playwright/playwright-report'
+          destination-github-username: '100mslive'
+          destination-repository-name: 'automation-reports'
+          target-branch: '${{ env.REGION }}'
+          target-directory: 'web'
+          user-name: 'github-actions[bot]'
+          user-email: 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Send custom test result
+        if: always()
+        id: slack
+        uses: slackapi/slack-github-action@v1.19.0
+        with:
+          payload-file-path: './playwright/slackMessage.json'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

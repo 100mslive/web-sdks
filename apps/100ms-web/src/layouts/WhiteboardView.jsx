@@ -1,20 +1,11 @@
 import React from "react";
 import { useMedia } from "react-use";
-import { Tldraw } from "@tldraw/tldraw";
 import { selectPeers, selectRoomID, useHMSStore } from "@100mslive/react-sdk";
-import { Box, Flex, config as cssConfig } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { SidePane } from "./screenShareView";
-import usePusherEvents from "../plugins/whiteboard/pusher/useMultiplayerState";
-import useYjsEvents from "../plugins/whiteboard/yjs/useMultiplayerState";
-
-const useMultiplayerState =
-  process.env.REACT_APP_WHITEBOARD_PROVIDER === "pusher"
-    ? usePusherEvents
-    : useYjsEvents;
+import { Whiteboard } from "../plugins/whiteboard";
 
 const Editor = React.memo(({ roomId }) => {
-  const events = useMultiplayerState(roomId);
-
   return (
     <Box
       css={{
@@ -29,20 +20,13 @@ const Editor = React.memo(({ roomId }) => {
       }}
     >
       <Box css={{ position: "relative", width: "100%", height: "100%" }}>
-        <Tldraw
-          autofocus
-          disableAssets={true}
-          showSponsorLink={false}
-          showPages={false}
-          showMenu={false}
-          {...events}
-        />
+        <Whiteboard roomId={roomId} />
       </Box>
     </Box>
   );
 });
 
-const WhiteboardView = ({ showStats }) => {
+const WhiteboardView = () => {
   // for smaller screen we will show sidebar in bottom
   const mediaQueryLg = cssConfig.media.lg;
   const showSidebarInBottom = useMedia(mediaQueryLg);
@@ -69,7 +53,6 @@ const WhiteboardView = ({ showStats }) => {
       >
         <SidePane
           showSidebarInBottom={showSidebarInBottom}
-          showStats={showStats}
           isPresenterInSmallTiles={true}
           smallTilePeers={peers}
           totalPeers={peers.length}

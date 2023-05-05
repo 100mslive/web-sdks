@@ -6,12 +6,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node: ['14.x']
+        node: ['16.x']
         os: [ubuntu-latest]
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v1
@@ -31,16 +31,16 @@ jobs:
       - name: Install packages
         run: yarn install --frozen-lockfile
 
-      - name: Lint
-        run: yarn lint
-
       - name: Test
         run: yarn test
+
+      - name: Lint
+        run: yarn lint
 
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v1
         if: github.ref == 'main' || github.ref == 'production'
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.DOCKER_GIT_TOKEN }}
           event-type: automation
           repository: 100mslive/playwright-automation

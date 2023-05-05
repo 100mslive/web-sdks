@@ -1,12 +1,13 @@
 import {
   HMSStore,
   selectAvailableRoleNames,
-  selectRolesMap,
+  selectIsAllowedToPublish,
+  selectIsAllowedToSubscribe,
+  selectIsRoleAllowedToPublish,
   selectLocalPeerRole,
   selectRoleByRoleName,
   selectRoleChangeRequest,
-  selectIsAllowedToPublish,
-  selectIsAllowedToSubscribe,
+  selectRolesMap,
 } from '../../core';
 import { hostRole, localPeer, makeFakeStore, remotePeerOne, ROLES, speakerRole } from '../fakeStore';
 
@@ -50,17 +51,22 @@ describe('test role related selectors', () => {
     expect(storeHost).toBe(hostRole);
   });
 
-  test('publish params', () => {
-    localPeer.roleName = ROLES.SPEAKER;
+  test('local peer publish params', () => {
     const allowed = selectIsAllowedToPublish(fakeStore);
+    expect(allowed.audio).toBe(true);
+    expect(allowed.video).toBe(true);
+    expect(allowed.screen).toBe(true);
+  });
+
+  test('publish params', () => {
+    const allowed = selectIsRoleAllowedToPublish(ROLES.SPEAKER)(fakeStore);
     expect(allowed.audio).toBe(true);
     expect(allowed.video).toBe(false);
     expect(allowed.screen).toBe(false);
   });
 
   test('publish params viewer', () => {
-    localPeer.roleName = ROLES.VIEWER;
-    const allowed = selectIsAllowedToPublish(fakeStore);
+    const allowed = selectIsRoleAllowedToPublish(ROLES.VIEWER)(fakeStore);
     expect(allowed.audio).toBe(false);
     expect(allowed.video).toBe(false);
     expect(allowed.screen).toBe(false);
