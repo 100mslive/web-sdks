@@ -36,4 +36,5 @@ export enum InitFlags {
   FLAG_SERVER_SUB_DEGRADATION = 'subscribeDegradation',
   FLAG_SERVER_SIMULCAST = 'simulcast',
   FLAG_NON_WEBRTC_DISABLE_OFFER = 'nonWebRTCDisableOffer',
+  FLAG_PUBLISH_STATS = 'publishStats',
 }

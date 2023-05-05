@@ -86,9 +86,9 @@ class RunningTrackAnalytics implements TrackAnalytics {
       timestamp: Date.now(),
       avg_bitrate: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
-      avg_jitter: this.calculateAverage('jitter', true),
-      avg_round_trip_time: this.calculateAverage('roundTripTime', true),
-      total_packets_lost: this.calculateSum('packetsLost', true),
+      avg_jitter: this.calculateAverage('jitter'),
+      avg_round_trip_time: this.calculateAverage('roundTripTime'),
+      total_packets_lost: this.calculateSum('packetsLost'),
       // @ts-expect-error
       total_quality_limitation: this.getLatestStat().qualityLimitationDurations,
       resolution:
@@ -118,23 +118,18 @@ class RunningTrackAnalytics implements TrackAnalytics {
     return length === SAMPLE_WINDOW || (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat));
   }
 
-  private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats, remote = false) {
-    const checkStat = remote
-      ? this.tempStats[0].remote?.[key as keyof RTCRemoteInboundRtpStreamStats]
-      : this.tempStats[0][key as keyof HMSLocalTrackStats];
+  private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats) {
+    const checkStat = this.getLatestStat()[key as keyof HMSLocalTrackStats];
     if (typeof checkStat !== 'number') {
       return;
     }
     return this.tempStats.reduce((partialSum, stat) => {
-      const value = ((remote
-        ? stat.remote?.[key as keyof RTCRemoteInboundRtpStreamStats]
-        : stat[key as keyof HMSLocalTrackStats]) || 0) as number;
-      return partialSum + value;
+      return partialSum + ((stat[key as keyof HMSLocalTrackStats] || 0) as number);
     }, 0);
   }
 
-  private calculateAverage(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats, remote = false) {
-    const sum = this.calculateSum(key, remote);
+  private calculateAverage(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats) {
+    const sum = this.calculateSum(key);
     return sum ? sum / this.tempStats.length : undefined;
   }
 }
