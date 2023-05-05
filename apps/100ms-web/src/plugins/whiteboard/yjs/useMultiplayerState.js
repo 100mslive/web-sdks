@@ -13,7 +13,7 @@ import {
 
 export default function useMultiplayerState(roomId) {
   /**
-   * @type {[import('@tldraw/tldraw').TldrawApp, import("react").Dispatch<import('@tldraw/tldraw').TldrawApp>]}
+   * @type {[import('@tldraw/tldraw').TldrawApp | undefined, import("react").Dispatch<import('@tldraw/tldraw').TldrawApp>]}
    */
   const [app, setApp] = useState();
   const [loading, setLoading] = useState(true);
@@ -79,7 +79,7 @@ export default function useMultiplayerState(roomId) {
 
       const ids = users
         .filter(user => user.presence)
-        .map(user => user.presence.tdUser.id);
+        .map(user => user.presence?.tdUser.id);
 
       // remove any user that is not connected in the room
       Object.values(app.room.users).forEach(user => {
@@ -97,7 +97,7 @@ export default function useMultiplayerState(roomId) {
       app.updateUsers(
         users
           .filter(user => user.presence)
-          .map(other => other.presence.tdUser)
+          .map(other => other.presence?.tdUser)
           .filter(Boolean)
       );
     });
