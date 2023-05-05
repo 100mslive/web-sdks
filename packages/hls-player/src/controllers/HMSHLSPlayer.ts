@@ -2,6 +2,7 @@ import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
 import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
+import { HMSHLSException } from '../error/HMSHLSException';
 import { HMSHLSPlayerEventEmitter, HMSHLSPlayerListeners, IHMSHLSPlayerEventEmitter } from '../interfaces/events';
 import { HMSHLSLayer } from '../interfaces/IHMSHLSLayer';
 import IHMSHLSPlayer from '../interfaces/IHMSHLSPlayer';
@@ -116,6 +117,13 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     eventName: E,
     eventObject: Parameters<HMSHLSPlayerListeners<E>>[0],
   ): boolean => {
+    if (eventName === HMSHLSPlayerEvents.ERROR) {
+      const hlsError = eventObject as HMSHLSException;
+      if (hlsError?.isTerminal) {
+        // send analytics event
+        window?.__hms?.sdk?.sendHLSAnalytics(hlsError);
+      }
+    }
     return this._emitter.emitEvent(eventName, eventObject);
   };
 
@@ -257,7 +265,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
         break;
       }
       default: {
-        const error = HMSHLSErrorFactory.UnknownError(detail);
+        const error = HMSHLSErrorFactory.HLSError(detail, data.type, data.details);
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         break;
       }

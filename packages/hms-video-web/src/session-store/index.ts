@@ -20,21 +20,30 @@ export class SessionStore implements HMSSessionStore {
   }
 
   async observe(keys: string[]) {
-    const newObservedKeys = new Set(this.observedKeys);
-    keys.forEach(key => newObservedKeys.add(key));
+    const prevObservedKeys = new Set(this.observedKeys);
+    keys.forEach(key => this.observedKeys.add(key));
 
-    if (this.observedKeys.size !== newObservedKeys.size) {
-      await this.transport.listenMetadataChange(Array.from(newObservedKeys));
-      this.observedKeys = newObservedKeys;
+    if (this.observedKeys.size !== prevObservedKeys.size) {
+      try {
+        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+      } catch (e) {
+        this.observedKeys = prevObservedKeys;
+        throw e;
+      }
     }
   }
 
   async unobserve(keys: string[]) {
-    const newObservedKeys = new Set([...this.observedKeys].filter(key => !keys.includes(key)));
+    const prevObservedKeys = new Set(this.observedKeys);
+    this.observedKeys = new Set([...this.observedKeys].filter(key => !keys.includes(key)));
 
-    if (this.observedKeys.size !== newObservedKeys.size) {
-      await this.transport.listenMetadataChange(Array.from(newObservedKeys));
-      this.observedKeys = newObservedKeys;
+    if (this.observedKeys.size !== prevObservedKeys.size) {
+      try {
+        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+      } catch (e) {
+        this.observedKeys = prevObservedKeys;
+        throw e;
+      }
     }
   }
 }

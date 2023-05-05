@@ -1,6 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
+import HMSLogger from '../../utils/logger';
 import HMSMediaStream from '../streams/HMSMediaStream';
 
 export class HMSVideoTrack extends HMSTrack {
@@ -51,6 +52,7 @@ export class HMSVideoTrack extends HMSTrack {
    * @param videoElement
    */
   removeSink(videoElement: HTMLVideoElement) {
+    HMSLogger.d(`[HMSVideoTrack] removing sink video element - ${videoElement}`);
     if (videoElement.srcObject !== null) {
       videoElement.srcObject = null;
       if (this.sinkCount > 0) {
@@ -65,6 +67,7 @@ export class HMSVideoTrack extends HMSTrack {
   }
 
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
+    HMSLogger.d(`[HMSVideoTrack] adding sink internal video - ${videoElement} track - ${track}`);
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
       const existingTrackID = srcObject.getVideoTracks()[0]?.id;

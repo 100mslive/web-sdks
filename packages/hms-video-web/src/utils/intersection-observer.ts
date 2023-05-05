@@ -27,6 +27,8 @@ class HMSIntersectionObserverWrapper {
 
   observe = (element: HTMLElement, onIntersection: HMSIntersectionObserverCallback) => {
     this.createObserver();
+    // unobserve before observing the element
+    this.unobserve(element);
     this.intersectionObserver?.observe(element);
     this.listeners.set(element, onIntersection);
   };

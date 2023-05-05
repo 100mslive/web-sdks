@@ -104,6 +104,13 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static hlsPlayerError(error: HMSException) {
+    return new AnalyticsEvent({
+      name: 'hlsPlayerError',
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getErrorProperties(error),
+    });
+  }
   static subscribeFail(error: Error) {
     const name = this.eventNameFor('subscribe', false);
     const level = AnalyticsEventLevel.ERROR;
