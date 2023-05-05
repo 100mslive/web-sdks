@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect } from "react";
 import {
-  MemoryRouter as Router,
+  BrowserRouter,
+  MemoryRouter,
   Navigate,
   Route,
   Routes,
@@ -235,6 +236,19 @@ const BackSwipe = () => {
   return null;
 };
 
+const Router = ({ children, roomId, role, roomCode }) => {
+  return [roomId, role, roomCode].every(value => !value) ? (
+    <BrowserRouter>{children}</BrowserRouter>
+  ) : (
+    <MemoryRouter
+      initialEntries={[`/preview/${roomCode ? roomCode : `${roomId}/${role}`}`]}
+      initialIndex={0}
+    >
+      {children}
+    </MemoryRouter>
+  );
+};
+
 function AppRoutes({
   getDetails,
   authTokenByRoomCodeEndpoint,
@@ -243,10 +257,7 @@ function AppRoutes({
   roomCode,
 }) {
   return (
-    <Router
-      initialEntries={[`/preview/${roomCode ? roomCode : `${roomId}/${role}`}`]}
-      initialIndex={0}
-    >
+    <Router roomId={roomId} role={role} roomCode={roomCode}>
       <ToastContainer />
       <Notifications />
       <BackSwipe />
@@ -289,6 +300,7 @@ export default function App() {
         font: process.env.REACT_APP_FONT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
+      roomCode="fuzzy-maroon-stingray"
     />
   );
 }
