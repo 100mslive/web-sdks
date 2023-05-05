@@ -33,10 +33,11 @@ export class HMSAudioTrack extends HMSTrack {
     // Don't subscribe to audio when volume is 0
     // await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement && this.gainNode) {
-      this.audioElement.volume = value / 100;
+      // this.audioElement.volume = value / 100;
       this.gainNode.gain.value = value / 100;
       this.volume = value / 100;
     }
+    console.log('setVolume::volume:: ', this.audioElement?.volume, this.gainNode?.gain?.value);
   }
   setAudioElement(element: HTMLAudioElement | null) {
     HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
