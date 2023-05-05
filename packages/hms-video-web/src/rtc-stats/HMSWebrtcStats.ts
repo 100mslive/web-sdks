@@ -29,28 +29,28 @@ export class HMSWebrtcStats {
     this.localPeerID = this.store.getLocalPeer()?.peerId;
   }
 
-  getLocalPeerStats(): HMSPeerStats | undefined {
+  getLocalPeerStats = (): HMSPeerStats | undefined => {
     return this.peerStats[this.localPeerID!];
-  }
+  };
 
-  getRemoteTrackStats(trackId: string): HMSTrackStats | undefined {
+  getRemoteTrackStats = (trackId: string): HMSTrackStats | undefined => {
     return this.remoteTrackStats[trackId];
-  }
+  };
 
-  getLocalTrackStats() {
+  getLocalTrackStats = () => {
     return this.localTrackStats;
-  }
+  };
 
   /**
    * @internal
    */
-  async updateStats() {
+  updateStats = async () => {
     await this.updateLocalPeerStats();
     await this.updateLocalTrackStats();
     await this.updateRemoteTrackStats();
-  }
+  };
 
-  private async updateLocalPeerStats() {
+  private updateLocalPeerStats = async () => {
     const prevLocalPeerStats = this.getLocalPeerStats();
     let publishReport: RTCStatsReport | undefined;
     try {
@@ -81,9 +81,9 @@ export class HMSWebrtcStats {
       baseSubscribeStats && Object.assign(baseSubscribeStats, { packetsLostRate, jitter, packetsLost });
 
     this.peerStats[this.localPeerID!] = { publish: publishStats, subscribe: subscribeStats };
-  }
+  };
 
-  private async updateRemoteTrackStats() {
+  private updateRemoteTrackStats = async () => {
     const tracks = Array.from(this.store.getTracksMap().values()).filter(
       track => track instanceof HMSRemoteVideoTrack || track instanceof HMSRemoteAudioTrack,
     );
@@ -101,9 +101,9 @@ export class HMSWebrtcStats {
         this.remoteTrackStats[track.trackId] = trackStats;
       }
     }
-  }
+  };
 
-  private async updateLocalTrackStats() {
+  private updateLocalTrackStats = async () => {
     const tracks = this.store.getLocalPeerTracks().reduce<Record<string, HMSLocalTrack>>((res, track) => {
       res[track.getTrackIDBeingSent()] = track;
       return res;
@@ -121,5 +121,5 @@ export class HMSWebrtcStats {
         delete this.localTrackStats[trackID];
       }
     }
-  }
+  };
 }
