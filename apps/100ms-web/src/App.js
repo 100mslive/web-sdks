@@ -59,7 +59,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export function HMSMeetingComponent({
+export function HMSRoom({
   tokenEndpoint = defaultTokenEndpoint,
   themeConfig: {
     aspectRatio = "1-1",
@@ -134,7 +134,7 @@ export function HMSMeetingComponent({
   );
 }
 
-HMSMeetingComponent.displayName = "HMSMeetingComponent";
+HMSRoom.displayName = "HMSMeetingComponent";
 
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
@@ -291,7 +291,7 @@ function AppRoutes({
 
 export default function App() {
   return (
-    <HMSMeetingComponent
+    <HMSRoom
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
         theme: process.env.REACT_APP_THEME,

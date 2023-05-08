@@ -19,8 +19,8 @@ const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSMeetingComponent = React.lazy(() =>
-  import('@100mslive/meeting-component').then(module => ({
-    default: module.HMSMeetingComponent,
+  import('@100mslive/hms-room').then(module => ({
+    default: module.HMSRoom,
   }))
 );
 let hostname = window.location.hostname;

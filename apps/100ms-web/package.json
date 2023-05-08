@@ -1,5 +1,5 @@
 {
-  "name": "@100mslive/meeting-component",
+  "name": "@100mslive/hms-room",
   "version": "0.0.1",
   "private": true,
   "main": "dist/index.cjs.js",
