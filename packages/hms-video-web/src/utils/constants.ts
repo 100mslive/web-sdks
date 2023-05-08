@@ -29,7 +29,7 @@ export const CLIENT_ANAYLTICS_QA_ENDPOINT = 'https://event-nonprod.100ms.live/v2
 export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 
 export const PUBLISH_STATS_SAMPLE_WINDOW = 30;
-export const PUBLISH_STATS_SEND_INTERVAL = 300000;
+export const PUBLISH_STATS_SEND_INTERVAL = 300_000;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',

@@ -127,13 +127,10 @@ class RunningTrackAnalytics {
     const newStat = this.tempStats[length - 1];
     const prevStat = this.tempStats[length - 2];
 
-    const hasResolutionChanged = (newStat: HMSLocalTrackStats, prevStat: HMSLocalTrackStats) =>
-      newStat &&
-      prevStat &&
-      (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
-
     return (
-      length === PUBLISH_STATS_SAMPLE_WINDOW || (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
+      length === PUBLISH_STATS_SAMPLE_WINDOW ||
+      hasEnabledStateChanged(newStat, prevStat) ||
+      (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
     );
   }
 
@@ -152,3 +149,9 @@ class RunningTrackAnalytics {
     return sum ? sum / this.tempStats.length : undefined;
   }
 }
+
+const hasResolutionChanged = (newStat: HMSLocalTrackStats, prevStat: HMSLocalTrackStats) =>
+  newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
+
+const hasEnabledStateChanged = (newStat: HMSLocalTrackStats, prevStat: HMSLocalTrackStats) =>
+  newStat && prevStat && newStat.enabled !== prevStat.enabled;

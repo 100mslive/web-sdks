@@ -49,6 +49,7 @@ interface BaseTrackStats extends RTCRtpStreamStats {
   peerName?: string;
   bitrate: number;
   codec?: string;
+  enabled?: boolean;
 }
 
 /**
