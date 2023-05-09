@@ -59,80 +59,95 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export function HMSRoom({
-  tokenEndpoint = defaultTokenEndpoint,
-  themeConfig: {
-    aspectRatio = "1-1",
-    font = "Roboto",
-    color = "#2F80FF",
-    theme = "dark",
-    logo = "",
-    metadata = "",
-    recordingUrl = "",
-  },
-  policyConfig = envPolicyConfig,
-  getDetails = () => {},
-  authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
-  roomId,
-  role,
-  roomCode,
-}) {
-  const { 0: width, 1: height } = aspectRatio
-    .split("-")
-    .map(el => parseInt(el));
+export const HMSRoom = React.forwardRef(
+  (
+    {
+      tokenEndpoint = defaultTokenEndpoint,
+      themeConfig: {
+        aspectRatio = "1-1",
+        font = "Roboto",
+        color = "#2F80FF",
+        theme = "dark",
+        logo = "",
+        metadata = "",
+        recordingUrl = "",
+      },
+      policyConfig = envPolicyConfig,
+      getDetails = () => {},
+      authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
+      roomId,
+      role,
+      roomCode,
+    },
+    ref
+  ) => {
+    const { 0: width, 1: height } = aspectRatio
+      .split("-")
+      .map(el => parseInt(el));
+    useEffect(() => {
+      if (!ref) {
+        return;
+      }
+      ref.current = {
+        hmsActions,
+        hmsStats,
+        hmsStore,
+      };
+    }, [ref]);
 
-  return (
-    <ErrorBoundary>
-      <HMSThemeProvider
-        themeType={theme}
-        aspectRatio={getAspectRatio({ width, height })}
-        theme={{
-          colors: {
-            brandDefault: color,
-            brandDark: shadeColor(color, -30),
-            brandLight: shadeColor(color, 30),
-            brandDisabled: shadeColor(color, 10),
-          },
-          fonts: {
-            sans: [font, "Inter", "sans-serif"],
-          },
-        }}
-      >
-        <HMSRoomProvider
-          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-          actions={hmsActions}
-          store={hmsStore}
-          notifications={hmsNotifications}
-          stats={hmsStats}
+    return (
+      <ErrorBoundary>
+        <HMSThemeProvider
+          themeType={theme}
+          aspectRatio={getAspectRatio({ width, height })}
+          theme={{
+            colors: {
+              brandDefault: color,
+              brandDark: shadeColor(color, -30),
+              brandLight: shadeColor(color, 30),
+              brandDisabled: shadeColor(color, 10),
+            },
+            fonts: {
+              sans: [font, "Inter", "sans-serif"],
+            },
+          }}
         >
-          <AppData
-            appDetails={metadata}
-            policyConfig={policyConfig}
-            recordingUrl={recordingUrl}
-            logo={logo}
-            tokenEndpoint={tokenEndpoint}
-          />
-
-          <Init />
-          <Box
-            css={{
-              bg: "$mainBg",
-              size: "100%",
-            }}
+          <HMSRoomProvider
+            isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+            actions={hmsActions}
+            store={hmsStore}
+            notifications={hmsNotifications}
+            stats={hmsStats}
           >
-            <AppRoutes
-              getDetails={getDetails}
-              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-              roomId={roomId}
-              role={role}
-              roomCode={roomCode}
+            <AppData
+              appDetails={metadata}
+              policyConfig={policyConfig}
+              recordingUrl={recordingUrl}
+              logo={logo}
+              tokenEndpoint={tokenEndpoint}
             />
-          </Box>
-        </HMSRoomProvider>
-      </HMSThemeProvider>
-    </ErrorBoundary>
-  );
-}
+
+            <Init />
+            <Box
+              css={{
+                bg: "$mainBg",
+                size: "100%",
+              }}
+            >
+              <AppRoutes
+                getDetails={getDetails}
+                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+                roomId={roomId}
+                role={role}
+                roomCode={roomCode}
+              />
+            </Box>
+          </HMSRoomProvider>
+        </HMSThemeProvider>
+      </ErrorBoundary>
+    );
+  }
+);
 
 HMSRoom.displayName = "HMSRoom";
 
