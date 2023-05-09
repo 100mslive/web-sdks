@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect } from "react";
 import {
-  BrowserRouter as Router,
+  BrowserRouter,
+  MemoryRouter,
   Navigate,
   Route,
   Routes,
@@ -58,7 +59,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export function HMSMeetingComponent({
+export function HMSRoom({
   tokenEndpoint = defaultTokenEndpoint,
   themeConfig: {
     aspectRatio = "1-1",
@@ -71,7 +72,10 @@ export function HMSMeetingComponent({
   },
   policyConfig = envPolicyConfig,
   getDetails = () => {},
-  authTokenByRoomCodeEndpoint = "",
+  authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
+  roomId,
+  role,
+  roomCode,
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
@@ -119,6 +123,9 @@ export function HMSMeetingComponent({
             <AppRoutes
               getDetails={getDetails}
               authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+              roomId={roomId}
+              role={role}
+              roomCode={roomCode}
             />
           </Box>
         </HMSRoomProvider>
@@ -127,7 +134,7 @@ export function HMSMeetingComponent({
   );
 }
 
-HMSMeetingComponent.displayName = "HMSMeetingComponent";
+HMSRoom.displayName = "HMSMeetingComponent";
 
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
@@ -229,9 +236,28 @@ const BackSwipe = () => {
   return null;
 };
 
-function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
+const Router = ({ children, roomId, role, roomCode }) => {
+  return [roomId, role, roomCode].every(value => !value) ? (
+    <BrowserRouter>{children}</BrowserRouter>
+  ) : (
+    <MemoryRouter
+      initialEntries={[`/preview/${roomCode ? roomCode : `${roomId}/${role}`}`]}
+      initialIndex={0}
+    >
+      {children}
+    </MemoryRouter>
+  );
+};
+
+function AppRoutes({
+  getDetails,
+  authTokenByRoomCodeEndpoint,
+  roomId,
+  role,
+  roomCode,
+}) {
   return (
-    <Router>
+    <Router roomId={roomId} role={role} roomCode={roomCode}>
       <ToastContainer />
       <Notifications />
       <BackSwipe />
@@ -265,7 +291,7 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
 
 export default function App() {
   return (
-    <HMSMeetingComponent
+    <HMSRoom
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
         theme: process.env.REACT_APP_THEME,

@@ -16,11 +16,11 @@ const lernaCommands = [
   'lerna add @100mslive/react-icons --scope=@100mslive/react-ui --exact || echo "No changes"',
   'lerna add @100mslive/react-sdk --scope=@100mslive/react-ui --exact || echo "No changes"',
   // Update deps in webapp
-  'lerna add @100mslive/react-ui --scope=@100mslive/meeting-component --exact || echo "No changes"',
-  'lerna add @100mslive/react-sdk --scope=@100mslive/meeting-component --exact || echo "No changes"',
-  'lerna add @100mslive/react-icons --scope=@100mslive/meeting-component --exact || echo "No changes"',
-  'lerna add @100mslive/hms-virtual-background --scope=@100mslive/meeting-component --exact || echo "No changes"',
-  'lerna add @100mslive/hms-noise-suppression --scope=@100mslive/meeting-component --exact || echo "No changes"',
+  'lerna add @100mslive/react-ui --scope=@100mslive/hms-room --exact || echo "No changes"',
+  'lerna add @100mslive/react-sdk --scope=@100mslive/hms-room --exact || echo "No changes"',
+  'lerna add @100mslive/react-icons --scope=@100mslive/hms-room --exact || echo "No changes"',
+  'lerna add @100mslive/hms-virtual-background --scope=@100mslive/hms-room --exact || echo "No changes"',
+  'lerna add @100mslive/hms-noise-suppression --scope=@100mslive/hms-room --exact || echo "No changes"',
   // Update deps in custom app
   'lerna add @100mslive/react-icons --scope=100ms-custom-app --exact || echo "No changes"',
   'lerna add @100mslive/react-ui --scope=100ms-custom-app --exact || echo "No changes"',
