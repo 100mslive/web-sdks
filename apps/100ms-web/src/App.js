@@ -134,7 +134,7 @@ export function HMSRoom({
   );
 }
 
-HMSRoom.displayName = "HMSMeetingComponent";
+HMSRoom.displayName = "HMSRoom";
 
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
