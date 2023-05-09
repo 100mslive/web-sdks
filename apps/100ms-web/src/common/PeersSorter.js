@@ -52,9 +52,9 @@ class PeersSorter {
       this.lruPeers.has(speakerPeer) &&
       this.lruPeers.size <= this.tilesPerPage
     ) {
+      this.updateListeners();
       return;
     }
-
     // delete to insert at beginning
     this.lruPeers.delete(speakerPeer);
     let lruPeerArray = Array.from(this.lruPeers);
