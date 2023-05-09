@@ -52,7 +52,7 @@ export class HMSAudioTrack extends HMSTrack {
     // Create a gain node
     this.gainNode = this.audioCtx.createGain();
 
-    this.audioSource.connect(this.gainNode);
+    // this.audioSource.connect(this.gainNode);
     this.gainNode.connect(this.audioCtx.destination);
     // this.audioElement.volume = this.volume;
     // this.gainNode.gain.value = this.volume;
