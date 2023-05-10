@@ -60,17 +60,17 @@ export const LayoutSettings = () => {
         label="Active Speaker Sorting"
         id="activeSpeakerSortingMode"
         checked={activeSpeakerSorting}
-        onChange={toggleIsAudioOnly}
-      />
-      <SwitchWithLabel
-        label="Audio Only Mode"
-        id="audioOnlyMode"
-        checked={isAudioOnly}
         onChange={value => {
           setUISettings({
             [UI_SETTINGS.activeSpeakerSorting]: value,
           });
         }}
+      />
+      <SwitchWithLabel
+        label="Audio Only Mode"
+        id="audioOnlyMode"
+        checked={isAudioOnly}
+        onChange={toggleIsAudioOnly}
       />
       <SwitchWithLabel
         label="Mirror Local Video"
