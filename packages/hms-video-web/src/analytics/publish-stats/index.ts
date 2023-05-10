@@ -44,15 +44,19 @@ export class PublishStatsAnalytics {
   }
 
   private toAnalytics(): PublishAnalyticPayload {
-    const trackAnalyticValues = Array.from(this.trackAnalytics.values());
+    const audio: TrackAnalytics[] = [];
+    const video: TrackAnalytics[] = [];
+    this.trackAnalytics.forEach(trackAnalytic => {
+      if (trackAnalytic.track.type === 'audio') {
+        audio.push(trackAnalytic.toAnalytics());
+      } else if (trackAnalytic.track.type === 'video') {
+        video.push(trackAnalytic.toAnalytics());
+      }
+    });
     return {
-      audio: trackAnalyticValues
-        .filter(trackAnalytic => trackAnalytic.track.type === 'audio')
-        .map(trackAnalytic => trackAnalytic.toAnalytics()),
-      video: trackAnalyticValues
-        .filter(trackAnalytic => trackAnalytic.track.type === 'video')
-        .map(trackAnalytic => trackAnalytic.toAnalytics()),
-      joined_at: this.store.getRoom()?.joinedAt?.getMilliseconds()!,
+      audio,
+      video,
+      joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
       sequence_num: this.sequenceNum++,
       max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
     };
