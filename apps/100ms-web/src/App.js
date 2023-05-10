@@ -92,6 +92,7 @@ export const HMSRoom = React.forwardRef(
         hmsActions,
         hmsStats,
         hmsStore,
+        hmsNotifications,
       };
     }, [ref]);
 
