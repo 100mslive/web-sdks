@@ -14,15 +14,11 @@ class PeersSorter {
   setPeersAndTilesPerPage = ({ peers, tilesPerPage }) => {
     this.tilesPerPage = tilesPerPage;
     const peerIds = peers.map(peer => peer.id);
+    this.lruPeers.clear();
     // remove existing peers which are no longer provided
     this.peers.forEach((_, key) => {
       if (!peerIds.includes(key)) {
         this.peers.delete(key);
-      }
-    });
-    this.lruPeers.forEach(peer => {
-      if (!peerIds.includes(peer.id)) {
-        this.lruPeers.delete(peer);
       }
     });
     peers.forEach(peer => {
