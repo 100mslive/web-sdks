@@ -1,5 +1,6 @@
 import { PageWrapper } from "../../PageWrapper";
 import { expect, test } from "@playwright/test";
+import { table } from "console";
 
 let page: PageWrapper;
 
@@ -75,6 +76,20 @@ test(`Verify emoji container text and is clickable`, async ({ page: nativePage }
   }  
   // close emoji container
   await page.click("html");
+  await page.endRoom();
+  await page.close();
+});
+
+test(`Verify SFN cta in advanced settings @sfn`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.click(page.footer.more_settings_btn, page.footer.stats_for_nreds_btn)
+  await page.hasText(page.center.sfn_onText, page.center.expected_sfn_header)
+  let SFNDialogText = page.locator(page.center.sfn_dialog_texts)
+  expect(await SFNDialogText.count()).not.toEqual(0);
+  await page.click(page.footer.enable_sfn, page.footer.close_sfn_modal)
+  await page.assertVisible(page.center.sfn_onTile)
+  let SFNContent = page.locator(page.center.sfn_onTile);
+  expect(await SFNContent.count()).not.toEqual(0);
   await page.endRoom();
   await page.close();
 });
