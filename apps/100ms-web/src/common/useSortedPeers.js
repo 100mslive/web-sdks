@@ -22,7 +22,7 @@ function useSortedPeers({ peers, maxTileCount = 9 }) {
     }
   }, [maxTileCount, peers, activeSpeakerSorting]);
 
-  return sortedPeers;
+  return activeSpeakerSorting ? sortedPeers : peers;
 }
 
 export default useSortedPeers;
