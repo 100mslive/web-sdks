@@ -13,18 +13,20 @@ class PeersSorter {
 
   setPeersAndTilesPerPage = ({ peers, tilesPerPage }) => {
     this.tilesPerPage = tilesPerPage;
-    const peerIds = peers.map(peer => peer.id);
-    this.lruPeers.clear();
+    const peerIds = new Set(peers.map(peer => peer.id));
     // remove existing peers which are no longer provided
     this.peers.forEach((_, key) => {
-      if (!peerIds.includes(key)) {
+      if (!peerIds.has(key)) {
         this.peers.delete(key);
       }
     });
+    this.lruPeers = new Set(
+      [...this.lruPeers].filter(peerId => peerIds.has(peerId))
+    );
     peers.forEach(peer => {
       this.peers.set(peer.id, peer);
       if (this.lruPeers.size < tilesPerPage) {
-        this.lruPeers.add(peer);
+        this.lruPeers.add(peer.id);
       }
     });
     if (!this.storeUnsubscribe) {
@@ -51,24 +53,20 @@ class PeersSorter {
       this.updateListeners();
       return;
     }
-    const speakerPeer = this.peers.get(speaker.id);
-    if (!speakerPeer) {
-      return;
-    }
     if (
-      this.lruPeers.has(speakerPeer) &&
+      this.lruPeers.has(speaker.id) &&
       this.lruPeers.size <= this.tilesPerPage
     ) {
       this.updateListeners();
       return;
     }
     // delete to insert at beginning
-    this.lruPeers.delete(speakerPeer);
+    this.lruPeers.delete(speaker.id);
     let lruPeerArray = Array.from(this.lruPeers);
     while (lruPeerArray.length >= this.tilesPerPage) {
       lruPeerArray.pop();
     }
-    this.lruPeers = new Set([speakerPeer, ...lruPeerArray]);
+    this.lruPeers = new Set([speaker.id, ...lruPeerArray]);
     this.updateListeners();
   };
 
@@ -80,13 +78,18 @@ class PeersSorter {
   };
 
   updateListeners = () => {
-    const remainingPeers = [];
-    this.peers.forEach(peer => {
-      if (!this.lruPeers.has(peer) && peer) {
-        remainingPeers.push(peer);
+    const orderedPeers = [];
+    this.lruPeers.forEach(key => {
+      const peer = this.peers.get(key);
+      if (peer) {
+        orderedPeers.push(peer);
       }
     });
-    const orderedPeers = [...this.lruPeers].concat(remainingPeers);
+    this.peers.forEach(peer => {
+      if (!this.lruPeers.has(peer.id) && peer) {
+        orderedPeers.push(peer);
+      }
+    });
     this.listeners.forEach(listener => listener?.(orderedPeers));
   };
 }
