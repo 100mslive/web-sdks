@@ -368,6 +368,7 @@ export default class JsonRpcSignal implements ISignal {
   private onMessageHandler(event: MessageEvent) {
     const text: string = event.data;
     const response = JSON.parse(text);
+    this.resolvePingOnAnyResponse();
     if (response.id) {
       this.handleResponseWithId(response);
     } else if (response.method) {
@@ -419,6 +420,16 @@ export default class JsonRpcSignal implements ISignal {
         break;
     }
   }
+
+  private resolvePingOnAnyResponse = () => {
+    this.callbacks.forEach((callback, key) => {
+      if (callback.metadata?.method === HMSSignalMethod.PING) {
+        //@ts-ignore
+        callback.resolve({ timestamp: Date.now() });
+        this.callbacks.delete(key);
+      }
+    });
+  };
 
   private rejectPendingCalls(reason = '') {
     this.callbacks.forEach((callback, id) => {
