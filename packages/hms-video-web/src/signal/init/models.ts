@@ -29,6 +29,10 @@ export interface InitConfig {
   readonly config: {
     readonly enabledFlags?: Array<InitFlags>;
     readonly networkHealth: NetworkHealth;
+    readonly publishStats?: {
+      readonly maxSampleWindowSize: number;
+      readonly maxSamplePushInterval: number;
+    };
   };
 }
 

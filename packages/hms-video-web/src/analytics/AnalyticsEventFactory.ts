@@ -1,3 +1,4 @@
+import { PublishAnalyticPayload } from './publish-stats/interfaces';
 import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
@@ -206,6 +207,14 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({
       name: 'perf.networkquality.preview',
       level: properties.error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
+  static publishStats(properties: PublishAnalyticPayload) {
+    return new AnalyticsEvent({
+      name: 'publisher.stats',
+      level: AnalyticsEventLevel.INFO,
       properties,
     });
   }

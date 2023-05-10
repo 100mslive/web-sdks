@@ -4,17 +4,46 @@ import { HMSLocalTrackStats, HMSTrackStats, RTCRemoteInboundRtpStreamStats } fro
 import { HMSLocalTrack } from '../../media/tracks';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { IStore } from '../../sdk/store';
-import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { PUBLISH_STATS_PUSH_INTERVAL, PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import HMSLogger from '../../utils/logger';
+import { sleep } from '../../utils/timer-utils';
+import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class PublishStatsAnalytics {
+  private shouldSendEvent = false;
   private sequenceNum = 1;
   private trackAnalytics: Map<string, RunningTrackAnalytics> = new Map();
 
-  constructor(private store: IStore, private eventBus: EventBus) {
+  constructor(
+    private store: IStore,
+    private eventBus: EventBus,
+    private readonly sampleWindowSize = PUBLISH_STATS_SAMPLE_WINDOW,
+    private readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
+  ) {
     this.eventBus.statsUpdate.subscribe(hmsStats => this.handleStatsUpdate(hmsStats));
   }
 
-  toAnalytics(): PublishAnalyticPayload {
+  async start() {
+    if (this.shouldSendEvent) {
+      return;
+    }
+    this.stop();
+    this.shouldSendEvent = true;
+    this.startLoop().catch(e => HMSLogger.e('[PublishStatsAnalytics]', e.message));
+  }
+
+  stop() {
+    this.shouldSendEvent = false;
+  }
+
+  private async startLoop() {
+    while (this.shouldSendEvent) {
+      await sleep(this.pushInterval * 1000);
+      this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
+    }
+  }
+
+  private toAnalytics(): PublishAnalyticPayload {
     const trackAnalyticValues = Array.from(this.trackAnalytics.values());
     return {
       audio: trackAnalyticValues
@@ -43,6 +72,7 @@ export class PublishStatsAnalytics {
           if (track) {
             const trackAnalytics = new RunningTrackAnalytics({
               track,
+              sampleWindowSize: this.sampleWindowSize,
               rid: layerStats.rid,
               ssrc: layerStats.ssrc.toString(),
               kind: layerStats.kind,
@@ -60,6 +90,7 @@ export class PublishStatsAnalytics {
 }
 
 class RunningTrackAnalytics {
+  readonly sampleWindowSize: number;
   track: HMSLocalTrack;
   track_id: string;
   source: string;
@@ -70,13 +101,26 @@ class RunningTrackAnalytics {
 
   private tempStats: HMSLocalTrackStats[] = [];
 
-  constructor({ track, ssrc, rid, kind }: { track: HMSLocalTrack; ssrc: string; kind: string; rid?: string }) {
+  constructor({
+    track,
+    ssrc,
+    rid,
+    kind,
+    sampleWindowSize,
+  }: {
+    track: HMSLocalTrack;
+    ssrc: string;
+    kind: string;
+    rid?: string;
+    sampleWindowSize: number;
+  }) {
     this.track = track;
     this.ssrc = ssrc;
     this.rid = rid;
     this.kind = kind;
     this.track_id = this.track.trackId;
     this.source = this.track.source!;
+    this.sampleWindowSize = sampleWindowSize;
   }
 
   push(stat: HMSLocalTrackStats) {

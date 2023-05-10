@@ -47,7 +47,6 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
-  PUBLISH_STATS_SEND_INTERVAL,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
@@ -81,6 +80,7 @@ export default class HMSTransport implements ITransport {
   private joinParameters?: JoinParameters;
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
+  private publishStatsAnalytics?: PublishStatsAnalytics;
   private maxSubscribeBitrate = 0;
   joinRetryCount = 0;
 
@@ -452,6 +452,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'leaving in transport');
     try {
       this.state = TransportState.Leaving;
+      this.publishStatsAnalytics?.stop();
       this.webrtcInternals?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
@@ -1042,10 +1043,13 @@ export default class HMSTransport implements ITransport {
     });
 
     if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
-      const publishStatsAnalytics = new PublishStatsAnalytics(this.store, this.eventBus);
-      setInterval(() => {
-        console.log('Publish Stats Analytics', publishStatsAnalytics.toAnalytics());
-      }, PUBLISH_STATS_SEND_INTERVAL);
+      this.publishStatsAnalytics = new PublishStatsAnalytics(
+        this.store,
+        this.eventBus,
+        this.initConfig?.config.publishStats?.maxSampleWindowSize,
+        this.initConfig?.config.publishStats?.maxSamplePushInterval,
+      );
+      this.publishStatsAnalytics.start();
     }
   }
 
