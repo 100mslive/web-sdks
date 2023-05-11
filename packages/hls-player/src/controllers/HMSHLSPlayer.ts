@@ -44,6 +44,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this.listenHLSEvent();
     this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emitEvent);
     this.seekToLivePosition();
+    // window.__hms = {
+    //   ...window.__hms,
+    //   player: this
+    // };
   }
 
   /**
@@ -320,6 +324,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       enableWorker: true,
       maxBufferLength: 20,
       backBufferLength: 10,
+      abrBandWidthUpFactor: 1,
     };
   }
 
