@@ -1049,7 +1049,6 @@ export default class HMSTransport implements ITransport {
         this.initConfig?.config.publishStats?.maxSampleWindowSize,
         this.initConfig?.config.publishStats?.maxSamplePushInterval,
       );
-      this.publishStatsAnalytics.start();
     }
   }
 

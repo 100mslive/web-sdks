@@ -21,9 +21,10 @@ export class PublishStatsAnalytics {
     private readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
   ) {
     this.eventBus.statsUpdate.subscribe(hmsStats => this.handleStatsUpdate(hmsStats));
+    this.start();
   }
 
-  async start() {
+  start() {
     if (this.shouldSendEvent) {
       return;
     }
