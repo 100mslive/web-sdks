@@ -44,10 +44,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this.listenHLSEvent();
     this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emitEvent);
     this.seekToLivePosition();
-    // window.__hms = {
-    //   ...window.__hms,
-    //   player: this
-    // };
   }
 
   /**
