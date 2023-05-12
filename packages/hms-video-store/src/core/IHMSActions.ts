@@ -209,6 +209,8 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
+  addVB(): Promise<void>;
+
   /**
    * To check the support of the plugin, based on browser, os and audio devices
    * @param plugin HMSVideoPlugin

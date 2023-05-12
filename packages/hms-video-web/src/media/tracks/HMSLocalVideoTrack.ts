@@ -164,6 +164,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this.pluginsManager.addPlugin(plugin, pluginFrameRate);
   }
 
+  async applyPlugin(cb: (stream: MediaStream) => Promise<MediaStream>) {
+    try {
+      const newStream = await cb(this.stream.nativeStream);
+      this.setProcessedTrack(newStream.getVideoTracks()[0]);
+    } catch (err) {
+      console.log('applyPlugin::error:: ', err);
+    }
+  }
+
   /**
    * @see HMSVideoPlugin
    */

@@ -3,7 +3,7 @@ import { HMSVirtualBackgroundTypes } from "@100mslive/hms-virtual-background";
 import {
   selectIsAllowedToPublish,
   selectIsLocalVideoPluginPresent,
-  selectLocalPeerRole,
+  // selectLocalPeerRole,
   selectLocalVideoTrackID,
   useHMSActions,
   useHMSStore,
@@ -19,7 +19,7 @@ export const VirtualBackground = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const role = useHMSStore(selectLocalPeerRole);
+  // const role = useHMSStore(selectLocalPeerRole);
   const [isVBLoading, setIsVBLoading] = useState(false);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
@@ -55,10 +55,11 @@ export const VirtualBackground = () => {
       window.HMS.virtualBackground = pluginRef.current;
       const { background, backgroundType } = getRandomVirtualBackground();
       await pluginRef.current.setBackground(background, backgroundType);
-      await hmsActions.addPluginToVideoTrack(
-        pluginRef.current,
-        Math.floor(role.publishParams.video.frameRate / 2)
-      );
+      // await hmsActions.addPluginToVideoTrack(
+      //   pluginRef.current,
+      //   Math.floor(role.publishParams.video.frameRate / 2)
+      // );
+      await hmsActions.addVB();
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }

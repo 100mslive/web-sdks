@@ -77,6 +77,12 @@ import {
   selectVideoTrackByID,
 } from '../selectors';
 
+// Effect SDK will add tsvb property in window object.
+declare global {
+  interface Window {
+    tsvb: any;
+  }
+}
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
 
 /**
@@ -1320,6 +1326,56 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
     }
   }
+
+  async addVB() {
+    const cb = (stream: MediaStream): Promise<MediaStream> => {
+      return new Promise((resolve, reject) => {
+        // TODO: It will load the script everytime VB is turned on. Load the script in better way.
+        const script = document.createElement('script');
+        script.src = 'https://effectssdk.com/sdk/web/tsvb-web.js';
+        script.async = true;
+
+        script.onload = () => {
+          if (!window.tsvb) {
+            reject('Window object does not have tsvb property');
+          }
+          const sdk = new window.tsvb('22d268435824179e93a2e3da317306dfb0c72f7a');
+          console.log('addVB::effectsSdk: ', sdk);
+          if (!sdk) {
+            reject('SDK is not present');
+          }
+          sdk.onReady = () => {
+            console.log("SDK is ready let's run it");
+            sdk.run();
+            // available preset mode = 'quality | balanced | speed | lightning'
+            sdk.setSegmentationPreset('balanced');
+            // available fit mode = 'fill | fit'
+            sdk.setBackgroundFitMode('fill');
+            sdk.setBackground(`https://www.100ms.live/images/vb-3.png`);
+
+            // sdk.setBackgroundColor(0x00ff00);
+            // sdk.setBackground('color');
+            // sdk.setBlur(15);
+          };
+          sdk.clear();
+          sdk.useStream(stream);
+          resolve(sdk.getStream());
+        };
+        document.body.appendChild(script);
+      });
+    };
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        await (sdkTrack as SDKHMSLocalVideoTrack).applyPlugin(cb);
+        // this.syncRoomState(`${action}VideoPlugin`);
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+      }
+    }
+  }
+
   private async addRemoveAudioPlugin(plugin: HMSAudioPlugin, action: 'add' | 'remove') {
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');
