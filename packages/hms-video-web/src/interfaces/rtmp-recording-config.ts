@@ -1,5 +1,5 @@
 export interface RTMPRecordingConfig {
-  meetingURL: string;
+  meetingURL?: string;
   rtmpURLs?: Array<string>;
   record: boolean;
   resolution?: RTMPRecordingResolution;

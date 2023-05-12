@@ -16,8 +16,8 @@ export function useBorderAudioLevel(audioTrackId?: HMSTrackID) {
         transition: 'outline 0.4s ease-in-out',
       };
       style['outline'] = level
-        ? `4px solid ${color}`
-        : '';
+        ? `${sigmoid(level) * 4}px solid ${color}`
+        : '0px solid transparent';
       return style;
     },
     [color],

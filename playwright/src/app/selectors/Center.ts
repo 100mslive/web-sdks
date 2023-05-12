@@ -12,7 +12,11 @@ export class Center {
   first_person_img = 'div[data-testid="first_person_img"]';
   network_ontile = 'div[data-testid="participant_tile_?"] span[data-testid="tile_network"]';
   mute_ontile = 'div[data-testid="participant_tile_?"] div[data-testid="participant_audio_mute_icon"]';
+  sfn_onTile = 'table tbody tr td'
   no_stream_text = '[data-testid="conferencing"] p';
+  sfn_onText = 'h2 div p'
+  expected_sfn_header = 'Stats For Nerds'
+  sfn_dialog_texts = '[role="dialog"] div p'
 
   participant_tile_menu_btn = 'div[data-testid="participant_tile_?"] button[data-testid="participant_menu_btn"]';
   tile_menu_remove_participant = 'button[data-testid="remove_participant_btn"]';
