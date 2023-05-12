@@ -101,6 +101,13 @@ export class PageWrapper {
     console.log('asserted visibility for', elementId);
   }
 
+  async checkScreenMode() {
+    const isFullScreen = await this.page.evaluate(() => {
+      return document.fullscreenElement !== null;
+    });
+    return isFullScreen;
+  }
+
   locator(elementSelector: string) {
     return this.page.locator(elementSelector);
   }
