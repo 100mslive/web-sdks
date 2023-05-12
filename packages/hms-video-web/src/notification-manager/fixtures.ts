@@ -172,4 +172,5 @@ export const fakeMessage: MessageNotification = {
     message: 'Test',
     type: 'chat',
   },
+  message_id: 'test',
 };
