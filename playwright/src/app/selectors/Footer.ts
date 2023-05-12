@@ -45,6 +45,8 @@ export class Footer {
   ui_settings_btn = 'div[data-testid="ui_settings_btn"]';
   device_settings_btn = 'div[data-testid="device_settings_btn"]';
   stats_for_nreds_btn = 'div[data-testid="stats_for_nreds_btn"]';
+  enable_sfn = '[role="switch"]'
+  close_sfn_modal = '[data-testid="stats_dialog_close_icon"]'
 
   change_my_role_btn = 'div[data-testid="change_my_role_btn"]';
   change_to_role_ = 'div[data-testid="change_to_role_?"]';
