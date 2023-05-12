@@ -49,6 +49,7 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
       message: ${this.message};
       time: ${this.time};
       type: ${this.type};
+      id: ${this.id}
     }`;
   }
 }
