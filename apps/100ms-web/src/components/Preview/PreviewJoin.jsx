@@ -27,7 +27,7 @@ import TileConnection from "../Connection/TileConnection";
 import SettingsModal from "../Settings/SettingsModal";
 import PreviewName from "./PreviewName";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { useUISettings } from "../AppData/useUISettings";
+import { useAuthToken, useUISettings } from "../AppData/useUISettings";
 import {
   defaultPreviewPreference,
   UserPreferencesKeys,
@@ -35,25 +35,21 @@ import {
 } from "../hooks/useUserPreferences";
 import { UI_SETTINGS } from "../../common/constants";
 
-const PreviewJoin = ({
-  token,
-  onJoin,
-  env,
-  skipPreview,
-  initialName,
-  asRole,
-}) => {
+const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
   );
+  const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
-    token,
-    initEndpoint: env ? `https://${env}-init.100ms.live/init` : undefined,
+    token: authToken,
+    initEndpoint: process.env.REACT_APP_ENV
+      ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
+      : undefined,
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
@@ -84,7 +80,7 @@ const PreviewJoin = ({
     onJoin,
   ]);
   useEffect(() => {
-    if (token) {
+    if (authToken) {
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
@@ -92,7 +88,7 @@ const PreviewJoin = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token, skipPreview]);
+  }, [authToken, skipPreview]);
   return (
     <Container>
       <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>

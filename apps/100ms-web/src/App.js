@@ -16,6 +16,7 @@ import {
 import { Box, HMSThemeProvider } from "@100mslive/react-ui";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
+import AuthToken from "./components/AuthToken";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import ErrorPage from "./components/ErrorPage";
 import FullPageProgress from "./components/FullPageProgress";
@@ -23,6 +24,7 @@ import { Init } from "./components/init/Init";
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
+import PreviewContainer from "./components/Preview/PreviewContainer.jsx";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { Confetti } from "./plugins/confetti";
@@ -34,7 +36,6 @@ import "./base.css";
 import "./index.css";
 
 const Conference = React.lazy(() => import("./components/conference"));
-const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
 
 const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
 const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
@@ -79,6 +80,7 @@ export const HMSRoom = React.forwardRef(
       roomId,
       role,
       roomCode,
+      showPreview = true,
     },
     ref
   ) => {
@@ -142,6 +144,7 @@ export const HMSRoom = React.forwardRef(
                 roomId={roomId}
                 role={role}
                 roomCode={roomCode}
+                showPreview={showPreview}
               />
             </Box>
           </HMSRoomProvider>
@@ -176,7 +179,7 @@ const RedirectToPreview = ({ getDetails }) => {
   );
 };
 
-const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
+const RouteList = ({ getDetails, showPreview }) => {
   return (
     <Routes>
       <Route path="preview">
@@ -184,9 +187,7 @@ const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
           path=":roomId/:role"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen
-                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-              />
+              <PreviewContainer />
             </Suspense>
           }
         />
@@ -194,9 +195,7 @@ const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
           path=":roomId"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <PreviewScreen
-                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-              />
+              <PreviewContainer />
             </Suspense>
           }
         />
@@ -206,7 +205,7 @@ const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
           path=":roomId/:role"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <Conference />
+              <Conference showPreview={showPreview} />
             </Suspense>
           }
         />
@@ -214,7 +213,7 @@ const RouteList = ({ getDetails, authTokenByRoomCodeEndpoint }) => {
           path=":roomId"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <Conference />
+              <Conference showPreview={showPreview} />
             </Suspense>
           }
         />
@@ -272,6 +271,7 @@ function AppRoutes({
   roomId,
   role,
   roomCode,
+  showPreview,
 }) {
   return (
     <Router roomId={roomId} role={role} roomCode={roomCode}>
@@ -283,23 +283,21 @@ function AppRoutes({
       <RemoteStopScreenshare />
       <KeyboardHandler />
       <BeamSpeakerLabelsLogging />
+      <AuthToken
+        authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+        showPreview={showPreview}
+      />
       <Routes>
         <Route
           path="/*"
           element={
-            <RouteList
-              getDetails={getDetails}
-              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-            />
+            <RouteList getDetails={getDetails} showPreview={showPreview} />
           }
         />
         <Route
           path="/streaming/*"
           element={
-            <RouteList
-              getDetails={getDetails}
-              authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-            />
+            <RouteList getDetails={getDetails} showPreview={showPreview} />
           }
         />
       </Routes>
@@ -318,6 +316,7 @@ export default function App() {
         font: process.env.REACT_APP_FONT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
+      showPreview={false}
     />
   );
 }

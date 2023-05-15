@@ -9,7 +9,7 @@ import {
   ThemeContext,
   Tooltip,
 } from "@100mslive/react-ui";
-import { ErrorWithSupportLink } from "./PreviewScreen";
+import { ErrorWithSupportLink } from "./AuthToken";
 
 export class ErrorBoundary extends Component {
   constructor(props) {

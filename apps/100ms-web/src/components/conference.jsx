@@ -25,7 +25,7 @@ import {
   isIPadOS,
 } from "../common/constants";
 
-const Conference = () => {
+const Conference = ({ showPreview }) => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
@@ -67,6 +67,9 @@ const Conference = () => {
       navigate(`/`);
       return;
     }
+    if (!showPreview) {
+      return;
+    }
     if (
       !prevState &&
       !(
@@ -78,7 +81,15 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ""}/${role}`);
       else navigate(`/preview/${roomId || ""}`);
     }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
+  }, [
+    isConnectedToRoom,
+    prevState,
+    roomState,
+    navigate,
+    role,
+    roomId,
+    showPreview,
+  ]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
