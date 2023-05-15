@@ -157,7 +157,7 @@ export const HMSRoom = React.forwardRef(
   }
 );
 
-const RedirectToPreview = ({ getDetails }) => {
+const Redirector = ({ getDetails, showPreview }) => {
   const { roomId, role } = useParams();
   useEffect(() => {
     getDetails();
@@ -174,7 +174,11 @@ const RedirectToPreview = ({ getDetails }) => {
   }
 
   return (
-    <Navigate to={`${getRoutePrefix()}/preview/${roomId}/${role || ""}`} />
+    <Navigate
+      to={`${getRoutePrefix()}/${
+        showPreview ? "preview" : "meeting"
+      }/${roomId}/${role || ""}`}
+    />
   );
 };
 
@@ -229,11 +233,15 @@ const RouteList = ({ getDetails }) => {
       )}
       <Route
         path="/:roomId/:role"
-        element={<RedirectToPreview getDetails={getDetails} />}
+        element={
+          <Redirector getDetails={getDetails} showPreview={showPreview} />
+        }
       />
       <Route
         path="/:roomId/"
-        element={<RedirectToPreview getDetails={getDetails} />}
+        element={
+          <Redirector getDetails={getDetails} showPreview={showPreview} />
+        }
       />
       <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
     </Routes>
