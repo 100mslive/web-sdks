@@ -10,6 +10,7 @@
     "prod-in": "APP_ENV=prod ENV_PATH=env/.env.prod-in playwright test --grep-invert @qaonly",
     "prod-us": "APP_ENV=prod ENV_PATH=env/.env.prod-us playwright test --grep-invert @qaonly",
     "prod-eu": "APP_ENV=prod ENV_PATH=env/.env.prod-eu playwright test --grep-invert @qaonly",
+    "stag-in": "APP_ENV=prod ENV_PATH=env/.env.stag-in playwright test --grep-invert @qaonly",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier --write src/**/*.ts"
@@ -18,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.21.0",
+    "@playwright/test": "^1.33.0",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.25.0",
     "dotenv": "^16.0.0",

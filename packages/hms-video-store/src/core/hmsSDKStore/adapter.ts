@@ -165,6 +165,7 @@ export class SDKToHMS {
       time: sdkMessage.time,
       type: sdkMessage.type,
       message: sdkMessage.message,
+      id: sdkMessage.id,
     };
   }
 

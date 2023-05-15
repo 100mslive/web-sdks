@@ -156,6 +156,11 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
+  // @ts-ignore
+  private sendHLSAnalytics(error: HMSException) {
+    this.sendAnalyticsEvent(AnalyticsEventFactory.hlsPlayerError(error));
+  }
+
   async refreshDevices() {
     this.validateJoined('refreshDevices');
     await this.deviceManager.init(true);
@@ -598,6 +603,7 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
     const response = await this.transport.sendMessage(hmsMessage);
     hmsMessage.time = new Date(response.timestamp);
+    hmsMessage.id = response.message_id;
     return hmsMessage;
   }
 

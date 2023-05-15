@@ -87,19 +87,6 @@ export const defaultVideoList = [
   },
 ];
 
-export const emojiIdMapping = [
-  { emojiId: "+1", emoji: "👍" },
-  { emojiId: "-1", emoji: "👎" },
-  { emojiId: "wave", emoji: "👋" },
-  { emojiId: "clap", emoji: "👏" },
-  { emojiId: "fire", emoji: "🔥" },
-  { emojiId: "tada", emoji: "🎉" },
-  { emojiId: "heart_eyes", emoji: "😍" },
-  { emojiId: "joy", emoji: "😂" },
-  { emojiId: "open_mouth", emoji: "😮" },
-  { emojiId: "sob", emoji: "😭" },
-];
-
 export const DEFAULT_HLS_ROLE_KEY = "HLS_VIEWER_ROLE";
 export const DEFAULT_HLS_VIEWER_ROLE = "hls-viewer";
 export const DEFAULT_WAITING_VIEWER_ROLE = "waiting-room";
@@ -118,6 +105,7 @@ export const RTMP_RECORD_DEFAULT_RESOLUTION = {
   width: 1280,
   height: 720,
 };
+export const EMOJI_REACTION_TYPE = "EMOJI_REACTION";
 
 export const CHAT_SELECTOR = {
   PEER_ID: "peer_id",
@@ -209,4 +197,10 @@ export const FEATURE_LIST = {
   HAND_RAISE: "handraise",
   CHAT: "chat",
   PIN_TILE: "pintile",
+};
+
+export const SESSION_STORE_KEY = {
+  TRANSCRIPTION_STATE: "transcriptionState",
+  PINNED_MESSAGE: "pinnedMessage",
+  SPOTLIGHT: "spotlight",
 };

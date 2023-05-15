@@ -54,3 +54,56 @@ test(`Verify network on tile and peerlist`, async ({ context }) => {
   await pages[0].endRoom();
   await context.close();
 });
+
+
+test(`Verify emoji container text and is clickable`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.assertVisible(page.footer.emoji_btn);
+  await page.click(page.footer.emoji_btn)
+  await page.assertVisible(page.footer.emoji_container);
+
+  //verify emoji container text
+  await page.hasText(page.footer.emoji_container_text, page.footer.expected_emoji_container_text);
+  await page.hasText(page.footer.emoji_container_href, page.footer.expected_emoji_container_href_text);
+  await page.hasLink(page.footer.emoji_container_href, page.footer.expected_emoji_href_link);
+
+  //verify emojis are clickable through iteration
+  let emojis = page.locator(page.footer.emoji_container);
+  let emojiCount = await emojis.count();
+  for (let emoji = 0; emoji < emojiCount; emoji++) {
+   await emojis.nth(emoji).click();
+  }  
+  // close emoji container
+  await page.click("html");
+  await page.endRoom();
+  await page.close();
+});
+
+test(`Verify SFN cta in advanced settings`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.click(page.footer.more_settings_btn, page.footer.stats_for_nreds_btn)
+  await page.hasText(page.center.sfn_onText, page.center.expected_sfn_header)
+  let SFNDialogText = page.locator(page.center.sfn_dialog_texts)
+  expect(await SFNDialogText.count()).not.toEqual(0);
+  await page.click(page.footer.enable_sfn, page.footer.close_sfn_modal)
+  await page.assertVisible(page.center.sfn_onTile)
+  let SFNContent = page.locator(page.center.sfn_onTile);
+  expect(await SFNContent.count()).not.toEqual(0);
+  await page.endRoom();
+  await page.close();
+});
+
+
+test(`Verify full screen page`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  // switch to full screen mode
+  await page.click(page.footer.more_settings_btn, page.footer.full_screen_btn);
+  let isFullScreen = await page.checkScreenMode(); 
+  expect(isFullScreen).toBeTruthy();
+  // switch to normal screen mode
+  await page.click(page.footer.more_settings_btn, page.footer.full_screen_btn);
+  isFullScreen = await page.checkScreenMode(); 
+  expect(isFullScreen).not.toBeTruthy();
+  await page.endRoom();
+  await page.close();
+});

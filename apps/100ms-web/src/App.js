@@ -26,6 +26,7 @@ import PostLeave from "./components/PostLeave";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { Confetti } from "./plugins/confetti";
+import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
 import { getRoutePrefix, shadeColor } from "./common/utils";
 import { FeatureFlags } from "./services/FeatureFlags";
@@ -278,6 +279,7 @@ function AppRoutes({
       <Notifications />
       <BackSwipe />
       <Confetti />
+      <FlyingEmoji />
       <RemoteStopScreenshare />
       <KeyboardHandler />
       <BeamSpeakerLabelsLogging />

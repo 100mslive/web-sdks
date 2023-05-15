@@ -25,7 +25,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private pendingMessageQueue: string[] = [];
 
   private apiChannel?: HMSDataChannel;
-  private eventEmitter = new EventEmitter({ maxListeners: 15 });
+  private eventEmitter = new EventEmitter({ maxListeners: 60 });
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {

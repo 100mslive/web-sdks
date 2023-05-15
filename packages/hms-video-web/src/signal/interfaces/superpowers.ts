@@ -46,7 +46,7 @@ export interface MultiTrackUpdateRequestParams {
 }
 
 export interface StartRTMPOrRecordingRequestParams {
-  meeting_url: string;
+  meeting_url?: string;
   rtmp_urls?: Array<string>;
   record: boolean;
   resolution?: RTMPRecordingResolution;

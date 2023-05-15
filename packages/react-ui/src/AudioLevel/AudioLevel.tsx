@@ -13,11 +13,11 @@ export function useBorderAudioLevel(audioTrackId?: HMSTrackID) {
   const getStyle = useCallback(
     (level: number) => {
       const style: Record<string, string> = {
-        transition: 'box-shadow 0.4s ease-in-out',
+        transition: 'outline 0.4s ease-in-out',
       };
-      style['box-shadow'] = level
-        ? `0px 0px ${24 * sigmoid(level)}px ${color}, 0px 0px ${16 * sigmoid(level)}px ${color}`
-        : '';
+      style['outline'] = level
+        ? `${sigmoid(level) * 4}px solid ${color}`
+        : '0px solid transparent';
       return style;
     },
     [color],
