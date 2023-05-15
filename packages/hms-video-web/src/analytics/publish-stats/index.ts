@@ -1,6 +1,6 @@
 import { BaseSample, PublishAnalyticPayload, TrackAnalytics, VideoSample } from './interfaces';
 import { EventBus } from '../../events/EventBus';
-import { HMSLocalTrackStats, HMSTrackStats, RTCRemoteInboundRtpStreamStats } from '../../interfaces';
+import { HMSTrackStats, RTCRemoteInboundRtpStreamStats } from '../../interfaces';
 import { HMSLocalTrack } from '../../media/tracks';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { IStore } from '../../sdk/store';
@@ -104,7 +104,7 @@ class RunningTrackAnalytics {
   rid?: string;
   samples: BaseSample[] = [];
 
-  private tempStats: HMSLocalTrackStats[] = [];
+  private tempStats: HMSTrackStats[] = [];
 
   constructor({
     track,
@@ -128,7 +128,7 @@ class RunningTrackAnalytics {
     this.sampleWindowSize = sampleWindowSize;
   }
 
-  push(stat: HMSLocalTrackStats) {
+  push(stat: HMSTrackStats) {
     this.tempStats.push(stat);
 
     if (this.shouldCreateSample()) {
@@ -148,22 +148,29 @@ class RunningTrackAnalytics {
   }
 
   private createSample(): BaseSample | VideoSample {
+    const latestStat = this.getLatestStat();
+    // @ts-expect-error
+    const qualityLimitationDurations = latestStat.qualityLimitationDurations;
+    const total_quality_limitation = qualityLimitationDurations && {
+      bandwidth_ms: qualityLimitationDurations.bandwidth,
+      cpu_ms: qualityLimitationDurations.cpu,
+      other_ms: qualityLimitationDurations.other,
+    };
+    const resolution = latestStat.frameHeight
+      ? {
+          height_px: this.getLatestStat().frameHeight,
+          width_px: this.getLatestStat().frameWidth,
+        }
+      : undefined;
     return {
       timestamp: Date.now(),
-      avg_bitrate: this.calculateAverage('bitrate'),
+      avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
-      avg_jitter: this.calculateAverage('jitter'),
-      avg_round_trip_time: this.calculateAverage('roundTripTime'),
-      total_packets_lost: this.calculateSum('packetsLost'),
-      // @ts-expect-error
-      total_quality_limitation: this.getLatestStat().qualityLimitationDurations,
-      resolution:
-        this.kind === 'video'
-          ? {
-              height: this.getLatestStat().frameHeight,
-              width: this.getLatestStat().frameWidth,
-            }
-          : undefined,
+      avg_jitter_ms: this.calculateAverage('jitter'),
+      avg_round_trip_time_ms: this.calculateAverage('roundTripTime'),
+      total_packets_lost: latestStat.packetsLost,
+      total_quality_limitation,
+      resolution,
     };
   }
 
@@ -183,24 +190,24 @@ class RunningTrackAnalytics {
     );
   }
 
-  private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats) {
-    const checkStat = this.getLatestStat()[key as keyof HMSLocalTrackStats];
+  private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSTrackStats) {
+    const checkStat = this.getLatestStat()[key as keyof HMSTrackStats];
     if (typeof checkStat !== 'number') {
       return;
     }
     return this.tempStats.reduce((partialSum, stat) => {
-      return partialSum + ((stat[key as keyof HMSLocalTrackStats] || 0) as number);
+      return partialSum + ((stat[key as keyof HMSTrackStats] || 0) as number);
     }, 0);
   }
 
-  private calculateAverage(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSLocalTrackStats) {
+  private calculateAverage(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSTrackStats) {
     const sum = this.calculateSum(key);
     return sum ? sum / this.tempStats.length : undefined;
   }
 }
 
-const hasResolutionChanged = (newStat: HMSLocalTrackStats, prevStat: HMSLocalTrackStats) =>
+const hasResolutionChanged = (newStat: HMSTrackStats, prevStat: HMSTrackStats) =>
   newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-const hasEnabledStateChanged = (newStat: HMSLocalTrackStats, prevStat: HMSLocalTrackStats) =>
+const hasEnabledStateChanged = (newStat: HMSTrackStats, prevStat: HMSTrackStats) =>
   newStat && prevStat && newStat.enabled !== prevStat.enabled;

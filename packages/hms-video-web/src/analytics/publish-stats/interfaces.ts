@@ -17,11 +17,11 @@ export interface TrackAnalytics {
 // One sample would contain the data of the last 30 seconds window
 export interface BaseSample {
   timestamp: number; // the ts at the end of the 30s window
-  avg_round_trip_time?: number;
-  avg_jitter?: number;
+  avg_round_trip_time_ms?: number;
+  avg_jitter_ms?: number;
   total_packets_lost?: number;
-  avg_bitrate?: number;
-  avg_available_outgoing_bitrate?: number;
+  avg_bitrate_bps?: number;
+  avg_available_outgoing_bitrate_bps?: number;
 }
 
 export interface VideoSample extends BaseSample {
@@ -31,13 +31,12 @@ export interface VideoSample extends BaseSample {
 }
 
 export interface QualityLimitation {
-  bandwith?: number; // Total time in millis in the last 30s where this video track was limited by bandwidth
-  cpu?: number; // Total time in millis in the last 30s where this video track was limited by CPU
-  none?: number; // Total time in millis in the last 30s where this video track was not limited
-  other?: number;
+  bandwith_ms?: number; // Total time in millis in the last 30s where this video track was limited by bandwidth
+  cpu_ms?: number; // Total time in millis in the last 30s where this video track was limited by CPU
+  other_ms?: number;
 }
 
 export interface Resolution {
-  width?: number; // the frame width in the last
-  height?: number;
+  width_px?: number; // the frame width in the last
+  height_px?: number;
 }
