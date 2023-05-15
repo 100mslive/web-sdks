@@ -180,7 +180,7 @@ const RedirectToPreview = ({ getDetails }) => {
 
 const RouteList = ({ getDetails }) => {
   const { showPreview, showLeave } = useAppContext();
-  console.log({ showPreview, showLeave });
+
   return (
     <Routes>
       {showPreview && (
