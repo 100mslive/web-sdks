@@ -22,7 +22,7 @@ const PostLeave = () => {
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
-        <Header isPreview />
+        <Header />
       </Box>
       <Flex
         justify="center"

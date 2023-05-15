@@ -40,7 +40,6 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, showPreview }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    console.log({ tokenEndpoint, urlRoomId });
     if (!tokenEndpoint || !urlRoomId) {
       return;
     }

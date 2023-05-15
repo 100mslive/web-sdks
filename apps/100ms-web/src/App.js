@@ -156,13 +156,11 @@ export const HMSRoom = React.forwardRef(
 
 HMSRoom.displayName = "HMSRoom";
 
-const RedirectToPreview = ({ getDetails }) => {
+const RedirectToPreview = ({ getDetails, showLeave }) => {
   const { roomId, role } = useParams();
   useEffect(() => {
     getDetails();
   }, [roomId]); //eslint-disable-line
-
-  console.error({ roomId, role });
 
   if (!roomId && !role) {
     return <Navigate to="/" />;
@@ -182,24 +180,26 @@ const RedirectToPreview = ({ getDetails }) => {
 const RouteList = ({ getDetails, showPreview }) => {
   return (
     <Routes>
-      <Route path="preview">
-        <Route
-          path=":roomId/:role"
-          element={
-            <Suspense fallback={<FullPageProgress />}>
-              <PreviewContainer />
-            </Suspense>
-          }
-        />
-        <Route
-          path=":roomId"
-          element={
-            <Suspense fallback={<FullPageProgress />}>
-              <PreviewContainer />
-            </Suspense>
-          }
-        />
-      </Route>
+      {showPreview && (
+        <Route path="preview">
+          <Route
+            path=":roomId/:role"
+            element={
+              <Suspense fallback={<FullPageProgress />}>
+                <PreviewContainer />
+              </Suspense>
+            }
+          />
+          <Route
+            path=":roomId"
+            element={
+              <Suspense fallback={<FullPageProgress />}>
+                <PreviewContainer />
+              </Suspense>
+            }
+          />
+        </Route>
+      )}
       <Route path="meeting">
         <Route
           path=":roomId/:role"
