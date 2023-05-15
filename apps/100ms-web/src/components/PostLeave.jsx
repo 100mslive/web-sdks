@@ -12,7 +12,7 @@ import {
 } from "./hooks/useUserPreferences";
 import { getRoutePrefix } from "../common/utils";
 
-const PostLeave = () => {
+const PostLeave = ({ showPreview }) => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
@@ -56,28 +56,32 @@ const PostLeave = () => {
           )}
           !
         </Text>
-        <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
-          <Text
-            variant="body1"
-            css={{ color: "$textMedEmp", fontWeight: "$regular" }}
-          >
-            Left by mistake?
-          </Text>
-          <Button
-            onClick={() => {
-              let previewUrl = "/preview/" + roomId;
-              if (role) previewUrl += "/" + role;
-              navigate(previewUrl);
-              ToastManager.clearAllToast();
-            }}
-            data-testid="join_again_btn"
-          >
-            <ExitIcon />
-            <Text css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}>
-              Rejoin
+        {showPreview && (
+          <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
+            <Text
+              variant="body1"
+              css={{ color: "$textMedEmp", fontWeight: "$regular" }}
+            >
+              Left by mistake?
             </Text>
-          </Button>
-        </Flex>
+            <Button
+              onClick={() => {
+                let previewUrl = "/preview/" + roomId;
+                if (role) previewUrl += "/" + role;
+                navigate(previewUrl);
+                ToastManager.clearAllToast();
+              }}
+              data-testid="join_again_btn"
+            >
+              <ExitIcon />
+              <Text
+                css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}
+              >
+                Rejoin
+              </Text>
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );

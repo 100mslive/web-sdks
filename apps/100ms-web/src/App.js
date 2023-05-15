@@ -81,6 +81,7 @@ export const HMSRoom = React.forwardRef(
       role,
       roomCode,
       showPreview = true,
+      showLeave = true,
     },
     ref
   ) => {
@@ -145,6 +146,7 @@ export const HMSRoom = React.forwardRef(
                 role={role}
                 roomCode={roomCode}
                 showPreview={showPreview}
+                showLeave={showLeave}
               />
             </Box>
           </HMSRoomProvider>
@@ -156,7 +158,7 @@ export const HMSRoom = React.forwardRef(
 
 HMSRoom.displayName = "HMSRoom";
 
-const RedirectToPreview = ({ getDetails, showLeave }) => {
+const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
   useEffect(() => {
     getDetails();
@@ -177,7 +179,7 @@ const RedirectToPreview = ({ getDetails, showLeave }) => {
   );
 };
 
-const RouteList = ({ getDetails, showPreview }) => {
+const RouteList = ({ getDetails, showPreview, showLeave }) => {
   return (
     <Routes>
       {showPreview && (
@@ -218,10 +220,18 @@ const RouteList = ({ getDetails, showPreview }) => {
           }
         />
       </Route>
-      <Route path="leave">
-        <Route path=":roomId/:role" element={<PostLeave />} />
-        <Route path=":roomId" element={<PostLeave />} />
-      </Route>
+      {showLeave && (
+        <Route path="leave">
+          <Route
+            path=":roomId/:role"
+            element={<PostLeave showPreview={showPreview} />}
+          />
+          <Route
+            path=":roomId"
+            element={<PostLeave showPreview={showPreview} />}
+          />
+        </Route>
+      )}
       <Route
         path="/:roomId/:role"
         element={<RedirectToPreview getDetails={getDetails} />}
@@ -272,6 +282,7 @@ function AppRoutes({
   role,
   roomCode,
   showPreview,
+  showLeave,
 }) {
   return (
     <Router roomId={roomId} role={role} roomCode={roomCode}>
@@ -291,13 +302,21 @@ function AppRoutes({
         <Route
           path="/*"
           element={
-            <RouteList getDetails={getDetails} showPreview={showPreview} />
+            <RouteList
+              getDetails={getDetails}
+              showPreview={showPreview}
+              showLeave={showLeave}
+            />
           }
         />
         <Route
           path="/streaming/*"
           element={
-            <RouteList getDetails={getDetails} showPreview={showPreview} />
+            <RouteList
+              getDetails={getDetails}
+              showPreview={showPreview}
+              showLeave={showLeave}
+            />
           }
         />
       </Routes>
