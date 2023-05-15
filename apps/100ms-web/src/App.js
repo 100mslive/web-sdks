@@ -26,6 +26,7 @@ import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import PreviewContainer from "./components/Preview/PreviewContainer.jsx";
 import { ToastContainer } from "./components/Toast/ToastContainer";
+import { AppContext, useAppContext } from "./AppContext.js";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
@@ -82,6 +83,7 @@ export const HMSRoom = React.forwardRef(
       roomCode,
       showPreview = true,
       showLeave = true,
+      onLeave = () => {},
     },
     ref
   ) => {
@@ -102,61 +104,58 @@ export const HMSRoom = React.forwardRef(
 
     return (
       <ErrorBoundary>
-        <HMSThemeProvider
-          themeType={theme}
-          aspectRatio={getAspectRatio({ width, height })}
-          theme={{
-            colors: {
-              brandDefault: color,
-              brandDark: shadeColor(color, -30),
-              brandLight: shadeColor(color, 30),
-              brandDisabled: shadeColor(color, 10),
-            },
-            fonts: {
-              sans: [font, "Inter", "sans-serif"],
-            },
-          }}
+        <AppContext.Provider
+          value={{ roomId, role, roomCode, showPreview, showLeave, onLeave }}
         >
-          <HMSRoomProvider
-            isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-            actions={hmsActions}
-            store={hmsStore}
-            notifications={hmsNotifications}
-            stats={hmsStats}
+          <HMSThemeProvider
+            themeType={theme}
+            aspectRatio={getAspectRatio({ width, height })}
+            theme={{
+              colors: {
+                brandDefault: color,
+                brandDark: shadeColor(color, -30),
+                brandLight: shadeColor(color, 30),
+                brandDisabled: shadeColor(color, 10),
+              },
+              fonts: {
+                sans: [font, "Inter", "sans-serif"],
+              },
+            }}
           >
-            <AppData
-              appDetails={metadata}
-              policyConfig={policyConfig}
-              recordingUrl={recordingUrl}
-              logo={logo}
-              tokenEndpoint={tokenEndpoint}
-            />
-
-            <Init />
-            <Box
-              css={{
-                bg: "$mainBg",
-                size: "100%",
-              }}
+            <HMSRoomProvider
+              isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+              actions={hmsActions}
+              store={hmsStore}
+              notifications={hmsNotifications}
+              stats={hmsStats}
             >
-              <AppRoutes
-                getDetails={getDetails}
-                authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-                roomId={roomId}
-                role={role}
-                roomCode={roomCode}
-                showPreview={showPreview}
-                showLeave={showLeave}
+              <AppData
+                appDetails={metadata}
+                policyConfig={policyConfig}
+                recordingUrl={recordingUrl}
+                logo={logo}
+                tokenEndpoint={tokenEndpoint}
               />
-            </Box>
-          </HMSRoomProvider>
-        </HMSThemeProvider>
+
+              <Init />
+              <Box
+                css={{
+                  bg: "$mainBg",
+                  size: "100%",
+                }}
+              >
+                <AppRoutes
+                  getDetails={getDetails}
+                  authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+                />
+              </Box>
+            </HMSRoomProvider>
+          </HMSThemeProvider>
+        </AppContext.Provider>
       </ErrorBoundary>
     );
   }
 );
-
-HMSRoom.displayName = "HMSRoom";
 
 const RedirectToPreview = ({ getDetails }) => {
   const { roomId, role } = useParams();
@@ -179,7 +178,9 @@ const RedirectToPreview = ({ getDetails }) => {
   );
 };
 
-const RouteList = ({ getDetails, showPreview, showLeave }) => {
+const RouteList = ({ getDetails }) => {
+  const { showPreview, showLeave } = useAppContext();
+  console.log({ showPreview, showLeave });
   return (
     <Routes>
       {showPreview && (
@@ -207,7 +208,7 @@ const RouteList = ({ getDetails, showPreview, showLeave }) => {
           path=":roomId/:role"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <Conference showPreview={showPreview} />
+              <Conference />
             </Suspense>
           }
         />
@@ -215,21 +216,15 @@ const RouteList = ({ getDetails, showPreview, showLeave }) => {
           path=":roomId"
           element={
             <Suspense fallback={<FullPageProgress />}>
-              <Conference showPreview={showPreview} />
+              <Conference />
             </Suspense>
           }
         />
       </Route>
       {showLeave && (
         <Route path="leave">
-          <Route
-            path=":roomId/:role"
-            element={<PostLeave showPreview={showPreview} />}
-          />
-          <Route
-            path=":roomId"
-            element={<PostLeave showPreview={showPreview} />}
-          />
+          <Route path=":roomId/:role" element={<PostLeave />} />
+          <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
       <Route
@@ -262,7 +257,8 @@ const BackSwipe = () => {
   return null;
 };
 
-const Router = ({ children, roomId, role, roomCode }) => {
+const Router = ({ children }) => {
+  const { roomId, role, roomCode } = useAppContext;
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
@@ -275,17 +271,9 @@ const Router = ({ children, roomId, role, roomCode }) => {
   );
 };
 
-function AppRoutes({
-  getDetails,
-  authTokenByRoomCodeEndpoint,
-  roomId,
-  role,
-  roomCode,
-  showPreview,
-  showLeave,
-}) {
+function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
   return (
-    <Router roomId={roomId} role={role} roomCode={roomCode}>
+    <Router>
       <ToastContainer />
       <Notifications />
       <BackSwipe />
@@ -294,30 +282,12 @@ function AppRoutes({
       <RemoteStopScreenshare />
       <KeyboardHandler />
       <BeamSpeakerLabelsLogging />
-      <AuthToken
-        authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-        showPreview={showPreview}
-      />
+      <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
       <Routes>
-        <Route
-          path="/*"
-          element={
-            <RouteList
-              getDetails={getDetails}
-              showPreview={showPreview}
-              showLeave={showLeave}
-            />
-          }
-        />
+        <Route path="/*" element={<RouteList getDetails={getDetails} />} />
         <Route
           path="/streaming/*"
-          element={
-            <RouteList
-              getDetails={getDetails}
-              showPreview={showPreview}
-              showLeave={showLeave}
-            />
-          }
+          element={<RouteList getDetails={getDetails} />}
         />
       </Routes>
     </Router>

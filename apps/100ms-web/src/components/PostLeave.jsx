@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ExitIcon } from "@100mslive/react-icons";
 import { Box, Button, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
+import { useAppContext } from "../AppContext";
 import { Header } from "./Header";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -12,8 +13,9 @@ import {
 } from "./hooks/useUserPreferences";
 import { getRoutePrefix } from "../common/utils";
 
-const PostLeave = ({ showPreview }) => {
+const PostLeave = () => {
   const navigate = useNavigation();
+  const { showPreview } = useAppContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,

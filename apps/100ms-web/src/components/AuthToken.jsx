@@ -4,6 +4,7 @@ import { useSearchParam } from "react-use";
 import { v4 as uuid } from "uuid";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { styled } from "@100mslive/react-ui";
+import { useAppContext } from "../AppContext";
 import { ErrorDialog } from "../primitives/DialogContent";
 import { useSetAppDataByKey, useTokenEndpoint } from "./AppData/useUISettings";
 import getToken from "../services/tokenService";
@@ -18,9 +19,10 @@ import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
  * auth_token=123 => uses the passed in token to join instead of fetching from token endpoint
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
-const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, showPreview }) => {
+const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
+  const { showPreview } = useAppContext();
   const location = useLocation();
   const matches = useMemo(
     () =>
