@@ -22,7 +22,7 @@ import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
 const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
-  const { showPreview } = useAppContext();
+  const { showPreview, roomId, roomCode, role } = useAppContext();
   const location = useLocation();
   const matches = useMemo(
     () =>
@@ -42,18 +42,24 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    if (!tokenEndpoint || !urlRoomId) {
+    if (!tokenEndpoint || (!urlRoomId && !roomId)) {
       return;
     }
-    const roomCode = !userRole && urlRoomId;
+    const code = !userRole && (roomCode || urlRoomId);
 
-    const getTokenFn = roomCode
+    const getTokenFn = code
       ? () =>
           hmsActions.getAuthTokenByRoomCode(
-            { roomCode },
+            { roomCode: code },
             { endpoint: authTokenByRoomCodeEndpoint }
           )
-      : () => getToken(tokenEndpoint, uuid(), userRole, urlRoomId);
+      : () =>
+          getToken(
+            tokenEndpoint,
+            uuid(),
+            role || userRole,
+            roomId || urlRoomId
+          );
 
     getTokenFn()
       .then(token => {
@@ -70,6 +76,9 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
     authToken,
     authTokenByRoomCodeEndpoint,
     setAuthTokenInAppData,
+    roomId,
+    role,
+    roomCode,
   ]);
 
   if (error.title) {
