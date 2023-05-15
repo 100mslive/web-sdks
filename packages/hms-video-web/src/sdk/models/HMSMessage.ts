@@ -11,14 +11,16 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   message: any;
   time: Date;
   type: string;
+  id?: string;
 
-  constructor({ sender, message, type = 'chat', recipientPeer, recipientRoles, time }: HMSMessage) {
+  constructor({ sender, message, type = 'chat', recipientPeer, recipientRoles, time, id }: HMSMessage) {
     this.sender = sender;
     this.message = message;
     this.type = type;
     this.recipientPeer = recipientPeer;
     this.recipientRoles = recipientRoles;
     this.time = time;
+    this.id = id;
   }
 
   toSignalParams() {
@@ -47,6 +49,7 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
       message: ${this.message};
       time: ${this.time};
       type: ${this.type};
+      id: ${this.id}
     }`;
   }
 }
