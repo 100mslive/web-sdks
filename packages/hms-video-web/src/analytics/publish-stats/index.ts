@@ -1,6 +1,6 @@
 import { BaseSample, PublishAnalyticPayload, TrackAnalytics, VideoSample } from './interfaces';
 import { EventBus } from '../../events/EventBus';
-import { HMSTrackStats, RTCRemoteInboundRtpStreamStats } from '../../interfaces';
+import { HMSTrackStats } from '../../interfaces';
 import { HMSLocalTrack } from '../../media/tracks';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { IStore } from '../../sdk/store';
@@ -34,6 +34,7 @@ export class PublishStatsAnalytics {
   }
 
   stop() {
+    this.eventBus.statsUpdate.unsubscribe(hmsStats => this.handleStatsUpdate(hmsStats));
     this.shouldSendEvent = false;
   }
 
@@ -72,7 +73,10 @@ export class PublishStatsAnalytics {
         const layerStats = trackStats[statId];
         const identifier = track && this.getTrackIdentifier(track?.trackId, layerStats);
         if (identifier && this.trackAnalytics.has(identifier)) {
-          this.trackAnalytics.get(identifier)?.push(layerStats);
+          this.trackAnalytics.get(identifier)?.push({
+            ...layerStats,
+            availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
+          });
         } else {
           if (track) {
             const trackAnalytics = new RunningTrackAnalytics({
@@ -81,6 +85,10 @@ export class PublishStatsAnalytics {
               rid: layerStats.rid,
               ssrc: layerStats.ssrc.toString(),
               kind: layerStats.kind,
+            });
+            trackAnalytics.push({
+              ...layerStats,
+              availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
             });
             this.trackAnalytics.set(this.getTrackIdentifier(track?.trackId, layerStats), trackAnalytics);
           }
@@ -94,6 +102,8 @@ export class PublishStatsAnalytics {
   }
 }
 
+type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
+
 class RunningTrackAnalytics {
   readonly sampleWindowSize: number;
   track: HMSLocalTrack;
@@ -104,7 +114,7 @@ class RunningTrackAnalytics {
   rid?: string;
   samples: BaseSample[] = [];
 
-  private tempStats: HMSTrackStats[] = [];
+  private tempStats: TempPublishStats[] = [];
 
   constructor({
     track,
@@ -128,7 +138,7 @@ class RunningTrackAnalytics {
     this.sampleWindowSize = sampleWindowSize;
   }
 
-  push(stat: HMSTrackStats) {
+  push(stat: TempPublishStats) {
     this.tempStats.push(stat);
 
     if (this.shouldCreateSample()) {
@@ -149,6 +159,7 @@ class RunningTrackAnalytics {
 
   private createSample(): BaseSample | VideoSample {
     const latestStat = this.getLatestStat();
+
     // @ts-expect-error
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
     const total_quality_limitation = qualityLimitationDurations && {
@@ -156,22 +167,30 @@ class RunningTrackAnalytics {
       cpu_ms: qualityLimitationDurations.cpu,
       other_ms: qualityLimitationDurations.other,
     };
+
     const resolution = latestStat.frameHeight
       ? {
           height_px: this.getLatestStat().frameHeight,
           width_px: this.getLatestStat().frameWidth,
         }
       : undefined;
-    return {
+    const avg_jitter = this.calculateAverage('jitter', false);
+    const avg_jitter_ms = avg_jitter ? Math.round(avg_jitter * 1000) : undefined;
+
+    const avg_round_trip_time = this.calculateAverage('roundTripTime', false);
+    const avg_round_trip_time_ms = avg_round_trip_time ? Math.round(avg_round_trip_time * 1000) : undefined;
+
+    return removeUndefinedFromObject({
       timestamp: Date.now(),
+      avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
-      avg_jitter_ms: this.calculateAverage('jitter'),
-      avg_round_trip_time_ms: this.calculateAverage('roundTripTime'),
       total_packets_lost: latestStat.packetsLost,
+      avg_jitter_ms,
+      avg_round_trip_time_ms,
       total_quality_limitation,
       resolution,
-    };
+    });
   }
 
   private getLatestStat() {
@@ -190,7 +209,7 @@ class RunningTrackAnalytics {
     );
   }
 
-  private calculateSum(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSTrackStats) {
+  private calculateSum(key: keyof TempPublishStats) {
     const checkStat = this.getLatestStat()[key as keyof HMSTrackStats];
     if (typeof checkStat !== 'number') {
       return;
@@ -200,14 +219,24 @@ class RunningTrackAnalytics {
     }, 0);
   }
 
-  private calculateAverage(key: keyof RTCRemoteInboundRtpStreamStats | keyof HMSTrackStats) {
+  private calculateAverage(key: keyof TempPublishStats, round = true) {
     const sum = this.calculateSum(key);
-    return sum ? sum / this.tempStats.length : undefined;
+    const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
+    return avg ? (round ? Math.round(avg) : avg) : undefined;
   }
 }
 
-const hasResolutionChanged = (newStat: HMSTrackStats, prevStat: HMSTrackStats) =>
+const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
   newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-const hasEnabledStateChanged = (newStat: HMSTrackStats, prevStat: HMSTrackStats) =>
+const hasEnabledStateChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
   newStat && prevStat && newStat.enabled !== prevStat.enabled;
+
+const removeUndefinedFromObject = <T extends Record<string, any>>(data: T) => {
+  return Object.entries(data)
+    .filter(([, value]) => value !== undefined)
+    .reduce((obj, [key, value]) => {
+      obj[key as keyof T] = value;
+      return obj;
+    }, {} as T);
+};
