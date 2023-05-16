@@ -30,7 +30,7 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
   bytesSent?: number;
   packetsSent?: number;
   qualityLimitationReason?: string;
-  qualityLimitationDurations: { none: number; cpu: number; bandwidth: number; other: number };
+  qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
   rid?: RID;
 }
 
