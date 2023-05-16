@@ -73,7 +73,7 @@ export const VirtualBackground = () => {
     }
   }
 
-  if (!isAllowedToPublish.video || !isVBSupported || isFeatureEnabled) {
+  if (!isAllowedToPublish.video || !isVBSupported || !isFeatureEnabled) {
     return null;
   }
 
