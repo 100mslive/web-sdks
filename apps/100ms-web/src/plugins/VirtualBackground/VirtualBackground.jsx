@@ -53,13 +53,13 @@ export const VirtualBackground = () => {
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
-      const { background, backgroundType } = getRandomVirtualBackground();
-      await pluginRef.current.setBackground(background, backgroundType);
+      const { background } = getRandomVirtualBackground();
+      // await pluginRef.current.setBackground(background, backgroundType);
       // await hmsActions.addPluginToVideoTrack(
       //   pluginRef.current,
       //   Math.floor(role.publishParams.video.frameRate / 2)
       // );
-      await hmsActions.addVB();
+      await hmsActions.addVB(background);
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }
@@ -73,7 +73,7 @@ export const VirtualBackground = () => {
     }
   }
 
-  if (!isAllowedToPublish.video || !isVBSupported || !isFeatureEnabled) {
+  if (!isAllowedToPublish.video || !isVBSupported || isFeatureEnabled) {
     return null;
   }
 

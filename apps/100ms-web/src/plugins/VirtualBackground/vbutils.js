@@ -47,8 +47,8 @@ export function getRandomVirtualBackground() {
   backgroundList.push(...videoList);
 
   const randomIdx = Math.floor(Math.random() * backgroundList.length);
-  const virtualBackground = backgroundList[randomIdx];
-  switch (virtualBackground.backgroundType) {
+  return backgroundList[randomIdx];
+  /* switch (virtualBackground.backgroundType) {
     case HMSVirtualBackgroundTypes.IMAGE:
       const img = document.createElement("img");
       img.alt = "VB";
@@ -62,5 +62,5 @@ export function getRandomVirtualBackground() {
       return virtualBackground;
     default:
       return virtualBackground;
-  }
+  } */
 }

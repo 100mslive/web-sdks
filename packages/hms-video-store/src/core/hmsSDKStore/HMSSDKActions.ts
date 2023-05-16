@@ -115,6 +115,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
+  private effectsSDK: any;
   // private actionBatcher: ActionBatcher;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
@@ -1327,41 +1328,38 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  async addVB() {
+  async addVB(url: string) {
     const cb = (stream: MediaStream): Promise<MediaStream> => {
       return new Promise((resolve, reject) => {
-        // TODO: It will load the script everytime VB is turned on. Load the script in better way.
-        const script = document.createElement('script');
-        script.src = 'https://effectssdk.com/sdk/web/tsvb-web.js';
-        script.async = true;
-
-        script.onload = () => {
-          if (!window.tsvb) {
+        if (!this.effectsSDK) {
+          if (!window?.tsvb) {
             reject('Window object does not have tsvb property');
           }
-          const sdk = new window.tsvb('22d268435824179e93a2e3da317306dfb0c72f7a');
-          console.log('addVB::effectsSdk: ', sdk);
-          if (!sdk) {
+          this.effectsSDK = new window.tsvb('22d268435824179e93a2e3da317306dfb0c72f7a');
+          console.log('addVB::effectsSdk: ', this.effectsSDK);
+          if (!this.effectsSDK) {
             reject('SDK is not present');
           }
-          sdk.onReady = () => {
-            console.log("SDK is ready let's run it");
-            sdk.run();
-            // available preset mode = 'quality | balanced | speed | lightning'
-            sdk.setSegmentationPreset('balanced');
-            // available fit mode = 'fill | fit'
-            sdk.setBackgroundFitMode('fill');
-            sdk.setBackground(`https://www.100ms.live/images/vb-3.png`);
-
-            // sdk.setBackgroundColor(0x00ff00);
-            // sdk.setBackground('color');
-            // sdk.setBlur(15);
-          };
-          sdk.clear();
-          sdk.useStream(stream);
-          resolve(sdk.getStream());
+        }
+        this.effectsSDK.onReady = () => {
+          console.log("SDK is ready let's run it");
+          this.effectsSDK.run();
+          // available preset mode = 'quality | balanced | speed | lightning'
+          this.effectsSDK.setSegmentationPreset('balanced');
+          // available fit mode = 'fill | fit'
+          this.effectsSDK.setBackgroundFitMode('fill');
+          if (url === 'blur') {
+            this.effectsSDK.setBlur(15);
+          } else {
+            this.effectsSDK.setBackground(url);
+          }
+          // sdk.setBackgroundColor(0x00ff00);
+          // sdk.setBackground('color');
+          // sdk.setBlur(15);
         };
-        document.body.appendChild(script);
+        this.effectsSDK.clear();
+        this.effectsSDK.useStream(stream);
+        resolve(this.effectsSDK.getStream());
       });
     };
     const trackID = this.store.getState(selectLocalVideoTrackID);
