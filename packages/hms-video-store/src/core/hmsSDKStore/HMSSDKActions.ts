@@ -81,6 +81,7 @@ import {
 declare global {
   interface Window {
     tsvb: any;
+    effectsPreset?: 'balanced' | 'speed' | 'lightning' | 'quality';
   }
 }
 // import { ActionBatcher } from './sdkUtils/ActionBatcher';
@@ -1344,7 +1345,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
           console.debug("effects SDK is ready let's run it");
           this.effectsSDK.run();
           // available preset mode = 'quality | balanced | speed | lightning'
-          this.effectsSDK.setSegmentationPreset('balanced');
+          this.effectsSDK.setSegmentationPreset(window.effectsPreset || 'balanced');
           // available fit mode = 'fill | fit'
           this.effectsSDK.setBackgroundFitMode('fill');
           console.debug('vb url', url);
