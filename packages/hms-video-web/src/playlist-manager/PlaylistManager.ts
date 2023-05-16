@@ -49,7 +49,7 @@ export class PlaylistManager
   private videoManager: PlaylistVideoManager;
   private readonly TAG = '[PlaylistManager]';
 
-  constructor(private sdk: HMSSdk, private eventBus: EventBus, private audioContextManager: AudioContextManager) {
+  constructor(private sdk: HMSSdk, private eventBus: EventBus, audioContextManager: AudioContextManager) {
     super();
     this.audioManager = new PlaylistAudioManager(audioContextManager);
     this.videoManager = new PlaylistVideoManager(audioContextManager);
