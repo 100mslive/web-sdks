@@ -51,8 +51,8 @@ export class PlaylistManager
 
   constructor(private sdk: HMSSdk, private eventBus: EventBus, private audioContextManager: AudioContextManager) {
     super();
-    this.audioManager = new PlaylistAudioManager(this.audioContextManager);
-    this.videoManager = new PlaylistVideoManager(this.audioContextManager);
+    this.audioManager = new PlaylistAudioManager(audioContextManager);
+    this.videoManager = new PlaylistVideoManager(audioContextManager);
     this.addListeners();
   }
 

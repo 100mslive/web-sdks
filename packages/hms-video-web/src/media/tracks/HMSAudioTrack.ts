@@ -1,5 +1,6 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
+import HMSLogger from '../../utils/logger';
 import HMSMediaStream from '../streams/HMSMediaStream';
 import HMSRemoteStream from '../streams/HMSRemoteStream';
 
