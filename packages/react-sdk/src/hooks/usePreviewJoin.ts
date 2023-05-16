@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
-import { HMSConfig } from '@100mslive/hms-video';
 import {
   HMSConfigInitialSettings,
+  HMSPreviewConfig,
   HMSRoomState,
   selectIsConnectedToRoom,
   selectRoomState,
@@ -39,6 +39,18 @@ export interface usePreviewInput {
    * 1-5 ranges from poor to good quality.
    */
   captureNetworkQualityInPreview?: boolean;
+  asRole?: string;
+  /**
+   * if this flag is enabled, the SDK takes care of unsubscribing to the video when it goes out of view.
+   * Additionally if simulcast is enabled, it takes care of auto managing simulcast layers based on the
+   * dimensions of the video element to conserve bandwidth.
+   */
+  autoManageVideo?: boolean;
+  /**
+   * if this flag is enabled, wake lock will be acquired automatically(if supported) when joining the room, so the device
+   * will be kept awake.
+   */
+  autoManageWakeLock?: boolean;
 }
 
 export interface usePreviewResult {
@@ -62,7 +74,7 @@ export interface usePreviewResult {
 }
 
 /**
- * This hook can be used to build a preview UI component, this lets you call preview everytime the passed in
+ * This hook can be used to build a preview UI component, this lets you call preview every time the passed in
  * token changes. This hook is best used in combination with useDevices for changing devices, useAVToggle for
  * muting/unmuting and useAudioLevelStyles for showing mic audio level to the user.
  * Any device change or mute/unmute will be carried across to join.
@@ -75,13 +87,16 @@ export const usePreviewJoin = ({
   initEndpoint,
   initialSettings,
   captureNetworkQualityInPreview,
+  asRole,
+  autoManageVideo,
+  autoManageWakeLock,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
   const isConnected = useHMSStore(selectIsConnectedToRoom) || false;
   const enableJoin = roomState === HMSRoomState.Preview;
 
-  const config: HMSConfig = useMemo(() => {
+  const config: HMSPreviewConfig = useMemo(() => {
     return {
       userName: name,
       authToken: token,
@@ -89,9 +104,22 @@ export const usePreviewJoin = ({
       rememberDeviceSelection: true,
       settings: initialSettings,
       initEndpoint: initEndpoint,
+      asRole,
       captureNetworkQualityInPreview,
+      autoManageVideo,
+      autoManageWakeLock,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview]);
+  }, [
+    name,
+    token,
+    metadata,
+    initEndpoint,
+    initialSettings,
+    captureNetworkQualityInPreview,
+    asRole,
+    autoManageVideo,
+    autoManageWakeLock,
+  ]);
 
   const preview = useCallback(async () => {
     if (!token) {

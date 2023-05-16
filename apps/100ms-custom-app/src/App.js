@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import merge from 'lodash.merge';
 import { Flex, Loading } from '@100mslive/react-ui';
 import {
@@ -10,11 +9,12 @@ import {
   mapFromBackend,
   mapTileShape,
   storeRoomSettings,
+  getAuthTokenByRoomCodeEndpoint,
 } from './utils/utils';
 
 import logoLight from './assets/images/logo-on-white.png';
 import logoDark from './assets/images/logo-on-black.png';
-import LogRocket from 'logrocket';
+import { logError } from 'zipyai';
 
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
@@ -29,6 +29,10 @@ if (!hostname.endsWith('app.100ms.live')) {
   // route dev-app appropriately to qa or prod
   const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
   hostname = hostname.replace('dev-app.100ms.live', envSuffix);
+} else if (hostname.endsWith('staging-app.100ms.live')) {
+  // route staging-app appropriately to qa or prod
+  const envSuffix = process.env.REACT_APP_ENV === 'prod' ? 'app.100ms.live' : 'qa-app.100ms.live';
+  hostname = hostname.replace('staging-app.100ms.live', envSuffix);
 } else if (hostname.endsWith('qa-app.100ms.live') && process.env.REACT_APP_ENV === 'prod') {
   hostname = hostname.replace('qa-app.100ms.live', 'app.100ms.live');
 }
@@ -97,46 +101,6 @@ const App = () => {
     };
   };
 
-  const getRoomDetails = async name => {
-    const code = getRoomCodeFromUrl();
-    if (!code) {
-      LogRocket.track('roomIdNull', window.location.pathname);
-      return;
-    }
-    const jwt = getAuthInfo().token;
-    const url = `${apiBasePath}get-token`;
-    let headers;
-    if (jwt) {
-      headers = {
-        Authorization: `Bearer ${jwt}`,
-        'Content-Type': 'application/json',
-        subdomain: hostname,
-      };
-    } else {
-      headers = {
-        'Content-Type': 'application/json',
-        subdomain: hostname,
-      };
-    }
-
-    let formData = new FormData();
-    formData.append('code', code);
-    formData.append('user_id', name);
-
-    return await axios
-      .post(url, formData, { headers: headers })
-      .then(res => {
-        try {
-          return res.data.token;
-        } catch (err) {
-          throw Error(err);
-        }
-      })
-      .catch(err => {
-        throw err;
-      });
-  };
-
   const fetchData = async () => {
     const jwt = getAuthInfo().token;
     const code = getRoomCodeFromUrl();
@@ -176,16 +140,16 @@ const App = () => {
         }
       })
       .catch(err => {
-        const errorMessage = `[FetchData - get-details] ${err.message} ${err.toJSON && JSON.stringify(err.toJSON())}`;
+        const errorMessage = `[Get Details] ${err.message}`;
         let error = {
           title: 'Something went wrong',
           body: errorMessage,
         };
-        LogRocket.track('getDetailsError', error);
+        logError('getDetailsError', error.body);
         if (err.response && err.response.status === 404) {
           error = {
             title: 'Link is invalid',
-            body: 'Please make sure the domain name is right',
+            body: err.response.data?.msg || 'Please make sure that link is valid.',
           };
         }
         setError(error);
@@ -278,7 +242,7 @@ const App = () => {
               metadata: settings.metadataFields.metadata,
               recordingUrl: settings.recording_url,
             }}
-            getUserToken={getRoomDetails}
+            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
             getDetails={fetchData}
           />
         </Suspense>

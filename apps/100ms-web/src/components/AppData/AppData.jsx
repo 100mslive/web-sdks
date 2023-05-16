@@ -1,11 +1,13 @@
 import React, { useEffect } from "react";
 import { useSearchParam } from "react-use";
 import {
+  HMSRoomState,
   selectAvailableRoleNames,
   selectHLSState,
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectRolesMap,
+  selectRoomState,
   selectRTMPState,
   useHMSActions,
   useHMSStore,
@@ -26,8 +28,10 @@ import { useSetAppDataByKey } from "./useUISettings";
 import { getMetadata } from "../../common/utils";
 import {
   APP_DATA,
+  CHAT_SELECTOR,
   DEFAULT_HLS_ROLE_KEY,
   DEFAULT_HLS_VIEWER_ROLE,
+  DEFAULT_WAITING_VIEWER_ROLE,
   QUERY_PARAM_VIEW_MODE,
   SIDE_PANE_OPTIONS,
   UI_MODE_ACTIVE_SPEAKER,
@@ -52,6 +56,8 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
+    [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === "qa",
+    [UI_SETTINGS.hideLocalVideo]: false,
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,
@@ -61,16 +67,22 @@ const initialAppData = {
     METADATA_UPDATED: true,
   },
   [APP_DATA.chatOpen]: false,
+  [APP_DATA.chatSelector]: {
+    [CHAT_SELECTOR.ROLE]: "",
+    [CHAT_SELECTOR.PEER_ID]: "",
+  },
   [APP_DATA.chatDraft]: "",
   [APP_DATA.sidePane]: "",
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
+  [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
+  [APP_DATA.dropdownList]: [],
 };
 
 export const AppData = React.memo(
-  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig }) => {
+  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig, uiMode }) => {
     const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const sidePane = useSidepaneState();
@@ -99,7 +111,7 @@ export const AppData = React.memo(
     }, [hmsActions]);
 
     useEffect(() => {
-      const uiSettings = preferences.uiSettings || {};
+      const uiSettings = preferences || {};
       const updatedSettings = {
         ...uiSettings,
         [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
@@ -107,7 +119,7 @@ export const AppData = React.memo(
           : uiSettings.uiViewMode || UI_MODE_GRID,
       };
       hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-    }, [preferences.uiSettings, isDefaultModeActiveSpeaker, hmsActions]);
+    }, [preferences, isDefaultModeActiveSpeaker, hmsActions]);
 
     useEffect(() => {
       const appData = {
@@ -118,11 +130,12 @@ export const AppData = React.memo(
           getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
           DEFAULT_HLS_VIEWER_ROLE,
         [APP_DATA.appConfig]: getAppDetails(appDetails),
+        [APP_DATA.uiMode]: uiMode,
       };
       for (const key in appData) {
         hmsActions.setAppData([key], appData[key]);
       }
-    }, [appDetails, logo, recordingUrl, tokenEndpoint, hmsActions]);
+    }, [appDetails, logo, recordingUrl, tokenEndpoint, uiMode, hmsActions]);
 
     useEffect(() => {
       if (!preferences.subscribedNotifications) {
@@ -158,6 +171,7 @@ const ResetStreamingStart = () => {
     useRecordingStreaming();
   const hlsError = useHMSStore(selectHLSState).error;
   const rtmpError = useHMSStore(selectRTMPState).error;
+  const roomState = useHMSStore(selectRoomState);
   const [hlsStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const [recordingStarted, setRecordingStarted] = useSetAppDataByKey(
     APP_DATA.recordingStarted
@@ -173,6 +187,16 @@ const ResetStreamingStart = () => {
       setRecordingStarted(false);
     }
   }, [isBrowserRecordingOn, recordingStarted, setRecordingStarted]);
+  /**
+   * Reset on leave
+   */
+  useEffect(() => {
+    if (roomState === HMSRoomState.Disconnected) {
+      setHLSStarted(false);
+      setRecordingStarted(false);
+      setRTMPStarted(false);
+    }
+  }, [roomState, setHLSStarted, setRTMPStarted, setRecordingStarted]);
   useEffect(() => {
     if (isHLSRunning || hlsError) {
       if (hlsStarted) {

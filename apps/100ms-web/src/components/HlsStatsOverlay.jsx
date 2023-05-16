@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { CloseIcon, LinkIcon } from "@100mslive/react-icons";
+import { CloseIcon } from "@100mslive/react-icons";
 import { Flex, IconButton, Text } from "@100mslive/react-ui";
 
 export function HlsStatsOverlay({ hlsStatsState, onClose }) {
@@ -7,32 +7,23 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
     <Flex
       css={{
         position: "absolute",
-        minWidth: "60%",
-        margin: "$8 0  0 $20",
-        "@md": {
-          minWidth: "60%",
-          margin: "$8 0  0 $8",
-        },
-        "@sm": {
-          minWidth: "100%",
-          margin: "$0",
-        },
-        padding: "$2 $4 $2 $4",
-        zIndex: 100,
+        width: "$80",
+        marginLeft: "$8",
+        padding: "$8 $8 $10",
+        zIndex: 10,
         backgroundColor: "rgba(55,59,66, 0.84)",
-
         borderRadius: "$1",
       }}
       direction="column"
     >
-      <Flex justify="end">
-        <IconButton onClick={onClose}>
-          <CloseIcon />
-        </IconButton>
-      </Flex>
+      <IconButton
+        css={{ position: "absolute", top: "$2", right: "$2" }}
+        onClick={onClose}
+      >
+        <CloseIcon />
+      </IconButton>
       <HlsStatsRow label="URL">
         <Flex align="center">
-          <LinkIcon />
           <a
             style={{ cursor: "pointer", textDecoration: "underline" }}
             href={hlsStatsState?.url}
@@ -50,15 +41,17 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
         {hlsStatsState?.bufferedDuration?.toFixed(2)}{" "}
       </HlsStatsRow>
       <HlsStatsRow label="Connection speed">
-        {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(2)}Mbps`}
+        {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(
+          2
+        )} Mbps`}
       </HlsStatsRow>
       <HlsStatsRow label="Bitrate">
-        {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)}Mbps`}
+        {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)} Mbps`}
       </HlsStatsRow>
       <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
-      <HlsStatsRow label="Total frames dropped">
+      <HlsStatsRow label="Dropped frames">
         {`${hlsStatsState?.droppedFrames}`}
       </HlsStatsRow>
     </Flex>
@@ -90,12 +83,13 @@ export function getDurationFromSeconds(timeInSeconds) {
 
 const HlsStatsRow = memo(({ label, children }) => {
   return (
-    <Flex gap={4} justify="between" css={{ width: "100%" }}>
+    <Flex gap={4} justify="center" css={{ width: "100%" }}>
       <Text
         css={{
-          width: "30%",
+          width: "50%",
           "@md": { fontSize: "$md" },
           "@sm": { fontSize: "$sm" },
+          // textAlign: "right",
         }}
       >
         {label}
@@ -104,9 +98,9 @@ const HlsStatsRow = memo(({ label, children }) => {
         css={{
           "@md": { fontSize: "$md" },
           "@sm": { fontSize: "$sm" },
-          maxWidth: "70%",
-          minWidth: "50%",
+          width: "50%",
           overflowWrap: "break-word",
+          // textAlign: "left",
         }}
       >
         {children}

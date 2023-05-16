@@ -92,6 +92,7 @@ export const makeFakeStore = (): HMSStore => {
     appData: {
       isAudioOnly: true,
     },
+    templateAppData: {},
     peers: {
       '1': {
         id: '1',
@@ -280,7 +281,14 @@ export const makeFakeStore = (): HMSStore => {
       audioOutput: [],
       videoInput: [],
     },
+    preview: {
+      localPeer: '1',
+      asRole: ROLES.HOST,
+      videoTrack: '101',
+      audioTrack: '102',
+    },
     errors: [],
+    sessionStore: {},
   };
 
   localPeer = fakeStore.peers['1'];

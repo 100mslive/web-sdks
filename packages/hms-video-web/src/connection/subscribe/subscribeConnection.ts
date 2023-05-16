@@ -17,7 +17,6 @@ import { HMSConnectionRole } from '../model';
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
   private readonly remoteStreams = new Map<string, HMSRemoteStream>();
-
   private readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
@@ -26,7 +25,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   private pendingMessageQueue: string[] = [];
 
   private apiChannel?: HMSDataChannel;
-  private eventEmitter = new EventEmitter({ maxListeners: 15 });
+  private eventEmitter = new EventEmitter({ maxListeners: 60 });
 
   private initNativeConnectionCallbacks() {
     this.nativeConnection.oniceconnectionstatechange = () => {
@@ -67,33 +66,39 @@ export default class HMSSubscribeConnection extends HMSConnection {
     this.nativeConnection.ontrack = e => {
       const stream = e.streams[0];
       const streamId = stream.id;
+
       if (!this.remoteStreams.has(streamId)) {
         const remote = new HMSRemoteStream(stream, this);
         this.remoteStreams.set(streamId, remote);
-
-        stream.onremovetrack = e => {
-          /*
-           * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
-           * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
-           * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
-           */
-          const toRemoveTrackIdx = remote.tracks.findIndex(track => track.nativeTrack.id === e.track.id);
-          if (toRemoveTrackIdx >= 0) {
-            const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
-            this.observer.onTrackRemove(toRemoveTrack);
-            remote.tracks.splice(toRemoveTrackIdx, 1);
-
-            // If the length becomes 0 we assume that stream is removed entirely
-            if (remote.tracks.length === 0) {
-              this.remoteStreams.delete(streamId);
-            }
-          }
-        };
       }
+
+      stream.addEventListener('removetrack', (ev: MediaStreamTrackEvent) => {
+        if (ev.track.id !== e.track.id) {
+          return;
+        }
+        /*
+         * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
+         * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
+         * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
+         */
+        const toRemoveTrackIdx = remote.tracks.findIndex(
+          track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.transceiver?.mid,
+        );
+        if (toRemoveTrackIdx >= 0) {
+          const toRemoveTrack = remote.tracks[toRemoveTrackIdx];
+          this.observer.onTrackRemove(toRemoveTrack);
+          remote.tracks.splice(toRemoveTrackIdx, 1);
+          // If the length becomes 0 we assume that stream is removed entirely
+          if (remote.tracks.length === 0) {
+            this.remoteStreams.delete(streamId);
+          }
+        }
+      });
 
       const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
+      track.transceiver = e.transceiver;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
       remote.tracks.push(track);
@@ -145,6 +150,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     }
   };
 
+  // eslint-disable-next-line complexity
   private sendMessage = async (request: string, requestId: string): Promise<PreferLayerResponse> => {
     if (this.apiChannel?.readyState !== 'open') {
       await this.eventEmitter.waitFor('open');
@@ -155,6 +161,11 @@ export default class HMSSubscribeConnection extends HMSConnection {
       response = await this.waitForResponse(requestId);
       const error = response.error;
       if (error) {
+        // Don't retry or do anything, track is already removed
+        if (error.code === 404) {
+          HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
+          break;
+        }
         HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
         const shouldRetry = error.code / 100 === 5 || error.code === 429;
         if (!shouldRetry) {
@@ -174,9 +185,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
       return value.includes(requestId);
     });
     const response = JSON.parse(res[0] as string);
-    if (response.error) {
-      throw response.error;
-    }
     HMSLogger.d(this.TAG, `response for ${requestId} -`, JSON.stringify(response, null, 2));
     return response;
   };

@@ -1,5 +1,6 @@
 import {
   DeviceMap,
+  DeviceType,
   HLSConfig,
   HLSMeetingURLVariant,
   HLSTimedMetadata,
@@ -24,6 +25,7 @@ import {
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
   HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
   HMSRecording,
   HMSRemotePeer,
   HMSRemoteTrackStats,
@@ -48,6 +50,8 @@ import {
   RTMPRecordingConfig,
   ScreenCaptureHandle,
   simulcastMapping,
+  TokenRequest,
+  TokenRequestOptions,
 } from '@100mslive/hms-video';
 
 export {
@@ -62,6 +66,7 @@ export {
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
   simulcastMapping,
+  DeviceType,
 };
 
 export type {
@@ -72,6 +77,7 @@ export type {
   HMSSpeaker,
   HMSConfig,
   HMSConfigInitialSettings,
+  HMSPreviewConfig,
   HMSAudioTrackSettings,
   HMSVideoTrackSettings,
   HMSRole,
@@ -103,4 +109,6 @@ export type {
   RID,
   ScreenCaptureHandle,
   HMSPreferredSimulcastLayer,
+  TokenRequest,
+  TokenRequestOptions,
 };

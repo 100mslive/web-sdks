@@ -1,10 +1,10 @@
-import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
-import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
-import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
-import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
-import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
-import { ErrorFactory, HMSAction } from '../../packages/hms-video-web/src/error/ErrorFactory';
 import { HMSUpdateListener } from '../../packages/hms-video-web/src';
+import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
+import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
+import { ErrorFactory, HMSAction } from '../../packages/hms-video-web/src/error/ErrorFactory';
+import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
+import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
+import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
 
 let sdk: HMSSdk;
 let token: string;
@@ -110,7 +110,7 @@ describe('Http Analytics tests', () => {
       { url: CLIENT_ANAYLTICS_QA_ENDPOINT, method: 'POST' },
       { statusCode: 200, statusText: 'Event recorded' },
     );
-    const event = AnalyticsEventFactory.connect(ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT));
+    const event = AnalyticsEventFactory.connect(ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT));
     event.properties.token = token;
     localStorage.setItem('client-events', JSON.stringify([event]));
     sdk.join({ userName: 'test', authToken: token, initEndpoint }, joinListener);

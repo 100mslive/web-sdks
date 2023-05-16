@@ -43,3 +43,5 @@ export const getAnalyticsDeviceId = () => {
 };
 
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;
+
+export const isIOS = () => parsedUserAgent.getOS().name?.toLowerCase() === 'ios';

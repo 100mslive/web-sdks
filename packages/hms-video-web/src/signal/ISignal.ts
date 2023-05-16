@@ -6,8 +6,10 @@ import {
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
   RemovePeerRequest,
+  RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
-  SessionMetadataUpdateParams,
+  SetSessionMetadataParams,
+  SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
   Track,
   TrackUpdateRequestParams,
@@ -51,6 +53,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   requestRoleChange(params: RequestForRoleChangeParams): Promise<void>;
 
+  requestBulkRoleChange(params: RequestForBulkRoleChangeParams): Promise<void>;
+
   acceptRoleChangeRequest(params: AcceptRoleChangeParams): Promise<void>;
 
   requestTrackStateChange(params: TrackUpdateRequestParams): Promise<void>;
@@ -71,9 +75,11 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
 
-  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+  getSessionMetadata(key?: string): Promise<GetSessionMetadataResponse>;
 
-  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
+  setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
+
+  listenMetadataChange(keys: string[]): Promise<void>;
 
   close(): Promise<void>;
 }

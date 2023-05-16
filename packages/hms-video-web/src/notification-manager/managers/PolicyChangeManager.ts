@@ -1,5 +1,6 @@
 import { EventBus } from '../../events/EventBus';
 import { IStore } from '../../sdk/store';
+import HMSLogger from '../../utils/logger';
 import { PolicyParams } from '../HMSNotifications';
 
 /**
@@ -19,11 +20,16 @@ export class PolicyChangeManager {
       localPeer.updateRole(newRole);
     }
 
-    this.store.setKnownRoles(params.known_roles);
-    this.store.getRoom().templateId = params.template_id;
+    this.store.setKnownRoles(params);
+    const room = this.store.getRoom();
+    if (room) {
+      room.templateId = params.template_id;
+    } else {
+      HMSLogger.w('[PolicyChangeManager]', 'on policy change - room not present');
+    }
     // handle when role is not present in known_roles
-    const publishParams = params.known_roles[params.name]?.publishParams;
-    this.store.setPublishParams(publishParams);
+    // const publishParams = params.known_roles[params.name]?.publishParams;
+    // this.store.setPublishParams(publishParams);
 
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);

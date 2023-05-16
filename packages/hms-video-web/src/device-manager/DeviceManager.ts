@@ -2,17 +2,17 @@ import { DeviceStorageManager } from './DeviceStorage';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HMSDeviceChangeEvent } from '../interfaces';
-import type { DeviceMap } from '../interfaces/HMSDeviceManager';
+import { DeviceMap, DeviceType, HMSDeviceChangeEvent } from '../interfaces';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
 import HMSLogger from '../utils/logger';
+import { debounce } from '../utils/timer-utils';
 
 export type SelectedDevices = {
-  audioInput?: MediaDeviceInfo;
-  videoInput?: MediaDeviceInfo;
-  audioOutput?: MediaDeviceInfo;
+  [DeviceType.audioInput]?: MediaDeviceInfo;
+  [DeviceType.videoInput]?: MediaDeviceInfo;
+  [DeviceType.audioOutput]?: MediaDeviceInfo;
 };
 
 type DeviceAndGroup = Partial<MediaTrackSettings>;
@@ -166,7 +166,7 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
-  private handleDeviceChange = async () => {
+  private handleDeviceChange = debounce(async () => {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
@@ -180,7 +180,7 @@ export class DeviceManager implements HMSDeviceManager {
         devices: this.getDevices(),
       }),
     );
-  };
+  }, 500).bind(this);
 
   /**
    * Function to get the device after device change
@@ -195,7 +195,7 @@ export class DeviceManager implements HMSDeviceManager {
       // false positives when device is removed, because the other available device
       // get's the deviceId as default once this device is removed
       const nextDevice = this.audioInput.find(device => {
-        return device.label !== defaultDevice.label && defaultDevice.label.includes(device.label);
+        return device.deviceId !== 'default' && defaultDevice.label.includes(device.label);
       });
       return nextDevice;
     }

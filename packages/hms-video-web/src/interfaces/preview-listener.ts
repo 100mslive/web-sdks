@@ -1,4 +1,4 @@
-import { DeviceChangeListener } from './device-change-listener';
+import { DeviceChangeListener } from './devices';
 import { HMSPeer } from './peer';
 import { HMSRoom } from './room';
 import { HMSPeerUpdate, HMSRoomUpdate } from './update-listener';

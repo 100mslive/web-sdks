@@ -7,14 +7,11 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import {
-  METADATA_MESSAGE_TYPE,
-  REFRESH_MESSAGE,
-} from "./useRefreshSessionMetadata";
+import { ToastManager } from "../Toast/ToastManager";
+import { SESSION_STORE_KEY } from "../../common/constants";
 
 /**
- * set pinned chat message by updating the session metadata
- * and broadcasting metadata refresh message to other peers
+ * set pinned chat message by updating the session store
  */
 export const useSetPinnedMessage = () => {
   const hmsActions = useHMSActions();
@@ -35,11 +32,9 @@ export const useSetPinnedMessage = () => {
           : message.message
         : null;
       if (newPinnedMessage !== pinnedMessage) {
-        await hmsActions.setSessionMetadata(newPinnedMessage);
-        await hmsActions.sendBroadcastMessage(
-          REFRESH_MESSAGE,
-          METADATA_MESSAGE_TYPE
-        );
+        await hmsActions.sessionStore
+          .set(SESSION_STORE_KEY.PINNED_MESSAGE, newPinnedMessage)
+          .catch(err => ToastManager.addToast({ title: err.description }));
       }
     },
     [hmsActions, vanillaStore, pinnedMessage]

@@ -6,19 +6,24 @@ import {
   HMSLogLevel,
   HMSPluginSupportResult,
   HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
   HMSScreenShareConfig,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
+  TokenRequest,
+  TokenRequestOptions,
 } from '@100mslive/hms-video';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
+  HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
   IHMSPlaylistActions,
+  IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
 
@@ -38,8 +43,8 @@ import { HMSRoleChangeRequest } from './selectors';
  *
  * @category Core
  */
-export interface IHMSActions {
-  preview(config: HMSConfig): Promise<void>;
+export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
+  preview(config: HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -143,15 +148,19 @@ export interface IHMSActions {
   /**
    * Change settings of the local peer's audio track
    * @param settings HMSAudioTrackSettings
-   * ({ volume, codec, maxBitrate, deviceId, advanced })
+   * `({ volume, codec, maxBitrate, deviceId, advanced })`
    */
   setAudioSettings(settings: Partial<HMSAudioTrackSettings>): Promise<void>;
   /**
    * Change settings of the local peer's video track
    * @param settings HMSVideoTrackSettings
-   * ({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced })
+   * `({ width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode })`
    */
   setVideoSettings(settings: Partial<HMSVideoTrackSettings>): Promise<void>;
+  /**
+   * Toggle the camera between front and back if the both the camera's exist
+   */
+  switchCamera(): Promise<void>;
 
   /**
    * You can use the attach and detach video function
@@ -234,11 +243,27 @@ export interface IHMSActions {
 
   /**
    * Request for a role change of a remote peer. Can be forced.
+   * @deprecated Use `changeRoleOfPeer`
    * @param forPeerId The remote peer id whose role needs to be changed
    * @param toRole The name of the new role.
    * @param [force] this being true would mean that user won't get a request to accept role change
    */
   changeRole(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param forPeerId The remote peer id whose role needs to be changed
+   * @param toRole The name of the new role.
+   * @param [force] this being true would mean that user won't get a request to accept role change
+   */
+  changeRoleOfPeer(forPeerId: HMSPeerID, toRole: HMSRoleName, force?: boolean): Promise<void>;
+
+  /**
+   * Request for a role change of a remote peer. Can be forced.
+   * @param roles List of roles whose role needs to be changed
+   * @param toRole The name of the new role.
+   */
+  changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName): Promise<void>;
 
   /**
    * Accept the role change request received
@@ -323,14 +348,14 @@ export interface IHMSActions {
    * It is useful for defining timed metadata for interstitial regions such as advertisements,
    * but can be used to define any timed metadata needed by your stream.
    * usage (e.g)
-   * const metadataList = [{
+   * const metadataList = `[{
    *  payload: "some string 1",
    *  duration: 2
    * },
    * {
    *  payload: "some string 2",
    *  duration: 3
-   * }]
+   * }]`
    * sendHLSTimedMetadata(metadataList);
    */
   sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]): Promise<void>;
@@ -353,14 +378,14 @@ export interface IHMSActions {
    * Session metadata is available to every peer in the room and is persisted throughout a session
    * till the last peer leaves a room
    *
-   * @alpha - the API is not stable and might have breaking changes later
+   * @deprecated use `actions.sessionStore.set` instead
    */
   setSessionMetadata(metadata: any): Promise<void>;
 
   /**
    * Fetch the current room metadata from the server and populate it in store
    *
-   * @alpha - the API is not stable and might have breaking changes later
+   * @deprecated use `actions.sessionStore.observe` instead
    */
   populateSessionMetadata(): Promise<void>;
 
@@ -426,20 +451,20 @@ export interface IHMSActions {
    *            than a plain object (i.e) JSON.parse()able.
    *          - If set to true on non-plain objects, this is ignored.
    * @example
-   * assume appdata is initially
-   *  {
+   * assume appData is initially
+   *  `{
    *     mySettings: {
    *       setting1: 'val1',
    *       setting2: 'val2',
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * after calling,
-   * setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);
+   * `setAppData("mySettings", {setting1:'val1-edit', setting3:'val3'}, true);`
    * it becomes
-   *  {
+   *  `{
    *     mySettings: {
    *       setting1: 'val1-edit',
    *       setting2: 'val2',
@@ -447,7 +472,7 @@ export interface IHMSActions {
    *     },
    *     mySettings2: 43,
    *     mySettings3: false,
-   *   };
+   *   };`
    *
    * Note: This is not suitable for keeping large data or data which updates
    * at a high frequency, it is recommended to use app side store for those
@@ -455,4 +480,20 @@ export interface IHMSActions {
    **/
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
+
+  getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
+
+  /**
+   * enable sending audio speaker data to beam
+   * @alpha
+   */
+  enableBeamSpeakerLabelsLogging(): Promise<void>;
+
+  /**
+   * actions that can be performed on the real-time key-value store
+   *
+   * Values in the session store are available to every peer in the room(who have observed the relevant keys) and
+   * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
+   */
+  sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 }

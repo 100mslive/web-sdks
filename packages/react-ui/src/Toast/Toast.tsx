@@ -26,6 +26,12 @@ const getToastVariant = (base: string) => {
       height: '100%',
       zIndex: 10,
     },
+    "@sm": {
+      "&:before": {
+        content: 'none',
+      },
+      border: `solid $space$px ${base}`
+    }
   };
 };
 
@@ -40,6 +46,9 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   border: 'solid $space$px $borderLight',
   overflow: 'hidden',
   ...toastAnimation,
+  "@sm": {
+    p: "$8 $11",
+  },
   variants: {
     variant: {
       standard: getToastVariant('$secondaryDefault'),
@@ -58,7 +67,7 @@ const ToastTitle = styled(ToastPrimitives.Title, {
   color: '$textHighEmp',
   fontWeight: '$semiBold',
   display: 'flex',
-  alignItems: 'start',
+  alignItems: 'center',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
@@ -77,6 +86,10 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   padding: '$8',
   gap: 10,
   width: 390,
+  '@sm': {
+    width: '100%',
+    padding: "$6"
+  },
   maxWidth: '100vw',
   margin: 0,
   listStyle: 'none',
@@ -99,9 +112,18 @@ interface HMSToastProps extends ToastPrimitives.ToastProps {
   isClosable?: boolean;
   icon?: React.ReactNode;
   action?: React.ReactNode;
+  inlineAction?: boolean;
 }
 
-const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = true, icon, action, ...props }) => {
+const HMSToast: React.FC<HMSToastProps> = ({
+  title,
+  description,
+  isClosable = true,
+  icon,
+  action,
+  inlineAction = false,
+  ...props
+}) => {
   return (
     <>
       <ToastRoot {...props}>
@@ -113,6 +135,9 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </Flex>
           {isClosable ? <DefaultClose /> : null}
+          {!isClosable && inlineAction && action ? (
+            <ToastAction altText={`${title}Action`}>{action}</ToastAction>
+          ) : null}
         </ToastTitle>
         {description ? (
           <ToastDescription>
@@ -121,7 +146,7 @@ const HMSToast: React.FC<HMSToastProps> = ({ title, description, isClosable = tr
             </Text>
           </ToastDescription>
         ) : null}
-        {action ? (
+        {!inlineAction && action ? (
           <ToastAction altText={`${title}Action`} css={{ mt: '$10' }}>
             {action}
           </ToastAction>

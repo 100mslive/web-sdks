@@ -36,7 +36,6 @@ import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
-import { getDefaultMeetingUrl } from "../../common/utils";
 import {
   APP_DATA,
   RTMP_RECORD_DEFAULT_RESOLUTION,
@@ -197,7 +196,7 @@ const StartRTMP = () => {
                 : [];
               hmsActions.startRTMPOrRecording({
                 rtmpURLs: urls,
-                meetingURL: recordingUrl || getDefaultMeetingUrl(),
+                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: record,
               });
@@ -283,7 +282,7 @@ const FormLabel = ({ id, children }) => {
 const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
   const formRef = useRef(null);
   return (
-    <Flex id={id} direction="column" css={{ mb: "$8" }} ref={formRef}>
+    <Flex id={id} direction="column" css={{ mb: "$8", px: "$8" }} ref={formRef}>
       <FormLabel id="rtmpURL">
         RTMP URL
         <Asterik />

@@ -1,9 +1,14 @@
 import * as workerTimers from "worker-timers";
-import { drawVideoElementsOnCanvas, dummyChangeInCanvas } from "./pipUtils";
+import {
+  drawVideoElementsOnCanvas,
+  dummyChangeInCanvas,
+  resetPIPCanvasColors,
+} from "./pipUtils";
+import { isIOS, isMacOS, isSafari } from "../../common/constants";
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
-const DEFAULT_CANVAS_WIDTH = 900;
-const DEFAULT_CANVAS_HEIGHT = 600;
+const DEFAULT_CANVAS_WIDTH = 480;
+const DEFAULT_CANVAS_HEIGHT = 320;
 const LEAVE_EVENT_NAME = "leavepictureinpicture";
 
 const PIPStates = {
@@ -32,6 +37,7 @@ class PipManager {
    */
   reset() {
     console.debug("resetting PIP state");
+    resetPIPCanvasColors();
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
     this.timeoutRef = null; // setTimeout reference so it can be cancelled
@@ -46,7 +52,9 @@ class PipManager {
    * check if PIP is supported in this browser env
    */
   isSupported() {
-    return !!document.pictureInPictureEnabled;
+    return (
+      !!document.pictureInPictureEnabled && !isIOS && !(isMacOS && isSafari)
+    );
   }
 
   /**
@@ -162,6 +170,8 @@ class PipManager {
     canvas.width = DEFAULT_CANVAS_WIDTH;
     canvas.height = DEFAULT_CANVAS_HEIGHT;
     const pipVideo = document.createElement("video");
+    pipVideo.width = DEFAULT_CANVAS_WIDTH;
+    pipVideo.height = DEFAULT_CANVAS_HEIGHT;
     pipVideo.muted = true;
     pipVideo.srcObject = canvas.captureStream();
     return { canvas, pipVideo };

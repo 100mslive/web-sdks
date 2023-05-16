@@ -354,7 +354,7 @@ export class PlaylistManager
     this.audioManager.on('ended', () => this.handleEnded(HMSPlaylistType.audio));
     this.videoManager.on('ended', () => this.handleEnded(HMSPlaylistType.video));
     this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
-    this.eventBus.localAudioEnabled.subscribe(this.handlePausePlaylist);
+    this.eventBus.localVideoEnabled.subscribe(this.handlePausePlaylist);
   }
 
   /**
@@ -383,7 +383,7 @@ export class PlaylistManager
   };
 
   private removeTrack = async (trackId: string) => {
-    await this.sdk.removeTrack(trackId);
+    await this.sdk.removeTrack(trackId, true);
     HMSLogger.d(this.TAG, 'Playlist track removed', trackId);
   };
 }

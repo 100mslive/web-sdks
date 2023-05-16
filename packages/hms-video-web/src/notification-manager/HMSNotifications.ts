@@ -45,6 +45,7 @@ export interface PolicyParams {
     [role: string]: HMSRole;
   };
   template_id: string;
+  app_data?: Record<string, string>;
 }
 
 /**
@@ -188,6 +189,7 @@ export interface MessageNotification {
     };
   };
   roles?: string[];
+  message_id: string;
   private: boolean;
   timestamp: number;
   info: MessageNotificationInfo;
@@ -232,4 +234,14 @@ export interface HLSVariantInfo {
   meeting_url?: string;
   metadata?: string;
   started_at?: number;
+}
+
+export interface MetadataChangeNotification {
+  values: {
+    change_version?: number;
+    updated_by?: string;
+    data: any;
+    key: string;
+    updated_at?: number;
+  }[];
 }

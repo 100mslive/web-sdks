@@ -1,132 +1,180 @@
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { HlsStats } from "@100mslive/hls-stats";
-import Hls from "hls.js";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useFullscreen, useToggle } from "react-use";
+import {
+  HLSPlaybackState,
+  HMSHLSPlayer,
+  HMSHLSPlayerEvents,
+} from "@100mslive/hls-player";
+import screenfull from "screenfull";
 import {
   selectAppData,
   selectHLSState,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import {
-  ChevronDownIcon,
-  ChevronUpIcon,
-  RecordIcon,
-  SettingsIcon,
-} from "@100mslive/react-icons";
+import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
 import {
   Box,
-  Button,
-  Dropdown,
   Flex,
-  styled,
+  IconButton,
   Text,
   Tooltip,
+  useTheme,
 } from "@100mslive/react-ui";
 import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
+import { HMSVideoPlayer } from "../components/HMSVideo";
+import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
+import { HLSAutoplayBlockedPrompt } from "../components/HMSVideo/HLSAutoplayBlockedPrompt";
+import { HLSQualitySelector } from "../components/HMSVideo/HLSQualitySelector";
 import { ToastManager } from "../components/Toast/ToastManager";
-import {
-  HLS_STREAM_NO_LONGER_LIVE,
-  HLS_TIMED_METADATA_LOADED,
-  HLSController,
-} from "../controllers/hls/HLSController";
-import { APP_DATA } from "../common/constants";
+import { APP_DATA, EMOJI_REACTION_TYPE } from "../common/constants";
 
-const HLSVideo = styled("video", {
-  margin: "0 auto",
-  flex: "1 1 0",
-  minHeight: 0,
-  h: "100%",
-});
-
-let hlsController;
-let hlsStats;
+let hlsPlayer;
 
 const HLSView = () => {
   const videoRef = useRef(null);
+  const hlsViewRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const hmsActions = useHMSActions();
+  const { themeType } = useTheme();
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const hlsUrl = hlsState.variants[0]?.url;
-  const [availableLevels, setAvailableLevels] = useState([]);
+  const [availableLayers, setAvailableLayers] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
-
-  const [currentSelectedQualityText, setCurrentSelectedQualityText] =
-    useState("");
-  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+  const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
+  const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
+  const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const isFullScreenSupported = screenfull.isEnabled;
+  const [show, toggle] = useToggle(false);
+  const isFullScreen = useFullscreen(hlsViewRef, show, {
+    onClose: () => toggle(false),
+  });
+  /**
+   * initialize HMSHLSPlayer and add event listeners.
+   */
   useEffect(() => {
     let videoEl = videoRef.current;
-    if (videoEl && hlsUrl) {
-      if (Hls.isSupported()) {
-        hlsController = new HLSController(hlsUrl, videoRef);
-        hlsStats = new HlsStats(hlsController.getHlsJsInstance(), videoEl);
-        hlsController.on(HLS_STREAM_NO_LONGER_LIVE, () => {
-          setIsVideoLive(false);
-        });
-        hlsController.on(HLS_TIMED_METADATA_LOADED, ({ payload, ...rest }) => {
-          console.log(
-            `%c Payload: ${payload}`,
-            "color:#2b2d42; background:#d80032"
-          );
-          console.log(rest);
-          ToastManager.addToast({
-            title: `Payload from timed Metadata ${payload}`,
-          });
-        });
-
-        hlsController.on(Hls.Events.MANIFEST_LOADED, (_, { levels }) => {
-          const onlyVideoLevels = removeAudioLevels(levels);
-          setAvailableLevels(onlyVideoLevels);
-          setCurrentSelectedQualityText("Auto");
-        });
-      } else if (videoEl.canPlayType("application/vnd.apple.mpegurl")) {
-        videoEl.src = hlsUrl;
-      }
-    }
-    return () => {
-      hlsStats = null;
+    const manifestLoadedHandler = ({ layers }) => {
+      setAvailableLayers(layers);
     };
+    const layerUpdatedHandler = ({ layer }) => {
+      setCurrentSelectedQuality(layer);
+    };
+    const metadataLoadedHandler = ({ payload, ...rest }) => {
+      const parsePayload = str => {
+        try {
+          return JSON.parse(str);
+        } catch (e) {
+          return str;
+        }
+      };
+      // parse payload and extract start_time and payload
+      const duration = rest.duration;
+      const parsedPayload = parsePayload(payload);
+      switch (parsedPayload.type) {
+        case EMOJI_REACTION_TYPE:
+          window.showFlyingEmoji(
+            parsedPayload?.emojiId,
+            parsedPayload?.senderId
+          );
+          break;
+        default: {
+          const toast = {
+            title: `Payload from timed Metadata ${parsedPayload}`,
+            duration: duration || 3000,
+          };
+          console.debug("Added toast ", JSON.stringify(toast));
+          ToastManager.addToast(toast);
+          break;
+        }
+      }
+    };
+    const handleError = data => {
+      console.error("[HLSView] error in hls", `${data}`);
+    };
+    const handleNoLongerLive = ({ isLive }) => {
+      setIsVideoLive(isLive);
+    };
+
+    const playbackEventHandler = data =>
+      setIsPaused(data.state === HLSPlaybackState.paused);
+
+    const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
+    if (videoEl && hlsUrl) {
+      hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
+      hlsPlayer.on(
+        HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
+        handleNoLongerLive
+      );
+      hlsPlayer.on(
+        HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
+        metadataLoadedHandler
+      );
+      hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
+      hlsPlayer.on(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+
+      hlsPlayer.on(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.LAYER_UPDATED, layerUpdatedHandler);
+      return () => {
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE,
+          handleNoLongerLive
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.ERROR, handleError);
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.TIMED_METADATA_LOADED,
+          metadataLoadedHandler
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+        hlsPlayer.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
+        hlsPlayer.off(
+          HMSHLSPlayerEvents.MANIFEST_LOADED,
+          manifestLoadedHandler
+        );
+        hlsPlayer.off(HMSHLSPlayerEvents.LAYER_UPDATED, layerUpdatedHandler);
+        hlsPlayer.reset();
+        hlsPlayer = null;
+      };
+    }
   }, [hlsUrl]);
 
+  /**
+   * initialize and subscribe to hlsState
+   */
   useEffect(() => {
-    if (!hlsStats) {
-      return;
-    }
-    let unsubscribe;
+    const onHLSStats = state => setHlsStatsState(state);
     if (enablHlsStats) {
-      unsubscribe = hlsStats.subscribe(state => {
-        setHlsStatsState(state);
-      });
+      hlsPlayer?.on(HMSHLSPlayerEvents.STATS, onHLSStats);
     } else {
-      unsubscribe?.();
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     }
     return () => {
-      unsubscribe?.();
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     };
   }, [enablHlsStats]);
 
-  useEffect(() => {
-    if (hlsController) {
-      return () => hlsController.reset();
+  const unblockAutoPlay = async () => {
+    try {
+      await hlsPlayer.play();
+      setIsHlsAutoplayBlocked(false);
+    } catch (error) {
+      console.error("Tried to unblock Autoplay failed with", error.message);
     }
-  }, []);
+  };
 
-  const qualitySelectorHandler = useCallback(
-    qualityLevel => {
-      if (hlsController) {
-        hlsController.setCurrentLevel(qualityLevel);
-        const levelText =
-          qualityLevel.height === "auto" ? "Auto" : `${qualityLevel.height}p`;
-        setCurrentSelectedQualityText(levelText);
+  const handleQuality = useCallback(
+    quality => {
+      if (hlsPlayer) {
+        setIsUserSelectedAuto(
+          quality.height.toString().toLowerCase() === "auto"
+        );
+        hlsPlayer.setLayer(quality);
       }
     },
-    [availableLevels] //eslint-disable-line
+    [availableLayers] //eslint-disable-line
   );
 
   const sfnOverlayClose = () => {
@@ -134,119 +182,108 @@ const HLSView = () => {
   };
 
   return (
-    <Fragment>
+    <Flex
+      key="hls-viewer"
+      id={`hls-viewer-${themeType}`}
+      ref={hlsViewRef}
+      css={{
+        size: "100%",
+      }}
+    >
       {hlsStatsState?.url && enablHlsStats ? (
         <HlsStatsOverlay
           hlsStatsState={hlsStatsState}
           onClose={sfnOverlayClose}
         />
       ) : null}
-      {hlsUrl ? (
-        <Flex css={{ flexDirection: "column", size: "100%", px: "$10" }}>
-          <HLSVideo ref={videoRef} autoPlay controls playsInline />
-          <Flex align="center" justify="end">
-            {hlsController ? (
-              <Button
-                variant="standard"
-                css={{ marginRight: "0.3rem" }}
-                onClick={() => {
-                  hlsController.jumpToLive();
-                  setIsVideoLive(true);
+      {hlsUrl && hlsState.running ? (
+        <Flex
+          id="hls-player-container"
+          align="center"
+          justify="center"
+          css={{
+            width: "100%",
+            margin: "0 auto",
+            height: "100%",
+          }}
+        >
+          <HLSAutoplayBlockedPrompt
+            open={isHlsAutoplayBlocked}
+            unblockAutoPlay={unblockAutoPlay}
+          />
+          <HMSVideoPlayer.Root ref={videoRef}>
+            {hlsPlayer && (
+              <HMSVideoPlayer.Progress
+                onValueChange={currentTime => {
+                  hlsPlayer.seekTo(currentTime);
                 }}
-                key="LeaveRoom"
-                data-testid="leave_room_btn"
-              >
-                <Tooltip title="Jump to Live">
-                  <Flex css={{ gap: "$2" }}>
-                    <RecordIcon
-                      color={isVideoLive ? "#CC525F" : "FAFAFA"}
-                      key="jumpToLive"
-                    />
-                    Live
-                  </Flex>
-                </Tooltip>
-              </Button>
-            ) : null}
-            <Dropdown.Root
-              open={qualityDropDownOpen}
-              onOpenChange={value => setQualityDropDownOpen(value)}
-            >
-              <Dropdown.Trigger asChild data-testid="quality_selector">
-                <Flex
-                  css={{
-                    color: "$textPrimary",
-                    borderRadius: "$1",
-                    cursor: "pointer",
-                    zIndex: 4,
-                    border: "$space$px solid $textDisabled",
-                    padding: "$4",
-                  }}
-                >
-                  <Tooltip title="Select Quality">
-                    <Flex>
-                      <SettingsIcon />
-                      <Text variant="md">{currentSelectedQualityText}</Text>
-                    </Flex>
-                  </Tooltip>
+                hlsPlayer={hlsPlayer}
+              />
+            )}
 
-                  <Box
-                    css={{
-                      "@lg": { display: "none" },
-                      color: "$textDisabled",
-                    }}
-                  >
-                    {qualityDropDownOpen ? (
-                      <ChevronDownIcon />
-                    ) : (
-                      <ChevronUpIcon />
-                    )}
-                  </Box>
-                </Flex>
-              </Dropdown.Trigger>
-              {availableLevels.length > 0 && (
-                <Dropdown.Content
-                  sideOffset={5}
-                  align="end"
-                  css={{ height: "auto", maxHeight: "$96" }}
-                >
-                  <Dropdown.Item
-                    onClick={event =>
-                      qualitySelectorHandler({ height: "auto" })
-                    }
-                    css={{
-                      h: "auto",
-                      flexDirection: "column",
-                      flexWrap: "wrap",
-                      cursor: "pointer",
-                      alignItems: "flex-start",
-                    }}
-                    key="auto"
-                  >
-                    <Text>Automatic</Text>
-                  </Dropdown.Item>
-                  {availableLevels.map(level => {
-                    return (
-                      <Dropdown.Item
-                        onClick={() => qualitySelectorHandler(level)}
-                        css={{
-                          h: "auto",
-                          flexDirection: "column",
-                          flexWrap: "wrap",
-                          cursor: "pointer",
-                          alignItems: "flex-start",
-                        }}
-                        key={level.url}
-                      >
-                        <Text>{`${level.height}p (${(
-                          Number(level.bitrate / 1024) / 1024
-                        ).toFixed(2)} Mbps)`}</Text>
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Content>
-              )}
-            </Dropdown.Root>
-          </Flex>
+            <HMSVideoPlayer.Controls.Root css={{ p: "$4 $8" }}>
+              <HMSVideoPlayer.Controls.Left>
+                <HMSVideoPlayer.PlayButton
+                  onClick={async () => {
+                    isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
+                  }}
+                  isPaused={isPaused}
+                />
+                <HMSVideoPlayer.Duration hlsPlayer={hlsPlayer} />
+                <HMSVideoPlayer.Volume hlsPlayer={hlsPlayer} />
+              </HMSVideoPlayer.Controls.Left>
+
+              <HMSVideoPlayer.Controls.Right>
+                {availableLayers.length > 0 ? (
+                  <>
+                    <IconButton
+                      variant="standard"
+                      css={{ px: "$2" }}
+                      onClick={async () => {
+                        await hlsPlayer.seekToLivePosition();
+                        setIsVideoLive(true);
+                      }}
+                      key="jump-to-live_btn"
+                      data-testid="jump-to-live_btn"
+                    >
+                      <Tooltip title="Go to Live" side="top">
+                        <Flex justify="center" gap={2} align="center">
+                          <Box
+                            css={{
+                              height: "$4",
+                              width: "$4",
+                              background: isVideoLive ? "$error" : "$white",
+                              r: "$1",
+                            }}
+                          />
+                          <Text
+                            variant={{
+                              "@sm": "xs",
+                            }}
+                          >
+                            {isVideoLive ? "LIVE" : "GO LIVE"}
+                          </Text>
+                        </Flex>
+                      </Tooltip>
+                    </IconButton>
+                    <HLSQualitySelector
+                      layers={availableLayers}
+                      selection={currentSelectedQuality}
+                      onQualityChange={handleQuality}
+                      isAuto={isUserSelectedAuto}
+                    />
+                  </>
+                ) : null}
+                {isFullScreenSupported ? (
+                  <FullScreenButton
+                    isFullScreen={isFullScreen}
+                    onToggle={toggle}
+                    icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                  />
+                ) : null}
+              </HMSVideoPlayer.Controls.Right>
+            </HMSVideoPlayer.Controls.Root>
+          </HMSVideoPlayer.Root>
         </Flex>
       ) : (
         <Flex align="center" justify="center" css={{ size: "100%", px: "$10" }}>
@@ -255,26 +292,8 @@ const HLSView = () => {
           </Text>
         </Flex>
       )}
-    </Fragment>
+    </Flex>
   );
 };
-
-/**
- *
- * This function is needed because HLSJS currently doesn't
- * support switching to audio rendition from a video rendition.
- * more on this here
- * https://github.com/video-dev/hls.js/issues/4881
- * https://github.com/video-dev/hls.js/issues/3480#issuecomment-778799541
- * https://github.com/video-dev/hls.js/issues/163#issuecomment-169773788
- *
- * @param {Array} levels array from hlsJS
- * @returns a new array with only video levels.
- */
-function removeAudioLevels(levels) {
-  return levels.filter(
-    ({ videoCodec, width, height }) => !!videoCodec || !!(width && height)
-  );
-}
 
 export default HLSView;

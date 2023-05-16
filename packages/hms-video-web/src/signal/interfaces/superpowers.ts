@@ -10,10 +10,17 @@ export interface RequestForRoleChangeParams {
   role: string;
 }
 
+export interface RequestForBulkRoleChangeParams {
+  roles: string[];
+  force: boolean;
+  role: string;
+}
+
 /**
  * Parameters for accepting a role change request sent to the server.
  */
 export interface AcceptRoleChangeParams {
+  requested_by?: string;
   role: string;
   token: string;
 }
@@ -39,7 +46,7 @@ export interface MultiTrackUpdateRequestParams {
 }
 
 export interface StartRTMPOrRecordingRequestParams {
-  meeting_url: string;
+  meeting_url?: string;
   rtmp_urls?: Array<string>;
   record: boolean;
   resolution?: RTMPRecordingResolution;
@@ -50,8 +57,10 @@ export interface UpdatePeerRequestParams {
   data?: string;
 }
 
-export interface SessionMetadataUpdateParams {
-  data?: any;
+export interface SetSessionMetadataParams {
+  key?: string;
+  data: any;
+  if_change_version?: number;
 }
 
 export interface HLSRequestParams {

@@ -1,4 +1,5 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
+import { VideoElementManager } from './VideoElementManager';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import {
   HMSPreferredSimulcastLayer,
@@ -16,6 +17,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
 
+  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
+    super(stream, track, source);
+    this.setVideoHandler(new VideoElementManager(this));
+  }
+
   public get degraded() {
     return this._degraded;
   }
@@ -29,7 +35,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    await super.setEnabled(value);
+    super.setEnabled(value);
+    this.videoHandler.updateSinks();
   }
 
   async setPreferredLayer(layer: HMSPreferredSimulcastLayer) {
@@ -44,8 +51,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     if (!this.hasSinks()) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Track does not have any sink, saving ${layer}, source=${this.source}`,
+        `[Remote Track] ${this.logIdentifier}
+        streamId=${this.stream.id} 
+        trackId=${this.trackId}
+        saving ${layer}, source=${this.source}
+        Track does not have any sink`,
       );
       return;
     }
@@ -103,22 +113,26 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * @returns {boolean} isDegraded - returns true if degraded
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
-    const isDegraded = layerUpdate.subscriber_degraded;
-    // TODO: remove && check later when degraded status handling is updated. This is to keep in sink with android and ios
-    this._degraded = isDegraded && layerUpdate.current_layer === HMSSimulcastLayer.NONE;
-    this._degradedAt = isDegraded ? new Date() : this._degradedAt;
+    this._degraded =
+      (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
+      layerUpdate.current_layer === HMSSimulcastLayer.NONE;
+    this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
-      `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from sfu`,
-      `currLayer=${layerUpdate.current_layer}, preferredLayer=${layerUpdate.expected_layer}`,
-      `sub_degraded=${layerUpdate.subscriber_degraded}`,
-      `pub_degraded=${layerUpdate.publisher_degraded}`,
-      `isDegraded=${isDegraded}`,
+      `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id} 
+      trackId=${this.trackId}
+      layer update from sfu
+      currLayer=${layerUpdate.current_layer}
+      preferredLayer=${layerUpdate.expected_layer}
+      sub_degraded=${layerUpdate.subscriber_degraded}
+      pub_degraded=${layerUpdate.publisher_degraded}
+      isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
     this.pushInHistory(`sfuLayerUpdate-${currentLayer}`);
-    return isDegraded;
+    return this._degraded;
   }
 
   /**
@@ -155,12 +169,20 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         this.logIdentifier,
         source,
       );
-      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${this.source}`);
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Requested layer ${layer}, source=${source}`,
+      );
       return response;
     } catch (error) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Failed to set layer ${layer}, source=${source}
+      error=${(error as Error).message}`,
       );
       throw error;
     }

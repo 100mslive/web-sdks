@@ -1,0 +1,24 @@
+{
+  "entryPoints": ["./src/index.ts"],
+  "out": "docs",
+  "disableSources": true,
+  "plugin": ["../../scripts/typedocNavigationPlugin.js", "typedoc-plugin-markdown"],
+  "excludeInternal": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeTags": ["@privateRemarks"],
+  "hideBreadcrumbs": true,
+  "hideInPageTOC": true,
+  "hidePageTitle": true,
+  "publicPath": "/api-reference/javascript/v2/react-hooks/",
+  "githubPages": false,
+  "excludeExternals": true,
+  "externalPattern": [
+    "**/node_modules/**",
+    "**/hms-video-store/**/*.ts",
+    "**/hms-video-web/**/*.ts",
+  ],
+  "packageDocsPath": "packages/react-sdk/docs",
+  "pagesPattern": "(?<!README\.md)$",
+  "hierarchyPrefix": "5"
+}

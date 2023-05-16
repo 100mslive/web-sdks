@@ -8,6 +8,17 @@ export enum HMSAudioCodec {
   OPUS = 'opus',
 }
 
+/**
+ * Refer https://developer.mozilla.org/en-US/docs/Web/API/MediaTrackConstraints/facingMode
+ * for more details.
+ */
+export enum HMSFacingMode {
+  USER = 'user',
+  ENVIRONMENT = 'environment',
+  LEFT = 'left',
+  RIGHT = 'right',
+}
+
 export interface HMSAudioTrackSettings {
   volume?: number;
   codec?: HMSAudioCodec;
@@ -24,6 +35,7 @@ export interface HMSVideoTrackSettings {
   maxBitrate?: number;
   deviceId?: string;
   advanced?: Array<MediaTrackConstraintSet>;
+  facingMode?: HMSFacingMode;
 }
 
 /**

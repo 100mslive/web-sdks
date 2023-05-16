@@ -3,22 +3,28 @@ import { HMSVirtualBackgroundTypes } from "@100mslive/hms-virtual-background";
 import {
   selectIsAllowedToPublish,
   selectIsLocalVideoPluginPresent,
+  selectLocalPeerRole,
   selectLocalVideoTrackID,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
-import { Tooltip } from "@100mslive/react-ui";
+import { Loading, Tooltip } from "@100mslive/react-ui";
 import IconButton from "../../IconButton";
+import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";
 import { getRandomVirtualBackground } from "./vbutils";
+import { FEATURE_LIST } from "../../common/constants";
 
 export const VirtualBackground = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const role = useHMSStore(selectLocalPeerRole);
+  const [isVBLoading, setIsVBLoading] = useState(false);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent("HMSVB"));
+  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.VIDEO_PLUGINS);
 
   async function createPlugin() {
     if (!pluginRef.current) {
@@ -43,16 +49,20 @@ export const VirtualBackground = () => {
   }, [hmsActions, localPeerVideoTrackID]);
 
   async function addPlugin() {
+    setIsVBLoading(true);
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
       const { background, backgroundType } = getRandomVirtualBackground();
       await pluginRef.current.setBackground(background, backgroundType);
-      //Running VB on every alternate frame rate for optimized cpu usage
-      await hmsActions.addPluginToVideoTrack(pluginRef.current, 15);
+      await hmsActions.addPluginToVideoTrack(
+        pluginRef.current,
+        Math.floor(role.publishParams.video.frameRate / 2)
+      );
     } catch (err) {
       console.error("add virtual background plugin failed", err);
     }
+    setIsVBLoading(false);
   }
 
   async function removePlugin() {
@@ -62,20 +72,27 @@ export const VirtualBackground = () => {
     }
   }
 
-  if (!isAllowedToPublish.video || !isVBSupported) {
+  if (!isAllowedToPublish.video || !isVBSupported || !isFeatureEnabled) {
     return null;
   }
 
   return (
-    <Tooltip title={`Turn ${!isVBPresent ? "on" : "off"} virtual background`}>
+    <Tooltip
+      title={
+        isVBLoading
+          ? "Adding virtual background"
+          : `Turn ${!isVBPresent ? "on" : "off"} virtual background`
+      }
+    >
       <IconButton
         active={!isVBPresent}
+        disabled={isVBLoading}
         onClick={() => {
           !isVBPresent ? addPlugin() : removePlugin();
         }}
         data-testid="virtual_bg_btn"
       >
-        <VirtualBackgroundIcon />
+        {isVBLoading ? <Loading /> : <VirtualBackgroundIcon />}
       </IconButton>
     </Tooltip>
   );

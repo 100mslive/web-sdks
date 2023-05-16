@@ -1,7 +1,8 @@
-import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import create from 'zustand';
 import {
   HMSActions,
+  HMSGenericTypes,
   HMSNotificationInCallback,
   HMSNotifications,
   HMSNotificationTypeParam,
@@ -14,9 +15,9 @@ import {
 import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
-export interface HMSRoomProviderProps {
-  actions?: HMSActions;
-  store?: HMSStoreWrapper;
+export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
+  actions?: HMSActions<T>;
+  store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
   stats?: HMSStats;
   /**
@@ -32,7 +33,6 @@ export interface HMSRoomProviderProps {
  */
 const HMSContext = createContext<HMSContextProviderProps | null>(null);
 
-let providerProps: HMSContextProviderProps;
 /**
  * top level wrapper for using react sdk hooks. This doesn't have any mandatory arguments, if you are already
  * initialising the sdk on your side, you can pass in the primitives from there as well to use hooks for
@@ -40,7 +40,7 @@ let providerProps: HMSContextProviderProps;
  * @constructor
  */
 // eslint-disable-next-line complexity
-export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> = ({
+export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Record<string, any> }>({
   children,
   actions,
   store,
@@ -48,8 +48,9 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
   stats,
   isHMSStatsOn = false,
   leaveOnUnload = true,
-}) => {
-  if (!providerProps) {
+}: PropsWithChildren<HMSRoomProviderProps<T>>) => {
+  const providerProps: HMSContextProviderProps = useMemo(() => {
+    let providerProps: HMSContextProviderProps;
     // adding a dummy function for setstate and destroy because zustan'd create expects them
     // to be present but we don't expose them from the store.
     const errFn = () => {
@@ -58,7 +59,7 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
     if (actions && store) {
       providerProps = {
         actions: actions,
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...store,
           setState: errFn,
           destroy: errFn,
@@ -76,10 +77,10 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
         });
       }
     } else {
-      const hmsReactiveStore = new HMSReactiveStore();
+      const hmsReactiveStore = new HMSReactiveStore<T>();
       providerProps = {
         actions: hmsReactiveStore.getActions(),
-        store: create<HMSStore>({
+        store: create<HMSStore<T>>({
           ...hmsReactiveStore.getStore(),
           setState: errFn,
           destroy: errFn,
@@ -104,13 +105,22 @@ export const HMSRoomProvider: React.FC<PropsWithChildren<HMSRoomProviderProps>> 
       version: React.version,
       sdkVersion: process.env.REACT_SDK_VERSION,
     });
-  }
+
+    return providerProps;
+  }, [actions, store, notifications, stats, isHMSStatsOn]);
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      window.addEventListener('beforeunload', () => providerProps.actions.leave());
+      const beforeUnloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('beforeunload', beforeUnloadCallback);
+
+      return () => {
+        window.removeEventListener('beforeunload', beforeUnloadCallback);
+      };
     }
-  }, [leaveOnUnload]);
+
+    return () => {};
+  }, [leaveOnUnload, providerProps]);
 
   return React.createElement(HMSContext.Provider, { value: providerProps }, children);
 };

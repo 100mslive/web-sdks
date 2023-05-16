@@ -1,6 +1,6 @@
 {
   "name": "@100mslive/hms-video",
-  "version": "0.7.0",
+  "version": "0.9.3",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "typings": "dist/index.d.ts",
@@ -37,6 +37,7 @@
   },
   "author": "100ms <tech-common@100ms.live>",
   "devDependencies": {
+    "@types/dom-screen-wake-lock": "^1.0.1",
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",

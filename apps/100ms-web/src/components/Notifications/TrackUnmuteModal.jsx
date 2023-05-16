@@ -9,14 +9,26 @@ import { RequestDialog } from "../../primitives/DialogContent";
 
 export const TrackUnmuteModal = () => {
   const hmsActions = useHMSActions();
-  const notification = useHMSNotifications(
-    HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST
-  );
+  const notification = useHMSNotifications([
+    HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
+    HMSNotificationTypes.ROOM_ENDED,
+    HMSNotificationTypes.REMOVED_FROM_ROOM,
+  ]);
   const [muteNotification, setMuteNotification] = useState(null);
 
   useEffect(() => {
-    if (notification?.data.enabled) {
-      setMuteNotification(notification.data);
+    switch (notification?.type) {
+      case HMSNotificationTypes.REMOVED_FROM_ROOM:
+      case HMSNotificationTypes.ROOM_ENDED:
+        setMuteNotification(null);
+        break;
+      case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
+        if (notification?.data.enabled) {
+          setMuteNotification(notification.data);
+        }
+        break;
+      default:
+        return;
     }
   }, [notification]);
 

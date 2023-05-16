@@ -38,7 +38,9 @@ export class AudioContextManager {
 
   cleanup() {
     if (this.audioContext.state !== 'closed') {
-      this.audioContext.close();
+      this.audioContext.close().catch(e => {
+        HMSLogger.d(this.TAG, 'AudioContext close error', e.message);
+      });
     }
   }
 }

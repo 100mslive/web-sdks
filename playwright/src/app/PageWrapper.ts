@@ -1,6 +1,7 @@
 import { BrowserContext, ChromiumBrowserContext, Dialog, expect, Page as PlaywrightPage } from '@playwright/test';
 import { PreviewPage } from './selectors/PreviewPage';
 import { PrePreviewPage } from './selectors/PrePreviewPage';
+import { HlsViewerPage } from './selectors/HlsViewerPage';
 import { Header } from './selectors/Header';
 import { Center } from './selectors/Center';
 import { Footer } from './selectors/Footer';
@@ -11,6 +12,7 @@ export class PageWrapper {
   localName: string;
   prepreview: PrePreviewPage;
   preview: PreviewPage;
+  hlsViewer: HlsViewerPage;
   header: Header;
   center: Center;
   footer: Footer;
@@ -23,11 +25,18 @@ export class PageWrapper {
     this.header = new Header(this);
     this.footer = new Footer(this);
     this.center = new Center(this);
+    this.hlsViewer = new HlsViewerPage(this);
   }
 
   static async openMeetingPage(nativePage: PlaywrightPage, joinConfig?: JoinConfig) {
     const page = new PageWrapper(nativePage);
     await page.gotoMeetingRoom(joinConfig);
+    return page;
+  }
+
+  static async openHLSMeetingPage(nativePage: PlaywrightPage, joinConfig?: JoinConfig) {
+    const page = new PageWrapper(nativePage);
+    await page.gotoHLSMeetingRoom(joinConfig);
     return page;
   }
 
@@ -67,6 +76,13 @@ export class PageWrapper {
     this.localName = name;
   }
 
+  async gotoHLSMeetingRoom({ url, name }: JoinConfig = {}) {
+    url = url || `${process.env.hls_viewer_url}`;
+    name = name || `${process.env.peer_name}0`;
+    await this.hlsViewer.gotoHLSMeetingRoom(url, name);
+    this.localName = name;
+  }
+
   async click(...elementIds: string[]) {
     for (const element of elementIds) {
       await this.clickOnce(element);
@@ -83,6 +99,13 @@ export class PageWrapper {
     console.log('going to assert visibility', elementId);
     await this.page.waitForSelector(elementId, { state: 'visible' });
     console.log('asserted visibility for', elementId);
+  }
+
+  async checkScreenMode() {
+    const isFullScreen = await this.page.evaluate(() => {
+      return document.fullscreenElement !== null;
+    });
+    return isFullScreen;
   }
 
   locator(elementSelector: string) {
@@ -103,6 +126,11 @@ export class PageWrapper {
   async hasText(elementId: string, msgSent: string) {
     const innerText = (await this.getText(elementId)) as string;
     expect(innerText.includes(msgSent)).toBeTruthy();
+  }
+
+  async hasLink(elementId: string, hrefLink: string){
+    const emojiHref = await this.page.locator(elementId).getAttribute('href');
+    expect(emojiHref?.includes(hrefLink))
   }
 
   /**

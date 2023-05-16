@@ -1,10 +1,10 @@
-import { HlsInstance, HlsPlayerStats } from '../interfaces';
-
+import Hls from 'hls.js';
+import { HlsPlayerStats } from '../interfaces';
 export abstract class BaseAdapter {
-  hlsInstance: HlsInstance = {} as HlsInstance;
+  hlsInstance: Hls;
   videoEl: HTMLVideoElement;
   hlsStatsState: HlsPlayerStats = {};
-  constructor(hlsInstance: HlsInstance, videoEl: HTMLVideoElement) {
+  constructor(hlsInstance: Hls, videoEl: HTMLVideoElement) {
     this.hlsInstance = hlsInstance;
     this.videoEl = videoEl;
   }

@@ -7,6 +7,7 @@ import {
   HMSChangeTrackStateRequest,
   HMSDeviceChangeEvent,
   HMSException,
+  HMSGenericTypes,
   HMSLeaveRoomRequest,
   HMSMessage,
   HMSNotification,
@@ -27,12 +28,14 @@ import { selectPeerByID, selectTrackByID } from '../selectors';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
-export class HMSNotifications implements IHMSNotifications {
+export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
+  implements IHMSNotifications
+{
   private id = 0;
   private eventEmitter: EventEmitter;
-  private store: IHMSStore;
+  private store: IHMSStore<T>;
 
-  constructor(store: IHMSStore) {
+  constructor(store: IHMSStore<T>) {
     this.store = store;
     this.eventEmitter = new EventEmitter({ maxListeners: Object.keys(HMSNotificationTypes).length });
   }
