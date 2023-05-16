@@ -20,7 +20,6 @@ export class PublishStatsAnalytics {
     private readonly sampleWindowSize = PUBLISH_STATS_SAMPLE_WINDOW,
     private readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
   ) {
-    this.eventBus.statsUpdate.subscribe(hmsStats => this.handleStatsUpdate(hmsStats));
     this.start();
   }
 
@@ -30,11 +29,12 @@ export class PublishStatsAnalytics {
     }
     this.stop();
     this.shouldSendEvent = true;
+    this.eventBus.statsUpdate.subscribe(this.handleStatsUpdate);
     this.startLoop().catch(e => HMSLogger.e('[PublishStatsAnalytics]', e.message));
   }
 
   stop() {
-    this.eventBus.statsUpdate.unsubscribe(hmsStats => this.handleStatsUpdate(hmsStats));
+    this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate);
     this.shouldSendEvent = false;
   }
 
