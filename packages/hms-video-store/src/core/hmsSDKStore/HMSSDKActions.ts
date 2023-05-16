@@ -57,7 +57,6 @@ import {
 } from '../schema';
 import {
   HMSRoleChangeRequest,
-  selectHMSMessagesCount,
   selectIsConnectedToRoom,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
@@ -1034,7 +1033,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       return;
     }
     this.setState(store => {
-      hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     }, 'newMessage');

@@ -1,5 +1,6 @@
 export interface BroadcastResponse {
   timestamp: number;
+  message_id: string;
 }
 
 export interface GetSessionMetadataResponse {
