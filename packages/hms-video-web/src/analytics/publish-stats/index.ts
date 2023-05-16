@@ -160,7 +160,6 @@ class RunningTrackAnalytics {
   private createSample(): BaseSample | VideoSample {
     const latestStat = this.getLatestStat();
 
-    // @ts-expect-error
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
     const total_quality_limitation = qualityLimitationDurations && {
       bandwidth_ms: qualityLimitationDurations.bandwidth,
