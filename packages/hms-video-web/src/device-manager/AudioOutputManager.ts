@@ -26,8 +26,12 @@ export class AudioOutputManager implements IAudioOutputManager {
     return this.deviceManager.outputDevice;
   }
 
-  setDevice(deviceId?: string) {
-    return this.deviceManager.updateOutputDevice(deviceId);
+  async setDevice(deviceId?: string) {
+    const outputDevice = await this.deviceManager.updateOutputDevice(deviceId);
+    if (outputDevice) {
+      this.audioSinkManager.setOutputDevice(outputDevice.deviceId);
+    }
+    return outputDevice;
   }
 
   async unblockAutoplay() {

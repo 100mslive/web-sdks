@@ -60,7 +60,6 @@ export class DeviceManager implements HMSDeviceManager {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
-      await this.store.updateAudioOutputDevice(newDevice);
       DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
@@ -226,7 +225,6 @@ export class DeviceManager implements HMSDeviceManager {
         this.outputDevice = this.audioOutput.find(device => device.deviceId === 'default') || this.audioOutput[0];
       }
     }
-    await this.store.updateAudioOutputDevice(this.outputDevice);
     // send event only on device change and device is not same as previous
     if (deviceChange && prevSelection !== this.createIdentifier(this.outputDevice)) {
       this.eventBus.analytics.publish(

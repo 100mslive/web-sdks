@@ -58,6 +58,18 @@ export class AudioSinkManager {
     this.volume = value;
   }
 
+  async setOutputDevice(deviceId: string) {
+    try {
+      // @ts-ignore
+      if (typeof this.audioElement.setSinkId === 'function') {
+        // @ts-ignore
+        await this.audioElement?.setSinkId(deviceId);
+      }
+    } catch (error) {
+      HMSLogger.d(this.TAG, 'error in setSinkId', error);
+    }
+  }
+
   /**
    *  This function is to be called only on user interaction when
    *  autoplay error is received.
@@ -114,6 +126,9 @@ export class AudioSinkManager {
     // if there is no selection that means this is an init request. No need to do anything
     if (event.error || !event.selection || event.type === 'video') {
       return;
+    }
+    if (event.type === 'audioOutput' && event.selection?.deviceId) {
+      this.setOutputDevice(event.selection.deviceId);
     }
   };
 

@@ -276,16 +276,6 @@ class Store implements IStore {
     }
   }
 
-  async updateAudioOutputDevice(_device: MediaDeviceInfo) {
-    // const promises: Promise<void>[] = [];
-    // this.getAudioTracks().forEach(track => {
-    //   if (track instanceof HMSRemoteAudioTrack) {
-    //     promises.push(track.setOutputDevice(device));
-    //   }
-    // });
-    // await Promise.all(promises);
-  }
-
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
     // Enable only when backend enables and source is video or screen. ignore videoplaylist
     if (!this.simulcastEnabled || !['screen', 'regular'].includes(source)) {
