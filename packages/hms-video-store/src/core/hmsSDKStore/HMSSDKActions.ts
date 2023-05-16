@@ -1336,18 +1336,18 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
             reject('Window object does not have tsvb property');
           }
           this.effectsSDK = new window.tsvb('22d268435824179e93a2e3da317306dfb0c72f7a');
-          console.log('addVB::effectsSdk: ', this.effectsSDK);
           if (!this.effectsSDK) {
-            reject('SDK is not present');
+            reject('effects SDK is not present');
           }
         }
         this.effectsSDK.onReady = () => {
-          console.log("SDK is ready let's run it");
+          console.debug("effects SDK is ready let's run it");
           this.effectsSDK.run();
           // available preset mode = 'quality | balanced | speed | lightning'
           this.effectsSDK.setSegmentationPreset('balanced');
           // available fit mode = 'fill | fit'
           this.effectsSDK.setBackgroundFitMode('fill');
+          console.debug('vb url', url);
           if (url === 'blur') {
             this.effectsSDK.setBlur(15);
           } else {
