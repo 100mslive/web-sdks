@@ -510,6 +510,7 @@ export class HMSSdk implements HMSInterface {
     if (room) {
       const roomId = room.id;
       this.networkTestManager?.stop();
+      this.memoryTracker?.checkAndReportMemoryUsage();
       this.eventBus.leave.publish(error);
       HMSLogger.d(this.TAG, `⏳ Leaving room ${roomId}`);
       // browsers often put limitation on amount of time a function set on window onBeforeUnload can take in case of

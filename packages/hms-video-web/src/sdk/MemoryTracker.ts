@@ -9,22 +9,24 @@ export class MemoryTracker {
   }
 
   private start = () => {
-    this.timerId = setInterval(() => {
-      if (!window?.performance?.memory) {
-        return;
-      }
-      const { totalJSHeapSize, usedJSHeapSize } = window.performance.memory;
-      const percentage = usedJSHeapSize / totalJSHeapSize;
-      if (percentage >= 90) {
-        this.sendAnalyticsEvent(
-          AnalyticsEventFactory.memoryUsed({
-            percentage,
-            total: this.convertBytesToMB(totalJSHeapSize),
-            used: this.convertBytesToMB(usedJSHeapSize),
-          }),
-        );
-      }
-    }, MEMORY_CHECK_INTERVAL);
+    this.timerId = setInterval(this.checkAndReportMemoryUsage, MEMORY_CHECK_INTERVAL);
+  };
+
+  checkAndReportMemoryUsage = () => {
+    if (!window?.performance?.memory) {
+      return;
+    }
+    const { totalJSHeapSize, usedJSHeapSize } = window.performance.memory;
+    const percentage = usedJSHeapSize / totalJSHeapSize;
+    if (percentage >= 90) {
+      this.sendAnalyticsEvent(
+        AnalyticsEventFactory.memoryUsed({
+          percentage,
+          total: this.convertBytesToMB(totalJSHeapSize),
+          used: this.convertBytesToMB(usedJSHeapSize),
+        }),
+      );
+    }
   };
 
   cleanup = () => {
