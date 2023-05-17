@@ -30,6 +30,7 @@ export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 
 export const PUBLISH_STATS_SAMPLE_WINDOW = 30;
 export const PUBLISH_STATS_PUSH_INTERVAL = 300;
+export const MEMORY_CHECK_INTERVAL = 300_000; // Check every 5 minutes
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',

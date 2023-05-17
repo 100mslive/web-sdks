@@ -2,6 +2,7 @@ import Message from './models/HMSMessage';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
 import { LocalTrackManager } from './LocalTrackManager';
+import { MemoryTracker } from './MemoryTracker';
 import { NetworkTestManager } from './NetworkTestManager';
 import RoleChangeManager from './RoleChangeManager';
 import { IStore, Store } from './store';
@@ -97,6 +98,7 @@ export class HMSSdk implements HMSInterface {
   private eventBus!: EventBus;
   private networkTestManager!: NetworkTestManager;
   private wakeLockManager!: WakeLockManager;
+  private memoryTracker!: MemoryTracker;
   private sessionStore!: SessionStore;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
@@ -115,6 +117,7 @@ export class HMSSdk implements HMSInterface {
     this.store = new Store();
     this.eventBus = new EventBus();
     this.wakeLockManager = new WakeLockManager();
+    this.memoryTracker = new MemoryTracker(this.sendAnalyticsEvent);
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
     this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
@@ -478,6 +481,7 @@ export class HMSSdk implements HMSInterface {
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     this.wakeLockManager?.cleanup();
+    this.memoryTracker?.cleanup();
     HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**

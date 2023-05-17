@@ -219,6 +219,14 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static memoryUsed(properties: { percentage: number; used: number; total: number }) {
+    return new AnalyticsEvent({
+      name: 'memory_used_in_mb',
+      level: AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
