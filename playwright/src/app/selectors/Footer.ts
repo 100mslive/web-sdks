@@ -42,6 +42,17 @@ export class Footer {
   mute_all_btn = 'div[data-testid="mute_all_btn"]';
   mute_all_apply_btn = 'text=Apply';
 
+  embed_url_cta = '[data-testid="embed_url_btn"]';
+  embed_url_text_field = 'input[placeholder="https://www.tldraw.com/"]';
+  valid_embed_url = 'https://www.100ms.live/';
+  invalid_embed_url = 'sdet.qa';
+  embed_cta = 'text="Just Embed"';
+  update_embed_cta = 'text="Update Embed"'
+  stop_embed_cta = 'text="Stop Embed"'
+  embed_share_cta = 'text="Embed and Share"';
+  invalid_embed_link_header = 'text="Link is invalid"'
+  inavlid_embed_link_subject = 'text="The room code does not exist. Please check the room code."';
+
   ui_settings_btn = 'div[data-testid="ui_settings_btn"]';
   device_settings_btn = 'div[data-testid="device_settings_btn"]';
   stats_for_nreds_btn = 'div[data-testid="stats_for_nreds_btn"]';
