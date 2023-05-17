@@ -58,6 +58,7 @@ export const getLocalTrackStats = async (
         totalRoundTripTime: inStats?.totalRoundTripTime,
         peerName,
         peerID: track.peerId,
+        enabled: track.enabled,
         codec,
       };
     });
@@ -96,6 +97,7 @@ export const getTrackStats = async (
       bitrate,
       packetsLostRate,
       peerId: track.peerId,
+      enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
     })
