@@ -33,15 +33,18 @@ export class PublishStatsAnalytics {
     this.startLoop().catch(e => HMSLogger.e('[PublishStatsAnalytics]', e.message));
   }
 
-  stop() {
+  stop = () => {
+    if (this.shouldSendEvent) {
+      this.sendEvent();
+    }
     this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate);
     this.shouldSendEvent = false;
-  }
+  };
 
   private async startLoop() {
     while (this.shouldSendEvent) {
       await sleep(this.pushInterval * 1000);
-      this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
+      this.sendEvent();
     }
   }
 
@@ -64,7 +67,11 @@ export class PublishStatsAnalytics {
     };
   }
 
-  private handleStatsUpdate(hmsStats: HMSWebrtcStats) {
+  private sendEvent = () => {
+    this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
+  };
+
+  private handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
     const localTracksStats = hmsStats.getLocalTrackStats();
     Object.keys(localTracksStats).forEach(trackIDBeingSent => {
       const trackStats = localTracksStats[trackIDBeingSent];
@@ -95,7 +102,7 @@ export class PublishStatsAnalytics {
         }
       });
     });
-  }
+  };
 
   private getTrackIdentifier(trackId: string, stats: HMSTrackStats) {
     return stats.rid ? `${trackId}:${stats.rid}` : trackId;
