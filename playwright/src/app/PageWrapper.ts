@@ -101,6 +101,13 @@ export class PageWrapper {
     console.log('asserted visibility for', elementId);
   }
 
+  async checkScreenMode() {
+    const isFullScreen = await this.page.evaluate(() => {
+      return document.fullscreenElement !== null;
+    });
+    return isFullScreen;
+  }
+
   locator(elementSelector: string) {
     return this.page.locator(elementSelector);
   }
@@ -121,6 +128,16 @@ export class PageWrapper {
     expect(innerText.includes(msgSent)).toBeTruthy();
   }
 
+  async hasValue(elementId: string, msgSent: string) {
+    const innerValue = (await this.getValue(elementId)) as string;
+    expect(innerValue.includes(msgSent)).toBeTruthy();
+  }
+
+  async hasLink(elementId: string, hrefLink: string){
+    const emojiHref = await this.page.locator(elementId).getAttribute('href');
+    expect(emojiHref?.includes(hrefLink))
+  }
+
   /**
    * @returns {String}
    */
@@ -128,6 +145,12 @@ export class PageWrapper {
     const text = await this.page.locator(elementId).textContent();
     console.log('Text Found- ', text);
     return text;
+  }
+
+  async getValue(elementId: string) {
+    const value = await this.page.locator(elementId).getAttribute('value');
+    console.log('Value Found- ', value);
+    return value;
   }
 
   async gotoPreviewPage() {

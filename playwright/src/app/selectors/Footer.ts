@@ -42,9 +42,22 @@ export class Footer {
   mute_all_btn = 'div[data-testid="mute_all_btn"]';
   mute_all_apply_btn = 'text=Apply';
 
+  embed_url_cta = '[data-testid="embed_url_btn"]';
+  embed_url_text_field = 'input[placeholder="https://www.tldraw.com/"]';
+  valid_embed_url = 'https://www.100ms.live/';
+  invalid_embed_url = 'sdet.qa';
+  embed_cta = 'text="Just Embed"';
+  update_embed_cta = 'text="Update Embed"'
+  stop_embed_cta = 'text="Stop Embed"'
+  embed_share_cta = 'text="Embed and Share"';
+  invalid_embed_link_header = 'text="Link is invalid"'
+  inavlid_embed_link_subject = 'text="The room code does not exist. Please check the room code."';
+
   ui_settings_btn = 'div[data-testid="ui_settings_btn"]';
   device_settings_btn = 'div[data-testid="device_settings_btn"]';
   stats_for_nreds_btn = 'div[data-testid="stats_for_nreds_btn"]';
+  enable_sfn = '[role="switch"]'
+  close_sfn_modal = '[data-testid="stats_dialog_close_icon"]'
 
   change_my_role_btn = 'div[data-testid="change_my_role_btn"]';
   change_to_role_ = 'div[data-testid="change_to_role_?"]';
@@ -56,6 +69,13 @@ export class Footer {
   brb_btn = '(//button[@data-testid="brb_btn"])[2]';
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
   chat_placeholder = 'css=[placeholder="Write something here"]';
+  emoji_btn = '[data-testid="emoji_reaction_btn"]';
+  emoji_container = '[class="emoji-mart-emoji"]';
+  expected_emoji_container_text = 'Reactions will be timed for Live Streaming viewers.';
+  expected_emoji_container_href_text = 'Learn more ->';
+  emoji_container_text = '//*[@role="menu"]/div[3]/p[1]'
+  emoji_container_href = '[role="menu"] div p a'
+  expected_emoji_href_link = 'https://www.100ms.live/docs/javascript/v2/how--to-guides/record-and-live-stream/hls/hls-timed-metadata'
 
   first_chat_msg = 'div[data-testid="chat_msg"]';
 

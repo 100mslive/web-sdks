@@ -320,6 +320,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       enableWorker: true,
       maxBufferLength: 20,
       backBufferLength: 10,
+      abrBandWidthUpFactor: 1,
     };
   }
 

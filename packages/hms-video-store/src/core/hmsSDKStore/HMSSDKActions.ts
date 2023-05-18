@@ -57,7 +57,6 @@ import {
 } from '../schema';
 import {
   HMSRoleChangeRequest,
-  selectHMSMessagesCount,
   selectIsConnectedToRoom,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
@@ -408,7 +407,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async attachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    HMSLogger.d(`[HMSSDKAction] attaching the video element ${trackID} ${videoElement}`);
     if (this.localAndVideoUnmuting(trackID)) {
       // wait till video unmute has finished
       return new Promise<void>(resolve => {
@@ -426,7 +424,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    HMSLogger.d(`[HMSSDKAction] detaching the video element ${trackID} ${videoElement}`);
     const sdkTrack = this.hmsSDKTracks[trackID];
     if (sdkTrack?.type === 'video') {
       await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
@@ -1036,7 +1033,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       return;
     }
     this.setState(store => {
-      hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     }, 'newMessage');

@@ -14,4 +14,5 @@ export interface HMSMessage {
   time: Date;
   type?: string;
   message: any;
+  id?: string;
 }

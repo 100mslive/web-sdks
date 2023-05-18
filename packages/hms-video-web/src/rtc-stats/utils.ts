@@ -147,7 +147,7 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
 
 export const getLocalPeerStatsFromReport = (
   type: PeerConnectionType,
-  report: RTCStatsReport,
+  report?: RTCStatsReport,
   prevStats?: HMSPeerStats,
 ): (RTCIceCandidatePairStats & { bitrate: number }) | undefined => {
   const activeCandidatePair = getActiveCandidatePairFromReport(report);
@@ -160,19 +160,19 @@ export const getLocalPeerStatsFromReport = (
   return activeCandidatePair && Object.assign(activeCandidatePair, { bitrate });
 };
 
-export const getActiveCandidatePairFromReport = (report: RTCStatsReport): RTCIceCandidatePairStats | undefined => {
+export const getActiveCandidatePairFromReport = (report?: RTCStatsReport): RTCIceCandidatePairStats | undefined => {
   let activeCandidatePair: RTCIceCandidatePairStats | undefined;
-  report.forEach(stat => {
+  report?.forEach(stat => {
     if (stat.type === 'transport') {
       // TS doesn't have correct types for RTCStatsReports
       // @ts-expect-error
-      activeCandidatePair = report.get(stat.selectedCandidatePairId);
+      activeCandidatePair = report?.get(stat.selectedCandidatePairId);
     }
   });
 
   // Fallback for Firefox.
   if (!activeCandidatePair) {
-    report.forEach(stat => {
+    report?.forEach(stat => {
       if (stat.type === 'candidate-pair' && stat.selected) {
         activeCandidatePair = stat;
       }
