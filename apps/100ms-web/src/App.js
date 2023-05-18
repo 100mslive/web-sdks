@@ -48,7 +48,7 @@ if (window.location.host.includes("localhost")) {
 document.title = `${appName}'s ${document.title}`;
 
 // TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }) => {
+/* const getAspectRatio = ({ width, height }) => {
   const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
   const portraitDomains = (
     process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
@@ -57,7 +57,7 @@ const getAspectRatio = ({ width, height }) => {
     return { width: height, height: width };
   }
   return { width, height };
-};
+}; */
 
 export function EdtechComponent({
   tokenEndpoint = defaultTokenEndpoint,
@@ -75,15 +75,15 @@ export function EdtechComponent({
   getDetails = () => {},
   authTokenByRoomCodeEndpoint = "",
 }) {
-  const { 0: width, 1: height } = aspectRatio
-    .split("-")
-    .map(el => parseInt(el));
+  // const { 0: width, 1: height } = aspectRatio
+  //   .split("-")
+  //   .map(el => parseInt(el));
 
   return (
     <ErrorBoundary>
       <HMSThemeProvider
         themeType={theme}
-        aspectRatio={getAspectRatio({ width, height })}
+        aspectRatio={{ width: 4, height: 3 }}
         theme={{
           colors: {
             brandDefault: color,
