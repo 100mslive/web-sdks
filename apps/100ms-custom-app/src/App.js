@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
+import { HMSRoomComposite } from '@100mslive/uikit-react';
 import merge from 'lodash.merge';
 import { logError } from 'zipyai';
 import { Box, Flex, Loading } from '@100mslive/react-ui';
@@ -18,11 +19,7 @@ import logoLight from './assets/images/logo-on-white.png';
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
-const HMSMeetingComponent = React.lazy(() =>
-  import('@100mslive/hms-room').then(module => ({
-    default: module.HMSRoom,
-  }))
-);
+
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;
@@ -247,7 +244,7 @@ const App = () => {
           }
         >
           <Box css={{ flex: '1 1 0', minHeight: 0 }}>
-            <HMSMeetingComponent
+            <HMSRoomComposite
               tokenEndpoint={`${apiBasePath + hostname}/`}
               themeConfig={{
                 aspectRatio: settings.tile_shape,
