@@ -62,7 +62,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export const HMSRoom = React.forwardRef(
+export const HMSRoomComposite = React.forwardRef(
   (
     {
       tokenEndpoint = defaultTokenEndpoint,
@@ -156,6 +156,8 @@ export const HMSRoom = React.forwardRef(
     );
   }
 );
+
+HMSRoomComposite.displayName = "HMSRoomComposite";
 
 const Redirector = ({ getDetails, showPreview }) => {
   const { roomId, role } = useParams();
@@ -304,7 +306,7 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
 
 export default function App() {
   return (
-    <HMSRoom
+    <HMSRoomComposite
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
         theme: process.env.REACT_APP_THEME,
