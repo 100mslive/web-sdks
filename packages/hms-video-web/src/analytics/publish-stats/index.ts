@@ -33,13 +33,13 @@ export class PublishStatsAnalytics {
     this.startLoop().catch(e => HMSLogger.e('[PublishStatsAnalytics]', e.message));
   }
 
-  stop() {
+  stop = () => {
     if (this.shouldSendEvent) {
       this.sendEvent();
     }
     this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate);
     this.shouldSendEvent = false;
-  }
+  };
 
   private async startLoop() {
     while (this.shouldSendEvent) {
@@ -67,9 +67,9 @@ export class PublishStatsAnalytics {
     };
   }
 
-  private sendEvent() {
+  private sendEvent = () => {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
-  }
+  };
 
   private handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
     const localTracksStats = hmsStats.getLocalTrackStats();
