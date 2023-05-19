@@ -1,8 +1,8 @@
 import React from "react";
 import { Tldraw } from "@tldraw/tldraw";
+import { Box } from "@100mslive/react-ui";
 import { useMultiplayerState } from "./useMultiplayerState";
 import "./Whiteboard.css";
-import { Box } from "@100mslive/react-ui";
 
 export const Whiteboard = React.memo(({ roomId }) => {
   const events = useMultiplayerState(roomId);
