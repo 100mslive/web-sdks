@@ -51,7 +51,7 @@ const List = ({
         css={{ flexWrap: "wrap", placeContent: "center" }}
       >
         {pagesWithTiles && pagesWithTiles.length > 0
-          ? pagesWithTiles[page].map(tile => {
+          ? pagesWithTiles[page]?.map(tile => {
               return (
                 <Fragment>
                   {tile.track?.source === "screen" ? (
