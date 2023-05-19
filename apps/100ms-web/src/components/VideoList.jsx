@@ -48,7 +48,7 @@ const List = ({
   return (
     <StyledVideoList.Root ref={ref}>
       <StyledVideoList.Container
-        css={{ flexWrap: "wrap", justifyContent: "center" }}
+        css={{ flexWrap: "wrap", placeContent: "center" }}
       >
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles[page].map(tile => {
