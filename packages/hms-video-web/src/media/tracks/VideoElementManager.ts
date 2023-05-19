@@ -43,7 +43,7 @@ export class VideoElementManager {
     // Call init again, to initialize again if for some reason it failed in constructor
     // it will be a no-op if initialize already
     this.init();
-    HMSLogger.d(this.TAG, `Adding video element: ${videoElement} for ${this.track}`, this.id);
+    HMSLogger.d(this.TAG, `Adding video element for ${this.track}`, this.id);
     this.videoElements.add(videoElement);
     if (this.videoElements.size >= 10) {
       HMSLogger.w(
@@ -75,7 +75,7 @@ export class VideoElementManager {
     this.entries.delete(videoElement);
     this.resizeObserver?.unobserve(videoElement);
     this.intersectionObserver?.unobserve(videoElement);
-    HMSLogger.d(this.TAG, `Removing video element: ${videoElement} for ${this.track}`);
+    HMSLogger.d(this.TAG, `Removing video element for ${this.track}`);
   }
 
   getVideoElements(): HTMLVideoElement[] {
