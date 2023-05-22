@@ -13,7 +13,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { getVideoTrack } from '../../utils/track';
+import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 
@@ -344,12 +344,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   };
 
   private applyTrackContraints = async (constraints: MediaTrackConstraints) => {
-    try {
+    if (!isEmptyTrack(this.nativeTrack)) {
       await this.nativeTrack.applyConstraints(constraints);
-    } catch (err) {
-      // OverconstrainedError: error is thrown when contraint is not applied immediately
-      // occur when camera took time to open and track was publishing.
-      HMSLogger.e(this.TAG, 'failed to apply constraits', err);
     }
   };
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
