@@ -343,6 +343,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return newSettings;
   };
 
+  private applyTrackContraints = async (constraints: MediaTrackConstraints) => {
+    try {
+      await this.nativeTrack.applyConstraints(constraints);
+    } catch (err) {
+      // OverconstrainedError: error is thrown when contraint is not applied immediately
+      // occur when camera took time to open and track was publishing.
+      console.error('error ', err);
+    }
+  };
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
@@ -351,7 +360,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      this.applyTrackContraints(settings.toConstraints());
     }
   };
 
