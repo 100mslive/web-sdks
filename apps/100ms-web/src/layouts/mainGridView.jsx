@@ -16,7 +16,7 @@ import { UI_SETTINGS } from "../common/constants";
 
 export const MainGridView = () => {
   const centerRoles = useAppLayout("center") || [];
-  const sidepaneRoles = [];
+  const sidepaneRoles = useAppLayout("sidepane") || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const peers = useHMSStore(selectPeers);
   const roles = useHMSStore(selectRolesMap);
