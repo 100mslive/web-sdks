@@ -9,7 +9,7 @@ export interface HMSIntersectionObserverCallback {
  * This is a wrapper around IntersectionObserver which will call the callback passed
  * for an element while observing, only when that element is intersecting
  */
-class HMSIntersectionObserverWrapper {
+export class HMSIntersectionObserverWrapper {
   private intersectionObserver?: IntersectionObserver;
   private readonly TAG = '[HMSIntersectionObserverWrapper]';
   private listeners = new WeakMap<HTMLElement, HMSIntersectionObserverCallback>();
