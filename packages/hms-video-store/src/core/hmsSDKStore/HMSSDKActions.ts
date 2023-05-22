@@ -1030,7 +1030,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         const storeTrack = draftStore.tracks[hmsTrack.id];
         if (isEntityUpdated(storeTrack, hmsTrack)) {
           mergeTrackArrayFields(storeTrack, hmsTrack);
-          Object.assign(hmsTrack, hmsTrack);
+          Object.assign(storeTrack, hmsTrack);
         }
       }, actionName);
     }
