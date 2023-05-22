@@ -12,7 +12,7 @@ export interface HMSIntersectionObserverCallback {
 class HMSIntersectionObserverWrapper {
   private intersectionObserver?: IntersectionObserver;
   private readonly TAG = '[HMSIntersectionObserverWrapper]';
-  private listeners = new Map<HTMLElement, HMSIntersectionObserverCallback>();
+  private listeners = new WeakMap<HTMLElement, HMSIntersectionObserverCallback>();
   constructor() {
     this.createObserver();
   }
@@ -35,9 +35,7 @@ class HMSIntersectionObserverWrapper {
 
   unobserve = (element: HTMLElement) => {
     this.intersectionObserver?.unobserve(element);
-    if (this.listeners.has(element)) {
-      this.listeners.delete(element);
-    }
+    this.listeners.delete(element);
   };
 
   private createObserver = () => {
@@ -48,9 +46,7 @@ class HMSIntersectionObserverWrapper {
 
   private handleIntersection = (entries: IntersectionObserverEntry[]) => {
     for (const entry of entries) {
-      if (this.listeners.has(entry.target as HTMLElement)) {
-        this.listeners.get(entry.target as HTMLElement)?.(entry);
-      }
+      this.listeners.get(entry.target as HTMLElement)?.(entry);
     }
   };
 }

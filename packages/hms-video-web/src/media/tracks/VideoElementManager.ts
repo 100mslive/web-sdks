@@ -17,7 +17,7 @@ export class VideoElementManager {
   private resizeObserver?: typeof HMSResizeObserver;
   private intersectionObserver?: typeof HMSIntersectionObserver;
   private videoElements = new Set<HTMLVideoElement>();
-  private entries = new Map<HTMLVideoElement, DOMRectReadOnly>();
+  private entries = new WeakMap<HTMLVideoElement, DOMRectReadOnly>();
   private id: string;
 
   constructor(private track: HMSLocalVideoTrack | HMSRemoteVideoTrack) {
@@ -146,7 +146,11 @@ export class VideoElementManager {
     if (!(this.track instanceof HMSRemoteVideoTrack)) {
       return;
     }
-    for (const entry of this.entries.values()) {
+    for (const element of this.videoElements) {
+      const entry = this.entries.get(element);
+      if (!entry) {
+        continue;
+      }
       const { width, height } = entry;
       const layer = getClosestLayer(this.track.getSimulcastDefinitions(), { width, height });
       if (!maxLayer) {
