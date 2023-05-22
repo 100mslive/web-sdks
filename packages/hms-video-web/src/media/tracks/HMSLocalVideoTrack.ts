@@ -345,12 +345,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private applyTrackContraints = async (constraints: MediaTrackConstraints) => {
     try {
-      console.log('contraints ', constraints);
       await this.nativeTrack.applyConstraints(constraints);
     } catch (err) {
       // OverconstrainedError: error is thrown when contraint is not applied immediately
       // occur when camera took time to open and track was publishing.
-      console.error('error ', err);
+      HMSLogger.e(this.TAG, 'failed to apply constraits', err);
     }
   };
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
