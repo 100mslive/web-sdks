@@ -345,6 +345,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private applyTrackContraints = async (constraints: MediaTrackConstraints) => {
     try {
+      console.log('contraints ', constraints);
       await this.nativeTrack.applyConstraints(constraints);
     } catch (err) {
       // OverconstrainedError: error is thrown when contraint is not applied immediately
@@ -360,7 +361,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      this.applyTrackContraints(settings.toConstraints());
+      await this.applyTrackContraints(settings.toConstraints());
     }
   };
 
