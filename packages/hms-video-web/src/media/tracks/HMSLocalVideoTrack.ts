@@ -141,7 +141,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
     await this.handleDeviceChange(newSettings, internal);
-    if (!this.enabled) {
+    if (!this.enabled || isEmptyTrack(this.nativeTrack)) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
@@ -343,11 +343,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return newSettings;
   };
 
-  private applyTrackContraints = async (constraints: MediaTrackConstraints) => {
-    if (!isEmptyTrack(this.nativeTrack)) {
-      await this.nativeTrack.applyConstraints(constraints);
-    }
-  };
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
@@ -356,7 +351,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.applyTrackContraints(settings.toConstraints());
+      await this.nativeTrack.applyConstraints(settings.toConstraints());
     }
   };
 
