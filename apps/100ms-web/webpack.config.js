@@ -52,12 +52,12 @@ module.exports = {
         use: ["source-map-loader"],
       },
       {
-        test: /\.jsx?$/,
+        test: /\.[j|t]sx?$/,
         use: [
           {
             loader: "esbuild-loader",
             options: {
-              loader: "jsx",
+              loader: "tsx",
               target: "es6",
             },
           },

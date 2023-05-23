@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { init } from "zipyai";
-import App from "./App";
+import App from "./App.tsx";
 import reportWebVitals from "./reportWebVitals";
 
 if (process.env.REACT_APP_ZIPY_KEY) {

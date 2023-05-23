@@ -13,33 +13,52 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, HMSThemeProvider } from "@100mslive/react-ui";
+import { Box, HMSThemeProvider, ThemeTypes } from "@100mslive/react-ui";
+// @ts-ignore
 import { AppData } from "./components/AppData/AppData.jsx";
+// @ts-ignore
 import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
+// @ts-ignore
 import AuthToken from "./components/AuthToken";
+// @ts-ignore
 import { ErrorBoundary } from "./components/ErrorBoundary";
+// @ts-ignore
 import ErrorPage from "./components/ErrorPage";
+// @ts-ignore
 import FullPageProgress from "./components/FullPageProgress";
+// @ts-ignore
 import { Init } from "./components/init/Init";
+// @ts-ignore
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
+// @ts-ignore
 import { Notifications } from "./components/Notifications";
+// @ts-ignore
 import PostLeave from "./components/PostLeave";
-import PreviewContainer from "./components/Preview/PreviewContainer.jsx";
+// @ts-ignore
+import PreviewContainer from "./components/Preview/PreviewContainer";
+// @ts-ignore
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import { AppContext, useAppContext } from "./AppContext.js";
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
+// @ts-ignore
+import { AppContext, useAppContext } from "./AppContext";
+// @ts-ignore
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms";
+// @ts-ignore
 import { Confetti } from "./plugins/confetti";
+// @ts-ignore
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
+// @ts-ignore
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
+// @ts-ignore
 import { getRoutePrefix, shadeColor } from "./common/utils";
+// @ts-ignore
 import { FeatureFlags } from "./services/FeatureFlags";
 import "./base.css";
 import "./index.css";
 
+// @ts-ignore
 const Conference = React.lazy(() => import("./components/conference"));
 
 const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
-const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 
 let appName;
 if (window.location.host.includes("localhost")) {
@@ -50,19 +69,42 @@ if (window.location.host.includes("localhost")) {
 
 document.title = `${appName}'s ${document.title}`;
 
-// TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }) => {
-  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
-  const portraitDomains = (
-    process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
-  ).split(",");
-  if (portraitDomains.includes(host) && width > height) {
-    return { width: height, height: width };
-  }
-  return { width, height };
+export type HMSRoomCompositeProps = {
+  tokenEndpoint?: string;
+  themeConfig: {
+    aspectRatio?: string;
+    font?: string;
+    color?: string;
+    theme?: ThemeTypes;
+    logo?: string;
+    metadata?: string;
+    recordingUrl?: string;
+  };
+  /**
+   * @internal
+   */
+  getDetails?: () => void;
+  /**
+   * @internal
+   */
+  authTokenByRoomCodeEndpoint?: string;
+  roomId?: string;
+  roomCode?: string;
+  role?: string;
+  showPreview?: boolean;
+  showLeave?: boolean;
+  onLeave?: () => void;
 };
 
-export const HMSRoomComposite = React.forwardRef(
+export const HMSRoomComposite = React.forwardRef<
+  {
+    hmsActions: typeof hmsActions;
+    hmsStats: typeof hmsStats;
+    hmsStore: typeof hmsStore;
+    hmsNotifications: typeof hmsNotifications;
+  },
+  HMSRoomCompositeProps
+>(
   (
     {
       tokenEndpoint = defaultTokenEndpoint,
@@ -70,12 +112,11 @@ export const HMSRoomComposite = React.forwardRef(
         aspectRatio = "1-1",
         font = "Roboto",
         color = "#2F80FF",
-        theme = "dark",
+        theme = ThemeTypes.dark,
         logo = "",
         metadata = "",
         recordingUrl = "",
       },
-      policyConfig = envPolicyConfig,
       getDetails = () => {},
       authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
       roomId,
@@ -87,13 +128,13 @@ export const HMSRoomComposite = React.forwardRef(
     },
     ref
   ) => {
-    const { 0: width, 1: height } = aspectRatio
-      .split("-")
-      .map(el => parseInt(el));
+    const [width, height] = aspectRatio.split("-").map(el => parseInt(el));
+
     useEffect(() => {
       if (!ref) {
         return;
       }
+      // @ts-ignore
       ref.current = {
         hmsActions,
         hmsStats,
@@ -109,15 +150,17 @@ export const HMSRoomComposite = React.forwardRef(
         >
           <HMSThemeProvider
             themeType={theme}
-            aspectRatio={getAspectRatio({ width, height })}
+            aspectRatio={{ width, height }}
             theme={{
               colors: {
+                // @ts-ignore
                 brandDefault: color,
                 brandDark: shadeColor(color, -30),
                 brandLight: shadeColor(color, 30),
                 brandDisabled: shadeColor(color, 10),
               },
               fonts: {
+                // @ts-ignore
                 sans: [font, "Inter", "sans-serif"],
               },
             }}
@@ -131,7 +174,6 @@ export const HMSRoomComposite = React.forwardRef(
             >
               <AppData
                 appDetails={metadata}
-                policyConfig={policyConfig}
                 recordingUrl={recordingUrl}
                 logo={logo}
                 tokenEndpoint={tokenEndpoint}
@@ -157,12 +199,13 @@ export const HMSRoomComposite = React.forwardRef(
   }
 );
 
-HMSRoomComposite.displayName = "HMSRoomComposite";
-
-const Redirector = ({ getDetails, showPreview }) => {
+const Redirector = ({
+  getDetails,
+  showPreview,
+}: Pick<HMSRoomCompositeProps, "getDetails" | "showPreview">) => {
   const { roomId, role } = useParams();
   useEffect(() => {
-    getDetails();
+    getDetails?.();
   }, [roomId]); //eslint-disable-line
 
   if (!roomId && !role) {
@@ -184,7 +227,9 @@ const Redirector = ({ getDetails, showPreview }) => {
   );
 };
 
-const RouteList = ({ getDetails }) => {
+const RouteList = ({
+  getDetails,
+}: Pick<HMSRoomCompositeProps, "getDetails">) => {
   const { showPreview, showLeave } = useAppContext();
 
   return (
@@ -267,7 +312,7 @@ const BackSwipe = () => {
   return null;
 };
 
-const Router = ({ children }) => {
+const Router = ({ children }: React.PropsWithChildren) => {
   const { roomId, role, roomCode } = useAppContext;
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
@@ -281,7 +326,10 @@ const Router = ({ children }) => {
   );
 };
 
-function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
+function AppRoutes({
+  getDetails,
+  authTokenByRoomCodeEndpoint,
+}: Pick<HMSRoomCompositeProps, "getDetails" | "authTokenByRoomCodeEndpoint">) {
   return (
     <Router>
       <ToastContainer />
@@ -309,13 +357,12 @@ export default function App() {
     <HMSRoomComposite
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
-        theme: process.env.REACT_APP_THEME,
+        theme: process.env.REACT_APP_THEME as ThemeTypes,
         color: process.env.REACT_APP_COLOR,
         logo: process.env.REACT_APP_LOGO,
         font: process.env.REACT_APP_FONT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
-      showPreview={false}
     />
   );
 }
