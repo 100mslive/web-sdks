@@ -49,6 +49,7 @@ export const useVideo = ({ trackId, attach }: useVideoInput): useVideoOutput => 
             HMSLogger.w('detach video error for track', prevTrackId.current, err);
           }
         }
+        prevTrackId.current = track?.id;
       })();
     }
   }, [track?.id, actions]);
