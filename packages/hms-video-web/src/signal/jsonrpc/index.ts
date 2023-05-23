@@ -155,7 +155,7 @@ export default class JsonRpcSignal implements ISignal {
       };
 
       this.onCloseHandler = (event: CloseEvent) => {
-        HMSLogger.e(`Websocket closed code=${event.code}`);
+        HMSLogger.w(`Websocket closed code=${event.code}`);
         if (promiseSettled) {
           this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
         } else {
