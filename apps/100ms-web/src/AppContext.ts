@@ -1,12 +1,20 @@
 import React, { useContext } from "react";
 
-export const AppContext = React.createContext({
+export type AppContextType = {
+  showPreview?: boolean;
+  showLeave?: boolean;
+  roomId?: string;
+  role?: string;
+  roomCode?: string;
+  onLeave?: () => void;
+};
+
+export const AppContext = React.createContext<AppContextType>({
   showPreview: true,
   showLeave: true,
   roomId: "",
   role: "",
   roomCode: "",
-  onLeave: () => {},
 });
 
 AppContext.displayName = "AppContext";

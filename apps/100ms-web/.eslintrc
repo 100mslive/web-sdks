@@ -1,11 +1,7 @@
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:import/recommended",
-    "react-app",
-    "react-app/jest"
-  ],
-  "plugins": ["prettier", "simple-import-sort"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "prettier", "simple-import-sort"],
+  "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "react-app"],
   "rules": {
     "no-unused-vars": [
       "error",
@@ -73,9 +69,9 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     }
   },
-  "ignorePatterns": ["src/*.css", "src/images/*"]
+  "ignorePatterns": ["src/*.css", "src/images/*", "webpack.config.js"]
 }

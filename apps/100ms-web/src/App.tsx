@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { Suspense, useEffect } from "react";
 import {
   BrowserRouter,
@@ -15,7 +16,7 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, HMSThemeProvider, ThemeTypes } from "@100mslive/react-ui";
 // @ts-ignore
-import { AppData } from "./components/AppData/AppData.jsx";
+import { AppData } from "./components/AppData/AppData";
 // @ts-ignore
 import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
 // @ts-ignore
@@ -38,7 +39,6 @@ import PostLeave from "./components/PostLeave";
 import PreviewContainer from "./components/Preview/PreviewContainer";
 // @ts-ignore
 import { ToastContainer } from "./components/Toast/ToastContainer";
-// @ts-ignore
 import { AppContext, useAppContext } from "./AppContext";
 // @ts-ignore
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms";
@@ -117,14 +117,14 @@ export const HMSRoomComposite = React.forwardRef<
         metadata = "",
         recordingUrl = "",
       },
-      getDetails = () => {},
+      getDetails,
       authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
       roomId,
       role,
       roomCode,
       showPreview = true,
       showLeave = true,
-      onLeave = () => {},
+      onLeave,
     },
     ref
   ) => {
@@ -313,7 +313,7 @@ const BackSwipe = () => {
 };
 
 const Router = ({ children }: React.PropsWithChildren) => {
-  const { roomId, role, roomCode } = useAppContext;
+  const { roomId, role, roomCode } = useAppContext();
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
