@@ -97,6 +97,8 @@ export class Footer {
 
   audio_playlist_item = 'div[role="menuitem"]:nth-child(?)';
 
+  error_message = 'text=Resolution not supported';
+  
   constructor(page: PageWrapper) {
     this.page = page;
   }
