@@ -36,7 +36,7 @@ module.exports = {
   performance: false,
   target: "web",
   resolve: {
-    extensions: [".js", ".jsx", ".css", ".svg"],
+    extensions: [".js", ".jsx", ".ts", ".tsx", ".css", ".svg"],
     fallback: {
       path: false,
       fs: false,

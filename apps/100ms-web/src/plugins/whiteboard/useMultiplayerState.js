@@ -141,7 +141,7 @@ export function useMultiplayerState(roomId) {
 
   // Update the live shapes when the app's shapes change.
   const onChangePage = useCallback(
-    (_app, shapes, bindings, _assets) => {
+    (_app, shapes, bindings) => {
       updateLocalState({ shapes, bindings });
       room.broadcastEvent(Events.STATE_CHANGE, { shapes, bindings });
 

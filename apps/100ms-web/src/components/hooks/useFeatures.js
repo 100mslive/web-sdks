@@ -1,6 +1,6 @@
 import { selectTemplateAppData, useHMSStore } from "@100mslive/react-sdk";
 
-export const useFeatures = key => {
+export const useFeatures = () => {
   let features = useHMSStore(selectTemplateAppData)?.features;
   return features && typeof features === "string"
     ? features.split(",")

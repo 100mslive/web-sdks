@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect, useRef, useState } from "react";
 import {
   selectAvailableRoleNames,
@@ -23,7 +22,6 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 
   useEffect(() => {
     if (alone && !cbTimeout.current) {
-      // @ts-ignore
       cbTimeout.current = setTimeout(() => {
         setAloneForLong(true);
       }, thresholdMs);
