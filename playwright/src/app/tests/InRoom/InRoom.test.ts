@@ -107,3 +107,42 @@ test(`Verify full screen page`, async ({ page: nativePage }) => {
   await page.endRoom();
   await page.close();
 });
+
+test(`Verify valid embed url and stop embed`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
+  await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url)
+  await page.click(page.footer.embed_cta)
+  await page.assertNotVisible(page.center.first_person_img)
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta, page.footer.stop_embed_cta);
+  await page.endRoom();
+  await page.close();
+});
+
+test(`Verify invalid embed url`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
+  await page.sendText(page.footer.embed_url_text_field, page.footer.invalid_embed_url)
+  await page.click(page.footer.embed_cta)
+  await page.assertNotVisible(page.center.first_person_img)
+  expect(page.locator(page.footer.invalid_embed_link_header).isVisible).toBeTruthy();
+  expect(page.locator(page.footer.inavlid_embed_link_subject).isVisible).toBeTruthy();
+  await page.endRoom();
+  await page.close();
+});
+
+test(`Update embed url`, async ({ page: nativePage }) => {
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
+  await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url);
+  await page.click(page.footer.embed_cta);
+  await page.assertNotVisible(page.center.first_person_img);
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
+  await page.sendText(page.footer.embed_url_text_field, page.footer.invalid_embed_url);
+  await page.click(page.footer.update_embed_cta);
+  await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
+  await page.hasValue(page.footer.embed_url_text_field, page.footer.invalid_embed_url);
+  await page.click(page.footer.stop_embed_cta);
+  await page.endRoom();
+  await page.close();
+});

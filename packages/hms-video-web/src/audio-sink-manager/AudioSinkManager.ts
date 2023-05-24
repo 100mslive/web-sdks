@@ -213,7 +213,7 @@ export class AudioSinkManager {
       HMSLogger.d(this.TAG, 'Played track', `${track}`);
     } catch (err) {
       this.autoPausedTracks.add(track);
-      HMSLogger.e(this.TAG, 'Failed to play track', `${track}`, err as Error);
+      HMSLogger.w(this.TAG, 'Failed to play track', `${track}`, err as Error);
       const error = err as Error;
       if (!this.state.autoplayFailed && error.name === 'NotAllowedError') {
         this.state.autoplayFailed = true;
