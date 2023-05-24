@@ -146,6 +146,7 @@ export default class JsonRpcSignal implements ISignal {
          * disconnects the websocket for some reason, there is a network disconnect or a firewall/antivirus on user's
          * device is breaking the websocket connecting(which can happen even after a successful connect).
          */
+        HMSLogger.e(this.TAG, 'Error from websocket');
         promiseSettled = true;
         // above error does not contain any description hence not sent here
         reject(
