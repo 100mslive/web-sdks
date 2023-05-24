@@ -1426,7 +1426,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         const storePeer = draftStore.peers[hmsPeer.id];
         if (isEntityUpdated(storePeer, hmsPeer)) {
           if (areArraysEqual(storePeer.auxiliaryTracks, hmsPeer.auxiliaryTracks)) {
-            hmsPeer.auxiliaryTracks = storePeer.auxiliaryTracks;
+            storePeer.auxiliaryTracks = hmsPeer.auxiliaryTracks;
           }
           Object.assign(storePeer, hmsPeer);
         }
