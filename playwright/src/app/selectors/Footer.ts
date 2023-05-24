@@ -109,6 +109,15 @@ export class Footer {
   audio_playlist_item = 'div[role="menuitem"]:nth-child(?)';
 
   error_message = 'text=Resolution not supported';
+
+  //Layout
+  layout_button = 'button[id*="trigger-layout"]';
+  activespeaker_toggle = 'button[id="activeSpeakerMode"]';
+  activespeakersorting_toggle = 'button[id="activeSpeakerSortingMode"]';
+  audioonly_toggle = 'button[id="audioOnlyMode"]';
+  mirrorlocal_toggle = 'button[id="mirrorMode"]';
+  hidelocal_toggle = 'button[id="hideLocalVideo"]';
+  tilesinview_bar = 'span[dir="ltr"]';
   
   constructor(page: PageWrapper) {
     this.page = page;
