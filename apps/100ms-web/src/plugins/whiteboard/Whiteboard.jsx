@@ -1,12 +1,15 @@
 import React from "react";
 import { Tldraw } from "@tldraw/tldraw";
+import PdfViewerComponent from "./pdfAnnotation";
 import { useMultiplayerState } from "./useMultiplayerState";
 import "./Whiteboard.css";
 
 export const Whiteboard = React.memo(({ roomId }) => {
   const events = useMultiplayerState(roomId);
-
-  return (
+  const isPdf = true;
+  return isPdf ? (
+    <PdfViewerComponent />
+  ) : (
     <Tldraw
       autofocus
       disableAssets={true}
