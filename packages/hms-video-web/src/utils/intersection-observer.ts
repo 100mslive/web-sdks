@@ -1,5 +1,5 @@
 import HMSLogger from './logger';
-import { isBrowser } from './support';
+import { isBrowser } from './user-agent';
 
 export interface HMSIntersectionObserverCallback {
   (entry: IntersectionObserverEntry): void;

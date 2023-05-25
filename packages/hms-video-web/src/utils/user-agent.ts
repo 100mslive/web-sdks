@@ -3,6 +3,8 @@ import { DomainCategory } from '../analytics/AnalyticsEventDomains';
 import { domainCategory } from '../analytics/domain-analytics';
 import { HMSFrameworkInfo } from '../interfaces';
 
+export const isBrowser = typeof window !== 'undefined';
+
 const sdk_version = require('../../package.json').version;
 
 type UserAgent = {

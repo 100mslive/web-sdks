@@ -1,4 +1,4 @@
-import { HMSAction } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';

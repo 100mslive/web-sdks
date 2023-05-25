@@ -6,9 +6,10 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interface
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
+import { isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
+import { isBrowser } from '../../utils/user-agent';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 

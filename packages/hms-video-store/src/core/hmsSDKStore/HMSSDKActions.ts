@@ -936,7 +936,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.roomState = HMSRoomState.Preview;
     }, 'previewStart');
     this.syncRoomState('previewSync');
@@ -958,7 +958,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     );
     this.syncRoomState('joinSync');
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
@@ -977,7 +977,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(room));
+      Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
   }
 

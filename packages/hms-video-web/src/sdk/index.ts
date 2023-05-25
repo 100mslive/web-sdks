@@ -15,7 +15,8 @@ import { AudioSinkManager } from '../audio-sink-manager';
 import { AudioOutputManager, DeviceManager } from '../device-manager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
@@ -1114,7 +1115,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, this.store));
+      this.store.setRoom(new HMSRoom(roomId));
     }
   }
 

@@ -1,7 +1,8 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,

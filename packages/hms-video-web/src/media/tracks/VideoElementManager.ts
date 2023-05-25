@@ -5,7 +5,7 @@ import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
-import { isBrowser } from '../../utils/support';
+import { isBrowser } from '../../utils/user-agent';
 
 /**
  * This class is to manager video elements for video tracks.

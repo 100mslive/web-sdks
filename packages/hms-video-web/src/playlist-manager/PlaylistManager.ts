@@ -1,6 +1,7 @@
 import { PlaylistAudioManager } from './PlaylistAudioManager';
 import { PlaylistVideoManager } from './PlaylistVideoManager';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSPlaylistItem, HMSPlaylistManager, HMSPlaylistProgressEvent, HMSPlaylistType } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';

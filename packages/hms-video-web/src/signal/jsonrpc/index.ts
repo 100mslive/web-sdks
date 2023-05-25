@@ -2,7 +2,8 @@ import { v4 as uuid } from 'uuid';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import Message from '../../sdk/models/HMSMessage';
 import {

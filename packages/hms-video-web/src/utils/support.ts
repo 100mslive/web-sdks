@@ -7,8 +7,6 @@ export const parsedUserAgent = new UAParser();
 export const isNode =
   typeof window === 'undefined' && !parsedUserAgent.getBrowser().name?.toLowerCase().includes('electron');
 
-export const isBrowser = typeof window !== 'undefined';
-
 export enum ENV {
   PROD = 'prod',
   QA = 'qa',
