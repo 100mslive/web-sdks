@@ -377,7 +377,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const hmsPeer = this.sdk.getPeers().find(peer => peer.peerId === peerID);
+    const hmsPeer = this.getSDKHMSPeer(peerID);
     if (!hmsPeer) {
       HMSLogger.w('sendMessage', 'Failed to send message');
       throw Error(`sendMessage Failed - peer ${peerID} not found`);
