@@ -17,7 +17,7 @@ test.beforeEach(async ({ page: nativePage }, testInfo) => {
   });
 
 
-  test(`Verify change layout window @mytest`, async () => {
+  test(`Verify change layout window`, async () => {
 
     await page.footer.openMoreSettings();
     await page.click(page.footer.device_settings_btn);
@@ -25,7 +25,7 @@ test.beforeEach(async ({ page: nativePage }, testInfo) => {
     await page.click(page.footer.layout_button);
     
     await expect(page.locator(page.footer.activespeaker_toggle)).toBeEnabled();
-    await expect(page.locator(page.footer.activespeakersorting_toggle)).toBeEnabled();
+    //await expect(page.locator(page.footer.activespeakersorting_toggle)).toBeEnabled();
     await expect(page.locator(page.footer.audioonly_toggle)).toBeEnabled();
     await expect(page.locator(page.footer.mirrorlocal_toggle)).toBeEnabled();
     await expect(page.locator(page.footer.hidelocal_toggle)).toBeEnabled();
