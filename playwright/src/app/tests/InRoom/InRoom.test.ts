@@ -148,5 +148,6 @@ test(`Update embed url`, async ({ page: nativePage }) => {
 });
 
 test(`Verify PIP mode button is displayed and visible`, async({page: nativePage}) => {
-  await expect(page.locator(page.header.pip_btn)).toBeEnabled();
+  page = await PageWrapper.openMeetingPage(nativePage);
+  await page.assertVisible(page.header.pip_btn);
 });
