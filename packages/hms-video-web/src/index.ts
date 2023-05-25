@@ -9,6 +9,7 @@ export * from './media/tracks';
 export * from './utils/media';
 export * from './utils/device-error';
 export * from './utils/support';
+export { isBrowser } from './utils/user-agent';
 export * from './error/HMSException';
 export * from './interfaces';
 export * from './rtc-stats';
