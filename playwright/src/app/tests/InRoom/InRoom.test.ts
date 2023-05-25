@@ -146,3 +146,7 @@ test(`Update embed url`, async ({ page: nativePage }) => {
   await page.endRoom();
   await page.close();
 });
+
+test(`Verify PIP mode button is displayed and visible`, async({page: nativePage}) => {
+  await expect(page.locator(page.header.pip_btn)).toBeEnabled();
+});
