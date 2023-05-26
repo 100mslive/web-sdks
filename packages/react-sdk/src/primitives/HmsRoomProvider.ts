@@ -7,11 +7,11 @@ import {
   HMSNotifications,
   HMSNotificationTypeParam,
   HMSReactiveStore,
-  HMSStats,
   HMSStatsStore,
   HMSStore,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
+import { IHMSStatsStoreReadOnly } from '@100mslive/hms-video-store/dist/core/IHMSStore';
 import { HMSContextProviderProps, hooksErrorMessage, makeHMSStatsStoreHook, makeHMSStoreHook } from './store';
 import { isBrowser } from '../utils/isBrowser';
 
@@ -19,7 +19,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
   actions?: HMSActions<T>;
   store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
-  stats?: HMSStats;
+  stats?: IHMSStatsStoreReadOnly;
   /**
    * if true this will enable webrtc stats collection
    */
