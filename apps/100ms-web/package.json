@@ -47,7 +47,9 @@
     "dev": "node ../../scripts/dev-webapp",
     "format": "prettier -w src",
     "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
-    "lint:fix": "yarn lint --fix"
+    "lint:fix": "yarn lint --fix",
+    "types:build": "tsc -p tsconfig.json"
+
   },
   "browserslist": {
     "production": [
