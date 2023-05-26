@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect } from "react";
 import { useSearchParam } from "react-use";
 import {
@@ -14,23 +13,18 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
-//@ts-ignore
 import { normalizeAppPolicyConfig } from "../init/initUtils";
 import {
   UserPreferencesKeys,
   useUserPreferences,
-  //@ts-ignore
 } from "../hooks/useUserPreferences";
 import {
   useIsSidepaneTypeOpen,
   useSidepaneReset,
   useSidepaneState,
   useSidepaneToggle,
-  //@ts-ignore
 } from "./useSidepane";
-//@ts-ignore
 import { useSetAppDataByKey } from "./useUISettings";
-//@ts-ignore
 import { getMetadata } from "../../common/utils";
 import {
   APP_DATA,
@@ -43,7 +37,6 @@ import {
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
-  //@ts-ignore
 } from "../../common/constants";
 
 export const getAppDetails = (appDetails?: string) => {

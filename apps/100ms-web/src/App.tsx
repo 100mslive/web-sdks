@@ -15,47 +15,28 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, HMSThemeProvider, ThemeTypes } from "@100mslive/react-ui";
-// @ts-ignore
 import { AppData } from "./components/AppData/AppData";
-// @ts-ignore
 import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
-// @ts-ignore
 import AuthToken from "./components/AuthToken";
-// @ts-ignore
 import { ErrorBoundary } from "./components/ErrorBoundary";
-// @ts-ignore
 import ErrorPage from "./components/ErrorPage";
-// @ts-ignore
 import FullPageProgress from "./components/FullPageProgress";
-// @ts-ignore
 import { Init } from "./components/init/Init";
-// @ts-ignore
 import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
-// @ts-ignore
 import { Notifications } from "./components/Notifications";
-// @ts-ignore
 import PostLeave from "./components/PostLeave";
-// @ts-ignore
 import PreviewContainer from "./components/Preview/PreviewContainer";
-// @ts-ignore
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { AppContext, useAppContext } from "./AppContext";
-// @ts-ignore
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms";
-// @ts-ignore
 import { Confetti } from "./plugins/confetti";
-// @ts-ignore
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
-// @ts-ignore
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
-// @ts-ignore
 import { getRoutePrefix, shadeColor } from "./common/utils";
-// @ts-ignore
 import { FeatureFlags } from "./services/FeatureFlags";
 import "./base.css";
 import "./index.css";
 
-// @ts-ignore
 const Conference = React.lazy(() => import("./components/conference"));
 
 const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
@@ -134,7 +115,7 @@ export const HMSRoomComposite = React.forwardRef<
       if (!ref) {
         return;
       }
-      // @ts-ignore
+      //@ts-ignore
       ref.current = {
         hmsActions,
         hmsStats,
@@ -153,14 +134,14 @@ export const HMSRoomComposite = React.forwardRef<
             aspectRatio={{ width, height }}
             theme={{
               colors: {
-                // @ts-ignore
+                //@ts-ignore
                 brandDefault: color,
                 brandDark: shadeColor(color, -30),
                 brandLight: shadeColor(color, 30),
                 brandDisabled: shadeColor(color, 10),
               },
               fonts: {
-                // @ts-ignore
+                //@ts-ignore
                 sans: [font, "Inter", "sans-serif"],
               },
             }}
