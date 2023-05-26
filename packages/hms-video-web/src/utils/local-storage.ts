@@ -1,5 +1,5 @@
 import { initializeLocalstoragePolyfill } from './local-storage-polyfill';
-import { isBrowser } from './user-agent';
+import { isBrowser } from './support';
 
 export class LocalStorage<T> {
   private storage: Storage | null = null;

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { isBrowser } from './user-agent';
+import { isBrowser } from './support';
 
 export const getNetworkInfo = () => {
   if (!isBrowser || typeof navigator.connection === 'undefined') {

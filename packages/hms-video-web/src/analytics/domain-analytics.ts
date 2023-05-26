@@ -1,5 +1,5 @@
 import { DomainCategory } from './AnalyticsEventDomains';
-import { isBrowser } from '../utils/user-agent';
+import { isBrowser } from '../utils/support';
 
 function getDomainCategory() {
   // this function gives us the domain category(sutom, hms , local) of the base url.

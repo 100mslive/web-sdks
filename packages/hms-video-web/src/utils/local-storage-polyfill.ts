@@ -1,4 +1,4 @@
-import { isBrowser } from './user-agent';
+import { isBrowser } from './support';
 
 class LocalStorage {
   valuesMap = new Map();

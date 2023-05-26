@@ -1,6 +1,6 @@
 import HMSLogger from './logger';
+import { isBrowser } from './support';
 import { debounce } from './timer-utils';
-import { isBrowser } from './user-agent';
 
 export interface HMSResizeObserverCallback {
   (entry: ResizeObserverEntry): void;
