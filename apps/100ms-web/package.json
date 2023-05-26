@@ -44,13 +44,12 @@
     "prebuild": "rm -rf build",
     "build": "webpack --node-env production",
     "start": "webpack serve",
-    "esbuild": "node ../../scripts/build-webapp",
+    "esbuild": "node ../../scripts/build-webapp && yarn types:build",
     "dev": "node ../../scripts/dev-webapp",
+    "types:build": "tsc -p tsconfig.json",
     "format": "prettier -w src",
     "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
-    "lint:fix": "yarn lint --fix",
-    "types:build": "tsc -p tsconfig.json"
-
+    "lint:fix": "yarn lint --fix"
   },
   "browserslist": {
     "production": [
