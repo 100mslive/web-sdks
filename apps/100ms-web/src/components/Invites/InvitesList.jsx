@@ -85,7 +85,7 @@ const Card = ({ title, link, order = 0 }) => {
     >
       <Flex align="baseline" gap="2" css={{ color: "$primaryLight" }}>
         <Text
-          variant={isMobile ? "h6" : "caption"}
+          variant={!isMobile ? "h6" : "caption"}
           css={{ fontWeight: "$semiBold", flexGrow: "1" }}
         >
           {title}
