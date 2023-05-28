@@ -84,7 +84,10 @@ const Card = ({ title, link, order = 0 }) => {
       }}
     >
       <Flex align="baseline" gap="2" css={{ color: "$primaryLight" }}>
-        <Text variant="h6" css={{ fontWeight: "$semiBold", flexGrow: "1" }}>
+        <Text
+          variant={isMobile ? "h6" : "caption"}
+          css={{ fontWeight: "$semiBold", flexGrow: "1" }}
+        >
           {title}
         </Text>
         <Button
