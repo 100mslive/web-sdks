@@ -78,7 +78,7 @@ const Card = ({ title, link, order = 0 }) => {
       key={title}
       css={{
         backgroundColor: "$surfaceLight",
-        padding: "$10",
+        padding: "$6",
         order,
         borderRadius: "$2",
       }}
