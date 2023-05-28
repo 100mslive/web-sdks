@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { ViewIcon } from "@100mslive/react-icons";
-import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
+import { Button, Dialog, Text } from "@100mslive/react-ui";
 import {
   DialogContent,
-  DialogInput,
   DialogInputFile,
   DialogRow,
 } from "../../primitives/DialogContent";
@@ -18,7 +16,6 @@ export function PDFFileOptions({ onOpenChange }) {
       <DialogContent title="Share PDF">
         <DialogInputFile
           onChange={target => {
-            console.log("evnet", target.files[0]);
             setPDFFile(target.files[0]);
           }}
           title="Upload File"

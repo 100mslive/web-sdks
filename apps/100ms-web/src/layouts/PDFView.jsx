@@ -86,8 +86,7 @@ const EmbedComponent = () => {
       }}
     >
       <iframe
-        // src="https://647049c78de3c94c8e164383--venerable-smakager-42f7d2.netlify.app/web/viewer.html"
-        src="http://localhost:8888/web/viewer.html"
+        src="https://pdf-js-git-feat-pdf-upload-100mslive.vercel.app/generic/web/viewer.html"
         title="PDF Annotator"
         ref={ref}
         style={{ width: "100%", height: "100%", border: 0 }}
