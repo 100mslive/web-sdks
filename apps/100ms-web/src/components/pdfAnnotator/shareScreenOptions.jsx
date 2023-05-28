@@ -1,17 +1,26 @@
-import React from "react";
+import React, { Fragment, useState } from "react";
 import { useScreenShare } from "@100mslive/react-sdk";
-import { Box, Button, Dialog, Flex, Text } from "@100mslive/react-ui";
-import { DialogContent, DialogRow } from "../../primitives/DialogContent";
-import { HorizontalMenuIcon } from "@100mslive/react-icons";
+import { VerticalMenuIcon } from "@100mslive/react-icons";
+import {
+  Box,
+  Button,
+  Dropdown,
+  Flex,
+  IconButton,
+  Text,
+  Tooltip,
+} from "@100mslive/react-ui";
+import { PDFFileOptions } from "./pdfFileOptions";
 
 const MODALS = {
-  "SHARE": "share",
-  "SCREEN_SHARE": "screenShare",
-  "PDF_SHARE": "pdfShare",
-}
+  SHARE: "share",
+  SCREEN_SHARE: "screenShare",
+  PDF_SHARE: "pdfShare",
+};
 
-export function ShareScreenOptions({ onOpenChange }) {
+export function ShareScreenOptions() {
   const [openModals, setOpenModals] = useState(new Set());
+  const { amIScreenSharing } = useScreenShare();
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
@@ -30,28 +39,41 @@ export function ShareScreenOptions({ onOpenChange }) {
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
       >
-        <Dropdown.Trigger asChild data-testid="more_settings_btn">
+        <Dropdown.Trigger asChild data-testid="sharing_btn">
           <IconButton>
-            <Tooltip title="More options">
+            <Tooltip title="Share">
               <Box>
-                <HorizontalMenuIcon />
+                <VerticalMenuIcon />
               </Box>
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
-        <Dropdown.Content></Dropdown.Content>
-      </Dropdown.Root>
-    </Fragment>
-    <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <DialogContent title="Start Sharing">
-        <DialogRow>
-          <Text variant="sm">Choose what you want to share.</Text>
-        </DialogRow>
-        <DialogRow>
-          <Flex direction="row">
+        <Dropdown.Content
+          sideOffset={5}
+          css={{
+            w: "$96",
+            h: "24rem",
+          }}
+        >
+          <Dropdown.Item
+            css={{
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
+            <Text variant="h6">Start Sharing</Text>
+            <Text variant="sm">Choose what you want to share</Text>
+          </Dropdown.Item>
+          <Dropdown.Item
+            css={{
+              flexDirection: "row",
+              alignItems: "flex-start",
+            }}
+          >
             <Flex direction="column" align="center">
-              <Box
-                onClick={console.log("here")}
+              <IconButton
+                as="div"
+                onClick={() => toggleScreenShare()}
                 css={{
                   p: "$4",
                   display: "flex",
@@ -66,18 +88,23 @@ export function ShareScreenOptions({ onOpenChange }) {
                   alt="Share screen to user"
                   style={{
                     borderRadius: "$4 $4 0 0",
+                    padding: "$2",
                   }}
                 />
-              </Box>
+              </IconButton>
 
-              <Text>Share Screen</Text>
-              <Text variant="sm">
-                {" "}
+              <Text variant="sub1">Share Screen</Text>
+              <Text variant="caption">
                 Share your tab, window, or entire screen.
               </Text>
             </Flex>
             <Flex direction="column" align="center">
-              <Box
+              <IconButton
+                onClick={() => {
+                  if (!amIScreenSharing) {
+                    updateState(MODALS.PDF_SHARE, true);
+                  }
+                }}
                 css={{
                   p: "$4",
                   display: "flex",
@@ -92,28 +119,37 @@ export function ShareScreenOptions({ onOpenChange }) {
                   alt="Share pdf to user"
                   style={{
                     borderRadius: "$4 $4 0 0",
+                    padding: "$2",
                   }}
                 />
-              </Box>
-              <Text>Share PDF</Text>
-              <Text variant="sm">Annotate, share and more over PDFs</Text>
+              </IconButton>
+              <Text variant="sub1">Share PDF</Text>
+              <Text variant="caption">Annotate, share and more over PDFs</Text>
             </Flex>
-          </Flex>
-        </DialogRow>
-        <DialogRow>
-          <Button
-            variant="primary"
-            outlined
-            type="submit"
-            onClick={() => {
-              onOpenChange(false);
-            }}
-            data-testid="share_btn"
-          >
-            Cancel
-          </Button>
-        </DialogRow>
-      </DialogContent>
-    </Dialog.Root>
+          </Dropdown.Item>
+          <Dropdown.Item>
+            <Button
+              variant="primary"
+              outlined
+              type="submit"
+              onClick={() => {
+                updateState(MODALS.SHARE, false);
+              }}
+              data-testid="share_btn"
+              css={{
+                w: "100%",
+              }}
+            >
+              Cancel
+            </Button>
+          </Dropdown.Item>
+        </Dropdown.Content>
+      </Dropdown.Root>
+      {openModals.has(MODALS.PDF_SHARE) && (
+        <PDFFileOptions
+          onOpenChange={value => updateState(MODALS.PDF_SHARE, value)}
+        />
+      )}
+    </Fragment>
   );
 }

@@ -133,6 +133,7 @@ export const APP_DATA = {
   embedConfig: "embedConfig",
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
+  pdfConfig: "pdfConfig",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",

@@ -229,6 +229,31 @@ export const DialogInput = ({
   );
 };
 
+export const DialogInputFile = ({
+  title,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  type,
+  ...props
+}) => {
+  return (
+    <DialogRow breakSm>
+      <Label>{title}</Label>
+      <Input
+        css={{ width: "70%", "@sm": { width: "100%" } }}
+        value={value}
+        onChange={e => onChange(e.target)}
+        placeholder={placeholder}
+        disabled={disabled}
+        type={type}
+        {...props}
+      />
+    </DialogRow>
+  );
+};
+
 export const DialogSwitch = ({ title, value, onChange, disabled }) => {
   return (
     <DialogRow>

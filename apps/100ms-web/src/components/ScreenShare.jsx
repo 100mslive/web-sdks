@@ -1,43 +1,55 @@
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { ShareScreenIcon } from "@100mslive/react-icons";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { Box, Tooltip } from "@100mslive/react-ui";
 import { ShareScreenOptions } from "./pdfAnnotator/shareScreenOptions";
+import IconButton from "../IconButton";
+import { useUISettings } from "./AppData/useUISettings";
 import { isScreenshareSupported } from "../common/utils";
+import { UI_SETTINGS } from "../common/constants";
 
 export const ScreenshareToggle = ({ css }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const [openShareScreen, setOpenShareScreen] = useState(false);
-  const { amIScreenSharing, screenShareVideoTrackId: video } = useScreenShare();
+  const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  const {
+    amIScreenSharing,
+    screenShareVideoTrackId: video,
+    toggleScreenShare,
+  } = useScreenShare();
   const isVideoScreenshare = amIScreenSharing && !!video;
   if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
     return null;
   }
-  console.log("here ");
 
   return (
     <Fragment>
-      <Tooltip
-        title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
+      <Box
+        css={{
+          display: "flex",
+          flexDirection: "row",
+        }}
       >
-        <IconButton
-          active={!isVideoScreenshare}
-          css={css}
-          onClick={() => {
-            setOpenShareScreen(true);
-          }}
-          data-testid="screen_share_btn"
+        <Tooltip
+          title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
         >
-          <ShareScreenIcon />
-        </IconButton>
-      </Tooltip>
-      {openShareScreen && (
-        <ShareScreenOptions onOpenChange={setOpenShareScreen} />
-      )}
+          <IconButton
+            active={!isVideoScreenshare}
+            css={css}
+            disabled={isAudioOnly}
+            onClick={() => {
+              toggleScreenShare();
+            }}
+            data-testid="screen_share_btn"
+          >
+            <ShareScreenIcon />
+          </IconButton>
+        </Tooltip>
+        <ShareScreenOptions />
+      </Box>
     </Fragment>
   );
 };
