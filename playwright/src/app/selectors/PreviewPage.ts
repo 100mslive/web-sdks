@@ -19,6 +19,8 @@ export class PreviewPage {
   dialoge_cross_icon = 'div[data-testid="dialog_cross_icon"]';
   dialoge_select_settings = 'div[data-testid="?_selector"]';
   preview_setting_btn_list = ['fake_device_0', 'Fake Default Audio Input', 'Fake Default Audio Output'];
+  preview_network_status = 'span[data-testid="tile_network"]';
+
 
   constructor(page: PageWrapper) {
     this.page = page;

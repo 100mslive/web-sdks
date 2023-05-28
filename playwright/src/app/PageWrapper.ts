@@ -95,6 +95,14 @@ export class PageWrapper {
     }
   }
 
+  async assertEnabled(elementId: string) {
+    await this.page.locator(elementId).isEnabled();
+  }
+
+  async assertDisabled(elementId: string) {
+    await this.page.locator(elementId).isDisabled();
+  }
+  
   async assertVisible(elementId: string) {
     console.log('going to assert visibility', elementId);
     await this.page.waitForSelector(elementId, { state: 'visible' });

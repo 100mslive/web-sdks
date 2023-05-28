@@ -821,6 +821,10 @@ export default class HMSTransport implements ITransport {
         parseInt(`${hmsError.code / 100}`) === 5 ||
         [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
 
+      if (hmsError.code === 410) {
+        hmsError.isTerminal = true;
+      }
+
       if (shouldRetry) {
         this.joinRetryCount = 0;
         hmsError.isTerminal = false;
