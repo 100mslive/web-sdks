@@ -55,7 +55,11 @@ export class NetworkTestManager {
           this.sendScore({ scoreMap, downloadedSize, startTime, finished: true });
         })
         .catch(error => {
-          HMSLogger.e(this.TAG, error);
+          if ((error as Error).name !== 'AbortError') {
+            HMSLogger.d(this.TAG, error);
+          } else {
+            HMSLogger.e(this.TAG, error);
+          }
           this.updateScoreToListener(0);
           this.eventBus.analytics.publish(
             AnalyticsEventFactory.previewNetworkQuality({ error: (error as Error).message }),
