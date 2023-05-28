@@ -20,10 +20,11 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import GoLiveButton from "../GoLiveButton";
+import InvitesButton from "../Invites/InvitesButton";
 import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
-import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
+import { getRecordingText } from "./AdditionalRoomState";
 import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import {
@@ -257,11 +258,11 @@ export const StreamActions = () => {
 
   return (
     <Flex align="center" css={{ gap: "$4" }}>
-      <AdditionalRoomState />
       <Flex align="center" css={{ gap: "$4", "@md": { display: "none" } }}>
         <LiveStatus />
         <RecordingStatus />
       </Flex>
+      {isConnected ? <InvitesButton /> : null}
       {isConnected && !isMobile ? <StartRecording /> : null}
       {isConnected &&
         (permissions.hlsStreaming || permissions.rtmpStreaming) && (
