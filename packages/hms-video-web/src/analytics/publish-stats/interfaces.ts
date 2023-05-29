@@ -31,9 +31,9 @@ export interface VideoSample extends BaseSample {
 }
 
 export interface QualityLimitation {
-  bandwith_ms?: number; // Total time in millis in the last 30s where this video track was limited by bandwidth
-  cpu_ms?: number; // Total time in millis in the last 30s where this video track was limited by CPU
-  other_ms?: number;
+  bandwith_sec?: number; // Total time in millis in the last 30s where this video track was limited by bandwidth
+  cpu_sec?: number; // Total time in millis in the last 30s where this video track was limited by CPU
+  other_sec?: number;
 }
 
 export interface Resolution {
