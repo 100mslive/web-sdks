@@ -12,7 +12,7 @@ const InvitesButton = () => {
   return (
     <Tooltip title="Invite">
       <Button
-        data-testid="go_live"
+        data-testid="invite_users"
         variant="standard"
         onClick={() => {
           toggleInvites();

@@ -24,7 +24,7 @@ import InvitesButton from "../Invites/InvitesButton";
 import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";
-import { getRecordingText } from "./AdditionalRoomState";
+import { AdditionalRoomState, getRecordingText } from "./AdditionalRoomState";
 import { useSidepaneState, useSidepaneToggle } from "../AppData/useSidepane";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import {
@@ -258,6 +258,7 @@ export const StreamActions = () => {
 
   return (
     <Flex align="center" css={{ gap: "$4" }}>
+      <AdditionalRoomState />
       <Flex align="center" css={{ gap: "$4", "@md": { display: "none" } }}>
         <LiveStatus />
         <RecordingStatus />
