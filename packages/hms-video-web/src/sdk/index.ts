@@ -117,7 +117,7 @@ export class HMSSdk implements HMSInterface {
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
-    this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
+
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
@@ -138,6 +138,13 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+    );
+    this.notificationManager = new NotificationManager(
+      this.store,
+      this.eventBus,
+      this.transport!,
+      this.listener,
+      this.audioListener,
     );
     this.sessionStore = new SessionStore(this.transport);
 
@@ -1156,10 +1163,10 @@ export class HMSSdk implements HMSInterface {
         );
       }
       tracks.push(audioTrack);
-      audioTrack.nativeTrack.onended = handleEnded;
+      audioTrack.nativeTrack.addEventListener('ended', handleEnded);
     } else {
       tracks.push(videoTrack);
-      videoTrack.nativeTrack.onended = handleEnded;
+      videoTrack.nativeTrack.addEventListener('ended', handleEnded);
       // audio track is not always available
       if (audioTrack) {
         tracks.push(audioTrack);

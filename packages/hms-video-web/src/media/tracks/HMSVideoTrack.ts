@@ -7,12 +7,21 @@ export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
   private sinkCount = 0;
   videoHandler!: VideoElementManager;
+  private customTrackId!: string;
 
   constructor(stream: HMSMediaStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source as HMSTrackSource);
     if (track.kind !== 'video') {
       throw new Error("Expected 'track' kind = 'video'");
     }
+  }
+
+  setTrackId(trackId: string) {
+    this.customTrackId = trackId;
+  }
+
+  get trackId(): string {
+    return this.customTrackId;
   }
 
   setVideoHandler(videoHandler: VideoElementManager) {

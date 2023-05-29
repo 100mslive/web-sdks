@@ -1,10 +1,14 @@
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
 import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
+import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
+import { isEmptyTrack } from '../../utils/track';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
 /**
@@ -26,7 +30,12 @@ export class TrackManager {
   private readonly TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
-  constructor(private store: IStore, private eventBus: EventBus, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: IStore,
+    private eventBus: EventBus,
+    private transport: HMSTransport,
+    public listener?: HMSUpdateListener,
+  ) {}
   /**
    * Add event from biz on track-add
    * @param params TrackStateNotification
@@ -35,10 +44,14 @@ export class TrackManager {
     HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
 
     for (const trackId in params.tracks) {
+      const trackInfo = params.tracks[trackId];
       this.store.setTrackState({
         peerId: params.peer.peer_id,
-        trackInfo: params.tracks[trackId],
+        trackInfo,
       });
+      if (trackInfo.type === 'video') {
+        this.processTrackInfo(trackInfo, params.peer.peer_id);
+      }
     }
 
     this.processPendingTracks();
@@ -214,7 +227,14 @@ export class TrackManager {
     const remoteTrack = track as HMSRemoteVideoTrack;
     const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
     remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-    if (track.source === 'regular' && (!hmsPeer.videoTrack || hmsPeer.videoTrack?.trackId === track.trackId)) {
+    if (
+      track.source === 'regular' &&
+      (!hmsPeer.videoTrack ||
+        isEmptyTrack(hmsPeer.videoTrack.nativeTrack) ||
+        hmsPeer.videoTrack?.trackId === track.trackId)
+    ) {
+      console.log('add video track', remoteTrack);
+
       hmsPeer.videoTrack = remoteTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);
@@ -233,4 +253,21 @@ export class TrackManager {
     }
     return eventType;
   }
+
+  private processTrackInfo = (trackInfo: TrackState, peerId: string) => {
+    const hmsPeer = this.store.getPeerById(peerId);
+    if (!hmsPeer) {
+      console.log(`no peer in store for peerId: ${peerId}`);
+      return;
+    }
+    if (trackInfo.type === 'video' && !hmsPeer?.videoTrack) {
+      // @ts-ignore
+      const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
+      const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
+      emptyTrack.enabled = true;
+      const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
+      track.setTrackId(trackInfo.track_id);
+      this.addVideoTrack(hmsPeer, track);
+    }
+  };
 }

@@ -288,9 +288,9 @@ export class LocalTrackManager {
         ctx.fillRect(0, 0, 1, 1);
       }
     }, 1000 / frameRate);
-    emptyTrack.onended = () => {
+    emptyTrack.addEventListener('ended', () => {
       clearInterval(intervalID);
-    };
+    });
     emptyTrack.enabled = false;
     return emptyTrack;
   }

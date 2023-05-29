@@ -20,6 +20,7 @@ import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
+import HMSTransport from '../transport';
 import HMSLogger from '../utils/logger';
 
 export class NotificationManager {
@@ -44,11 +45,12 @@ export class NotificationManager {
   constructor(
     private store: IStore,
     eventBus: EventBus,
+    private transport: HMSTransport,
     private listener?: HMSUpdateListener,
     private audioListener?: HMSAudioListener,
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
-    this.trackManager = new TrackManager(this.store, eventBus, this.listener);
+    this.trackManager = new TrackManager(this.store, eventBus, this.transport, this.listener);
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
