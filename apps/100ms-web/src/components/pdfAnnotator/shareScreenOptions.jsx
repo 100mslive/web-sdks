@@ -1,6 +1,10 @@
 import React, { Fragment, useState } from "react";
 import { useScreenShare } from "@100mslive/react-sdk";
-import { VerticalMenuIcon } from "@100mslive/react-icons";
+import {
+  PdfShare,
+  ScreenShare,
+  VerticalMenuIcon,
+} from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -82,15 +86,9 @@ export function ShareScreenOptions() {
                   borderRadius: "$2",
                   backgroundColor: "#282F39",
                 }}
+                icon
               >
-                <img
-                  src="/screenShare.png"
-                  alt="Share screen to user"
-                  style={{
-                    borderRadius: "$4 $4 0 0",
-                    padding: "$2",
-                  }}
-                />
+                <ScreenShare width="135px" height="84px" />
               </IconButton>
 
               <Text variant="sub1">Share Screen</Text>
@@ -113,15 +111,9 @@ export function ShareScreenOptions() {
                   borderRadius: "$2",
                   backgroundColor: "#282F39",
                 }}
+                icon
               >
-                <img
-                  src="/pdfShare.png"
-                  alt="Share pdf to user"
-                  style={{
-                    borderRadius: "$4 $4 0 0",
-                    padding: "$2",
-                  }}
-                />
+                <PdfShare width="135px" height="84px" />
               </IconButton>
               <Text variant="sub1">Share PDF</Text>
               <Text variant="caption">Annotate, share and more over PDFs</Text>
