@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Dialog, Text } from "@100mslive/react-ui";
+import { Button, Dialog, Flex, Text } from "@100mslive/react-ui";
 import {
   DialogContent,
   DialogInputFile,
@@ -11,21 +11,34 @@ import { APP_DATA } from "../../common/constants";
 export function PDFFileOptions({ onOpenChange }) {
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   const [pdfFile, setPDFFile] = useState();
+  console.log("pdf file ", pdfFile);
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Share PDF">
-        <DialogInputFile
-          onChange={target => {
-            setPDFFile(target.files[0]);
-          }}
-          title="Upload File"
-          accept=".pdf"
-          placeholder="Upload pdf file"
-          type="file"
-        />
-        <DialogRow>
-          <Text>Upload PDF file which you will annotate.</Text>
-        </DialogRow>
+        <Flex direction="column">
+          <DialogInputFile
+            onChange={target => {
+              setPDFFile(target.files[0]);
+            }}
+            accept=".pdf"
+            placeholder="Upload pdf file"
+            type="file"
+            css={{
+              w: "100%",
+              "&:hover": {
+                cursor: "pointer",
+              },
+            }}
+          />
+          <Text
+            css={{
+              pl: "$4",
+              mt: "-$8",
+            }}
+          >
+            Upload PDF file to share and annotate.
+          </Text>
+        </Flex>
         <DialogRow>
           <Button
             variant="standard"
@@ -45,6 +58,7 @@ export function PDFFileOptions({ onOpenChange }) {
               setPDFConfig({ state: true, file: pdfFile });
               onOpenChange(false);
             }}
+            disabled={!pdfFile}
             data-testid="share_pdf_btn"
           >
             Start Sharing
