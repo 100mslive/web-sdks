@@ -11,7 +11,6 @@ import { APP_DATA } from "../../common/constants";
 export function PDFFileOptions({ onOpenChange }) {
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   const [pdfFile, setPDFFile] = useState();
-  console.log("pdf file ", pdfFile);
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Share PDF">
