@@ -15,14 +15,16 @@ export const PDFView = ({ showStats }) => {
 
   return (
     <Flex css={{ size: "100%", "@lg": { flexDirection: "column" } }}>
-      <EmbedComponent />
+      <PDFEmbedComponent />
       <GridSidePaneView peers={peers} showStatsOnTiles={showStats} />
     </Flex>
   );
 };
 
-const EmbedComponent = () => {
+const PDFEmbedComponent = () => {
   const ref = useRef();
+  const pdfJSURL =
+    "https://pdf-js-git-feat-pdf-upload-100mslive.vercel.app/generic/web/viewer.html";
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
@@ -86,7 +88,7 @@ const EmbedComponent = () => {
       }}
     >
       <iframe
-        src="https://pdf-js-git-feat-pdf-upload-100mslive.vercel.app/generic/web/viewer.html"
+        src={pdfJSURL}
         title="PDF Annotator"
         ref={ref}
         style={{ width: "100%", height: "100%", border: 0 }}

@@ -5,7 +5,7 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { ShareScreenIcon } from "@100mslive/react-icons";
-import { Box, Tooltip } from "@100mslive/react-ui";
+import { Flex, Tooltip } from "@100mslive/react-ui";
 import { ShareScreenOptions } from "./pdfAnnotator/shareScreenOptions";
 import IconButton from "../IconButton";
 import { useUISettings } from "./AppData/useUISettings";
@@ -27,12 +27,7 @@ export const ScreenshareToggle = ({ css }) => {
 
   return (
     <Fragment>
-      <Box
-        css={{
-          display: "flex",
-          flexDirection: "row",
-        }}
-      >
+      <Flex direction="row">
         <Tooltip
           title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
         >
@@ -49,7 +44,7 @@ export const ScreenshareToggle = ({ css }) => {
           </IconButton>
         </Tooltip>
         <ShareScreenOptions />
-      </Box>
+      </Flex>
     </Fragment>
   );
 };
