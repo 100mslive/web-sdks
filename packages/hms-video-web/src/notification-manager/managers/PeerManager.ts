@@ -144,10 +144,14 @@ export class PeerManager {
     }
 
     for (const trackId in peer.tracks) {
+      const trackInfo = peer.tracks[trackId];
       this.store.setTrackState({
         peerId: peer.peer_id,
-        trackInfo: peer.tracks[trackId],
+        trackInfo,
       });
+      if (trackInfo.type === 'video') {
+        this.trackManager.processTrackInfo(trackInfo, peer.peer_id);
+      }
     }
     return hmsPeer;
   }

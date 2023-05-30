@@ -254,7 +254,7 @@ export class TrackManager {
     return eventType;
   }
 
-  private processTrackInfo = (trackInfo: TrackState, peerId: string) => {
+  processTrackInfo = (trackInfo: TrackState, peerId: string) => {
     const hmsPeer = this.store.getPeerById(peerId);
     if (!hmsPeer) {
       console.log(`no peer in store for peerId: ${peerId}`);
