@@ -1033,6 +1033,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
           Object.assign(storeTrack, hmsTrack);
         }
       }, actionName);
+      this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
 
