@@ -1355,6 +1355,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
           if (!this.effectsSDK) {
             reject('effects SDK is not present');
           }
+          this.effectsSDK.config({
+            models: {
+              colorcorrector: '',
+              facedetector: '',
+            },
+          });
         }
         this.effectsSDK.onReady = () => {
           console.debug("effects SDK is ready let's run it");
