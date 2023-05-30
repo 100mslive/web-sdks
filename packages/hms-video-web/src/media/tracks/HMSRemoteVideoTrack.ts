@@ -16,10 +16,19 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+  private customTrackId!: string;
 
   constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source);
     this.setVideoHandler(new VideoElementManager(this));
+  }
+
+  setTrackId(trackId: string) {
+    this.customTrackId = trackId;
+  }
+
+  get trackId(): string {
+    return this.customTrackId || super.trackId;
   }
 
   public get degraded() {
