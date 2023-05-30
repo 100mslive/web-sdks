@@ -3,6 +3,7 @@ import { useScreenShare } from "@100mslive/react-sdk";
 import {
   PdfShare,
   ScreenShare,
+  StarIcon,
   VerticalMenuIcon,
 } from "@100mslive/react-icons";
 import {
@@ -56,7 +57,7 @@ export function ShareScreenOptions() {
           sideOffset={5}
           css={{
             w: "$96",
-            h: "24rem",
+            maxHeight: "$96",
           }}
         >
           <Dropdown.Item
@@ -72,6 +73,7 @@ export function ShareScreenOptions() {
             css={{
               flexDirection: "row",
               alignItems: "flex-start",
+              gap: "$8",
             }}
           >
             <Flex direction="column" align="center">
@@ -79,16 +81,17 @@ export function ShareScreenOptions() {
                 as="div"
                 onClick={() => toggleScreenShare()}
                 css={{
-                  p: "$4",
+                  p: "$6",
                   display: "flex",
                   justifyContent: "center",
-                  border: "gray 1px solid",
+                  border: "1px solid $grayDefault",
                   borderRadius: "$2",
-                  backgroundColor: "#282F39",
+                  backgroundColor: "$surfaceLighter",
+                  pb: "0",
                 }}
                 icon
               >
-                <ScreenShare width="135px" height="84px" />
+                <ScreenShare width="100%" height="100%" />
               </IconButton>
 
               <Text variant="sub1">Share Screen</Text>
@@ -99,29 +102,62 @@ export function ShareScreenOptions() {
             <Flex direction="column" align="center">
               <IconButton
                 onClick={() => {
-                  if (!amIScreenSharing) {
-                    updateState(MODALS.PDF_SHARE, true);
-                  }
+                  updateState(MODALS.PDF_SHARE, true);
                 }}
+                disabled={amIScreenSharing}
                 css={{
-                  p: "$4",
+                  p: "$6",
                   display: "flex",
                   justifyContent: "center",
-                  border: "gray 1px solid",
+                  border: "$grayDefault 1px solid",
                   borderRadius: "$2",
-                  backgroundColor: "#282F39",
+                  backgroundColor: "$surfaceLight",
+                  pb: "0",
                 }}
                 icon
               >
-                <PdfShare width="135px" height="84px" />
+                <PdfShare width="100%" height="100%" />
               </IconButton>
               <Text variant="sub1">Share PDF</Text>
               <Text variant="caption">Annotate, share and more over PDFs</Text>
+              <Flex
+                direction="row"
+                css={{
+                  position: "absolute",
+                  top: "29%",
+                  left: "54%",
+                  padding: "$2 $4",
+                  borderRadius: "$2",
+                  backgroundColor: "$primaryLight",
+                  zIndex: "2",
+                }}
+              >
+                <IconButton
+                  css={{
+                    w: "$10",
+                    h: "$8",
+                  }}
+                  icon
+                >
+                  <StarIcon />
+                </IconButton>
+
+                <Text
+                  variant="xs"
+                  css={{
+                    fontWeight: "$semiBold",
+                    color: "$white",
+                    pr: "$4",
+                  }}
+                >
+                  New
+                </Text>
+              </Flex>
             </Flex>
           </Dropdown.Item>
           <Dropdown.Item>
             <Button
-              variant="primary"
+              variant="standard"
               outlined
               type="submit"
               onClick={() => {
