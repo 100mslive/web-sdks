@@ -140,13 +140,13 @@ export default class JsonRpcSignal implements ISignal {
 
       this.socket = new WebSocket(uri); // @DISCUSS: Inject WebSocket as a dependency so that it can be easier to mock and test
 
-      const errorListener = (error: Event) => {
+      const errorListener = () => {
         /**
          * there was an error received from websocket leading to disconnection, this can happen either if server
          * disconnects the websocket for some reason, there is a network disconnect or a firewall/antivirus on user's
          * device is breaking the websocket connecting(which can happen even after a successful connect).
          */
-        HMSLogger.e(this.TAG, 'Error from websocket', error);
+        HMSLogger.e(this.TAG, 'Error from websocket');
         promiseSettled = true;
         // above error does not contain any description hence not sent here
         reject(
@@ -155,7 +155,7 @@ export default class JsonRpcSignal implements ISignal {
       };
 
       this.onCloseHandler = (event: CloseEvent) => {
-        HMSLogger.e(`Websocket closed code=${event.code}`);
+        HMSLogger.w(`Websocket closed code=${event.code}`);
         if (promiseSettled) {
           this.setIsConnected(false, `code: ${event.code}${event.code !== 1000 ? ', unexpected websocket close' : ''}`);
         } else {

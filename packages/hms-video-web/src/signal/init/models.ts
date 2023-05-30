@@ -29,6 +29,10 @@ export interface InitConfig {
   readonly config: {
     readonly enabledFlags?: Array<InitFlags>;
     readonly networkHealth: NetworkHealth;
+    readonly publishStats?: {
+      readonly maxSampleWindowSize: number;
+      readonly maxSamplePushInterval: number;
+    };
   };
 }
 
@@ -36,4 +40,5 @@ export enum InitFlags {
   FLAG_SERVER_SUB_DEGRADATION = 'subscribeDegradation',
   FLAG_SERVER_SIMULCAST = 'simulcast',
   FLAG_NON_WEBRTC_DISABLE_OFFER = 'nonWebRTCDisableOffer',
+  FLAG_PUBLISH_STATS = 'publishStats',
 }

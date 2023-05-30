@@ -83,7 +83,7 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
                 variant="standard"
                 css={{ lineHeight: '1.5rem' }}
                 onClick={() => {
-                  window.open('https://100ms.live/contact');
+                  window.open('https://100ms.live/contact?referrer=prebuilt');
                 }}
               >
                 Schedule a demo

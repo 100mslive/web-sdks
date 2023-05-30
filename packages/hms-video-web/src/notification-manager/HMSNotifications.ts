@@ -189,6 +189,7 @@ export interface MessageNotification {
     };
   };
   roles?: string[];
+  message_id: string;
   private: boolean;
   timestamp: number;
   info: MessageNotificationInfo;

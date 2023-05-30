@@ -98,7 +98,7 @@ export const mergeLocalTrackStats = (
 /**
  * array's are usually created with new reference, avoid that update if both arrays are same
  */
-const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) => {
+export const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) => {
   if (oldTrack.plugins && areArraysEqual(oldTrack.plugins, newTrack.plugins)) {
     newTrack.plugins = oldTrack.plugins;
   }
@@ -111,7 +111,7 @@ const mergeTrackArrayFields = (oldTrack: HMSTrack, newTrack: Partial<HMSTrack>) 
   }
 };
 
-const isEntityUpdated = <T>(oldItem: T, newItem: T) => oldItem && newItem;
+export const isEntityUpdated = <T>(oldItem: T, newItem: T) => oldItem && newItem;
 const isEntityRemoved = <T>(oldItem: T, newItem: T) => oldItem && !newItem;
 const isEntityAdded = <T>(oldItem: T, newItem: T) => !oldItem && newItem;
 
