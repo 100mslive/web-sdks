@@ -24,7 +24,13 @@ import {
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import { areArraysEqual, mergeNewPeersInDraft, mergeNewTracksInDraft } from './sdkUtils/storeMergeUtils';
+import {
+  areArraysEqual,
+  isEntityUpdated,
+  mergeNewPeersInDraft,
+  mergeNewTracksInDraft,
+  mergeTrackArrayFields,
+} from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
@@ -57,7 +63,6 @@ import {
 } from '../schema';
 import {
   HMSRoleChangeRequest,
-  selectHMSMessagesCount,
   selectIsConnectedToRoom,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
@@ -1022,9 +1027,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (type === sdkTypes.HMSTrackUpdate.TRACK_REMOVED) {
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
       this.handleTrackRemove(track, peer);
+    } else if ([sdkTypes.HMSTrackUpdate.TRACK_ADDED, sdkTypes.HMSTrackUpdate.TRACK_REMOVED].includes(type)) {
+      const actionName = TRACK_NOTIFICATION_TYPES[type];
+      this.syncRoomState(actionName);
+      this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     } else {
       const actionName = TRACK_NOTIFICATION_TYPES[type] || 'trackUpdate';
-      this.syncRoomState(actionName);
+      const hmsTrack = SDKToHMS.convertTrack(track);
+      this.setState(draftStore => {
+        const storeTrack = draftStore.tracks[hmsTrack.id];
+        if (isEntityUpdated(storeTrack, hmsTrack)) {
+          mergeTrackArrayFields(storeTrack, hmsTrack);
+          Object.assign(storeTrack, hmsTrack);
+        }
+      }, actionName);
       this.hmsNotifications.sendTrackUpdate(type, track.trackId);
     }
   }
@@ -1042,7 +1058,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       return;
     }
     this.setState(store => {
-      hmsMessage.id = String(this.store.getState(selectHMSMessagesCount) + 1);
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     }, 'newMessage');
@@ -1455,10 +1470,24 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    this.syncRoomState(actionName);
-    // if peer wasn't available before sync(will happen if event is peer join)
-    if (!peer) {
-      peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+    if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
+      this.syncRoomState(actionName);
+      // if peer wasn't available before sync(will happen if event is peer join)
+      if (!peer) {
+        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      }
+    } else {
+      const hmsPeer = SDKToHMS.convertPeer(sdkPeer) as HMSPeer;
+      this.setState(draftStore => {
+        const storePeer = draftStore.peers[hmsPeer.id];
+        if (isEntityUpdated(storePeer, hmsPeer)) {
+          if (areArraysEqual(storePeer.auxiliaryTracks, hmsPeer.auxiliaryTracks)) {
+            storePeer.auxiliaryTracks = hmsPeer.auxiliaryTracks;
+          }
+          Object.assign(storePeer, hmsPeer);
+        }
+        peer = hmsPeer;
+      }, actionName);
     }
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };

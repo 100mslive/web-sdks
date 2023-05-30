@@ -10,6 +10,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
+import { PublishStatsAnalytics } from '../analytics/publish-stats';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
@@ -79,6 +80,7 @@ export default class HMSTransport implements ITransport {
   private joinParameters?: JoinParameters;
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
+  private publishStatsAnalytics?: PublishStatsAnalytics;
   private maxSubscribeBitrate = 0;
   joinRetryCount = 0;
 
@@ -450,6 +452,7 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'leaving in transport');
     try {
       this.state = TransportState.Leaving;
+      this.publishStatsAnalytics?.stop();
       this.webrtcInternals?.cleanUp();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
@@ -818,6 +821,10 @@ export default class HMSTransport implements ITransport {
         parseInt(`${hmsError.code / 100}`) === 5 ||
         [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
 
+      if (hmsError.code === 410) {
+        hmsError.isTerminal = true;
+      }
+
       if (shouldRetry) {
         this.joinRetryCount = 0;
         hmsError.isTerminal = false;
@@ -1038,6 +1045,15 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
+
+    if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
+      this.publishStatsAnalytics = new PublishStatsAnalytics(
+        this.store,
+        this.eventBus,
+        this.initConfig?.config.publishStats?.maxSampleWindowSize,
+        this.initConfig?.config.publishStats?.maxSamplePushInterval,
+      );
+    }
   }
 
   /**

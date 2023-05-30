@@ -85,7 +85,7 @@
   "size-limit": [
     {
       "path": "packages/hms-video-web/dist/index.cjs.js",
-      "limit": "60 KB"
+      "limit": "80 KB"
     },
     {
       "path": "packages/hms-video-web/dist/index.js",

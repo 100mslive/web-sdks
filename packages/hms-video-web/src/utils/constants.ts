@@ -11,22 +11,25 @@ export const ANALYTICS_BUFFER_SIZE = 100;
 export const MAX_TRANSPORT_RETRIES = 5;
 export const MAX_TRANSPORT_RETRY_DELAY = 60;
 
-export const DEFAULT_SIGNAL_PING_TIMEOUT = 12000;
-export const DEFAULT_SIGNAL_PING_INTERVAL = 1000;
+export const DEFAULT_SIGNAL_PING_TIMEOUT = 12_000;
+export const DEFAULT_SIGNAL_PING_INTERVAL = 3_000;
 export const PONG_RESPONSE_TIMES_SIZE = 5;
 
 export const SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID = 'SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID';
-export const SUBSCRIBE_TIMEOUT = 60000;
+export const SUBSCRIBE_TIMEOUT = 60_000;
 
-export const ICE_DISCONNECTION_TIMEOUT = 5000;
+export const ICE_DISCONNECTION_TIMEOUT = 5_000;
 
-export const RTC_STATS_MONITOR_INTERVAL = 1000;
+export const RTC_STATS_MONITOR_INTERVAL = 1_000;
 
 export const MAINTAIN_TRACK_HISTORY = false;
 
 export const CLIENT_ANAYLTICS_PROD_ENDPOINT = 'https://event.100ms.live/v2/client/report';
 export const CLIENT_ANAYLTICS_QA_ENDPOINT = 'https://event-nonprod.100ms.live/v2/client/report';
 export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
+
+export const PUBLISH_STATS_SAMPLE_WINDOW = 30;
+export const PUBLISH_STATS_PUSH_INTERVAL = 300;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
