@@ -115,6 +115,7 @@ export class TrackManager {
     }
   };
 
+  // eslint-disable-next-line complexity
   handleTrackUpdate = (params: TrackStateNotification) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
@@ -135,6 +136,10 @@ export class TrackManager {
 
       // TRACK_UPDATE came before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
       if (!track || this.tracksToProcess.has(trackId)) {
+        if (!trackEntry.mute) {
+          this.processTrackInfo(trackEntry, params.peer.peer_id);
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
+        }
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
