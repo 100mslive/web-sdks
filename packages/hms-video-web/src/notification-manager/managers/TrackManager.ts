@@ -262,7 +262,7 @@ export class TrackManager {
   processTrackInfo = (trackInfo: TrackState, peerId: string) => {
     const hmsPeer = this.store.getPeerById(peerId);
     if (!hmsPeer) {
-      console.log(`no peer in store for peerId: ${peerId}`);
+      HMSLogger.d(this.TAG, `no peer in store for peerId: ${peerId}`);
       return;
     }
     if (trackInfo.type === 'video' && !hmsPeer?.videoTrack) {
