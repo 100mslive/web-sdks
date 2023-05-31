@@ -75,7 +75,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     }
     const sender = track.transceiver?.sender;
     if (!sender) {
-      HMSLogger.e(this.TAG, `No sender found for trackId=${track.trackId}`);
+      HMSLogger.w(this.TAG, `No sender found for trackId=${track.trackId}`);
       return;
     }
     this.connection?.removeTrack(sender);
@@ -83,7 +83,7 @@ export default class HMSLocalStream extends HMSMediaStream {
     if (toRemoveLocalTrackIdx !== -1) {
       this.tracks.splice(toRemoveLocalTrackIdx, 1);
     } else {
-      HMSLogger.e(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
+      HMSLogger.w(this.TAG, `Cannot find ${track.trackId} in locally stored tracks`);
     }
   }
 

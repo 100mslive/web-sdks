@@ -13,7 +13,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { getVideoTrack } from '../../utils/track';
+import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import HMSLocalStream from '../streams/HMSLocalStream';
 
@@ -141,7 +141,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
     await this.handleDeviceChange(newSettings, internal);
-    if (!this.enabled) {
+    if (!this.enabled || isEmptyTrack(this.nativeTrack)) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;

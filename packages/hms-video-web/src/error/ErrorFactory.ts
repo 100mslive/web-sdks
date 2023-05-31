@@ -34,6 +34,7 @@ const terminalActions: (HMSSignalMethod | HMSAction)[] = [
   HMSSignalMethod.OFFER,
   HMSSignalMethod.ANSWER,
   HMSSignalMethod.TRICKLE,
+  HMSSignalMethod.SERVER_ERROR,
   HMSAction.JOIN,
 ];
 

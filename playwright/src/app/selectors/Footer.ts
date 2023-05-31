@@ -27,6 +27,15 @@ export class Footer {
   change_name_field = 'input[data-testid="change_name_field"]';
   popup_change_btn = 'button[data-testid="popup_change_btn"]';
 
+  //bulk role ids
+  bulk_role_change_btn = 'div[data-testid="bulk_role_change_btn"]';
+  for_role_dropdown = 'div[data-testid="Select Multiple Roles_selector"]';
+  for_role_checkbox = "text='audio-video-sshare'"
+  for_role_label = "text='For Roles:'"
+  to_role_dropdown = 'div[data-testid="Select Role_selector"]';
+  to_role = "text='audio-video'"
+  apply_btn = "text='Apply'";
+
   streaming_recording_btn = 'div[data-testid="streaming_recording_btn"]';
   streaming_metting_url_field = 'input[data-testid="metting_url_field"]';
   streaming_rtmp_url_field = 'input[data-testid="rtmp_url_field"]';
@@ -41,6 +50,17 @@ export class Footer {
   full_screen_btn = 'div[data-testid="full_screen_btn"]';
   mute_all_btn = 'div[data-testid="mute_all_btn"]';
   mute_all_apply_btn = 'text=Apply';
+
+  embed_url_cta = '[data-testid="embed_url_btn"]';
+  embed_url_text_field = 'input[placeholder="https://www.tldraw.com/"]';
+  valid_embed_url = 'https://www.100ms.live/';
+  invalid_embed_url = 'sdet.qa';
+  embed_cta = 'text="Just Embed"';
+  update_embed_cta = 'text="Update Embed"'
+  stop_embed_cta = 'text="Stop Embed"'
+  embed_share_cta = 'text="Embed and Share"';
+  invalid_embed_link_header = 'text="Link is invalid"'
+  inavlid_embed_link_subject = 'text="The room code does not exist. Please check the room code."';
 
   ui_settings_btn = 'div[data-testid="ui_settings_btn"]';
   device_settings_btn = 'div[data-testid="device_settings_btn"]';
@@ -88,6 +108,17 @@ export class Footer {
 
   audio_playlist_item = 'div[role="menuitem"]:nth-child(?)';
 
+  error_message = 'text=Resolution not supported';
+
+  //Layout
+  layout_button = 'button[id*="trigger-layout"]';
+  activespeaker_toggle = 'button[id="activeSpeakerMode"]';
+  activespeakersorting_toggle = 'button[id="activeSpeakerSortingMode"]';
+  audioonly_toggle = 'button[id="audioOnlyMode"]';
+  mirrorlocal_toggle = 'button[id="mirrorMode"]';
+  hidelocal_toggle = 'button[id="hideLocalVideo"]';
+  tilesinview_bar = 'span[dir="ltr"]';
+  
   constructor(page: PageWrapper) {
     this.page = page;
   }
@@ -151,4 +182,29 @@ export class Footer {
   async openMoreSettings() {
     await this.page.click(this.more_settings_btn);
   }
+
+  async openBulkRoleChange(){
+    await this.page.click(this.bulk_role_change_btn);
+  }
+
+  async openRoleForChange(){
+    await this.page.click(this.for_role_dropdown);
+  }
+
+  async selectForRoleForChange(){
+    await this.page.click(this.for_role_checkbox);
+  }
+
+  async selectToRoleDropdown(){
+    await this.page.click(this.to_role_dropdown);
+  }
+
+  async selectToRole(){
+    await this.page.click(this.to_role);
+  }
+
+  async clickApplyButton(){
+    await this.page.click(this.apply_btn);
+  }
+
 }

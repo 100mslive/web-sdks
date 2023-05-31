@@ -4,13 +4,20 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.3",
+  "version": "0.8.5",
   "author": "100ms",
   "license": "MIT",
   "files": [
     "dist",
     "src"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist",
@@ -36,7 +43,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.10.3",
+    "@100mslive/hms-video-store": "0.10.5",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }

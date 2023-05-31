@@ -78,4 +78,15 @@ describe('videoElementManager', () => {
     remoteTrack.attach(document.createElement('video'));
     expect(remoteTrack.getSinks().length).toBe(2);
   });
+
+  test('test cleanup', async () => {
+    const track = localTrack;
+    const videoElement1 = document.createElement('video');
+    const videoElement2 = document.createElement('video');
+    await track.videoHandler.addVideoElement(videoElement1);
+    await track.videoHandler.addVideoElement(videoElement2);
+    expect(track.videoHandler.getVideoElements().length).toBe(2);
+    track.videoHandler.cleanup();
+    expect(track.videoHandler.getVideoElements().length).toBe(0);
+  });
 });
