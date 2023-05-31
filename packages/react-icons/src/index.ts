@@ -57,6 +57,7 @@ export { default as ClipIcon } from './ClipIcon';
 export { default as ClockIcon } from './ClockIcon';
 export { default as CloseIcon } from './CloseIcon';
 export { default as ClosedCaptionIcon } from './ClosedCaptionIcon';
+export { default as CloudUploadIcon } from './CloudUploadIcon';
 export { default as CodeIcon } from './CodeIcon';
 export { default as ColoredHandIcon } from './ColoredHandIcon';
 export { default as ColoredTimeIcon } from './ColoredTimeIcon';

@@ -1,69 +1,166 @@
-import React, { useState } from "react";
-import { Button, Dialog, Flex, Text } from "@100mslive/react-ui";
+import React, { useCallback, useState } from "react";
+import { TrashIcon } from "@100mslive/react-icons";
 import {
-  DialogContent,
-  DialogInputFile,
-  DialogRow,
-} from "../../primitives/DialogContent";
+  Button,
+  Dialog,
+  HorizontalDivider,
+  Input,
+  Text,
+} from "@100mslive/react-ui";
+import { DialogInputFile, DialogRow } from "../../primitives/DialogContent";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  const [pdfFile, setPDFFile] = useState();
-  return (
+  const [pdfFile, setPDFFile] = useState(null);
+  const [pdfURL, setPDFURL] = useState("");
+
+  const SubmitSharing = useCallback(() => {
+    return (
+      <DialogRow>
+        <Button
+          variant="standard"
+          outlined
+          type="submit"
+          onClick={() => {
+            onOpenChange(false);
+          }}
+          css={{ mr: "$4" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          type="submit"
+          onClick={() => {
+            setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
+            onOpenChange(false);
+          }}
+          disabled={!pdfFile && !pdfURL}
+          data-testid="share_pdf_btn"
+        >
+          Start Sharing
+        </Button>
+      </DialogRow>
+    );
+  }, [onOpenChange, pdfFile, pdfURL, setPDFConfig]);
+  const PDFHeader = useCallback(() => {
+    return (
+      <>
+        <Dialog.Title asChild>
+          <Text as="h6" variant="h6">
+            Share PDF
+          </Text>
+        </Dialog.Title>
+        <Dialog.Description asChild>
+          <Text
+            variant="sm"
+            css={{
+              color: "$textMedEmp",
+            }}
+          >
+            Choose PDF you want to annotate and share
+          </Text>
+        </Dialog.Description>
+      </>
+    );
+  }, []);
+  const ShowUploadedFile = useCallback(() => {
+    return (
+      <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content
+            css={{
+              w: "min(420px,80%)",
+              h: "min(264px, 90%)",
+              overflow: "auto",
+              p: "$10",
+            }}
+          >
+            <PDFHeader />
+            <DialogRow
+              css={{
+                fontFamily: "$sans",
+                backgroundColor: "$surfaceLight",
+                borderRadius: "$1",
+                outline: "none",
+                border: "1px solid $borderLight",
+                padding: "0.5rem 0.75rem",
+                minHeight: "30px",
+                color: "$textPrimary",
+                fontSize: "$md",
+                w: "100%",
+                "&:focus": {
+                  boxShadow: "0 0 0 1px $colors$borderAccent",
+                  border: "1px solid transparent",
+                },
+              }}
+            >
+              <Text css={{ flexGrow: "1" }}>{pdfFile.name}</Text>
+              <TrashIcon onClick={() => setPDFFile(null)} />
+            </DialogRow>
+            <SubmitSharing />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }, [onOpenChange, pdfFile]);
+  return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <DialogContent title="Share PDF">
-        <Flex direction="column">
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content
+          css={{
+            w: "min(420px,80%)",
+            h: "min(486px, 90%)",
+            overflow: "auto",
+            p: "$10",
+          }}
+        >
+          <PDFHeader />
           <DialogInputFile
             onChange={target => {
               setPDFFile(target.files[0]);
             }}
-            accept=".pdf"
-            placeholder="Upload pdf file"
+            placeholder="Click to upload"
             type="file"
-            css={{
-              w: "100%",
-              "&:hover": {
-                cursor: "pointer",
-              },
-            }}
+            accept=".pdf"
           />
+          <DialogRow>
+            <HorizontalDivider
+              css={{
+                mx: "$2",
+              }}
+            />
+            <Text variant="sm">OR</Text>
+            <HorizontalDivider
+              css={{
+                mx: "$2",
+              }}
+            />
+          </DialogRow>
           <Text
+            variant="sm"
             css={{
-              pl: "$4",
-              mt: "-$8",
+              py: "$2",
             }}
           >
-            Upload PDF file to share and annotate.
+            Import from URL
           </Text>
-        </Flex>
-        <DialogRow>
-          <Button
-            variant="standard"
-            outlined
-            type="submit"
-            onClick={() => {
-              onOpenChange(false);
-            }}
-            css={{ mr: "$4" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            type="submit"
-            onClick={() => {
-              setPDFConfig({ state: true, file: pdfFile });
-              onOpenChange(false);
-            }}
-            disabled={!pdfFile}
-            data-testid="share_pdf_btn"
-          >
-            Start Sharing
-          </Button>
-        </DialogRow>
-      </DialogContent>
+          <Input
+            css={{ w: "100%" }}
+            value={pdfURL}
+            onChange={e => setPDFURL(e.target.value)}
+            placeholder="Add PDF URL"
+            type="text"
+          />
+          <SubmitSharing />
+        </Dialog.Content>
+      </Dialog.Portal>
     </Dialog.Root>
+  ) : (
+    <ShowUploadedFile />
   );
 }

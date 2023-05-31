@@ -45,7 +45,7 @@ export function ShareScreenOptions() {
         onOpenChange={value => updateState(MODALS.SHARE, value)}
       >
         <Dropdown.Trigger asChild data-testid="sharing_btn">
-          <IconButton>
+          <IconButton disabled={amIScreenSharing}>
             <Tooltip title="Share">
               <Box>
                 <VerticalMenuIcon />
@@ -64,6 +64,10 @@ export function ShareScreenOptions() {
             css={{
               flexDirection: "column",
               alignItems: "flex-start",
+              "&:hover": {
+                backgroundColor: "transparent",
+                cursor: "default",
+              },
             }}
           >
             <Text variant="h6">Start Sharing</Text>
@@ -74,9 +78,19 @@ export function ShareScreenOptions() {
               flexDirection: "row",
               alignItems: "flex-start",
               gap: "$8",
+              "&:hover": {
+                backgroundColor: "transparent",
+                cursor: "default",
+              },
             }}
           >
-            <Flex direction="column" align="center">
+            <Flex
+              direction="column"
+              align="center"
+              css={{
+                gap: "$6",
+              }}
+            >
               <IconButton
                 as="div"
                 onClick={() => toggleScreenShare()}
@@ -91,15 +105,34 @@ export function ShareScreenOptions() {
                 }}
                 icon
               >
-                <ScreenShare width="100%" height="100%" />
+                <ScreenShare
+                  width="100%"
+                  height="100%"
+                  style={{
+                    borderTopLeftRadius: "4px",
+                    borderTopRightRadius: "4px",
+                  }}
+                />
               </IconButton>
-
-              <Text variant="sub1">Share Screen</Text>
-              <Text variant="caption">
-                Share your tab, window, or entire screen.
-              </Text>
+              <Flex direction="column" align="center">
+                <Text variant="body2">Share Screen</Text>
+                <Text
+                  variant="caption"
+                  css={{
+                    color: "$textDisabled",
+                  }}
+                >
+                  Share your tab, window, or entire screen.
+                </Text>
+              </Flex>
             </Flex>
-            <Flex direction="column" align="center">
+            <Flex
+              direction="column"
+              align="center"
+              css={{
+                gap: "$6",
+              }}
+            >
               <IconButton
                 onClick={() => {
                   updateState(MODALS.PDF_SHARE, true);
@@ -116,10 +149,26 @@ export function ShareScreenOptions() {
                 }}
                 icon
               >
-                <PdfShare width="100%" height="100%" />
+                <PdfShare
+                  width="100%"
+                  height="100%"
+                  style={{
+                    borderTopLeftRadius: "4px",
+                    borderTopRightRadius: "4px",
+                  }}
+                />
               </IconButton>
-              <Text variant="sub1">Share PDF</Text>
-              <Text variant="caption">Annotate, share and more over PDFs</Text>
+              <Flex direction="column" align="center">
+                <Text variant="body2">Share PDF</Text>
+                <Text
+                  variant="caption"
+                  css={{
+                    color: "$textDisabled",
+                  }}
+                >
+                  Annotate, share and more over PDFs
+                </Text>
+              </Flex>
               <Flex
                 direction="row"
                 css={{
@@ -155,7 +204,14 @@ export function ShareScreenOptions() {
               </Flex>
             </Flex>
           </Dropdown.Item>
-          <Dropdown.Item>
+          <Dropdown.Item
+            css={{
+              "&:hover": {
+                backgroundColor: "transparent",
+                cursor: "default",
+              },
+            }}
+          >
             <Button
               variant="standard"
               outlined

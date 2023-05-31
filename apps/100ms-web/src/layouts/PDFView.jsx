@@ -23,11 +23,14 @@ export const PDFView = ({ showStats }) => {
 
 const PDFEmbedComponent = () => {
   const ref = useRef();
-  const pdfJSURL =
+  let pdfJSURL =
     "https://pdf-js-git-feat-pdf-upload-100mslive.vercel.app/generic/web/viewer.html";
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  if (pdfConfig.url) {
+    pdfJSURL = pdfJSURL + "?file=" + encodeURIComponent(pdfConfig.url);
+  }
   const [wasScreenShared, setWasScreenShared] = useState(false);
   // to handle - https://github.com/facebook/react/issues/24502
   const screenShareAttemptInProgress = useRef(false);
@@ -95,7 +98,7 @@ const PDFEmbedComponent = () => {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
         referrerPolicy="no-referrer"
         onLoad={() => {
-          if (ref.current) {
+          if (ref.current && pdfConfig.file) {
             setTimeout(() => {
               ref.current.contentWindow.postMessage(
                 { file: pdfConfig.file },
