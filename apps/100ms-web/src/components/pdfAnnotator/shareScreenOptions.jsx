@@ -66,7 +66,7 @@ export function ShareScreenOptions() {
               flexDirection: "column",
               alignItems: "flex-start",
               "&:hover": {
-                backgroundColor: "transparent",
+                bg: "$transparent",
                 cursor: "default",
               },
             }}
@@ -80,7 +80,7 @@ export function ShareScreenOptions() {
               alignItems: "flex-start",
               gap: "$8",
               "&:hover": {
-                backgroundColor: "transparent",
+                bg: "$transparent",
                 cursor: "default",
               },
             }}
@@ -100,8 +100,8 @@ export function ShareScreenOptions() {
                   display: "flex",
                   justifyContent: "center",
                   border: "1px solid $grayDefault",
-                  borderRadius: "$2",
-                  backgroundColor: "$surfaceLighter",
+                  r: "$2",
+                  bg: "$surfaceLighter",
                   pb: "0",
                 }}
                 icon
@@ -120,7 +120,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    color: "$textDisabled",
+                    c: "$textDisabled",
                     textAlign: "center",
                   }}
                 >
@@ -145,8 +145,8 @@ export function ShareScreenOptions() {
                   display: "flex",
                   justifyContent: "center",
                   border: "$grayDefault 1px solid",
-                  borderRadius: "$2",
-                  backgroundColor: "$surfaceLight",
+                  r: "$2",
+                  bg: "$surfaceLight",
                   pb: "0",
                 }}
                 icon
@@ -166,8 +166,8 @@ export function ShareScreenOptions() {
                     top: "29%",
                     left: "54%",
                     padding: "$2 $4",
-                    borderRadius: "$2",
-                    backgroundColor: "$primaryLight",
+                    r: "$2",
+                    bg: "$primaryLight",
                     zIndex: "2",
                   }}
                 >
@@ -176,7 +176,7 @@ export function ShareScreenOptions() {
                       w: "$10",
                       h: "$8",
                       "&:hover": {
-                        backgroundColor: "transparent !important",
+                        bg: "$transparent !important",
                         border: "none",
                       },
                     }}
@@ -188,7 +188,7 @@ export function ShareScreenOptions() {
                     variant="xs"
                     css={{
                       fontWeight: "$semiBold",
-                      color: "$white",
+                      c: "$white",
                       pr: "$4",
                     }}
                   >
@@ -201,7 +201,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    color: "$textDisabled",
+                    c: "$textDisabled",
                     textAlign: "center",
                   }}
                 >
@@ -213,7 +213,7 @@ export function ShareScreenOptions() {
           <Dropdown.Item
             css={{
               "&:hover": {
-                backgroundColor: "transparent",
+                bg: "$transparent",
                 cursor: "default",
               },
             }}

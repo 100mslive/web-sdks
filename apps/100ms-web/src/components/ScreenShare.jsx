@@ -53,7 +53,7 @@ export const ScreenshareToggle = ({ css }) => {
 };
 
 const ScreenShareButton = styled(IconButton, {
-  color: "$white",
+  c: "$white",
   h: "$14",
   px: "$8",
   r: "$1",

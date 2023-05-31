@@ -65,7 +65,7 @@ export function PDFFileOptions({ onOpenChange }) {
           <Text
             variant="sm"
             css={{
-              color: "$textMedEmp",
+              c: "$textMedEmp",
             }}
           >
             Choose PDF you want to annotate and share
@@ -93,18 +93,18 @@ export function PDFFileOptions({ onOpenChange }) {
                 <DialogRow
                   css={{
                     fontFamily: "$sans",
-                    backgroundColor: "$surfaceLight",
-                    borderRadius: "$1",
+                    bg: "$surfaceLight",
+                    r: "$1",
                     outline: "none",
                     border: "1px solid $borderLight",
-                    padding: "0.5rem 0.75rem",
+                    p: "0.5rem 0.75rem",
                     minHeight: "30px",
-                    color: "$textPrimary",
-                    fontSize: "$md",
+                    c: "$textPrimary",
+                    fs: "$md",
                     w: "100%",
                     "&:focus": {
                       boxShadow: "0 0 0 1px $colors$borderAccent",
-                      border: "1px solid transparent",
+                      border: "1px solid $transparent",
                     },
                   }}
                 >

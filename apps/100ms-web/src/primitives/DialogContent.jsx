@@ -283,7 +283,7 @@ export const DialogInputFile = ({
         cursor: "pointer",
         p: "$10",
         border: "1px dashed $borderLight",
-        borderRadius: "$1",
+        r: "$1",
         height: "max(140px, 30%)",
         alignItems: "center",
       }}
@@ -297,7 +297,7 @@ export const DialogInputFile = ({
           "&:hover": {
             border: "none",
             background: "none",
-            backgroundColor: "transparent !important",
+            bg: "$transparent !important",
           },
         }}
         icon
