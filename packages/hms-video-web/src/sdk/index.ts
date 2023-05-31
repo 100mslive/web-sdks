@@ -553,6 +553,10 @@ export class HMSSdk implements HMSInterface {
     return this.store.getPeers();
   }
 
+  getPeerMap() {
+    return this.store.getPeerMap();
+  }
+
   getAudioOutput() {
     return this.audioOutput;
   }

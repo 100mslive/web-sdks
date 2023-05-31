@@ -98,6 +98,10 @@ class Store implements IStore {
     return Object.values(this.peers);
   }
 
+  getPeerMap() {
+    return this.peers;
+  }
+
   getPeerById(peerId: string) {
     if (this.peers[peerId]) {
       return this.peers[peerId];

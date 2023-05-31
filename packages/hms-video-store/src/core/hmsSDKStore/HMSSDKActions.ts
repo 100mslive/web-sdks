@@ -1452,7 +1452,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private getSDKHMSPeer = (peerID: HMSPeerID) => {
-    return this.sdk.getPeers().find(peer => peer.peerId === peerID);
+    return this.sdk.getPeerMap()[peerID];
   };
 
   /**
