@@ -15,6 +15,7 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/react-ui";
+import { ShareMenuIcon } from "../ScreenShare";
 import { PDFFileOptions } from "./pdfFileOptions";
 
 const MODALS = {
@@ -45,13 +46,13 @@ export function ShareScreenOptions() {
         onOpenChange={value => updateState(MODALS.SHARE, value)}
       >
         <Dropdown.Trigger asChild data-testid="sharing_btn">
-          <IconButton disabled={amIScreenSharing}>
+          <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
               <Box>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>
-          </IconButton>
+          </ShareMenuIcon>
         </Dropdown.Trigger>
         <Dropdown.Content
           sideOffset={5}
@@ -120,9 +121,10 @@ export function ShareScreenOptions() {
                   variant="caption"
                   css={{
                     color: "$textDisabled",
+                    textAlign: "center",
                   }}
                 >
-                  Share your tab, window, or entire screen.
+                  Share your tab, window or your entire screen
                 </Text>
               </Flex>
             </Flex>
@@ -157,6 +159,42 @@ export function ShareScreenOptions() {
                     borderTopRightRadius: "4px",
                   }}
                 />
+                <Flex
+                  direction="row"
+                  css={{
+                    position: "absolute",
+                    top: "29%",
+                    left: "54%",
+                    padding: "$2 $4",
+                    borderRadius: "$2",
+                    backgroundColor: "$primaryLight",
+                    zIndex: "2",
+                  }}
+                >
+                  <IconButton
+                    css={{
+                      w: "$10",
+                      h: "$8",
+                      "&:hover": {
+                        backgroundColor: "transparent !important",
+                        border: "none",
+                      },
+                    }}
+                    icon
+                  >
+                    <StarIcon />
+                  </IconButton>
+                  <Text
+                    variant="xs"
+                    css={{
+                      fontWeight: "$semiBold",
+                      color: "$white",
+                      pr: "$4",
+                    }}
+                  >
+                    New
+                  </Text>
+                </Flex>
               </IconButton>
               <Flex direction="column" align="center">
                 <Text variant="body2">Share PDF</Text>
@@ -164,42 +202,10 @@ export function ShareScreenOptions() {
                   variant="caption"
                   css={{
                     color: "$textDisabled",
+                    textAlign: "center",
                   }}
                 >
-                  Annotate, share and more over PDFs
-                </Text>
-              </Flex>
-              <Flex
-                direction="row"
-                css={{
-                  position: "absolute",
-                  top: "29%",
-                  left: "54%",
-                  padding: "$2 $4",
-                  borderRadius: "$2",
-                  backgroundColor: "$primaryLight",
-                  zIndex: "2",
-                }}
-              >
-                <IconButton
-                  css={{
-                    w: "$10",
-                    h: "$8",
-                  }}
-                  icon
-                >
-                  <StarIcon />
-                </IconButton>
-
-                <Text
-                  variant="xs"
-                  css={{
-                    fontWeight: "$semiBold",
-                    color: "$white",
-                    pr: "$4",
-                  }}
-                >
-                  New
+                  Annotate, draw shapes, and more over PDFs
                 </Text>
               </Flex>
             </Flex>

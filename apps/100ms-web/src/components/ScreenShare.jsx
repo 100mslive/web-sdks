@@ -5,7 +5,7 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { ShareScreenIcon } from "@100mslive/react-icons";
-import { Flex, Tooltip } from "@100mslive/react-ui";
+import { Box, Flex, styled, Tooltip } from "@100mslive/react-ui";
 import { ShareScreenOptions } from "./pdfAnnotator/shareScreenOptions";
 import IconButton from "../IconButton";
 import { useUISettings } from "./AppData/useUISettings";
@@ -28,23 +28,51 @@ export const ScreenshareToggle = ({ css }) => {
   return (
     <Fragment>
       <Flex direction="row">
-        <Tooltip
-          title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
+        <ScreenShareButton
+          variant="standard"
+          key="ShareScreen"
+          active={!isVideoScreenshare}
+          css={css}
+          disabled={isAudioOnly}
+          onClick={() => {
+            toggleScreenShare();
+          }}
         >
-          <IconButton
-            active={!isVideoScreenshare}
-            css={css}
-            disabled={isAudioOnly}
-            onClick={() => {
-              toggleScreenShare();
-            }}
-            data-testid="screen_share_btn"
+          <Tooltip
+            title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
           >
-            <ShareScreenIcon />
-          </IconButton>
-        </Tooltip>
+            <Box>
+              <ShareScreenIcon />
+            </Box>
+          </Tooltip>
+        </ScreenShareButton>
         <ShareScreenOptions />
       </Flex>
     </Fragment>
   );
 };
+
+const ScreenShareButton = styled(IconButton, {
+  color: "$white",
+  h: "$14",
+  px: "$8",
+  r: "$1",
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
+  "@md": {
+    px: "$4",
+    mx: 0,
+  },
+});
+
+export const ShareMenuIcon = styled(ScreenShareButton, {
+  borderLeft: "1px solid $grayDark",
+  borderTopLeftRadius: 0,
+  borderBottomLeftRadius: 0,
+  borderTopRightRadius: "$1",
+  borderBottomRightRadius: "$1",
+  px: "$3",
+  "@md": {
+    px: "$2",
+  },
+});
