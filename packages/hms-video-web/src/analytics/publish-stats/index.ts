@@ -169,9 +169,9 @@ class RunningTrackAnalytics {
 
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
     const total_quality_limitation = qualityLimitationDurations && {
-      bandwidth_ms: qualityLimitationDurations.bandwidth,
-      cpu_ms: qualityLimitationDurations.cpu,
-      other_ms: qualityLimitationDurations.other,
+      bandwidth_sec: qualityLimitationDurations.bandwidth,
+      cpu_sec: qualityLimitationDurations.cpu,
+      other_sec: qualityLimitationDurations.other,
     };
 
     const resolution = latestStat.frameHeight
