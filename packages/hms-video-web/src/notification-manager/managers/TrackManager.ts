@@ -1,14 +1,12 @@
+import { OnDemandTrackManager } from './onDemandTrackManager';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
 import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
-import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
-import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
-import { isEmptyTrack } from '../../utils/track';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
 /**
@@ -29,13 +27,16 @@ import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } fr
 export class TrackManager {
   private readonly TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
+  public onDemandTrackManager: OnDemandTrackManager;
 
   constructor(
     private store: IStore,
     private eventBus: EventBus,
     private transport: HMSTransport,
     public listener?: HMSUpdateListener,
-  ) {}
+  ) {
+    this.onDemandTrackManager = new OnDemandTrackManager(this.store, this.transport, this.listener);
+  }
   /**
    * Add event from biz on track-add
    * @param params TrackStateNotification
@@ -49,9 +50,7 @@ export class TrackManager {
         peerId: params.peer.peer_id,
         trackInfo,
       });
-      if (trackInfo.type === 'video') {
-        this.processTrackInfo(trackInfo, params.peer.peer_id);
-      }
+      this.onDemandTrackManager?.processTrackInfo(trackInfo, params.peer.peer_id);
     }
 
     this.processPendingTracks();
@@ -136,10 +135,7 @@ export class TrackManager {
 
       // TRACK_UPDATE came before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
       if (!track || this.tracksToProcess.has(trackId)) {
-        if (!trackEntry.mute) {
-          this.processTrackInfo(trackEntry, params.peer.peer_id);
-          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
-        }
+        this.onDemandTrackManager?.handleTrackUpdate(trackEntry, hmsPeer);
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
@@ -232,14 +228,7 @@ export class TrackManager {
     const remoteTrack = track as HMSRemoteVideoTrack;
     const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
     remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-    if (
-      track.source === 'regular' &&
-      (!hmsPeer.videoTrack ||
-        isEmptyTrack(hmsPeer.videoTrack.nativeTrack) ||
-        hmsPeer.videoTrack?.trackId === track.trackId)
-    ) {
-      console.log('add video track', remoteTrack);
-
+    if (track.source === 'regular' && (!hmsPeer.videoTrack || hmsPeer.videoTrack?.trackId === track.trackId)) {
       hmsPeer.videoTrack = remoteTrack;
     } else {
       hmsPeer.auxiliaryTracks.push(remoteTrack);
@@ -260,19 +249,6 @@ export class TrackManager {
   }
 
   processTrackInfo = (trackInfo: TrackState, peerId: string) => {
-    const hmsPeer = this.store.getPeerById(peerId);
-    if (!hmsPeer) {
-      HMSLogger.d(this.TAG, `no peer in store for peerId: ${peerId}`);
-      return;
-    }
-    if (trackInfo.type === 'video' && !hmsPeer?.videoTrack) {
-      // @ts-ignore
-      const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
-      const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
-      emptyTrack.enabled = true;
-      const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
-      track.setTrackId(trackInfo.track_id);
-      this.addVideoTrack(hmsPeer, track);
-    }
+    this.onDemandTrackManager?.processTrackInfo(trackInfo, peerId);
   };
 }

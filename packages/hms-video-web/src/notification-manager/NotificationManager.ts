@@ -65,6 +65,9 @@ export class NotificationManager {
   setListener(listener?: HMSUpdateListener) {
     this.listener = listener;
     this.trackManager.listener = listener;
+    if (this.trackManager.onDemandTrackManager) {
+      this.trackManager.onDemandTrackManager.listener = listener;
+    }
     this.peerManager.listener = listener;
     this.peerListManager.listener = listener;
     this.broadcastManager.listener = listener;
