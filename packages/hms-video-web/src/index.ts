@@ -2,7 +2,7 @@ import adapter from 'webrtc-adapter';
 import './utils/local-storage-polyfill';
 import HMSLogger from './utils/logger';
 
-HMSLogger.i('adapter', `${adapter.browserDetails.browser} v${adapter.browserDetails.version}`);
+HMSLogger.d('adapter', `${adapter.browserDetails.browser} v${adapter.browserDetails.version}`);
 
 export * from './sdk';
 export * from './media/tracks';
