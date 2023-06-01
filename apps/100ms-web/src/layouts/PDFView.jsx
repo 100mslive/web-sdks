@@ -5,7 +5,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { Box, Flex } from "@100mslive/react-ui";
+import { Box, Flex, ThemeTypes, useTheme } from "@100mslive/react-ui";
 import { GridSidePaneView } from "../components/gridView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA } from "../common/constants";
@@ -23,8 +23,9 @@ export const PDFView = ({ showStats }) => {
 
 const PDFEmbedComponent = () => {
   const ref = useRef();
+  const themeType = useTheme().themeType;
   let pdfJSURL =
-    "https://pdf-js-git-feat-pdf-upload-100mslive.vercel.app/generic/web/viewer.html";
+    "https://pdf-js-git-feat-web-1725-ui-update-100mslive.vercel.app/generic/web/viewer.html";
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
@@ -99,9 +100,13 @@ const PDFEmbedComponent = () => {
         referrerPolicy="no-referrer"
         onLoad={() => {
           if (ref.current && pdfConfig.file) {
+            // setting theme dark -> 2 and light -> 1
             setTimeout(() => {
               ref.current.contentWindow.postMessage(
-                { file: pdfConfig.file },
+                {
+                  file: pdfConfig.file,
+                  theme: themeType === ThemeTypes.dark ? 2 : 1,
+                },
                 "*"
               );
             }, 1000);
