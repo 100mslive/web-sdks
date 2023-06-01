@@ -59,12 +59,16 @@ export function ShareScreenOptions() {
           css={{
             w: "$96",
             maxHeight: "$96",
+            p: 0,
           }}
         >
           <Dropdown.Item
             css={{
               flexDirection: "column",
               alignItems: "flex-start",
+              px: "$10",
+              pt: "$10",
+              pb: "$6",
               "&:hover": {
                 bg: "$transparent",
                 cursor: "default",
@@ -79,6 +83,8 @@ export function ShareScreenOptions() {
               flexDirection: "row",
               alignItems: "flex-start",
               gap: "$8",
+              px: "$10",
+              py: "$6",
               "&:hover": {
                 bg: "$transparent",
                 cursor: "default",
@@ -212,6 +218,9 @@ export function ShareScreenOptions() {
           </Dropdown.Item>
           <Dropdown.Item
             css={{
+              px: "$10",
+              pb: "$10",
+              pt: "$6",
               "&:hover": {
                 bg: "$transparent",
                 cursor: "default",

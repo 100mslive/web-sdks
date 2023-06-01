@@ -109,7 +109,12 @@ export function PDFFileOptions({ onOpenChange }) {
                   }}
                 >
                   <Text css={{ flexGrow: "1" }}>{pdfFile.name}</Text>
-                  <TrashIcon onClick={() => setPDFFile(null)} />
+                  <TrashIcon
+                    onClick={() => setPDFFile(null)}
+                    style={{
+                      cursor: "pointer",
+                    }}
+                  />
                 </DialogRow>
               </Flex>
               <SubmitSharing />

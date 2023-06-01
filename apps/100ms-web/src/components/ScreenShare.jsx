@@ -66,12 +66,12 @@ const ScreenShareButton = styled(IconButton, {
 });
 
 export const ShareMenuIcon = styled(ScreenShareButton, {
-  borderLeft: "1px solid $grayDark",
+  borderLeft: "0.5px solid $grayDark",
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
   borderTopRightRadius: "$1",
   borderBottomRightRadius: "$1",
-  px: "$3",
+  w: "$4",
   "@md": {
     px: "$2",
   },
