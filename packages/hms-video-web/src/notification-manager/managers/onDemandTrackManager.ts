@@ -19,14 +19,14 @@ export class OnDemandTrackManager {
       return;
     }
     const track = this.store.getTrackById(trackEntry.track_id);
-    if (!track && !trackEntry.mute) {
+    if (!track) {
       this.processTrackInfo(trackEntry, hmsPeer.peerId);
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
     }
   };
 
   processTrackInfo = (trackInfo: TrackState, peerId: string) => {
-    if (!this.isFeatureEnabled() || trackInfo.type !== 'video' || trackInfo.mute) {
+    if (!this.isFeatureEnabled() || trackInfo.type !== 'video') {
       return;
     }
     const hmsPeer = this.store.getPeerById(peerId);

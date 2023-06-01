@@ -93,6 +93,16 @@ export class TrackManager {
     }
     this.removePeerTracks(hmsPeer, track);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+    this.onDemandTrackManager.handleTrackUpdate(
+      {
+        track_id: track.trackId,
+        mute: !track.enabled,
+        type: track.type,
+        source: track.source || 'regular',
+        stream_id: track.stream.id,
+      } as TrackState,
+      hmsPeer,
+    );
   };
 
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
