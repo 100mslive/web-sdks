@@ -25,7 +25,8 @@ export function PDFFileOptions({ onOpenChange }) {
     return (
       <DialogRow
         css={{
-          p: "$8",
+          px: "$8",
+          py: "$6",
           bg: "$surfaceLight",
           r: "8px",
           outline: "none",
