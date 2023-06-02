@@ -870,7 +870,16 @@ export default class HMSTransport implements ITransport {
     await this.publishConnection.setLocalDescription(offer);
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const answer = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+      offer,
+    );
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -884,7 +893,15 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const response = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+    );
     return !!response;
   }
 
