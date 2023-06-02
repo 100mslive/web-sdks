@@ -169,9 +169,9 @@ class RunningTrackAnalytics {
 
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
     const total_quality_limitation = qualityLimitationDurations && {
-      bandwidth_ms: qualityLimitationDurations.bandwidth,
-      cpu_ms: qualityLimitationDurations.cpu,
-      other_ms: qualityLimitationDurations.other,
+      bandwidth_sec: qualityLimitationDurations.bandwidth,
+      cpu_sec: qualityLimitationDurations.cpu,
+      other_sec: qualityLimitationDurations.other,
     };
 
     const resolution = latestStat.frameHeight
@@ -191,7 +191,9 @@ class RunningTrackAnalytics {
       avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
       avg_bitrate_bps: this.calculateAverage('bitrate'),
       avg_fps: this.calculateAverage('framesPerSecond'),
-      total_packets_lost: latestStat.packetsLost,
+      total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
+      total_packets_sent: this.calculateDifferenceForSample('packetsSent'),
+      total_packet_sent_delay_sec: parseFloat(this.calculateDifferenceForSample('totalPacketSendDelay').toFixed(4)),
       avg_jitter_ms,
       avg_round_trip_time_ms,
       total_quality_limitation,
@@ -216,12 +218,12 @@ class RunningTrackAnalytics {
   }
 
   private calculateSum(key: keyof TempPublishStats) {
-    const checkStat = this.getLatestStat()[key as keyof HMSTrackStats];
+    const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
       return;
     }
     return this.tempStats.reduce((partialSum, stat) => {
-      return partialSum + ((stat[key as keyof HMSTrackStats] || 0) as number);
+      return partialSum + ((stat[key] || 0) as number);
     }, 0);
   }
 
@@ -229,6 +231,13 @@ class RunningTrackAnalytics {
     const sum = this.calculateSum(key);
     const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
     return avg ? (round ? Math.round(avg) : avg) : undefined;
+  }
+
+  private calculateDifferenceForSample(key: keyof TempPublishStats) {
+    const firstValue = Number(this.tempStats[0][key]) || 0;
+    const latestValue = Number(this.getLatestStat()[key]) || 0;
+
+    return latestValue - firstValue;
   }
 }
 
