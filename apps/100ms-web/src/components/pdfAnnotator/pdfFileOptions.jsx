@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { TrashIcon } from "@100mslive/react-icons";
+import { InfoIcon, TrashIcon } from "@100mslive/react-icons";
 import {
   Button,
   Dialog,
@@ -8,7 +8,11 @@ import {
   Input,
   Text,
 } from "@100mslive/react-ui";
-import { DialogInputFile, DialogRow } from "../../primitives/DialogContent";
+import {
+  DialogCol,
+  DialogInputFile,
+  DialogRow,
+} from "../../primitives/DialogContent";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
@@ -17,11 +21,39 @@ export function PDFFileOptions({ onOpenChange }) {
   const [pdfFile, setPDFFile] = useState(null);
   const [pdfURL, setPDFURL] = useState("");
 
-  const SubmitSharing = useCallback(() => {
+  const PDFInfo = useCallback(() => {
     return (
       <DialogRow
         css={{
+          p: "$8",
+          bg: "$surfaceLight",
+          r: "8px",
+          outline: "none",
+          border: "1px solid $borderLight",
+          minHeight: "30px",
+        }}
+      >
+        <InfoIcon
+          width="64px"
+          height="64px"
+          style={{
+            paddingRight: "16px",
+          }}
+        />
+        <Text variant="caption">
+          On the next screen, ensure you select “This Tab” and click on share.
+          Only the PDF viewer will be seen by other participants
+        </Text>
+      </DialogRow>
+    );
+  }, []);
+  const SubmitSharing = useCallback(() => {
+    return (
+      <Flex
+        direction="row"
+        css={{
           mb: "0",
+          mt: "auto",
         }}
       >
         <Button
@@ -50,12 +82,18 @@ export function PDFFileOptions({ onOpenChange }) {
         >
           Start Sharing
         </Button>
-      </DialogRow>
+      </Flex>
     );
   }, [onOpenChange, pdfFile, pdfURL, setPDFConfig]);
   const PDFHeader = useCallback(() => {
     return (
-      <>
+      <DialogCol
+        align="start"
+        css={{
+          mt: 0,
+          mb: "$6",
+        }}
+      >
         <Dialog.Title asChild>
           <Text as="h6" variant="h6">
             Share PDF
@@ -71,7 +109,7 @@ export function PDFFileOptions({ onOpenChange }) {
             Choose PDF you want to annotate and share
           </Text>
         </Dialog.Description>
-      </>
+      </DialogCol>
     );
   }, []);
   const ShowUploadedFile = useCallback(() => {
@@ -82,41 +120,42 @@ export function PDFFileOptions({ onOpenChange }) {
           <Dialog.Content
             css={{
               w: "min(420px,80%)",
-              h: "min(264px, 90%)",
+              h: "min(348px, 90%)",
               overflow: "auto",
               p: "$10",
             }}
           >
             <Flex direction="column">
-              <Flex direction="column" flexGrow="1">
-                <PDFHeader />
-                <DialogRow
-                  css={{
-                    fontFamily: "$sans",
-                    bg: "$surfaceLight",
-                    r: "$1",
-                    outline: "none",
-                    border: "1px solid $borderLight",
-                    p: "0.5rem 0.75rem",
-                    minHeight: "30px",
-                    c: "$textPrimary",
-                    fs: "$md",
-                    w: "100%",
-                    "&:focus": {
-                      boxShadow: "0 0 0 1px $colors$borderAccent",
-                      border: "1px solid $transparent",
-                    },
+              <PDFHeader />
+              <DialogRow
+                css={{
+                  fontFamily: "$sans",
+                  bg: "$surfaceLight",
+                  r: "$1",
+                  outline: "none",
+                  border: "1px solid $borderLight",
+                  p: "0.5rem 0.75rem",
+                  minHeight: "30px",
+                  c: "$textPrimary",
+                  fs: "$md",
+                  w: "100%",
+                  "&:focus": {
+                    boxShadow: "0 0 0 1px $colors$borderAccent",
+                    border: "1px solid $transparent",
+                  },
+                  mb: 0,
+                  mt: "$6",
+                }}
+              >
+                <Text css={{ flexGrow: "1" }}>{pdfFile.name}</Text>
+                <TrashIcon
+                  onClick={() => setPDFFile(null)}
+                  style={{
+                    cursor: "pointer",
                   }}
-                >
-                  <Text css={{ flexGrow: "1" }}>{pdfFile.name}</Text>
-                  <TrashIcon
-                    onClick={() => setPDFFile(null)}
-                    style={{
-                      cursor: "pointer",
-                    }}
-                  />
-                </DialogRow>
-              </Flex>
+                />
+              </DialogRow>
+              <PDFInfo />
               <SubmitSharing />
             </Flex>
           </Dialog.Content>
@@ -131,51 +170,61 @@ export function PDFFileOptions({ onOpenChange }) {
         <Dialog.Content
           css={{
             w: "min(420px,80%)",
-            h: "min(516px, 90%)",
+            h: "min(638px, 90%)",
             overflow: "auto",
             p: "$10",
           }}
         >
           <Flex direction="column">
-            <Flex direction="column" flexGrow="1">
-              <PDFHeader />
-              <DialogInputFile
-                onChange={target => {
-                  setPDFFile(target.files[0]);
-                }}
-                placeholder="Click to upload"
-                type="file"
-                accept=".pdf"
-              />
-              <DialogRow>
-                <HorizontalDivider
-                  css={{
-                    mx: "$2",
-                  }}
-                />
-                <Text variant="sm">OR</Text>
-                <HorizontalDivider
-                  css={{
-                    mx: "$2",
-                  }}
-                />
-              </DialogRow>
-              <Text
-                variant="sm"
+            <PDFHeader />
+            <DialogInputFile
+              onChange={target => {
+                setPDFFile(target.files[0]);
+              }}
+              placeholder="Click to upload"
+              type="file"
+              accept=".pdf"
+            />
+            <DialogRow
+              css={{
+                m: "$10 0",
+              }}
+            >
+              <HorizontalDivider
                 css={{
-                  py: "$2",
+                  mr: "$4",
+                }}
+              />
+              <Text
+                variant="tiny"
+                css={{
+                  color: "$textDisabled",
                 }}
               >
-                Import from URL
+                OR
               </Text>
-              <Input
-                css={{ w: "100%", mb: "$10" }}
-                value={pdfURL}
-                onChange={e => setPDFURL(e.target.value)}
-                placeholder="Add PDF URL"
-                type="text"
+              <HorizontalDivider
+                css={{
+                  ml: "$4",
+                }}
               />
-            </Flex>
+            </DialogRow>
+            <Text
+              variant="sm"
+              css={{
+                py: "$2",
+              }}
+            >
+              Import from URL
+            </Text>
+            <Input
+              css={{ w: "100%", mb: "$10" }}
+              value={pdfURL}
+              onChange={e => setPDFURL(e.target.value)}
+              placeholder="Add PDF URL"
+              type="text"
+            />
+            <PDFInfo />
             <SubmitSharing />
           </Flex>
         </Dialog.Content>

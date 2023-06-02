@@ -281,11 +281,12 @@ export const DialogInputFile = ({
         justifyContent: "center",
         position: "relative",
         cursor: "pointer",
-        p: "$10",
+        py: "$12",
         border: "1px dashed $borderLight",
         r: "$1",
         height: "max(140px, 30%)",
         alignItems: "center",
+        m: "$6 0",
       }}
       gap="8"
     >
