@@ -36,6 +36,7 @@ const ScreenShareView = () => {
     if (showPresenterInSmallTile && peerPresenting) {
       smallTilePeers.unshift(peerPresenting); // put presenter on first page
     }
+    console.log(peers);
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
 
@@ -167,7 +168,7 @@ const SmallTilePeersView = ({
       {smallTilePeers && smallTilePeers.length > 0 && (
         <VideoList
           peers={smallTilePeers}
-          maxColCount={showSidebarInBottom ? undefined : 2}
+          maxColCount={showSidebarInBottom ? undefined : 1}
           maxRowCount={showSidebarInBottom ? 1 : undefined}
           includeScreenShareForPeer={shouldShowScreenFn}
         />
