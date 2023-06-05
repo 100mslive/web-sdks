@@ -67,6 +67,7 @@
         "import/first": "error",
         "import/no-duplicates": "error",
         "import/no-cycle": [2, { "maxDepth": 2 }],
+        "import/namespace": [2, { "allowComputed": true}],
         "simple-import-sort/imports": [
           "error",
           {
