@@ -26,7 +26,7 @@ export function PDFFileOptions({ onOpenChange }) {
       <DialogRow
         css={{
           px: "$8",
-          py: "$6",
+          py: "$3",
           bg: "$surfaceLight",
           r: "8px",
           outline: "none",
@@ -121,7 +121,7 @@ export function PDFFileOptions({ onOpenChange }) {
           <Dialog.Content
             css={{
               w: "min(420px,80%)",
-              h: "min(348px, 90%)",
+              h: "min(328px, 90%)",
               overflow: "auto",
               p: "$10",
             }}
@@ -171,7 +171,7 @@ export function PDFFileOptions({ onOpenChange }) {
         <Dialog.Content
           css={{
             w: "min(420px,80%)",
-            h: "min(638px, 90%)",
+            h: "min(618px, 90%)",
             overflow: "auto",
             p: "$10",
           }}
