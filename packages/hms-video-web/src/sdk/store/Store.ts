@@ -1,10 +1,10 @@
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
