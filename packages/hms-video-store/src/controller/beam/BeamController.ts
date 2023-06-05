@@ -1,6 +1,7 @@
-import { HMSGenericTypes, HMSNotifications, IHMSNotifications, IHMSStore } from '../../core';
+import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
 import { IHMSActions } from '../../core/IHMSActions';
-import { IHMSStoreReadOnly } from '../../core/IHMSStore';
+import { IHMSStore, IHMSStoreReadOnly } from '../../core/IHMSStore';
+import { HMSGenericTypes, IHMSNotifications } from '../../core/schema';
 
 /**
  * @internal
