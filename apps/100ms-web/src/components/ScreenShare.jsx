@@ -59,7 +59,6 @@ const ScreenShareButton = styled(IconButton, {
   r: "$1",
   borderTopRightRadius: 0,
   borderBottomRightRadius: 0,
-  borderRightWidth: 0,
   "@md": {
     px: "$4",
     mx: 0,
@@ -71,6 +70,7 @@ export const ShareMenuIcon = styled(ScreenShareButton, {
   borderBottomLeftRadius: 0,
   borderTopRightRadius: "$1",
   borderBottomRightRadius: "$1",
+  borderLeftWidth: 0,
   w: "$4",
   "@md": {
     px: "$2",
