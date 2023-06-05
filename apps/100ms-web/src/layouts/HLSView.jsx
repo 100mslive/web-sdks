@@ -52,7 +52,7 @@ const HLSView = () => {
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
-  const [loading, showLoading] = useState(false);
+  const [showLoader, setShowLoader] = useState(false);
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
@@ -60,10 +60,8 @@ const HLSView = () => {
      * @type {HTMLVideoElement} videoEl
      */
     const videoEl = videoRef.current;
-    const showLoader = () => {
-      showLoading(true);
-    };
-    const hideLoader = () => showLoading(false);
+    const showLoader = () => setShowLoader(true);
+    const hideLoader = () => setShowLoader(false);
     videoEl?.addEventListener("playing", hideLoader);
     videoEl?.addEventListener("waiting", showLoader);
     return () => {
@@ -232,7 +230,7 @@ const HLSView = () => {
             open={isHlsAutoplayBlocked}
             unblockAutoPlay={unblockAutoPlay}
           />
-          {loading && (
+          {showLoader && (
             <Flex
               align="center"
               justify="center"
