@@ -17,7 +17,7 @@ import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
-  const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   const [pdfFile, setPDFFile] = useState(null);
   const [pdfURL, setPDFURL] = useState("");
 
@@ -55,6 +55,7 @@ export function PDFFileOptions({ onOpenChange }) {
         css={{
           mb: "0",
           mt: "auto",
+          gap: "$8",
         }}
       >
         <Button
@@ -64,7 +65,7 @@ export function PDFFileOptions({ onOpenChange }) {
           onClick={() => {
             onOpenChange(false);
           }}
-          css={{ mr: "$4", w: "50%" }}
+          css={{ w: "50%" }}
         >
           Cancel
         </Button>
