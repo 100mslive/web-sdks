@@ -34,17 +34,16 @@ export class OnDemandTrackManager {
       HMSLogger.d(this.TAG, `no peer in store for peerId: ${peerId}`);
       return;
     }
-    if (!hmsPeer?.videoTrack) {
-      // @ts-ignore
-      const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
-      const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
-      emptyTrack.enabled = true;
-      const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
-      track.setTrackId(trackInfo.track_id);
-      this.addVideoTrack(hmsPeer, track);
-    }
+    // @ts-ignore
+    const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
+    const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
+    emptyTrack.enabled = true;
+    const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
+    track.setTrackId(trackInfo.track_id);
+    this.addVideoTrack(hmsPeer, track);
   };
 
+  // eslint-disable-next-line complexity
   private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
     if (track.type !== HMSTrackType.VIDEO) {
       return;
@@ -60,7 +59,12 @@ export class OnDemandTrackManager {
     ) {
       hmsPeer.videoTrack = remoteTrack;
     } else {
-      hmsPeer.auxiliaryTracks.push(remoteTrack);
+      const index = hmsPeer.auxiliaryTracks.findIndex(track => track.trackId === remoteTrack.trackId);
+      if (index === -1) {
+        hmsPeer.auxiliaryTracks.push(remoteTrack);
+      } else {
+        hmsPeer.auxiliaryTracks.splice(index, 1, remoteTrack);
+      }
     }
     HMSLogger.d(this.TAG, 'video track added', `${track}`);
   }
