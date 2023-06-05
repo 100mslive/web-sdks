@@ -153,7 +153,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       const current = this._hls.levels.findIndex((level: Level) => {
         return level?.attrs?.RESOLUTION === layer?.resolution;
       });
-      this._hls.currentLevel = current;
+      this._hls.nextLevel = current;
     }
     return;
   }
