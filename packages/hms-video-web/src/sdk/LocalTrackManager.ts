@@ -11,6 +11,7 @@ import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -20,7 +21,6 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';

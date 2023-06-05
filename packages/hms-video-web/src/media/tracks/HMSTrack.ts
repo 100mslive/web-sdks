@@ -1,7 +1,7 @@
 import { HMSTrackType } from './HMSTrackType';
-import { HMSMediaStream } from '../../internal';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
+import { HMSMediaStream } from '../streams';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 

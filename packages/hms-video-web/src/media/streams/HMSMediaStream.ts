@@ -1,4 +1,4 @@
-import { HMSTrack } from '../tracks/HMSTrack';
+import { HMSTrack } from '../tracks';
 
 export class HMSMediaStream {
   readonly nativeStream: MediaStream;

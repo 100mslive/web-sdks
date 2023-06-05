@@ -6,9 +6,9 @@ import {
   HMSSimulcastLayer,
   HMSSimulcastLayerDefinition,
 } from '../../interfaces/simulcast-layers';
-import { HMSRemoteStream } from '../../internal';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
+import { HMSRemoteStream } from '../streams';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;

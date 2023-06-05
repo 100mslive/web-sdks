@@ -3,9 +3,14 @@ import { HMSInternalEvent } from './HMSInternalEvent';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { HMSException } from '../error/HMSException';
 import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../internal';
-import { PolicyParams } from '../notification-manager';
-import { HMSWebrtcStats } from '../rtc-stats';
+import {
+  HMSLocalAudioTrack,
+  HMSLocalVideoTrack,
+  HMSRemoteAudioTrack,
+  HMSRemoteVideoTrack,
+  HMSWebrtcStats,
+} from '../internal';
+import { PolicyParams } from '../notification-manager/HMSNotifications';
 import { HMSRemotePeer } from '../sdk/models/peer';
 import { HMSEvents } from '../utils/constants';
 import { ITrackAudioLevelUpdate } from '../utils/track-audio-level-monitor';
