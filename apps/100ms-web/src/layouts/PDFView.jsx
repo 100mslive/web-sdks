@@ -24,8 +24,7 @@ export const PDFView = ({ showStats }) => {
 const PDFEmbedComponent = () => {
   const ref = useRef();
   const themeType = useTheme().themeType;
-  let pdfJSURL =
-    "https://pdf-js-git-feat-web-1725-ui-update-100mslive.vercel.app/generic/web/viewer.html";
+  let pdfJSURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
