@@ -3,7 +3,7 @@ import { HMSInternalEvent } from './HMSInternalEvent';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import { HMSException } from '../error/HMSException';
 import { HMSDeviceChangeEvent, HMSRole } from '../interfaces';
-import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../media/tracks';
+import { HMSLocalAudioTrack, HMSLocalVideoTrack, HMSRemoteAudioTrack, HMSRemoteVideoTrack } from '../internal';
 import { PolicyParams } from '../notification-manager';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { HMSRemotePeer } from '../sdk/models/peer';

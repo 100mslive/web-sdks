@@ -1,8 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
+import { HMSMediaStream, HMSRemoteStream } from '../../internal';
 import HMSLogger from '../../utils/logger';
-import HMSMediaStream from '../streams/HMSMediaStream';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;

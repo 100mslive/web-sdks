@@ -1,4 +1,4 @@
-import { DeviceManager } from '.';
+import { DeviceManager } from './DeviceManager';
 import { AudioSinkManager } from '../audio-sink-manager';
 import { HMSAudioContextHandler } from '../utils/media';
 
