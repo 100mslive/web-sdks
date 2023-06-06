@@ -36,7 +36,6 @@ const ScreenShareView = () => {
     if (showPresenterInSmallTile && peerPresenting) {
       smallTilePeers.unshift(peerPresenting); // put presenter on first page
     }
-    console.log(peers);
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
 
