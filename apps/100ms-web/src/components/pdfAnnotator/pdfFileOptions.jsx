@@ -115,6 +115,7 @@ export function PDFFileOptions({ onOpenChange }) {
     );
   }, []);
   const ShowUploadedFile = useCallback(() => {
+    const [fileName, ext] = pdfFile.name?.split(".");
     return (
       <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
         <Dialog.Portal>
@@ -148,7 +149,18 @@ export function PDFFileOptions({ onOpenChange }) {
                   mt: "$6",
                 }}
               >
-                <Text css={{ flexGrow: "1" }}>{pdfFile.name}</Text>
+                <Flex direction="row" css={{ flexGrow: "1", maxWidth: "88%" }}>
+                  <Text
+                    css={{
+                      textOverflow: "ellipsis",
+                      overflow: "hidden",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {fileName}
+                  </Text>
+                  <Text css={{ whiteSpace: "nowrap" }}>.{ext}</Text>
+                </Flex>
                 <TrashIcon
                   onClick={() => setPDFFile(null)}
                   style={{
