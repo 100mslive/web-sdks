@@ -117,7 +117,6 @@ export function useMultiplayerState(roomId) {
        * Newly joined peers request the owner for current state
        * and update their boards when they receive it
        */
-      console.log("herre request");
       room.broadcastEvent(Events.REQUEST_STATE);
     }
   }, [
