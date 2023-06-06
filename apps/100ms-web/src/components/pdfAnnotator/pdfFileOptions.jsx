@@ -115,7 +115,7 @@ export function PDFFileOptions({ onOpenChange }) {
     );
   }, []);
   const ShowUploadedFile = useCallback(() => {
-    const [fileName, ext] = pdfFile.name?.split(".");
+    const [fileName, ext] = pdfFile.name.split(".");
     return (
       <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
         <Dialog.Portal>
