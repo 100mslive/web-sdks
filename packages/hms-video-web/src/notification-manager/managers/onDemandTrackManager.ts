@@ -37,7 +37,7 @@ export class OnDemandTrackManager {
     // @ts-ignore
     const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
     const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
-    emptyTrack.enabled = true;
+    emptyTrack.enabled = !trackInfo.mute;
     const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
     track.setTrackId(trackInfo.track_id);
     this.addVideoTrack(hmsPeer, track);
