@@ -74,7 +74,7 @@ export default class HMSTransport implements ITransport {
   private state: TransportState = TransportState.Disconnected;
   private trackStates: Map<string, TrackState> = new Map();
   private publishConnection: HMSPublishConnection | null = null;
-  private subscribeConnection: HMSSubscribeConnection | null = null;
+  subscribeConnection: HMSSubscribeConnection | null = null;
   private initConfig?: InitConfig;
   private endpoint!: string;
   private joinParameters?: JoinParameters;

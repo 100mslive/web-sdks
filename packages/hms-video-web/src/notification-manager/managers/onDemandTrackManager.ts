@@ -1,32 +1,51 @@
+import { TrackManager } from './TrackManager';
+import { EventBus } from '../../events/EventBus';
 import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
-import { HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { HMSRemoteTrack, HMSRemoteVideoTrack } from '../../media/tracks';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import { IStore } from '../../sdk/store';
-import { InitFlags } from '../../signal/init/models';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
 import { isEmptyTrack } from '../../utils/track';
 import { TrackState } from '../HMSNotifications';
 
-export class OnDemandTrackManager {
-  private readonly TAG = '[OnDemandTrackManager]';
+export class OnDemandTrackManager extends TrackManager {
+  TAG = '[OnDemandTrackManager]';
 
-  constructor(private store: IStore, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
+  constructor(store: IStore, eventBus: EventBus, private transport: HMSTransport, listener?: HMSUpdateListener) {
+    super(store, eventBus, listener);
+  }
 
-  handleTrackUpdate = (trackEntry: TrackState, hmsPeer: HMSPeer) => {
-    if (!this.isFeatureEnabled() || trackEntry.type !== 'video') {
-      return;
-    }
-    const track = this.store.getTrackById(trackEntry.track_id);
-    if (!track) {
-      this.processTrackInfo(trackEntry, hmsPeer.peerId);
-      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
+  handlePeerRoleUpdate = (hmsPeer: HMSPeer) => {
+    const subscribeParams = this.store.getLocalPeer()?.role?.subscribeParams;
+    const isAllowedToSubscribe = subscribeParams?.subscribeToRoles.includes(hmsPeer.role?.name!);
+    if (!isAllowedToSubscribe) {
+      this.store.getPeerTracks(hmsPeer.peerId).forEach(track => {
+        this.removePeerTracks(hmsPeer, track as HMSRemoteTrack);
+      });
     }
   };
 
+  handleTrackRemove = (track: HMSRemoteTrack) => {
+    const removed = super.handleTrackRemove(track);
+    if (removed) {
+      this.processTrackInfo(
+        {
+          track_id: track.trackId,
+          mute: !track.enabled,
+          type: track.type,
+          source: track.source || 'regular',
+          stream_id: track.stream.id,
+        } as TrackState,
+        track.peerId!,
+      );
+    }
+    return removed;
+  };
+
   processTrackInfo = (trackInfo: TrackState, peerId: string) => {
-    if (!this.isFeatureEnabled() || trackInfo.type !== 'video') {
+    if (trackInfo.type !== 'video') {
       return;
     }
     const hmsPeer = this.store.getPeerById(peerId);
@@ -34,42 +53,25 @@ export class OnDemandTrackManager {
       HMSLogger.d(this.TAG, `no peer in store for peerId: ${peerId}`);
       return;
     }
-    // @ts-ignore
-    const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection);
+    const remoteStream = new HMSRemoteStream(new MediaStream(), this.transport.subscribeConnection!);
     const emptyTrack = LocalTrackManager.getEmptyVideoTrack();
     emptyTrack.enabled = !trackInfo.mute;
     const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
     track.setTrackId(trackInfo.track_id);
     this.addVideoTrack(hmsPeer, track);
+    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
   };
 
-  // eslint-disable-next-line complexity
-  private addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    if (track.type !== HMSTrackType.VIDEO) {
-      return;
+  addAsPrimaryVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
+    if (track.source !== 'regular') {
+      return false;
     }
-    const remoteTrack = track as HMSRemoteVideoTrack;
-    const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
-    remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
-    if (
-      track.source === 'regular' &&
-      (!hmsPeer.videoTrack ||
-        isEmptyTrack(hmsPeer.videoTrack.nativeTrack) ||
-        hmsPeer.videoTrack?.trackId === track.trackId)
-    ) {
-      hmsPeer.videoTrack = remoteTrack;
-    } else {
-      const index = hmsPeer.auxiliaryTracks.findIndex(track => track.trackId === remoteTrack.trackId);
-      if (index === -1) {
-        hmsPeer.auxiliaryTracks.push(remoteTrack);
-      } else {
-        hmsPeer.auxiliaryTracks.splice(index, 1, remoteTrack);
-      }
+    if (!hmsPeer.videoTrack) {
+      return true;
     }
-    HMSLogger.d(this.TAG, 'video track added', `${track}`);
-  }
-
-  private isFeatureEnabled() {
-    return this.transport.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    if (hmsPeer.videoTrack.trackId === track.trackId) {
+      return true;
+    }
+    return hmsPeer.videoTrack.enabled && isEmptyTrack(hmsPeer.videoTrack.nativeTrack);
   }
 }
