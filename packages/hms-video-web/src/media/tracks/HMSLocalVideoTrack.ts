@@ -360,7 +360,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      const track = await this.replaceTrackWith(settings);
+      await this.replaceSender(track, this.enabled);
+      this.nativeTrack = track;
+      this.videoHandler.updateSinks();
     }
   };
 
