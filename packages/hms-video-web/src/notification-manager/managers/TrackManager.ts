@@ -37,6 +37,16 @@ export class TrackManager {
   ) {
     this.onDemandTrackManager = new OnDemandTrackManager(this.store, this.transport, this.listener);
   }
+
+  handlePeerRoleUpdate = (hmsPeer: HMSPeer) => {
+    const subscribeParams = this.store.getLocalPeer()?.role?.subscribeParams;
+    const isAllowedToSubscribe = subscribeParams?.subscribeToRoles.includes(hmsPeer.role?.name!);
+    if (!isAllowedToSubscribe) {
+      this.store.getPeerTracks(hmsPeer.peerId).forEach(track => {
+        this.removePeerTracks(hmsPeer, track as HMSRemoteTrack);
+      });
+    }
+  };
   /**
    * Add event from biz on track-add
    * @param params TrackStateNotification
@@ -157,6 +167,10 @@ export class TrackManager {
     }
   };
 
+  processTrackInfo = (trackInfo: TrackState, peerId: string) => {
+    this.onDemandTrackManager?.processTrackInfo(trackInfo, peerId);
+  };
+
   processPendingTracks() {
     const tracksCopy = new Map(this.tracksToProcess);
     tracksCopy.forEach(track => {
@@ -257,8 +271,4 @@ export class TrackManager {
     }
     return eventType;
   }
-
-  processTrackInfo = (trackInfo: TrackState, peerId: string) => {
-    this.onDemandTrackManager?.processTrackInfo(trackInfo, peerId);
-  };
 }

@@ -109,6 +109,7 @@ export class PeerManager {
       peer.updateRole(newRole);
       this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
+      this.trackManager.handlePeerRoleUpdate(peer);
     }
     this.handlePeerInfoUpdate({ peer, ...notification.info });
   }
