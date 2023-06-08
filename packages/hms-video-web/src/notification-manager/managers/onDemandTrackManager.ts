@@ -29,13 +29,13 @@ export class OnDemandTrackManager extends TrackManager {
 
   handleTrackRemove = (track: HMSRemoteTrack) => {
     const removed = super.handleTrackRemove(track);
-    if (removed) {
+    if (removed && track.source === 'regular') {
       this.processTrackInfo(
         {
           track_id: track.trackId,
           mute: !track.enabled,
           type: track.type,
-          source: track.source || 'regular',
+          source: track.source,
           stream_id: track.stream.id,
         } as TrackState,
         track.peerId!,
