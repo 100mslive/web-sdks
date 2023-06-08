@@ -45,7 +45,11 @@ export function ShareScreenOptions() {
         open={openModals.has(MODALS.SHARE)}
         onOpenChange={value => updateState(MODALS.SHARE, value)}
       >
-        <Dropdown.Trigger asChild data-testid="sharing_btn">
+        <Dropdown.Trigger
+          asChild
+          data-testid="sharing_btn"
+          disabled={amIScreenSharing}
+        >
           <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
               <Box>
