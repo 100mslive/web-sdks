@@ -4,7 +4,7 @@ import { useSearchParam } from "react-use";
 import { v4 as uuid } from "uuid";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { styled } from "@100mslive/react-ui";
-import { useAppContext } from "../AppContext";
+import { useHMSRoomCompositeContext } from "../AppContext";
 import { ErrorDialog } from "../primitives/DialogContent";
 import { useSetAppDataByKey, useTokenEndpoint } from "./AppData/useUISettings";
 import getToken from "../services/tokenService";
@@ -22,7 +22,7 @@ import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from "../common/constants";
 const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
-  const { showPreview, roomId, roomCode, role } = useAppContext();
+  const { showPreview, roomId, roomCode, role } = useHMSRoomCompositeContext();
   const location = useLocation();
   const matches = useMemo(
     () =>

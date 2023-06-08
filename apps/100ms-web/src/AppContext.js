@@ -1,18 +1,21 @@
 import React, { useContext } from "react";
 
-export const AppContext = React.createContext({
+export const HMSRoomCompositeContext = React.createContext({
   showPreview: true,
   showLeave: true,
   roomId: "",
   role: "",
   roomCode: "",
+  userName: "",
+  userId: "",
+  endPoints: {},
   onLeave: () => {},
 });
 
-AppContext.displayName = "AppContext";
+HMSRoomCompositeContext.displayName = "HMSRoomCompositeContext";
 
-export const useAppContext = () => {
-  const context = useContext(AppContext);
+export const useHMSRoomCompositeContext = () => {
+  const context = useContext(HMSRoomCompositeContext);
   if (!context) {
     throw Error(
       "Make sure AppContext.Provider is present at the top level of your application"

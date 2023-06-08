@@ -83,7 +83,7 @@ const initialAppData = {
 };
 
 export const AppData = React.memo(
-  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig }) => {
+  ({ appDetails, logo, recordingUrl, tokenEndpoint }) => {
     const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const sidePane = useSidepaneState();
@@ -150,14 +150,10 @@ export const AppData = React.memo(
 
     useEffect(() => {
       if (localPeerRole) {
-        const config = normalizeAppPolicyConfig(
-          roleNames,
-          rolesMap,
-          policyConfig
-        );
+        const config = normalizeAppPolicyConfig(roleNames, rolesMap);
         hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
       }
-    }, [roleNames, policyConfig, rolesMap, localPeerRole, hmsActions]);
+    }, [roleNames, rolesMap, localPeerRole, hmsActions]);
 
     return <ResetStreamingStart />;
   }

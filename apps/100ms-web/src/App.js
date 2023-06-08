@@ -26,7 +26,10 @@ import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import PreviewContainer from "./components/Preview/PreviewContainer.jsx";
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import { AppContext, useAppContext } from "./AppContext.js";
+import {
+  HMSRoomCompositeContext,
+  useHMSRoomCompositeContext,
+} from "./AppContext.js";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
@@ -39,7 +42,6 @@ import "./index.css";
 const Conference = React.lazy(() => import("./components/conference"));
 
 const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
-const envPolicyConfig = JSON.parse(process.env.REACT_APP_POLICY_CONFIG || "{}");
 
 let appName;
 if (window.location.host.includes("localhost")) {
@@ -75,15 +77,16 @@ export const HMSRoomComposite = React.forwardRef(
         metadata = "",
         recordingUrl = "",
       },
-      policyConfig = envPolicyConfig,
       getDetails = () => {},
-      authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
       roomId,
       role,
       roomCode,
       showPreview = true,
       showLeave = true,
       onLeave = () => {},
+      userName,
+      userId,
+      endPoints,
     },
     ref
   ) => {
@@ -104,8 +107,18 @@ export const HMSRoomComposite = React.forwardRef(
 
     return (
       <ErrorBoundary>
-        <AppContext.Provider
-          value={{ roomId, role, roomCode, showPreview, showLeave, onLeave }}
+        <HMSRoomCompositeContext.Provider
+          value={{
+            roomId,
+            role,
+            roomCode,
+            showPreview,
+            showLeave,
+            onLeave,
+            userName,
+            userId,
+            endPoints,
+          }}
         >
           <HMSThemeProvider
             themeType={theme}
@@ -131,7 +144,6 @@ export const HMSRoomComposite = React.forwardRef(
             >
               <AppData
                 appDetails={metadata}
-                policyConfig={policyConfig}
                 recordingUrl={recordingUrl}
                 logo={logo}
                 tokenEndpoint={tokenEndpoint}
@@ -144,14 +156,11 @@ export const HMSRoomComposite = React.forwardRef(
                   size: "100%",
                 }}
               >
-                <AppRoutes
-                  getDetails={getDetails}
-                  authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
-                />
+                <AppRoutes getDetails={getDetails} />
               </Box>
             </HMSRoomProvider>
           </HMSThemeProvider>
-        </AppContext.Provider>
+        </HMSRoomCompositeContext.Provider>
       </ErrorBoundary>
     );
   }
@@ -185,7 +194,7 @@ const Redirector = ({ getDetails, showPreview }) => {
 };
 
 const RouteList = ({ getDetails }) => {
-  const { showPreview, showLeave } = useAppContext();
+  const { showPreview, showLeave } = useHMSRoomCompositeContext();
 
   return (
     <Routes>
@@ -268,7 +277,7 @@ const BackSwipe = () => {
 };
 
 const Router = ({ children }) => {
-  const { roomId, role, roomCode } = useAppContext;
+  const { roomId, role, roomCode } = useHMSRoomCompositeContext;
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (

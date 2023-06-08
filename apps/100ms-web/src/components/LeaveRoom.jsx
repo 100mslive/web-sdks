@@ -24,7 +24,7 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
-import { useAppContext } from "../AppContext";
+import { useHMSRoomCompositeContext } from "../AppContext";
 import {
   DialogCheckbox,
   DialogContent,
@@ -43,7 +43,7 @@ export const LeaveRoom = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
-  const { showLeave, onLeave } = useAppContext();
+  const { showLeave, onLeave } = useHMSRoomCompositeContext();
   useDropdownList({ open, name: "LeaveRoom" });
 
   const redirectToLeavePage = () => {
