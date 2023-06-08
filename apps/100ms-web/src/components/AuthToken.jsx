@@ -66,7 +66,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
         setAuthTokenInAppData(token);
       })
       .catch(error => {
-        setError(convertPreviewError(error));
+        setError(convertError(error));
       });
   }, [
     hmsActions,
@@ -87,7 +87,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   return null;
 });
 
-const convertPreviewError = error => {
+const convertError = error => {
   console.error("[error]", { error });
   if (error.action === "GET_TOKEN" && error.code === 403) {
     return {
