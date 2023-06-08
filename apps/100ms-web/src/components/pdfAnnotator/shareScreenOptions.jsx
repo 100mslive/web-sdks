@@ -114,7 +114,6 @@ export function ShareScreenOptions() {
                   bg: "$surfaceLighter",
                   pb: "0",
                 }}
-                icon
               >
                 <ScreenShare
                   width="100%"
@@ -159,7 +158,6 @@ export function ShareScreenOptions() {
                   bg: "$surfaceLight",
                   pb: "0",
                 }}
-                icon
               >
                 <PdfShare
                   width="100%"
@@ -190,7 +188,6 @@ export function ShareScreenOptions() {
                         border: "none",
                       },
                     }}
-                    icon
                   >
                     <StarIcon />
                   </IconButton>

@@ -301,7 +301,6 @@ export const DialogInputFile = ({
             bg: "$transparent !important",
           },
         }}
-        icon
       >
         <CloudUploadIcon
           style={{
