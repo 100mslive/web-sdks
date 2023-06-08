@@ -408,7 +408,7 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
-            HMSAction.NONE,
+            HMSSignalMethod.SERVER_ERROR,
             response.params.message,
           ),
         );

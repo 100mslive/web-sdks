@@ -41,5 +41,3 @@ export type {
   TokenRequestOptions,
   RID,
 } from './hmsSDKStore/sdkTypes';
-
-export * from '../controller/beam/BeamController';
