@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { ExitIcon } from "@100mslive/react-icons";
 import { Box, Button, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
+import { useAppContext } from "../AppContext";
 import { Header } from "./Header";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -14,6 +15,7 @@ import { getRoutePrefix } from "../common/utils";
 
 const PostLeave = () => {
   const navigate = useNavigation();
+  const { showPreview } = useAppContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
@@ -22,7 +24,7 @@ const PostLeave = () => {
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
-        <Header isPreview />
+        <Header />
       </Box>
       <Flex
         justify="center"
@@ -56,28 +58,32 @@ const PostLeave = () => {
           )}
           !
         </Text>
-        <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
-          <Text
-            variant="body1"
-            css={{ color: "$textMedEmp", fontWeight: "$regular" }}
-          >
-            Left by mistake?
-          </Text>
-          <Button
-            onClick={() => {
-              let previewUrl = "/preview/" + roomId;
-              if (role) previewUrl += "/" + role;
-              navigate(previewUrl);
-              ToastManager.clearAllToast();
-            }}
-            data-testid="join_again_btn"
-          >
-            <ExitIcon />
-            <Text css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}>
-              Rejoin
+        {showPreview && (
+          <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
+            <Text
+              variant="body1"
+              css={{ color: "$textMedEmp", fontWeight: "$regular" }}
+            >
+              Left by mistake?
             </Text>
-          </Button>
-        </Flex>
+            <Button
+              onClick={() => {
+                let previewUrl = "/preview/" + roomId;
+                if (role) previewUrl += "/" + role;
+                navigate(previewUrl);
+                ToastManager.clearAllToast();
+              }}
+              data-testid="join_again_btn"
+            >
+              <ExitIcon />
+              <Text
+                css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}
+              >
+                Rejoin
+              </Text>
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </Flex>
   );

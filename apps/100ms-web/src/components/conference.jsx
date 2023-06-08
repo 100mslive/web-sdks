@@ -15,8 +15,9 @@ import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
-import { useIsHeadless } from "./AppData/useUISettings";
+import { useAuthToken, useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
+import { useSkipPreview } from "./hooks/useSkipPreview";
 import {
   APP_DATA,
   EMOJI_REACTION_TYPE,
@@ -25,7 +26,7 @@ import {
   isIPadOS,
 } from "../common/constants";
 
-const Conference = () => {
+const Conference = ({ showPreview }) => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
@@ -35,6 +36,8 @@ const Conference = () => {
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
+  const skipPreview = useSkipPreview();
+  const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
   const dropdownListRef = useRef();
@@ -67,6 +70,9 @@ const Conference = () => {
       navigate(`/`);
       return;
     }
+    if (!showPreview) {
+      return;
+    }
     if (
       !prevState &&
       !(
@@ -78,7 +84,46 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ""}/${role}`);
       else navigate(`/preview/${roomId || ""}`);
     }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId]);
+  }, [
+    isConnectedToRoom,
+    prevState,
+    roomState,
+    navigate,
+    role,
+    roomId,
+    showPreview,
+  ]);
+
+  useEffect(() => {
+    if (
+      authTokenInAppData &&
+      !isConnectedToRoom &&
+      !showPreview &&
+      roomState !== HMSRoomState.Connecting
+    ) {
+      hmsActions
+        .join({
+          userName: "Test",
+          authToken: authTokenInAppData,
+          initEndpoint: process.env.REACT_APP_ENV
+            ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
+            : undefined,
+          initialSettings: {
+            isAudioMuted: skipPreview,
+            isVideoMuted: skipPreview,
+            speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
+          },
+        })
+        .catch(console.error);
+    }
+  }, [
+    authTokenInAppData,
+    skipPreview,
+    hmsActions,
+    isConnectedToRoom,
+    showPreview,
+    roomState,
+  ]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
