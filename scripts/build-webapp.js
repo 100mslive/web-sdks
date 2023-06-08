@@ -54,6 +54,7 @@ async function main() {
       .then(() => {
         fs.renameSync('./dist/App.js', './dist/index.js');
         fs.renameSync('./dist/App.css', './dist/index.css');
+        fs.copyFileSync('./src/index.d.ts', './dist/index.d.ts');
       });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
