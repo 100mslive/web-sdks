@@ -3,8 +3,8 @@ import { HMSLocalVideoTrack } from '../..';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { EventBus } from '../../events/EventBus';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { HMSLocalStream } from '../streams/HMSLocalStream';
+import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const remoteStreamId = '123';
 const remoteTrackId = '456';

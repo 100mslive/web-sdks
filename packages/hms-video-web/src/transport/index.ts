@@ -19,12 +19,13 @@ import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConn
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';

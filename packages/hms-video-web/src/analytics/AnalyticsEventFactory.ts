@@ -3,9 +3,8 @@ import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
-import { SelectedDevices } from '../device-manager';
 import { HMSException } from '../error/HMSException';
-import { DeviceMap } from '../interfaces';
+import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks';
 

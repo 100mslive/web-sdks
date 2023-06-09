@@ -1,10 +1,10 @@
-import HMSMediaStream from './HMSMediaStream';
+import { HMSMediaStream } from './HMSMediaStream';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 
 /** @internal */
-export default class HMSRemoteStream extends HMSMediaStream {
+export class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;

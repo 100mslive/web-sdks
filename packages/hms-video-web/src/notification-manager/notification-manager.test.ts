@@ -46,7 +46,7 @@ beforeEach(() => {
   audioUpdateHandler = jest.fn();
   sessionStoreUpdateHandler = jest.fn();
   eventBus = new EventBus();
-  store.setRoom(new HMSRoom('1234', store));
+  store.setRoom(new HMSRoom('1234'));
 
   listener = {
     onJoin: joinHandler,
