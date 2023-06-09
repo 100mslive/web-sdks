@@ -153,7 +153,7 @@ module.exports = {
     open: true,
     compress: true,
     hot: true,
-    port: process.env.PORT || 3000,
+    port: process.env.PORT || 4000,
     allowedHosts: "all",
   },
 };

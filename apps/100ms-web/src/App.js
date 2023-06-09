@@ -87,6 +87,7 @@ export const HMSRoomComposite = React.forwardRef(
       userName,
       userId,
       endPoints,
+      authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
     },
     ref
   ) => {
@@ -156,7 +157,10 @@ export const HMSRoomComposite = React.forwardRef(
                   size: "100%",
                 }}
               >
-                <AppRoutes getDetails={getDetails} />
+                <AppRoutes
+                  getDetails={getDetails}
+                  authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+                />
               </Box>
             </HMSRoomProvider>
           </HMSThemeProvider>
@@ -277,7 +281,7 @@ const BackSwipe = () => {
 };
 
 const Router = ({ children }) => {
-  const { roomId, role, roomCode } = useHMSRoomCompositeContext;
+  const { roomId, role, roomCode } = useHMSRoomCompositeContext();
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
@@ -324,7 +328,7 @@ export default function App() {
         font: process.env.REACT_APP_FONT,
         metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
       }}
-      showPreview={false}
+      roomCode="afa-wuos-imd"
     />
   );
 }
