@@ -51,7 +51,6 @@ beforeEach(() => {
   audioUpdateHandler = jest.fn();
   sessionStoreUpdateHandler = jest.fn();
   eventBus = new EventBus();
-  store.setRoom(new HMSRoom('1234', store));
   const mockMediaStream = {
     id: 'native-stream-id',
     getVideoTracks: jest.fn(() => [
@@ -90,6 +89,7 @@ beforeEach(() => {
     new AnalyticsEventsService(store),
     new AnalyticsTimer(),
   );
+  store.setRoom(new HMSRoom('1234'));
 
   listener = {
     onJoin: joinHandler,

@@ -12,10 +12,12 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
-import { AudioOutputManager, DeviceManager } from '../device-manager';
+import { DeviceManager } from '../device-manager';
+import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import {
@@ -36,13 +38,13 @@ import {
 import { DeviceChangeListener } from '../interfaces/devices';
 import { IErrorListener } from '../interfaces/error-listener';
 import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
-import HMSInterface from '../interfaces/hms';
+import { HMSInterface } from '../interfaces/hms';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
   HMSLocalTrack,
@@ -557,6 +559,10 @@ export class HMSSdk implements HMSInterface {
 
   getPeers() {
     return this.store.getPeers();
+  }
+
+  getPeerMap() {
+    return this.store.getPeerMap();
   }
 
   getAudioOutput() {
@@ -1121,7 +1127,7 @@ export class HMSSdk implements HMSInterface {
 
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId, this.store));
+      this.store.setRoom(new HMSRoom(roomId));
     }
   }
 

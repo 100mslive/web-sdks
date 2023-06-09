@@ -2,7 +2,7 @@ import { v4 as uuid } from 'uuid';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { domainCategory } from './domain-analytics';
 import { ISignalParamsProvider } from '../signal/ISignalSendParamsProvider';
-import { getAnalyticsDeviceId } from '../utils/support';
+import { getAnalyticsDeviceId } from '../utils/analytics-deviceId';
 import { createUserAgent } from '../utils/user-agent';
 
 interface AnalyticsEventInit {
