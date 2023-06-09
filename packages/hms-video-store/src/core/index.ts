@@ -15,7 +15,6 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
-  HMSSimulcastLayer,
   simulcastMapping,
   DeviceType,
 } from './hmsSDKStore/sdkTypes';
