@@ -20,7 +20,7 @@ export const PdfErrorView = ({ isPDFUrlValid }) => {
             color: "$error",
           }}
         >
-          Invalid PDF URL, try again
+          Please enter a valid PDF URL
         </Text>
       </DialogRow>
     )
