@@ -54,7 +54,8 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
+import { NotificationManager } from '../notification-manager/NotificationManager';
 import { PlaylistManager } from '../playlist-manager';
 import { SessionStore } from '../session-store';
 import { InitConfig } from '../signal/init/models';
