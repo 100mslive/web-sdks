@@ -8,13 +8,22 @@ import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
 import { isEmptyTrack } from '../../utils/track';
-import { TrackState } from '../HMSNotifications';
+import { TrackState, TrackStateNotification } from '../HMSNotifications';
 
 export class OnDemandTrackManager extends TrackManager {
   TAG = '[OnDemandTrackManager]';
 
   constructor(store: IStore, eventBus: EventBus, private transport: HMSTransport, listener?: HMSUpdateListener) {
     super(store, eventBus, listener);
+  }
+
+  handleTrackMetadataAdd(params: TrackStateNotification) {
+    super.handleTrackMetadataAdd(params);
+    for (const trackId in params.tracks) {
+      if (params.tracks[trackId].type === 'video') {
+        this.processTrackInfo(params.tracks[trackId], params.peer.peer_id);
+      }
+    }
   }
 
   handlePeerRoleUpdate = (hmsPeer: HMSPeer) => {
