@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
-import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { HMSPreferredSimulcastLayer, HMSSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '../../internal';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
@@ -95,12 +95,12 @@ export class VideoElementManager {
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
       HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
       await this.track.addSink(entry.target as HTMLVideoElement);
+      await this.selectMaxLayer();
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
       await this.track.removeSink(entry.target as HTMLVideoElement);
     }
     this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
-    await this.selectMaxLayer();
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -141,11 +141,12 @@ export class VideoElementManager {
     );
   }
 
+  // eslint-disable-next-line complexity
   private async selectMaxLayer() {
-    let maxLayer!: HMSPreferredSimulcastLayer;
-    if (!(this.track instanceof HMSRemoteVideoTrack)) {
+    if (!(this.track instanceof HMSRemoteVideoTrack) || this.videoElements.size === 0) {
       return;
     }
+    let maxLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
     for (const element of this.videoElements) {
       const entry = this.entries.get(element);
       if (!entry) {
