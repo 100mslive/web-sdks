@@ -26,16 +26,6 @@ export class OnDemandTrackManager extends TrackManager {
     }
   }
 
-  handlePeerRoleUpdate = (hmsPeer: HMSPeer) => {
-    const subscribeParams = this.store.getLocalPeer()?.role?.subscribeParams;
-    const isAllowedToSubscribe = subscribeParams?.subscribeToRoles.includes(hmsPeer.role?.name!);
-    if (!isAllowedToSubscribe) {
-      this.store.getPeerTracks(hmsPeer.peerId).forEach(track => {
-        this.removePeerTracks(hmsPeer, track as HMSRemoteTrack);
-      });
-    }
-  };
-
   handleTrackRemove(track: HMSRemoteTrack) {
     const removed = super.handleTrackRemove(track);
     if (removed && track.source === 'regular') {
@@ -58,7 +48,7 @@ export class OnDemandTrackManager extends TrackManager {
       return;
     }
     const hmsPeer = this.store.getPeerById(peerId);
-    if (!hmsPeer) {
+    if (!hmsPeer || !this.isPeerRoleSubscribed(peerId)) {
       HMSLogger.d(this.TAG, `no peer in store for peerId: ${peerId}`);
       return;
     }
@@ -82,5 +72,14 @@ export class OnDemandTrackManager extends TrackManager {
       return true;
     }
     return hmsPeer.videoTrack.enabled && isEmptyTrack(hmsPeer.videoTrack.nativeTrack);
+  }
+
+  private isPeerRoleSubscribed(peerId?: string) {
+    if (!peerId) {
+      return true;
+    }
+    const localPeer = this.store.getLocalPeer();
+    const peer = this.store.getPeerById(peerId);
+    return peer && localPeer?.role?.subscribeParams?.subscribeToRoles?.includes(peer.role?.name!);
   }
 }

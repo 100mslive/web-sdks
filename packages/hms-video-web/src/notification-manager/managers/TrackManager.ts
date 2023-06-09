@@ -27,8 +27,6 @@ export class TrackManager {
 
   constructor(public store: IStore, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
 
-  handlePeerRoleUpdate = (_hmsPeer: HMSPeer) => {};
-
   /**
    * Add event from biz on track-add
    * @param params TrackStateNotification
