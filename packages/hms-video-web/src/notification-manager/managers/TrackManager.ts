@@ -59,7 +59,7 @@ export class TrackManager {
   /**
    * Sets the track of corresponding peer to null and returns the peer
    */
-  handleTrackRemove = (track: HMSRemoteTrack): boolean => {
+  handleTrackRemove(track: HMSRemoteTrack): boolean {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
 
     const trackStateEntry = this.store.getTrackState(track.trackId);
@@ -84,7 +84,7 @@ export class TrackManager {
     this.removePeerTracks(hmsPeer, track);
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     return true;
-  };
+  }
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
     for (const trackId in params.tracks) {
       const trackEntry = params.tracks[trackId];
