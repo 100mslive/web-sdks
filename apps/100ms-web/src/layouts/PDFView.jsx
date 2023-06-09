@@ -105,7 +105,7 @@ const PDFEmbedComponent = () => {
         onLoad={() => {
           if (ref.current && pdfConfig.file) {
             // setting theme dark -> 2 and light -> 1
-            setTimeout(() => {
+            requestAnimationFrame(() => {
               ref.current.contentWindow.postMessage(
                 {
                   file: pdfConfig.file,
