@@ -1,5 +1,4 @@
-import { SelectedDevices } from './DeviceManager';
-import { DeviceMap } from '../interfaces';
+import { DeviceMap, SelectedDevices } from '../interfaces';
 import { LocalStorage } from '../utils/local-storage';
 import HMSLogger from '../utils/logger';
 

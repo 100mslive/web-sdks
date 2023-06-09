@@ -6,7 +6,6 @@ import {
   ScreenCaptureHandle,
 } from '../hmsSDKStore/sdkTypes';
 
-export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;

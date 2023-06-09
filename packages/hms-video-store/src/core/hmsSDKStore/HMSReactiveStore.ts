@@ -1,4 +1,4 @@
-import produce from 'immer';
+import { produce } from 'immer';
 import shallow from 'zustand/shallow';
 import create, {
   EqualityChecker,
@@ -18,7 +18,7 @@ import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSGenericTypes, HMSStore } from '../schema';
 import { IHMSNotifications } from '../schema/notification';
-import { HMSStats } from '../webrtc-stats';
+import { HMSStats } from '../';
 
 declare global {
   interface Window {

@@ -36,6 +36,7 @@ export interface IStore {
   getLocalPeer(): HMSLocalPeer | undefined;
   getRemotePeers(): HMSRemotePeer[];
   getPeers(): HMSPeer[];
+  getPeerMap(): Record<string, HMSPeer>;
 
   getTracksMap(): Map<HMSTrack, HMSTrack>;
   getTracks(): HMSTrack[];

@@ -19,7 +19,7 @@ import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSLogLevel } from '../utils/logger';
 
-export default interface HMS {
+export interface HMSInterface {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
