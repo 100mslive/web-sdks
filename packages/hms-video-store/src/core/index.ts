@@ -42,6 +42,7 @@ export type {
   TokenRequest,
   TokenRequestOptions,
   RID,
+  HMSPoll,
 } from './hmsSDKStore/sdkTypes';
 
 export * from '../controller/beam/BeamController';

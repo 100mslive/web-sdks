@@ -13,6 +13,7 @@ import {
   TokenRequest,
   TokenRequestOptions,
 } from '@100mslive/hms-video';
+import { IHMSInteractivityCenterActions } from './hmsSDKStore/HMSInteractivityCenter';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
@@ -496,4 +497,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+
+  interactivityCenter: IHMSInteractivityCenterActions;
 }

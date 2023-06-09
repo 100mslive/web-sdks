@@ -28,10 +28,12 @@ import {
   areArraysEqual,
   isEntityUpdated,
   mergeNewPeersInDraft,
+  mergeNewPollsInDraft,
   mergeNewTracksInDraft,
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
+import { HMSInteractivityCenter, IHMSInteractivityCenterActions } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -118,6 +120,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  interactivityCenter: IHMSInteractivityCenterActions;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
@@ -126,7 +129,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications = notificationManager;
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
-
+    this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -740,6 +743,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
+      onPollsUpdate: this.onPollsUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -818,6 +822,16 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
     this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
+  }
+
+  private onPollsUpdate(actionType: string, polls: sdkTypes.HMSPoll[]) {
+    this.setState(draftStore => {
+      const pollsObject = polls.reduce((acc, poll) => {
+        acc[poll.id] = poll;
+        return acc;
+      }, {} as { [key: string]: sdkTypes.HMSPoll });
+      mergeNewPollsInDraft(draftStore.polls, pollsObject);
+    }, actionType);
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {
