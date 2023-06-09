@@ -1,7 +1,7 @@
 import { TrackManager } from './TrackManager';
 import { EventBus } from '../../events/EventBus';
 import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
-import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
+import { HMSRemoteStream } from '../../media/streams/HMSRemoteStream';
 import { HMSRemoteTrack, HMSRemoteVideoTrack } from '../../media/tracks';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import { IStore } from '../../sdk/store';
