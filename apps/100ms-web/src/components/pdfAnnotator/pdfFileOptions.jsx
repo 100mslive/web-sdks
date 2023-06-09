@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from "react";
-import { useDebounce } from "react-use";
 import { InfoIcon, TrashIcon } from "@100mslive/react-icons";
 import {
   Button,
@@ -19,47 +18,43 @@ import { APP_DATA } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  const [isPDFUrlValid, setIsPDFUrlValid] = useState(false);
-  const [pdfUrlMessage, setPDFUrlMessage] = useState("");
+  const [isPDFUrlValid, setIsPDFUrlValid] = useState(true);
+  const [isValidateProgress, setIsValidateProgress] = useState(false);
   const [pdfFile, setPDFFile] = useState(null);
   const [pdfURL, setPDFURL] = useState("");
 
-  const isValidPDF = useCallback(pdfURL => {
-    const extension = pdfURL.split(".").pop().toLowerCase();
-    setPDFUrlMessage("Validating!!!");
-    if (extension === "pdf") {
-      setIsPDFUrlValid(true);
-      setPDFUrlMessage("");
-    }
-
-    fetch(pdfURL, { method: "HEAD" })
-      .then(response => response.headers.get("content-type"))
-      .then(contentType => {
-        if (contentType === "application/pdf") {
-          setIsPDFUrlValid(true);
-          setPDFUrlMessage("");
-        } else {
-          setIsPDFUrlValid(false);
-          setPDFUrlMessage("Invalid PDF URL, try again");
-        }
-      })
-      .catch(error => {
-        setIsPDFUrlValid(false);
-        setPDFUrlMessage("Invalid PDF URL, try again");
-      });
-  }, []);
-  useDebounce(
-    () => {
-      if (pdfURL) {
-        isValidPDF(pdfURL);
-      } else {
-        setIsPDFUrlValid(false);
-        setPDFUrlMessage("");
+  const isValidPDF = useCallback(
+    pdfURL => {
+      const extension = pdfURL.split(".").pop().toLowerCase();
+      setIsValidateProgress(true);
+      if (extension === "pdf") {
+        setIsPDFUrlValid(true);
+        setIsValidateProgress(false);
+        setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
+        onOpenChange(false);
       }
+
+      fetch(pdfURL, { method: "HEAD" })
+        .then(response => response.headers.get("content-type"))
+        .then(contentType => {
+          if (contentType === "application/pdf") {
+            setIsPDFUrlValid(true);
+            setIsValidateProgress(false);
+            setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
+            onOpenChange(false);
+          } else {
+            setIsPDFUrlValid(false);
+            setIsValidateProgress(false);
+          }
+        })
+        .catch(error => {
+          setIsPDFUrlValid(false);
+          setIsValidateProgress(false);
+        });
     },
-    300,
-    [pdfURL, isValidPDF]
+    [onOpenChange, pdfFile, setPDFConfig]
   );
+
   const PDFInfo = useCallback(() => {
     return (
       <DialogRow
@@ -67,10 +62,10 @@ export function PDFFileOptions({ onOpenChange }) {
           px: "$8",
           py: "$3",
           bg: "$surfaceLight",
-          r: "8px",
+          r: "$1",
           outline: "none",
           border: "1px solid $borderLight",
-          minHeight: "30px",
+          minHeight: "$11",
         }}
       >
         <InfoIcon
@@ -112,10 +107,15 @@ export function PDFFileOptions({ onOpenChange }) {
           variant="primary"
           type="submit"
           onClick={() => {
-            setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
-            onOpenChange(false);
+            if (pdfFile) {
+              setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
+              onOpenChange(false);
+            } else if (pdfURL) {
+              isValidPDF(pdfURL);
+            }
           }}
-          disabled={!pdfFile && !(pdfURL && isPDFUrlValid)}
+          disabled={!pdfFile && !pdfURL}
+          loading={isValidateProgress}
           data-testid="share_pdf_btn"
           css={{
             w: "50%",
@@ -125,7 +125,14 @@ export function PDFFileOptions({ onOpenChange }) {
         </Button>
       </Flex>
     );
-  }, [onOpenChange, pdfFile, pdfURL, isPDFUrlValid, setPDFConfig]);
+  }, [
+    pdfFile,
+    pdfURL,
+    isValidateProgress,
+    onOpenChange,
+    setPDFConfig,
+    isValidPDF,
+  ]);
   const PDFHeader = useCallback(() => {
     return (
       <DialogCol
@@ -175,8 +182,8 @@ export function PDFFileOptions({ onOpenChange }) {
                   r: "$1",
                   outline: "none",
                   border: "1px solid $borderLight",
-                  p: "0.5rem 0.75rem",
-                  minHeight: "30px",
+                  p: "$4 $6",
+                  minHeight: "$11",
                   c: "$textPrimary",
                   fs: "$md",
                   w: "100%",
@@ -215,34 +222,30 @@ export function PDFFileOptions({ onOpenChange }) {
       </Dialog.Root>
     );
   }, [onOpenChange, pdfFile]);
-  const PdfURLView = useCallback(
-    ({ color }) => {
-      return (
-        pdfUrlMessage &&
-        !isPDFUrlValid && (
-          <DialogRow
+  const PdfURLView = useCallback(() => {
+    return (
+      !isPDFUrlValid && (
+        <DialogRow
+          css={{
+            mt: "-$8",
+            color: "$error",
+            justifyContent: "start",
+          }}
+        >
+          <InfoIcon width="12px" height="12px" />
+          <Text
+            variant="caption"
             css={{
-              mt: "-$8",
-              color: color,
-              justifyContent: "start",
+              pl: "$1",
+              color: "$error",
             }}
           >
-            <InfoIcon width="12px" height="12px" />
-            <Text
-              variant="caption"
-              css={{
-                pl: "$1",
-                color: color,
-              }}
-            >
-              {pdfUrlMessage}
-            </Text>
-          </DialogRow>
-        )
-      );
-    },
-    [pdfUrlMessage, isPDFUrlValid]
-  );
+            Invalid PDF URL, try again
+          </Text>
+        </DialogRow>
+      )
+    );
+  }, [isPDFUrlValid]);
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -299,6 +302,10 @@ export function PDFFileOptions({ onOpenChange }) {
             <Input
               css={{ w: "100%", mb: "$10" }}
               value={pdfURL}
+              onFocus={() => {
+                setIsPDFUrlValid(true);
+                setIsValidateProgress(false);
+              }}
               onChange={e => {
                 setPDFURL(e.target.value);
               }}
@@ -306,11 +313,7 @@ export function PDFFileOptions({ onOpenChange }) {
               type="text"
               error={!isPDFUrlValid}
             />
-            {isPDFUrlValid ? (
-              <PdfURLView color="$white" />
-            ) : (
-              <PdfURLView color="$error" />
-            )}
+            {!isPDFUrlValid && <PdfURLView />}
             <PDFInfo />
             <SubmitSharing />
           </Flex>

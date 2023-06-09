@@ -119,8 +119,8 @@ export function ShareScreenOptions() {
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "4px",
-                    borderTopRightRadius: "4px",
+                    borderTopLeftRadius: "$0",
+                    borderTopRightRadius: "$0",
                   }}
                 />
               </IconButton>
@@ -163,8 +163,8 @@ export function ShareScreenOptions() {
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "4px",
-                    borderTopRightRadius: "4px",
+                    borderTopLeftRadius: "$0",
+                    borderTopRightRadius: "$0",
                   }}
                 />
                 <Flex

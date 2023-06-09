@@ -21,7 +21,7 @@ export const ScreenshareToggle = ({ css }) => {
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const sharePDF = !(isSafari || isFirefox);
   if (!sharePDF) {
-    css = Object.assign(finalCSS, css || {});
+    css = { finalCSS, ...css };
   }
 
   const {
