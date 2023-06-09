@@ -1,4 +1,4 @@
-import { HMSPeer } from '.';
+import { HMSPeer } from '..';
 
 export interface HMSSessionStore {
   set(key: string, value: any): Promise<{ value: any; updatedAt?: Date }>;
@@ -12,3 +12,5 @@ export interface SessionStoreUpdate {
   updatedAt?: Date;
   updatedBy?: HMSPeer;
 }
+
+export * from './polls';

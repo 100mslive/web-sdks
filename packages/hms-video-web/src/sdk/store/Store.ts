@@ -3,7 +3,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -47,6 +47,7 @@ class Store implements IStore {
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
+  private polls: Record<string, HMSPoll> = {};
 
   getConfig() {
     return this.config;
@@ -351,6 +352,14 @@ class Store implements IStore {
         } as HMSSimulcastLayerDefinition;
       }) || []
     );
+  }
+
+  setPoll(poll: HMSPoll) {
+    this.polls[poll.id] = poll;
+  }
+
+  getPoll(id: string) {
+    return this.polls[id];
   }
 
   getErrorListener() {

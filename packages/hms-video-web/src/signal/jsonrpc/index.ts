@@ -22,6 +22,18 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
+  PollInfoGetParams,
+  PollInfoGetResponse,
+  PollInfoSetParams,
+  PollInfoSetResponse,
+  PollQuestionsGetParams,
+  PollQuestionsGetResponse,
+  PollQuestionsSetParams,
+  PollQuestionsSetResponse,
+  PollStartParams,
+  PollStartResponse,
+  PollStopParams,
+  PollStopResponse,
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
@@ -363,6 +375,45 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
+  }
+
+  pollInfoSet(params: PollInfoSetParams) {
+    this.valiateConnection();
+    return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { version: '1.0', ...params });
+  }
+
+  pollInfoGet(params: PollInfoGetParams) {
+    this.valiateConnection();
+    return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { version: '1.0', ...params });
+  }
+
+  pollQuestionsSet(params: PollQuestionsSetParams) {
+    this.valiateConnection();
+    return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { version: '1.0', ...params });
+  }
+
+  pollStart(params: PollStartParams) {
+    this.valiateConnection();
+    return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { version: '1.0', ...params });
+  }
+
+  pollStop(params: PollStopParams) {
+    this.valiateConnection();
+    return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { version: '1.0', ...params });
+  }
+
+  pollQuestionsGet(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
+    this.valiateConnection();
+    return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { version: '1.0', ...params });
+  }
+
+  private valiateConnection() {
+    if (!this.isConnected) {
+      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
+        HMSAction.RECONNECT_SIGNAL,
+        'Failed to send message due to network disconnection',
+      );
+    }
   }
 
   private onMessageHandler(event: MessageEvent) {

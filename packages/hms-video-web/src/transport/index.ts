@@ -37,6 +37,17 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  PollInfoGetParams,
+  PollInfoGetResponse,
+  PollInfoSetParams,
+  PollInfoSetResponse,
+  PollQuestionsGetParams,
+  PollQuestionsGetResponse,
+  PollQuestionsSetParams,
+  PollQuestionsSetResponse,
+  PollStartParams,
+  PollStartResponse,
+  PollStopParams,
   SetSessionMetadataParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
@@ -666,6 +677,30 @@ export default class HMSTransport implements ITransport {
 
   listenMetadataChange(keys: string[]): Promise<void> {
     return this.signal.listenMetadataChange(keys);
+  }
+
+  pollInfoSet(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
+    return this.signal.pollInfoSet(params);
+  }
+
+  pollInfoGet(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
+    return this.signal.pollInfoGet(params);
+  }
+
+  pollQuestionsSet(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse> {
+    return this.signal.pollQuestionsSet(params);
+  }
+
+  pollQuestionsGet(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
+    return this.signal.pollQuestionsGet(params);
+  }
+
+  pollStart(params: PollStartParams): Promise<PollStartResponse> {
+    return this.signal.pollStart(params);
+  }
+
+  pollStop(params: PollStopParams): Promise<PollStartResponse> {
+    return this.signal.pollStop(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
