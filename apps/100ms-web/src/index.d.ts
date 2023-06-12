@@ -9,7 +9,7 @@ export declare const HMSRoomComposite: React.FC<{
     logo: string;
     font: string;
   };
-  endPoints: {
+  endPoints?: {
     token?: string;
     init?: string;
   };
