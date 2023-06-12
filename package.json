@@ -46,7 +46,7 @@
     "lint": "lerna run lint --parallel",
     "lint:fix": "lerna run lint:fix --parallel",
     "format": "lerna run format --parallel",
-    "test": "yarn build --no-private && lerna run test --stream",
+    "test": "yarn build && lerna run test --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream --ignore @100mslive/uikit-react",
     "size": "size-limit",

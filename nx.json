@@ -8,10 +8,5 @@
         "parellel": 7
       }
     }
-  },
-  "targetDefaults": {
-    "lint": {
-      "dependsOn": ["esbuild"]
-    }
   }
 }
