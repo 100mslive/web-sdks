@@ -15,7 +15,7 @@ import { getRoutePrefix } from "../common/utils";
 
 const PostLeave = () => {
   const navigate = useNavigation();
-  const { showPreview } = useHMSRoomCompositeContext();
+  const { showPreview, roomCode } = useHMSRoomCompositeContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
@@ -58,32 +58,30 @@ const PostLeave = () => {
           )}
           !
         </Text>
-        {showPreview && (
-          <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
-            <Text
-              variant="body1"
-              css={{ color: "$textMedEmp", fontWeight: "$regular" }}
-            >
-              Left by mistake?
+        <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
+          <Text
+            variant="body1"
+            css={{ color: "$textMedEmp", fontWeight: "$regular" }}
+          >
+            Left by mistake?
+          </Text>
+          <Button
+            onClick={() => {
+              let redirectUrl = `${showPreview ? "/preview/" : "/meeting/"}${
+                roomCode || roomId
+              }`;
+              if (role && roomId) redirectUrl += "/" + role;
+              navigate(redirectUrl);
+              ToastManager.clearAllToast();
+            }}
+            data-testid="join_again_btn"
+          >
+            <ExitIcon />
+            <Text css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}>
+              Rejoin
             </Text>
-            <Button
-              onClick={() => {
-                let previewUrl = "/preview/" + roomId;
-                if (role) previewUrl += "/" + role;
-                navigate(previewUrl);
-                ToastManager.clearAllToast();
-              }}
-              data-testid="join_again_btn"
-            >
-              <ExitIcon />
-              <Text
-                css={{ ml: "$3", fontWeight: "$semiBold", color: "inherit" }}
-              >
-                Rejoin
-              </Text>
-            </Button>
-          </Flex>
-        )}
+          </Button>
+        </Flex>
       </Flex>
     </Flex>
   );

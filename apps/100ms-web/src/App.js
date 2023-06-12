@@ -286,7 +286,7 @@ const Router = ({ children }) => {
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
     <MemoryRouter
-      initialEntries={[`/preview/${roomCode ? roomCode : `${roomId}/${role}`}`]}
+      initialEntries={[`/${roomCode ? roomCode : `${roomId}/${role || ""}`}`]}
       initialIndex={0}
     >
       {children}

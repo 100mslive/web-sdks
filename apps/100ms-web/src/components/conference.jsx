@@ -10,6 +10,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
+import { useHMSRoomCompositeContext } from "../AppContext";
 import { ConferenceMainView } from "../layouts/mainView";
 import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
@@ -26,7 +27,7 @@ import {
   isIPadOS,
 } from "../common/constants";
 
-const Conference = ({ showPreview }) => {
+const Conference = () => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
@@ -37,6 +38,7 @@ const Conference = ({ showPreview }) => {
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const skipPreview = useSkipPreview();
+  const { showPreview } = useHMSRoomCompositeContext();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
