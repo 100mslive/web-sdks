@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { HMSRoomComposite } from '@100mslive/uikit-react';
+import { HMSPrebuilt } from '@100mslive/uikit-react';
 import merge from 'lodash.merge';
 import { logError } from 'zipyai';
 import { Box, Flex, Loading } from '@100mslive/react-ui';
@@ -244,7 +244,7 @@ const App = () => {
           }
         >
           <Box css={{ flex: '1 1 0', minHeight: 0 }}>
-            <HMSRoomComposite
+            <HMSPrebuilt
               tokenEndpoint={`${apiBasePath + hostname}/`}
               themeConfig={{
                 aspectRatio: settings.tile_shape,
