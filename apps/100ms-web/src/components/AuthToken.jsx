@@ -42,9 +42,9 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    // if (!tokenEndpoint || (!urlRoomId && !roomId)) {
-    //   return;
-    // }
+    if (!tokenEndpoint || (!urlRoomId && !roomId && !roomCode)) {
+      return;
+    }
     const code = !userRole && (roomCode || urlRoomId);
 
     const getTokenFn = code
