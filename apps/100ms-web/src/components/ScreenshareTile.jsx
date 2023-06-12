@@ -82,6 +82,9 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
               mirror={peer.isLocal && track?.source === "regular"}
               attach={!isAudioOnly}
               trackId={track.id}
+              css={{
+                objectFit: "cover",
+              }}
             />
           ) : null}
           <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
