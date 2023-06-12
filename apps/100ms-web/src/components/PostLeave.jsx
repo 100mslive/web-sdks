@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { ExitIcon } from "@100mslive/react-icons";
 import { Box, Button, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
-import { useHMSRoomCompositeContext } from "../AppContext";
+import { useHMSPrebuiltContext } from "../AppContext";
 import { Header } from "./Header";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -15,7 +15,7 @@ import { getRoutePrefix } from "../common/utils";
 
 const PostLeave = () => {
   const navigate = useNavigation();
-  const { showPreview, roomCode } = useHMSRoomCompositeContext();
+  const { showPreview, roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,

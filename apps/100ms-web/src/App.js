@@ -26,10 +26,7 @@ import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import PreviewContainer from "./components/Preview/PreviewContainer.jsx";
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import {
-  HMSRoomCompositeContext,
-  useHMSRoomCompositeContext,
-} from "./AppContext.js";
+import { HMSPrebuiltContext, useHMSPrebuiltContext } from "./AppContext.js";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
@@ -64,7 +61,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export const HMSRoomComposite = React.forwardRef(
+export const HMSPrebuilt = React.forwardRef(
   (
     {
       tokenEndpoint = defaultTokenEndpoint,
@@ -108,7 +105,7 @@ export const HMSRoomComposite = React.forwardRef(
 
     return (
       <ErrorBoundary>
-        <HMSRoomCompositeContext.Provider
+        <HMSPrebuiltContext.Provider
           value={{
             roomId,
             role,
@@ -164,13 +161,13 @@ export const HMSRoomComposite = React.forwardRef(
               </Box>
             </HMSRoomProvider>
           </HMSThemeProvider>
-        </HMSRoomCompositeContext.Provider>
+        </HMSPrebuiltContext.Provider>
       </ErrorBoundary>
     );
   }
 );
 
-HMSRoomComposite.displayName = "HMSRoomComposite";
+HMSPrebuilt.displayName = "HMSRoomComposite";
 
 const Redirector = ({ getDetails, showPreview }) => {
   const { roomId, role } = useParams();
@@ -198,7 +195,7 @@ const Redirector = ({ getDetails, showPreview }) => {
 };
 
 const RouteList = ({ getDetails }) => {
-  const { showPreview, showLeave } = useHMSRoomCompositeContext();
+  const { showPreview, showLeave } = useHMSPrebuiltContext();
 
   return (
     <Routes>
@@ -281,7 +278,7 @@ const BackSwipe = () => {
 };
 
 const Router = ({ children }) => {
-  const { roomId, role, roomCode } = useHMSRoomCompositeContext();
+  const { roomId, role, roomCode } = useHMSPrebuiltContext();
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
@@ -319,7 +316,7 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
 
 export default function App() {
   return (
-    <HMSRoomComposite
+    <HMSPrebuilt
       themeConfig={{
         aspectRatio: process.env.REACT_APP_TILE_SHAPE,
         theme: process.env.REACT_APP_THEME,

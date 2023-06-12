@@ -10,7 +10,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Flex } from "@100mslive/react-ui";
-import { useHMSRoomCompositeContext } from "../AppContext";
+import { useHMSPrebuiltContext } from "../AppContext";
 import { ConferenceMainView } from "../layouts/mainView";
 import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
@@ -38,7 +38,7 @@ const Conference = () => {
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const skipPreview = useSkipPreview();
-  const { showPreview } = useHMSRoomCompositeContext();
+  const { showPreview } = useHMSPrebuiltContext();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();

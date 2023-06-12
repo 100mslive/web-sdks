@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-export const HMSRoomCompositeContext = React.createContext({
+export const HMSPrebuiltContext = React.createContext({
   showPreview: true,
   showLeave: true,
   roomId: "",
@@ -12,10 +12,10 @@ export const HMSRoomCompositeContext = React.createContext({
   onLeave: () => {},
 });
 
-HMSRoomCompositeContext.displayName = "HMSRoomCompositeContext";
+HMSPrebuiltContext.displayName = "HMSPrebuiltContext";
 
-export const useHMSRoomCompositeContext = () => {
-  const context = useContext(HMSRoomCompositeContext);
+export const useHMSPrebuiltContext = () => {
+  const context = useContext(HMSPrebuiltContext);
   if (!context) {
     throw Error(
       "Make sure AppContext.Provider is present at the top level of your application"

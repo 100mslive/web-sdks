@@ -1,6 +1,6 @@
 import React from "react";
 
-export declare const HMSRoomComposite: React.FC<{
+export declare const HMSPrebuilt: React.FC<{
   roomCode: string;
   themeConfig: {
     aspectRatio: string;
