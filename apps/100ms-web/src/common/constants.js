@@ -134,6 +134,7 @@ export const APP_DATA = {
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
   authToken: "authToken",
+  pdfConfig: "pdfConfig",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
@@ -170,6 +171,8 @@ export const HLS_TIMED_METADATA_DOC_URL =
 
 export const REMOTE_STOP_SCREENSHARE_TYPE = "REMOTE_STOP_SCREENSHARE";
 
+export const isFirefox =
+  parsedUserAgent.getBrowser()?.name?.toLowerCase() === "firefox";
 export const isSafari =
   parsedUserAgent.getBrowser()?.name?.toLowerCase() === "safari";
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === "ios";
