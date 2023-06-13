@@ -167,7 +167,7 @@ export const HMSPrebuilt = React.forwardRef(
   }
 );
 
-HMSPrebuilt.displayName = "HMSRoomComposite";
+HMSPrebuilt.displayName = "HMSPrebuilt";
 
 const Redirector = ({ getDetails, showPreview }) => {
   const { roomId, role } = useParams();
