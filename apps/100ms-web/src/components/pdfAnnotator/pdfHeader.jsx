@@ -1,3 +1,4 @@
+import React from "react";
 import { Dialog, Text } from "@100mslive/react-ui";
 import { DialogCol } from "../../primitives/DialogContent";
 

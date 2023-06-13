@@ -1,3 +1,4 @@
+import React from "react";
 import { TrashIcon } from "@100mslive/react-icons";
 import { Dialog, Flex, Text } from "@100mslive/react-ui";
 import { DialogRow } from "../../primitives/DialogContent";
