@@ -94,8 +94,8 @@ export class VideoElementManager {
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
       HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
-      await this.track.addSink(entry.target as HTMLVideoElement);
       await this.selectMaxLayer();
+      await this.track.addSink(entry.target as HTMLVideoElement);
     } else {
       HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
       await this.track.removeSink(entry.target as HTMLVideoElement);
@@ -160,9 +160,10 @@ export class VideoElementManager {
         maxLayer = layerToIntMapping[layer] > layerToIntMapping[maxLayer] ? layer : maxLayer;
       }
     }
-
-    HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
-    await this.track.setPreferredLayer(maxLayer);
+    if (maxLayer) {
+      HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
+      await this.track.setPreferredLayer(maxLayer);
+    }
   }
 
   cleanup = () => {
