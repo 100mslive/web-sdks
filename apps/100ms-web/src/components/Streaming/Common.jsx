@@ -58,24 +58,33 @@ export const StreamCard = ({
 export const ContentHeader = ({ onBack, title, content }) => {
   return (
     <Flex css={{ w: "100%", py: "$8", px: "$10", cursor: "pointer" }}>
-      <Text
-        css={{ p: "$2", bg: "$surfaceLight", r: "$round", alignSelf: "center" }}
-        onClick={onBack}
-        data-testid="go_back"
-      >
-        <ChevronLeftIcon width={16} height={16} />
-      </Text>
-      <Box css={{ flex: "1 1 0", mx: "$8" }}>
+      {onBack ? (
         <Text
-          variant="tiny"
           css={{
-            textTransform: "uppercase",
-            fontWeight: "$semiBold",
-            color: "$textMedEmp",
+            p: "$2",
+            bg: "$surfaceLight",
+            r: "$round",
+            alignSelf: "center",
           }}
+          onClick={onBack}
+          data-testid="go_back"
         >
-          {title}
+          <ChevronLeftIcon width={16} height={16} />
         </Text>
+      ) : null}
+      <Box css={{ flex: "1 1 0", mx: "$8" }}>
+        {title ? (
+          <Text
+            variant="tiny"
+            css={{
+              textTransform: "uppercase",
+              fontWeight: "$semiBold",
+              color: "$textMedEmp",
+            }}
+          >
+            {title}
+          </Text>
+        ) : null}
         <Text variant="h6">{content}</Text>
       </Box>
       <IconButton
