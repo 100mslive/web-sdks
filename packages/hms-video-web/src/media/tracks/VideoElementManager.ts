@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
-import { HMSPreferredSimulcastLayer, HMSSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
 import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '../../internal';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
@@ -146,7 +146,7 @@ export class VideoElementManager {
     if (!(this.track instanceof HMSRemoteVideoTrack) || this.videoElements.size === 0) {
       return;
     }
-    let maxLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+    let maxLayer!: HMSPreferredSimulcastLayer;
     for (const element of this.videoElements) {
       const entry = this.entries.get(element);
       if (!entry) {
