@@ -85,7 +85,7 @@ export function FlyingEmoji() {
   return (
     <Box
       css={{
-        position: "fixed",
+        position: "absolute",
         top: 0,
         bottom: 0,
         left: 0,
