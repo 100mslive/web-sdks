@@ -218,7 +218,11 @@ export class TrackManager {
     const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(hmsPeer, remoteTrack.source!);
     remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
     if (this.addAsPrimaryVideoTrack(hmsPeer, remoteTrack)) {
-      hmsPeer.videoTrack = remoteTrack;
+      if (!hmsPeer.videoTrack) {
+        hmsPeer.videoTrack = remoteTrack;
+      } else {
+        (hmsPeer.videoTrack as HMSRemoteVideoTrack).replaceTrack(remoteTrack.nativeTrack);
+      }
     } else {
       const index = hmsPeer.auxiliaryTracks.findIndex(track => track.trackId === remoteTrack.trackId);
       if (index === -1) {

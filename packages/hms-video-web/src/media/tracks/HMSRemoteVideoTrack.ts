@@ -88,6 +88,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this.preferredLayer;
   }
 
+  replaceTrack(track: MediaStreamTrack) {
+    this.nativeTrack = track;
+    this.videoHandler.updateSinks();
+  }
+
   async addSink(videoElement: HTMLVideoElement) {
     super.addSink(videoElement);
     await this.updateLayer('addSink');
@@ -95,10 +100,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
+    const hasSinks = this.hasSinks();
     super.removeSink(videoElement);
-    await this.updateLayer('removeSink');
     this._degraded = false;
-    this.pushInHistory('uiSetLayer-none');
+    if (hasSinks) {
+      await this.requestLayer(HMSSimulcastLayer.NONE, 'removeSink');
+      this.pushInHistory('uiSetLayer-none');
+    }
   }
 
   /**
