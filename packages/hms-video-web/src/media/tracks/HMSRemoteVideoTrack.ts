@@ -8,6 +8,7 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
+import { isEmptyTrack } from '../../utils/track';
 import { HMSRemoteStream } from '../streams';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
@@ -94,8 +95,13 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async addSink(videoElement: HTMLVideoElement) {
-    super.addSink(videoElement);
-    await this.updateLayer('addSink');
+    // if the native track is empty track, just request the preferred layer else attach it
+    if (!isEmptyTrack(this.nativeTrack)) {
+      super.addSink(videoElement);
+      await this.updateLayer('addSink');
+    } else {
+      await this.requestLayer(this.preferredLayer, 'addSink');
+    }
     this.pushInHistory(`uiSetLayer-high`);
   }
 
