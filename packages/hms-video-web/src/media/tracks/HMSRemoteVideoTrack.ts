@@ -100,13 +100,10 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   async removeSink(videoElement: HTMLVideoElement) {
-    const hasSinks = this.hasSinks();
     super.removeSink(videoElement);
+    await this.updateLayer('removeSink');
     this._degraded = false;
-    if (hasSinks) {
-      await this.requestLayer(HMSSimulcastLayer.NONE, 'removeSink');
-      this.pushInHistory('uiSetLayer-none');
-    }
+    this.pushInHistory('uiSetLayer-none');
   }
 
   /**
