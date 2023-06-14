@@ -1,9 +1,21 @@
 import React from "react";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Flex, Input, Switch, Text, Button } from "@100mslive/react-ui";
-
+import { Container, ContentHeader } from "./Streaming/Common";
 function PollsQuizMenu() {
-  return <Flex></Flex>;
+  return (
+    <Container rounded>
+      <ContentHeader content="Polls/Quiz" />
+      <Flex direction="column" css={{ p: "$10" }}>
+        <Flex direction="column">
+          <PollCard />
+        </Flex>
+        <Flex>
+          <Button>Launch Poll</Button>
+        </Flex>
+      </Flex>
+    </Container>
+  );
 }
 
 export default PollsQuizMenu;
