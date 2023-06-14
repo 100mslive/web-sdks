@@ -28,6 +28,7 @@
         "html": false
       }
     ],
+    "react/react-in-jsx-scope": "error",
     "prettier/prettier": [
       "error",
       {

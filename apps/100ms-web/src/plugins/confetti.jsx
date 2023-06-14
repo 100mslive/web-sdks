@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useMedia } from "react-use";
 import JSConfetti from "js-confetti";
 import { useCustomEvent } from "@100mslive/react-sdk";

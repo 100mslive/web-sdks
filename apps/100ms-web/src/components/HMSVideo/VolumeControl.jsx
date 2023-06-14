@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { SpeakerIcon } from "@100mslive/react-icons";
 import { Flex, Slider } from "@100mslive/react-ui";
 

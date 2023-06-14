@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import React, { Fragment } from "react";
 import {
   selectIsAllowedToPublish,
   useHMSStore,
@@ -62,7 +62,6 @@ export const ScreenshareToggle = ({ css }) => {
 };
 
 const ScreenShareButton = styled(IconButton, {
-  c: "$white",
   h: "$14",
   px: "$8",
   r: "$1",
