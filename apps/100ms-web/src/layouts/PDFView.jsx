@@ -8,7 +8,7 @@ import {
 import { Box, Flex, ThemeTypes, useTheme } from "@100mslive/react-ui";
 import { GridSidePaneView } from "../components/gridView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
-import { APP_DATA } from "../common/constants";
+import { APP_DATA, isChrome } from "../common/constants";
 
 export const PDFView = ({ showStats }) => {
   const peers = useHMSStore(selectPeers);
@@ -59,9 +59,9 @@ const PDFEmbedComponent = () => {
       screenShareAttemptInProgress.current = true;
       // start screenshare on load for others in the room to see
       toggleScreenShare({
-        forceCurrentTab: true,
+        forceCurrentTab: isChrome,
         cropElement: iframeRef.current,
-        preferCurrentTab: true,
+        preferCurrentTab: isChrome,
       })
         .then(() => {
           setWasScreenShared(true);

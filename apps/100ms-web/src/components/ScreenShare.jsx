@@ -10,19 +10,11 @@ import { ShareScreenOptions } from "./pdfAnnotator/shareScreenOptions";
 import IconButton from "../IconButton";
 import { useUISettings } from "./AppData/useUISettings";
 import { isScreenshareSupported } from "../common/utils";
-import { isFirefox, isSafari, UI_SETTINGS } from "../common/constants";
+import { UI_SETTINGS } from "../common/constants";
 
 export const ScreenshareToggle = ({ css }) => {
-  let finalCSS = {
-    borderTopRightRadius: "$1",
-    borderBottomRightRadius: "$1",
-  };
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
-  const sharePDF = !(isSafari || isFirefox);
-  if (!sharePDF) {
-    css = { finalCSS, ...css };
-  }
 
   const {
     amIScreenSharing,
@@ -55,7 +47,7 @@ export const ScreenshareToggle = ({ css }) => {
             </Box>
           </Tooltip>
         </ScreenShareButton>
-        {sharePDF && <ShareScreenOptions />}
+        <ShareScreenOptions />
       </Flex>
     </Fragment>
   );
