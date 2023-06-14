@@ -1,17 +1,23 @@
 import React from "react";
 import { Flex, Text } from "@100mslive/react-ui";
-import { Container, ContentBody, ContentHeader } from "../Streaming/Common";
+import { Container, ContentHeader } from "../Streaming/Common";
 
-const Widgets = () => {
+export const Widgets = () => {
   return (
     <Container rounded>
-      <ContentHeader title="" content="Widgets" />
-      <Flex>
-        {cardData.map(card => {
-          return <WidgetCard {...card} />;
-        })}
+      <ContentHeader content="Widgets" />
+      <Flex direction="column" css={{ p: "$10" }}>
+        <Flex>
+          {cardData.map(card => {
+            return <WidgetCard {...card} />;
+          })}
+        </Flex>
+        <Flex direction="column">
+          {optionsData.map(option => {
+            return <WidgetOptions {...option} />;
+          })}
+        </Flex>
       </Flex>
-      <Flex></Flex>
     </Container>
   );
 };
@@ -59,6 +65,7 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
       direction="column"
       css={{ cursor: "pointer", ...css }}
       onClick={onClick}
+      key={title}
     >
       <Flex>
         <img src={imageSrc} alt={`${imageSrc}-polls`} />
@@ -73,12 +80,10 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
   );
 };
 
-const WidgetOptions = (title, onClick, subtitle, Icon) => {
+const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
   return (
-    <Flex onClick={onClick}>
-      <Flex>
-        <Icon />
-      </Flex>
+    <Flex onClick={onClick} key={title} css={{ cursor: "pointer" }}>
+      <Flex>{Icon}</Flex>
       <Flex direction="column">
         <Text variant="sub2">{title}</Text>
         <Text variant="sub2">{subtitle}</Text>

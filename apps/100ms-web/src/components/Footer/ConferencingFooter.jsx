@@ -31,6 +31,7 @@ import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { FEATURE_LIST } from "../../common/constants";
+import GetWidgetsButton from "../GetWidgetsButton";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
@@ -88,6 +89,7 @@ export const ConferencingFooter = () => {
   return (
     <AppFooter.Root>
       <AppFooter.Left>
+        <GetWidgetsButton />
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />

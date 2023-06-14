@@ -5,6 +5,7 @@ import { Chat } from "../components/Chat/Chat";
 import { ParticipantList } from "../components/Header/ParticipantList";
 import { StreamingLanding } from "../components/Streaming/StreamingLanding";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
+import { Widgets } from "../components/Footer/Widgets";
 
 const SidePane = ({ css = {} }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
@@ -15,7 +16,10 @@ const SidePane = ({ css = {} }) => {
     ViewComponent = Chat;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = StreamingLanding;
+  } else if (sidepane === SIDE_PANE_OPTIONS.WIDGET) {
+    ViewComponent = Widgets;
   }
+
   if (!ViewComponent) {
     return null;
   }
