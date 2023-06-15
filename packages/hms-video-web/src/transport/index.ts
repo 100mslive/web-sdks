@@ -391,7 +391,7 @@ export default class HMSTransport implements ITransport {
       throw ex;
     }
 
-    HMSLogger.i(TAG, '✅ join: successful');
+    HMSLogger.d(TAG, '✅ join: successful');
     this.state = TransportState.Joined;
     this.observer.onStateChange(this.state);
   }

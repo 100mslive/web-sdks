@@ -93,12 +93,12 @@ export class VideoElementManager {
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
-      HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
+      HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
       this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
       await this.selectMaxLayer();
       await this.track.addSink(entry.target as HTMLVideoElement);
     } else {
-      HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
+      HMSLogger.d(this.TAG, 'remove sink intersection', `${this.track}`, this.id);
       await this.track.removeSink(entry.target as HTMLVideoElement);
     }
   };
