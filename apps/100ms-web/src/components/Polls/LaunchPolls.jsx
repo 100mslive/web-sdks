@@ -1,23 +1,17 @@
 import React, { useState } from "react";
+import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
-  AddCircleIcon,
-  QuestionIcon,
-  StatsIcon,
-  TrashIcon,
-} from "@100mslive/react-icons";
-import {
-  Flex,
-  Input,
-  Switch,
-  Text,
   Button,
   Dropdown,
+  Flex,
   IconButton,
+  Input,
+  Text,
 } from "@100mslive/react-ui";
-import { Container, ContentHeader } from "../Streaming/Common";
 import { ErrorDialog } from "../../primitives/DialogContent";
+import { Container, ContentHeader } from "../Streaming/Common";
 
-function LaunchPolls() {
+export function LaunchPolls() {
   return (
     <Container rounded>
       <ContentHeader content="Launch Poll" />
@@ -32,8 +26,6 @@ function LaunchPolls() {
     </Container>
   );
 }
-
-export default LaunchPolls;
 
 const questionTypes = ["Single Choice", "Multiple Choice"];
 

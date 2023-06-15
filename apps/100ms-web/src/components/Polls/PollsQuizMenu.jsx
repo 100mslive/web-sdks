@@ -1,8 +1,9 @@
 import React from "react";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
-import { Flex, Input, Switch, Text, Button } from "@100mslive/react-ui";
+import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
 import { Container, ContentHeader } from "./Streaming/Common";
-function PollsQuizMenu() {
+
+export function PollsQuizMenu() {
   return (
     <Container rounded>
       <ContentHeader content="Polls/Quiz" />
@@ -17,8 +18,6 @@ function PollsQuizMenu() {
     </Container>
   );
 }
-
-export default PollsQuizMenu;
 
 const questionTypes = [
   {

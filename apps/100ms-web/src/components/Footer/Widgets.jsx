@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Flex, Text } from "@100mslive/react-ui";
+import { PollsQuizMenu } from "../Polls/PollsQuizMenu";
 import { Container, ContentHeader } from "../Streaming/Common";
 
 export const Widgets = () => {
+  const [showPollQuiz, setShowPollQuiz] = useState(false);
   return (
     <Container rounded>
       <ContentHeader content="Widgets" />
@@ -13,11 +15,14 @@ export const Widgets = () => {
           })}
         </Flex>
         <Flex direction="column">
-          {optionsData.map(option => {
-            return <WidgetOptions {...option} />;
-          })}
+          <WidgetOptions
+            title="Poll/Quiz"
+            subtitle="Find out what others think"
+            onClick={() => setShowPollQuiz(true)}
+          />
         </Flex>
       </Flex>
+      {showPollQuiz && <PollsQuizMenu />}
     </Container>
   );
 };
@@ -33,28 +38,6 @@ const cardData = [
     title: "Whiteboard",
     subtitle: "Collaboratively sketch ideas",
     imageSrc: "",
-    onClick: () => {},
-  },
-];
-
-const optionsData = [
-  {
-    title: "Poll/Quiz",
-    subtitle: "Find out what others think",
-    Icon: "",
-    onClick: () => {},
-  },
-  {
-    title: "Audio Playlist",
-    subtitle:
-      "Play music from Spotify or any other tabPlay audios from select collection",
-    Icon: "",
-    onClick: () => {},
-  },
-  {
-    title: "Video Playlist",
-    subtitle: "Play videos from select collection",
-    Icon: "",
     onClick: () => {},
   },
 ];
