@@ -4,12 +4,14 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -18,8 +20,7 @@ import {
   HMSVideoTrackSettings,
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';

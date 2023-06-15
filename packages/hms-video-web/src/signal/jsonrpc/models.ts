@@ -1,4 +1,4 @@
-import { HMSAction } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 
 export interface JsonRpcRequest {
   id: string;

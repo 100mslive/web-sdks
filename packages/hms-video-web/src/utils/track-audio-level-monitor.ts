@@ -3,7 +3,7 @@ import { HMSAudioContextHandler } from './media';
 import { Queue } from './queue';
 import { sleep } from './timer-utils';
 import { HMSInternalEvent } from '../events/HMSInternalEvent';
-import { HMSLocalAudioTrack } from '../media/tracks';
+import { HMSLocalAudioTrack } from '../internal';
 
 /** Send update only if audio level is above THRESHOLD */
 const THRESHOLD = 35;

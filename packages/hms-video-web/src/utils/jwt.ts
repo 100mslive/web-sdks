@@ -1,4 +1,5 @@
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 
 export interface AuthToken {
   roomId: string;

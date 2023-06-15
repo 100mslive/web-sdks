@@ -1,9 +1,10 @@
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
+import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -96,6 +97,10 @@ class Store implements IStore {
 
   getPeers(): HMSPeer[] {
     return Object.values(this.peers);
+  }
+
+  getPeerMap() {
+    return this.peers;
   }
 
   getPeerById(peerId: string) {

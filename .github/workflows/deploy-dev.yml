@@ -34,6 +34,7 @@ jobs:
       REACT_APP_HEADLESS_JOIN: false
       REACT_APP_ENABLE_STATS_FOR_NERDS: 'true'
       REACT_APP_ENABLE_WHITEBOARD: 'true'
+      REACT_APP_PDFJS_IFRAME_URL: 'https://pdf-annotation.100ms.live/generic/web/viewer.html'
       REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
       REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
       REACT_APP_ENABLE_BEAM_SPEAKERS_LOGGING: 'true'
