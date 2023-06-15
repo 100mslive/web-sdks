@@ -53,6 +53,12 @@ export const Voting = () => {
           question="Another one"
           options={{}}
         />
+        <QuestionCard
+          index={2}
+          totalCount={2}
+          questionType={QUESTION_TYPE.LONG_ANSWER}
+          question="Another one"
+        />
       </Flex>
     </Container>
   );

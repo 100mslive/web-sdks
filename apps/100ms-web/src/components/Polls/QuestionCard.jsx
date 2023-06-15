@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, Text, Flex } from "@100mslive/react-ui";
+import { Box, Button, Text, Flex, Input } from "@100mslive/react-ui";
 import { QUESTION_TYPE } from "../../common/constants";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
@@ -9,10 +9,15 @@ export const QuestionCard = ({
   totalCount,
   questionType,
   question,
-  options,
+  options = [],
   isSkippable = false,
 }) => {
   const [voted, setVoted] = useState(false);
+  const stringAnswerExpected = [
+    QUESTION_TYPE.LONG_ANSWER,
+    QUESTION_TYPE.SHORT_ANSWER,
+  ].includes(questionType);
+
   return (
     <Box
       css={{
@@ -32,9 +37,17 @@ export const QuestionCard = ({
         <Text css={{ color: "$textHighEmp" }}>{question}</Text>
       </Box>
 
-      {/* To be replaced with textarea */}
-      {/* {questionType === QUESTION_TYPE.LONG_ANSWER ? <Input /> : ""} */}
-      {/* {questionType === QUESTION_TYPE.SHORT_ANSWER ? <Input /> : ""} */}
+      {stringAnswerExpected ? (
+        <Input
+          placeholder="Enter your answer"
+          css={{
+            w: "100%",
+            backgroundColor: "$surfaceLighter",
+            mb: "$md",
+            border: "1px solid $borderDefault",
+          }}
+        />
+      ) : null}
 
       {questionType === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions voted={voted} />
@@ -53,17 +66,17 @@ export const QuestionCard = ({
             Skip
           </Button>
         ) : null}
-        
+
         {voted ? (
           <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
-            Voted
+            {stringAnswerExpected ? "Submitted" : "Voted"}
           </Text>
         ) : (
           <Button
             css={{ p: "$xs $10", fontWeight: "$semiBold" }}
             onClick={() => setVoted(true)}
           >
-            Vote
+            {stringAnswerExpected ? "Submit" : "Vote"}
           </Button>
         )}
       </Flex>
