@@ -1,7 +1,8 @@
+import { HMSAction } from '@100mslive/hms-video/src/error/HMSAction';
 import { HMSUpdateListener } from '../../packages/hms-video-web/src';
 import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
 import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
-import { ErrorFactory, HMSAction } from '../../packages/hms-video-web/src/error/ErrorFactory';
+import { ErrorFactory } from '../../packages/hms-video-web/src/error/ErrorFactory';
 import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
 import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
 import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
@@ -49,6 +50,7 @@ describe('Http Analytics tests', () => {
       onChangeTrackStateRequest: cy.stub().as('onChangeTrackStateRequest'),
       onChangeMultiTrackStateRequest: cy.stub().as('onChangeMultiTrackStateRequest'),
       onRemovedFromRoom: cy.stub().as('onRemovedFromRoom'),
+      onSessionStoreUpdate: cy.stub().as('onSessionStoreUpdate'),
     };
     cy.spy(HTTPAnalyticsTransport, 'sendEvent').as('sendEvent');
     cy.spy(HTTPAnalyticsTransport, 'setEnv').as('setEnv');

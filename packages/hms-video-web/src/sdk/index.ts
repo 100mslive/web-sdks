@@ -512,7 +512,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async internalLeave(notifyServer = true, error?: HMSException) {
-    const room = this.store.getRoom();
+    const room = this.store?.getRoom();
     if (room) {
       const roomId = room.id;
       this.networkTestManager?.stop();
