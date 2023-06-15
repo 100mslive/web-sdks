@@ -8,6 +8,7 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
+import { isEmptyTrack } from '../../utils/track';
 import { HMSRemoteStream } from '../streams';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
@@ -16,10 +17,19 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+  private bizTrackId!: string;
 
   constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
     super(stream, track, source);
     this.setVideoHandler(new VideoElementManager(this));
+  }
+
+  setTrackId(trackId: string) {
+    this.bizTrackId = trackId;
+  }
+
+  get trackId(): string {
+    return this.bizTrackId || super.trackId;
   }
 
   public get degraded() {
@@ -79,9 +89,19 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this.preferredLayer;
   }
 
+  replaceTrack(track: MediaStreamTrack) {
+    this.nativeTrack = track;
+    this.videoHandler.updateSinks();
+  }
+
   async addSink(videoElement: HTMLVideoElement) {
-    super.addSink(videoElement);
-    await this.updateLayer('addSink');
+    // if the native track is empty track, just request the preferred layer else attach it
+    if (isEmptyTrack(this.nativeTrack)) {
+      await this.requestLayer(this.preferredLayer, 'addSink');
+    } else {
+      super.addSink(videoElement);
+      await this.updateLayer('addSink');
+    }
     this.pushInHistory(`uiSetLayer-high`);
   }
 
