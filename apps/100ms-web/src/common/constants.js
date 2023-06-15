@@ -209,8 +209,8 @@ export const SESSION_STORE_KEY = {
 };
 
 export const QUESTION_TYPE = {
-  SHORT_ANSWER: "SHORT_ANSWER",
-  LONG_ANSWER: "LONG_ASWER",
-  SINGLE_CHOICE: "SINGLE_CHOICE",
-  MULTIPLE_CHOICE: "MULTIPLE_CHOICE",
+  SHORT_ANSWER: "Short Answer",
+  LONG_ANSWER: "Long Answer",
+  SINGLE_CHOICE: "Single Choice",
+  MULTIPLE_CHOICE: "Multiple Choice",
 };

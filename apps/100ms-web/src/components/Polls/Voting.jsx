@@ -5,10 +5,12 @@ import { useSidepaneToggle } from "../AppData/useSidepane";
 import { QUESTION_TYPE, SIDE_PANE_OPTIONS } from "../../common/constants";
 import { CrossIcon } from "@100mslive/react-icons";
 import { QuestionCard } from "./QuestionCard";
+import { StatusIndicator } from "./StatusIndicator";
 
 export const Voting = () => {
   const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);
   const pollCreator = "Tyler";
+  const isTimed = false;
 
   return (
     <Container rounded>
@@ -24,17 +26,8 @@ export const Voting = () => {
           }}
         >
           <Text variant="h6">Poll</Text>
-          <Flex
-            css={{
-              backgroundColor: "$error",
-              p: "$2 $4",
-              borderRadius: "$0",
-            }}
-          >
-            <Text variant="caption" css={{ fontWeight: "$semiBold" }}>
-              LIVE
-            </Text>
-          </Flex>
+          <StatusIndicator />
+
           <CrossIcon
             onClick={toggleVoting}
             style={{ marginLeft: "auto", cursor: "pointer" }}
@@ -55,15 +48,7 @@ export const Voting = () => {
         />
         <QuestionCard
           index={2}
-          totalCount={3}
-          questionType={QUESTION_TYPE.SINGLE_CHOICE}
-          question="Another one"
-          isSkippable
-          options={{}}
-        />
-        <QuestionCard
-          index={3}
-          totalCount={3}
+          totalCount={2}
           questionType={QUESTION_TYPE.SINGLE_CHOICE}
           question="Another one"
           options={{}}
