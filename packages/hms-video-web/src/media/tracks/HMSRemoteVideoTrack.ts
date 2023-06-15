@@ -96,11 +96,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   async addSink(videoElement: HTMLVideoElement) {
     // if the native track is empty track, just request the preferred layer else attach it
-    if (!isEmptyTrack(this.nativeTrack)) {
+    if (isEmptyTrack(this.nativeTrack)) {
+      await this.requestLayer(this.preferredLayer, 'addSink');
+    } else {
       super.addSink(videoElement);
       await this.updateLayer('addSink');
-    } else {
-      await this.requestLayer(this.preferredLayer, 'addSink');
     }
     this.pushInHistory(`uiSetLayer-high`);
   }
