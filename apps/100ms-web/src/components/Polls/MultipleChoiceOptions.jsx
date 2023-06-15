@@ -1,3 +1,4 @@
+import { CheckIcon } from "@100mslive/react-icons";
 import { Flex, Text, Checkbox } from "@100mslive/react-ui";
 import { ProgressBar } from "./OptionComponents/ProgressBar";
 import { Votes } from "./OptionComponents/Votes";
@@ -19,7 +20,7 @@ export const MultipleChoiceOptions = ({
           key={`${option.text}-${index}`}
           css={{ w: "100%", gap: "$9" }}
         >
-          <Checkbox.Root>
+          <Checkbox.Root disabled={voted}>
             <Checkbox.Indicator>
               <CheckIcon width={16} height={16} />
             </Checkbox.Indicator>

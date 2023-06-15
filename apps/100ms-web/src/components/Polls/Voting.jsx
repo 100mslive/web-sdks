@@ -49,7 +49,7 @@ export const Voting = () => {
         <QuestionCard
           index={2}
           totalCount={2}
-          questionType={QUESTION_TYPE.SINGLE_CHOICE}
+          questionType={QUESTION_TYPE.MULTIPLE_CHOICE}
           question="Another one"
           options={{}}
         />
