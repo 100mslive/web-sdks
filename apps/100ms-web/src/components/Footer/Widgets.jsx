@@ -1,13 +1,19 @@
 import React, { useState } from "react";
+import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
-import { PollsQuizMenu } from "../Polls/PollsQuizMenu";
+import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
+import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Container, ContentHeader } from "../Streaming/Common";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Widgets = () => {
-  const [showPollQuiz, setShowPollQuiz] = useState(false);
+  const [showWidgetState, setShowWidgetState] = useState("");
+  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
+
   return (
     <Container rounded>
-      <ContentHeader content="Widgets" />
+      <ContentHeader content="Widgets" onBack={closeWidgets} />
       <Flex direction="column" css={{ p: "$10" }}>
         <Flex>
           {cardData.map(card => {
@@ -17,12 +23,24 @@ export const Widgets = () => {
         <Flex direction="column">
           <WidgetOptions
             title="Poll/Quiz"
+            Icon={<QuizIcon width={40} height={40} />}
             subtitle="Find out what others think"
-            onClick={() => setShowPollQuiz(true)}
+            onClick={() => setShowWidgetState("PollsQuizMenu")}
+            launchQuestions={() => setShowWidgetState("QuestionMenu")}
           />
         </Flex>
       </Flex>
-      {showPollQuiz && <PollsQuizMenu />}
+      {showWidgetState === "PollsQuizMenu" && (
+        <PollsQuizMenu
+          launchQuestions={() => setShowWidgetState("QuestionMenu")}
+          onBack={() => setShowWidgetState("")}
+        />
+      )}
+      {showWidgetState === "QuestionMenu" && (
+        <LaunchPollsQuizMenu
+          onBack={() => setShowWidgetState("PollsQuizMenu")}
+        />
+      )}
     </Container>
   );
 };
@@ -46,7 +64,7 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
   return (
     <Flex
       direction="column"
-      css={{ cursor: "pointer", ...css }}
+      css={{ cursor: "pointer", w: "100%", ...css }}
       onClick={onClick}
       key={title}
     >
@@ -65,11 +83,30 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
 
 const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
   return (
-    <Flex onClick={onClick} key={title} css={{ cursor: "pointer" }}>
-      <Flex>{Icon}</Flex>
-      <Flex direction="column">
-        <Text variant="sub2">{title}</Text>
-        <Text variant="sub2">{subtitle}</Text>
+    <Flex
+      onClick={onClick}
+      key={title}
+      css={{ cursor: "pointer", "&:hover": { bg: "$surfaceLight", r: "$0" } }}
+      align="center"
+    >
+      <Flex
+        css={{
+          border: "$space$px solid $borderLight",
+          r: "$1",
+          p: "$4",
+          c: "$textHighEmp",
+        }}
+      >
+        {Icon}
+      </Flex>
+      <Flex direction="column" css={{ ml: "$md" }}>
+        <Text
+          variant="sub2"
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold", mb: "$4" }}
+        >
+          {title}
+        </Text>
+        <Text variant="caption">{subtitle}</Text>
       </Flex>
     </Flex>
   );

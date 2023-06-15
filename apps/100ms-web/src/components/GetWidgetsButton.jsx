@@ -24,7 +24,6 @@ const GetWidgetsButton = () => {
           window.sessionStorage.setItem("userOpenedWidgetsMenu", "true");
         }}
         icon
-        disabled={isWidgetsMenuOpen}
       >
         {isWidgetsMenuOpen ? (
           <InteractionOpenIcon />
