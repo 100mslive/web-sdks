@@ -1,4 +1,4 @@
-import { Box, Flex, RadioGroup, Text } from "@100mslive/react-ui";
+import { Flex, RadioGroup, Text } from "@100mslive/react-ui";
 import { ProgressBar } from "./OptionComponents/ProgressBar";
 import { Votes } from "./OptionComponents/Votes";
 

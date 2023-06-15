@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, Text, Flex } from "@100mslive/react-ui";
 import { QUESTION_TYPE } from "../../common/constants";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
+import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 
 export const QuestionCard = ({
   index,
@@ -34,8 +35,15 @@ export const QuestionCard = ({
       {/* To be replaced with textarea */}
       {/* {questionType === QUESTION_TYPE.LONG_ANSWER ? <Input /> : ""} */}
       {/* {questionType === QUESTION_TYPE.SHORT_ANSWER ? <Input /> : ""} */}
-      {questionType === QUESTION_TYPE.SINGLE_CHOICE ? <SingleChoiceOptions voted={voted} /> : ""}
-      {/* {questionType === QUESTION_TYPE.MULTIPLE_CHOICE ? <Input /> : ""} */}
+
+      {questionType === QUESTION_TYPE.SINGLE_CHOICE ? (
+        <SingleChoiceOptions voted={voted} />
+      ) : null}
+
+      {questionType === QUESTION_TYPE.MULTIPLE_CHOICE ? (
+        <MultipleChoiceOptions voted={voted} />
+      ) : null}
+
       <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
         {isSkippable && !voted ? (
           <Button
@@ -44,9 +52,8 @@ export const QuestionCard = ({
           >
             Skip
           </Button>
-        ) : (
-          ""
-        )}
+        ) : null}
+        
         {voted ? (
           <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
             Voted

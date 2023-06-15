@@ -1,3 +1,5 @@
+import { Flex, Text } from "@100mslive/react-ui";
+
 export const StatusIndicator = ({ isTimed }) => {
   return (
     <Flex align="center">
