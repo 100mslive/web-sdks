@@ -43,6 +43,17 @@ export class OnDemandTrackManager extends TrackManager {
     return removed;
   }
 
+  /**
+   * Add a blank track for the track received from biz so that the UI can render and show video element
+   * which will trigger the prefer-video-track-state request which results in the actual track being
+   * received from the sfu.
+   * This will also be called when track is removed, as it can be removed when none is sent to sfu to
+   * reduce the overall offer size
+   * @param {TrackState} trackInfo
+   * @param {string} peerId
+   * @param {boolean} callListener
+   * @returns
+   */
   processTrackInfo = (trackInfo: TrackState, peerId: string, callListener = true) => {
     if (trackInfo.type !== 'video') {
       return;
