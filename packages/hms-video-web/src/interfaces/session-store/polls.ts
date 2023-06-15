@@ -91,17 +91,22 @@ export interface HMSPollQuestionOptionCreateParams extends Pick<HMSPollQuestionO
 }
 
 export interface HMSPollQuestionResponse {
-  questionID: number;
-  peer: HMSPollResponsePeerInfo;
-  type: HMSPollQuestionType; // private property
-  skipped: boolean;
+  questionIndex: number;
+  peer?: HMSPollResponsePeerInfo;
+  type?: HMSPollQuestionType; // private property
+  skipped?: boolean;
   option?: number;
   options?: [number];
   text?: string;
-  update: boolean; // SDK Needs to track wether we previously answered and set accordingly
-  duration: number; // Time it took to answer the question for leaderboard
-  responseFinal: boolean; // Indicates wether this is last update when fetching responses
+  update?: boolean; // SDK Needs to track wether we previously answered and set accordingly
+  duration?: number; // Time it took to answer the question for leaderboard
+  responseFinal?: boolean; // Indicates wether this is last update when fetching responses
 }
+
+export type HMSPollQuestionResponseCreateParams = Omit<
+  HMSPollQuestionResponse,
+  'type' | 'peer' | 'update' | 'responseFinal'
+>;
 
 interface HMSPollResponsePeerInfo {
   userHash?: string;

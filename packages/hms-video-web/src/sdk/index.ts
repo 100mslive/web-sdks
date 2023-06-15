@@ -148,7 +148,7 @@ export class HMSSdk implements HMSInterface {
       this.audioListener,
     );
     this.sessionStore = new SessionStore(this.transport);
-    this.interactivityCenter = new InteractivityCenter(this.transport);
+    this.interactivityCenter = new InteractivityCenter(this.transport, this.store);
 
     /**
      * Note: Subscribe to events here right after creating stores and managers

@@ -6,6 +6,7 @@ import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } fro
 import HMSRoom from '../sdk/models/HMSRoom';
 import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
+import HMSTransport from '../transport';
 
 let joinHandler: jest.Mock<any, any>;
 let roomUpdateHandler: jest.Mock<any, any>;
@@ -22,12 +23,14 @@ let changeMultiTrackStateRequestHandler: jest.Mock<any, any>;
 let removedFromRoomHandler: jest.Mock<any, any>;
 let audioUpdateHandler: jest.Mock<any, any>;
 let sessionStoreUpdateHandler: jest.Mock<any, any>;
+let pollsUpdateHandler: jest.Mock<any, any>;
 
 let listener: HMSUpdateListener;
 let audioListener: HMSAudioListener;
 const store: Store = new Store();
 let notificationManager: NotificationManager;
 let eventBus: EventBus;
+let transport: HMSTransport;
 
 beforeEach(() => {
   joinHandler = jest.fn();
@@ -45,6 +48,7 @@ beforeEach(() => {
   removedFromRoomHandler = jest.fn();
   audioUpdateHandler = jest.fn();
   sessionStoreUpdateHandler = jest.fn();
+  pollsUpdateHandler = jest.fn();
   eventBus = new EventBus();
   store.setRoom(new HMSRoom('1234', store));
 
@@ -63,11 +67,12 @@ beforeEach(() => {
     onChangeMultiTrackStateRequest: changeMultiTrackStateRequestHandler,
     onRemovedFromRoom: removedFromRoomHandler,
     onSessionStoreUpdate: sessionStoreUpdateHandler,
+    onPollsUpdate: pollsUpdateHandler,
   };
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
 
-  notificationManager = new NotificationManager(store, eventBus, listener, audioListener);
+  notificationManager = new NotificationManager(store, eventBus, transport, listener, audioListener);
 });
 
 describe('Notification Manager', () => {

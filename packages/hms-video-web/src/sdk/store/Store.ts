@@ -358,7 +358,7 @@ class Store implements IStore {
     this.polls[poll.id] = poll;
   }
 
-  getPoll(id: string) {
+  getPoll(id: string): HMSPoll | undefined {
     return this.polls[id];
   }
 
