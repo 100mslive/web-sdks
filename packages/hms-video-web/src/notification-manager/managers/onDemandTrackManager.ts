@@ -43,7 +43,7 @@ export class OnDemandTrackManager extends TrackManager {
     return removed;
   }
 
-  processTrackInfo = (trackInfo: TrackState, peerId: string) => {
+  processTrackInfo = (trackInfo: TrackState, peerId: string, callListener = true) => {
     if (trackInfo.type !== 'video') {
       return;
     }
@@ -58,7 +58,9 @@ export class OnDemandTrackManager extends TrackManager {
     const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
     track.setTrackId(trackInfo.track_id);
     this.addVideoTrack(hmsPeer, track);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
+    if (callListener) {
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
+    }
   };
 
   addAsPrimaryVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {

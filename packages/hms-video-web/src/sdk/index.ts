@@ -87,7 +87,7 @@ export class HMSSdk implements HMSInterface {
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
   private store!: IStore;
-  private notificationManager!: NotificationManager;
+  private notificationManager?: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private playlistManager!: PlaylistManager;
@@ -104,12 +104,24 @@ export class HMSSdk implements HMSInterface {
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
 
+  private initNotificationManager() {
+    if (!this.notificationManager) {
+      this.notificationManager = new NotificationManager(
+        this.store,
+        this.eventBus,
+        this.transport!,
+        this.listener,
+        this.audioListener,
+      );
+    }
+  }
+
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
        */
-      this.notificationManager.setListener(this.listener);
+      this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       return;
     }
@@ -142,13 +154,7 @@ export class HMSSdk implements HMSInterface {
       this.analyticsEventsService,
       this.analyticsTimer,
     );
-    this.notificationManager = new NotificationManager(
-      this.store,
-      this.eventBus,
-      this.transport!,
-      this.listener,
-      this.audioListener,
-    );
+
     this.sessionStore = new SessionStore(this.transport);
 
     /**
@@ -233,15 +239,15 @@ export class HMSSdk implements HMSInterface {
         default:
       }
 
-      this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
+      this.notificationManager?.handleNotification(message, this.sdkState.isReconnecting);
     },
 
     onTrackAdd: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleTrackAdd(track);
+      this.notificationManager?.handleTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleTrackRemove(track);
+      this.notificationManager?.handleTrackRemove(track);
     },
 
     onFailure: (exception: HMSException) => {
@@ -264,6 +270,7 @@ export class HMSSdk implements HMSInterface {
       switch (state) {
         case TransportState.Preview:
         case TransportState.Joined:
+          this.initNotificationManager();
           if (this.transportState === TransportState.Reconnecting) {
             this.listener?.onReconnected();
           }
@@ -487,6 +494,7 @@ export class HMSSdk implements HMSInterface {
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     this.wakeLockManager?.cleanup();
+    this.notificationManager = undefined;
     HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**
@@ -734,11 +742,11 @@ export class HMSSdk implements HMSInterface {
 
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
-    this.notificationManager.setAudioListener(audioListener);
+    this.notificationManager?.setAudioListener(audioListener);
   }
 
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {
-    this.notificationManager.setConnectionQualityListener(qualityListener);
+    this.notificationManager?.setConnectionQualityListener(qualityListener);
   }
 
   async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
@@ -836,13 +844,13 @@ export class HMSSdk implements HMSInterface {
   async changeName(name: string) {
     this.validateJoined('changeName');
     await this.transport?.changeName(name);
-    this.notificationManager.updateLocalPeer({ name });
+    this.notificationManager?.updateLocalPeer({ name });
   }
 
   async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
-    this.notificationManager.updateLocalPeer({ metadata });
+    this.notificationManager?.updateLocalPeer({ metadata });
   }
 
   async setSessionMetadata(metadata: any) {

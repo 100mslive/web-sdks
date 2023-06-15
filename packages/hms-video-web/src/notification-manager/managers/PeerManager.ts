@@ -150,7 +150,7 @@ export class PeerManager {
         trackInfo,
       });
       if (trackInfo.type === 'video') {
-        this.trackManager.processTrackInfo(trackInfo, peer.peer_id);
+        this.trackManager.processTrackInfo(trackInfo, peer.peer_id, false);
       }
     }
     return hmsPeer;

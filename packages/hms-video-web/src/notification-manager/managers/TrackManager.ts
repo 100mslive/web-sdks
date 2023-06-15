@@ -134,7 +134,7 @@ export class TrackManager {
     }
   };
 
-  processTrackInfo = (_trackInfo: TrackState, _peerId: string) => {};
+  processTrackInfo = (_trackInfo: TrackState, _peerId: string, _callListener?: boolean) => {};
 
   processPendingTracks = () => {
     const tracksCopy = new Map(this.tracksToProcess);

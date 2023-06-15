@@ -54,8 +54,9 @@ export class NotificationManager {
   ) {
     const isOnDemandTracksEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
     this.trackManager = isOnDemandTracksEnabled
-      ? new TrackManager(this.store, eventBus, this.listener)
-      : new OnDemandTrackManager(this.store, eventBus, this.transport, this.listener);
+      ? new OnDemandTrackManager(this.store, eventBus, this.transport, this.listener)
+      : new TrackManager(this.store, eventBus, this.listener);
+
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
