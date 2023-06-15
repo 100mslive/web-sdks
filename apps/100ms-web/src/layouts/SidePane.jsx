@@ -6,6 +6,7 @@ import { ParticipantList } from "../components/Header/ParticipantList";
 import { StreamingLanding } from "../components/Streaming/StreamingLanding";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";
 import { Widgets } from "../components/Footer/Widgets";
+import { Voting } from "../components/Polls/Voting";
 
 const SidePane = ({ css = {} }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
@@ -18,6 +19,8 @@ const SidePane = ({ css = {} }) => {
     ViewComponent = StreamingLanding;
   } else if (sidepane === SIDE_PANE_OPTIONS.WIDGET) {
     ViewComponent = Widgets;
+  } else if (sidepane === SIDE_PANE_OPTIONS.VOTING) {
+    ViewComponent = Voting;
   }
 
   if (!ViewComponent) {

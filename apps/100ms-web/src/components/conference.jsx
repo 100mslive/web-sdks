@@ -9,7 +9,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex } from "@100mslive/react-ui";
+import { Box, Button, Flex } from "@100mslive/react-ui";
 import { ConferenceMainView } from "../layouts/mainView";
 import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
@@ -24,6 +24,9 @@ import {
   isIOS,
   isIPadOS,
 } from "../common/constants";
+import { ToastManager } from "./Toast/ToastManager";
+import { useSidepaneToggle } from "./AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../common/constants";
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -39,6 +42,8 @@ const Conference = () => {
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
+  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);
+  // const isVotingOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VOTING);
 
   const toggleControls = e => {
     if (dropdownListRef.current?.length === 0) {
@@ -86,6 +91,26 @@ const Conference = () => {
       hmsActions.ignoreMessageTypes(["chat", EMOJI_REACTION_TYPE]);
     }
   }, [isHeadless, hmsActions]);
+
+  useEffect(() => {
+    ToastManager.addToast({
+      title: "Tyler has started a poll",
+      action: (
+        <Button
+          onClick={toggleVoting}
+          variant="standard"
+          css={{
+            backgroundColor: "$surfaceLight",
+            fontWeight: "$semiBold",
+            color: "$textHighEmp",
+            p: "$xs $md",
+          }}
+        >
+          Vote
+        </Button>
+      ),
+    });
+  }, []);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;
