@@ -75,7 +75,7 @@ export default class HMSTransport implements ITransport {
   private state: TransportState = TransportState.Disconnected;
   private trackStates: Map<string, TrackState> = new Map();
   private publishConnection: HMSPublishConnection | null = null;
-  subscribeConnection: HMSSubscribeConnection | null = null;
+  private subscribeConnection: HMSSubscribeConnection | null = null;
   private initConfig?: InitConfig;
   private endpoint!: string;
   private joinParameters?: JoinParameters;
@@ -1222,6 +1222,10 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
+  }
+
+  getSubscribeConnection() {
+    return this.subscribeConnection;
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {
