@@ -23,9 +23,6 @@ export const MultipleChoiceOptions = ({
           <Checkbox.Root
             disabled={voted}
             css={{
-              background: "none",
-              border: "2px solid $textHighEmp",
-              borderRadius: "2px",
               cursor: voted ? "not-allowed" : "pointer",
             }}
           >
