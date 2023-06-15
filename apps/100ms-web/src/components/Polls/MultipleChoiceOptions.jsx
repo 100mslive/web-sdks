@@ -20,7 +20,15 @@ export const MultipleChoiceOptions = ({
           key={`${option.text}-${index}`}
           css={{ w: "100%", gap: "$9" }}
         >
-          <Checkbox.Root disabled={voted}>
+          <Checkbox.Root
+            disabled={voted}
+            css={{
+              background: "none",
+              border: "2px solid $textHighEmp",
+              borderRadius: "2px",
+              cursor: voted ? "not-allowed" : "pointer",
+            }}
+          >
             <Checkbox.Indicator>
               <CheckIcon width={16} height={16} />
             </Checkbox.Indicator>

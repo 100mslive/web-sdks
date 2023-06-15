@@ -20,7 +20,15 @@ export const SingleChoiceOptions = ({
             key={`${option.text}-${index}`}
             css={{ w: "100%", gap: "$9" }}
           >
-            <RadioGroup.Item disabled={voted} value={option.text}>
+            <RadioGroup.Item
+              css={{
+                background: "none",
+                border: "2px solid $textHighEmp",
+                cursor: voted ? "not-allowed" : "pointer",
+              }}
+              disabled={voted}
+              value={option.text}
+            >
               <RadioGroup.Indicator />
             </RadioGroup.Item>
 

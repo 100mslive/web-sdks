@@ -1,15 +1,18 @@
 import React from "react";
 import { Box, Flex, Text } from "@100mslive/react-ui";
-import { Container, ContentHeader } from "../Streaming/Common";
+import { Container } from "../Streaming/Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { QUESTION_TYPE, SIDE_PANE_OPTIONS } from "../../common/constants";
 import { CrossIcon } from "@100mslive/react-icons";
-import { QuestionCard } from "./QuestionCard";
 import { StatusIndicator } from "./StatusIndicator";
+import { TimedView } from "./Views/TimedView";
+import { StandardView } from "./Views/StandardView";
 
 export const Voting = () => {
   const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);
   const pollCreator = "Tyler";
+
+  // Sets view - linear or vertical, toggles timer indicator
   const isTimed = false;
 
   return (
@@ -26,12 +29,16 @@ export const Voting = () => {
           }}
         >
           <Text variant="h6">Poll</Text>
-          <StatusIndicator />
-
-          <CrossIcon
-            onClick={toggleVoting}
-            style={{ marginLeft: "auto", cursor: "pointer" }}
-          />
+          <StatusIndicator isTimed={isTimed} />
+          <Box
+            css={{
+              marginLeft: "auto",
+              cursor: "pointer",
+              "&:hover": { opacity: "0.8" },
+            }}
+          >
+            <CrossIcon onClick={toggleVoting} />
+          </Box>
         </Flex>
       </Box>
 
@@ -39,27 +46,39 @@ export const Voting = () => {
         <Text css={{ color: "$textMedEmp", fontWeight: "$semiBold" }}>
           {pollCreator} started a poll
         </Text>
-        <QuestionCard
-          index={1}
-          totalCount={3}
-          questionType={QUESTION_TYPE.SINGLE_CHOICE}
-          question="A single choice question"
-          options={{}}
-        />
-        <QuestionCard
-          index={2}
-          totalCount={2}
-          questionType={QUESTION_TYPE.MULTIPLE_CHOICE}
-          question="Another one"
-          options={{}}
-        />
-        <QuestionCard
-          index={2}
-          totalCount={2}
-          questionType={QUESTION_TYPE.LONG_ANSWER}
-          question="Another one"
-        />
+        {isTimed ? (
+          <TimedView questions={questions} />
+        ) : (
+          <StandardView questions={questions} />
+        )}
       </Flex>
     </Container>
   );
 };
+
+const questions = [
+  {
+    questionType: QUESTION_TYPE.SINGLE_CHOICE,
+    question: "A single choice question",
+    options: [
+      { text: "A", voters: ["Alex Kar", "San France", "Rachel"] },
+      { text: "B", voters: ["Boris Johnson", "James Franco"] },
+      { text: "C", voters: [] },
+    ],
+  },
+  {
+    questionType: QUESTION_TYPE.MULTIPLE_CHOICE,
+    question: "A multiple choice question",
+    options: [
+      { text: "A", voters: ["Alex Kar", "San France", "Rachel"] },
+      { text: "B", voters: ["Boris Johnson", "James Franco"] },
+      { text: "C", voters: [] },
+      { text: "D", voters: [] },
+    ],
+  },
+  {
+    questionType: QUESTION_TYPE.SHORT_ANSWER,
+    question: "A short answer type question",
+    options: [],
+  },
+];
