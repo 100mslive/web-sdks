@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Box, Button, Text, Flex, Input } from "@100mslive/react-ui";
+import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
+import { Box, Text, Flex, Input } from "@100mslive/react-ui";
 import { QUESTION_TYPE } from "../../common/constants";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
-import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
+import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 
 export const QuestionCard = ({
   index,
@@ -18,6 +19,7 @@ export const QuestionCard = ({
   const [voted, setVoted] = useState(false);
   const leftNavigationEnabled = index !== 0;
   const rightNavigationEnabled = index !== totalCount && (isSkippable || voted);
+
   const stringAnswerExpected = [
     QUESTION_TYPE.LONG_ANSWER,
     QUESTION_TYPE.SHORT_ANSWER,
@@ -41,11 +43,13 @@ export const QuestionCard = ({
         >
           QUESTION {index + 1} OF {totalCount}: {questionType.toUpperCase()}
         </Text>
+        
         {isTimed ? (
           <Flex align="center" css={{ gap: "$4" }}>
             <Flex
               onClick={() => {
                 setCurrentIndex(prev => Math.max(0, prev - 1));
+                setVoted(false);
               }}
               css={
                 leftNavigationEnabled
@@ -61,6 +65,7 @@ export const QuestionCard = ({
             <Flex
               onClick={() => {
                 setCurrentIndex(prev => Math.min(totalCount, prev + 1));
+                setVoted(false);
               }}
               css={
                 rightNavigationEnabled
@@ -76,6 +81,7 @@ export const QuestionCard = ({
           </Flex>
         ) : null}
       </Flex>
+
       <Box css={{ my: "$md" }}>
         <Text css={{ color: "$textHighEmp" }}>{question}</Text>
       </Box>
@@ -102,29 +108,12 @@ export const QuestionCard = ({
         <MultipleChoiceOptions voted={voted} options={options} />
       ) : null}
 
-      <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
-        {isSkippable && !voted ? (
-          <Button
-            variant="standard"
-            css={{ p: "$xs $10", fontWeight: "$semiBold" }}
-          >
-            Skip
-          </Button>
-        ) : null}
-
-        {voted ? (
-          <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
-            {stringAnswerExpected ? "Submitted" : "Voted"}
-          </Text>
-        ) : (
-          <Button
-            css={{ p: "$xs $10", fontWeight: "$semiBold" }}
-            onClick={() => setVoted(true)}
-          >
-            {stringAnswerExpected ? "Submit" : "Vote"}
-          </Button>
-        )}
-      </Flex>
+      <QuestionCardFooter
+        isSkippable={isSkippable}
+        voted={voted}
+        stringAnswerExpected={stringAnswerExpected}
+        setVoted={setVoted}
+      />
     </Box>
   );
 };

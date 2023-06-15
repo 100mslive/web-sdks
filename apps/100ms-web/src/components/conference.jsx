@@ -43,7 +43,6 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);
-  // const isVotingOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VOTING);
 
   const toggleControls = e => {
     if (dropdownListRef.current?.length === 0) {

@@ -1,5 +1,7 @@
 import { Avatar, Box, Text, Flex, Tooltip } from "@100mslive/react-ui";
+import { VoterList } from "./VoterList";
 
+// Shows number of votes, avatars of voters and list of voters on hover
 export const Votes = ({ voters }) => {
   const hiddenVotersCount = voters.length > 2 ? voters.length - 2 : 0;
 
@@ -21,30 +23,7 @@ export const Votes = ({ voters }) => {
           zIndex: "20",
           minWidth: "$44",
         }}
-        title={voters.map((voter, index) => (
-          <Flex
-            align="center"
-            key={`${voter}-${index}`}
-            css={{ gap: "$4", py: "$2" }}
-          >
-            <Avatar
-              name={voter}
-              css={{
-                position: "relative",
-                transform: "unset",
-                fontSize: "$tiny",
-                size: "$9",
-                p: "$4",
-              }}
-            />
-            <Text
-              variant="xs"
-              css={{ color: "$textMedEmp", fontWeight: "$semiBold" }}
-            >
-              {voter}
-            </Text>
-          </Flex>
-        ))}
+        title={<VoterList voters={voters} />}
       >
         <Flex align="center">
           {voters.length

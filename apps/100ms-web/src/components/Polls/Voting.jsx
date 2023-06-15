@@ -13,7 +13,7 @@ export const Voting = () => {
   const pollCreator = "Tyler";
 
   // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = false;
+  const isTimed = true;
 
   return (
     <Container rounded>

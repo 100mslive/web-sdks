@@ -39,6 +39,7 @@ export const SingleChoiceOptions = ({
                 </Text>
                 {voted ? <Votes voters={option.voters || []} /> : ""}
               </Flex>
+
               {voted ? (
                 <ProgressBar
                   w={`${(100 * option.voters.length) / totalVotes}%`}

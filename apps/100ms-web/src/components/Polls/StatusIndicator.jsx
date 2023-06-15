@@ -20,6 +20,7 @@ export const StatusIndicator = ({ isTimed }) => {
           LIVE
         </Text>
       </Flex>
+
       {isTimed ? (
         <Flex
           css={{

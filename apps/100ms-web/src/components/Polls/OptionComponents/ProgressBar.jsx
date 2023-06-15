@@ -1,5 +1,6 @@
 import { Box } from "@100mslive/react-ui";
 
+// Width to be supplied as %
 export const ProgressBar = ({ w }) => (
   <Box
     css={{
