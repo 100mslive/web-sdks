@@ -444,7 +444,6 @@ export class HMSSdk implements HMSInterface {
     );
     this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
 
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
@@ -1058,7 +1057,6 @@ export class HMSSdk implements HMSInterface {
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 
   /**
