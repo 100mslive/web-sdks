@@ -22,6 +22,8 @@ export interface BaseSample {
   total_packets_lost?: number;
   avg_bitrate_bps?: number;
   avg_available_outgoing_bitrate_bps?: number;
+  total_packets_sent?: number;
+  total_packet_sent_delay_sec?: number;
 }
 
 export interface VideoSample extends BaseSample {

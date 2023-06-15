@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 import { getClosestLayer, layerToIntMapping } from './trackUtils';
-import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '.';
 import { HMSPreferredSimulcastLayer } from '../../interfaces/simulcast-layers';
+import { HMSLocalVideoTrack, HMSRemoteVideoTrack } from '../../internal';
 import { HMSIntersectionObserver } from '../../utils/intersection-observer';
 import HMSLogger from '../../utils/logger';
 import { HMSResizeObserver } from '../../utils/resize-observer';
