@@ -153,6 +153,9 @@ export class VideoElementManager {
         continue;
       }
       const { width, height } = entry;
+      if (width === 0 || height === 0) {
+        continue;
+      }
       const layer = getClosestLayer(this.track.getSimulcastDefinitions(), { width, height });
       if (!maxLayer) {
         maxLayer = layer;
