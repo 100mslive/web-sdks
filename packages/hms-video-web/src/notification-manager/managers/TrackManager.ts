@@ -83,6 +83,7 @@ export class TrackManager {
     this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
     return true;
   }
+
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
     for (const trackId in params.tracks) {
       const trackEntry = params.tracks[trackId];
@@ -102,7 +103,7 @@ export class TrackManager {
     }
   };
 
-  handleTrackUpdate = (params: TrackStateNotification) => {
+  handleTrackUpdate = (params: TrackStateNotification, callListener = true) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
       HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
@@ -122,7 +123,7 @@ export class TrackManager {
 
       // TRACK_UPDATE came before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
       if (!track || this.tracksToProcess.has(trackId)) {
-        this.processTrackInfo(trackEntry, params.peer.peer_id);
+        this.processTrackInfo(trackEntry, params.peer.peer_id, callListener);
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
