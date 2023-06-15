@@ -137,10 +137,13 @@ export class PeerListManager {
         });
 
         // Handle RTC track add and track state change.
-        this.trackManager.handleTrackUpdate({
-          peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peer_id },
-          tracks: newPeerNotification.tracks,
-        });
+        this.trackManager.handleTrackUpdate(
+          {
+            peer: { info: newPeerNotification.info, peer_id: newPeerNotification.peer_id },
+            tracks: newPeerNotification.tracks,
+          },
+          false,
+        );
 
         // Update peer's role locally, new role is received from the reconnect peer-list
         this.peerManager.handlePeerUpdate(newPeerNotification);
