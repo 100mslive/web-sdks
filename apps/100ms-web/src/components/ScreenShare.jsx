@@ -12,9 +12,17 @@ import { useUISettings } from "./AppData/useUISettings";
 import { isScreenshareSupported } from "../common/utils";
 import { UI_SETTINGS } from "../common/constants";
 
-export const ScreenshareToggle = ({ css }) => {
+const isProd = process.env.REACT_APP_ENV === "prod";
+export const ScreenshareToggle = ({ css = {} }) => {
+  const finalCSS = {
+    borderTopRightRadius: "$1",
+    borderBottomRightRadius: "$1",
+  };
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
+  if (isProd) {
+    css = { ...finalCSS, ...css };
+  }
 
   const {
     amIScreenSharing,
@@ -47,7 +55,7 @@ export const ScreenshareToggle = ({ css }) => {
             </Box>
           </Tooltip>
         </ScreenShareButton>
-        <ShareScreenOptions />
+        {!isProd && <ShareScreenOptions />}
       </Flex>
     </Fragment>
   );
