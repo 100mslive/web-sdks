@@ -82,6 +82,7 @@ beforeEach(() => {
       onTrackRemove: jest.fn(),
       onFailure: jest.fn(),
       onStateChange: jest.fn(),
+      onConnected: jest.fn(),
     },
     new DeviceManager(store, eventBus),
     store,
