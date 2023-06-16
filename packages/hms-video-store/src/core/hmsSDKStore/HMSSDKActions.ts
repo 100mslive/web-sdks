@@ -33,7 +33,7 @@ import {
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
-import { HMSInteractivityCenter, IHMSInteractivityCenterActions } from './HMSInteractivityCenter';
+import { HMSInteractivityCenter, IHMSInteractivityCenter } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -119,7 +119,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
-  interactivityCenter: IHMSInteractivityCenterActions;
+  interactivityCenter: IHMSInteractivityCenter;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {

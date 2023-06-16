@@ -13,7 +13,7 @@ import {
   TokenRequest,
   TokenRequestOptions,
 } from '@100mslive/hms-video';
-import { IHMSInteractivityCenterActions } from './hmsSDKStore/HMSInteractivityCenter';
+import { IHMSInteractivityCenter } from './hmsSDKStore/HMSInteractivityCenter';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
@@ -498,5 +498,5 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 
-  interactivityCenter: IHMSInteractivityCenterActions;
+  interactivityCenter: IHMSInteractivityCenter;
 }

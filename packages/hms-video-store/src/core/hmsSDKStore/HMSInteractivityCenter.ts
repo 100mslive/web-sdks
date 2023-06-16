@@ -1,7 +1,6 @@
-import { HMSPollQuestionResponseCreateParams } from '@100mslive/hms-video';
-import { HMSPollCreateParams, HMSSdk } from '@100mslive/hms-video';
+import { HMSPollCreateParams, HMSPollQuestionResponseCreateParams, HMSSdk } from '@100mslive/hms-video';
 
-export interface IHMSInteractivityCenterActions {
+export interface IHMSInteractivityCenter {
   startPoll(poll: HMSPollCreateParams): void;
 }
 
@@ -15,9 +14,6 @@ export class HMSInteractivityCenter {
   startPoll(poll: HMSPollCreateParams) {
     this.sdkInteractivityCenter.startPoll(poll);
   }
-
-  // addQuestionToPoll(question: HMSPollQuestionCreateParams) {
-  // }
 
   addResponseToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
     this.sdkInteractivityCenter.addResponsesToPoll(pollID, responses);
