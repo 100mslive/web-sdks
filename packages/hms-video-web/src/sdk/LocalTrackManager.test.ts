@@ -23,6 +23,8 @@ const testObserver: ITransportObserver = {
     // console.log('sdk Failure Callback', _s);
   },
 
+  onConnected(): void {},
+
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
 };
 
