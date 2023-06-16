@@ -1,5 +1,4 @@
-import { Flex, RadioGroup, Text } from "@100mslive/react-ui";
-import { ProgressBar } from "./OptionComponents/ProgressBar";
+import { Flex, RadioGroup, Text, Progress } from "@100mslive/react-ui";
 import { Votes } from "./OptionComponents/Votes";
 
 export const SingleChoiceOptions = ({
@@ -41,9 +40,13 @@ export const SingleChoiceOptions = ({
               </Flex>
 
               {voted ? (
-                <ProgressBar
-                  w={`${(100 * option.voters.length) / totalVotes}%`}
-                />
+                <Progress.Root value={progressValue}>
+                  <Progress.Content
+                    style={{
+                      transform: `translateX(-${100 - progressValue}%)`,
+                    }}
+                  />
+                </Progress.Root>
               ) : null}
             </Flex>
           </Flex>

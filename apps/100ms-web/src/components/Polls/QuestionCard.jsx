@@ -18,7 +18,8 @@ export const QuestionCard = ({
 }) => {
   const [voted, setVoted] = useState(false);
   const leftNavigationEnabled = index !== 0;
-  const rightNavigationEnabled = index !== totalCount && (isSkippable || voted);
+  const rightNavigationEnabled =
+    index !== totalCount - 1 && (isSkippable || voted);
 
   const stringAnswerExpected = [
     QUESTION_TYPE.LONG_ANSWER,
@@ -43,7 +44,7 @@ export const QuestionCard = ({
         >
           QUESTION {index + 1} OF {totalCount}: {questionType.toUpperCase()}
         </Text>
-        
+
         {isTimed ? (
           <Flex align="center" css={{ gap: "$4" }}>
             <Flex
