@@ -26,7 +26,7 @@ import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack, RtcTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import Message from '../sdk/models/HMSMessage';
@@ -273,14 +273,14 @@ export default class HMSTransport implements ITransport {
       this.observer.onNotification(JSON.parse(message));
     },
 
-    onTrackAdd: (track: HMSTrack) => {
+    onTrackAdd: (track: RtcTrack) => {
       HMSLogger.d(TAG, '[Subscribe] onTrackAdd', `${track}`);
       this.observer.onTrackAdd(track);
     },
 
-    onTrackRemove: (track: HMSTrack) => {
-      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', `${track}`);
-      this.observer.onTrackRemove(track);
+    onTrackRemove: (id: string) => {
+      HMSLogger.d(TAG, '[Subscribe] onTrackRemove', `${id}`);
+      this.observer.onTrackRemove(id);
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {

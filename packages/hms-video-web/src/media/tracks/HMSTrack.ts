@@ -1,9 +1,27 @@
 import { HMSTrackType } from './HMSTrackType';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
-import { HMSMediaStream } from '../streams';
+import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
+
+export class RtcTrack {
+  readonly track: MediaStreamTrack;
+  readonly transceiver: RTCRtpTransceiver;
+  readonly stream: HMSRemoteStream;
+
+  assignedBizTrackId: string | undefined;
+
+  constructor(track: MediaStreamTrack, transceiver: RTCRtpTransceiver, remote: HMSRemoteStream) {
+    this.track = track;
+    this.transceiver = transceiver;
+    this.stream = remote;
+  }
+
+  public get id(): string {
+    return this.track.id;
+  }
+}
 
 export abstract class HMSTrack {
   /**
@@ -13,6 +31,7 @@ export abstract class HMSTrack {
   source?: HMSTrackSource;
   peerId?: string;
   transceiver?: RTCRtpTransceiver;
+  private bizTrackId!: string;
 
   /**
    * @internal to print as a helpful identifier alongside logs
@@ -49,18 +68,26 @@ export abstract class HMSTrack {
     return this.nativeTrack.enabled;
   }
 
+  setTrackId(trackId: string) {
+    this.bizTrackId = trackId;
+  }
+
   /**
    * firstTrackId => encapsulates change in local track ids
    * sdpTrackId => fixes remote track updates correlation on firefox
    */
   public get trackId(): string {
-    return this.firstTrackId || this.sdpTrackId || this.nativeTrack.id;
+    return this.firstTrackId || this.sdpTrackId || this.bizTrackId;
   }
 
   getMediaTrackSettings(): MediaTrackSettings {
     return this.nativeTrack.getSettings();
   }
 
+  /** setEnabled is internal to 100ms and directly impacts the
+   * state of underlying 'native' track and should be equal to
+   * actual remote publisher's local video track mute status.
+   */
   async setEnabled(value: boolean): Promise<void> {
     this.nativeTrack.enabled = value;
   }

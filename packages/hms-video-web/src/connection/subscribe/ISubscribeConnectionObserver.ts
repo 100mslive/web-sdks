@@ -1,4 +1,4 @@
-import { HMSTrack } from '../../media/tracks/HMSTrack';
+import { RtcTrack } from '../../media/tracks/HMSTrack';
 import IConnectionObserver from '../IConnectionObserver';
 
 export default interface ISubscribeConnectionObserver extends IConnectionObserver {
@@ -12,10 +12,10 @@ export default interface ISubscribeConnectionObserver extends IConnectionObserve
   onApiChannelMessage(message: string): void;
 
   /** Triggered when media is received on a new streams from remote peer. */
-  onTrackAdd(track: HMSTrack): void;
+  onTrackAdd(track: RtcTrack): void;
 
   /** Triggered when a remote peer close a streams.*/
-  onTrackRemove(track: HMSTrack): void;
+  onTrackRemove(id: string): void;
 
   /**
    * NOTE: No [PeerConnection.Observer.onRenegotiationNeeded] override

@@ -1,7 +1,6 @@
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
-import { OnDemandTrackManager } from './managers/onDemandTrackManager';
 import { PeerListManager } from './managers/PeerListManager';
 import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
@@ -12,16 +11,16 @@ import { TrackManager } from './managers/TrackManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
-  OnTrackLayerUpdateNotification,
+  OnPipeAllocateNotification,
+  OnTrackLayerUpdateNotification, OnTrackRemoveNotification,
   PolicyParams,
   SpeakerList,
   TrackStateNotification,
 } from './HMSNotifications';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
-import { HMSRemoteTrack } from '../media/tracks';
+import { RtcTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
-import { InitFlags } from '../signal/init/models';
 import HMSTransport from '../transport';
 import HMSLogger from '../utils/logger';
 
@@ -52,11 +51,7 @@ export class NotificationManager {
     private audioListener?: HMSAudioListener,
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
-    const isOnDemandTracksEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
-    this.trackManager = isOnDemandTracksEnabled
-      ? new OnDemandTrackManager(this.store, eventBus, this.transport, this.listener)
-      : new TrackManager(this.store, eventBus, this.listener);
-
+    this.trackManager = new TrackManager(this.store, eventBus, this.transport, this.listener);
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
@@ -134,6 +129,14 @@ export class NotificationManager {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
         break;
       }
+      case HMSNotificationMethod.ON_PIPE_ALLOCATE: {
+        this.trackManager.handlePipeAllocate(notification as OnPipeAllocateNotification);
+        break;
+      }
+      case HMSNotificationMethod.ON_TRACK_REMOVE: {
+        this.trackManager.handleBizTrackRemove(notification as OnTrackRemoveNotification);
+        break;
+      }
       case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {
         this.trackManager.handleTrackLayerUpdate(notification as OnTrackLayerUpdateNotification);
         break;
@@ -165,12 +168,12 @@ export class NotificationManager {
     return false;
   };
 
-  handleTrackAdd = (track: HMSRemoteTrack) => {
+  handleTrackAdd = (track: RtcTrack) => {
     this.trackManager.handleTrackAdd(track);
   };
 
-  handleTrackRemove = (track: HMSRemoteTrack) => {
-    this.trackManager.handleTrackRemove(track);
+  handleTrackRemove = (id: string) => {
+    this.trackManager.handleTrackRemove(id);
   };
 
   updateLocalPeer = ({ name, metadata }: { name?: string; metadata?: string }) => {

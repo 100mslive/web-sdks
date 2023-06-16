@@ -1,10 +1,20 @@
-import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
-import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
-import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
-import { IStore } from '../../sdk/store';
+import {VideoTrackLayerUpdate} from '../../connection/channel-messages';
+import {EventBus} from '../../events/EventBus';
+import {HMSPeer, HMSTrackUpdate, HMSUpdateListener} from '../../interfaces';
+import {HMSRemoteStream} from '../../media/streams';
+import {HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType, RtcTrack} from '../../media/tracks';
+import {LocalTrackManager} from '../../sdk/LocalTrackManager';
+import {IStore} from '../../sdk/store';
+import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
-import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
+import {isEmptyTrack} from '../../utils/track';
+import {
+  OnPipeAllocateNotification,
+  OnTrackLayerUpdateNotification,
+  OnTrackRemoveNotification,
+  TrackState,
+  TrackStateNotification,
+} from '../HMSNotifications';
 
 /**
  * Handles:
@@ -23,66 +33,161 @@ import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } fr
  */
 export class TrackManager {
   public TAG = '[TrackManager]';
-  private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
-  constructor(public store: IStore, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
+  private allocation: OnPipeAllocateNotification = { tracks: {} };
+  private readonly rtcTracks: Map<string, RtcTrack> = new Map();
+
+  constructor(
+    public store: IStore,
+    public eventBus: EventBus,
+    protected transport: HMSTransport,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   /**
-   * Add event from biz on track-add
+   * Handles biz event 'on-track-add' - initialises empty track such that it's ready for allocation
+   * once actual RtcTrack binding is received via 'on-pipe-allocate'
    * @param params TrackStateNotification
    */
   handleTrackMetadataAdd(params: TrackStateNotification) {
-    HMSLogger.d(this.TAG, `TRACK_METADATA_ADD`, JSON.stringify(params, null, 2));
+    HMSLogger.d(this.TAG, `on-track-add`, params);
 
     for (const trackId in params.tracks) {
+      if (this.store.getTrackState(trackId)) {
+        HMSLogger.w(this.TAG, `track-state already in store id:${trackId}`);
+        continue;
+      }
+
       const trackInfo = params.tracks[trackId];
       this.store.setTrackState({
         peerId: params.peer.peer_id,
         trackInfo,
       });
+
+      const peer = this.store.getPeerById(params.peer.peer_id);
+      if (!peer) {
+        HMSLogger.w(this.TAG, `peer not found id:${params.peer.peer_id}, not initialising empty track`, params);
+        continue;
+      }
+
+      let track: HMSRemoteTrack;
+      if (trackInfo.type === 'audio') {
+        track = new HMSRemoteAudioTrack(
+          new HMSRemoteStream(new MediaStream(), this.transport.getSubscribeConnection()!),
+          LocalTrackManager.getEmptyAudioTrack(),
+          trackInfo.source,
+        );
+      } else {
+        track = new HMSRemoteVideoTrack(
+          new HMSRemoteStream(new MediaStream(), this.transport.getSubscribeConnection()!),
+          LocalTrackManager.getEmptyVideoTrack(),
+          trackInfo.source,
+        );
+
+        track.source = trackInfo.source;
+        track.peerId = peer.peerId;
+        track.logIdentifier = peer.name;
+      }
+
+      track.setEnabled(!trackInfo.mute);
+      track.setTrackId(trackInfo.track_id);
+      track.setSdpTrackId(trackInfo.track_id);
+      this.store.addTrack(track);
+
+      if (track.type === HMSTrackType.AUDIO) {
+        this.addAudioTrack(peer, track);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, peer.audioTrack!, peer);
+      } else {
+        this.addVideoTrack(peer, track);
+        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, peer.videoTrack!, peer);
+      }
     }
-    this.processPendingTracks();
   }
+
+  handleTrackUpdate = (params: TrackStateNotification) => {
+    HMSLogger.d(this.TAG, 'on-track-update', params);
+
+    const peer = this.store.getPeerById(params.peer.peer_id);
+    if (!peer) {
+      HMSLogger.d(this.TAG, `on-track-update ignored - Peer not added to store`, params);
+      return;
+    }
+
+    for (const trackId in params.tracks) {
+      const currentTrackStateInfo = Object.assign({}, this.store.getTrackState(trackId)?.trackInfo);
+
+      const trackEntry = params.tracks[trackId];
+      const track = this.store.getTrackById(trackId);
+
+      this.store.setTrackState({
+        peerId: params.peer.peer_id,
+        trackInfo: { ...currentTrackStateInfo, ...trackEntry },
+      });
+
+      if (track) {
+        track.setEnabled(!trackEntry.mute);
+        const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
+        if (eventType) {
+          this.listener?.onTrackUpdate(eventType, track, peer);
+        }
+      } else {
+        // fixme(aditya): on-track-add received after on-track-update
+        HMSLogger.w(this.TAG, `on-track-update received before on-track-add track-id:${trackId}`, trackEntry);
+        this.allocateTracks();
+      }
+    }
+  };
 
   /**
    * Sets the tracks to peer and returns the peer
    */
-  handleTrackAdd = (track: HMSRemoteTrack) => {
-    HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
-    this.store.addTrack(track);
-    this.tracksToProcess.set(track.trackId, track);
-    this.processPendingTracks();
+  handleTrackAdd = (track: RtcTrack) => {
+    HMSLogger.d(this.TAG, `rtc track-add`, track);
+    this.rtcTracks.set(track.id, track);
+
+    // fixme(aditya): optimise by not calling allocateTrack always
+    this.allocateTracks();
   };
 
   /**
    * Sets the track of corresponding peer to null and returns the peer
+   *
+   * todo(aditya): cleanup respective bound HMSTrack (if exist)
    */
-  handleTrackRemove(track: HMSRemoteTrack): boolean {
-    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
-
-    const trackStateEntry = this.store.getTrackState(track.trackId);
-
-    if (!trackStateEntry) {
-      return false;
-    }
-
-    const storeHasTrack = this.store.hasTrack(track);
-    if (!storeHasTrack) {
-      HMSLogger.d(this.TAG, 'Track not found in store');
-      return false;
-    }
-
-    // emit this event here as peer will already be removed(if left the room) by the time this event is received
-    track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
-    this.store.removeTrack(track);
-    const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
-    if (!hmsPeer) {
-      return false;
-    }
-    this.removePeerTracks(hmsPeer, track);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+  handleTrackRemove(id: string): boolean {
+    HMSLogger.d(this.TAG, `rtc track-remove ${id}`);
+    this.rtcTracks.delete(id);
     return true;
   }
+
+  handlePipeAllocate = (params: OnPipeAllocateNotification) => {
+    this.allocation = params;
+    this.allocateTracks();
+  };
+
+  handleBizTrackRemove = (params: OnTrackRemoveNotification) => {
+    for (const track_id in params.tracks) {
+      const track = this.store.getTrackById(track_id) as HMSRemoteTrack | undefined;
+      if (!track) {
+        HMSLogger.w(this.TAG, `track not found in store id:${track_id}`);
+        continue;
+      }
+
+      if (track.type === HMSTrackType.AUDIO) {
+        this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+      }
+      this.store.removeTrack(track);
+
+      const peer = this.store.getPeerById(track.peerId!);
+      if (!peer) {
+        HMSLogger.w(this.TAG, `peer not found in store track_id:${track_id} peer_id:${track.peerId}`);
+        continue;
+      }
+
+      this.removePeerTracks(peer, track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, peer);
+    }
+  };
 
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
     for (const trackId in params.tracks) {
@@ -103,71 +208,82 @@ export class TrackManager {
     }
   };
 
-  handleTrackUpdate = (params: TrackStateNotification, callListener = true) => {
-    const hmsPeer = this.store.getPeerById(params.peer.peer_id);
-    if (!hmsPeer) {
-      HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
-      return;
-    }
+  allocateTracks = () => {
+    const tracks = new Map(this.rtcTracks);
+    const allocation = this.allocation;
 
-    for (const trackId in params.tracks) {
-      const currentTrackStateInfo = Object.assign({}, this.store.getTrackState(trackId)?.trackInfo);
+    let added = 0;
+    let same = 0;
+    let removed = 0;
 
-      const trackEntry = params.tracks[trackId];
-      const track = this.store.getTrackById(trackId);
+    // eslint-disable-next-line complexity
+    tracks.forEach(rtcTrack => {
+      const bizTrackId = allocation.tracks[rtcTrack.id];
+      const warnPrefix = `allocate tracks ${rtcTrack.id}:${bizTrackId}`;
 
-      this.store.setTrackState({
-        peerId: params.peer.peer_id,
-        trackInfo: { ...currentTrackStateInfo, ...trackEntry },
-      });
+      if (rtcTrack.assignedBizTrackId && rtcTrack.assignedBizTrackId !== bizTrackId) {
+        // track is de-allocated, check if this native-track is assigned to some HMSTrack
+        const track = this.store.getTrackById(rtcTrack.assignedBizTrackId) as HMSRemoteTrack | undefined;
+        if (track) {
+          track.transceiver = undefined;
+          if (track.type === HMSTrackType.AUDIO) {
+            track.nativeTrack = LocalTrackManager.getEmptyAudioTrack();
+          } else {
+            track.nativeTrack = LocalTrackManager.getEmptyVideoTrack();
+          }
 
-      // TRACK_UPDATE came before TRACK_ADD -> update state, process pending tracks when TRACK_ADD arrives.
-      if (!track || this.tracksToProcess.has(trackId)) {
-        this.processTrackInfo(trackEntry, params.peer.peer_id, callListener);
-        this.processPendingTracks();
-      } else {
-        track.setEnabled(!trackEntry.mute);
-        const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
-        if (eventType) {
-          this.listener?.onTrackUpdate(eventType, track, hmsPeer);
+          const state = this.store.getTrackState(rtcTrack.assignedBizTrackId!);
+          if (state) {
+            track.setEnabled(!state.trackInfo.mute);
+          }
         }
+
+        rtcTrack.assignedBizTrackId = undefined;
+        removed++;
+
+        if (!bizTrackId) {
+          // track was simply de-allocated
+          return;
+        }
+      } else if (rtcTrack.assignedBizTrackId === bizTrackId) {
+        // already assigned; skip below changes
+        same++;
+        return;
       }
-    }
-  };
 
-  processTrackInfo = (_trackInfo: TrackState, _peerId: string, _callListener?: boolean) => {};
+      const track = this.store.getTrackById(bizTrackId) as HMSRemoteTrack | undefined;
+      if (!track) {
+        HMSLogger.w(this.TAG, `${warnPrefix} - track not in store`);
+        return;
+      }
 
-  processPendingTracks = () => {
-    const tracksCopy = new Map(this.tracksToProcess);
-    tracksCopy.forEach(track => {
-      const state = this.store.getTrackState(track.trackId);
+      const state = this.store.getTrackState(bizTrackId);
       if (!state) {
-        HMSLogger.d(this.TAG, 'TrackState not added to store', `peerId - ${track.peerId}`, `trackId -${track.trackId}`);
+        HMSLogger.w(this.TAG, `${warnPrefix} - track state not in store`);
         return;
       }
 
-      const hmsPeer = this.store.getPeerById(state.peerId);
-      if (!hmsPeer) {
-        HMSLogger.d(this.TAG, 'Peer not added to store, peerId', state.peerId);
+      const peer = this.store.getPeerById(state.peerId);
+      if (!peer) {
+        HMSLogger.w(this.TAG, `${warnPrefix} - peer not in store`);
         return;
       }
 
-      track.source = state.trackInfo.source;
-      track.peerId = hmsPeer.peerId;
-      // set log identifier to initial name of the peer
-      track.logIdentifier = hmsPeer.name;
+      track.transceiver = rtcTrack.transceiver;
+      track.nativeTrack = rtcTrack.track;
+      rtcTrack.assignedBizTrackId = state.trackInfo.track_id;
       track.setEnabled(!state.trackInfo.mute);
-      this.addAudioTrack(hmsPeer, track);
-      this.addVideoTrack(hmsPeer, track);
-      /**
-       * Don't call onTrackUpdate for audio elements immediately because the operations(eg: setVolume) performed
-       * on onTrackUpdate can be overriden in AudioSinkManager when audio element is created
-       **/
-      track.type === HMSTrackType.AUDIO
-        ? this.eventBus.audioTrackAdded.publish({ track: track as HMSRemoteAudioTrack, peer: hmsPeer as HMSRemotePeer })
-        : this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, track, hmsPeer);
-      this.tracksToProcess.delete(track.trackId);
+
+      if (track.type === HMSTrackType.AUDIO) {
+        this.addAudioTrack(peer, track);
+      } else {
+        this.addVideoTrack(peer, track);
+      }
+
+      added++;
     });
+
+    HMSLogger.i(this.TAG, `allocate tracks same:${same} added:${added} removed:${removed}`, allocation, tracks);
   };
 
   private setLayer(track: HMSRemoteVideoTrack, layerUpdate: VideoTrackLayerUpdate) {
@@ -187,14 +303,14 @@ export class TrackManager {
     const auxiliaryTrackIndex = hmsPeer.auxiliaryTracks.indexOf(track);
     if (auxiliaryTrackIndex > -1) {
       hmsPeer.auxiliaryTracks.splice(auxiliaryTrackIndex, 1);
-      HMSLogger.d(this.TAG, 'auxiliary track removed', `${track}`);
+      HMSLogger.d(this.TAG, 'auxiliary track removed', track);
     } else {
       if (track.type === HMSTrackType.AUDIO && hmsPeer.audioTrack === track) {
         hmsPeer.audioTrack = undefined;
-        HMSLogger.d(this.TAG, 'audio track removed', `${track}`);
+        HMSLogger.d(this.TAG, 'audio track removed', track);
       } else if (track.type === HMSTrackType.VIDEO && hmsPeer.videoTrack === track) {
         hmsPeer.videoTrack = undefined;
-        HMSLogger.d(this.TAG, 'video track removed', `${track}`);
+        HMSLogger.d(this.TAG, 'video track removed', track);
       }
     }
   }
@@ -208,7 +324,8 @@ export class TrackManager {
     } else {
       hmsPeer.auxiliaryTracks.push(track);
     }
-    HMSLogger.d(this.TAG, 'audio track added', `${track}`);
+
+    HMSLogger.d(this.TAG, `audio track added id:${track.trackId} enabled:${track.enabled}`);
   }
 
   addVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
@@ -232,11 +349,21 @@ export class TrackManager {
         hmsPeer.auxiliaryTracks.splice(index, 1, remoteTrack);
       }
     }
-    HMSLogger.d(this.TAG, 'video track added', `${track}`);
+
+    HMSLogger.d(this.TAG, `video track added id:${track.trackId} enabled:${track.enabled}`)
   }
 
   addAsPrimaryVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
-    return track.source === 'regular' && (!hmsPeer.videoTrack || hmsPeer.videoTrack?.trackId === track.trackId);
+    if (track.source !== 'regular') {
+      return false;
+    }
+    if (!hmsPeer.videoTrack) {
+      return true;
+    }
+    if (hmsPeer.videoTrack.trackId === track.trackId) {
+      return true;
+    }
+    return hmsPeer.videoTrack.enabled && isEmptyTrack(hmsPeer.videoTrack.nativeTrack);
   }
 
   private processTrackUpdate(track: HMSRemoteTrack, currentTrackState: TrackState, trackState: TrackState) {

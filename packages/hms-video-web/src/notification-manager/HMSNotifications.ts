@@ -22,6 +22,21 @@ export interface TrackStateNotification {
   peer: PeerNotificationInfo;
 }
 
+export interface OnPipeAllocateNotification {
+  tracks: {
+    [rtc_track_id: string]: string; // BizTrackID -> RtcTrackID
+  };
+}
+
+export interface OnTrackRemoveNotification {
+  tracks: {
+    [track_id: string]: {
+      track_id: string;
+      stream_id: string;
+    };
+  },
+}
+
 export interface OnTrackLayerUpdateNotification {
   tracks: {
     [track_id: string]: VideoTrackLayerUpdate;

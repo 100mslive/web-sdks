@@ -2,12 +2,10 @@ import EventEmitter from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
 import { HMSRemoteStream } from '../../internal';
-import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
-import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
+import { RtcTrack } from '../../media/tracks/HMSTrack';
 import { ISignal } from '../../signal/ISignal';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import { getSdpTrackIdForMid } from '../../utils/session-description';
 import { sleep } from '../../utils/timer-utils';
 import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
 import HMSConnection from '../HMSConnection';
@@ -16,7 +14,7 @@ import { HMSConnectionRole } from '../model';
 
 export default class HMSSubscribeConnection extends HMSConnection {
   private readonly TAG = '[HMSSubscribeConnection]';
-  private readonly remoteStreams = new Map<string, HMSRemoteStream>();
+  private readonly remoteStreams: Map<string, HMSRemoteStream> = new Map();
   private readonly observer: ISubscribeConnectionObserver;
   private readonly MAX_RETRIES = 3;
 
@@ -76,12 +74,14 @@ export default class HMSSubscribeConnection extends HMSConnection {
         if (ev.track.id !== e.track.id) {
           return;
         }
+
+        this.observer.onTrackRemove(ev.track.id);
         /*
          * this match has to be with nativetrack.id instead of track.trackId as the latter refers to sdp track id for
          * ease of correlating update messages coming from the backend. The two track ids are usually the same, but
          * can be different for some browsers. checkout sdptrackid field in HMSTrack for more details.
          */
-        const toRemoveTrackIdx = remote.tracks.findIndex(
+        /* const toRemoveTrackIdx = remote.tracks.findIndex(
           track => track.nativeTrack.id === ev.track.id && e.transceiver.mid === track.transceiver?.mid,
         );
         if (toRemoveTrackIdx >= 0) {
@@ -92,17 +92,17 @@ export default class HMSSubscribeConnection extends HMSConnection {
           if (remote.tracks.length === 0) {
             this.remoteStreams.delete(streamId);
           }
-        }
+        } */
       });
 
       const remote = this.remoteStreams.get(streamId)!;
-      const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
+      /* const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
       track.transceiver = e.transceiver;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
-      remote.tracks.push(track);
-      this.observer.onTrackAdd(track);
+      remote.tracks.push(track); */
+      this.observer.onTrackAdd(new RtcTrack(e.track, e.transceiver, remote));
     };
   }
 

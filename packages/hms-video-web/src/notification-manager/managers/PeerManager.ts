@@ -63,14 +63,14 @@ export class PeerManager {
       hmsPeers.push(this.makePeer(peer));
     }
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LIST, hmsPeers);
-    this.trackManager.processPendingTracks();
+    this.trackManager.allocateTracks();
   };
 
   handlePeerJoin = (peer: PeerNotification) => {
     const hmsPeer = this.makePeer(peer);
 
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_JOINED, hmsPeer);
-    this.trackManager.processPendingTracks();
+    this.trackManager.allocateTracks();
   };
 
   handlePeerLeave = (peer: PeerNotification) => {
@@ -143,16 +143,14 @@ export class PeerManager {
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
     }
 
-    for (const trackId in peer.tracks) {
-      const trackInfo = peer.tracks[trackId];
-      this.store.setTrackState({
-        peerId: peer.peer_id,
-        trackInfo,
-      });
-      if (trackInfo.type === 'video') {
-        this.trackManager.processTrackInfo(trackInfo, peer.peer_id, false);
-      }
-    }
+    this.trackManager.handleTrackMetadataAdd({
+      tracks: peer.tracks,
+      peer: {
+        peer_id: peer.peer_id,
+        info: peer.info,
+      },
+    });
+
     return hmsPeer;
   }
 

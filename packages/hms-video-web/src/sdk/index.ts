@@ -53,6 +53,7 @@ import {
   HMSTrackSource,
   HMSTrackType,
   HMSVideoTrack,
+  RtcTrack,
 } from '../media/tracks';
 import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
 import { NotificationManager } from '../notification-manager/NotificationManager';
@@ -242,12 +243,12 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.handleNotification(message, this.sdkState.isReconnecting);
     },
 
-    onTrackAdd: (track: HMSRemoteTrack) => {
+    onTrackAdd: (track: RtcTrack) => {
       this.notificationManager?.handleTrackAdd(track);
     },
 
-    onTrackRemove: (track: HMSRemoteTrack) => {
-      this.notificationManager?.handleTrackRemove(track);
+    onTrackRemove: (id: string) => {
+      this.notificationManager?.handleTrackRemove(id);
     },
 
     onFailure: (exception: HMSException) => {
