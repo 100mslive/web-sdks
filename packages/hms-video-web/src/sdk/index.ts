@@ -242,6 +242,10 @@ export class HMSSdk implements HMSInterface {
       this.notificationManager?.handleNotification(message, this.sdkState.isReconnecting);
     },
 
+    onConnected: () => {
+      this.initNotificationManager();
+    },
+
     onTrackAdd: (track: HMSRemoteTrack) => {
       this.notificationManager?.handleTrackAdd(track);
     },
