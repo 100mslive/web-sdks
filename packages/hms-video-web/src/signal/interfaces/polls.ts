@@ -1,4 +1,9 @@
-import { HMSPollQuestion, HMSPollQuestionAnswer, HMSPollQuestionOption } from '../../interfaces';
+import {
+  HMSPollQuestion,
+  HMSPollQuestionAnswer,
+  HMSPollQuestionOption,
+  HMSPollQuestionResponse,
+} from '../../interfaces';
 
 export interface PollInfoParams {
   poll_id: string; // unique poll id, optional, if not provided server will create one
@@ -69,4 +74,27 @@ export interface PollQuestionsGetParams {
 
 export interface PollQuestionsGetResponse extends PollQuestionsSetParams {
   last: boolean;
+}
+
+export interface PollResponseParams
+  extends Pick<HMSPollQuestionResponse, 'type' | 'skipped' | 'option' | 'options' | 'text' | 'update' | 'duration'> {
+  question: number;
+}
+
+export interface PollResponseSetParams {
+  poll_id: string;
+  responses: PollResponseParams[];
+}
+
+export interface PollResponseSetResponse {
+  poll_id: string;
+  result: {
+    question: number;
+    correct: boolean;
+    error: {
+      code: number;
+      message: string;
+      description: string;
+    };
+  }[];
 }

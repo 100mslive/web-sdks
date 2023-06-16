@@ -1,4 +1,5 @@
 import React, { ComponentProps } from 'react';
+import type { ToastProps } from '@radix-ui/react-toast'
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
@@ -106,7 +107,7 @@ const DefaultClose = ({ css }: Pick<ComponentProps<typeof ToastClose>, 'css'>) =
   );
 };
 
-interface HMSToastProps extends ToastPrimitives.ToastProps {
+interface HMSToastProps extends ToastProps {
   title: string;
   description?: string;
   isClosable?: boolean;

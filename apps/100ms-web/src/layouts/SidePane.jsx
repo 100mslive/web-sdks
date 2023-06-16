@@ -2,6 +2,7 @@ import React from "react";
 import { selectAppData, useHMSStore } from "@100mslive/react-sdk";
 import { Box } from "@100mslive/react-ui";
 import { Chat } from "../components/Chat/Chat";
+import { Widgets } from "../components/Footer/Widgets";
 import { ParticipantList } from "../components/Header/ParticipantList";
 import { StreamingLanding } from "../components/Streaming/StreamingLanding";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../common/constants";

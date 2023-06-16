@@ -1,17 +1,20 @@
 import { HMSPollQuestionCreateParams } from '../../interfaces';
 import { HMSInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
 import {
+  HMSPoll,
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
+  HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
 } from '../../interfaces/session-store/polls';
-import { PollQuestionParams } from '../../signal/interfaces';
+import { IStore } from '../../sdk/store';
+import { PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
-  constructor(private transport: HMSTransport) {}
+  constructor(private transport: HMSTransport, private store: IStore) {}
 
   async startPoll(pollParams: HMSPollCreateParams): Promise<void> {
     const { poll_id: serverPollID } = await this.transport.pollInfoSet({
@@ -43,8 +46,30 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     await this.transport.pollStop({ poll_id: pollID });
   }
 
-  addResponse(_response: HMSPollQuestionResponse): Promise<void> {
-    throw new Error('Method not implemented.');
+  async addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
+    const poll = this.store.getPoll(pollID);
+    if (!poll) {
+      throw new Error('Invalid poll ID - Poll not found');
+    }
+    const responsesParams: PollResponseParams[] = responses.map(response => {
+      const { question } = this.getPollAndQuestion(poll, response.questionIndex);
+      if (question.type === HMSPollQuestionType.SINGLE_CHOICE) {
+        response.option = response.option || response.options?.[0] || -1;
+        delete response.text;
+        delete response.options;
+      } else if (question.type === HMSPollQuestionType.MULTI_CHOICE) {
+        delete response.text;
+        delete response.option;
+      } else {
+        response.text = response.text || '';
+        delete response.option;
+        delete response.options;
+      }
+
+      return { duration: 0, type: question.type, question: response.questionIndex, ...response };
+    });
+
+    await this.transport.pollResponseSet({ poll_id: pollID, responses: responsesParams });
   }
   getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {
     throw new Error('Method not implemented.');
@@ -78,5 +103,14 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     }
 
     return { question, options, answer };
+  }
+
+  private getPollAndQuestion(poll: HMSPoll, questionIndex: number) {
+    const question = poll?.questions?.find(question => question.index === questionIndex);
+    if (!question) {
+      throw new Error('Invalid question index - Question not found in poll');
+    }
+
+    return { poll, question };
   }
 }

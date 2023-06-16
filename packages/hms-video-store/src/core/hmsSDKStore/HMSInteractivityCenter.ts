@@ -1,3 +1,4 @@
+import { HMSPollQuestionResponseCreateParams } from '@100mslive/hms-video';
 import { HMSPollCreateParams, HMSSdk } from '@100mslive/hms-video';
 
 export interface IHMSInteractivityCenterActions {
@@ -18,5 +19,7 @@ export class HMSInteractivityCenter {
   // addQuestionToPoll(question: HMSPollQuestionCreateParams) {
   // }
 
-  // addResponseToPoll(response: HMSPollResponseCreateParams) {}
+  addResponseToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
+    this.sdkInteractivityCenter.addResponsesToPoll(pollID, responses);
+  }
 }

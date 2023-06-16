@@ -6,10 +6,8 @@ export type {
   IHMSStatsStoreReadOnly as HMSStatsStoreWrapper,
 } from './IHMSStore';
 export type { IHMSActions as HMSActions } from './IHMSActions';
-export type { IHMSNotifications as HMSNotifications } from './schema/notification';
-export type { HMSNotificationInCallback, HMSNotificationCallback } from './schema/notification';
-export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
 export * from './schema';
+export type { IHMSNotifications as HMSNotifications } from './schema/notification';
 export * from './selectors';
 export {
   HMSLogLevel,
@@ -17,7 +15,6 @@ export {
   HMSVideoPluginType,
   HMSVideoPluginCanvasContextType,
   parsedUserAgent,
-  HMSSimulcastLayer,
   simulcastMapping,
   DeviceType,
 } from './hmsSDKStore/sdkTypes';
@@ -44,5 +41,3 @@ export type {
   RID,
   HMSPoll,
 } from './hmsSDKStore/sdkTypes';
-
-export * from '../controller/beam/BeamController';

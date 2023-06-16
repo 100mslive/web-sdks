@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
+import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
+import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
+import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Container, ContentHeader } from "../Streaming/Common";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Widgets = () => {
+  const [showWidgetState, setShowWidgetState] = useState("");
+  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
+
   return (
     <Container rounded>
-      <ContentHeader content="Widgets" />
+      <ContentHeader content="Widgets" onBack={closeWidgets} />
       <Flex direction="column" css={{ p: "$10" }}>
         <Flex>
           {cardData.map(card => {
@@ -13,11 +21,26 @@ export const Widgets = () => {
           })}
         </Flex>
         <Flex direction="column">
-          {optionsData.map(option => {
-            return <WidgetOptions {...option} />;
-          })}
+          <WidgetOptions
+            title="Poll/Quiz"
+            Icon={<QuizIcon width={40} height={40} />}
+            subtitle="Find out what others think"
+            onClick={() => setShowWidgetState("PollsQuizMenu")}
+            launchQuestions={() => setShowWidgetState("QuestionMenu")}
+          />
         </Flex>
       </Flex>
+      {showWidgetState === "PollsQuizMenu" && (
+        <PollsQuizMenu
+          launchQuestions={() => setShowWidgetState("QuestionMenu")}
+          onBack={() => setShowWidgetState("")}
+        />
+      )}
+      {showWidgetState === "QuestionMenu" && (
+        <LaunchPollsQuizMenu
+          onBack={() => setShowWidgetState("PollsQuizMenu")}
+        />
+      )}
     </Container>
   );
 };
@@ -37,33 +60,11 @@ const cardData = [
   },
 ];
 
-const optionsData = [
-  {
-    title: "Poll/Quiz",
-    subtitle: "Find out what others think",
-    Icon: "",
-    onClick: () => {},
-  },
-  {
-    title: "Audio Playlist",
-    subtitle:
-      "Play music from Spotify or any other tabPlay audios from select collection",
-    Icon: "",
-    onClick: () => {},
-  },
-  {
-    title: "Video Playlist",
-    subtitle: "Play videos from select collection",
-    Icon: "",
-    onClick: () => {},
-  },
-];
-
 const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
   return (
     <Flex
       direction="column"
-      css={{ cursor: "pointer", ...css }}
+      css={{ cursor: "pointer", w: "100%", ...css }}
       onClick={onClick}
       key={title}
     >
@@ -82,11 +83,30 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
 
 const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
   return (
-    <Flex onClick={onClick} key={title} css={{ cursor: "pointer" }}>
-      <Flex>{Icon}</Flex>
-      <Flex direction="column">
-        <Text variant="sub2">{title}</Text>
-        <Text variant="sub2">{subtitle}</Text>
+    <Flex
+      onClick={onClick}
+      key={title}
+      css={{ cursor: "pointer", "&:hover": { bg: "$surfaceLight", r: "$0" } }}
+      align="center"
+    >
+      <Flex
+        css={{
+          border: "$space$px solid $borderLight",
+          r: "$1",
+          p: "$4",
+          c: "$textHighEmp",
+        }}
+      >
+        {Icon}
+      </Flex>
+      <Flex direction="column" css={{ ml: "$md" }}>
+        <Text
+          variant="sub2"
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold", mb: "$4" }}
+        >
+          {title}
+        </Text>
+        <Text variant="caption">{subtitle}</Text>
       </Flex>
     </Flex>
   );

@@ -2,7 +2,8 @@ import { v4 as uuid } from 'uuid';
 import { convertSignalMethodtoErrorAction, HMSSignalMethod, JsonRpcRequest, JsonRpcResponse } from './models';
 import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import Message from '../../sdk/models/HMSMessage';
 import {
@@ -30,6 +31,8 @@ import {
   PollQuestionsGetResponse,
   PollQuestionsSetParams,
   PollQuestionsSetResponse,
+  PollResponseSetParams,
+  PollResponseSetResponse,
   PollStartParams,
   PollStartResponse,
   PollStopParams,
@@ -407,6 +410,11 @@ export default class JsonRpcSignal implements ISignal {
     return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { version: '1.0', ...params });
   }
 
+  pollResponseSet(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+    this.valiateConnection();
+    return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { version: '1.0', ...params });
+  }
+
   private valiateConnection() {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
@@ -458,7 +466,7 @@ export default class JsonRpcSignal implements ISignal {
         this.observer.onServerError(
           ErrorFactory.WebsocketMethodErrors.ServerErrors(
             Number(response.params.code),
-            HMSAction.NONE,
+            HMSSignalMethod.SERVER_ERROR,
             response.params.message,
           ),
         );

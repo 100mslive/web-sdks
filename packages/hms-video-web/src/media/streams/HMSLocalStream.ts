@@ -1,4 +1,4 @@
-import HMSMediaStream from './HMSMediaStream';
+import { HMSMediaStream } from './HMSMediaStream';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import { SimulcastLayer } from '../../interfaces';
 import { stringifyMediaStreamTrack } from '../../utils/json';
@@ -6,7 +6,7 @@ import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
-export default class HMSLocalStream extends HMSMediaStream {
+export class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
   private readonly TAG = '[HMSLocalStream]';
   private connection: HMSPublishConnection | null = null;

@@ -1,6 +1,5 @@
-import { HMSPeer, HMSPeerID, HMSTrack } from './peer';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackSource } from './peer';
 import { HMSRoleName } from './role';
-import { HMSTrackSource } from '.';
 
 export interface HMSRoleChangeStoreRequest {
   requestedBy?: HMSPeerID;

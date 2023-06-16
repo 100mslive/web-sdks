@@ -31,6 +31,7 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
   packetsSent?: number;
   qualityLimitationReason?: string;
   qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
+  totalPacketSendDelay?: number;
   rid?: RID;
 }
 

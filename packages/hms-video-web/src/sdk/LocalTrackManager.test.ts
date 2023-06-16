@@ -5,7 +5,7 @@ import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
 import { PolicyParams } from '../notification-manager';
 import ITransportObserver from '../transport/ITransportObserver';

@@ -1,7 +1,7 @@
 import EventEmitter from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
-import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
+import { HMSRemoteStream } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import { ISignal } from '../../signal/ISignal';
