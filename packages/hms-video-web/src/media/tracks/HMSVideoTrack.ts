@@ -68,11 +68,13 @@ export class HMSVideoTrack extends HMSTrack {
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
       const existingTrack = srcObject.getVideoTracks()[0];
+      console.log('existing src track', existingTrack);
       if (existingTrack?.id === track.id && !existingTrack?.muted) {
         // it's already attached, attaching again would just cause flickering
         return;
       }
     }
+    console.log('attaching src track', track);
     videoElement.srcObject = new MediaStream([track]);
     this.sinkCount++;
   }
