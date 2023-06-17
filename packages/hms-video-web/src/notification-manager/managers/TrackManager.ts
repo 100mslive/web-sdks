@@ -92,11 +92,6 @@ export class TrackManager {
         continue;
       }
 
-      const peer = this.store.getPeerByTrackId(trackId)!;
-      if (!peer) {
-        continue;
-      }
-
       if (track instanceof HMSRemoteVideoTrack) {
         this.setLayer(track, trackEntry);
       }
