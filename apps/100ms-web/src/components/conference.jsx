@@ -10,11 +10,13 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, Button, Flex } from "@100mslive/react-ui";
+import { ToastManager } from "./Toast/ToastManager";
 import { ConferenceMainView } from "../layouts/mainView";
 import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
+import { useSidepaneToggle } from "./AppData/useSidepane";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -23,10 +25,8 @@ import {
   isAndroid,
   isIOS,
   isIPadOS,
+  SIDE_PANE_OPTIONS,
 } from "../common/constants";
-import { ToastManager } from "./Toast/ToastManager";
-import { useSidepaneToggle } from "./AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "../common/constants";
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -42,7 +42,7 @@ const Conference = () => {
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
-  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);
+  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
 
   const toggleControls = e => {
     if (dropdownListRef.current?.length === 0) {

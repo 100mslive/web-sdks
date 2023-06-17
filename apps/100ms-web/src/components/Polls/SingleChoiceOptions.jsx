@@ -1,4 +1,4 @@
-import { Flex, RadioGroup, Text, Progress } from "@100mslive/react-ui";
+import { Flex, Progress, RadioGroup, Text } from "@100mslive/react-ui";
 import { Votes } from "./OptionComponents/Votes";
 
 export const SingleChoiceOptions = ({

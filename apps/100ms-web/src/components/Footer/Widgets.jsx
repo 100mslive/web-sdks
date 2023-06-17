@@ -3,6 +3,7 @@ import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
 import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
 import PollsQuizMenu from "../Polls/PollsQuizMenu";
+import { Voting } from "../Polls/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
@@ -41,6 +42,8 @@ export const Widgets = () => {
           onBack={() => setShowWidgetState("PollsQuizMenu")}
         />
       )}
+
+      {showWidgetState === "voting" && <Voting />}
     </Container>
   );
 };

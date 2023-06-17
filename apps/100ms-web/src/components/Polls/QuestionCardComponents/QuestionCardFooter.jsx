@@ -1,6 +1,11 @@
-import { Flex, Button, Text } from "@100mslive/react-ui";
+import { Button, Flex, Text } from "@100mslive/react-ui";
 
-export const QuestionCardFooter = ({isSkippable, voted, stringAnswerExpected, setVoted}) => {
+export const QuestionCardFooter = ({
+  isSkippable,
+  voted,
+  stringAnswerExpected,
+  setVoted,
+}) => {
   return (
     <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
       {isSkippable && !voted ? (

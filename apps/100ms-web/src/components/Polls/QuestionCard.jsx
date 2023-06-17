@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
-import { Box, Text, Flex, Input } from "@100mslive/react-ui";
-import { QUESTION_TYPE } from "../../common/constants";
-import { SingleChoiceOptions } from "./SingleChoiceOptions";
-import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
+import { Box, Flex, Input, Text } from "@100mslive/react-ui";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
+import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
+import { SingleChoiceOptions } from "./SingleChoiceOptions";
+import { QUESTION_TYPE } from "../../common/constants";
 
 export const QuestionCard = ({
   index,

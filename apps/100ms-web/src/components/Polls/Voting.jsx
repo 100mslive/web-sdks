@@ -1,12 +1,12 @@
 import React from "react";
+import { CrossIcon } from "@100mslive/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
+import { StandardView } from "./Views/StandardView";
+import { TimedView } from "./Views/TimedView";
 import { Container } from "../Streaming/Common";
+import { StatusIndicator } from "./StatusIndicator";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { QUESTION_TYPE, SIDE_PANE_OPTIONS } from "../../common/constants";
-import { CrossIcon } from "@100mslive/react-icons";
-import { StatusIndicator } from "./StatusIndicator";
-import { TimedView } from "./Views/TimedView";
-import { StandardView } from "./Views/StandardView";
 
 export const Voting = () => {
   const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.VOTING);

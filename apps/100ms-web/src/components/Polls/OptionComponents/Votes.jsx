@@ -1,4 +1,4 @@
-import { Avatar, Box, Text, Flex, Tooltip } from "@100mslive/react-ui";
+import { Avatar, Box, Flex, Text, Tooltip } from "@100mslive/react-ui";
 import { VoterList } from "./VoterList";
 
 // Shows number of votes, avatars of voters and list of voters on hover

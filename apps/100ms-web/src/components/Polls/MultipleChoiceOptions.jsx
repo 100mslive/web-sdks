@@ -1,5 +1,5 @@
 import { CheckIcon } from "@100mslive/react-icons";
-import { Flex, Text, Checkbox, Progress } from "@100mslive/react-ui";
+import { Checkbox, Flex, Progress, Text } from "@100mslive/react-ui";
 import { Votes } from "./OptionComponents/Votes";
 
 export const MultipleChoiceOptions = ({
