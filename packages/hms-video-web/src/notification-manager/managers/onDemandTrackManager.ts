@@ -70,7 +70,9 @@ export class OnDemandTrackManager extends TrackManager {
     track.setTrackId(trackInfo.track_id);
     track.peerId = peerId;
     this.addVideoTrack(hmsPeer, track);
-    // remove current track in store and update with the new empty one
+    /** remove current track in store and update with the new empty one, this will ensure that the same
+     *  instance of track is present in store and on the peer.
+     */
     const storeTrack = this.store.getTracks().find(track => track.trackId === trackInfo.track_id);
     if (storeTrack) {
       this.store.removeTrack(storeTrack);
