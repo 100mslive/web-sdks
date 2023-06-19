@@ -29,7 +29,7 @@ const tileShapeMapping = {
   '9-16': '9-16',
 };
 
-const env = process.env.REACT_APP_ENV || 'prod';
+const env = 'prod' || process.env.REACT_APP_ENV;
 export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
 const authTokenEndpointByRoomCode = {
   qa: 'https://auth-nonprod.100ms.live/v2/token',
