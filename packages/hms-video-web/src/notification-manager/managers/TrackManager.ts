@@ -219,8 +219,7 @@ export class TrackManager {
       if (!hmsPeer.videoTrack) {
         hmsPeer.videoTrack = remoteTrack;
       } else {
-        const currentTrack = hmsPeer.videoTrack as HMSRemoteVideoTrack;
-        currentTrack.replaceTrack(remoteTrack);
+        (hmsPeer.videoTrack as HMSRemoteVideoTrack).replaceTrack(remoteTrack);
       }
       this.store.addTrack(hmsPeer.videoTrack);
     } else {
