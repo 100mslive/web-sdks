@@ -67,8 +67,8 @@ export class HMSVideoTrack extends HMSTrack {
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
-      const existingTrackID = srcObject.getVideoTracks()[0]?.id;
-      if (existingTrackID === track.id) {
+      const existingTrack = srcObject.getVideoTracks()[0];
+      if (existingTrack?.id === track.id && !existingTrack?.muted) {
         // it's already attached, attaching again would just cause flickering
         return;
       }
