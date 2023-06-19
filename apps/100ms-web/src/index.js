@@ -1,19 +1,21 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom";
 import { init } from "zipyai";
-import App from "./App";
+import App, { HMSPrebuilt } from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 if (process.env.REACT_APP_ZIPY_KEY) {
   init(process.env.REACT_APP_ZIPY_KEY);
 }
 
-const root = createRoot(document.getElementById("root"));
-root.render(
+ReactDOM.render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById("root")
 );
+
+export { HMSPrebuilt };
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

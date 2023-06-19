@@ -4,6 +4,7 @@ import { CREATE_ROOM_DOC_URL } from "../common/constants";
 
 function ErrorPage({ error }) {
   const themeType = useTheme().themeType;
+  const isSSR = typeof window === "undefined";
   return (
     <Flex
       align="center"
@@ -23,7 +24,7 @@ function ErrorPage({ error }) {
           }
           alt="Error Background"
         />
-        {window.location.hostname === "localhost" ? (
+        {!isSSR && window.location.hostname === "localhost" ? (
           <Flex
             align="center"
             direction="column"

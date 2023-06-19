@@ -39,19 +39,21 @@ import "./index.css";
 const Conference = React.lazy(() => import("./components/conference"));
 
 const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
+const isSSR = typeof window === "undefined";
 
 let appName;
-if (window.location.host.includes("localhost")) {
-  appName = "localhost";
-} else {
-  appName = window.location.host.split(".")[0];
+if (!isSSR) {
+  if (window.location.host.includes("localhost")) {
+    appName = "localhost";
+  } else {
+    appName = window.location.host.split(".")[0];
+  }
+  document.title = `${appName}'s ${document.title}`;
 }
-
-document.title = `${appName}'s ${document.title}`;
 
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
-  const host = process.env.REACT_APP_HOST_NAME || window.location.hostname;
+  const host = process.env.REACT_APP_HOST_NAME;
   const portraitDomains = (
     process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ""
   ).split(",");
@@ -64,7 +66,6 @@ const getAspectRatio = ({ width, height }) => {
 export const HMSPrebuilt = React.forwardRef(
   (
     {
-      tokenEndpoint = defaultTokenEndpoint,
       themeConfig: {
         aspectRatio = "1-1",
         font = "Roboto",
@@ -73,24 +74,30 @@ export const HMSPrebuilt = React.forwardRef(
         logo = "",
         metadata = "",
         recordingUrl = "",
-      },
-      getDetails = () => {},
-      roomId,
-      role,
-      roomCode,
-      showPreview = true,
-      showLeave = true,
+      } = {},
+      getDetails = () => {}, // this should get removed
+      roomId = "",
+      role = "",
+      roomCode = "",
+      options: {
+        userName = "",
+        userId = "",
+        endPoints: {
+          init: initEndpoint = "",
+          tokenByRoomCode = "",
+          tokenByRoomIdRole = defaultTokenEndpoint,
+        } = {},
+      } = {},
       onLeave = () => {},
-      userName,
-      userId,
-      endPoints,
-      authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
     },
     ref
   ) => {
     const { 0: width, 1: height } = aspectRatio
       .split("-")
       .map(el => parseInt(el));
+
+    const [hyderated, setHyderated] = React.useState(false);
+    useEffect(() => setHyderated(true), []);
     useEffect(() => {
       if (!ref) {
         return;
@@ -103,6 +110,15 @@ export const HMSPrebuilt = React.forwardRef(
       };
     }, [ref]);
 
+    const endPoints = {
+      tokenByRoomCode,
+      init: initEndpoint,
+      tokenByRoomIdRole,
+    };
+
+    if (!hyderated) {
+      return null;
+    }
     return (
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
@@ -110,8 +126,8 @@ export const HMSPrebuilt = React.forwardRef(
             roomId,
             role,
             roomCode,
-            showPreview,
-            showLeave,
+            showPreview: true,
+            showLeave: true,
             onLeave,
             userName,
             userId,
@@ -144,9 +160,8 @@ export const HMSPrebuilt = React.forwardRef(
                 appDetails={metadata}
                 recordingUrl={recordingUrl}
                 logo={logo}
-                tokenEndpoint={tokenEndpoint}
+                tokenEndpoint={endPoints.tokenByRoomIdRole}
               />
-
               <Init />
               <Box
                 css={{
@@ -156,7 +171,7 @@ export const HMSPrebuilt = React.forwardRef(
               >
                 <AppRoutes
                   getDetails={getDetails}
-                  authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint}
+                  authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode}
                 />
               </Box>
             </HMSRoomProvider>

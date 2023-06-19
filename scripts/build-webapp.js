@@ -14,7 +14,7 @@ async function main() {
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/App.js';
-  const external = Object.keys(pkg.dependencies || {});
+  const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [

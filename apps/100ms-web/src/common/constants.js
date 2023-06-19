@@ -180,10 +180,11 @@ export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
-export const isIPadOS =
-  navigator?.maxTouchPoints &&
-  navigator?.maxTouchPoints > 2 &&
-  navigator?.userAgent?.match(/Mac/);
+export const isIPadOS = false;
+// typeof navigator !== "undefined" &&
+// navigator?.maxTouchPoints &&
+// navigator?.maxTouchPoints > 2 &&
+// navigator?.userAgent?.match(/Mac/);
 
 export const FEATURE_LIST = {
   AUDIO_ONLY_SCREENSHARE: "audioscreenshare",

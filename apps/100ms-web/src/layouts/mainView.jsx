@@ -31,7 +31,7 @@ import {
 } from "../components/AppData/useUISettings";
 import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
 
-const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
+// const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import("./HLSView"));
 const ActiveSpeakerView = React.lazy(() => import("./ActiveSpeakerView"));
 const PinnedTrackView = React.lazy(() => import("./PinnedTrackView"));
@@ -91,7 +91,7 @@ export const ConferenceMainView = () => {
   } else if (urlToIframe) {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
-    ViewComponent = WhiteboardView;
+    // ViewComponent = WhiteboardView;
   } else if (uiMode === "inset") {
     ViewComponent = InsetView;
   } else if (
