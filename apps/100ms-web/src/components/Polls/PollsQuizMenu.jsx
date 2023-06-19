@@ -1,8 +1,15 @@
 import React, { useState } from "react";
+import { useHMSActions } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
-import { Container, ContentHeader } from "../Streaming/Common";
-const PollsQuizMenu = ({ setInteractionSettings, launchQuestions, onBack }) => {
+import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
+
+const PollsQuizMenu = ({
+  id,
+  setInteractionSettings,
+  launchQuestions,
+  onBack,
+}) => {
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
@@ -28,7 +35,8 @@ const PollsQuizMenu = ({ setInteractionSettings, launchQuestions, onBack }) => {
         </Flex>
         <AddMenu
           interactionType={interactionType}
-          setInteractionSettings={launchQuestions}
+          onCreate={launchQuestions}
+          id={id}
         />
 
         <Flex
@@ -80,48 +88,64 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
     </Flex>
   );
 }
-const pollOptions = [
-  {
-    title: "Hide vote count",
-    onCheckedChange: () => {},
-    key: "hideVoteCount",
-  },
-  {
-    title: "Make Results Anyonmous",
-    onCheckedChange: () => {},
-    key: "makeResultAnynomous",
-  },
-  { title: "Timer", onCheckedChange: () => {}, key: "timer" },
-];
 
-const AddMenu = ({
-  interactionType,
-  interactionSettings,
-  setInteractionSettings,
-}) => {
+const AddMenu = ({ id, interactionType, onCreate }) => {
+  const actions = useHMSActions();
+  const [title, setTitle] = useState("");
+  const [anonymous, setAnonymous] = useState(false);
+  const [error, setError] = useState();
+
   return (
     <Flex direction="column">
       <Text
         variant="body2"
         css={{ mb: "$4" }}
       >{`Name this ${interactionType.toLowerCase()}`}</Text>
-      <Input />
-      {pollOptions.map(option => (
-        <Flex align="center" css={{ mt: "$10" }}>
-          <Switch onCheckedChange={option.onCheckedChange} css={{ mr: "$6" }} />
-          <Text variant="body2" css={{ c: "$textMedEmp" }}>
-            {option.title}
-          </Text>
-        </Flex>
-      ))}
+      <Input
+        type="text"
+        value={title}
+        onChange={event => setTitle(event.target.value)}
+      />
+      <Flex align="center" css={{ mt: "$10" }}>
+        <Switch css={{ mr: "$6" }} />
+        <Text variant="body2" css={{ c: "$textMedEmp" }}>
+          Hide Vote Count
+        </Text>
+      </Flex>
+      <Flex align="center" css={{ mt: "$10" }}>
+        <Switch
+          onCheckedChange={value => setAnonymous(value)}
+          css={{ mr: "$6" }}
+        />
+        <Text variant="body2" css={{ c: "$textMedEmp" }}>
+          Make Results Anonymous
+        </Text>
+      </Flex>
+      <Flex align="center" css={{ mt: "$10" }}>
+        <Switch onCheckedChange={() => {}} css={{ mr: "$6" }} />
+        <Text variant="body2" css={{ c: "$textMedEmp" }}>
+          Timer
+        </Text>
+      </Flex>
 
       <Button
         variant="primary"
         css={{ mt: "$10" }}
-        onClick={setInteractionSettings}
+        onClick={async () => {
+          await actions.interactivityCenter
+            .createPoll({
+              id,
+              title,
+              anonymous,
+              type: interactionType.toLowerCase(),
+            })
+            .then(() => onCreate())
+            .catch(err => setError(err.message));
+        }}
       >
         {`Start ${interactionType}`}
       </Button>
+      <ErrorText error={error} />
     </Flex>
   );
 };

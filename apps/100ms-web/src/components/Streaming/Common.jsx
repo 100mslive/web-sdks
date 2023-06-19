@@ -113,6 +113,7 @@ export const Container = ({ children, rounded = false }) => {
         display: "flex",
         flexDirection: "column",
         borderRadius: rounded ? "$2" : "0",
+        overflowY: "auto",
       }}
     >
       {children}

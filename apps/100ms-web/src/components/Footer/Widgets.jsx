@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
 import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
@@ -8,8 +8,9 @@ import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Widgets = () => {
-  const [showWidgetState, setShowWidgetState] = useState("");
+  const [showWidgetState, setShowWidgetState] = useState("PollsQuizMenu");
   const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
+  const id = useRef(Date.now().toString());
 
   return (
     <Container rounded>
@@ -32,12 +33,14 @@ export const Widgets = () => {
       </Flex>
       {showWidgetState === "PollsQuizMenu" && (
         <PollsQuizMenu
+          id={id.current}
           launchQuestions={() => setShowWidgetState("QuestionMenu")}
           onBack={() => setShowWidgetState("")}
         />
       )}
       {showWidgetState === "QuestionMenu" && (
         <LaunchPollsQuizMenu
+          id={id.current}
           onBack={() => setShowWidgetState("PollsQuizMenu")}
         />
       )}
