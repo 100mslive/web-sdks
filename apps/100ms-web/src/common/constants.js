@@ -209,3 +209,10 @@ export const SESSION_STORE_KEY = {
   PINNED_MESSAGE: "pinnedMessage",
   SPOTLIGHT: "spotlight",
 };
+
+export const QUESTION_TYPE = {
+  SHORT_ANSWER: "Short Answer",
+  LONG_ANSWER: "Long Answer",
+  SINGLE_CHOICE: "Single Choice",
+  MULTIPLE_CHOICE: "Multiple Choice",
+};
