@@ -29,6 +29,7 @@ export interface HMSPollCreateParams
     HMSPoll,
     | 'id'
     | 'title'
+    | 'type'
     | 'duration'
     | 'anonymous'
     | 'visibility'

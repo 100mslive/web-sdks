@@ -16,7 +16,7 @@ import HMSTransport from '../../transport';
 export class InteractivityCenter implements HMSInteractivityCenter {
   constructor(private transport: HMSTransport, private store: IStore) {}
 
-  async startPoll(pollParams: HMSPollCreateParams): Promise<void> {
+  async createPoll(pollParams: HMSPollCreateParams) {
     const { poll_id: serverPollID } = await this.transport.pollInfoSet({
       ...pollParams,
       poll_id: pollParams.id,
@@ -28,18 +28,27 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       pollParams.id = serverPollID;
     }
 
-    if (Array.isArray(pollParams.questions) && pollParams.questions.length > 0) {
-      await this.addQuestionToPoll(pollParams.id, pollParams.questions);
+    if (Array.isArray(pollParams.questions)) {
+      await this.addQuestionsToPoll(pollParams.id, pollParams.questions);
     }
-
-    await this.transport.pollStart({ poll_id: pollParams.id });
   }
 
-  async addQuestionToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void> {
-    await this.transport.pollQuestionsSet({
-      poll_id: pollID,
-      questions: questions.map((question, index) => this.createQuestionSetParams(question, index)),
-    });
+  async startPoll(poll: string | HMSPollCreateParams): Promise<void> {
+    if (typeof poll === 'string') {
+      await this.transport.pollStart({ poll_id: poll });
+    } else {
+      await this.createPoll(poll);
+      await this.transport.pollStart({ poll_id: poll.id });
+    }
+  }
+
+  async addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void> {
+    if (questions.length > 0) {
+      await this.transport.pollQuestionsSet({
+        poll_id: pollID,
+        questions: questions.map((question, index) => this.createQuestionSetParams(question, index)),
+      });
+    }
   }
 
   async stopPoll(pollID: string): Promise<void> {
@@ -71,6 +80,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
     await this.transport.pollResponseSet({ poll_id: pollID, responses: responsesParams });
   }
+
   getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {
     throw new Error('Method not implemented.');
   }
