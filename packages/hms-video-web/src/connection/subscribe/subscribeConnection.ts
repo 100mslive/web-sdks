@@ -166,7 +166,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
           HMSLogger.d(this.TAG, `Track not found ${requestId}`, { request, try: i + 1, error });
           break;
         }
-        HMSLogger.e(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
+        HMSLogger.d(this.TAG, `Failed sending ${requestId}`, { request, try: i + 1, error });
         const shouldRetry = error.code / 100 === 5 || error.code === 429;
         if (!shouldRetry) {
           throw Error(`code=${error.code}, message=${error.message}`);
