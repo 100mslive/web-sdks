@@ -794,6 +794,7 @@ export default class HMSTransport implements ITransport {
         this.subscribeConnection = new HMSSubscribeConnection(
           this.signal,
           this.initConfig.rtcConfiguration,
+          this.isFlagEnabled.bind(this),
           this.subscribeConnectionObserver,
         );
       }
