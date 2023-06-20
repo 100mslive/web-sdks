@@ -2,11 +2,13 @@ import { HMSRoleName } from '../role';
 
 export type HMSPollUserTrackingMode = 'peerID' | 'customerID' | 'userName';
 
+export type HMSPollState = 'created' | 'started' | 'stopped';
+
 // MARK: - Poll
 export interface HMSPoll {
   id: string;
   title: string;
-  state?: 'started' | 'stopped' | 'created';
+  state?: HMSPollState;
   type?: 'poll' | 'quiz';
   duration?: number;
   anonymous?: boolean;

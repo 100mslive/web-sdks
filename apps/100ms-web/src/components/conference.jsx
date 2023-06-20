@@ -9,14 +9,12 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Button, Flex } from "@100mslive/react-ui";
-import { ToastManager } from "./Toast/ToastManager";
+import { Box, Flex } from "@100mslive/react-ui";
 import { ConferenceMainView } from "../layouts/mainView";
 import { Footer } from "./Footer";
 import FullPageProgress from "./FullPageProgress";
 import { Header } from "./Header";
 import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
-import { useSidepaneToggle } from "./AppData/useSidepane";
 import { useIsHeadless } from "./AppData/useUISettings";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -25,7 +23,6 @@ import {
   isAndroid,
   isIOS,
   isIPadOS,
-  SIDE_PANE_OPTIONS,
 } from "../common/constants";
 
 const Conference = () => {

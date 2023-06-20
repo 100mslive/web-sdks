@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+// @ts-check
+import React, { useState } from "react";
 import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
 import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
@@ -6,12 +7,13 @@ import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Voting } from "../Polls/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Widgets = () => {
   const [showWidgetState, setShowWidgetState] = useState("");
   const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
-  const id = useRef(Date.now().toString());
+  const [id, setId] = useSetAppDataByKey("pollInView");
 
   return (
     <Container rounded>
@@ -33,19 +35,21 @@ export const Widgets = () => {
       </Flex>
       {showWidgetState === "PollsQuizMenu" && (
         <PollsQuizMenu
-          id={id.current}
-          launchQuestions={() => setShowWidgetState("QuestionMenu")}
+          selectPoll={newID => {
+            setId(newID);
+            setShowWidgetState("QuestionMenu");
+          }}
           onBack={() => setShowWidgetState("")}
         />
       )}
       {showWidgetState === "QuestionMenu" && (
         <LaunchPollsQuizMenu
-          id={id.current}
+          id={id}
+          onStart={() => setShowWidgetState("voting")}
           onBack={() => setShowWidgetState("PollsQuizMenu")}
         />
       )}
-
-      {showWidgetState === "voting" && <Voting />}
+      {showWidgetState === "voting" && <Voting id={id} />}
     </Container>
   );
 };

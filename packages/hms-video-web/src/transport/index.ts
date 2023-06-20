@@ -42,6 +42,8 @@ import {
   PollInfoGetResponse,
   PollInfoSetParams,
   PollInfoSetResponse,
+  PollListParams,
+  PollListResponse,
   PollQuestionsGetParams,
   PollQuestionsGetResponse,
   PollQuestionsSetParams,
@@ -708,6 +710,10 @@ export default class HMSTransport implements ITransport {
 
   pollResponseSet(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
     return this.signal.pollResponseSet(params);
+  }
+
+  pollList(params: PollListParams): Promise<PollListResponse> {
+    return this.signal.pollList(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

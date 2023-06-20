@@ -45,6 +45,7 @@ export enum HMSTrackUpdate {
 }
 
 export enum HMSPollsUpdate {
+  POLL_LIST,
   POLL_STARTED,
   POLL_STOPPED,
   POLL_STATS_UPDATED,

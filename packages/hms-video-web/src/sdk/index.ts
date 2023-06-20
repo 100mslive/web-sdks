@@ -43,7 +43,7 @@ import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
-import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import { HMSAudioListener, HMSPollsUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -465,6 +465,8 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
+      const polls = await this.interactivityCenter.getPolls();
+      this.listener.onPollsUpdate(HMSPollsUpdate.POLL_LIST, polls);
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
     } catch (error) {

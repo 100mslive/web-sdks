@@ -3,6 +3,7 @@ import {
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
+  HMSPollState,
 } from '../../interfaces';
 
 export interface PollInfoParams {
@@ -16,7 +17,7 @@ export interface PollInfoParams {
   mode?: string; // polling mode, userid, peerid, username, default: userid
   vote?: string[]; // list of roles who can vote, default: null
   responses?: string[]; // list of roles who can itreate over all responses. default: null
-  state?: 'created' | 'started' | 'stopped';
+  state?: HMSPollState;
   created_by?: string;
   started_by?: string;
   stopped_by?: string;
@@ -97,4 +98,15 @@ export interface PollResponseSetResponse {
       description: string;
     };
   }[];
+}
+
+export interface PollListParams {
+  state?: HMSPollState;
+  count?: number;
+  start?: string;
+}
+
+export interface PollListResponse {
+  last: string;
+  polls: PollInfoParams[];
 }

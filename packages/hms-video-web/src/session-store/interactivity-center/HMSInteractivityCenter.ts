@@ -81,6 +81,11 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     await this.transport.pollResponseSet({ poll_id: pollID, responses: responsesParams });
   }
 
+  async getPolls(): Promise<HMSPoll[]> {
+    const { polls } = await this.transport.pollList({ count: 50 });
+    return polls.map(poll => ({ ...poll, id: poll.poll_id, mode: poll.mode as HMSPoll['mode'] }));
+  }
+
   getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {
     throw new Error('Method not implemented.');
   }
