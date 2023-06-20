@@ -136,7 +136,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     const id = uuid();
     if (message.method === 'prefer-video-track-state') {
       const isUnsubscribeFlagEnabled = this.isFlagEnabled(InitFlags.FLAG_VIDEO_TRACK_UNSUBSCRIBE);
-      if (isUnsubscribeFlagEnabled && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
+      if (!isUnsubscribeFlagEnabled && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
         return { id } as PreferLayerResponse;
       }
     }
