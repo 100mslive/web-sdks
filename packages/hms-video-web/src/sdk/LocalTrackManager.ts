@@ -273,7 +273,7 @@ export class LocalTrackManager {
       blankCanvas = document.createElement('canvas');
       blankCanvas.width = width;
       blankCanvas.height = height;
-      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
+      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
     }
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
@@ -282,6 +282,7 @@ export class LocalTrackManager {
       intervalID = setInterval(() => {
         if (emptyTrack.readyState === 'ended') {
           clearInterval(intervalID);
+          intervalID = undefined;
           return;
         }
         const ctx = blankCanvas.getContext('2d');
@@ -292,6 +293,7 @@ export class LocalTrackManager {
     }
     emptyTrack.addEventListener('ended', () => {
       clearInterval(intervalID);
+      intervalID = undefined;
     });
     emptyTrack.enabled = false;
     return emptyTrack;
