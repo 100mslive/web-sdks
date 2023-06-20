@@ -228,7 +228,8 @@ export class TrackManager {
         hmsPeer.auxiliaryTracks.push(remoteTrack);
         this.store.addTrack(remoteTrack);
       } else {
-        hmsPeer.auxiliaryTracks.splice(index, 1, remoteTrack);
+        (hmsPeer.auxiliaryTracks[index] as HMSRemoteVideoTrack).replaceTrack(remoteTrack);
+        this.store.addTrack(hmsPeer.auxiliaryTracks[index]);
       }
     }
     HMSLogger.d(this.TAG, 'video track added', `${track}`);
