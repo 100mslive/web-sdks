@@ -1,14 +1,23 @@
+// @ts-check
+import React from "react";
 import { QuestionCard } from "../QuestionCard";
 
-export const StandardView = ({ questions }) => {
-  return questions.map((question, index) => (
+/**
+ *
+ * @param {{poll: import("@100mslive/react-sdk").HMSPoll}} param0
+ * @returns
+ */
+export const StandardView = ({ poll }) => {
+  return poll.questions?.map((question, index) => (
     <QuestionCard
-      key={`${question}-${index}`}
-      index={index}
-      question={question.question}
-      questionType={question.questionType}
-      totalCount={questions.length}
+      pollID={poll.id}
+      key={`${question.text}-${index}`}
+      index={question.index}
+      text={question.text}
+      type={question.type}
+      totalCount={poll.questions?.length || 0}
       options={question.options}
+      skippable={question?.skippable}
     />
   ));
 };

@@ -1,32 +1,54 @@
-import { useEffect, useState } from "react";
+// @ts-check
+import React, { useCallback, useEffect, useState } from "react";
+import { useHMSActions } from "@100mslive/react-sdk";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import { Box, Flex, Input, Text } from "@100mslive/react-ui";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
-import { QUESTION_TYPE } from "../../common/constants";
 
 export const QuestionCard = ({
+  pollID,
   index,
   totalCount,
-  questionType,
-  question,
+  type,
+  text,
   options = [],
   setCurrentIndex = () => {},
-  isSkippable = false,
+  skippable = false,
   isTimed = false,
 }) => {
+  const actions = useHMSActions();
   const [voted, setVoted] = useState(false);
   const leftNavigationEnabled = index !== 0;
   const rightNavigationEnabled =
-    index !== totalCount - 1 && (isSkippable || voted);
+    index !== totalCount - 1 && (skippable || voted);
+  const [textAnswer, setTextAnswer] = useState("");
+  const [singleOptionAnswer, setSingleOptionAnswer] = useState();
+  const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
 
-  const stringAnswerExpected = [
-    QUESTION_TYPE.LONG_ANSWER,
-    QUESTION_TYPE.SHORT_ANSWER,
-  ].includes(questionType);
+  const stringAnswerExpected = ["long-answer", "short-answer"].includes(type);
 
   useEffect(() => setVoted(false), [index]);
+
+  const handleVote = useCallback(async () => {
+    await actions.interactivityCenter.addResponsesToPoll(pollID, [
+      {
+        questionIndex: index,
+        text: textAnswer,
+        option: singleOptionAnswer,
+        options: Array.from(multipleOptionAnswer).sort(),
+      },
+    ]);
+    setVoted(true);
+  }, [
+    actions,
+    index,
+    pollID,
+    textAnswer,
+    singleOptionAnswer,
+    multipleOptionAnswer,
+  ]);
 
   return (
     <Box
@@ -42,7 +64,7 @@ export const QuestionCard = ({
           variant="caption"
           css={{ color: "$textDisabled", fontWeight: "$semiBold" }}
         >
-          QUESTION {index + 1} OF {totalCount}: {questionType.toUpperCase()}
+          QUESTION {index} OF {totalCount}: {type.toUpperCase()}
         </Text>
 
         {isTimed ? (
@@ -84,13 +106,14 @@ export const QuestionCard = ({
       </Flex>
 
       <Box css={{ my: "$md" }}>
-        <Text css={{ color: "$textHighEmp" }}>{question}</Text>
+        <Text css={{ color: "$textHighEmp" }}>{text}</Text>
       </Box>
 
       {stringAnswerExpected ? (
         <Input
           disabled={voted}
           placeholder="Enter your answer"
+          onChange={e => setTextAnswer(e.target.value)}
           css={{
             w: "100%",
             backgroundColor: "$surfaceLighter",
@@ -101,19 +124,28 @@ export const QuestionCard = ({
         />
       ) : null}
 
-      {questionType === QUESTION_TYPE.SINGLE_CHOICE ? (
-        <SingleChoiceOptions voted={voted} options={options} />
+      {type === "single-choice" ? (
+        <SingleChoiceOptions
+          voted={voted}
+          options={options}
+          setAnswer={setSingleOptionAnswer}
+        />
       ) : null}
 
-      {questionType === QUESTION_TYPE.MULTIPLE_CHOICE ? (
-        <MultipleChoiceOptions voted={voted} options={options} />
+      {type === "multiple-choice" ? (
+        <MultipleChoiceOptions
+          voted={voted}
+          options={options}
+          selectedOptions={multipleOptionAnswer}
+          setSelectedOptions={setMultipleOptionAnswer}
+        />
       ) : null}
 
       <QuestionCardFooter
-        isSkippable={isSkippable}
+        skippable={skippable}
         voted={voted}
         stringAnswerExpected={stringAnswerExpected}
-        setVoted={setVoted}
+        handleVote={handleVote}
       />
     </Box>
   );

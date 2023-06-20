@@ -1,3 +1,4 @@
+// @ts-check
 import React, { useRef, useState } from "react";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
@@ -13,13 +14,7 @@ import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-
-const QuestionType = {
-  "single-choice": "Single Choice",
-  "multiple-choice": "Multiple Choice",
-  "short-answer": "Short Answer",
-  "long-answer": "Long Answer",
-};
+import { POLL_QUESTION_TYPE } from "../../common/constants";
 
 const isValidQuestion = ({ text, type, options }) => {
   if (!text) {
@@ -33,7 +28,7 @@ const isValidQuestion = ({ text, type, options }) => {
   }
 };
 
-export function LaunchPollsQuizMenu({ id, onBack }) {
+export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
   const [questions, setQuestions] = useState([{}]);
   const actions = useHMSActions();
 
@@ -49,6 +44,7 @@ export function LaunchPollsQuizMenu({ id, onBack }) {
         }))
     );
     await actions.interactivityCenter.startPoll(id);
+    onStart();
   };
 
   return (
@@ -114,7 +110,7 @@ const SavedQuestion = ({ question, index, length }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
-        Question {index + 1} of {length}: {QuestionType[question.type]}
+        Question {index + 1} of {length}: {POLL_QUESTION_TYPE[question.type]}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
         {question.text}
@@ -149,7 +145,7 @@ const QuestionForm = ({ question, index, length, onSave }) => {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <DialogDropdownTrigger
           ref={ref}
-          title={QuestionType[type]}
+          title={POLL_QUESTION_TYPE[type]}
           open={open}
         />
         <Dropdown.Portal>
@@ -158,7 +154,7 @@ const QuestionForm = ({ question, index, length, onSave }) => {
             sideOffset={8}
             css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
           >
-            {Object.keys(QuestionType).map(value => {
+            {Object.keys(POLL_QUESTION_TYPE).map(value => {
               return (
                 <Dropdown.Item
                   key={value}
@@ -168,7 +164,7 @@ const QuestionForm = ({ question, index, length, onSave }) => {
                     bg: type === value ? selectionBg : undefined,
                   }}
                 >
-                  {QuestionType[value]}
+                  {POLL_QUESTION_TYPE[value]}
                 </Dropdown.Item>
               );
             })}

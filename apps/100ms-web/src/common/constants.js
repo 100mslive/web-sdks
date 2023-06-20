@@ -134,6 +134,7 @@ export const APP_DATA = {
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
   pdfConfig: "pdfConfig",
+  pollInView: "pollInView",
 };
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
@@ -210,9 +211,9 @@ export const SESSION_STORE_KEY = {
   SPOTLIGHT: "spotlight",
 };
 
-export const QUESTION_TYPE = {
-  SHORT_ANSWER: "Short Answer",
-  LONG_ANSWER: "Long Answer",
-  SINGLE_CHOICE: "Single Choice",
-  MULTIPLE_CHOICE: "Multiple Choice",
+export const POLL_QUESTION_TYPE = {
+  "single-choice": "Single Choice",
+  "multiple-choice": "Multiple Choice",
+  "short-answer": "Short Answer",
+  "long-answer": "Long Answer",
 };

@@ -99,7 +99,7 @@ export interface HMSPollQuestionResponse {
   type?: HMSPollQuestionType; // private property
   skipped?: boolean;
   option?: number;
-  options?: [number];
+  options?: number[];
   text?: string;
   update?: boolean; // SDK Needs to track wether we previously answered and set accordingly
   duration?: number; // Time it took to answer the question for leaderboard

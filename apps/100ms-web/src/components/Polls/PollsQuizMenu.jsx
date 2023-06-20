@@ -1,10 +1,11 @@
+// @ts-check
 import React, { useState } from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
+import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
 
-const PollsQuizMenu = ({ id, launchQuestions, onBack }) => {
+const PollsQuizMenu = ({ onCreate, onVote, onBack }) => {
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
@@ -28,11 +29,7 @@ const PollsQuizMenu = ({ id, launchQuestions, onBack }) => {
             />
           ))}
         </Flex>
-        <AddMenu
-          interactionType={interactionType}
-          onCreate={launchQuestions}
-          id={id}
-        />
+        <AddMenu interactionType={interactionType} onCreate={onCreate} />
 
         <Flex
           css={{
@@ -41,7 +38,7 @@ const PollsQuizMenu = ({ id, launchQuestions, onBack }) => {
             pt: "$10",
           }}
         >
-          <PrevMenu />
+          <PrevMenu onVote={onVote} />
         </Flex>
       </Flex>
     </Container>
@@ -84,7 +81,7 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
   );
 }
 
-const AddMenu = ({ id, interactionType, onCreate }) => {
+const AddMenu = ({ interactionType, onCreate }) => {
   const actions = useHMSActions();
   const [title, setTitle] = useState("");
   const [anonymous, setAnonymous] = useState(false);
@@ -127,6 +124,7 @@ const AddMenu = ({ id, interactionType, onCreate }) => {
         variant="primary"
         css={{ mt: "$10" }}
         onClick={async () => {
+          const id = Date.now().toString();
           await actions.interactivityCenter
             .createPoll({
               id,
@@ -134,7 +132,7 @@ const AddMenu = ({ id, interactionType, onCreate }) => {
               anonymous,
               type: interactionType.toLowerCase(),
             })
-            .then(() => onCreate())
+            .then(() => onCreate(id))
             .catch(err => setError(err.message));
         }}
       >
@@ -145,33 +143,50 @@ const AddMenu = ({ id, interactionType, onCreate }) => {
   );
 };
 
-const PrevMenu = ({ interactions }) => {
+const PrevMenu = ({ onVote }) => {
+  const polls = useHMSStore(selectPolls);
   return (
     <Flex direction="column">
       <Text variant="h6" css={{ c: "$textHighEmp" }}>
         Previous Polls/Quiz
       </Text>
-      {interactions?.map(interaction => (
-        <InteractionCard {...interaction} />
+      {polls?.map(poll => (
+        <InteractionCard {...poll} onVote={onVote} />
       ))}
     </Flex>
   );
 };
 
-const InteractionCard = ({ title, active, timeLeft, onClick, css }) => {
+const InteractionCard = ({ id, title, state, onVote }) => {
+  const ended = state === "stopped";
   return (
     <Flex direction="column">
-      <Flex css={{ w: "100%" }}>
+      <Flex css={{ w: "100%", justifyContent: "space-between" }}>
         <Text
           variant="sub1"
           css={{ mt: "$md", c: "$textHighEmp", fontWeight: "$semiBold" }}
         >
           {title}
         </Text>
+        {/* <Text
+          css={{
+            bg: ended ? "$surfaceLighter" : "$error",
+            p: "$2 $4",
+            fontWeight: "$semiBold",
+            fontSize: "$xs",
+            r: "$1",
+          }}
+        >
+          {ended ? "ENDED" : "LIVE"}
+        </Text> */}
       </Flex>
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
-        {active ? <Button variant="standard">View results</Button> : null}
-        <Button variant="primary">View</Button>
+        <Button variant="standard">View results</Button>
+        {!ended && (
+          <Button variant="primary" onClick={() => onVote(id)}>
+            View
+          </Button>
+        )}
       </Flex>
     </Flex>
   );

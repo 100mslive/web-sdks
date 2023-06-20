@@ -1,29 +1,40 @@
+// @ts-check
+import React from "react";
 import { CheckIcon } from "@100mslive/react-icons";
-import { Checkbox, Flex, Progress, Text } from "@100mslive/react-ui";
-import { Votes } from "./OptionComponents/Votes";
+import { Checkbox, Flex, Text } from "@100mslive/react-ui";
+// import { Votes } from "./OptionComponents/Votes";
 
 export const MultipleChoiceOptions = ({
-  options = [
-    { text: "A", voters: ["Alex Kar", "San France", "Rachel"] },
-    { text: "B", voters: ["Boris Johnson", "James Franco"] },
-    { text: "C", voters: [] },
-  ],
+  options,
   voted,
+  selectedOptions,
+  setSelectedOptions,
 }) => {
-  const totalVotes = 5;
+  const handleCheckedChange = (checked, index) => {
+    const newSelected = new Set(selectedOptions);
+    if (checked) {
+      newSelected.add(index);
+    } else {
+      newSelected.delete(index);
+    }
+    setSelectedOptions(newSelected);
+  };
 
   return (
     <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
-      {options.map((option, index) => {
-        const progressValue = (100 * option.voters.length) / totalVotes;
+      {options.map(option => {
+        // const progressValue = (100 * option.voters.length) / totalVotes;
         return (
           <Flex
             align="center"
-            key={`${option.text}-${index}`}
+            key={`${option.text}-${option.index}`}
             css={{ w: "100%", gap: "$9" }}
           >
             <Checkbox.Root
               disabled={voted}
+              onCheckedChange={checked =>
+                handleCheckedChange(checked, option.index)
+              }
               css={{
                 cursor: voted ? "not-allowed" : "pointer",
               }}
@@ -38,9 +49,9 @@ export const MultipleChoiceOptions = ({
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   {option.text}
                 </Text>
-                {voted ? <Votes voters={option.voters || []} /> : ""}
+                {/* {voted ? <Votes voters={option.voters || []} /> : ""} */}
               </Flex>
-              {voted ? (
+              {/* {voted ? (
                 <Progress.Root value={progressValue}>
                   <Progress.Content
                     style={{
@@ -48,7 +59,7 @@ export const MultipleChoiceOptions = ({
                     }}
                   />
                 </Progress.Root>
-              ) : null}
+              ) : null} */}
             </Flex>
           </Flex>
         );

@@ -35,9 +35,13 @@ export const Widgets = () => {
       </Flex>
       {showWidgetState === "PollsQuizMenu" && (
         <PollsQuizMenu
-          selectPoll={newID => {
+          onCreate={newID => {
             setId(newID);
             setShowWidgetState("QuestionMenu");
+          }}
+          onVote={newID => {
+            setId(newID);
+            setShowWidgetState("voting");
           }}
           onBack={() => setShowWidgetState("")}
         />

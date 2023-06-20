@@ -1,22 +1,14 @@
-import { Flex, Progress, RadioGroup, Text } from "@100mslive/react-ui";
-import { Votes } from "./OptionComponents/Votes";
+import { Flex, RadioGroup, Text } from "@100mslive/react-ui";
+// import { Votes } from "./OptionComponents/Votes";
 
-export const SingleChoiceOptions = ({
-  options = [
-    { text: "A", voters: ["Alex Kar", "San France", "Rachel"] },
-    { text: "B", voters: ["Boris Johnson", "James Franco"] },
-    { text: "C", voters: [] },
-  ],
-  voted,
-}) => {
-  const totalVotes = 5;
+export const SingleChoiceOptions = ({ options, voted, setAnswer }) => {
   return (
-    <RadioGroup.Root>
+    <RadioGroup.Root onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
-        {options.map((option, index) => (
+        {options.map(option => (
           <Flex
             align="center"
-            key={`${option.text}-${index}`}
+            key={`${option.text}-${option.index}`}
             css={{ w: "100%", gap: "$9" }}
           >
             <RadioGroup.Item
@@ -26,7 +18,7 @@ export const SingleChoiceOptions = ({
                 cursor: voted ? "not-allowed" : "pointer",
               }}
               disabled={voted}
-              value={option.text}
+              value={option.index}
             >
               <RadioGroup.Indicator />
             </RadioGroup.Item>
@@ -36,10 +28,10 @@ export const SingleChoiceOptions = ({
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   {option.text}
                 </Text>
-                {voted ? <Votes voters={option.voters || []} /> : ""}
+                {/* {voted ? <Votes voters={option.voters || []} /> : ""} */}
               </Flex>
 
-              {voted ? (
+              {/* {voted ? (
                 <Progress.Root value={progressValue}>
                   <Progress.Content
                     style={{
@@ -47,7 +39,7 @@ export const SingleChoiceOptions = ({
                     }}
                   />
                 </Progress.Root>
-              ) : null}
+              ) : null} */}
             </Flex>
           </Flex>
         ))}
