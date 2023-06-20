@@ -137,6 +137,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
     if (message.method === 'prefer-video-track-state') {
       const disableAutoUnsubscribe = this.isFlagEnabled(InitFlags.FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE);
       if (disableAutoUnsubscribe && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
+        HMSLogger.d(this.TAG, 'video auto unsubscribe is disabled, request is ignored');
         return { id } as PreferLayerResponse;
       }
     }
