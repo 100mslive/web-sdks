@@ -35,6 +35,7 @@ const defaultSettings = {
 };
 
 let blankCanvas: HTMLCanvasElement;
+let intervalID: ReturnType<typeof setInterval> | undefined;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -267,30 +268,32 @@ export class LocalTrackManager {
   static getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
     const width = prevTrack?.getSettings()?.width || 320;
     const height = prevTrack?.getSettings()?.height || 240;
-    const frameRate = 10; // fps TODO: experiment, see if this can be reduced
+    const frameRate = 1; // fps TODO: experiment, see if this can be reduced
     if (!blankCanvas) {
       blankCanvas = document.createElement('canvas');
       blankCanvas.width = width;
       blankCanvas.height = height;
-      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
+      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
     }
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
-    const intervalID = setInterval(() => {
-      if (emptyTrack.readyState === 'ended') {
-        clearInterval(intervalID);
-        return;
-      }
-      const ctx = blankCanvas.getContext('2d');
-      if (ctx) {
-        const pixel = ctx.getImageData(0, 0, 1, 1).data;
-        const red = pixel[0] === 0 ? 1 : 0; // toggle red in pixel
-        ctx.fillStyle = `rgb(${red}, 0, 0)`;
-        ctx.fillRect(0, 0, 1, 1);
-      }
-    }, 1000 / frameRate);
+
+    if (!intervalID) {
+      intervalID = setInterval(() => {
+        if (emptyTrack.readyState === 'ended') {
+          clearInterval(intervalID);
+          intervalID = undefined;
+          return;
+        }
+        const ctx = blankCanvas.getContext('2d');
+        if (ctx) {
+          ctx.fillRect(0, 0, width, height);
+        }
+      }, 1000 / frameRate);
+    }
     emptyTrack.addEventListener('ended', () => {
       clearInterval(intervalID);
+      intervalID = undefined;
     });
     emptyTrack.enabled = false;
     return emptyTrack;
