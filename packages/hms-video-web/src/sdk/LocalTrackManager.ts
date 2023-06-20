@@ -286,10 +286,7 @@ export class LocalTrackManager {
         }
         const ctx = blankCanvas.getContext('2d');
         if (ctx) {
-          const pixel = ctx.getImageData(0, 0, 1, 1).data;
-          const red = pixel[0] === 0 ? 1 : 0; // toggle red in pixel
-          ctx.fillStyle = `rgb(${red}, 0, 0)`;
-          ctx.fillRect(0, 0, 1, 1);
+          ctx.fillRect(0, 0, width, height);
         }
       }, 1000 / frameRate);
     }
