@@ -60,7 +60,48 @@ export class PollsManager {
     this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STARTED, polls);
   }
 
-  private handlePollStop(_notification: PollStopNotification) {}
+  private handlePollStop(notification: PollStopNotification) {
+    const stoppedPolls: HMSPoll[] = [];
+    notification.polls.forEach(poll => {
+      const savedPoll = this.store.getPoll(poll.poll_id);
+      if (savedPoll) {
+        savedPoll.state = 'stopped';
+        savedPoll.stoppedAt = convertDateNumToDate(poll.stopped_at);
+        savedPoll.stoppedBy = poll.stopped_by;
+        stoppedPolls.push(savedPoll);
+      }
+    });
 
-  private handlePollStats(_notification: PollStatsNotification) {}
+    if (stoppedPolls.length > 0) {
+      this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STOPPED, stoppedPolls);
+    }
+  }
+
+  private handlePollStats(notification: PollStatsNotification) {
+    const updatedPolls: HMSPoll[] = [];
+    notification.polls.forEach(updatedPoll => {
+      const savedPoll = this.store.getPoll(updatedPoll.poll_id);
+      if (!savedPoll) {
+        return;
+      }
+      updatedPoll.questions.forEach(updatedQuestion => {
+        const savedQuestion = savedPoll.questions?.find(question => question.index === updatedQuestion.question);
+        if (!savedQuestion) {
+          return;
+        }
+
+        updatedQuestion.options.forEach((updatedVoteCount, index) => {
+          const savedOption = savedQuestion.options?.[index];
+          if (savedOption && savedOption.voteCount !== updatedVoteCount) {
+            savedOption.voteCount = updatedVoteCount;
+            updatedPolls.push(savedPoll);
+          }
+        });
+      });
+    });
+
+    if (updatedPolls.length > 0) {
+      this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, updatedPolls);
+    }
+  }
 }

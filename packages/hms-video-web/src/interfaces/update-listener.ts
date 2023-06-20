@@ -45,10 +45,9 @@ export enum HMSTrackUpdate {
 }
 
 export enum HMSPollsUpdate {
-  POLL_CREATED = 'pollCreated',
-  POLL_STARTED = 'pollStarted',
-  POLL_STOPPED = 'pollStopped',
-  POLL_STATS_UPDATED = 'pollStatsUpdated',
+  POLL_STARTED,
+  POLL_STOPPED,
+  POLL_STATS_UPDATED,
 }
 
 export interface HMSAudioListener {

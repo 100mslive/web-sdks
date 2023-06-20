@@ -17,6 +17,7 @@ import { ReconnectNotifications } from "./ReconnectNotifications";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { TrackNotifications } from "./TrackNotifications";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
+import { useSidepaneToggle } from "../AppData/useSidepane";
 import {
   useHLSViewerRole,
   useIsHeadless,
@@ -24,6 +25,7 @@ import {
 } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
+import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -31,6 +33,7 @@ export function Notifications() {
   const HLS_VIEWER_ROLE = useHLSViewerRole();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
+  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
 
   useEffect(() => {
     if (!notification) {
@@ -155,6 +158,26 @@ export function Notifications() {
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
           title: notification.message,
+        });
+        break;
+
+      case HMSNotificationTypes.POLL_STARTED:
+        ToastManager.addToast({
+          title: `A poll was started: ${notification.data.title}`,
+          action: (
+            <Button
+              onClick={toggleVoting}
+              variant="standard"
+              css={{
+                backgroundColor: "$surfaceLight",
+                fontWeight: "$semiBold",
+                color: "$textHighEmp",
+                p: "$xs $md",
+              }}
+            >
+              Vote
+            </Button>
+          ),
         });
         break;
       default:

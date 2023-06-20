@@ -21,3 +21,11 @@ export const TRACK_NOTIFICATION_TYPES: TrackNotificationMap = {
   [sdkTypes.HMSTrackUpdate.TRACK_RESTORED]: HMSNotificationTypes.TRACK_RESTORED,
   [sdkTypes.HMSTrackUpdate.TRACK_DESCRIPTION_CHANGED]: HMSNotificationTypes.TRACK_DESCRIPTION_CHANGED,
 };
+
+type PollNotificationMap = { [key in sdkTypes.HMSPollsUpdate]: HMSNotificationTypes };
+
+export const POLL_NOTIFICATION_TYPES: PollNotificationMap = {
+  [sdkTypes.HMSPollsUpdate.POLL_STARTED]: HMSNotificationTypes.POLL_STARTED,
+  [sdkTypes.HMSPollsUpdate.POLL_STOPPED]: HMSNotificationTypes.POLL_STOPPED,
+  [sdkTypes.HMSPollsUpdate.POLL_STATS_UPDATED]: HMSNotificationTypes.POLL_STOPPED,
+};

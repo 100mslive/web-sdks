@@ -22,7 +22,7 @@ import {
   HMSVideoTrack as SDKHMSVideoTrack,
   SessionStoreUpdate,
 } from '@100mslive/hms-video';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
@@ -828,14 +828,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
   }
 
-  private onPollsUpdate(actionType: string, polls: sdkTypes.HMSPoll[]) {
+  private onPollsUpdate(actionType: sdkTypes.HMSPollsUpdate, polls: sdkTypes.HMSPoll[]) {
+    const actionName = POLL_NOTIFICATION_TYPES[actionType];
     this.setState(draftStore => {
       const pollsObject = polls.reduce((acc, poll) => {
         acc[poll.id] = poll;
         return acc;
       }, {} as { [key: string]: sdkTypes.HMSPoll });
       mergeNewPollsInDraft(draftStore.polls, pollsObject);
-    }, actionType);
+    }, actionName);
+
+    polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {

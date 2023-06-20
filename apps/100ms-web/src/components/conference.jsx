@@ -42,7 +42,6 @@ const Conference = () => {
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
-  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
 
   const toggleControls = e => {
     if (dropdownListRef.current?.length === 0) {
@@ -90,26 +89,6 @@ const Conference = () => {
       hmsActions.ignoreMessageTypes(["chat", EMOJI_REACTION_TYPE]);
     }
   }, [isHeadless, hmsActions]);
-
-  useEffect(() => {
-    ToastManager.addToast({
-      title: "Tyler has started a poll",
-      action: (
-        <Button
-          onClick={toggleVoting}
-          variant="standard"
-          css={{
-            backgroundColor: "$surfaceLight",
-            fontWeight: "$semiBold",
-            color: "$textHighEmp",
-            p: "$xs $md",
-          }}
-        >
-          Vote
-        </Button>
-      ),
-    });
-  }, []);
 
   if (!isConnectedToRoom) {
     return <FullPageProgress />;

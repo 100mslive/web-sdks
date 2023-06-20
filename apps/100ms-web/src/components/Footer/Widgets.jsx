@@ -9,7 +9,7 @@ import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export const Widgets = () => {
-  const [showWidgetState, setShowWidgetState] = useState("PollsQuizMenu");
+  const [showWidgetState, setShowWidgetState] = useState("");
   const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
   const id = useRef(Date.now().toString());
 
@@ -28,7 +28,6 @@ export const Widgets = () => {
             Icon={<QuizIcon width={40} height={40} />}
             subtitle="Find out what others think"
             onClick={() => setShowWidgetState("PollsQuizMenu")}
-            launchQuestions={() => setShowWidgetState("QuestionMenu")}
           />
         </Flex>
       </Flex>

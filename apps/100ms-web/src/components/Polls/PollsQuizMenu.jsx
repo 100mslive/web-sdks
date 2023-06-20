@@ -4,12 +4,7 @@ import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
 
-const PollsQuizMenu = ({
-  id,
-  setInteractionSettings,
-  launchQuestions,
-  onBack,
-}) => {
+const PollsQuizMenu = ({ id, launchQuestions, onBack }) => {
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
