@@ -6,6 +6,7 @@ export const layerToIntMapping = {
   [HMSSimulcastLayer.MEDIUM]: 1,
   [HMSSimulcastLayer.HIGH]: 2,
 };
+const DELTA_THRESHOLD = 0.5;
 
 /**
  * Given the simulcast layers and the current video element dimensions, this function finds the
@@ -21,7 +22,6 @@ export const getClosestLayer = (
   const maxDimension = videoElementDimensions.width > videoElementDimensions.height ? 'width' : 'height';
   const layers = [...simulcastLayers].sort((a, b) => layerToIntMapping[a.layer] - layerToIntMapping[b.layer]);
   const videoDimesion = videoElementDimensions[maxDimension] * (window?.devicePixelRatio || 1);
-  let diff = Number.POSITIVE_INFINITY;
   for (let i = 0; i < layers.length; i++) {
     const { resolution, layer } = layers[i];
     const layerDimension = resolution[maxDimension];
@@ -30,10 +30,14 @@ export const getClosestLayer = (
       closestLayer = layer;
       break;
     } else {
-      const dimensionDiff = Math.abs(videoDimesion - layerDimension);
-      if (dimensionDiff < diff) {
-        diff = dimensionDiff;
+      const nextLayer = layers[i + 1];
+      const nextLayerDimension = nextLayer ? nextLayer.resolution[maxDimension] : Number.POSITIVE_INFINITY;
+      // calculating which layer this dimension is closer to
+      const proximityPercent = (videoDimesion - layerDimension) / (nextLayerDimension - layerDimension);
+      if (proximityPercent < DELTA_THRESHOLD) {
+        // the element's dimension is closer to the current layer
         closestLayer = layer;
+        break;
       }
     }
   }
