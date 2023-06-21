@@ -108,7 +108,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   implements IHMSActions<T>
 {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
-  private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
@@ -378,7 +377,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const hmsPeer = this.hmsSDKPeers[peerID];
+    const hmsPeer = this.getSDKHMSPeer(peerID);
+    if (!hmsPeer) {
+      HMSLogger.w('sendMessage', 'Failed to send message');
+      throw Error(`sendMessage Failed - peer ${peerID} not found`);
+    }
     const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
@@ -506,7 +509,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
-    const peer = this.hmsSDKPeers[forPeerId];
+    const peer = this.getSDKHMSPeer(forPeerId);
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
       return;
@@ -516,7 +519,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
-    const peer = this.hmsSDKPeers[forPeerId];
+    const peer = this.getSDKHMSPeer(forPeerId);
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
       return;
@@ -533,7 +536,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   // TODO: separate out role related things in another file
   async acceptChangeRole(request: HMSRoleChangeRequest) {
     const sdkPeer: sdkTypes.HMSPeer | undefined = request.requestedBy
-      ? this.hmsSDKPeers[request.requestedBy.id]
+      ? this.getSDKHMSPeer(request.requestedBy.id)
       : undefined;
     if (!sdkPeer) {
       HMSLogger.w(`peer for which role change is requested no longer available - ${request.requestedBy}`);
@@ -603,7 +606,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async removePeer(peerID: string, reason: string) {
-    const peer = this.hmsSDKPeers[peerID];
+    const peer = this.getSDKHMSPeer(peerID);
     if (peer && !peer.isLocal) {
       await this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
     } else {
@@ -776,8 +779,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
+      const sdkLocalPeer = this.sdk.getLocalPeer();
+      if (localPeer?.id && sdkLocalPeer) {
+        Object.assign(store.settings, this.getMediaSettings(sdkLocalPeer));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -878,7 +882,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
-      this.hmsSDKPeers[hmsPeer.id] = sdkPeer;
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (const sdkTrack of sdkTracks) {
@@ -933,7 +936,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.roomState = HMSRoomState.Preview;
     }, 'previewStart');
     this.syncRoomState('previewSync');
@@ -955,7 +958,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     );
     this.syncRoomState('joinSync');
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
@@ -974,7 +977,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(room));
+      Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
   }
 
@@ -1448,6 +1451,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       });
     }, actionName);
   }
+
+  private getSDKHMSPeer = (peerID: HMSPeerID) => {
+    return this.sdk.getPeerMap()[peerID];
+  };
 
   /**
    * setState is separate so any future changes to how state change can be done from one place.

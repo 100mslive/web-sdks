@@ -43,9 +43,9 @@
     "webpack-manifest-plugin": "^4.1.1"
   },
   "scripts": {
-    "lint": "lerna run lint --stream",
-    "lint:fix": "lerna run lint:fix --stream",
-    "format": "lerna run format --stream",
+    "lint": "lerna run lint --parallel",
+    "lint:fix": "lerna run lint:fix --parallel",
+    "format": "lerna run format --parallel",
     "test": "yarn build --no-private && lerna run test --stream",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream --ignore 100ms_edtech_template",

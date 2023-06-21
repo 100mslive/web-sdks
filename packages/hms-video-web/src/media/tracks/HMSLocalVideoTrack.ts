@@ -1,7 +1,8 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -15,7 +16,7 @@ import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import HMSLocalStream from '../streams/HMSLocalStream';
+import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -351,7 +352,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      const track = await this.replaceTrackWith(settings);
+      await this.replaceSender(track, this.enabled);
+      this.nativeTrack = track;
+      this.videoHandler.updateSinks();
     }
   };
 

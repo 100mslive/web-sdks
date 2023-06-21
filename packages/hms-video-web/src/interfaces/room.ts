@@ -1,6 +1,5 @@
 import { ServerError } from './internal';
 import { HMSException } from '../error/HMSException';
-import { HMSLocalPeer, HMSPeer } from '../sdk/models/peer';
 
 export interface HMSRoom {
   id: string;
@@ -8,8 +7,6 @@ export interface HMSRoom {
   sessionId?: string;
   joinedAt?: Date;
   startedAt?: Date;
-  localPeer: HMSLocalPeer;
-  peers: HMSPeer[];
   recording: HMSRecording;
   rtmp: HMSRTMP;
   hls: HMSHLS;

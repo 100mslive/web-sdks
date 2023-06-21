@@ -1,4 +1,4 @@
-import { HMSNotificationTypes } from '../../schema';
+import { HMSNotificationTypes } from '../../schema/notification';
 import * as sdkTypes from '../sdkTypes';
 
 type PeerNotificationMap = { [key in sdkTypes.HMSPeerUpdate]?: HMSNotificationTypes };

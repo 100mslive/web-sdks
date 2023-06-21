@@ -1,9 +1,10 @@
 import EventEmitter from 'eventemitter2';
 import { v4 as uuid } from 'uuid';
 import ISubscribeConnectionObserver from './ISubscribeConnectionObserver';
-import HMSRemoteStream from '../../media/streams/HMSRemoteStream';
+import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
+import { InitFlags } from '../../signal/init/models';
 import { ISignal } from '../../signal/ISignal';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
@@ -106,7 +107,12 @@ export default class HMSSubscribeConnection extends HMSConnection {
     };
   }
 
-  constructor(signal: ISignal, config: RTCConfiguration, observer: ISubscribeConnectionObserver) {
+  constructor(
+    signal: ISignal,
+    config: RTCConfiguration,
+    private isFlagEnabled: (flag: InitFlags) => boolean,
+    observer: ISubscribeConnectionObserver,
+  ) {
     super(HMSConnectionRole.Subscribe, signal);
     this.observer = observer;
 
@@ -128,6 +134,13 @@ export default class HMSSubscribeConnection extends HMSConnection {
     requestId?: string,
   ): Promise<PreferLayerResponse> {
     const id = uuid();
+    if (message.method === 'prefer-video-track-state') {
+      const disableAutoUnsubscribe = this.isFlagEnabled(InitFlags.FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE);
+      if (disableAutoUnsubscribe && message.params.max_spatial_layer === HMSSimulcastLayer.NONE) {
+        HMSLogger.d(this.TAG, 'video auto unsubscribe is disabled, request is ignored');
+        return { id } as PreferLayerResponse;
+      }
+    }
     const request = JSON.stringify({
       id: requestId || id,
       jsonrpc: '2.0',
