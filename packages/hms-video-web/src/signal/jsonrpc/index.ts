@@ -225,6 +225,7 @@ export default class JsonRpcSignal implements ISignal {
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
     simulcast: boolean,
+    onDemandTracks: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit> {
     if (!this.isConnected) {
@@ -233,7 +234,15 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to send join over WS connection',
       );
     }
-    const params = { name, disableVidAutoSub, data, offer, server_sub_degrade: serverSubDegrade, simulcast };
+    const params = {
+      name,
+      disableVidAutoSub,
+      data,
+      offer,
+      server_sub_degrade: serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+    };
     const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;

@@ -132,7 +132,7 @@ export class PlaylistManager
   getVolume(type: HMSPlaylistType = HMSPlaylistType.audio): number {
     const element = this.getElement(type);
     if (element) {
-      return element.volume * 100;
+      return Math.floor(element.volume * 100);
     }
     return 0;
   }

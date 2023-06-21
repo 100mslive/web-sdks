@@ -54,7 +54,8 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, NotificationManager, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
+import { NotificationManager } from '../notification-manager/NotificationManager';
 import { PlaylistManager } from '../playlist-manager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
@@ -87,7 +88,7 @@ export class HMSSdk implements HMSInterface {
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
   private store!: IStore;
-  private notificationManager!: NotificationManager;
+  private notificationManager?: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
   private playlistManager!: PlaylistManager;
@@ -105,12 +106,24 @@ export class HMSSdk implements HMSInterface {
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
 
+  private initNotificationManager() {
+    if (!this.notificationManager) {
+      this.notificationManager = new NotificationManager(
+        this.store,
+        this.eventBus,
+        this.transport!,
+        this.listener,
+        this.audioListener,
+      );
+    }
+  }
+
   private initStoreAndManagers() {
     if (this.sdkState.isInitialised) {
       /**
        * Set listener after both join and preview, since they can have different listeners
        */
-      this.notificationManager.setListener(this.listener);
+      this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
       return;
     }
@@ -141,13 +154,6 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
-    );
-    this.notificationManager = new NotificationManager(
-      this.store,
-      this.eventBus,
-      this.transport,
-      this.listener,
-      this.audioListener,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store);
@@ -238,15 +244,19 @@ export class HMSSdk implements HMSInterface {
         default:
       }
 
-      this.notificationManager.handleNotification(message, this.sdkState.isReconnecting);
+      this.notificationManager?.handleNotification(message, this.sdkState.isReconnecting);
+    },
+
+    onConnected: () => {
+      this.initNotificationManager();
     },
 
     onTrackAdd: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleTrackAdd(track);
+      this.notificationManager?.handleTrackAdd(track);
     },
 
     onTrackRemove: (track: HMSRemoteTrack) => {
-      this.notificationManager.handleTrackRemove(track);
+      this.notificationManager?.handleTrackRemove(track);
     },
 
     onFailure: (exception: HMSException) => {
@@ -269,6 +279,7 @@ export class HMSSdk implements HMSInterface {
       switch (state) {
         case TransportState.Preview:
         case TransportState.Joined:
+          this.initNotificationManager();
           if (this.transportState === TransportState.Reconnecting) {
             this.listener?.onReconnected();
           }
@@ -449,7 +460,6 @@ export class HMSSdk implements HMSInterface {
     );
     this.eventBus.localRoleUpdate.subscribe(this.handleLocalRoleUpdate);
 
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
     HMSLogger.d(this.TAG, `⏳ Joining room ${roomId}`);
 
     HMSLogger.time(`join-room-${roomId}`);
@@ -495,6 +505,7 @@ export class HMSSdk implements HMSInterface {
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     this.wakeLockManager?.cleanup();
+    this.notificationManager = undefined;
     HMSLogger.cleanUp();
     this.sdkState = { ...INITIAL_STATE };
     /**
@@ -519,7 +530,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private async internalLeave(notifyServer = true, error?: HMSException) {
-    const room = this.store.getRoom();
+    const room = this.store?.getRoom();
     if (room) {
       const roomId = room.id;
       this.networkTestManager?.stop();
@@ -742,11 +753,11 @@ export class HMSSdk implements HMSInterface {
 
   addAudioListener(audioListener: HMSAudioListener) {
     this.audioListener = audioListener;
-    this.notificationManager.setAudioListener(audioListener);
+    this.notificationManager?.setAudioListener(audioListener);
   }
 
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener) {
-    this.notificationManager.setConnectionQualityListener(qualityListener);
+    this.notificationManager?.setConnectionQualityListener(qualityListener);
   }
 
   async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
@@ -844,13 +855,13 @@ export class HMSSdk implements HMSInterface {
   async changeName(name: string) {
     this.validateJoined('changeName');
     await this.transport?.changeName(name);
-    this.notificationManager.updateLocalPeer({ name });
+    this.notificationManager?.updateLocalPeer({ name });
   }
 
   async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
     await this.transport?.changeMetadata(metadata);
-    this.notificationManager.updateLocalPeer({ metadata });
+    this.notificationManager?.updateLocalPeer({ metadata });
   }
 
   async setSessionMetadata(metadata: any) {
@@ -1065,7 +1076,6 @@ export class HMSSdk implements HMSInterface {
     /** set after config since we need config to get env for user agent */
     this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
-    HMSLogger.d(this.TAG, 'SDK Store', this.store);
   }
 
   /**
@@ -1177,10 +1187,10 @@ export class HMSSdk implements HMSInterface {
         );
       }
       tracks.push(audioTrack);
-      audioTrack.nativeTrack.onended = handleEnded;
+      audioTrack.nativeTrack.addEventListener('ended', handleEnded);
     } else {
       tracks.push(videoTrack);
-      videoTrack.nativeTrack.onended = handleEnded;
+      videoTrack.nativeTrack.addEventListener('ended', handleEnded);
       // audio track is not always available
       if (audioTrack) {
         tracks.push(audioTrack);

@@ -1,6 +1,9 @@
 import { FAKE_PEER_ID, fakeMessage, fakePeer, fakePeerList, fakeReconnectPeerList, fakeSpeakerList } from './fixtures';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import { NotificationManager } from './NotificationManager';
+import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
+import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
+import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
 import HMSRoom from '../sdk/models/HMSRoom';
@@ -50,6 +53,45 @@ beforeEach(() => {
   sessionStoreUpdateHandler = jest.fn();
   pollsUpdateHandler = jest.fn();
   eventBus = new EventBus();
+  const mockMediaStream = {
+    id: 'native-stream-id',
+    getVideoTracks: jest.fn(() => [
+      {
+        id: 'video-id',
+        kind: 'video',
+        getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })),
+        addEventListener: jest.fn(() => {}),
+      },
+    ]),
+    getAudioTracks: jest.fn(() => [
+      {
+        id: 'audio-id',
+        kind: 'audio',
+        getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })),
+        addEventListener: jest.fn(() => {}),
+      },
+    ]),
+    addTrack: jest.fn(() => {}),
+  };
+  global.MediaStream = jest.fn().mockImplementation(() => mockMediaStream);
+  // @ts-ignore
+  global.HTMLCanvasElement.prototype.captureStream = jest.fn().mockImplementation(() => mockMediaStream);
+
+  transport = new HMSTransport(
+    {
+      onNotification: jest.fn(),
+      onTrackAdd: jest.fn(),
+      onTrackRemove: jest.fn(),
+      onFailure: jest.fn(),
+      onStateChange: jest.fn(),
+      onConnected: jest.fn(),
+    },
+    new DeviceManager(store, eventBus),
+    store,
+    eventBus,
+    new AnalyticsEventsService(store),
+    new AnalyticsTimer(),
+  );
   store.setRoom(new HMSRoom('1234'));
 
   listener = {

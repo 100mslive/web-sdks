@@ -1,6 +1,7 @@
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
+import { OnDemandTrackManager } from './managers/onDemandTrackManager';
 import { PeerListManager } from './managers/PeerListManager';
 import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
@@ -21,6 +22,7 @@ import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
+import { InitFlags } from '../signal/init/models';
 import HMSTransport from '../transport';
 import HMSLogger from '../utils/logger';
 
@@ -52,7 +54,11 @@ export class NotificationManager {
     private audioListener?: HMSAudioListener,
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
-    this.trackManager = new TrackManager(this.store, eventBus, this.listener);
+    const isOnDemandTracksEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    this.trackManager = isOnDemandTracksEnabled
+      ? new OnDemandTrackManager(this.store, eventBus, this.transport, this.listener)
+      : new TrackManager(this.store, eventBus, this.listener);
+
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
