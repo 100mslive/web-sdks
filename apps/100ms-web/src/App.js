@@ -73,7 +73,7 @@ export function EdtechComponent({
   },
   policyConfig = envPolicyConfig,
   getDetails = () => {},
-  authTokenByRoomCodeEndpoint = "",
+  authTokenByRoomCodeEndpoint = "https://auth-nonprod.100ms.live/v2/token",
 }) {
   const { 0: width, 1: height } = aspectRatio
     .split("-")
