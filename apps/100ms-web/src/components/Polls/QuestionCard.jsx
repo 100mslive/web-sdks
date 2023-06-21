@@ -6,6 +6,19 @@ import { Box, Flex, Input, Text } from "@100mslive/react-ui";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
+import { QUESTION_TYPE } from "../../common/constants";
+import { styled } from "@100mslive/react-ui";
+
+const TextArea = styled("textarea", {
+  backgroundColor: "$surfaceLighter",
+  border: "1px solid $borderLight",
+  borderRadius: "$1",
+  mb: "$md",
+  color: "$textHighEmp",
+  resize: "none",
+  p: "$2",
+  w: "100%",
+});
 
 export const QuestionCard = ({
   pollID,
@@ -27,7 +40,10 @@ export const QuestionCard = ({
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
 
-  const stringAnswerExpected = ["long-answer", "short-answer"].includes(type);
+  const stringAnswerExpected = [
+    QUESTION_TYPE.LONG_ANSWER,
+    QUESTION_TYPE.SHORT_ANSWER,
+  ].includes(type);
 
   useEffect(() => setVoted(false), [index]);
 
@@ -109,7 +125,7 @@ export const QuestionCard = ({
         <Text css={{ color: "$textHighEmp" }}>{text}</Text>
       </Box>
 
-      {stringAnswerExpected ? (
+      {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
           disabled={voted}
           placeholder="Enter your answer"
@@ -124,7 +140,15 @@ export const QuestionCard = ({
         />
       ) : null}
 
-      {type === "single-choice" ? (
+      {type === QUESTION_TYPE.LONG_ANSWER ? (
+        <TextArea
+          disabled={voted}
+          placeholder="Enter your answer"
+          onChange={e => setTextAnswer(e.target.value)}
+        />
+      ) : null}
+
+      {type === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions
           voted={voted}
           options={options}
@@ -132,7 +156,7 @@ export const QuestionCard = ({
         />
       ) : null}
 
-      {type === "multiple-choice" ? (
+      {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <MultipleChoiceOptions
           voted={voted}
           options={options}

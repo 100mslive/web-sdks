@@ -24,7 +24,7 @@ export const Widgets = () => {
             return <WidgetCard {...card} />;
           })}
         </Flex>
-        <Flex direction="column">
+        <Flex direction="column" css={{ py: "$12" }}>
           <WidgetOptions
             title="Poll/Quiz"
             Icon={<QuizIcon width={40} height={40} />}
@@ -73,7 +73,7 @@ const cardData = [
   },
 ];
 
-const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
+const WidgetCard = ({ title, subtitle, imageSrc, onClick, css = {} }) => {
   return (
     <Flex
       direction="column"
@@ -99,7 +99,9 @@ const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
     <Flex
       onClick={onClick}
       key={title}
-      css={{ cursor: "pointer", "&:hover": { bg: "$surfaceLight", r: "$0" } }}
+      css={{
+        cursor: "pointer",
+      }}
       align="center"
     >
       <Flex

@@ -14,14 +14,18 @@ import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import { POLL_QUESTION_TYPE } from "../../common/constants";
+import { POLL_QUESTION_TYPE, QUESTION_TYPE } from "../../common/constants";
+import { isEqual } from "lodash";
 
 const isValidQuestion = ({ text, type, options }) => {
   if (!text) {
     return false;
   }
 
-  if (type === "single-choice" || type === "multiple-choice") {
+  if (
+    type === QUESTION_TYPE.SINGLE_CHOICE ||
+    type === QUESTION_TYPE.MULTIPLE_CHOICE
+  ) {
     return options.every(option => option && option.length > 0);
   } else {
     return true;
@@ -63,6 +67,13 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
                 newQuestions[index] = questionParams;
                 setQuestions(newQuestions);
               }}
+              removeQuestion={() =>
+                setQuestions(prev =>
+                  prev.filter(
+                    questionFromSet => !isEqual(question, questionFromSet)
+                  )
+                )
+              }
             />
           ))}
         </Flex>
@@ -84,7 +95,7 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
   );
 }
 
-const QuestionCard = ({ question, onSave, index, length }) => {
+const QuestionCard = ({ question, onSave, index, length, removeQuestion }) => {
   return (
     <Flex
       direction="column"
@@ -95,6 +106,7 @@ const QuestionCard = ({ question, onSave, index, length }) => {
       ) : (
         <QuestionForm
           question={question}
+          removeQuestion={removeQuestion}
           onSave={params => {
             onSave(params);
           }}
@@ -110,7 +122,8 @@ const SavedQuestion = ({ question, index, length }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
-        Question {index + 1} of {length}: {POLL_QUESTION_TYPE[question.type]}
+        Question {index + 1} of {length}:{" "}
+        {POLL_QUESTION_TYPE[question.type].replace("-", " ")}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
         {question.text}
@@ -124,15 +137,17 @@ const SavedQuestion = ({ question, index, length }) => {
   );
 };
 
-const QuestionForm = ({ question, index, length, onSave }) => {
+const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
   const ref = useRef(null);
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [type, setType] = useState(question.type || "single-choice");
+  const [type, setType] = useState(
+    question.type || QUESTION_TYPE.SINGLE_CHOICE
+  );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState(question.options || [""]);
+  const [options, setOptions] = useState(question.options || ["", ""]);
 
   return (
     <>
@@ -223,10 +238,24 @@ const QuestionForm = ({ question, index, length, onSave }) => {
       </Flex>
       <ErrorDialog
         open={openDelete}
-        setOpen={setOpenDelete}
-        title="Delete Question"
+        onOpenChange={setOpenDelete}
+        title="Delete question?"
       >
         <Text>Are you sure you want to delete this question?</Text>
+        <Flex justify="end" align="end" gap="2" css={{ w: "100%", mt: "$10" }}>
+          <Button variant="standard" onClick={() => setOpenDelete(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              removeQuestion();
+              setOpenDelete(false);
+            }}
+          >
+            Delete
+          </Button>
+        </Flex>
       </ErrorDialog>
     </>
   );

@@ -55,7 +55,7 @@ export const StreamCard = ({
   );
 };
 
-export const ContentHeader = ({ onBack, title, content }) => {
+export const ContentHeader = ({ onBack, title = "", content }) => {
   return (
     <Flex css={{ w: "100%", py: "$8", px: "$10", cursor: "pointer" }}>
       {onBack ? (

@@ -219,3 +219,10 @@ export const POLL_QUESTION_TYPE = {
   "short-answer": "Short Answer",
   "long-answer": "Long Answer",
 };
+
+export const QUESTION_TYPE = {
+  SINGLE_CHOICE: "single-choice",
+  MULTIPLE_CHOICE: "multiple-choice",
+  SHORT_ANSWER: "short-answer",
+  LONG_ANSWER: "long-answer",
+};
