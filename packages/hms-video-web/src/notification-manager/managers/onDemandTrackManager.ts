@@ -27,8 +27,8 @@ export class OnDemandTrackManager extends TrackManager {
   }
 
   handleTrackRemove(track: HMSRemoteTrack) {
-    const removed = super.handleTrackRemove(track);
-    if (removed && track.source === 'regular') {
+    super.handleTrackRemove(track);
+    if (track.type === 'video' && track.source === 'regular') {
       this.processTrackInfo(
         {
           track_id: track.trackId,
@@ -38,9 +38,9 @@ export class OnDemandTrackManager extends TrackManager {
           stream_id: track.stream.id,
         } as TrackState,
         track.peerId!,
+        false,
       );
     }
-    return removed;
   }
 
   /**
