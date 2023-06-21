@@ -169,7 +169,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
+    const newLayer = !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
@@ -184,6 +184,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
 
   private async requestLayer(layer: HMSSimulcastLayer, source: string) {
     try {
+      console.trace('requestLayer', layer);
       const response = await (this.stream as HMSRemoteStream).setVideoLayer(
         layer,
         this.trackId,
