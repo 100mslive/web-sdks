@@ -233,7 +233,7 @@ const App = () => {
           <HMSEdtechTemplate
             tokenEndpoint={`${apiBasePath + hostname}/`}
             themeConfig={{
-              aspectRatio: settings.tile_shape,
+              aspectRatio: "4-3" || settings.tile_shape,
               font: settings.font,
               color: settings.brand_color,
               theme: settings.theme,
