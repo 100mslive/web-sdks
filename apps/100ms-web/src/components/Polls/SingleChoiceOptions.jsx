@@ -24,7 +24,7 @@ export const SingleChoiceOptions = ({ options, voted, setAnswer }) => {
                 cursor: voted ? "not-allowed" : "pointer",
                 '&[data-state="checked"]': {
                   borderColor: "$primaryLight",
-                  borderWidth: "1px",
+                  borderWidth: "2px",
                 },
               }}
               disabled={voted}
@@ -32,8 +32,8 @@ export const SingleChoiceOptions = ({ options, voted, setAnswer }) => {
             >
               <RadioGroup.Indicator
                 css={{
-                  h: "70%",
-                  w: "70%",
+                  h: "80%",
+                  w: "80%",
                   background: "$primaryLight",
                   borderRadius: "$round",
                 }}

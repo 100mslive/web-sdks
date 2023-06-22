@@ -4,6 +4,7 @@ import { isEqual } from "lodash";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
+  Box,
   Button,
   Dropdown,
   Flex,
@@ -151,7 +152,10 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
 
   return (
     <>
-      <Text variant="overline" css={{ c: "$textDisabled" }}>
+      <Text
+        variant="overline"
+        css={{ c: "$textDisabled", textTransform: "uppercase" }}
+      >
         Question {index + 1} of {length}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
@@ -222,10 +226,16 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
           </Flex>
         </>
       ) : null}
-      <Flex justify="between" css={{ my: "$xs" }}>
-        <IconButton onClick={() => setOpenDelete(!open)}>
-          <TrashIcon />
-        </IconButton>
+      <Flex justify="between" align="center" css={{ mt: "$12" }}>
+        <Box
+          css={{
+            color: "$textMedEmp",
+            cursor: "pointer",
+            "&:hover": { color: "$textHighEmp" },
+          }}
+        >
+          <TrashIcon onClick={() => setOpenDelete(!open)} />
+        </Box>
         <Button
           variant="standard"
           disabled={!isValidQuestion({ text, type, options })}
