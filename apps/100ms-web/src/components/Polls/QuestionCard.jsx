@@ -2,12 +2,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
-import { Box, Flex, Input, Text } from "@100mslive/react-ui";
+import { Box, Flex, Input, styled, Text } from "@100mslive/react-ui";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
 import { QUESTION_TYPE } from "../../common/constants";
-import { styled } from "@100mslive/react-ui";
 
 const TextArea = styled("textarea", {
   backgroundColor: "$surfaceLighter",

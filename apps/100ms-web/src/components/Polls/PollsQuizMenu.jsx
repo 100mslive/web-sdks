@@ -145,16 +145,16 @@ const AddMenu = ({ interactionType, onCreate }) => {
 
 const PrevMenu = ({ onVote }) => {
   const polls = useHMSStore(selectPolls);
-  return (
+  return polls?.length ? (
     <Flex direction="column">
       <Text variant="h6" css={{ c: "$textHighEmp" }}>
         Previous Polls/Quiz
       </Text>
-      {polls?.map(poll => (
+      {polls.map(poll => (
         <InteractionCard {...poll} onVote={onVote} />
       ))}
     </Flex>
-  );
+  ) : null;
 };
 
 const InteractionCard = ({ id, title, state, onVote }) => {

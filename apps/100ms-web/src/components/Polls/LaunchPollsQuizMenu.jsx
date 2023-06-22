@@ -1,5 +1,6 @@
 // @ts-check
 import React, { useRef, useState } from "react";
+import { isEqual } from "lodash";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
@@ -15,7 +16,6 @@ import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
 import { POLL_QUESTION_TYPE, QUESTION_TYPE } from "../../common/constants";
-import { isEqual } from "lodash";
 
 const isValidQuestion = ({ text, type, options }) => {
   if (!text) {

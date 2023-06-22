@@ -73,26 +73,27 @@ const cardData = [
   },
 ];
 
-const WidgetCard = ({ title, subtitle, imageSrc, onClick, css = {} }) => {
-  return (
-    <Flex
-      direction="column"
-      css={{ cursor: "pointer", w: "100%", ...css }}
-      onClick={onClick}
-      key={title}
-    >
-      <Flex>
-        <img src={imageSrc} alt={`${imageSrc}-polls`} />
-      </Flex>
-      <Text variant="sub2" css={{ mt: "$md", c: "$textHighEmp" }}>
-        {title}
-      </Text>
-      <Text variant="caption" css={{ c: "$textMedEmp", mt: "$2" }}>
-        {subtitle}
-      </Text>
+const WidgetCard = ({ title, subtitle, imageSrc, onClick, css = {} }) => (
+  <Flex
+    direction="column"
+    css={{ cursor: "pointer", w: "100%", ...css }}
+    onClick={onClick}
+    key={title}
+  >
+    <Flex>
+      <img src={imageSrc} alt={`${imageSrc}-polls`} />
     </Flex>
-  );
-};
+    <Text
+      variant="sm"
+      css={{ mt: "$md", c: "$textHighEmp", fontWeight: "$semiBold" }}
+    >
+      {title}
+    </Text>
+    <Text variant="caption" css={{ c: "$textMedEmp", mt: "$2" }}>
+      {subtitle}
+    </Text>
+  </Flex>
+);
 
 const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
   return (
