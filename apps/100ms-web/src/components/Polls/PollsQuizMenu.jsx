@@ -195,6 +195,7 @@ const AddMenu = ({ interactionType, onCreate }) => {
 
       <Button
         variant="primary"
+        disabled={!title}
         css={{ mt: "$10" }}
         onClick={async () => {
           const id = Date.now().toString();
