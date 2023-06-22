@@ -67,11 +67,16 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
           ))}
         </Flex>
         <Flex
-          css={{ c: "$textDisabled", my: "$sm", cursor: "pointer" }}
+          css={{
+            c: "$textDisabled",
+            my: "$sm",
+            cursor: "pointer",
+            "&:hover": { c: "$textMedEmp" },
+          }}
           onClick={() => setQuestions([...questions, {}])}
         >
           <AddCircleIcon />
-          <Text variant="body1" css={{ ml: "$md", c: "$textDisabled" }}>
+          <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
             Add another question
           </Text>
         </Flex>
@@ -195,12 +200,21 @@ const QuestionForm = ({ question, index, length, onSave }) => {
               }}
             />
           ))}
-          <Flex css={{ c: "$textMedEmp", cursor: "pointer" }}>
+          <Flex
+            css={{
+              c: "$textMedEmp",
+              cursor: "pointer",
+              "&:hover": { c: "$textHighEmp" },
+            }}
+            onClick={() => setOptions([...options, ""])}
+          >
             <AddCircleIcon />
             <Text
               variant="body1"
-              css={{ ml: "$9", c: "$textMedEmp" }}
-              onClick={() => setOptions([...options, ""])}
+              css={{
+                ml: "$9",
+                c: "inherit",
+              }}
             >
               Add Option
             </Text>
@@ -223,7 +237,7 @@ const QuestionForm = ({ question, index, length, onSave }) => {
       </Flex>
       <ErrorDialog
         open={openDelete}
-        setOpen={setOpenDelete}
+        onOpenChange={setOpenDelete}
         title="Delete Question"
       >
         <Text>Are you sure you want to delete this question?</Text>

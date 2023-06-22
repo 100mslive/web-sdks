@@ -19,7 +19,7 @@ export const Widgets = () => {
     <Container rounded>
       <ContentHeader content="Widgets" onBack={closeWidgets} />
       <Flex direction="column" css={{ p: "$10" }}>
-        <Flex>
+        <Flex css={{ gap: "$10", mb: "$12" }}>
           {cardData.map(card => {
             return <WidgetCard {...card} />;
           })}
@@ -62,13 +62,13 @@ const cardData = [
   {
     title: "Share Music",
     subtitle: "Play music from Spotify or any other tab",
-    imageSrc: "",
+    imageSrc: "/audio.png",
     onClick: () => {},
   },
   {
     title: "Whiteboard",
     subtitle: "Collaboratively sketch ideas",
-    imageSrc: "",
+    imageSrc: "/whiteboard.png",
     onClick: () => {},
   },
 ];
@@ -77,12 +77,21 @@ const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
   return (
     <Flex
       direction="column"
-      css={{ cursor: "pointer", w: "100%", ...css }}
+      css={{
+        cursor: "pointer",
+        w: "100%",
+        "&:hover": { opacity: 0.7, r: "$0" },
+        ...css,
+      }}
       onClick={onClick}
       key={title}
     >
-      <Flex>
-        <img src={imageSrc} alt={`${imageSrc}-polls`} />
+      <Flex css={{ border: "$space$px solid $borderLight", r: "$0" }}>
+        <img
+          src={imageSrc}
+          alt={`${imageSrc}-polls`}
+          style={{ borderRadius: "4px" }}
+        />
       </Flex>
       <Text variant="sub2" css={{ mt: "$md", c: "$textHighEmp" }}>
         {title}
@@ -99,7 +108,7 @@ const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
     <Flex
       onClick={onClick}
       key={title}
-      css={{ cursor: "pointer", "&:hover": { bg: "$surfaceLight", r: "$0" } }}
+      css={{ cursor: "pointer", "&:hover": { opacity: 0.7, r: "$0" } }}
       align="center"
     >
       <Flex

@@ -1,9 +1,18 @@
 // @ts-check
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
-import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
+import {
+  Button,
+  Dropdown,
+  Flex,
+  Input,
+  Switch,
+  Text,
+} from "@100mslive/react-ui";
+import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
+import { useDropdownSelection } from "../hooks/useDropdownSelection";
 
 const PollsQuizMenu = ({ onCreate, onVote, onBack }) => {
   const [interactionType, setInteractionType] = useState(
@@ -81,11 +90,28 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
   );
 }
 
+const timerSettings = {
+  10: "10 secs",
+  15: "15 secs",
+  20: "20 secs",
+  25: "25 secs",
+  30: "30 secs",
+  60: "1 min",
+  120: "2 mins",
+  300: "5 mins",
+};
+
 const AddMenu = ({ interactionType, onCreate }) => {
   const actions = useHMSActions();
+
+  const selectionBg = useDropdownSelection();
   const [title, setTitle] = useState("");
   const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState();
+  const [timer, setTimer] = useState(10);
+  const [showTimerDropDown, setShowTimerDropDown] = useState(false);
+  const [timerDropdownToggle, setTimerDropdownToggle] = useState(false);
+  const timerDropdownRef = useRef();
 
   return (
     <Flex direction="column">
@@ -113,11 +139,58 @@ const AddMenu = ({ interactionType, onCreate }) => {
           Make Results Anonymous
         </Text>
       </Flex>
-      <Flex align="center" css={{ mt: "$10" }}>
-        <Switch onCheckedChange={() => {}} css={{ mr: "$6" }} />
-        <Text variant="body2" css={{ c: "$textMedEmp" }}>
-          Timer
-        </Text>
+      <Flex justify="between" align="center" css={{ mt: "$10" }}>
+        <Flex align="center">
+          <Switch
+            checked={showTimerDropDown}
+            onCheckedChange={setShowTimerDropDown}
+            css={{ mr: "$6" }}
+          />
+          <Text variant="body2" css={{ c: "$textMedEmp" }}>
+            Timer
+          </Text>
+        </Flex>
+        <Flex align="center">
+          {showTimerDropDown ? (
+            <Dropdown.Root
+              open={timerDropdownToggle}
+              onOpenChange={setTimerDropdownToggle}
+            >
+              <DialogDropdownTrigger
+                ref={timerDropdownRef}
+                title={timerSettings[timer]}
+                open={timerDropdownToggle}
+                titleCss={{ c: "$textHighEmp", ml: "$md" }}
+              />
+              <Dropdown.Portal>
+                <Dropdown.Content
+                  align="start"
+                  sideOffset={8}
+                  css={{
+                    w: timerDropdownRef.current?.clientWidth,
+                    zIndex: 1000,
+                  }}
+                >
+                  {Object.keys(timerSettings).map(value => {
+                    const val = parseInt(value);
+                    return (
+                      <Dropdown.Item
+                        key={value}
+                        onSelect={() => setTimer(val)}
+                        css={{
+                          px: "$9",
+                          bg: timer === val ? selectionBg : undefined,
+                        }}
+                      >
+                        {timerSettings[val]}
+                      </Dropdown.Item>
+                    );
+                  })}
+                </Dropdown.Content>
+              </Dropdown.Portal>
+            </Dropdown.Root>
+          ) : null}
+        </Flex>
       </Flex>
 
       <Button
