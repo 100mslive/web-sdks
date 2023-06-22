@@ -19,7 +19,7 @@ export const Widgets = () => {
     <Container rounded>
       <ContentHeader content="Widgets" onBack={closeWidgets} />
       <Flex direction="column" css={{ p: "$10" }}>
-        <Flex>
+        <Flex css={{ gap: "$10" }}>
           {cardData.map(card => {
             return <WidgetCard {...card} />;
           })}
@@ -62,13 +62,13 @@ const cardData = [
   {
     title: "Share Music",
     subtitle: "Play music from Spotify or any other tab",
-    imageSrc: "",
+    imageSrc: "/audio-sharing.png",
     onClick: () => {},
   },
   {
     title: "Whiteboard",
     subtitle: "Collaboratively sketch ideas",
-    imageSrc: "",
+    imageSrc: "/audio-sharing.png",
     onClick: () => {},
   },
 ];

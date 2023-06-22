@@ -240,13 +240,23 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
         open={openDelete}
         onOpenChange={setOpenDelete}
         title="Delete question?"
+        css={{ w: "$80", p: "$10", backgroundColor: "#201617" }}
       >
-        <Text>Are you sure you want to delete this question?</Text>
-        <Flex justify="end" align="end" gap="2" css={{ w: "100%", mt: "$10" }}>
-          <Button variant="standard" onClick={() => setOpenDelete(false)}>
+        <Text variant="sm" css={{ color: "$textMedEmp" }}>
+          Are you sure you want to delete this question? This action cannot be
+          undone.
+        </Text>
+        <Flex css={{ w: "100%", mt: "$12", gap: "$md" }}>
+          <Button
+            variant="standard"
+            outlined
+            onClick={() => setOpenDelete(false)}
+            css={{ w: "100%", fontSize: "$md", fontWeight: "$semiBold" }}
+          >
             Cancel
           </Button>
           <Button
+            css={{ w: "100%", fontSize: "$md", fontWeight: "$semiBold" }}
             variant="danger"
             onClick={() => {
               removeQuestion();
