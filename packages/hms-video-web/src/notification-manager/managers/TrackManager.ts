@@ -1,13 +1,13 @@
-import {VideoTrackLayerUpdate} from '../../connection/channel-messages';
-import {EventBus} from '../../events/EventBus';
-import {HMSPeer, HMSTrackUpdate, HMSUpdateListener} from '../../interfaces';
-import {HMSRemoteStream} from '../../media/streams';
-import {HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType, RtcTrack} from '../../media/tracks';
-import {LocalTrackManager} from '../../sdk/LocalTrackManager';
-import {IStore} from '../../sdk/store';
+import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
+import { EventBus } from '../../events/EventBus';
+import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSRemoteStream } from '../../media/streams';
+import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType, RtcTrack } from '../../media/tracks';
+import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
-import {isEmptyTrack} from '../../utils/track';
+import { isEmptyTrack } from '../../utils/track';
 import {
   OnPipeAllocateNotification,
   OnTrackLayerUpdateNotification,
@@ -282,7 +282,6 @@ export class TrackManager {
 
       added++;
     });
-
     HMSLogger.i(this.TAG, `allocate tracks same:${same} added:${added} removed:${removed}`, allocation, tracks);
   };
 
@@ -350,7 +349,7 @@ export class TrackManager {
       }
     }
 
-    HMSLogger.d(this.TAG, `video track added id:${track.trackId} enabled:${track.enabled}`)
+    HMSLogger.d(this.TAG, `video track added id:${track.trackId} enabled:${track.enabled}`);
   }
 
   addAsPrimaryVideoTrack(hmsPeer: HMSPeer, track: HMSRemoteTrack) {
