@@ -136,7 +136,7 @@ const AddMenu = ({ interactionType, onCreate }) => {
             .catch(err => setError(err.message));
         }}
       >
-        {`Start ${interactionType}`}
+        Create {interactionType}
       </Button>
       <ErrorText error={error} />
     </Flex>
