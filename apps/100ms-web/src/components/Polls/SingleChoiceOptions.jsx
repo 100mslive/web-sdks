@@ -14,13 +14,30 @@ export const SingleChoiceOptions = ({ options, voted, setAnswer }) => {
             <RadioGroup.Item
               css={{
                 background: "none",
-                border: "2px solid $textHighEmp",
+                h: "$9",
+                w: "$9",
+                border: "2px solid",
+                borderColor: "$textHighEmp",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 cursor: voted ? "not-allowed" : "pointer",
+                '&[data-state="checked"]': {
+                  borderColor: "$primaryLight",
+                  borderWidth: "2px",
+                },
               }}
               disabled={voted}
               value={option.index}
             >
-              <RadioGroup.Indicator />
+              <RadioGroup.Indicator
+                css={{
+                  h: "80%",
+                  w: "80%",
+                  background: "$primaryLight",
+                  borderRadius: "$round",
+                }}
+              />
             </RadioGroup.Item>
 
             <Flex direction="column" css={{ flexGrow: "1" }}>

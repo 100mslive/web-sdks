@@ -24,7 +24,7 @@ export const Widgets = () => {
             return <WidgetCard {...card} />;
           })}
         </Flex>
-        <Flex direction="column">
+        <Flex direction="column" css={{ py: "$12" }}>
           <WidgetOptions
             title="Poll/Quiz"
             Icon={<QuizIcon width={40} height={40} />}

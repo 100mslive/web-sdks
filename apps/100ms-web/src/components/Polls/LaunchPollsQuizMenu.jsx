@@ -1,27 +1,24 @@
 // @ts-check
 import React, { useRef, useState } from "react";
+import { isEqual } from "lodash";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
-import {
-  Button,
-  Dropdown,
-  Flex,
-  IconButton,
-  Input,
-  Text,
-} from "@100mslive/react-ui";
+import { Box, Button, Dropdown, Flex, Input, Text } from "@100mslive/react-ui";
 import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import { POLL_QUESTION_TYPE } from "../../common/constants";
+import { POLL_QUESTION_TYPE, QUESTION_TYPE } from "../../common/constants";
 
 const isValidQuestion = ({ text, type, options }) => {
   if (!text) {
     return false;
   }
 
-  if (type === "single-choice" || type === "multiple-choice") {
+  if (
+    type === QUESTION_TYPE.SINGLE_CHOICE ||
+    type === QUESTION_TYPE.MULTIPLE_CHOICE
+  ) {
     return options.every(option => option && option.length > 0);
   } else {
     return true;
@@ -63,6 +60,13 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
                 newQuestions[index] = questionParams;
                 setQuestions(newQuestions);
               }}
+              removeQuestion={() =>
+                setQuestions(prev =>
+                  prev.filter(
+                    questionFromSet => !isEqual(question, questionFromSet)
+                  )
+                )
+              }
             />
           ))}
         </Flex>
@@ -89,7 +93,7 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
   );
 }
 
-const QuestionCard = ({ question, onSave, index, length }) => {
+const QuestionCard = ({ question, onSave, index, length, removeQuestion }) => {
   return (
     <Flex
       direction="column"
@@ -100,6 +104,7 @@ const QuestionCard = ({ question, onSave, index, length }) => {
       ) : (
         <QuestionForm
           question={question}
+          removeQuestion={removeQuestion}
           onSave={params => {
             onSave(params);
           }}
@@ -115,7 +120,8 @@ const SavedQuestion = ({ question, index, length }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
-        Question {index + 1} of {length}: {POLL_QUESTION_TYPE[question.type]}
+        Question {index + 1} of {length}:{" "}
+        {POLL_QUESTION_TYPE[question.type].replace("-", " ")}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
         {question.text}
@@ -129,19 +135,24 @@ const SavedQuestion = ({ question, index, length }) => {
   );
 };
 
-const QuestionForm = ({ question, index, length, onSave }) => {
+const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
   const ref = useRef(null);
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const [type, setType] = useState(question.type || "single-choice");
+  const [type, setType] = useState(
+    question.type || QUESTION_TYPE.SINGLE_CHOICE
+  );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState(question.options || [""]);
+  const [options, setOptions] = useState(question.options || ["", ""]);
 
   return (
     <>
-      <Text variant="overline" css={{ c: "$textDisabled" }}>
+      <Text
+        variant="overline"
+        css={{ c: "$textDisabled", textTransform: "uppercase" }}
+      >
         Question {index + 1} of {length}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
@@ -221,10 +232,16 @@ const QuestionForm = ({ question, index, length, onSave }) => {
           </Flex>
         </>
       ) : null}
-      <Flex justify="between" css={{ my: "$xs" }}>
-        <IconButton onClick={() => setOpenDelete(!open)}>
-          <TrashIcon />
-        </IconButton>
+      <Flex justify="between" align="center" css={{ mt: "$12" }}>
+        <Box
+          css={{
+            color: "$textMedEmp",
+            cursor: "pointer",
+            "&:hover": { color: "$textHighEmp" },
+          }}
+        >
+          <TrashIcon onClick={() => setOpenDelete(!open)} />
+        </Box>
         <Button
           variant="standard"
           disabled={!isValidQuestion({ text, type, options })}
@@ -238,9 +255,33 @@ const QuestionForm = ({ question, index, length, onSave }) => {
       <ErrorDialog
         open={openDelete}
         onOpenChange={setOpenDelete}
-        title="Delete Question"
+        title="Delete question?"
+        css={{ w: "$80", p: "$10", backgroundColor: "#201617" }}
       >
-        <Text>Are you sure you want to delete this question?</Text>
+        <Text variant="sm" css={{ color: "$textMedEmp" }}>
+          Are you sure you want to delete this question? This action cannot be
+          undone.
+        </Text>
+        <Flex css={{ w: "100%", mt: "$12", gap: "$md" }}>
+          <Button
+            variant="standard"
+            outlined
+            onClick={() => setOpenDelete(false)}
+            css={{ w: "100%", fontSize: "$md", fontWeight: "$semiBold" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            css={{ w: "100%", fontSize: "$md", fontWeight: "$semiBold" }}
+            variant="danger"
+            onClick={() => {
+              removeQuestion();
+              setOpenDelete(false);
+            }}
+          >
+            Delete
+          </Button>
+        </Flex>
       </ErrorDialog>
     </>
   );
