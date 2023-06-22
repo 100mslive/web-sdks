@@ -97,20 +97,24 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this.videoHandler.updateSinks();
   }
 
-  async addSink(videoElement: HTMLVideoElement) {
+  async addSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
     // if the native track is empty track, just request the preferred layer else attach it
     if (isEmptyTrack(this.nativeTrack)) {
       await this.requestLayer(this.preferredLayer, 'addSink');
     } else {
       super.addSink(videoElement);
-      await this.updateLayer('addSink');
+      if (shouldSendVideoLayer) {
+        await this.updateLayer('addSink');
+      }
     }
     this.pushInHistory(`uiSetLayer-high`);
   }
 
-  async removeSink(videoElement: HTMLVideoElement) {
+  async removeSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
     super.removeSink(videoElement);
-    await this.updateLayer('removeSink');
+    if (shouldSendVideoLayer) {
+      await this.updateLayer('removeSink');
+    }
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
   }
@@ -137,6 +141,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
     this._degraded =
+      this.enabled &&
       (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
       layerUpdate.current_layer === HMSSimulcastLayer.NONE;
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
@@ -171,7 +176,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   }
 
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
+    const newLayer = this.degraded || !this.enabled || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
