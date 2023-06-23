@@ -163,18 +163,6 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this._degraded;
   }
 
-  /**
-   * @internal
-   * If degradation is being managed by sdk, sdk will let the track know of status
-   * post which it'll set it as well and send prefer layer message to SFU.
-   * */
-  setDegradedFromSdk(value: boolean) {
-    this._degraded = value;
-    this._degradedAt = value ? new Date() : this._degradedAt;
-    this.updateLayer('sdkDegradation');
-    this.pushInHistory(value ? 'sdkDegraded-none' : 'sdkRecovered-high');
-  }
-
   private async updateLayer(source: string) {
     const newLayer = this.degraded || !this.enabled || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
