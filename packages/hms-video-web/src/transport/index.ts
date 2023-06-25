@@ -561,6 +561,7 @@ export default class HMSTransport implements ITransport {
   }
 
   async acceptRoleChange(request: HMSRoleChangeRequest) {
+    this.deviceManager.getDevices();
     await this.signal.acceptRoleChangeRequest({
       requested_by: request.requestedBy?.peerId,
       role: request.role.name,
