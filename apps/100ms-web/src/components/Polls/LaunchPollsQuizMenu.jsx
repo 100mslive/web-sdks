@@ -3,20 +3,17 @@ import React, { useRef, useState } from "react";
 import { isEqual } from "lodash";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
-import {
-  Box,
-  Button,
-  Dropdown,
-  Flex,
-  IconButton,
-  Input,
-  Text,
-} from "@100mslive/react-ui";
+import { Box, Button, Dropdown, Flex, Input, Text } from "@100mslive/react-ui";
 import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
+import { useWidgetState } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import { POLL_QUESTION_TYPE, QUESTION_TYPE } from "../../common/constants";
+import {
+  QUESTION_TYPE,
+  QUESTION_TYPE_TITLE,
+  WIDGET_VIEWS,
+} from "../../common/constants";
 
 const isValidQuestion = ({ text, type, options }) => {
   if (!text) {
@@ -33,9 +30,10 @@ const isValidQuestion = ({ text, type, options }) => {
   }
 };
 
-export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
+export function LaunchPollsQuizMenu() {
   const [questions, setQuestions] = useState([{}]);
   const actions = useHMSActions();
+  const { pollInView: id, setWidgetView } = useWidgetState();
 
   const launchPoll = async () => {
     await actions.interactivityCenter.addQuestionsToPoll(
@@ -49,12 +47,15 @@ export function LaunchPollsQuizMenu({ id, onStart, onBack }) {
         }))
     );
     await actions.interactivityCenter.startPoll(id);
-    onStart();
+    setWidgetView(WIDGET_VIEWS.VOTE);
   };
 
   return (
     <Container rounded>
-      <ContentHeader content="Poll" onBack={onBack} />
+      <ContentHeader
+        content="Poll"
+        onBack={() => setWidgetView(WIDGET_VIEWS.CREATE_POLL_QUIZ)}
+      />
       <Flex direction="column" css={{ p: "$10" }}>
         <Flex direction="column">
           {questions.map((question, index) => (
@@ -123,8 +124,7 @@ const SavedQuestion = ({ question, index, length }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
-        Question {index + 1} of {length}:{" "}
-        {POLL_QUESTION_TYPE[question.type].replace("-", " ")}
+        Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
         {question.text}
@@ -164,7 +164,7 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <DialogDropdownTrigger
           ref={ref}
-          title={POLL_QUESTION_TYPE[type]}
+          title={QUESTION_TYPE_TITLE[type]}
           open={open}
         />
         <Dropdown.Portal>
@@ -173,7 +173,7 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
             sideOffset={8}
             css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
           >
-            {Object.keys(POLL_QUESTION_TYPE).map(value => {
+            {Object.keys(QUESTION_TYPE_TITLE).map(value => {
               return (
                 <Dropdown.Item
                   key={value}
@@ -183,7 +183,7 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
                     bg: type === value ? selectionBg : undefined,
                   }}
                 >
-                  {POLL_QUESTION_TYPE[value]}
+                  {QUESTION_TYPE_TITLE[value]}
                 </Dropdown.Item>
               );
             })}

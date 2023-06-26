@@ -4,15 +4,28 @@ import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { Button, Flex, Input, Switch, Text } from "@100mslive/react-ui";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
+import { useSidepaneToggle } from "../AppData/useSidepane";
+import { useWidgetState } from "../AppData/useUISettings";
+import {
+  SIDE_PANE_OPTIONS,
+  WIDGET_STATE,
+  WIDGET_VIEWS,
+} from "../../common/constants";
 
-const PollsQuizMenu = ({ onCreate, onVote, onBack }) => {
+const PollsQuizMenu = () => {
+  const { setWidgetView } = useWidgetState();
+  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
 
   return (
     <Container rounded>
-      <ContentHeader content="Polls/Quiz" onBack={onBack} />
+      <ContentHeader
+        content="Polls/Quiz"
+        onBack={() => setWidgetView(WIDGET_VIEWS.LANDING)}
+        onClose={closeWidgets}
+      />
       <Flex
         direction="column"
         css={{ px: "$10", pb: "$10", overflowY: "auto" }}
@@ -29,7 +42,7 @@ const PollsQuizMenu = ({ onCreate, onVote, onBack }) => {
             />
           ))}
         </Flex>
-        <AddMenu interactionType={interactionType} onCreate={onCreate} />
+        <AddMenu interactionType={interactionType} />
 
         <Flex
           css={{
@@ -38,7 +51,7 @@ const PollsQuizMenu = ({ onCreate, onVote, onBack }) => {
             pt: "$10",
           }}
         >
-          <PrevMenu onVote={onVote} />
+          <PrevMenu />
         </Flex>
       </Flex>
     </Container>
@@ -81,11 +94,19 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
   );
 }
 
-const AddMenu = ({ interactionType, onCreate }) => {
+const AddMenu = ({ interactionType }) => {
   const actions = useHMSActions();
   const [title, setTitle] = useState("");
   const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState();
+  const { setWidgetState } = useWidgetState();
+
+  const handleCreate = id => {
+    setWidgetState({
+      [WIDGET_STATE.pollInView]: id,
+      [WIDGET_STATE.view]: WIDGET_VIEWS.CREATE_QUESTIONS,
+    });
+  };
 
   return (
     <Flex direction="column">
@@ -123,6 +144,7 @@ const AddMenu = ({ interactionType, onCreate }) => {
       <Button
         variant="primary"
         css={{ mt: "$10" }}
+        disabled={!title}
         onClick={async () => {
           const id = Date.now().toString();
           await actions.interactivityCenter
@@ -132,7 +154,7 @@ const AddMenu = ({ interactionType, onCreate }) => {
               anonymous,
               type: interactionType.toLowerCase(),
             })
-            .then(() => onCreate(id))
+            .then(() => handleCreate(id))
             .catch(err => setError(err.message));
         }}
       >
@@ -143,7 +165,7 @@ const AddMenu = ({ interactionType, onCreate }) => {
   );
 };
 
-const PrevMenu = ({ onVote }) => {
+const PrevMenu = () => {
   const polls = useHMSStore(selectPolls);
   return polls?.length ? (
     <Flex direction="column">
@@ -151,14 +173,23 @@ const PrevMenu = ({ onVote }) => {
         Previous Polls/Quiz
       </Text>
       {polls.map(poll => (
-        <InteractionCard {...poll} onVote={onVote} />
+        <InteractionCard {...poll} />
       ))}
     </Flex>
   ) : null;
 };
 
-const InteractionCard = ({ id, title, state, onVote }) => {
+const InteractionCard = ({ id, title, state = "stopped" }) => {
   const ended = state === "stopped";
+  const { setWidgetState } = useWidgetState();
+
+  const goToVote = id => {
+    setWidgetState({
+      [WIDGET_STATE.pollInView]: id,
+      [WIDGET_STATE.view]: WIDGET_VIEWS.VOTE,
+    });
+  };
+
   return (
     <Flex direction="column">
       <Flex css={{ w: "100%", justifyContent: "space-between" }}>
@@ -183,7 +214,7 @@ const InteractionCard = ({ id, title, state, onVote }) => {
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
         <Button variant="standard">View results</Button>
         {!ended && (
-          <Button variant="primary" onClick={() => onVote(id)}>
+          <Button variant="primary" onClick={() => goToVote(id)}>
             View
           </Button>
         )}

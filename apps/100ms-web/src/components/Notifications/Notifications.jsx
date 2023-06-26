@@ -17,7 +17,7 @@ import { ReconnectNotifications } from "./ReconnectNotifications";
 import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
 import { TrackNotifications } from "./TrackNotifications";
 import { TrackUnmuteModal } from "./TrackUnmuteModal";
-import { useSidepaneToggle } from "../AppData/useSidepane";
+import { useWidgetToggle } from "../AppData/useSidepane";
 import {
   useHLSViewerRole,
   useIsHeadless,
@@ -25,7 +25,6 @@ import {
 } from "../AppData/useUISettings";
 import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -33,7 +32,7 @@ export function Notifications() {
   const HLS_VIEWER_ROLE = useHLSViewerRole();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
-  const toggleVoting = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
+  const toggleWidget = useWidgetToggle();
 
   useEffect(() => {
     if (!notification) {
@@ -166,7 +165,7 @@ export function Notifications() {
           title: `A poll was started: ${notification.data.title}`,
           action: (
             <Button
-              onClick={toggleVoting}
+              onClick={() => toggleWidget(notification.data.id)}
               variant="standard"
               css={{
                 backgroundColor: "$surfaceLight",

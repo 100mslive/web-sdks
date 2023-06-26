@@ -4,15 +4,12 @@ import {
 } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";
 import IconButton from "../IconButton";
-import {
-  useIsSidepaneTypeOpen,
-  useSidepaneToggle,
-} from "./AppData/useSidepane";
-import { SIDE_PANE_OPTIONS } from "./../common/constants";
+import { useWidgetToggle } from "./AppData/useSidepane";
+import { useWidgetState } from "./AppData/useUISettings";
 
 const GetWidgetsButton = () => {
-  const isWidgetsMenuOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.WIDGET);
-  const toggleWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
+  const toggleWidgets = useWidgetToggle();
+  const { widgetView } = useWidgetState();
 
   return (
     <Tooltip title="Toggle Widget Menu">
@@ -24,11 +21,7 @@ const GetWidgetsButton = () => {
         }}
         icon
       >
-        {isWidgetsMenuOpen ? (
-          <InteractionOpenIcon />
-        ) : (
-          <InteractionClosedIcon />
-        )}
+        {widgetView ? <InteractionOpenIcon /> : <InteractionClosedIcon />}
       </IconButton>
     </Tooltip>
   );

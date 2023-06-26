@@ -134,8 +134,9 @@ export const APP_DATA = {
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
   pdfConfig: "pdfConfig",
-  pollInView: "pollInView",
+  widgetState: "widgetState",
 };
+
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
   isHeadless: "isHeadless",
@@ -146,6 +147,19 @@ export const UI_SETTINGS = {
   mirrorLocalVideo: "mirrorLocalVideo",
   activeSpeakerSorting: "activeSpeakerSorting",
   hideLocalVideo: "hideLocalVideo",
+};
+
+export const WIDGET_STATE = {
+  pollInView: "pollInView",
+  view: "view",
+};
+
+export const WIDGET_VIEWS = {
+  LANDING: "LANDING",
+  CREATE_POLL_QUIZ: "CREATE_POLL_QUIZ",
+  CREATE_QUESTIONS: "CREATE_QUESTIONS",
+  VOTE: "VOTE",
+  RESULTS: "RESULTS",
 };
 
 export const SIDE_PANE_OPTIONS = {
@@ -213,7 +227,7 @@ export const SESSION_STORE_KEY = {
   SPOTLIGHT: "spotlight",
 };
 
-export const POLL_QUESTION_TYPE = {
+export const QUESTION_TYPE_TITLE = {
   "single-choice": "Single Choice",
   "multiple-choice": "Multiple Choice",
   "short-answer": "Short Answer",

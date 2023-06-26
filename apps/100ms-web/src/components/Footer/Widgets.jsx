@@ -1,59 +1,47 @@
 // @ts-check
-import React, { useState } from "react";
+import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
 import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
 import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Voting } from "../Polls/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
-import { useSidepaneToggle } from "../AppData/useSidepane";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
+import { useWidgetToggle } from "../AppData/useSidepane";
+import { useWidgetState } from "../AppData/useUISettings";
+import { WIDGET_STATE, WIDGET_VIEWS } from "../../common/constants";
 
 export const Widgets = () => {
-  const [showWidgetState, setShowWidgetState] = useState("");
-  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
-  const [id, setId] = useSetAppDataByKey("pollInView");
+  const toggleWidget = useWidgetToggle();
+  const { pollInView: pollID, widgetView, setWidgetState } = useWidgetState();
 
   return (
     <Container rounded>
-      <ContentHeader content="Widgets" onBack={closeWidgets} />
-      <Flex direction="column" css={{ p: "$10" }}>
-        <Flex css={{ gap: "$10" }}>
-          {cardData.map(card => {
-            return <WidgetCard {...card} />;
-          })}
+      <ContentHeader content="Widgets" onBack={toggleWidget} />
+      {widgetView === WIDGET_VIEWS.LANDING && (
+        <Flex direction="column" css={{ p: "$10" }}>
+          <Flex css={{ gap: "$10" }}>
+            {cardData.map(card => {
+              return <WidgetCard {...card} />;
+            })}
+          </Flex>
+
+          <Flex direction="column" css={{ py: "$12" }}>
+            <WidgetOptions
+              title="Poll/Quiz"
+              Icon={<QuizIcon width={40} height={40} />}
+              subtitle="Find out what others think"
+              onClick={() =>
+                setWidgetState({
+                  [WIDGET_STATE.view]: WIDGET_VIEWS.CREATE_POLL_QUIZ,
+                })
+              }
+            />
+          </Flex>
         </Flex>
-        <Flex direction="column" css={{ py: "$12" }}>
-          <WidgetOptions
-            title="Poll/Quiz"
-            Icon={<QuizIcon width={40} height={40} />}
-            subtitle="Find out what others think"
-            onClick={() => setShowWidgetState("PollsQuizMenu")}
-          />
-        </Flex>
-      </Flex>
-      {showWidgetState === "PollsQuizMenu" && (
-        <PollsQuizMenu
-          onCreate={newID => {
-            setId(newID);
-            setShowWidgetState("QuestionMenu");
-          }}
-          onVote={newID => {
-            setId(newID);
-            setShowWidgetState("voting");
-          }}
-          onBack={() => setShowWidgetState("")}
-        />
       )}
-      {showWidgetState === "QuestionMenu" && (
-        <LaunchPollsQuizMenu
-          id={id}
-          onStart={() => setShowWidgetState("voting")}
-          onBack={() => setShowWidgetState("PollsQuizMenu")}
-        />
-      )}
-      {showWidgetState === "voting" && <Voting id={id} />}
+      {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
+      {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <LaunchPollsQuizMenu />}
+      {widgetView === WIDGET_VIEWS.VOTE && <Voting id={pollID} />}
     </Container>
   );
 };

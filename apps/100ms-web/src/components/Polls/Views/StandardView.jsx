@@ -8,7 +8,10 @@ import { QuestionCard } from "../QuestionCard";
  * @returns
  */
 export const StandardView = ({ poll }) => {
-  return poll.questions?.map((question, index) => (
+  if (!poll.questions) {
+    return null;
+  }
+  return poll.questions.map((question, index) => (
     <QuestionCard
       pollID={poll.id}
       key={`${question.text}-${index}`}
