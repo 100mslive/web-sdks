@@ -53,9 +53,7 @@ export class HMSVideoTrack extends HMSTrack {
   removeSink(videoElement: HTMLVideoElement) {
     if (videoElement.srcObject !== null) {
       videoElement.srcObject = null;
-      if (this.sinkCount > 0) {
-        this.sinkCount--;
-      }
+      this.reduceSinkCount();
     }
   }
 
@@ -73,11 +71,19 @@ export class HMSVideoTrack extends HMSTrack {
           // it's already attached, attaching again would just cause flickering
           return;
         } else {
-          this.sinkCount--;
+          this.reduceSinkCount();
         }
+      } else {
+        this.reduceSinkCount();
       }
     }
     videoElement.srcObject = new MediaStream([track]);
     this.sinkCount++;
+  }
+
+  private reduceSinkCount() {
+    if (this.sinkCount > 0) {
+      this.sinkCount--;
+    }
   }
 }
