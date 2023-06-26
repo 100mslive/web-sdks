@@ -1,9 +1,22 @@
 // @ts-check
 import React, { useRef, useState } from "react";
 import { isEqual } from "lodash";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
-import { Box, Button, Dropdown, Flex, Input, Text } from "@100mslive/react-ui";
+import {
+  selectPollByID,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import { AddCircleIcon, CheckIcon, TrashIcon } from "@100mslive/react-icons";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dropdown,
+  Flex,
+  Input,
+  Switch,
+  Text,
+} from "@100mslive/react-ui";
 import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
@@ -34,6 +47,7 @@ export function LaunchPollsQuizMenu() {
   const [questions, setQuestions] = useState([{}]);
   const actions = useHMSActions();
   const { pollInView: id, setWidgetView } = useWidgetState();
+  const interaction = useHMSStore(selectPollByID(id));
 
   const launchPoll = async () => {
     await actions.interactivityCenter.addQuestionsToPoll(
@@ -49,11 +63,14 @@ export function LaunchPollsQuizMenu() {
     await actions.interactivityCenter.startPoll(id);
     setWidgetView(WIDGET_VIEWS.VOTE);
   };
-
+  const headingTitle = interaction?.type
+    ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
+    : "Polls/Quiz";
+  const isQuiz = interaction?.type === "quiz";
   return (
     <Container rounded>
       <ContentHeader
-        content="Poll"
+        content={headingTitle}
         onBack={() => setWidgetView(WIDGET_VIEWS.CREATE_POLL_QUIZ)}
       />
       <Flex direction="column" css={{ p: "$10" }}>
@@ -69,6 +86,7 @@ export function LaunchPollsQuizMenu() {
                 newQuestions[index] = questionParams;
                 setQuestions(newQuestions);
               }}
+              isQuiz={isQuiz}
               removeQuestion={() =>
                 setQuestions(prev =>
                   prev.filter(
@@ -80,11 +98,16 @@ export function LaunchPollsQuizMenu() {
           ))}
         </Flex>
         <Flex
-          css={{ c: "$textDisabled", my: "$sm", cursor: "pointer" }}
+          css={{
+            c: "$textDisabled",
+            my: "$sm",
+            cursor: "pointer",
+            "&:hover": { c: "$textMedEmp" },
+          }}
           onClick={() => setQuestions([...questions, {}])}
         >
           <AddCircleIcon />
-          <Text variant="body1" css={{ ml: "$md", c: "$textDisabled" }}>
+          <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
             Add another question
           </Text>
         </Flex>
@@ -97,7 +120,14 @@ export function LaunchPollsQuizMenu() {
   );
 }
 
-const QuestionCard = ({ question, onSave, index, length, removeQuestion }) => {
+const QuestionCard = ({
+  question,
+  onSave,
+  index,
+  length,
+  removeQuestion,
+  isQuiz,
+}) => {
   return (
     <Flex
       direction="column"
@@ -114,6 +144,7 @@ const QuestionCard = ({ question, onSave, index, length, removeQuestion }) => {
           }}
           index={index}
           length={length}
+          isQuiz={isQuiz}
         />
       )}
     </Flex>
@@ -138,7 +169,14 @@ const SavedQuestion = ({ question, index, length }) => {
   );
 };
 
-const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
+const QuestionForm = ({
+  question,
+  index,
+  length,
+  onSave,
+  removeQuestion,
+  isQuiz,
+}) => {
   const ref = useRef(null);
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
@@ -198,7 +236,24 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
       />
       {type === "single-choice" || type === "multiple-choice" ? (
         <>
-          <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
+          {isQuiz ? (
+            <Checkbox.Root
+              onCheckedChange={() => {}}
+              css={
+                {
+                  // cursor: voted ? "not-allowed" : "pointer",
+                }
+              }
+            >
+              <Checkbox.Indicator>
+                <CheckIcon width={16} height={16} />
+              </Checkbox.Indicator>
+            </Checkbox.Root>
+          ) : null}
+          <Text
+            variant="body2"
+            css={{ my: "$md", c: "$textMedEmp", ml: isQuiz ? "$md" : 0 }}
+          >
             Options
           </Text>
           {options.map((option, index) => (
@@ -214,18 +269,34 @@ const QuestionForm = ({ question, index, length, onSave, removeQuestion }) => {
               }}
             />
           ))}
-          <Flex css={{ c: "$textMedEmp", cursor: "pointer" }}>
+          <Flex
+            css={{
+              c: "$textMedEmp",
+              cursor: "pointer",
+              "&:hover": { c: "$textHighEmp" },
+            }}
+            onClick={() => setOptions([...options, ""])}
+          >
             <AddCircleIcon />
             <Text
               variant="body1"
-              css={{ ml: "$9", c: "$textMedEmp" }}
-              onClick={() => setOptions([...options, ""])}
+              css={{
+                ml: "$9",
+                c: "inherit",
+              }}
             >
               Add Option
             </Text>
           </Flex>
+          {isQuiz ? (
+            <Flex css={{ mt: "$md" }}>
+              <Switch css={{ mr: "$6" }} />
+              <Text>Not required to answer</Text>
+            </Flex>
+          ) : null}
         </>
       ) : null}
+
       <Flex justify="between" align="center" css={{ mt: "$12" }}>
         <Box
           css={{

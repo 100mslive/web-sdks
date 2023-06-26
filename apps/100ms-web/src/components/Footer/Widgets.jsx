@@ -19,7 +19,7 @@ export const Widgets = () => {
       <ContentHeader content="Widgets" onBack={toggleWidget} />
       {widgetView === WIDGET_VIEWS.LANDING && (
         <Flex direction="column" css={{ p: "$10" }}>
-          <Flex css={{ gap: "$10" }}>
+          <Flex css={{ gap: "$10", mb: "$12" }}>
             {cardData.map(card => {
               return <WidgetCard {...card} />;
             })}
@@ -50,47 +50,53 @@ const cardData = [
   {
     title: "Share Music",
     subtitle: "Play music from Spotify or any other tab",
-    imageSrc: "/audio-sharing.png",
+    imageSrc: "/audio.png",
     onClick: () => {},
   },
   {
     title: "Whiteboard",
     subtitle: "Collaboratively sketch ideas",
-    imageSrc: "/audio-sharing.png",
+    imageSrc: "/whiteboard.png",
     onClick: () => {},
   },
 ];
 
-const WidgetCard = ({ title, subtitle, imageSrc, onClick, css = {} }) => (
-  <Flex
-    direction="column"
-    css={{ cursor: "pointer", w: "100%", ...css }}
-    onClick={onClick}
-    key={title}
-  >
-    <Flex>
-      <img src={imageSrc} alt={`${imageSrc}-polls`} />
-    </Flex>
-    <Text
-      variant="sm"
-      css={{ mt: "$md", c: "$textHighEmp", fontWeight: "$semiBold" }}
+const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
+  return (
+    <Flex
+      direction="column"
+      css={{
+        cursor: "pointer",
+        w: "100%",
+        "&:hover": { opacity: 0.7, r: "$0" },
+        ...css,
+      }}
+      onClick={onClick}
+      key={title}
     >
-      {title}
-    </Text>
-    <Text variant="caption" css={{ c: "$textMedEmp", mt: "$2" }}>
-      {subtitle}
-    </Text>
-  </Flex>
-);
+      <Flex css={{ border: "$space$px solid $borderLight", r: "$0" }}>
+        <img
+          src={imageSrc}
+          alt={`${imageSrc}-polls`}
+          style={{ borderRadius: "4px" }}
+        />
+      </Flex>
+      <Text variant="sub2" css={{ mt: "$md", c: "$textHighEmp" }}>
+        {title}
+      </Text>
+      <Text variant="caption" css={{ c: "$textMedEmp", mt: "$2" }}>
+        {subtitle}
+      </Text>
+    </Flex>
+  );
+};
 
 const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
   return (
     <Flex
       onClick={onClick}
       key={title}
-      css={{
-        cursor: "pointer",
-      }}
+      css={{ cursor: "pointer", "&:hover": { opacity: 0.7, r: "$0" } }}
       align="center"
     >
       <Flex
