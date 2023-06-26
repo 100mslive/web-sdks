@@ -28,9 +28,9 @@ export class VideoElementManager {
   updateSinks() {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
-        this.track.addSink(videoElement);
+        this.track.addSink(videoElement, false);
       } else {
-        this.track.removeSink(videoElement);
+        this.track.removeSink(videoElement, false);
       }
     }
   }

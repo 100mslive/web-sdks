@@ -28,6 +28,12 @@ export interface OnTrackLayerUpdateNotification {
   };
 }
 
+export interface onTrackRemovedNotification {
+  tracks: {
+    [track_id: string]: Record<string, string>;
+  };
+}
+
 export interface PeerNotificationInfo {
   peer_id: string;
   info: Info;

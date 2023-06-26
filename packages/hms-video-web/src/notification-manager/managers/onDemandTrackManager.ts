@@ -27,8 +27,8 @@ export class OnDemandTrackManager extends TrackManager {
   }
 
   handleTrackRemove(track: HMSRemoteTrack) {
-    const removed = super.handleTrackRemove(track);
-    if (removed && track.source === 'regular') {
+    super.handleTrackRemove(track);
+    if (track.type === 'video' && track.source === 'regular') {
       this.processTrackInfo(
         {
           track_id: track.trackId,
@@ -38,9 +38,9 @@ export class OnDemandTrackManager extends TrackManager {
           stream_id: track.stream.id,
         } as TrackState,
         track.peerId!,
+        false,
       );
     }
-    return removed;
   }
 
   /**
@@ -68,6 +68,8 @@ export class OnDemandTrackManager extends TrackManager {
     emptyTrack.enabled = !trackInfo.mute;
     const track = new HMSRemoteVideoTrack(remoteStream, emptyTrack, trackInfo.source);
     track.setTrackId(trackInfo.track_id);
+    track.peerId = hmsPeer.peerId;
+    track.logIdentifier = hmsPeer.name;
     this.addVideoTrack(hmsPeer, track);
     if (callListener) {
       this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_ADDED, hmsPeer.videoTrack!, hmsPeer);
