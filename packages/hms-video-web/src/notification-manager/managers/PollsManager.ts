@@ -84,11 +84,15 @@ export class PollsManager {
       if (!savedPoll) {
         return;
       }
+      savedPoll.totalUsers = updatedPoll.user_count;
+      savedPoll.totalResponses = updatedPoll.total_responses;
       updatedPoll.questions.forEach(updatedQuestion => {
         const savedQuestion = savedPoll.questions?.find(question => question.index === updatedQuestion.question);
         if (!savedQuestion) {
           return;
         }
+
+        savedQuestion.totalResponses = updatedQuestion.total;
 
         updatedQuestion.options.forEach((updatedVoteCount, index) => {
           const savedOption = savedQuestion.options?.[index];

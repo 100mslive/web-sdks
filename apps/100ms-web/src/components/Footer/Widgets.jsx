@@ -61,7 +61,7 @@ const cardData = [
   },
 ];
 
-const WidgetCard = ({ title, subtitle, imageSrc, onClick, css }) => {
+const WidgetCard = ({ title, subtitle, imageSrc, onClick, css = {} }) => {
   return (
     <Flex
       direction="column"

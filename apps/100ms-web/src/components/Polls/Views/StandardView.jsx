@@ -18,7 +18,8 @@ export const StandardView = ({ poll }) => {
       index={question.index}
       text={question.text}
       type={question.type}
-      totalCount={poll.questions?.length || 0}
+      totalResponses={question.totalResponses}
+      totalQuestions={poll.questions?.length || 0}
       options={question.options}
       skippable={question?.skippable}
     />

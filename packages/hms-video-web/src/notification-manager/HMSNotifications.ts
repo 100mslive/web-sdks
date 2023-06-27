@@ -256,6 +256,9 @@ export type PollStopNotification = PollStartNotification;
 export interface PollStatsNotification {
   polls: {
     poll_id: string;
+    max_user: number;
+    total_responses: number;
+    user_count: number;
     questions: {
       question: number;
       type: HMSPollQuestionType;

@@ -28,5 +28,5 @@ export const POLL_NOTIFICATION_TYPES: PollNotificationMap = {
   [sdkTypes.HMSPollsUpdate.POLL_LIST]: HMSNotificationTypes.POLL_LIST,
   [sdkTypes.HMSPollsUpdate.POLL_STARTED]: HMSNotificationTypes.POLL_STARTED,
   [sdkTypes.HMSPollsUpdate.POLL_STOPPED]: HMSNotificationTypes.POLL_STOPPED,
-  [sdkTypes.HMSPollsUpdate.POLL_STATS_UPDATED]: HMSNotificationTypes.POLL_STOPPED,
+  [sdkTypes.HMSPollsUpdate.POLL_STATS_UPDATED]: HMSNotificationTypes.POLL_VOTES_UPDATED,
 };

@@ -24,6 +24,8 @@ export interface HMSPoll {
   questions?: HMSPollQuestion[];
   rolesThatCanVote?: HMSRoleName[];
   rolesThaCanViewResponses?: HMSRoleName[];
+  totalUsers?: number;
+  totalResponses?: number;
 }
 
 export interface HMSPollCreateParams
@@ -55,6 +57,7 @@ export interface HMSPollQuestion {
   negative?: boolean;
   answerMinLen?: number;
   answerMaxLen?: number;
+  totalResponses?: number;
   options?: HMSPollQuestionOption[];
   answer?: HMSPollQuestionAnswer;
   responses?: HMSPollQuestionResponse[];

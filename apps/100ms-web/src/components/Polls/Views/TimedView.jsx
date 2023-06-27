@@ -19,7 +19,8 @@ export const TimedView = ({ poll }) => {
       text={activeQuestion.text}
       type={activeQuestion.type}
       options={activeQuestion.options}
-      totalCount={poll.questions?.length || 0}
+      totalResponses={activeQuestion.totalResponses}
+      totalQuestions={poll.questions?.length || 0}
       skippable={activeQuestion?.skippable || false}
       setCurrentIndex={setCurrentIndex}
       isTimed

@@ -22,7 +22,8 @@ const TextArea = styled("textarea", {
 export const QuestionCard = ({
   pollID,
   index,
-  totalCount,
+  totalQuestions,
+  totalResponses,
   type,
   text,
   options = [],
@@ -34,7 +35,7 @@ export const QuestionCard = ({
   const [voted, setVoted] = useState(false);
   const leftNavigationEnabled = index !== 0;
   const rightNavigationEnabled =
-    index !== totalCount - 1 && (skippable || voted);
+    index !== totalQuestions - 1 && (skippable || voted);
   const [textAnswer, setTextAnswer] = useState("");
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
@@ -79,7 +80,7 @@ export const QuestionCard = ({
           variant="caption"
           css={{ color: "$textDisabled", fontWeight: "$semiBold" }}
         >
-          QUESTION {index} OF {totalCount}: {type.toUpperCase()}
+          QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
 
         {isTimed ? (
@@ -102,7 +103,7 @@ export const QuestionCard = ({
             </Flex>
             <Flex
               onClick={() => {
-                setCurrentIndex(prev => Math.min(totalCount, prev + 1));
+                setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
                 setVoted(false);
               }}
               css={
@@ -152,6 +153,7 @@ export const QuestionCard = ({
           voted={voted}
           options={options}
           setAnswer={setSingleOptionAnswer}
+          totalResponses={totalResponses}
         />
       ) : null}
 
@@ -161,6 +163,7 @@ export const QuestionCard = ({
           options={options}
           selectedOptions={multipleOptionAnswer}
           setSelectedOptions={setMultipleOptionAnswer}
+          totalResponses={totalResponses}
         />
       ) : null}
 

@@ -1,12 +1,13 @@
 // @ts-check
 import React from "react";
 import { CheckIcon } from "@100mslive/react-icons";
-import { Checkbox, Flex, Text } from "@100mslive/react-ui";
+import { Checkbox, Flex, Progress, Text } from "@100mslive/react-ui";
 // import { Votes } from "./OptionComponents/Votes";
 
 export const MultipleChoiceOptions = ({
   options,
   voted,
+  totalResponses,
   selectedOptions,
   setSelectedOptions,
 }) => {
@@ -23,7 +24,7 @@ export const MultipleChoiceOptions = ({
   return (
     <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
       {options.map(option => {
-        // const progressValue = (100 * option.voters.length) / totalVotes;
+        const progressValue = (100 * option.voteCount) / totalResponses;
         return (
           <Flex
             align="center"
@@ -49,9 +50,12 @@ export const MultipleChoiceOptions = ({
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   {option.text}
                 </Text>
-                {/* {voted ? <Votes voters={option.voters || []} /> : ""} */}
+                <Text variant="sm" css={{ color: "$textMedEmp" }}>
+                  {option.voteCount}&nbsp;
+                  {option.voteCount !== 1 ? "votes" : "votes"}
+                </Text>
               </Flex>
-              {/* {voted ? (
+              {voted ? (
                 <Progress.Root value={progressValue}>
                   <Progress.Content
                     style={{
@@ -59,7 +63,7 @@ export const MultipleChoiceOptions = ({
                     }}
                   />
                 </Progress.Root>
-              ) : null} */}
+              ) : null}
             </Flex>
           </Flex>
         );
