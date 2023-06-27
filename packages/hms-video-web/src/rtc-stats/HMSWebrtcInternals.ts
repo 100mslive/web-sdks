@@ -89,7 +89,7 @@ export class HMSWebrtcInternals {
   /**
    * @internal
    */
-  cleanUp() {
+  cleanup() {
     this.stop();
     this.eventBus.statsUpdate.removeAllListeners();
   }

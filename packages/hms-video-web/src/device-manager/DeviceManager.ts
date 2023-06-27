@@ -89,7 +89,7 @@ export class DeviceManager implements HMSDeviceManager {
     };
   }
 
-  cleanUp() {
+  cleanup() {
     this.initialized = false;
     this.audioInput = [];
     this.audioOutput = [];

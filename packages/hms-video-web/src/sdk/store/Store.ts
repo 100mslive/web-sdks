@@ -362,7 +362,7 @@ class Store implements IStore {
     return this.errorListener;
   }
 
-  cleanUp() {
+  cleanup() {
     const tracks = this.getTracks();
     for (const track of tracks) {
       track.cleanup();
