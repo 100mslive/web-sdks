@@ -1,4 +1,4 @@
-import { HMSPollQuestionCreateParams } from '../../interfaces';
+import { HMSPollQuestionCreateParams, HMSPollsUpdate, PollsListener } from '../../interfaces';
 import { HMSInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
 import {
   HMSPoll,
@@ -14,7 +14,11 @@ import { PollQuestionParams, PollResponseParams } from '../../signal/interfaces'
 import HMSTransport from '../../transport';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
-  constructor(private transport: HMSTransport, private store: IStore) {}
+  constructor(private transport: HMSTransport, private store: IStore, private listener?: PollsListener) {}
+
+  setListener(listener?: PollsListener) {
+    this.listener = listener;
+  }
 
   async createPoll(pollParams: HMSPollCreateParams) {
     const { poll_id: serverPollID } = await this.transport.pollInfoSet({
@@ -31,6 +35,26 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     if (Array.isArray(pollParams.questions)) {
       await this.addQuestionsToPoll(pollParams.id, pollParams.questions);
     }
+
+    const questions = await this.transport.pollQuestionsGet({ poll_id: pollParams.id, index: 0, count: 50 });
+
+    const poll: HMSPoll = {
+      id: pollParams.id,
+      title: pollParams.title,
+      anonymous: pollParams.anonymous,
+      type: pollParams.type,
+      duration: pollParams.duration,
+      locked: pollParams.locked, // poll is locked automatically when it starts
+      mode: pollParams.mode,
+      visibility: pollParams.visibility,
+      rolesThatCanVote: pollParams.rolesThatCanVote || [],
+      rolesThaCanViewResponses: pollParams.rolesThaCanViewResponses || [],
+      state: 'created',
+      createdBy: this.store.getLocalPeer()?.peerId,
+      questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
+    };
+
+    this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_CREATED, [poll]);
   }
 
   async startPoll(poll: string | HMSPollCreateParams): Promise<void> {

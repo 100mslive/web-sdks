@@ -3,7 +3,9 @@ import React, { useEffect } from "react";
 import { logMessage } from "zipyai";
 import {
   HMSNotificationTypes,
+  selectLocalPeerID,
   useHMSNotifications,
+  useHMSStore,
 } from "@100mslive/react-sdk";
 import { Button } from "@100mslive/react-ui";
 import { ToastBatcher } from "../Toast/ToastBatcher";
@@ -27,6 +29,7 @@ import { useNavigation } from "../hooks/useNavigation";
 import { getMetadata } from "../../common/utils";
 
 export function Notifications() {
+  const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
   const navigate = useNavigation();
   const HLS_VIEWER_ROLE = useHLSViewerRole();
@@ -161,23 +164,25 @@ export function Notifications() {
         break;
 
       case HMSNotificationTypes.POLL_STARTED:
-        ToastManager.addToast({
-          title: `A poll was started: ${notification.data.title}`,
-          action: (
-            <Button
-              onClick={() => toggleWidget(notification.data.id)}
-              variant="standard"
-              css={{
-                backgroundColor: "$surfaceLight",
-                fontWeight: "$semiBold",
-                color: "$textHighEmp",
-                p: "$xs $md",
-              }}
-            >
-              Vote
-            </Button>
-          ),
-        });
+        if (notification.data.startedBy !== localPeerID) {
+          ToastManager.addToast({
+            title: `A poll was started: ${notification.data.title}`,
+            action: (
+              <Button
+                onClick={() => toggleWidget(notification.data.id)}
+                variant="standard"
+                css={{
+                  backgroundColor: "$surfaceLight",
+                  fontWeight: "$semiBold",
+                  color: "$textHighEmp",
+                  p: "$xs $md",
+                }}
+              >
+                Vote
+              </Button>
+            ),
+          });
+        }
         break;
       default:
         break;

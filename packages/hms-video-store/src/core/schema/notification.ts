@@ -119,6 +119,7 @@ export enum HMSNotificationTypes {
   PLAYLIST_TRACK_ENDED = 'PLAYLIST_TRACK_ENDED',
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
+  POLL_CREATED = 'POLL_CREATED',
   POLL_STARTED = 'POLL_STARTED',
   POLL_STOPPED = 'POLL_STOPPED',
   POLL_VOTES_UPDATED = 'POLL_VOTES_UPDATED',
@@ -154,6 +155,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_STOPPED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_VOTES_UPDATED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_LIST]: HMSPollNotification;
+  [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
 }[T];
 
 type MappedNotifications<Type extends HMSNotificationTypes[]> = {

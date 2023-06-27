@@ -125,6 +125,7 @@ export class HMSSdk implements HMSInterface {
        */
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
+      this.interactivityCenter.setListener(this.listener);
       return;
     }
 
@@ -156,7 +157,7 @@ export class HMSSdk implements HMSInterface {
       this.analyticsTimer,
     );
     this.sessionStore = new SessionStore(this.transport);
-    this.interactivityCenter = new InteractivityCenter(this.transport, this.store);
+    this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
 
     /**
      * Note: Subscribe to events here right after creating stores and managers
