@@ -34,7 +34,8 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
-let blankCanvas: HTMLCanvasElement;
+let blankCanvas: HTMLCanvasElement | undefined;
+let intervalID: ReturnType<typeof setInterval> | undefined;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -274,6 +275,16 @@ export class LocalTrackManager {
       blankCanvas.height = height;
       blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
     }
+    if (!intervalID) {
+      // This is needed to send some data so the track is received on sfu
+      intervalID = setInterval(() => {
+        const ctx = blankCanvas?.getContext('2d');
+        if (ctx) {
+          ctx.fillRect(0, 0, 1, 1);
+        }
+      }, 1000 / frameRate);
+    }
+
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
     emptyTrack.enabled = false;
@@ -289,6 +300,12 @@ export class LocalTrackManager {
     const emptyTrack = dst.stream.getAudioTracks()[0];
     emptyTrack.enabled = false;
     return emptyTrack;
+  }
+
+  static cleanup() {
+    clearInterval(intervalID);
+    intervalID = undefined;
+    blankCanvas = undefined;
   }
 
   /**

@@ -90,7 +90,7 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'audio sink created', this.audioSink);
   }
 
-  cleanUp() {
+  cleanup() {
     this.audioSink?.remove();
     this.audioSink = undefined;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);

@@ -719,7 +719,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
-    HMSLogger.cleanUp();
+    HMSLogger.cleanup();
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
     }, reason);
