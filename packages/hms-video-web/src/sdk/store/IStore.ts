@@ -77,5 +77,5 @@ export interface IStore {
 
   hasRoleDetailsArrived(): boolean;
 
-  cleanUp(): void;
+  cleanup(): void;
 }
