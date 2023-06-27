@@ -217,7 +217,6 @@ const AddMenu = ({ interactionType }) => {
         variant="primary"
         disabled={!title}
         css={{ mt: "$10" }}
-        disabled={!title}
         onClick={async () => {
           const id = Date.now().toString();
           await actions.interactivityCenter
