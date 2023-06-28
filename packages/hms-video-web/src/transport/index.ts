@@ -26,7 +26,7 @@ import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrack, HMSTrackType } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import Message from '../sdk/models/HMSMessage';
@@ -561,7 +561,6 @@ export default class HMSTransport implements ITransport {
   }
 
   async acceptRoleChange(request: HMSRoleChangeRequest) {
-    this.deviceManager.getDevices();
     await this.signal.acceptRoleChangeRequest({
       requested_by: request.requestedBy?.peerId,
       role: request.role.name,
@@ -715,6 +714,12 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
+    // on publishing track check for devices
+    if (track.type === HMSTrackType.AUDIO) {
+      this.eventBus.localAudioEnabled.publish({ enabled: true, track: track as HMSLocalAudioTrack });
+    } else if (track.type === HMSTrackType.VIDEO) {
+      this.eventBus.localVideoEnabled.publish({ enabled: true, track: track as HMSLocalVideoTrack });
+    }
     track.isPublished = true;
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);
