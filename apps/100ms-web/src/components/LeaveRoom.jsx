@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   selectIsConnectedToRoom,
@@ -24,7 +24,6 @@ import {
   Tooltip,
 } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
-import { useHMSPrebuiltContext } from "../AppContext";
 import {
   DialogCheckbox,
   DialogContent,
@@ -43,19 +42,15 @@ export const LeaveRoom = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
-  const { showLeave, onLeave } = useHMSPrebuiltContext();
   useDropdownList({ open, name: "LeaveRoom" });
 
   const redirectToLeavePage = () => {
-    if (showLeave) {
-      if (params.role) {
-        navigate("/leave/" + params.roomId + "/" + params.role);
-      } else {
-        navigate("/leave/" + params.roomId);
-      }
+    if (params.role) {
+      navigate("/leave/" + params.roomId + "/" + params.role);
+    } else {
+      navigate("/leave/" + params.roomId);
     }
     ToastManager.clearAllToast();
-    onLeave?.();
   };
 
   const leaveRoom = () => {

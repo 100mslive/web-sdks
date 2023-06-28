@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useMedia } from "react-use";
 import {
   selectAppData,

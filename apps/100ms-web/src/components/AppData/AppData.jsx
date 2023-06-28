@@ -79,11 +79,10 @@ const initialAppData = {
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
-  [APP_DATA.authToken]: "",
 };
 
 export const AppData = React.memo(
-  ({ appDetails, logo, recordingUrl, tokenEndpoint }) => {
+  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig, uiMode }) => {
     const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const sidePane = useSidepaneState();
@@ -131,11 +130,12 @@ export const AppData = React.memo(
           getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] ||
           DEFAULT_HLS_VIEWER_ROLE,
         [APP_DATA.appConfig]: getAppDetails(appDetails),
+        [APP_DATA.uiMode]: uiMode,
       };
       for (const key in appData) {
         hmsActions.setAppData([key], appData[key]);
       }
-    }, [appDetails, logo, recordingUrl, tokenEndpoint, hmsActions]);
+    }, [appDetails, logo, recordingUrl, tokenEndpoint, uiMode, hmsActions]);
 
     useEffect(() => {
       if (!preferences.subscribedNotifications) {
@@ -150,10 +150,14 @@ export const AppData = React.memo(
 
     useEffect(() => {
       if (localPeerRole) {
-        const config = normalizeAppPolicyConfig(roleNames, rolesMap);
+        const config = normalizeAppPolicyConfig(
+          roleNames,
+          rolesMap,
+          policyConfig
+        );
         hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
       }
-    }, [roleNames, rolesMap, localPeerRole, hmsActions]);
+    }, [roleNames, policyConfig, rolesMap, localPeerRole, hmsActions]);
 
     return <ResetStreamingStart />;
   }

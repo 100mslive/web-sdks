@@ -1,4 +1,3 @@
-import React from "react";
 import { selectPermissions, useHMSStore } from "@100mslive/react-sdk";
 import {
   ChevronLeftIcon,

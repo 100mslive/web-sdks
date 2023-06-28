@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { ExitIcon } from "@100mslive/react-icons";
 import { Box, Button, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import { ToastManager } from "./Toast/ToastManager";
-import { useHMSPrebuiltContext } from "../AppContext";
 import { Header } from "./Header";
 import { useNavigation } from "./hooks/useNavigation";
 import {
@@ -15,7 +14,6 @@ import { getRoutePrefix } from "../common/utils";
 
 const PostLeave = () => {
   const navigate = useNavigation();
-  const { showPreview, roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
@@ -24,7 +22,7 @@ const PostLeave = () => {
   return (
     <Flex direction="column" css={{ size: "100%" }}>
       <Box css={{ h: "$18", "@md": { h: "$17" } }} data-testid="header">
-        <Header />
+        <Header isPreview />
       </Box>
       <Flex
         justify="center"
@@ -67,11 +65,9 @@ const PostLeave = () => {
           </Text>
           <Button
             onClick={() => {
-              let redirectUrl = `${showPreview ? "/preview/" : "/meeting/"}${
-                roomCode || roomId
-              }`;
-              if (role && roomId) redirectUrl += "/" + role;
-              navigate(redirectUrl);
+              let previewUrl = "/preview/" + roomId;
+              if (role) previewUrl += "/" + role;
+              navigate(previewUrl);
               ToastManager.clearAllToast();
             }}
             data-testid="join_again_btn"

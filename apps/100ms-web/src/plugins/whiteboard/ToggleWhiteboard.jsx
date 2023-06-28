@@ -1,4 +1,3 @@
-import React from "react";
 import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import { PencilDrawIcon } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/react-ui";

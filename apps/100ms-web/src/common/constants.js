@@ -133,7 +133,6 @@ export const APP_DATA = {
   embedConfig: "embedConfig",
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
-  authToken: "authToken",
   pdfConfig: "pdfConfig",
 };
 export const UI_SETTINGS = {
@@ -182,11 +181,10 @@ export const isMacOS =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "mac os";
 export const isAndroid =
   parsedUserAgent.getOS()?.name?.toLowerCase() === "android";
-export const isIPadOS = false;
-// typeof navigator !== "undefined" &&
-// navigator?.maxTouchPoints &&
-// navigator?.maxTouchPoints > 2 &&
-// navigator?.userAgent?.match(/Mac/);
+export const isIPadOS =
+  navigator?.maxTouchPoints &&
+  navigator?.maxTouchPoints > 2 &&
+  navigator?.userAgent?.match(/Mac/);
 
 export const FEATURE_LIST = {
   AUDIO_ONLY_SCREENSHARE: "audioscreenshare",

@@ -27,7 +27,7 @@ import TileConnection from "../Connection/TileConnection";
 import SettingsModal from "../Settings/SettingsModal";
 import PreviewName from "./PreviewName";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { useAuthToken, useUISettings } from "../AppData/useUISettings";
+import { useUISettings } from "../AppData/useUISettings";
 import {
   defaultPreviewPreference,
   UserPreferencesKeys,
@@ -35,21 +35,25 @@ import {
 } from "../hooks/useUserPreferences";
 import { UI_SETTINGS } from "../../common/constants";
 
-const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
+const PreviewJoin = ({
+  token,
+  onJoin,
+  env,
+  skipPreview,
+  initialName,
+  asRole,
+}) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference
   );
-  const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
-    token: authToken,
-    initEndpoint: process.env.REACT_APP_ENV
-      ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
-      : undefined,
+    token,
+    initEndpoint: env ? `https://${env}-init.100ms.live/init` : undefined,
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
@@ -80,7 +84,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     onJoin,
   ]);
   useEffect(() => {
-    if (authToken) {
+    if (token) {
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
@@ -88,7 +92,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authToken, skipPreview]);
+  }, [token, skipPreview]);
   return (
     <Container>
       <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>

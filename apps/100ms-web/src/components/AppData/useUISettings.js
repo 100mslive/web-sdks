@@ -82,10 +82,6 @@ export const useTokenEndpoint = () => {
   return useHMSStore(selectAppData(APP_DATA.tokenEndpoint));
 };
 
-export const useAuthToken = () => {
-  return useHMSStore(selectAppData(APP_DATA.authToken));
-};
-
 export const useLogo = () => {
   return useHMSStore(selectAppData(APP_DATA.logo));
 };

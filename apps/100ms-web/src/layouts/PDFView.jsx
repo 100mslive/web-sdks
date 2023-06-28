@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { throwErrorHandler, useScreenShare } from "@100mslive/react-sdk";
 import { Box, ThemeTypes, useTheme } from "@100mslive/react-ui";
 import { EmbebScreenShareView } from "./EmbedView";

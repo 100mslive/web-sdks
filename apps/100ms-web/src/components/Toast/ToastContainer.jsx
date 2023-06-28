@@ -25,12 +25,7 @@ export const ToastContainer = () => {
           />
         );
       })}
-      <ToastPrimitive.Viewport
-        css={{
-          position: "absolute",
-          ...(!isConnected ? {} : { bottom: "$24" }),
-        }}
-      />
+      <ToastPrimitive.Viewport css={!isConnected ? {} : { bottom: "$24" }} />
     </ToastPrimitive.Provider>
   );
 };

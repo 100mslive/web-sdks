@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { Button, Flex } from "@100mslive/react-ui";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";

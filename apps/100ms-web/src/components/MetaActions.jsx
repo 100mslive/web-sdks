@@ -1,4 +1,3 @@
-import React from "react";
 import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
 import { BrbIcon, HandIcon } from "@100mslive/react-icons";
 import { Flex, Tooltip } from "@100mslive/react-ui";

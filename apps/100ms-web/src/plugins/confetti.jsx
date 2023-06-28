@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { useMedia } from "react-use";
 import JSConfetti from "js-confetti";
 import { useCustomEvent } from "@100mslive/react-sdk";
 
+const jsConfetti = new JSConfetti();
 const confettiMsgType = "CONFETTI";
 
 const emojiCollections = {
@@ -20,16 +21,11 @@ const emojiCollections = {
 export function Confetti() {
   // https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
   const disableMotion = useMedia("(prefers-reduced-motion: reduce)");
-  const jsConfetti = useRef(null);
-
-  useEffect(() => {
-    jsConfetti.current = new JSConfetti();
-  });
 
   const onConfettiMsg = useCallback(
     config => {
-      if (!disableMotion && jsConfetti.current) {
-        jsConfetti.current.addConfetti(config);
+      if (!disableMotion) {
+        jsConfetti.addConfetti(config);
       }
     },
     [disableMotion]

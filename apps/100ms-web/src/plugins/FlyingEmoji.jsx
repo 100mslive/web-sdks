@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMedia } from "react-use";
 import {
   selectLocalPeerID,
@@ -85,7 +85,7 @@ export function FlyingEmoji() {
   return (
     <Box
       css={{
-        position: "absolute",
+        position: "fixed",
         top: 0,
         bottom: 0,
         left: 0,

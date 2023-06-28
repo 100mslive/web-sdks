@@ -1,4 +1,3 @@
-import React from "react";
 import PIPComponent from "./PIPComponent";
 import { usePinnedTrack } from "../AppData/useUISettings";
 

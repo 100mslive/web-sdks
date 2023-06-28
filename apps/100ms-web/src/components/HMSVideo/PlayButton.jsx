@@ -1,4 +1,3 @@
-import React from "react";
 import { PauseIcon, PlayIcon } from "@100mslive/react-icons";
 import { IconButton, Tooltip } from "@100mslive/react-ui";
 

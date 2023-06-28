@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { HMSHLSPlayerEvents } from "@100mslive/hls-player";
 import { Text } from "@100mslive/react-ui";
 import { getDurationFromSeconds } from "./HMSVIdeoUtils";

@@ -1,4 +1,3 @@
-import React from "react";
 import { Flex, Loading } from "@100mslive/react-ui";
 
 const FullPageProgress = () => (
