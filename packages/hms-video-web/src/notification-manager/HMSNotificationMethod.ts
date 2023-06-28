@@ -16,6 +16,7 @@ export enum HMSNotificationMethod {
   CONNECTION_QUALITY = 'on-connection-quality-update',
   SFU_STATS = 'sfu-stats',
   ON_SFU_TRACK_LAYER_UPDATE = 'on-track-layer-update',
+  ON_SFU_TRACK_REMOVED = 'on-track-remove',
   BROADCAST = 'on-broadcast',
   ROLE_CHANGE = 'on-role-change',
   POLICY_CHANGE = 'on-policy-change',
