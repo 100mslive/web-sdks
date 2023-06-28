@@ -15,6 +15,14 @@ import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA } from "../common/constants";
 
 export const EmbedView = () => {
+  return (
+    <EmbebScreenShareView>
+      <EmbedComponent />
+    </EmbebScreenShareView>
+  );
+};
+
+export const EmbebScreenShareView = ({ children }) => {
   const peers = useHMSStore(selectPeers);
 
   const mediaQueryLg = cssConfig.media.xl;
@@ -40,7 +48,7 @@ export const EmbedView = () => {
       css={{ size: "100%" }}
       direction={showSidebarInBottom ? "column" : "row"}
     >
-      <EmbedComponent />
+      {children}
       <Flex
         direction={{ "@initial": "column", "@lg": "row" }}
         css={{
