@@ -43,8 +43,6 @@
     "prebuild": "rm -rf build",
     "build": "webpack --node-env production",
     "start": "webpack serve",
-    "esbuild": "node ../../scripts/build-webapp",
-    "dev": "node ../../scripts/dev-webapp",
     "format": "prettier -w src",
     "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
     "lint:fix": "yarn lint --fix"
