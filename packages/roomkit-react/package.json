@@ -11,13 +11,6 @@
     "dist",
     "src"
   ],
-  "exports": {
-    ".": {
-      "require": "./dist/index.cjs.js",
-      "import": "./dist/index.js",
-      "default": "./dist/index.js"
-    }
-  },
   "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist",
@@ -36,14 +29,10 @@
     "eslint-config-react-app": "^7.0.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^8.0.0",
-    "react": "^17.0.0",
-    "rollup": "^2.70.1",
-    "rollup-plugin-esbuild": "^4.9.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "storybook-dark-mode": "^1.1.0"
+    "react": "^17.0.0"
   },
   "peerDependencies": {
-    "react": ">=17.0.2 <19.0.0"
+    "react": "^17.0.0"
   },
   "dependencies": {
     "@100mslive/hls-player": "0.1.7-alpha.7",
@@ -61,8 +50,6 @@
     "js-confetti": "^0.10.2",
     "mobx": "^6.3.12",
     "pusher-js": "^7.0.3",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
     "react-draggable": "^4.4.5",
     "react-intersection-observer": "^9.4.3",
     "react-router-dom": "^6.3.0",

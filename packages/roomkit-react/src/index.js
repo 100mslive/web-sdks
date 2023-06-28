@@ -1,6 +1,8 @@
 import { init } from 'zipyai';
 import { HMSPrebuilt } from './App';
 import reportWebVitals from './reportWebVitals';
+import './base.css';
+import './index.css';
 
 if (process.env.REACT_APP_ZIPY_KEY) {
   init(process.env.REACT_APP_ZIPY_KEY);

@@ -9,8 +9,11 @@ export declare const HMSPrebuilt: React.FC<{
     logo: string;
     font: string;
   };
-  endPoints?: {
-    token?: string;
-    init?: string;
+  options: {
+    endPoints?: {
+      tokenByRoomIdRole?: string;
+      tokenByRoomCode?: string;
+      init?: string;
+    };
   };
 }>;

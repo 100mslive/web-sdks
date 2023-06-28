@@ -22,17 +22,25 @@ import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from '../common/constants';
 const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
-  const { showPreview, roomId, roomCode, role } = useHMSPrebuiltContext();
+  const { showPreview, roomCode } = useHMSPrebuiltContext();
   const location = useLocation();
   const matches = useMemo(
     () =>
       matchPath(
         `${showPreview ? 'preview' : 'meeting'}/:roomId/:role`,
         location.pathname
+      ) ||
+      matchPath(
+        `${showPreview ? 'preview' : 'meeting'}/:roomCode/`,
+        location.pathname
       ),
     [location, showPreview]
   );
-  const { roomId: urlRoomId, role: userRole } = matches?.params || {};
+  const {
+    roomCode: urlRoomCode,
+    roomId: urlRoomId,
+    role: userRole,
+  } = matches?.params || {};
   const [error, setError] = useState({ title: '', body: '' });
   let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
   const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
@@ -42,10 +50,10 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    if (!tokenEndpoint || (!urlRoomId && !roomId && !roomCode)) {
+    if (!tokenEndpoint || (!urlRoomId && !roomCode && !urlRoomCode)) {
       return;
     }
-    const code = !userRole && (roomCode || urlRoomId);
+    const code = !userRole && (roomCode || urlRoomCode);
 
     const getTokenFn = code
       ? () =>
@@ -53,13 +61,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
             { roomCode: code },
             { endpoint: authTokenByRoomCodeEndpoint }
           )
-      : () =>
-          getToken(
-            tokenEndpoint,
-            uuid(),
-            role || userRole,
-            roomId || urlRoomId
-          );
+      : () => getToken(tokenEndpoint, uuid(), userRole, urlRoomId);
 
     getTokenFn()
       .then(token => {
@@ -72,12 +74,11 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
     hmsActions,
     tokenEndpoint,
     urlRoomId,
+    urlRoomCode,
     userRole,
     authToken,
     authTokenByRoomCodeEndpoint,
     setAuthTokenInAppData,
-    roomId,
-    role,
     roomCode,
   ]);
 

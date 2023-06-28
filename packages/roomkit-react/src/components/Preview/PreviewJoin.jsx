@@ -21,6 +21,7 @@ import {
   useTheme,
   Video,
 } from '@100mslive/react-ui';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
@@ -44,12 +45,11 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
+  const { endPoints } = useHMSPrebuiltContext();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
-    initEndpoint: process.env.REACT_APP_ENV
-      ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
-      : undefined,
+    initEndpoint: endPoints?.init,
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,

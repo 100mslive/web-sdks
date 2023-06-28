@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useSearchParam } from "react-use";
+import React, { useEffect } from 'react';
+import { useSearchParam } from 'react-use';
 import {
   HMSRoomState,
   selectAvailableRoleNames,
@@ -12,20 +12,20 @@ import {
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-} from "@100mslive/react-sdk";
-import { normalizeAppPolicyConfig } from "../init/initUtils";
+} from '@100mslive/react-sdk';
+import { normalizeAppPolicyConfig } from '../init/initUtils';
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../hooks/useUserPreferences";
+} from '../hooks/useUserPreferences';
 import {
   useIsSidepaneTypeOpen,
   useSidepaneReset,
   useSidepaneState,
   useSidepaneToggle,
-} from "./useSidepane";
-import { useSetAppDataByKey } from "./useUISettings";
-import { getMetadata } from "../../common/utils";
+} from './useSidepane';
+import { useSetAppDataByKey } from './useUISettings';
+import { getMetadata } from '../../common/utils';
 import {
   APP_DATA,
   CHAT_SELECTOR,
@@ -37,7 +37,7 @@ import {
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
-} from "../../common/constants";
+} from '../../common/constants';
 
 export const getAppDetails = appDetails => {
   try {
@@ -56,7 +56,7 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
-    [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === "qa",
+    [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === 'qa',
     [UI_SETTINGS.hideLocalVideo]: false,
   },
   [APP_DATA.subscribedNotifications]: {
@@ -68,18 +68,18 @@ const initialAppData = {
   },
   [APP_DATA.chatOpen]: false,
   [APP_DATA.chatSelector]: {
-    [CHAT_SELECTOR.ROLE]: "",
-    [CHAT_SELECTOR.PEER_ID]: "",
+    [CHAT_SELECTOR.ROLE]: '',
+    [CHAT_SELECTOR.PEER_ID]: '',
   },
-  [APP_DATA.chatDraft]: "",
-  [APP_DATA.sidePane]: "",
+  [APP_DATA.chatDraft]: '',
+  [APP_DATA.sidePane]: '',
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
-  [APP_DATA.authToken]: "",
+  [APP_DATA.authToken]: '',
 };
 
 export const AppData = React.memo(

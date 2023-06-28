@@ -3,8 +3,6 @@ import React, { useContext } from 'react';
 export const HMSPrebuiltContext = React.createContext({
   showPreview: true,
   showLeave: true,
-  roomId: '',
-  role: '',
   roomCode: '',
   userName: '',
   userId: '',

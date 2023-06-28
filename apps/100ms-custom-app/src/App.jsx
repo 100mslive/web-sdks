@@ -245,7 +245,13 @@ const App = () => {
         >
           <Box css={{ flex: '1 1 0', minHeight: 0 }}>
             <HMSPrebuilt
-              tokenEndpoint={`${apiBasePath + hostname}/`}
+              options={{
+                endPoints: {
+                  tokenByRoomIdRole: `${apiBasePath + hostname}/`,
+                  tokenByRoomCode: getAuthTokenByRoomCodeEndpoint(),
+                  init: `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`,
+                },
+              }}
               themeConfig={{
                 aspectRatio: settings.tile_shape,
                 font: settings.font,
@@ -257,7 +263,6 @@ const App = () => {
                 metadata: settings.metadataFields.metadata,
                 recordingUrl: settings.recording_url,
               }}
-              authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
               getDetails={fetchData}
             />
           </Box>
