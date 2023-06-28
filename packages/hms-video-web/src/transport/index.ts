@@ -26,7 +26,7 @@ import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrack, HMSTrackType } from '../media/tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import Message from '../sdk/models/HMSMessage';
@@ -714,12 +714,6 @@ export default class HMSTransport implements ITransport {
       })
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
-    // on publishing track check for devices
-    if (track.type === HMSTrackType.AUDIO && track.enabled) {
-      this.eventBus.localAudioEnabled.publish({ enabled: track.enabled, track: track as HMSLocalAudioTrack });
-    } else if (track.type === HMSTrackType.VIDEO && track.enabled) {
-      this.eventBus.localVideoEnabled.publish({ enabled: track.enabled, track: track as HMSLocalVideoTrack });
-    }
     track.isPublished = true;
 
     HMSLogger.d(TAG, `✅ publishTrack: trackId=${track.trackId}`, `${track}`, this.callbacks);

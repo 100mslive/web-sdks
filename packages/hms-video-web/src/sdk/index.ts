@@ -449,6 +449,7 @@ export class HMSSdk implements HMSInterface {
     this.roleChangeManager = new RoleChangeManager(
       this.store,
       this.transport,
+      this.deviceManager,
       this.getAndPublishTracks.bind(this),
       this.removeTrack.bind(this),
       this.listener,

@@ -1,4 +1,5 @@
 import { IStore } from './store';
+import { DeviceManager } from '../device-manager';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
@@ -10,6 +11,7 @@ export default class RoleChangeManager {
   constructor(
     private store: IStore,
     private transport: ITransport,
+    private deviceManager: DeviceManager,
     private publish: (settings: InitialSettings) => Promise<void>,
     private removeAuxiliaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
@@ -23,6 +25,7 @@ export default class RoleChangeManager {
     }
 
     await this.diffRolesAndPublishTracks({ oldRole, newRole });
+    await this.deviceManager.init(true);
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
