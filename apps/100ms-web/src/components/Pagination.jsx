@@ -25,6 +25,7 @@ export const Pagination = ({ page, setPage, numPages }) => {
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
         {!pinnedTrack &&
+          numPages < 8 &&
           [...Array(numPages)].map((_, i) => (
             <StyledPagination.Dot
               key={i}
