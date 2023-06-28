@@ -1,1 +1,0 @@
-export { StyledVideoTile } from './StyledVideoTile';

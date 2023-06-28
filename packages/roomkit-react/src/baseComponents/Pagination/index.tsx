@@ -1,1 +1,0 @@
-export { StyledPagination } from './StyledPagination';
