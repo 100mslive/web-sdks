@@ -1,5 +1,5 @@
 // @ts-check
-import Pusher from "pusher-js";
+import Pusher from 'pusher-js';
 
 const stringifyWithNull = obj =>
   JSON.stringify(obj, (k, v) => (v === undefined ? null : v));
@@ -30,14 +30,14 @@ class PusherCommunicationProvider {
     this.lastMessage = {};
   }
 
-  init = (roomId = "") => {
+  init = (roomId = '') => {
     if (this.initialized) {
       return;
     }
 
     /** @private */
     this.pusher = new Pusher(process.env.REACT_APP_PUSHER_APP_KEY, {
-      cluster: "ap2",
+      cluster: 'ap2',
       authEndpoint: process.env.REACT_APP_PUSHER_AUTHENDPOINT,
     });
 
@@ -50,9 +50,9 @@ class PusherCommunicationProvider {
      * When events(peer-join) are sent too early before subscribing to a channel,
      * resend last event after subscription has succeeded.
      */
-    this.channel.bind("pusher:subscription_succeeded", this.resendLastEvents);
+    this.channel.bind('pusher:subscription_succeeded', this.resendLastEvents);
 
-    console.log("Whiteboard initialized communication through Pusher");
+    console.log('Whiteboard initialized communication through Pusher');
     this.initialized = true;
   };
 

@@ -1,21 +1,21 @@
-import * as workerTimers from "worker-timers";
+import * as workerTimers from 'worker-timers';
 import {
   drawVideoElementsOnCanvas,
   dummyChangeInCanvas,
   resetPIPCanvasColors,
-} from "./pipUtils";
-import { isIOS, isMacOS, isSafari } from "../../common/constants";
+} from './pipUtils';
+import { isIOS, isMacOS, isSafari } from '../../common/constants';
 const MAX_NUMBER_OF_TILES_IN_PIP = 4;
 const DEFAULT_FPS = 30;
 const DEFAULT_CANVAS_WIDTH = 480;
 const DEFAULT_CANVAS_HEIGHT = 320;
-const LEAVE_EVENT_NAME = "leavepictureinpicture";
+const LEAVE_EVENT_NAME = 'leavepictureinpicture';
 
 const PIPStates = {
-  starting: "starting",
-  started: "started",
-  stopping: "stopping",
-  stopped: "stopped",
+  starting: 'starting',
+  started: 'started',
+  stopping: 'stopping',
+  stopped: 'stopped',
 };
 
 /**
@@ -36,7 +36,7 @@ class PipManager {
    * @private
    */
   reset() {
-    console.debug("resetting PIP state");
+    console.debug('resetting PIP state');
     resetPIPCanvasColors();
     this.canvas = null; // where stitching will take place
     this.pipVideo = null; // the element which will be sent in PIP
@@ -72,9 +72,9 @@ class PipManager {
    */
   async start(hmsActions, onStateChangeFn) {
     if (!this.isSupported()) {
-      throw new Error("pip is not supported on this browser");
+      throw new Error('pip is not supported on this browser');
     }
-    console.debug("starting PIP, current state", this.state);
+    console.debug('starting PIP, current state', this.state);
     if (this.state === PIPStates.started) {
       await this.stop(); // if anything is already running
     } else if (this.state === PIPStates.starting) {
@@ -89,11 +89,11 @@ class PipManager {
       if (!this.isOn()) {
         await this.requestPIP();
       }
-      console.debug("pip started");
+      console.debug('pip started');
       this.state = PIPStates.started;
       this.onStateChange(true);
     } catch (err) {
-      console.error("error in request pip", err);
+      console.error('error in request pip', err);
       this.state = PIPStates.stopped;
     }
   }
@@ -138,7 +138,7 @@ class PipManager {
         tracksMap
       );
     } catch (error) {
-      console.error("error in detaching/attaching tracks", error);
+      console.error('error in detaching/attaching tracks', error);
     }
   }
 
@@ -166,10 +166,10 @@ class PipManager {
   }
 
   initializeCanvasAndVideoElement() {
-    const canvas = document.createElement("canvas");
+    const canvas = document.createElement('canvas');
     canvas.width = DEFAULT_CANVAS_WIDTH;
     canvas.height = DEFAULT_CANVAS_HEIGHT;
-    const pipVideo = document.createElement("video");
+    const pipVideo = document.createElement('video');
     pipVideo.width = DEFAULT_CANVAS_WIDTH;
     pipVideo.height = DEFAULT_CANVAS_HEIGHT;
     pipVideo.muted = true;
@@ -180,7 +180,7 @@ class PipManager {
   initializeVideoElements() {
     let videoElements = [];
     for (let i = 0; i < MAX_NUMBER_OF_TILES_IN_PIP; i++) {
-      const videoElement = document.createElement("video");
+      const videoElement = document.createElement('video');
       videoElement.autoplay = true;
       videoElement.playsinline = true;
       videoElements.push(videoElement);
@@ -215,7 +215,7 @@ class PipManager {
       }
       await this.pipVideo.requestPictureInPicture();
     } catch (error) {
-      console.error("error in requestpip", error, "state", this.state);
+      console.error('error in requestpip', error, 'state', this.state);
       throw error;
     }
   }

@@ -1,12 +1,12 @@
 // @ts-check
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
   selectPeerCount,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { isInternalRole } from "./utils";
+} from '@100mslive/react-sdk';
+import { isInternalRole } from './utils';
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)

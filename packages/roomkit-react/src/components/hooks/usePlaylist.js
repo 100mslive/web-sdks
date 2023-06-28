@@ -4,7 +4,7 @@ import {
   selectVideoPlaylist,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 
 export const usePlaylist = type => {
   const isAudioPlaylist = type === HMSPlaylistType.audio;

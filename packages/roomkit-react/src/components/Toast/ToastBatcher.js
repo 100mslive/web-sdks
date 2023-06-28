@@ -1,5 +1,5 @@
-import { ToastConfig } from "./ToastConfig";
-import { ToastManager } from "./ToastManager";
+import { ToastConfig } from './ToastConfig';
+import { ToastManager } from './ToastManager';
 
 export const ToastBatcher = {
   toastsType: new Map(),
@@ -42,7 +42,7 @@ export const ToastBatcher = {
     try {
       this.showToastInternal({ notification, duration, type });
     } catch (err) {
-      console.debug("Notifications", err);
+      console.debug('Notifications', err);
     }
   },
   syncUItoast(toastsDisplaying) {

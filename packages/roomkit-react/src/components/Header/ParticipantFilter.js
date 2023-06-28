@@ -1,11 +1,23 @@
 import React, { useCallback, useState } from 'react';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, HandRaiseIcon, PeopleIcon } from '@100mslive/react-icons';
-import { isInternalRole } from '../../common/utils';
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  HandRaiseIcon,
+  PeopleIcon,
+} from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, textEllipsis } from '../base-components';
+import { isInternalRole } from '../../common/utils';
 
-export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }) => {
+export const ParticipantFilter = ({
+  selection,
+  onSelection,
+  isConnected,
+  roles,
+}) => {
   const [open, setOpen] = useState(false);
-  const selectionValue = selection?.role || (selection?.metadata?.isHandRaised ? 'Raised Hand' : '');
+  const selectionValue =
+    selection?.role || (selection?.metadata?.isHandRaised ? 'Raised Hand' : '');
   const onItemClick = useCallback(value => {
     onSelection(value);
     setOpen(false);
@@ -30,7 +42,11 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
             {selectionValue || 'Everyone'}
           </Text>
           <Box css={{ ml: '$2', color: '$textDisabled' }}>
-            {open ? <ChevronUpIcon width={14} height={14} /> : <ChevronDownIcon width={14} height={14} />}
+            {open ? (
+              <ChevronUpIcon width={14} height={14} />
+            ) : (
+              <ChevronDownIcon width={14} height={14} />
+            )}
           </Box>
         </Flex>
       </Dropdown.Trigger>
@@ -44,7 +60,12 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
           w: '$48',
         }}
       >
-        <Item selected={!selection} title="Everyone" onSelection={onItemClick} icon={<PeopleIcon />} />
+        <Item
+          selected={!selection}
+          title="Everyone"
+          onSelection={onItemClick}
+          icon={<PeopleIcon />}
+        />
         <Item
           selected={selection?.metadata?.isHandRaised}
           title="Raised Hand"

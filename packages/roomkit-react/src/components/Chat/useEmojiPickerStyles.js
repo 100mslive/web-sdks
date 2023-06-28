@@ -1,12 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export const useEmojiPickerStyles = showing => {
   const ref = useRef(null);
   useEffect(() => {
     if (showing) {
       setTimeout(() => {
-        const root = ref.current?.querySelector("em-emoji-picker")?.shadowRoot;
-        const style = document.createElement("style");
+        const root = ref.current?.querySelector('em-emoji-picker')?.shadowRoot;
+        const style = document.createElement('style');
         style.textContent = `
           #root {
             --em-rgb-color: var(--hms-ui-colors-textPrimary);

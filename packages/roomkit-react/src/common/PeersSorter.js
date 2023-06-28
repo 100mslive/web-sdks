@@ -1,4 +1,4 @@
-import { selectDominantSpeaker } from "@100mslive/hms-video-store";
+import { selectDominantSpeaker } from '@100mslive/hms-video-store';
 
 class PeersSorter {
   listeners = new Set();

@@ -1,4 +1,4 @@
-import { identify } from "zipyai";
+import { identify } from 'zipyai';
 
 const zipyKey = process.env.REACT_APP_ZIPY_KEY;
 export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
@@ -7,7 +7,7 @@ export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
   }
 
   let domain;
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     domain = window.location.hostname;
   }
 
@@ -38,7 +38,7 @@ export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
 function canPublishAV(role) {
   const params = role?.publishParams;
   if (params?.allowed) {
-    return params.allowed.includes("video") || params.allowed.includes("audio");
+    return params.allowed.includes('video') || params.allowed.includes('audio');
   }
   return false;
 }

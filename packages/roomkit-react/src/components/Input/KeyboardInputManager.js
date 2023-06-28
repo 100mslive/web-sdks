@@ -1,12 +1,12 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 import {
   selectAppData,
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
   useHMSActions,
   useHMSVanillaStore,
-} from "@100mslive/react-sdk";
-import { APP_DATA, isMacOS } from "../../common/constants";
+} from '@100mslive/react-sdk';
+import { APP_DATA, isMacOS } from '../../common/constants';
 
 let isEvenListenersAttached = false;
 export class KeyboardInputManager {
@@ -28,7 +28,7 @@ export class KeyboardInputManager {
 
   #hideSidepane = () => {
     if (this.#store.getState(selectAppData(APP_DATA.sidePane))) {
-      this.#actions.setAppData(APP_DATA.sidePane, "");
+      this.#actions.setAppData(APP_DATA.sidePane, '');
     }
   };
 
@@ -50,13 +50,13 @@ export class KeyboardInputManager {
 
   #keyDownHandler = async e => {
     const CONTROL_KEY = isMacOS ? e.metaKey : e.ctrlKey;
-    const D_KEY = e.key === "d" || e.key === "D";
-    const E_KEY = e.key === "e" || e.key === "E";
-    const SNF_KEY = e.key === "]" || e.key === "}";
+    const D_KEY = e.key === 'd' || e.key === 'D';
+    const E_KEY = e.key === 'e' || e.key === 'E';
+    const SNF_KEY = e.key === ']' || e.key === '}';
 
     const SHORTCUT_TOGGLE_AUDIO = CONTROL_KEY && D_KEY;
     const SHORTCUT_TOGGLE_VIDEO = CONTROL_KEY && E_KEY;
-    const SHORTCUT_SIDEPANE_CLOSE = e.key === "Escape";
+    const SHORTCUT_SIDEPANE_CLOSE = e.key === 'Escape';
     const SHORTCUT_STATS_FOR_NERDS = CONTROL_KEY && SNF_KEY;
 
     if (SHORTCUT_TOGGLE_AUDIO) {
@@ -74,11 +74,11 @@ export class KeyboardInputManager {
   };
 
   #bind = () => {
-    document.addEventListener("keydown", this.#keyDownHandler, false);
+    document.addEventListener('keydown', this.#keyDownHandler, false);
   };
 
   #unbind = () => {
-    document.removeEventListener("keydown", this.#keyDownHandler, false);
+    document.removeEventListener('keydown', this.#keyDownHandler, false);
   };
 
   bindAllShortcuts = () => {

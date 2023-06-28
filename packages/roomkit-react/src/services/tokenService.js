@@ -5,7 +5,7 @@
  */
 const fetchWithRetry = async (url, options) => {
   const MAX_RETRIES = 4;
-  let error = Error("something went wrong");
+  let error = Error('something went wrong');
   for (let i = 0; i < MAX_RETRIES; i++) {
     try {
       return await fetch(url, options);
@@ -13,14 +13,14 @@ const fetchWithRetry = async (url, options) => {
       error = err;
     }
   }
-  console.error("Fetch failed after max retries", { url, options });
+  console.error('Fetch failed after max retries', { url, options });
   throw error;
 };
 
 export default async function getToken(tokenEndpoint, userId, role, roomId) {
   try {
     const response = await fetchWithRetry(`${tokenEndpoint}api/token`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify({
         role,
         room_id: roomId,
@@ -29,7 +29,7 @@ export default async function getToken(tokenEndpoint, userId, role, roomId) {
     });
 
     if (!response.ok) {
-      let error = new Error("Request failed!");
+      let error = new Error('Request failed!');
       error.response = response;
       throw error;
     }

@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   selectIsLocalAudioPluginPresent,
   useDevices,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { AudioLevelIcon } from "@100mslive/react-icons";
-import { Tooltip } from "@100mslive/react-ui";
-import { ToastManager } from "../components/Toast/ToastManager";
-import IconButton from "../IconButton";
-import { useIsFeatureEnabled } from "../components/hooks/useFeatures";
-import { FeatureFlags } from "../services/FeatureFlags";
-import { FEATURE_LIST } from "../common/constants";
+} from '@100mslive/react-sdk';
+import { AudioLevelIcon } from '@100mslive/react-icons';
+import { Tooltip } from '@100mslive/react-ui';
+import { ToastManager } from '../components/Toast/ToastManager';
+import IconButton from '../IconButton';
+import { useIsFeatureEnabled } from '../components/hooks/useFeatures';
+import { FeatureFlags } from '../services/FeatureFlags';
+import { FEATURE_LIST } from '../common/constants';
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);
@@ -19,7 +19,7 @@ export const NoiseSuppression = () => {
   const [disable, setDisabled] = useState(false);
   const [isNSSupported, setIsNSSupported] = useState(false);
   const isPluginPresent = useHMSStore(
-    selectIsLocalAudioPluginPresent("@100mslive/hms-noise-suppression")
+    selectIsLocalAudioPluginPresent('@100mslive/hms-noise-suppression')
   );
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.AUDIO_PLUGINS);
   const { selectedDeviceIDs } = useDevices();
@@ -28,7 +28,7 @@ export const NoiseSuppression = () => {
   const createPlugin = useCallback(async () => {
     if (!pluginRef.current) {
       const { HMSNoiseSuppressionPlugin } = await import(
-        "@100mslive/hms-noise-suppression"
+        '@100mslive/hms-noise-suppression'
       );
       pluginRef.current = new HMSNoiseSuppressionPlugin(
         process.env.NS_DURATION_TIME_IN_MS
@@ -45,7 +45,7 @@ export const NoiseSuppression = () => {
 
   const handleFailure = useCallback(
     async err => {
-      let message = "adding Noise Suppression plugin failed, see docs";
+      let message = 'adding Noise Suppression plugin failed, see docs';
       if (err.message) {
         message = err.message;
       }
@@ -96,7 +96,7 @@ export const NoiseSuppression = () => {
 
   if (isNSSupported && FeatureFlags.showNS() && isFeatureEnabled) {
     return (
-      <Tooltip title={`Turn ${!pluginActive ? "on" : "off"} noise suppression`}>
+      <Tooltip title={`Turn ${!pluginActive ? 'on' : 'off'} noise suppression`}>
         <IconButton
           active={!pluginActive}
           disabled={disable}

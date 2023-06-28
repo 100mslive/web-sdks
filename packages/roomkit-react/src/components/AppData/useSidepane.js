@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import {
   selectAppData,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
-} from "@100mslive/react-sdk";
-import { APP_DATA } from "../../common/constants";
+} from '@100mslive/react-sdk';
+import { APP_DATA } from '../../common/constants';
 
 /**
  * Gives a boolean value if the sidepaneType matches current sidepane value in store
@@ -14,7 +14,7 @@ import { APP_DATA } from "../../common/constants";
  */
 export const useIsSidepaneTypeOpen = sidepaneType => {
   if (!sidepaneType) {
-    throw Error("Pass one of the side pane options");
+    throw Error('Pass one of the side pane options');
   }
   return useHMSStore(selectAppData(APP_DATA.sidePane)) === sidepaneType;
 };
@@ -38,7 +38,7 @@ export const useSidepaneToggle = sidepaneType => {
   const toggleSidepane = useCallback(() => {
     const isOpen =
       vanillaStore.getState(selectAppData(APP_DATA.sidePane)) === sidepaneType;
-    hmsActions.setAppData(APP_DATA.sidePane, !isOpen ? sidepaneType : "");
+    hmsActions.setAppData(APP_DATA.sidePane, !isOpen ? sidepaneType : '');
   }, [vanillaStore, hmsActions, sidepaneType]);
   return toggleSidepane;
 };
@@ -49,7 +49,7 @@ export const useSidepaneToggle = sidepaneType => {
 export const useSidepaneReset = () => {
   const hmsActions = useHMSActions();
   const resetSidepane = useCallback(() => {
-    hmsActions.setAppData(APP_DATA.sidePane, "");
+    hmsActions.setAppData(APP_DATA.sidePane, '');
   }, [hmsActions]);
   return resetSidepane;
 };

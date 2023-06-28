@@ -1,11 +1,11 @@
-import { PictureInPicture } from "./PIPManager";
+import { PictureInPicture } from './PIPManager';
 
-describe("pip manager tests", () => {
+describe('pip manager tests', () => {
   /**
    * Ensure that if a track is showing in both before and after, it's at the
    * same position.
    */
-  test("merging old and new tracks to show avoids shuffling", () => {
+  test('merging old and new tracks to show avoids shuffling', () => {
     const makeTestData = (oldArr, newArr, result) => {
       return { oldArr, newArr, result };
     };
@@ -39,7 +39,7 @@ describe("pip manager tests", () => {
    * the track changes as well. That is earlier it was showing on third position
    * but not it's on second position(because there are only two tracks left to show).
    */
-  test("attach and detach are called properly after tracks in view changes", async () => {
+  test('attach and detach are called properly after tracks in view changes', async () => {
     const makeTestData = (oldTracks, newTracks, detachFor, attachFor) => {
       return { oldTracks, newTracks, detachFor, attachFor };
     };

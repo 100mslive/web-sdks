@@ -1,8 +1,19 @@
 import React, { Suspense, useEffect } from 'react';
-import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { HMSRoomProvider, selectIsConnectedToRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  BrowserRouter,
+  MemoryRouter,
+  Navigate,
+  Route,
+  Routes,
+  useParams,
+} from 'react-router-dom';
+import {
+  HMSRoomProvider,
+  selectIsConnectedToRoom,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { Box, HMSThemeProvider } from '@100mslive/react-ui';
-import { getRoutePrefix, shadeColor } from './common/utils';
 import { AppData } from './components/AppData/AppData.jsx';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
@@ -15,12 +26,13 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer.jsx';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext.js';
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji.jsx';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+import { getRoutePrefix, shadeColor } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
-import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext.js';
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import './base.css';
 import './index.css';
 
@@ -42,7 +54,9 @@ if (!isSSR) {
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
   const host = process.env.REACT_APP_HOST_NAME;
-  const portraitDomains = (process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || '').split(',');
+  const portraitDomains = (
+    process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || ''
+  ).split(',');
   if (portraitDomains.includes(host) && width > height) {
     return { width: height, height: width };
   }
@@ -68,13 +82,19 @@ export const HMSPrebuilt = React.forwardRef(
       options: {
         userName = '',
         userId = '',
-        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = defaultTokenEndpoint } = {},
+        endPoints: {
+          init: initEndpoint = '',
+          tokenByRoomCode = '',
+          tokenByRoomIdRole = defaultTokenEndpoint,
+        } = {},
       } = {},
       onLeave = () => {},
     },
-    ref,
+    ref
   ) => {
-    const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
+    const { 0: width, 1: height } = aspectRatio
+      .split('-')
+      .map(el => parseInt(el));
 
     const [hyderated, setHyderated] = React.useState(false);
     useEffect(() => setHyderated(true), []);
@@ -149,14 +169,17 @@ export const HMSPrebuilt = React.forwardRef(
                   size: '100%',
                 }}
               >
-                <AppRoutes getDetails={getDetails} authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
+                <AppRoutes
+                  getDetails={getDetails}
+                  authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode}
+                />
               </Box>
             </HMSRoomProvider>
           </HMSThemeProvider>
         </HMSPrebuiltContext.Provider>
       </ErrorBoundary>
     );
-  },
+  }
 );
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
@@ -177,7 +200,13 @@ const Redirector = ({ getDetails, showPreview }) => {
     return <Navigate to="/" />;
   }
 
-  return <Navigate to={`${getRoutePrefix()}/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
+  return (
+    <Navigate
+      to={`${getRoutePrefix()}/${
+        showPreview ? 'preview' : 'meeting'
+      }/${roomId}/${role || ''}`}
+    />
+  );
 };
 
 const RouteList = ({ getDetails }) => {
@@ -229,8 +258,18 @@ const RouteList = ({ getDetails }) => {
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
-      <Route path="/:roomId/:role" element={<Redirector getDetails={getDetails} showPreview={showPreview} />} />
-      <Route path="/:roomId/" element={<Redirector getDetails={getDetails} showPreview={showPreview} />} />
+      <Route
+        path="/:roomId/:role"
+        element={
+          <Redirector getDetails={getDetails} showPreview={showPreview} />
+        }
+      />
+      <Route
+        path="/:roomId/"
+        element={
+          <Redirector getDetails={getDetails} showPreview={showPreview} />
+        }
+      />
       <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
     </Routes>
   );
@@ -258,7 +297,10 @@ const Router = ({ children }) => {
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
   ) : (
-    <MemoryRouter initialEntries={[`/${roomCode ? roomCode : `${roomId}/${role || ''}`}`]} initialIndex={0}>
+    <MemoryRouter
+      initialEntries={[`/${roomCode ? roomCode : `${roomId}/${role || ''}`}`]}
+      initialIndex={0}
+    >
       {children}
     </MemoryRouter>
   );
@@ -278,7 +320,10 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
       <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
       <Routes>
         <Route path="/*" element={<RouteList getDetails={getDetails} />} />
-        <Route path="/streaming/*" element={<RouteList getDetails={getDetails} />} />
+        <Route
+          path="/streaming/*"
+          element={<RouteList getDetails={getDetails} />}
+        />
       </Routes>
     </Router>
   );

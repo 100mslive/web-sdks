@@ -1,8 +1,8 @@
-import RecordRTC, { StereoAudioRecorder } from "recordrtc";
+import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
 import {
   selectIsLocalAudioEnabled,
   selectLocalPeerName,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 
 export class Transcriber {
   constructor({
@@ -37,7 +37,7 @@ export class Transcriber {
     if (enable === this.enabled) {
       return;
     }
-    console.log("transcription enabled", enable);
+    console.log('transcription enabled', enable);
     if (enable) {
       this.enabled = true;
       await this.setIsTranscriptionEnabled(true);
@@ -62,13 +62,13 @@ export class Transcriber {
   }
 
   resetTranscriptAndPeer() {
-    this.setTranscriptAndSpeakingPeer("", "");
+    this.setTranscriptAndSpeakingPeer('', '');
     clearTimeout(this.resetTextTimer);
   }
 
   async listen(retryCount = 0) {
     if (retryCount > 5) {
-      console.error("transcription", "Max retry count reached!!", retryCount);
+      console.error('transcription', 'Max retry count reached!!', retryCount);
       this.cleanup();
       return;
     }
@@ -91,9 +91,9 @@ export class Transcriber {
               let messageText =
                 res.text.length >= 80
                   ? res.text
-                      .split(" ")
-                      .slice(Math.max(res.text.split(" ").length - 10, 1))
-                      .join(" ")
+                      .split(' ')
+                      .slice(Math.max(res.text.split(' ').length - 10, 1))
+                      .join(' ')
                   : res.text;
               if (messageText) {
                 this.setTranscriptAndPeerWithExpiry(
@@ -103,12 +103,12 @@ export class Transcriber {
               }
             }
           } catch (err) {
-            console.error("transcription", err);
+            console.error('transcription', err);
           }
         };
 
         this.audioSocket.onerror = event => {
-          console.error("transcription", event);
+          console.error('transcription', event);
           this.audioSocket.close();
         };
 
@@ -120,7 +120,7 @@ export class Transcriber {
               this.listen(retryCount++);
             }
           } catch (err) {
-            console.error("transcription", err);
+            console.error('transcription', err);
           }
         };
 
@@ -128,10 +128,10 @@ export class Transcriber {
           this.observeLocalPeerTrack();
         };
       } else {
-        console.error("Unable to fetch dynamic token!!");
+        console.error('Unable to fetch dynamic token!!');
       }
     } catch (err) {
-      console.error("transcription", err);
+      console.error('transcription', err);
     }
   }
 
@@ -141,7 +141,7 @@ export class Transcriber {
         return;
       }
       this.observingLocalPeerTrack = true;
-      console.log("transcription - observing local peer track");
+      console.log('transcription - observing local peer track');
       let unsub = this.hmsStore.subscribe(
         this.getAndObserveStream,
         selectIsLocalAudioEnabled
@@ -149,7 +149,7 @@ export class Transcriber {
       this.unsubscribes.push(unsub);
       this.getAndObserveStream(); // call it once to start observing initially
     } catch (err) {
-      console.error("transcription - observing local peer track", err);
+      console.error('transcription - observing local peer track', err);
     }
   }
 
@@ -165,15 +165,15 @@ export class Transcriber {
       return;
     }
     this.trackIdBeingObserved = mediaTrack.id;
-    console.log("transcription - observing local peer track", mediaTrack.id);
+    console.log('transcription - observing local peer track', mediaTrack.id);
     try {
       if (this.recordRTCInstance) {
-        console.log("transcription - destroying earlier instance");
+        console.log('transcription - destroying earlier instance');
         this.recordRTCInstance.destroy();
       }
       this.recordRTCInstance = null;
     } catch (err) {
-      console.error("transcription - in destroying earlier instance", err);
+      console.error('transcription - in destroying earlier instance', err);
     }
     const stream = new MediaStream([mediaTrack]);
     await this.observeStream(stream);
@@ -182,8 +182,8 @@ export class Transcriber {
   async observeStream(stream) {
     this.recordRTCInstance = new RecordRTC(stream, {
       ...this.sttTuningConfig,
-      type: "audio",
-      mimeType: "audio/webm;codecs=pcm",
+      type: 'audio',
+      mimeType: 'audio/webm;codecs=pcm',
       recorderType: StereoAudioRecorder,
       ondataavailable: blob => {
         const reader = new FileReader();
@@ -197,10 +197,10 @@ export class Transcriber {
           ) {
             try {
               this.audioSocket.send(
-                JSON.stringify({ audio_data: base64data.split("base64,")[1] })
+                JSON.stringify({ audio_data: base64data.split('base64,')[1] })
               );
             } catch (err) {
-              console.error("transcription", err);
+              console.error('transcription', err);
             }
           }
         };
@@ -211,7 +211,7 @@ export class Transcriber {
   }
 
   cleanup() {
-    console.log("transcription - cleanup");
+    console.log('transcription - cleanup');
     if (this.audioSocket) {
       try {
         this.audioSocket.close();

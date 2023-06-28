@@ -21,7 +21,7 @@ import {
   Text,
   textEllipsis,
   Tooltip,
-} from "../base-components";
+} from "../baseComponents";
 import { useFilteredRoles } from "../common/hooks";
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (

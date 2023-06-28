@@ -1,10 +1,10 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import {
   selectPeerSharingAudio,
   selectScreenShareAudioByPeerID,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 
 export const useScreenshareAudio = () => {
   const hmsActions = useHMSActions();

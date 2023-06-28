@@ -1,7 +1,7 @@
 import {
   selectIsLocalAudioEnabled,
   selectIsLocalVideoEnabled,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 
 /**
  * Media Session API allows for handling control actions on top of pip
@@ -31,19 +31,19 @@ class SetupMediaSession {
   };
 
   toggleMic = async () => {
-    console.log("toggle mic clicked in pip");
+    console.log('toggle mic clicked in pip');
     const current = this.store.getState(selectIsLocalAudioEnabled);
     await this.actions.setLocalAudioEnabled(!current);
   };
 
   toggleCam = async () => {
-    console.log("toggle cam clicked in pip");
+    console.log('toggle cam clicked in pip');
     const current = this.store.getState(selectIsLocalVideoEnabled);
     await this.actions.setLocalVideoEnabled(!current);
   };
 
   leave = () => {
-    console.log("leave called from pip");
+    console.log('leave called from pip');
     this.actions.leave();
   };
 
@@ -51,13 +51,13 @@ class SetupMediaSession {
     if (navigator.mediaSession) {
       try {
         navigator.mediaSession.setActionHandler(
-          "togglemicrophone",
+          'togglemicrophone',
           this.toggleMic
         );
-        navigator.mediaSession.setActionHandler("togglecamera", this.toggleCam);
-        navigator.mediaSession.setActionHandler("hangup", this.leave);
+        navigator.mediaSession.setActionHandler('togglecamera', this.toggleCam);
+        navigator.mediaSession.setActionHandler('hangup', this.leave);
       } catch (err) {
-        console.error("error in setting media session handlers", err);
+        console.error('error in setting media session handlers', err);
       }
     }
   };

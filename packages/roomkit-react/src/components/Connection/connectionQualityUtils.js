@@ -1,12 +1,12 @@
 const connectionTooltip = {
-  0: "Reconnecting",
-  1: "Very Bad Connection",
-  2: "Bad Connection",
-  3: "Moderate Connection",
-  4: "Good Connection",
-  5: "Excellent Connection",
+  0: 'Reconnecting',
+  1: 'Very Bad Connection',
+  2: 'Bad Connection',
+  3: 'Moderate Connection',
+  4: 'Good Connection',
+  5: 'Excellent Connection',
 };
-connectionTooltip[-1] = "Network Unknown";
+connectionTooltip[-1] = 'Network Unknown';
 
 /**
  * @param connectionScore -> 1-5 connection score for network quality
@@ -29,11 +29,11 @@ export const getColor = (position, connectionScore, defaultColor) => {
     return defaultColor;
   }
   if (connectionScore >= 4) {
-    return "#37F28D";
+    return '#37F28D';
   } else if (connectionScore >= 3) {
-    return "#FAC919";
+    return '#FAC919';
   } else if (connectionScore >= 1) {
-    return "#ED4C5A";
+    return '#ED4C5A';
   }
   return defaultColor;
 };

@@ -1,9 +1,9 @@
 // @ts-check
-import { useCallback, useEffect, useRef, useState } from "react";
-import { selectDidIJoinWithin, useHMSStore } from "@100mslive/react-sdk";
-import { provider as room } from "./PusherCommunicationProvider";
-import { WhiteboardEvents as Events } from "./WhiteboardEvents";
-import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { selectDidIJoinWithin, useHMSStore } from '@100mslive/react-sdk';
+import { provider as room } from './PusherCommunicationProvider';
+import { WhiteboardEvents as Events } from './WhiteboardEvents';
+import { useWhiteboardMetadata } from './useWhiteboardMetadata';
 
 const useWhiteboardState = () => {
   const { amIWhiteboardOwner } = useWhiteboardMetadata();
@@ -202,7 +202,7 @@ export function useMultiplayerState(roomId) {
     // Store last state on closing whitboard so that when the board is reopened the state could be fetched and reapplied
     const handleUnmount = () => {
       if (isReady && !shouldRequestState) {
-        console.log("Whiteboard unmount storing", getCurrentState());
+        console.log('Whiteboard unmount storing', getCurrentState());
         room.storeEvent(Events.CURRENT_STATE, getCurrentState());
       }
     };

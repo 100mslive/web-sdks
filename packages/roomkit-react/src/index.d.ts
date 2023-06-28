@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export declare const HMSPrebuilt: React.FC<{
   roomCode: string;

@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from 'react';
 import {
   selectLocalPeerID,
   selectPeerByCondition,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { useMyMetadata } from "../../components/hooks/useMetadata";
-import { getMetadata } from "../../common/utils";
-import { FeatureFlags } from "../../services/FeatureFlags";
+} from '@100mslive/react-sdk';
+import { useMyMetadata } from '../../components/hooks/useMetadata';
+import { getMetadata } from '../../common/utils';
+import { FeatureFlags } from '../../services/FeatureFlags';
 
 const isWhiteboardOwner = peer => {
   return !!getMetadata(peer?.metadata).whiteboardOwner;
@@ -26,18 +26,18 @@ export const useWhiteboardMetadata = () => {
    */
   const toggleWhiteboard = useCallback(async () => {
     if (!process.env.REACT_APP_PUSHER_APP_KEY) {
-      console.error("Cannot start whiteboard - Pusher Key unavailable");
+      console.error('Cannot start whiteboard - Pusher Key unavailable');
     }
     try {
       if (!whiteboardOwner || amIWhiteboardOwner) {
         await updateMetaData({ whiteboardOwner: !whiteboardOwner });
       } else {
         console.warn(
-          "Cannot toggle whiteboard as it was shared by another peer"
+          'Cannot toggle whiteboard as it was shared by another peer'
         );
       }
     } catch (error) {
-      console.error("failed to toggle whiteboard to ", !whiteboardOwner, error);
+      console.error('failed to toggle whiteboard to ', !whiteboardOwner, error);
     }
   }, [whiteboardOwner, updateMetaData, amIWhiteboardOwner]);
 

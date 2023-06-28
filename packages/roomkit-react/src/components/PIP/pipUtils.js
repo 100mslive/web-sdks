@@ -5,18 +5,18 @@ function setPIPCanvasColors() {
   if (!CANVAS_FILL_COLOR) {
     CANVAS_FILL_COLOR = window
       .getComputedStyle(document.documentElement)
-      .getPropertyValue("--hms-ui-colors-surfaceLight");
+      .getPropertyValue('--hms-ui-colors-surfaceLight');
   }
   if (!CANVAS_STROKE_COLOR) {
     CANVAS_STROKE_COLOR = window
       .getComputedStyle(document.documentElement)
-      .getPropertyValue("--hms-ui-colors-borderLight");
+      .getPropertyValue('--hms-ui-colors-borderLight');
   }
 }
 
 export function resetPIPCanvasColors() {
-  CANVAS_FILL_COLOR = "";
-  CANVAS_STROKE_COLOR = "";
+  CANVAS_FILL_COLOR = '';
+  CANVAS_STROKE_COLOR = '';
 }
 /**
  * no tile - blank canvas, black image
@@ -31,7 +31,7 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
     videoElement => videoElement.srcObject !== null
   );
 
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -48,7 +48,7 @@ export function drawVideoElementsOnCanvas(videoElements, canvas) {
 // this is to send some data for stream and resolve video element's play for a
 // video element rendering this canvas' capture stream
 export function dummyChangeInCanvas(canvas) {
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext('2d');
   setPIPCanvasColors();
   ctx.fillStyle = CANVAS_FILL_COLOR;
   ctx.fillRect(0, 0, canvas.width, canvas.height);

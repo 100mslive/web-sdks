@@ -1,9 +1,9 @@
-import { LeftControls, RightControls, VideoControls } from "./Controls";
-import { HMSVideo } from "./HMSVideo";
-import { PlayButton } from "./PlayButton";
-import { VideoProgress } from "./VideoProgress";
-import { VideoTime } from "./VideoTime";
-import { VolumeControl } from "./VolumeControl";
+import { LeftControls, RightControls, VideoControls } from './Controls';
+import { HMSVideo } from './HMSVideo';
+import { PlayButton } from './PlayButton';
+import { VideoProgress } from './VideoProgress';
+import { VideoTime } from './VideoTime';
+import { VolumeControl } from './VolumeControl';
 
 export const HMSVideoPlayer = {
   Root: HMSVideo,

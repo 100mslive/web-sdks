@@ -1,4 +1,4 @@
-import { QUERY_PARAM_SKIP_PREVIEW } from "./constants";
+import { QUERY_PARAM_SKIP_PREVIEW } from './constants';
 
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
@@ -14,13 +14,13 @@ export function shadeColor(color, percent) {
   B = B < 255 ? B : 255;
 
   const RR =
-    R.toString(16).length === 1 ? "0" + R.toString(16) : R.toString(16);
+    R.toString(16).length === 1 ? '0' + R.toString(16) : R.toString(16);
   const GG =
-    G.toString(16).length === 1 ? "0" + G.toString(16) : G.toString(16);
+    G.toString(16).length === 1 ? '0' + G.toString(16) : G.toString(16);
   const BB =
-    B.toString(16).length === 1 ? "0" + B.toString(16) : B.toString(16);
+    B.toString(16).length === 1 ? '0' + B.toString(16) : B.toString(16);
 
-  return "#" + RR + GG + BB;
+  return '#' + RR + GG + BB;
 }
 
 /**
@@ -44,7 +44,7 @@ export const arrayIntersection = (a, b) => {
 
 export const getMetadata = metadataString => {
   try {
-    return metadataString === "" ? {} : JSON.parse(metadataString);
+    return metadataString === '' ? {} : JSON.parse(metadataString);
   } catch (error) {
     return {};
   }
@@ -57,25 +57,25 @@ export const metadataProps = function (peer) {
 };
 
 export const isScreenshareSupported = () => {
-  return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
+  return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
 };
 
 export const getDefaultMeetingUrl = () => {
   return (
-    window.location.href.replace("meeting", "preview") +
+    window.location.href.replace('meeting', 'preview') +
     `?${QUERY_PARAM_SKIP_PREVIEW}=true`
   );
 };
 
 export const getRoutePrefix = () => {
-  return window.location.pathname.startsWith("/streaming") ? "/streaming" : "";
+  return window.location.pathname.startsWith('/streaming') ? '/streaming' : '';
 };
 
 export const isStreamingKit = () => {
-  return window.location.pathname.startsWith("/streaming");
+  return window.location.pathname.startsWith('/streaming');
 };
 
-export const isInternalRole = role => role && role.startsWith("__internal");
+export const isInternalRole = role => role && role.startsWith('__internal');
 
 export const metadataPayloadParser = payload => {
   try {

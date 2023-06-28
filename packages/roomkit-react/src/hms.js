@@ -1,4 +1,4 @@
-import { HMSReactiveStore } from "@100mslive/react-sdk";
+import { HMSReactiveStore } from '@100mslive/react-sdk';
 
 const hms = new HMSReactiveStore();
 export const hmsStore = hms.getStore();

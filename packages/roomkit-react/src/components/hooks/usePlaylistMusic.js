@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import {
   selectAudioPlaylist,
   selectAudioPlaylistTrackByPeerID,
   selectPeerSharingAudioPlaylist,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 
 export const usePlaylistMusic = () => {
   const peer = useHMSStore(selectPeerSharingAudioPlaylist);
