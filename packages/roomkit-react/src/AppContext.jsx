@@ -9,7 +9,7 @@ export const HMSPrebuiltContext = React.createContext({
   userName: '',
   userId: '',
   endPoints: {},
-  onLeave: () => {},
+  onLeave: undefined,
 });
 
 HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';
@@ -18,7 +18,7 @@ export const useHMSPrebuiltContext = () => {
   const context = useContext(HMSPrebuiltContext);
   if (!context) {
     throw Error(
-      'Make sure AppContext.Provider is present at the top level of your application'
+      'Make sure HMSPrebuiltContext.Provider is present at the top level of your application'
     );
   }
   return context;

@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Box, HMSThemeProvider } from '@100mslive/react-ui';
-import { AppData } from './components/AppData/AppData.jsx';
+import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -24,12 +24,12 @@ import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
-import PreviewContainer from './components/Preview/PreviewContainer.jsx';
+import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext.js';
+import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
-import { FlyingEmoji } from './plugins/FlyingEmoji.jsx';
+import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 import { getRoutePrefix, shadeColor } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
@@ -75,7 +75,7 @@ export const HMSPrebuilt = React.forwardRef(
         metadata = '',
         recordingUrl = '',
       } = {},
-      getDetails = () => {}, // this should get removed
+      getDetails,
       roomId = '',
       role = '',
       roomCode = '',
@@ -88,7 +88,7 @@ export const HMSPrebuilt = React.forwardRef(
           tokenByRoomIdRole = defaultTokenEndpoint,
         } = {},
       } = {},
-      onLeave = () => {},
+      onLeave,
     },
     ref
   ) => {
@@ -326,21 +326,5 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
         />
       </Routes>
     </Router>
-  );
-}
-
-export default function App() {
-  return (
-    <HMSPrebuilt
-      themeConfig={{
-        aspectRatio: process.env.REACT_APP_TILE_SHAPE,
-        theme: process.env.REACT_APP_THEME,
-        color: process.env.REACT_APP_COLOR,
-        logo: process.env.REACT_APP_LOGO,
-        font: process.env.REACT_APP_FONT,
-        metadata: process.env.REACT_APP_DEFAULT_APP_DETAILS, // A stringified object in env
-      }}
-      roomCode="afa-wuos-imd"
-    />
   );
 }
