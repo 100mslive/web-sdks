@@ -25,7 +25,9 @@ export default class RoleChangeManager {
     }
 
     await this.diffRolesAndPublishTracks({ oldRole, newRole });
-    await this.deviceManager.init(true);
+    if (newRole.publishParams.allowed.length > 0) {
+      await this.deviceManager.init(true);
+    }
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
