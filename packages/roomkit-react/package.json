@@ -48,8 +48,8 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.8.7-alpha.0",
-    "@100mslive/react-sdk": "0.8.7-alpha.0",
+    "@100mslive/react-icons": "0.8.7-alpha.7",
+    "@100mslive/react-sdk": "0.8.7-alpha.7",
     "@radix-ui/react-accordion": "1.0.0",
     "@radix-ui/react-checkbox": "1.0.0",
     "@radix-ui/react-collapsible": "^1.0.1",
