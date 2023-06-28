@@ -1,6 +1,6 @@
 import React from "react";
 import { DialogCol } from "../../primitives/DialogContent";
-import { Dialog, Text } from "../base-components";
+import { Dialog, Text } from "../baseComponents";
 
 export const PDFHeader = () => {
   return (

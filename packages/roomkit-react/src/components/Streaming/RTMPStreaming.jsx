@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   selectAppData,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   AddCircleIcon,
   EndStreamIcon,
@@ -12,20 +12,7 @@ import {
   PencilIcon,
   SettingsIcon,
   TrashIcon,
-} from "@100mslive/react-icons";
-import {
-  Container,
-  ContentBody,
-  ContentHeader,
-  ErrorText,
-  RecordStream,
-} from "./Common";
-import { ResolutionInput } from "./ResolutionInput";
-import {
-  APP_DATA,
-  RTMP_RECORD_DEFAULT_RESOLUTION,
-} from "../../common/constants";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
+} from '@100mslive/react-icons';
 import {
   Accordion,
   Box,
@@ -35,11 +22,24 @@ import {
   Label,
   Loading,
   Text,
-} from "../base-components";
+} from '../baseComponents';
+import {
+  Container,
+  ContentBody,
+  ContentHeader,
+  ErrorText,
+  RecordStream,
+} from './Common';
+import { ResolutionInput } from './ResolutionInput';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../hooks/useUserPreferences";
+} from '../hooks/useUserPreferences';
+import {
+  APP_DATA,
+  RTMP_RECORD_DEFAULT_RESOLUTION,
+} from '../../common/constants';
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();
@@ -69,10 +69,10 @@ const StartRTMP = () => {
       ? rtmpPreference
       : [
           {
-            name: "Stream",
+            name: 'Stream',
             id: Date.now(),
-            rtmpURL: "",
-            streamKey: "",
+            rtmpURL: '',
+            streamKey: '',
           },
         ]
   );
@@ -90,14 +90,14 @@ const StartRTMP = () => {
 
   return (
     <Box
-      css={{ overflowY: "auto" }}
+      css={{ overflowY: 'auto' }}
       as="form"
       onSubmit={e => {
         e.preventDefault();
       }}
     >
       {rtmpStreams.length > 0 && (
-        <Box css={{ px: "$10" }}>
+        <Box css={{ px: '$10' }}>
           <Accordion.Root
             type="single"
             collapsible
@@ -109,16 +109,16 @@ const StartRTMP = () => {
                   value={rtmp.id}
                   key={rtmp.id}
                   css={{
-                    border: "2px solid $surfaceLight !important",
-                    r: "$1",
-                    my: "$4",
+                    border: '2px solid $surfaceLight !important',
+                    r: '$1',
+                    my: '$4',
                   }}
                 >
                   <AccordionHeader
                     rtmp={rtmp}
                     setRTMPStreams={setRTMPStreams}
                   />
-                  <Accordion.Content css={{ px: "$8", py: 0 }}>
+                  <Accordion.Content css={{ px: '$8', py: 0 }}>
                     <RTMPForm
                       {...rtmp}
                       setRTMPStreams={setRTMPStreams}
@@ -135,10 +135,10 @@ const StartRTMP = () => {
         testId="rtmp_resolution"
         onResolutionChange={setResolution}
         css={{
-          flexDirection: "column",
-          alignItems: "start",
-          px: "$10",
-          my: "$8",
+          flexDirection: 'column',
+          alignItems: 'start',
+          px: '$10',
+          my: '$8',
         }}
       />
       <RecordStream
@@ -146,22 +146,22 @@ const StartRTMP = () => {
         setRecord={setRecord}
         testId="rtmp_recording"
       />
-      <Box css={{ p: "$8 $10", "@lg": { display: "flex", gap: "$4" } }}>
+      <Box css={{ p: '$8 $10', '@lg': { display: 'flex', gap: '$4' } }}>
         {rtmpStreams.length < 3 && (
           <Button
             data-testid="add_stream"
             variant="standard"
             outlined
             icon
-            css={{ my: "$4", w: "100%" }}
+            css={{ my: '$4', w: '100%' }}
             onClick={() => {
               setRTMPStreams(streams => [
                 ...streams,
                 {
-                  name: "Stream",
+                  name: 'Stream',
                   id: Date.now(),
-                  rtmpURL: "",
-                  streamKey: "",
+                  rtmpURL: '',
+                  streamKey: '',
                 },
               ]);
             }}
@@ -175,7 +175,7 @@ const StartRTMP = () => {
           variant="primary"
           icon
           type="submit"
-          css={{ w: "100%", my: "$4" }}
+          css={{ w: '100%', my: '$4' }}
           disabled={isRTMPStarted || (rtmpStreams.length === 0 && !record)}
           onClick={async () => {
             try {
@@ -187,7 +187,7 @@ const StartRTMP = () => {
               if (hasInvalidData || (rtmpStreams.length > 0 && !hasRTMPURL)) {
                 return;
               }
-              setError("");
+              setError('');
               setRTMPStarted(true);
               const urls = hasRTMPURL
                 ? rtmpStreams.map(
@@ -213,7 +213,7 @@ const StartRTMP = () => {
           ) : (
             <GoLiveIcon />
           )}
-          {isRTMPStarted ? "Starting stream..." : "Go Live"}
+          {isRTMPStarted ? 'Starting stream...' : 'Go Live'}
         </Button>
         <ErrorText error={error} />
       </Box>
@@ -224,7 +224,7 @@ const StartRTMP = () => {
 const EndRTMP = () => {
   const hmsActions = useHMSActions();
   const [inProgress, setInProgress] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const { isRTMPRunning } = useRecordingStreaming();
 
   useEffect(() => {
@@ -234,12 +234,12 @@ const EndRTMP = () => {
   }, [inProgress, isRTMPRunning]);
 
   return (
-    <Box css={{ p: "$4 $10" }}>
+    <Box css={{ p: '$4 $10' }}>
       <ErrorText error={error} />
       <Button
         data-testid="stop_rtmp"
         variant="danger"
-        css={{ w: "100%", r: "$0", my: "$8" }}
+        css={{ w: '100%', r: '$0', my: '$8' }}
         icon
         loading={inProgress}
         disabled={inProgress}
@@ -262,7 +262,7 @@ const EndRTMP = () => {
 
 const ActionIcon = ({ icon: Icon, onClick }) => {
   return (
-    <Text as="span" css={{ mx: "$2", cursor: "pointer" }} onClick={onClick}>
+    <Text as="span" css={{ mx: '$2', cursor: 'pointer' }} onClick={onClick}>
       <Icon width={16} height={16} />
     </Text>
   );
@@ -272,7 +272,7 @@ const FormLabel = ({ id, children }) => {
   return (
     <Label
       htmlFor={id}
-      css={{ color: "$textHighEmp", my: "$4", fontSize: "$sm" }}
+      css={{ color: '$textHighEmp', my: '$4', fontSize: '$sm' }}
     >
       {children}
     </Label>
@@ -282,7 +282,7 @@ const FormLabel = ({ id, children }) => {
 const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
   const formRef = useRef(null);
   return (
-    <Flex id={id} direction="column" css={{ mb: "$8", px: "$8" }} ref={formRef}>
+    <Flex id={id} direction="column" css={{ mb: '$8', px: '$8' }} ref={formRef}>
       <FormLabel id="rtmpURL">
         RTMP URL
         <Asterik />
@@ -333,7 +333,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
 
 const Asterik = () => {
   return (
-    <Text variant="sm" as="span" css={{ color: "$error", mx: "$2" }}>
+    <Text variant="sm" as="span" css={{ color: '$error', mx: '$2' }}>
       *
     </Text>
   );
@@ -341,7 +341,7 @@ const Asterik = () => {
 const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
   const [edit, setEdit] = useState(false);
   return (
-    <Accordion.Header css={{ px: "$8" }}>
+    <Accordion.Header css={{ px: '$8' }}>
       {edit ? (
         <Input
           defaultValue={rtmp.name}
@@ -362,9 +362,9 @@ const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
           }}
         />
       ) : (
-        <Text css={{ flex: "1 1 0" }}>{rtmp.name}</Text>
+        <Text css={{ flex: '1 1 0' }}>{rtmp.name}</Text>
       )}
-      <Flex css={{ mx: "$4", gap: "$2" }}>
+      <Flex css={{ mx: '$4', gap: '$2' }}>
         <ActionIcon
           onClick={e => {
             e.stopPropagation();

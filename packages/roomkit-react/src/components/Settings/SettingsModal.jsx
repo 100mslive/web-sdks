@@ -16,7 +16,7 @@ import {
   IconButton,
   Tabs,
   Text,
-} from "../base-components";
+} from "../baseComponents";
 import DeviceSettings from "./DeviceSettings";
 import { LayoutSettings } from "./LayoutSettings";
 import { NotificationSettings } from "./NotificationSettings";

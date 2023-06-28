@@ -1,7 +1,7 @@
-import React from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { Button, Dialog } from "../base-components";
-import { DialogContent, DialogRow } from "../primitives/DialogContent";
+import React from 'react';
+import { useHMSActions } from '@100mslive/react-sdk';
+import { Button, Dialog } from '../baseComponents';
+import { DialogContent, DialogRow } from '../primitives/DialogContent';
 
 export const ScreenShareHintModal = ({ onClose }) => {
   const hmsActions = useHMSActions();
@@ -16,7 +16,7 @@ export const ScreenShareHintModal = ({ onClose }) => {
               hmsActions
                 .setScreenShareEnabled(true, {
                   audioOnly: true,
-                  displaySurface: "browser",
+                  displaySurface: 'browser',
                 })
                 .catch(console.error);
               onClose();

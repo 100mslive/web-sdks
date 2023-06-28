@@ -1,23 +1,23 @@
-import React, { useState } from "react";
-import { PdfErrorView } from "./pdfErrorView";
-import { PDFHeader } from "./pdfHeader";
-import { PDFInfo } from "./pdfInfo";
-import { SubmitPDF } from "./submitPdf";
-import { UploadedFile } from "./uploadedFile";
-import { DialogInputFile, DialogRow } from "../../primitives/DialogContent";
+import React, { useState } from 'react';
+import { DialogInputFile, DialogRow } from '../../primitives/DialogContent';
 import {
   Dialog,
   Flex,
   HorizontalDivider,
   Input,
   Text,
-} from "../base-components";
+} from '../baseComponents';
+import { PdfErrorView } from './pdfErrorView';
+import { PDFHeader } from './pdfHeader';
+import { PDFInfo } from './pdfInfo';
+import { SubmitPDF } from './submitPdf';
+import { UploadedFile } from './uploadedFile';
 
 export function PDFFileOptions({ onOpenChange }) {
   const [isPDFUrlValid, setIsPDFUrlValid] = useState(true);
   const [isValidateProgress, setIsValidateProgress] = useState(false);
   const [pdfFile, setPDFFile] = useState(null);
-  const [pdfURL, setPDFURL] = useState("");
+  const [pdfURL, setPDFURL] = useState('');
 
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
@@ -25,9 +25,9 @@ export function PDFFileOptions({ onOpenChange }) {
         <Dialog.Overlay />
         <Dialog.Content
           css={{
-            w: "min(420px,80%)",
-            overflow: "auto",
-            p: "$10",
+            w: 'min(420px,80%)',
+            overflow: 'auto',
+            p: '$10',
           }}
         >
           <Flex direction="column">
@@ -42,38 +42,38 @@ export function PDFFileOptions({ onOpenChange }) {
             />
             <DialogRow
               css={{
-                m: "$10 0",
+                m: '$10 0',
               }}
             >
               <HorizontalDivider
                 css={{
-                  mr: "$4",
+                  mr: '$4',
                 }}
               />
               <Text
                 variant="tiny"
                 css={{
-                  color: "$textDisabled",
+                  color: '$textDisabled',
                 }}
               >
                 OR
               </Text>
               <HorizontalDivider
                 css={{
-                  ml: "$4",
+                  ml: '$4',
                 }}
               />
             </DialogRow>
             <Text
               variant="sm"
               css={{
-                py: "$2",
+                py: '$2',
               }}
             >
               Import from URL
             </Text>
             <Input
-              css={{ w: "100%", mb: "$10" }}
+              css={{ w: '100%', mb: '$10' }}
               value={pdfURL}
               onFocus={() => {
                 setIsPDFUrlValid(true);

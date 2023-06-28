@@ -1,6 +1,6 @@
-import React, { Fragment, useState } from "react";
-import { useMedia } from "react-use";
-import Hls from "hls.js";
+import React, { Fragment, useState } from 'react';
+import { useMedia } from 'react-use';
+import Hls from 'hls.js';
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -10,7 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
   CheckIcon,
@@ -20,22 +20,8 @@ import {
   RecordIcon,
   SettingsIcon,
   VerticalMenuIcon,
-} from "@100mslive/react-icons";
-import { BulkRoleChangeModal } from "./BulkRoleChangeModal";
-import { ChangeNameModal } from "./ChangeNameModal";
-import { ChangeSelfRole } from "./ChangeSelfRole";
-import { EmbedUrl, EmbedUrlModal } from "./EmbedUrl";
-import { FullScreenItem } from "./FullScreenItem";
-import { MuteAllModal } from "./MuteAllModal";
-import {
-  APP_DATA,
-  FEATURE_LIST,
-  isAndroid,
-  isIOS,
-  isMacOS,
-} from "../../common/constants";
-import IconButton from "../../IconButton";
-import { FeatureFlags } from "../../services/FeatureFlags";
+} from '@100mslive/react-icons';
+import IconButton from '../../IconButton';
 import {
   Box,
   Checkbox,
@@ -44,26 +30,40 @@ import {
   Flex,
   Text,
   Tooltip,
-} from "../base-components";
-import { useDropdownList } from "../hooks/useDropdownList";
-import { useIsFeatureEnabled } from "../hooks/useFeatures";
-import { RoleChangeModal } from "../RoleChangeModal";
-import SettingsModal from "../Settings/SettingsModal";
-import StartRecording from "../Settings/StartRecording";
-import { StatsForNerds } from "../StatsForNerds";
+} from '../baseComponents';
+import { RoleChangeModal } from '../RoleChangeModal';
+import SettingsModal from '../Settings/SettingsModal';
+import StartRecording from '../Settings/StartRecording';
+import { StatsForNerds } from '../StatsForNerds';
+import { BulkRoleChangeModal } from './BulkRoleChangeModal';
+import { ChangeNameModal } from './ChangeNameModal';
+import { ChangeSelfRole } from './ChangeSelfRole';
+import { EmbedUrl, EmbedUrlModal } from './EmbedUrl';
+import { FullScreenItem } from './FullScreenItem';
+import { MuteAllModal } from './MuteAllModal';
+import { useDropdownList } from '../hooks/useDropdownList';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { FeatureFlags } from '../../services/FeatureFlags';
+import {
+  APP_DATA,
+  FEATURE_LIST,
+  isAndroid,
+  isIOS,
+  isMacOS,
+} from '../../common/constants';
 
 const isMobileOS = isAndroid || isIOS;
 
 const MODALS = {
-  CHANGE_NAME: "changeName",
-  SELF_ROLE_CHANGE: "selfRoleChange",
-  MORE_SETTINGS: "moreSettings",
-  START_RECORDING: "startRecording",
-  DEVICE_SETTINGS: "deviceSettings",
-  STATS_FOR_NERDS: "statsForNerds",
-  BULK_ROLE_CHANGE: "bulkRoleChange",
-  MUTE_ALL: "muteAll",
-  EMBED_URL: "embedUrl",
+  CHANGE_NAME: 'changeName',
+  SELF_ROLE_CHANGE: 'selfRoleChange',
+  MORE_SETTINGS: 'moreSettings',
+  START_RECORDING: 'startRecording',
+  DEVICE_SETTINGS: 'deviceSettings',
+  STATS_FOR_NERDS: 'statsForNerds',
+  BULK_ROLE_CHANGE: 'bulkRoleChange',
+  MUTE_ALL: 'muteAll',
+  EMBED_URL: 'embedUrl',
 };
 
 export const MoreSettings = () => {
@@ -79,7 +79,7 @@ export const MoreSettings = () => {
   const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
-  useDropdownList({ open: openModals.size > 0, name: "MoreSettings" });
+  useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
@@ -113,10 +113,10 @@ export const MoreSettings = () => {
           sideOffset={5}
           align="center"
           css={{
-            maxHeight: "$96",
-            "@md": { w: "$64" },
+            maxHeight: '$96',
+            '@md': { w: '$64' },
             "div[role='separator']:first-child": {
-              display: "none",
+              display: 'none',
             },
           }}
         >
@@ -126,8 +126,8 @@ export const MoreSettings = () => {
                 onClick={() => updateState(MODALS.START_RECORDING, true)}
               >
                 <RecordIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
-                  {isBrowserRecordingOn ? "Stop" : "Start"} Recording
+                <Text variant="sm" css={{ ml: '$4' }}>
+                  {isBrowserRecordingOn ? 'Stop' : 'Start'} Recording
                 </Text>
               </Dropdown.Item>
               <Dropdown.ItemSeparator />
@@ -139,7 +139,7 @@ export const MoreSettings = () => {
               data-testid="change_name_btn"
             >
               <PencilIcon />
-              <Text variant="sm" css={{ ml: "$4" }}>
+              <Text variant="sm" css={{ ml: '$4' }}>
                 Change Name
               </Text>
             </Dropdown.Item>
@@ -153,7 +153,7 @@ export const MoreSettings = () => {
               data-testid="bulk_role_change_btn"
             >
               <ChangeRoleIcon />
-              <Text variant="sm" css={{ ml: "$4" }}>
+              <Text variant="sm" css={{ ml: '$4' }}>
                 Bulk Role Change
               </Text>
             </Dropdown.Item>
@@ -170,7 +170,7 @@ export const MoreSettings = () => {
               data-testid="mute_all_btn"
             >
               <MicOffIcon />
-              <Text variant="sm" css={{ ml: "$4" }}>
+              <Text variant="sm" css={{ ml: '$4' }}>
                 Mute All
               </Text>
             </Dropdown.Item>
@@ -181,13 +181,13 @@ export const MoreSettings = () => {
             data-testid="device_settings_btn"
           >
             <SettingsIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
+            <Text variant="sm" css={{ ml: '$4' }}>
               Settings
             </Text>
           </Dropdown.Item>
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
-            (localPeerRole === "hls-viewer" ? (
+            (localPeerRole === 'hls-viewer' ? (
               Hls.isSupported() ? (
                 <Dropdown.Item
                   onClick={() =>
@@ -196,7 +196,7 @@ export const MoreSettings = () => {
                   data-testid="hls_stats"
                 >
                   <Checkbox.Root
-                    css={{ margin: "$2" }}
+                    css={{ margin: '$2' }}
                     checked={enablHlsStats}
                     onCheckedChange={() =>
                       hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)
@@ -206,13 +206,13 @@ export const MoreSettings = () => {
                       <CheckIcon width={16} height={16} />
                     </Checkbox.Indicator>
                   </Checkbox.Root>
-                  <Flex justify="between" css={{ width: "100%" }}>
-                    <Text variant="sm" css={{ ml: "$4" }}>
+                  <Flex justify="between" css={{ width: '100%' }}>
+                    <Text variant="sm" css={{ ml: '$4' }}>
                       Show HLS Stats
                     </Text>
                     {!isMobileOS ? (
-                      <Text variant="sm" css={{ ml: "$4" }}>
-                        {`${isMacOS ? "⌘" : "ctrl"} + ]`}
+                      <Text variant="sm" css={{ ml: '$4' }}>
+                        {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
                       </Text>
                     ) : null}
                   </Flex>
@@ -224,7 +224,7 @@ export const MoreSettings = () => {
                 data-testid="stats_for_nreds_btn"
               >
                 <InfoIcon />
-                <Text variant="sm" css={{ ml: "$4" }}>
+                <Text variant="sm" css={{ ml: '$4' }}>
                   Stats for Nerds
                 </Text>
               </Dropdown.Item>

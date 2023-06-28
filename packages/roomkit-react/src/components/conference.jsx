@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
-import { usePrevious } from "react-use";
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
@@ -8,24 +8,24 @@ import {
   selectRoomState,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { useAuthToken, useIsHeadless } from "./AppData/useUISettings";
-import { useNavigation } from "./hooks/useNavigation";
-import { useSkipPreview } from "./hooks/useSkipPreview";
-import { Footer } from "./Footer";
-import FullPageProgress from "./FullPageProgress";
-import { Header } from "./Header";
-import { RoleChangeRequestModal } from "./RoleChangeRequestModal";
-import { useHMSPrebuiltContext } from "../AppContext";
-import { Box, Flex } from "../base-components";
+} from '@100mslive/react-sdk';
+import { useHMSPrebuiltContext } from '../AppContext';
+import { Box, Flex } from '../baseComponents';
+import { ConferenceMainView } from '../layouts/mainView';
+import { Footer } from './Footer';
+import FullPageProgress from './FullPageProgress';
+import { Header } from './Header';
+import { RoleChangeRequestModal } from './RoleChangeRequestModal';
+import { useAuthToken, useIsHeadless } from './AppData/useUISettings';
+import { useNavigation } from './hooks/useNavigation';
+import { useSkipPreview } from './hooks/useSkipPreview';
 import {
   APP_DATA,
   EMOJI_REACTION_TYPE,
   isAndroid,
   isIOS,
   isIPadOS,
-} from "../common/constants";
-import { ConferenceMainView } from "../layouts/mainView";
+} from '../common/constants';
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -83,8 +83,8 @@ const Conference = () => {
         isConnectedToRoom
       )
     ) {
-      if (role) navigate(`/preview/${roomId || ""}/${role}`);
-      else navigate(`/preview/${roomId || ""}`);
+      if (role) navigate(`/preview/${roomId || ''}/${role}`);
+      else navigate(`/preview/${roomId || ''}`);
     }
   }, [
     isConnectedToRoom,
@@ -105,7 +105,7 @@ const Conference = () => {
     ) {
       hmsActions
         .join({
-          userName: "Test",
+          userName: 'Test',
           authToken: authTokenInAppData,
           initEndpoint: process.env.REACT_APP_ENV
             ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
@@ -113,7 +113,7 @@ const Conference = () => {
           initialSettings: {
             isAudioMuted: skipPreview,
             isVideoMuted: skipPreview,
-            speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
+            speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
         .catch(console.error);
@@ -130,7 +130,7 @@ const Conference = () => {
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
     if (isHeadless) {
-      hmsActions.ignoreMessageTypes(["chat", EMOJI_REACTION_TYPE]);
+      hmsActions.ignoreMessageTypes(['chat', EMOJI_REACTION_TYPE]);
     }
   }, [isHeadless, hmsActions]);
 
@@ -139,18 +139,18 @@ const Conference = () => {
   }
 
   return (
-    <Flex css={{ size: "100%", overflow: "hidden" }} direction="column">
+    <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
       {!isHeadless && (
         <Box
           ref={headerRef}
           css={{
-            h: "$18",
-            transition: "margin 0.3s ease-in-out",
+            h: '$18',
+            transition: 'margin 0.3s ease-in-out',
             marginTop: performAutoHide
               ? `-${headerRef.current?.clientHeight}px`
-              : "none",
-            "@md": {
-              h: "$17",
+              : 'none',
+            '@md': {
+              h: '$17',
             },
           }}
           data-testid="header"
@@ -160,10 +160,10 @@ const Conference = () => {
       )}
       <Box
         css={{
-          w: "100%",
-          flex: "1 1 0",
+          w: '100%',
+          flex: '1 1 0',
           minHeight: 0,
-          paddingBottom: "env(safe-area-inset-bottom)",
+          paddingBottom: 'env(safe-area-inset-bottom)',
         }}
         id="conferencing"
         data-testid="conferencing"
@@ -176,13 +176,13 @@ const Conference = () => {
           ref={footerRef}
           css={{
             flexShrink: 0,
-            maxHeight: "$24",
-            transition: "margin 0.3s ease-in-out",
+            maxHeight: '$24',
+            transition: 'margin 0.3s ease-in-out',
             marginBottom: performAutoHide
               ? `-${footerRef.current?.clientHeight}px`
               : undefined,
-            "@md": {
-              maxHeight: "unset",
+            '@md': {
+              maxHeight: 'unset',
             },
           }}
           data-testid="footer"

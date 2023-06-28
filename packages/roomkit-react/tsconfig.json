@@ -6,7 +6,8 @@
     "incremental": false,
     "declarationMap": false,
     "sourceMap": false,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "jsx": "react"
   },
   "include": ["src/**/*", "types", "**/*.mdx", "rollup.config.js"],
   "exclude": ["node_modules", "dist"]

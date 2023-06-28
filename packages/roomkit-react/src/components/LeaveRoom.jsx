@@ -1,21 +1,19 @@
-import React, { Fragment, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { Fragment, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   AlertTriangleIcon,
   ExitIcon,
   HangUpIcon,
   VerticalMenuIcon,
-} from "@100mslive/react-icons";
-import { useDropdownList } from "./hooks/useDropdownList";
-import { useNavigation } from "./hooks/useNavigation";
-import { ToastManager } from "./Toast/ToastManager";
-import { useHMSPrebuiltContext } from "../AppContext";
+} from '@100mslive/react-icons';
+import { ToastManager } from './Toast/ToastManager';
+import { useHMSPrebuiltContext } from '../AppContext';
 import {
   Box,
   Button,
@@ -26,13 +24,15 @@ import {
   styled,
   Text,
   Tooltip,
-} from "../base-components";
-import { isStreamingKit } from "../common/utils";
+} from '../baseComponents';
 import {
   DialogCheckbox,
   DialogContent,
   DialogRow,
-} from "../primitives/DialogContent";
+} from '../primitives/DialogContent';
+import { useDropdownList } from './hooks/useDropdownList';
+import { useNavigation } from './hooks/useNavigation';
+import { isStreamingKit } from '../common/utils';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
@@ -44,14 +44,14 @@ export const LeaveRoom = () => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const { showLeave, onLeave } = useHMSPrebuiltContext();
-  useDropdownList({ open, name: "LeaveRoom" });
+  useDropdownList({ open, name: 'LeaveRoom' });
 
   const redirectToLeavePage = () => {
     if (showLeave) {
       if (params.role) {
-        navigate("/leave/" + params.roomId + "/" + params.role);
+        navigate('/leave/' + params.roomId + '/' + params.role);
       } else {
-        navigate("/leave/" + params.roomId);
+        navigate('/leave/' + params.roomId);
       }
     }
     ToastManager.clearAllToast();
@@ -64,7 +64,7 @@ export const LeaveRoom = () => {
   };
 
   const endRoom = () => {
-    hmsActions.endRoom(lockRoom, "End Room");
+    hmsActions.endRoom(lockRoom, 'End Room');
     redirectToLeavePage();
   };
 
@@ -91,11 +91,11 @@ export const LeaveRoom = () => {
                 </Box>
               ) : (
                 <Flex gap={2}>
-                  <Box css={{ "@md": { transform: "rotate(180deg)" } }}>
+                  <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
                     <ExitIcon key="hangUp" />
                   </Box>
                   <Text
-                    css={{ "@md": { display: "none" }, color: "inherit" }}
+                    css={{ '@md': { display: 'none' }, color: 'inherit' }}
                     variant="button"
                   >
                     Leave Studio
@@ -109,7 +109,7 @@ export const LeaveRoom = () => {
               asChild
               css={{
                 '&[data-state="open"]': {
-                  bg: "$errorDark",
+                  bg: '$errorDark',
                 },
               }}
             >
@@ -122,28 +122,28 @@ export const LeaveRoom = () => {
             </Dropdown.Trigger>
             <Dropdown.Content css={{ p: 0 }} alignOffset={-50} sideOffset={10}>
               <Dropdown.Item
-                css={{ w: "100%", bg: "rgba(178, 71, 81, 0.1)" }}
+                css={{ w: '100%', bg: 'rgba(178, 71, 81, 0.1)' }}
                 onClick={() => {
                   setShowEndRoomModal(true);
                 }}
                 data-testid="end_room_btn"
               >
                 <Flex gap={4}>
-                  <Box css={{ color: "$error" }}>
+                  <Box css={{ color: '$error' }}>
                     <AlertTriangleIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ c: "$error" }}>
+                    <Text variant="lg" css={{ c: '$error' }}>
                       End Room for All
                     </Text>
-                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                    <Text variant="sm" css={{ c: '$textMedEmp', mt: '$2' }}>
                       Warning: You can’t undo this action
                     </Text>
                   </Flex>
                 </Flex>
               </Dropdown.Item>
               <Dropdown.Item
-                css={{ bg: "$surfaceDefault" }}
+                css={{ bg: '$surfaceDefault' }}
                 onClick={leaveRoom}
                 data-testid="just_leave_btn"
               >
@@ -153,9 +153,9 @@ export const LeaveRoom = () => {
                   </Box>
                   <Flex direction="column" align="start">
                     <Text variant="lg">
-                      Leave {isStreamKit ? "Studio" : "Room"}
+                      Leave {isStreamKit ? 'Studio' : 'Room'}
                     </Text>
-                    <Text variant="sm" css={{ c: "$textMedEmp", mt: "$2" }}>
+                    <Text variant="sm" css={{ c: '$textMedEmp', mt: '$2' }}>
                       You can always rejoin later
                     </Text>
                   </Flex>
@@ -174,7 +174,7 @@ export const LeaveRoom = () => {
           <Tooltip title="Leave Room">
             <Box>
               {isStreamKit ? (
-                <Box css={{ "@md": { transform: "rotate(180deg)" } }}>
+                <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
                   <ExitIcon />
                 </Box>
               ) : (
@@ -217,29 +217,29 @@ export const LeaveRoom = () => {
 };
 
 const LeaveIconButton = styled(IconButton, {
-  color: "$white",
-  h: "$14",
-  px: "$8",
-  r: "$1",
-  bg: "$error",
-  "&:not([disabled]):hover": {
-    bg: "$errorTint",
+  color: '$white',
+  h: '$14',
+  px: '$8',
+  r: '$1',
+  bg: '$error',
+  '&:not([disabled]):hover': {
+    bg: '$errorTint',
   },
-  "&:not([disabled]):active": {
-    bg: "$errorTint",
+  '&:not([disabled]):active': {
+    bg: '$errorTint',
   },
-  "@md": {
-    px: "$4",
+  '@md': {
+    px: '$4',
     mx: 0,
   },
 });
 
 const MenuTriggerButton = styled(LeaveIconButton, {
-  borderLeft: "1px solid $errorDark",
+  borderLeft: '1px solid $errorDark',
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
-  px: "$3",
-  "@md": {
-    px: "$2",
+  px: '$3',
+  '@md': {
+    px: '$2',
   },
 });

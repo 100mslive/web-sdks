@@ -1,24 +1,24 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import data from "@emoji-mart/data";
-import Picker from "@emoji-mart/react";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { EmojiIcon, SendIcon } from "@100mslive/react-icons";
-import { useEmojiPickerStyles } from "./useEmojiPickerStyles";
-import { useChatDraftMessage } from "../AppData/useChatState";
-import { Box, Flex, IconButton, Popover, styled } from "../base-components";
-import { ToastManager } from "../Toast/ToastManager";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { useHMSActions } from '@100mslive/react-sdk';
+import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
+import { Box, Flex, IconButton, Popover, styled } from '../baseComponents';
+import { ToastManager } from '../Toast/ToastManager';
+import { useChatDraftMessage } from '../AppData/useChatState';
+import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
-const TextArea = styled("textarea", {
-  width: "100%",
-  bg: "transparent",
-  color: "$textPrimary",
-  resize: "none",
-  lineHeight: "1rem",
-  position: "relative",
-  top: "$3",
-  "&:focus": {
-    boxShadow: "none",
-    outline: "none",
+const TextArea = styled('textarea', {
+  width: '100%',
+  bg: 'transparent',
+  color: '$textPrimary',
+  resize: 'none',
+  lineHeight: '1rem',
+  position: 'relative',
+  top: '$3',
+  '&:focus': {
+    boxShadow: 'none',
+    outline: 'none',
   },
 });
 
@@ -27,7 +27,7 @@ function EmojiPicker({ onSelect }) {
   const ref = useEmojiPickerStyles(showEmoji);
   return (
     <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
-      <Popover.Trigger asChild css={{ appearance: "none" }}>
+      <Popover.Trigger asChild css={{ appearance: 'none' }}>
         <IconButton as="div">
           <EmojiIcon />
         </IconButton>
@@ -79,7 +79,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
-      inputRef.current.value = "";
+      inputRef.current.value = '';
       setTimeout(() => {
         onSend();
       }, 0);
@@ -98,7 +98,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
   useEffect(() => {
     const messageElement = inputRef.current;
     return () => {
-      setDraftMessage(messageElement?.value || "");
+      setDraftMessage(messageElement?.value || '');
     };
   }, [setDraftMessage]);
 
@@ -106,13 +106,13 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        bg: "$surfaceLight",
-        minHeight: "$16",
-        maxHeight: "$24",
-        position: "relative",
-        py: "$6",
-        pl: "$8",
-        r: "$1",
+        bg: '$surfaceLight',
+        minHeight: '$16',
+        maxHeight: '$24',
+        position: 'relative',
+        py: '$6',
+        pl: '$8',
+        r: '$1',
       }}
     >
       {children}
@@ -121,7 +121,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         ref={inputRef}
         autoFocus
         onKeyPress={async event => {
-          if (event.key === "Enter") {
+          if (event.key === 'Enter') {
             if (!event.shiftKey) {
               event.preventDefault();
               await sendMessage();
@@ -141,7 +141,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
       />
       <IconButton
         onClick={sendMessage}
-        css={{ ml: "auto", height: "max-content", mr: "$4" }}
+        css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
         data-testid="send_msg_btn"
       >
         <SendIcon />

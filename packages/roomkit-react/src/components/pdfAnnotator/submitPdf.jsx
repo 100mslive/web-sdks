@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import { APP_DATA } from "../../common/constants";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { Button, Flex } from "../base-components";
+import { Button, Flex } from "../baseComponents";
 
 export const SubmitPDF = ({
   pdfFile,

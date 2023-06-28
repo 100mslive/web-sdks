@@ -1,16 +1,16 @@
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react';
 import {
   selectIsAllowedToPublish,
   useHMSStore,
   useScreenShare,
-} from "@100mslive/react-sdk";
-import { ShareScreenIcon } from "@100mslive/react-icons";
-import { useUISettings } from "./AppData/useUISettings";
-import { ShareScreenOptions } from "./pdfAnnotator/shareScreenOptions";
-import { Box, Flex, styled, Tooltip } from "../base-components";
-import { UI_SETTINGS } from "../common/constants";
-import { isScreenshareSupported } from "../common/utils";
-import IconButton from "../IconButton";
+} from '@100mslive/react-sdk';
+import { ShareScreenIcon } from '@100mslive/react-icons';
+import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
+import { Box, Flex, styled, Tooltip } from '../baseComponents';
+import IconButton from '../IconButton';
+import { useUISettings } from './AppData/useUISettings';
+import { isScreenshareSupported } from '../common/utils';
+import { UI_SETTINGS } from '../common/constants';
 
 export const ScreenshareToggle = ({ css = {} }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -40,7 +40,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
           }}
         >
           <Tooltip
-            title={`${!isVideoScreenshare ? "Start" : "Stop"} screen sharing`}
+            title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}
           >
             <Box>
               <ShareScreenIcon />
@@ -54,13 +54,13 @@ export const ScreenshareToggle = ({ css = {} }) => {
 };
 
 const ScreenShareButton = styled(IconButton, {
-  h: "$14",
-  px: "$8",
-  r: "$1",
+  h: '$14',
+  px: '$8',
+  r: '$1',
   borderTopRightRadius: 0,
   borderBottomRightRadius: 0,
-  "@md": {
-    px: "$4",
+  '@md': {
+    px: '$4',
     mx: 0,
   },
 });
@@ -68,11 +68,11 @@ const ScreenShareButton = styled(IconButton, {
 export const ShareMenuIcon = styled(ScreenShareButton, {
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
-  borderTopRightRadius: "$1",
-  borderBottomRightRadius: "$1",
+  borderTopRightRadius: '$1',
+  borderBottomRightRadius: '$1',
   borderLeftWidth: 0,
-  w: "$4",
-  "@md": {
-    px: "$2",
+  w: '$4',
+  '@md': {
+    px: '$2',
   },
 });

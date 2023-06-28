@@ -1,13 +1,13 @@
-import React, { useState } from "react";
-import { ViewIcon } from "@100mslive/react-icons";
-import { APP_DATA } from "../../common/constants";
+import React, { useState } from 'react';
+import { ViewIcon } from '@100mslive/react-icons';
 import {
   DialogContent,
   DialogInput,
   DialogRow,
-} from "../../primitives/DialogContent";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { Button, Dialog, Dropdown, Text } from "../base-components";
+} from '../../primitives/DialogContent';
+import { Button, Dialog, Dropdown, Text } from '../baseComponents';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA } from '../../common/constants';
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
   if (!window.CropTarget) {
@@ -22,7 +22,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
       data-testid="embed_url_btn"
     >
       <ViewIcon />
-      <Text variant="sm" css={{ ml: "$4" }}>
+      <Text variant="sm" css={{ ml: '$4' }}>
         Embed URL
       </Text>
     </Dropdown.Item>
@@ -33,7 +33,7 @@ export function EmbedUrlModal({ onOpenChange }) {
   const [embedConfig, setEmbedConfig] = useSetAppDataByKey(
     APP_DATA.embedConfig
   );
-  const [url, setUrl] = useState(embedConfig?.url || "");
+  const [url, setUrl] = useState(embedConfig?.url || '');
 
   const isAnythingEmbedded = !!embedConfig?.url;
   const isModifying = isAnythingEmbedded && url && url !== embedConfig.url;
@@ -67,7 +67,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
-                css={{ mr: "$4" }}
+                css={{ mr: '$4' }}
               >
                 Update Embed
               </Button>
@@ -75,7 +75,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 variant="danger"
                 type="submit"
                 onClick={() => {
-                  setEmbedConfig({ url: "" });
+                  setEmbedConfig({ url: '' });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -94,7 +94,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
-                css={{ mr: "$4" }}
+                css={{ mr: '$4' }}
               >
                 Just Embed
               </Button>

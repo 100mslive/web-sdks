@@ -1,21 +1,21 @@
-import { Flex, styled } from "../base-components";
+import { Flex, styled } from '../baseComponents';
 
 export const VideoControls = styled(Flex, {
-  justifyContent: "center",
-  alignItems: "center",
-  width: "100%",
-  gap: "$2",
+  justifyContent: 'center',
+  alignItems: 'center',
+  width: '100%',
+  gap: '$2',
 });
 
 export const LeftControls = styled(Flex, {
-  justifyContent: "flex-start",
-  alignItems: "center",
-  width: "100%",
-  gap: "$2",
+  justifyContent: 'flex-start',
+  alignItems: 'center',
+  width: '100%',
+  gap: '$2',
 });
 export const RightControls = styled(Flex, {
-  justifyContent: "flex-end",
-  alignItems: "center",
-  width: "100%",
-  gap: "$2",
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  width: '100%',
+  gap: '$2',
 });

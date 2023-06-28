@@ -1,6 +1,6 @@
-import React from "react";
-import { DialogContent, DialogRow } from "../../primitives/DialogContent";
-import { Button, Dialog, Text } from "../base-components";
+import React from 'react';
+import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { Button, Dialog, Text } from '../baseComponents';
 
 export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }) {
   return (

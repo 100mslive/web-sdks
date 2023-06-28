@@ -1,13 +1,11 @@
-import React from "react";
-import { useMedia } from "react-use";
+import React from 'react';
+import { useMedia } from 'react-use';
 import {
   selectDominantSpeaker,
   selectIsConnectedToRoom,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { VolumeOneIcon } from "@100mslive/react-icons";
-import { isStreamingKit } from "../../common/utils";
-import { useLogo } from "../AppData/useUISettings";
+} from '@100mslive/react-sdk';
+import { VolumeOneIcon } from '@100mslive/react-icons';
 import {
   config as cssConfig,
   Flex,
@@ -15,7 +13,9 @@ import {
   Text,
   textEllipsis,
   useTheme,
-} from "../base-components";
+} from '../baseComponents';
+import { useLogo } from '../AppData/useUISettings';
+import { isStreamingKit } from '../../common/utils';
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -23,12 +23,12 @@ export const SpeakerTag = () => {
     <Flex
       align="center"
       justify="center"
-      css={{ flex: "1 1 0", color: "$textPrimary", "@md": { display: "none" } }}
+      css={{ flex: '1 1 0', color: '$textPrimary', '@md': { display: 'none' } }}
     >
       <VolumeOneIcon />
       <Text
         variant="md"
-        css={{ ...textEllipsis(200), ml: "$2" }}
+        css={{ ...textEllipsis(200), ml: '$2' }}
         title={dominantSpeaker.name}
       >
         {dominantSpeaker.name}
@@ -39,12 +39,12 @@ export const SpeakerTag = () => {
   );
 };
 
-const LogoImg = styled("img", {
-  maxHeight: "$14",
-  p: "$2",
-  w: "auto",
-  "@md": {
-    maxHeight: "$12",
+const LogoImg = styled('img', {
+  maxHeight: '$14',
+  p: '$2',
+  w: 'auto',
+  '@md': {
+    maxHeight: '$12',
   },
 });
 
@@ -61,9 +61,9 @@ export const Logo = () => {
     <LogoImg
       src={
         logo ||
-        (themeType === "dark"
-          ? require("../../images/logo-light.svg")
-          : require("../../images/logo-dark.svg"))
+        (themeType === 'dark'
+          ? require('../../images/logo-light.svg')
+          : require('../../images/logo-dark.svg'))
       }
       alt="Brand Logo"
       width={132}

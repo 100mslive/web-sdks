@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import {
   selectIsLocalVideoEnabled,
   selectLocalPeer,
@@ -6,14 +6,10 @@ import {
   useAVToggle,
   useHMSStore,
   usePreviewJoin,
-} from "@100mslive/react-sdk";
-import { SettingsIcon } from "@100mslive/react-icons";
-import PreviewName from "./PreviewName";
-import { UI_SETTINGS } from "../../common/constants";
-import IconButton from "../../IconButton";
-import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { useAuthToken, useUISettings } from "../AppData/useUISettings";
-import { AudioVideoToggle } from "../AudioVideoToggle";
+} from '@100mslive/react-sdk';
+import { SettingsIcon } from '@100mslive/react-icons';
+import IconButton from '../../IconButton';
+import { AudioVideoToggle } from '../AudioVideoToggle';
 import {
   Avatar,
   Flex,
@@ -26,14 +22,18 @@ import {
   useBorderAudioLevel,
   useTheme,
   Video,
-} from "../base-components";
-import TileConnection from "../Connection/TileConnection";
+} from '../baseComponents';
+import TileConnection from '../Connection/TileConnection';
+import SettingsModal from '../Settings/SettingsModal';
+import PreviewName from './PreviewName';
+import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackground';
+import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import {
   defaultPreviewPreference,
   UserPreferencesKeys,
   useUserPreferences,
-} from "../hooks/useUserPreferences";
-import SettingsModal from "../Settings/SettingsModal";
+} from '../hooks/useUserPreferences';
+import { UI_SETTINGS } from '../../common/constants';
 
 const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
@@ -53,11 +53,11 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
-      speakerAutoSelectionBlacklist: ["Yeti Stereo Microphone"],
+      speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
     },
     captureNetworkQualityInPreview: true,
     handleError: (_, method) => {
-      if (method === "preview") {
+      if (method === 'preview') {
         setPreviewError(true);
       }
     },
@@ -91,11 +91,11 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   }, [authToken, skipPreview]);
   return (
     <Container>
-      <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>
+      <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
         Get Started
       </Text>
       <Text
-        css={{ c: "$textMedEmp", my: "$6", textAlign: "center" }}
+        css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }}
         variant="body1"
       >
         Setup your audio and video before joining
@@ -104,8 +104,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         align="center"
         justify="center"
         css={{
-          "@sm": { width: "100%" },
-          flexDirection: "column",
+          '@sm': { width: '100%' },
+          flexDirection: 'column',
         }}
       >
         <PreviewTile name={name} error={previewError} />
@@ -124,11 +124,11 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   );
 };
 
-const Container = styled("div", {
-  width: "100%",
+const Container = styled('div', {
+  width: '100%',
   ...flexCenter,
-  flexDirection: "column",
-  px: "$10",
+  flexDirection: 'column',
+  px: '$10',
 });
 
 const PreviewTile = ({ name, error }) => {
@@ -145,15 +145,15 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: "$surfaceDefault",
+        bg: '$surfaceDefault',
         aspectRatio: width / height,
-        width: "unset",
-        height: "min(360px, 60vh)",
-        mt: "$12",
-        "@sm": {
-          height: "unset",
-          width: "min(360px, 100%)",
-          maxWidth: "100%",
+        width: 'unset',
+        height: 'min(360px, 60vh)',
+        mt: '$12',
+        '@sm': {
+          height: 'unset',
+          width: 'min(360px, 100%)',
+          maxWidth: '100%',
         },
       }}
       ref={borderAudioRef}
@@ -162,14 +162,14 @@ const PreviewTile = ({ name, error }) => {
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
-            mirror={track?.facingMode !== "environment" && mirrorLocalVideo}
+            mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={name} data-testid="preview_avatar_tile" />
-              <Text css={{ ...textEllipsis("75%") }} variant="body2">
+              <Text css={{ ...textEllipsis('75%') }} variant="body2">
                 {name}
               </Text>
             </StyledVideoTile.AvatarContainer>
@@ -187,11 +187,11 @@ const PreviewControls = () => {
     <Flex
       justify="between"
       css={{
-        width: "100%",
-        mt: "$8",
+        width: '100%',
+        mt: '$8',
       }}
     >
-      <Flex css={{ gap: "$4" }}>
+      <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle compact />
         <VirtualBackground />
       </Flex>

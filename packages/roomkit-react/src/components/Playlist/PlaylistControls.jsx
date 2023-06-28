@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   HMSPlaylistType,
   selectAudioPlaylist,
@@ -8,7 +8,7 @@ import {
   selectVideoPlaylistAudioTrackByPeerID,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   NextIcon,
   PauseIcon,
@@ -16,9 +16,9 @@ import {
   PlaylistIcon,
   PrevIcon,
   SpeakerIcon,
-} from "@100mslive/react-icons";
-import { Box, Flex, IconButton, Slider, Text } from "../base-components";
-import { usePlaylist } from "../hooks/usePlaylist";
+} from '@100mslive/react-icons';
+import { Box, Flex, IconButton, Slider, Text } from '../baseComponents';
+import { usePlaylist } from '../hooks/usePlaylist';
 
 const Progress = ({ type, duration }) => {
   const selectPlaylist =
@@ -53,8 +53,8 @@ export const PlaylistActive = ({ type, onToggle }) => {
     return null;
   }
   return (
-    <Box css={{ mt: "$8" }}>
-      <Flex justify="between" css={{ w: "100%" }}>
+    <Box css={{ mt: '$8' }}>
+      <Flex justify="between" css={{ w: '100%' }}>
         <Box>
           <Text variant="md">{active.name}</Text>
           {active.metadata?.description && (
@@ -63,7 +63,7 @@ export const PlaylistActive = ({ type, onToggle }) => {
         </Box>
         <IconButton
           onClick={onToggle}
-          css={{ alignSelf: "center" }}
+          css={{ alignSelf: 'center' }}
           data-testid="playlist_collapse_btn"
         >
           <PlaylistIcon />
@@ -126,10 +126,10 @@ const VolumeControl = () => {
   const sliderVolume = active ? volume : audioTrackVolume;
 
   return (
-    <Flex align="center" css={{ color: "$white" }}>
+    <Flex align="center" css={{ color: '$white' }}>
       <SpeakerIcon />
       <Slider
-        css={{ mx: "$4", w: "$20" }}
+        css={{ mx: '$4', w: '$20' }}
         min={0}
         max={100}
         step={1}
@@ -142,7 +142,7 @@ const VolumeControl = () => {
             hmsActions.setVolume(value, audioTrack.id);
           }
         }}
-        thumbStyles={{ w: "$6", h: "$6" }}
+        thumbStyles={{ w: '$6', h: '$6' }}
       />
     </Flex>
   );
@@ -156,9 +156,9 @@ export const AudioPlaylistControls = ({ onToggle }) => {
   return (
     <Box
       css={{
-        p: "$8",
-        borderTop: "1px solid $borderLight",
-        bg: "$menuBg",
+        p: '$8',
+        borderTop: '1px solid $borderLight',
+        bg: '$menuBg',
       }}
     >
       <Controls type={HMSPlaylistType.audio} />
@@ -174,13 +174,13 @@ export const VideoPlaylistControls = ({ children }) => {
   return (
     <Box
       css={{
-        p: "$8",
-        mt: "-$24",
-        w: "100%",
+        p: '$8',
+        mt: '-$24',
+        w: '100%',
         zIndex: 1,
-        "@lg": {
+        '@lg': {
           mt: 0,
-          p: "$6",
+          p: '$6',
         },
       }}
     >
@@ -189,7 +189,7 @@ export const VideoPlaylistControls = ({ children }) => {
       )}
       <Flex align="center" justify="between">
         <VolumeControl />
-        {active && <Controls css={{ flex: "1 1 0" }} />}
+        {active && <Controls css={{ flex: '1 1 0' }} />}
         {children}
       </Flex>
     </Box>

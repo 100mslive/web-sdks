@@ -16,7 +16,7 @@ import {
   StyledVideoTile,
   Text,
   Video,
-} from "../base-components";
+} from "../baseComponents";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { useUISettings } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";

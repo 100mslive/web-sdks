@@ -1,6 +1,6 @@
-import React, { Component } from "react";
-import { logMessage } from "zipyai";
-import { CopyIcon } from "@100mslive/react-icons";
+import React, { Component } from 'react';
+import { logMessage } from 'zipyai';
+import { CopyIcon } from '@100mslive/react-icons';
 import {
   Box,
   Button,
@@ -8,8 +8,8 @@ import {
   Text,
   ThemeContext,
   Tooltip,
-} from "../base-components";
-import { ErrorWithSupportLink } from "./AuthToken";
+} from '../baseComponents';
+import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -42,21 +42,21 @@ export class ErrorBoundary extends Component {
           align="center"
           justify="center"
           css={{
-            size: "100%",
-            color: "$textPrimary",
-            backgroundColor: "$bgPrimary",
+            size: '100%',
+            color: '$textPrimary',
+            backgroundColor: '$bgPrimary',
           }}
         >
-          <Box css={{ position: "relative", overflow: "hidden", r: "$3" }}>
+          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
             <ThemeContext.Consumer>
               {value => {
                 const { themeType } = value;
                 return (
                   <img
                     src={
-                      themeType === "dark"
-                        ? require("../images/error-bg-dark.svg")
-                        : require("../images/error-bg-light.svg")
+                      themeType === 'dark'
+                        ? require('../images/error-bg-dark.svg')
+                        : require('../images/error-bg-light.svg')
                     }
                     alt="error background"
                   />
@@ -66,13 +66,13 @@ export class ErrorBoundary extends Component {
             <Flex
               direction="column"
               css={{
-                position: "absolute",
-                size: "100%",
-                top: "33.33%",
+                position: 'absolute',
+                size: '100%',
+                top: '33.33%',
                 left: 0,
               }}
             >
-              <div style={{ margin: "1.5rem" }}>
+              <div style={{ margin: '1.5rem' }}>
                 <Text>{`Something went wrong. ERROR: ${this.state.error}`}</Text>
                 {ErrorWithSupportLink(`Please reload to see if it works.`)}
               </div>
@@ -82,7 +82,7 @@ export class ErrorBoundary extends Component {
                     onClick={() => {
                       window.location.reload();
                     }}
-                    css={{ mx: "$4" }}
+                    css={{ mx: '$4' }}
                     data-testid="join_again_btn"
                   >
                     Reload
@@ -100,16 +100,16 @@ export class ErrorBoundary extends Component {
                       );
                       this.setState({ isErrorCopied: true });
                     }}
-                    css={{ mx: "$4" }}
+                    css={{ mx: '$4' }}
                     data-testid="join_again_btn"
                   >
-                    <CopyIcon />{" "}
-                    {this.state.isErrorCopied ? "Copied" : "Copy Details"}
+                    <CopyIcon />{' '}
+                    {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}
                   </Button>
                 </Tooltip>
               </Flex>
 
-              <details style={{ whiteSpace: "pre-wrap", margin: "1.5rem" }}>
+              <details style={{ whiteSpace: 'pre-wrap', margin: '1.5rem' }}>
                 <Text>{this.state.error && this.state.error.toString()}</Text>
                 <br />
                 <Text>{JSON.stringify(this.state.errorInfo)}</Text>

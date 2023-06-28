@@ -1,29 +1,29 @@
 /* eslint-disable no-case-declarations */
-import React, { useEffect } from "react";
-import { logMessage } from "zipyai";
+import React, { useEffect } from 'react';
+import { logMessage } from 'zipyai';
 import {
   HMSNotificationTypes,
   useHMSNotifications,
-} from "@100mslive/react-sdk";
-import { AutoplayBlockedModal } from "./AutoplayBlockedModal";
-import { InitErrorModal } from "./InitErrorModal";
-import { MessageNotifications } from "./MessageNotifications";
-import { PeerNotifications } from "./PeerNotifications";
-import { PermissionErrorModal } from "./PermissionErrorModal";
-import { ReconnectNotifications } from "./ReconnectNotifications";
-import { TrackBulkUnmuteModal } from "./TrackBulkUnmuteModal";
-import { TrackNotifications } from "./TrackNotifications";
-import { TrackUnmuteModal } from "./TrackUnmuteModal";
-import { getMetadata } from "../../common/utils";
+} from '@100mslive/react-sdk';
+import { Button } from '../baseComponents';
+import { ToastBatcher } from '../Toast/ToastBatcher';
+import { ToastManager } from '../Toast/ToastManager';
+import { AutoplayBlockedModal } from './AutoplayBlockedModal';
+import { InitErrorModal } from './InitErrorModal';
+import { MessageNotifications } from './MessageNotifications';
+import { PeerNotifications } from './PeerNotifications';
+import { PermissionErrorModal } from './PermissionErrorModal';
+import { ReconnectNotifications } from './ReconnectNotifications';
+import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
+import { TrackNotifications } from './TrackNotifications';
+import { TrackUnmuteModal } from './TrackUnmuteModal';
 import {
   useHLSViewerRole,
   useIsHeadless,
   useSubscribedNotifications,
-} from "../AppData/useUISettings";
-import { Button } from "../base-components";
-import { useNavigation } from "../hooks/useNavigation";
-import { ToastBatcher } from "../Toast/ToastBatcher";
-import { ToastManager } from "../Toast/ToastManager";
+} from '../AppData/useUISettings';
+import { useNavigation } from '../hooks/useNavigation';
+import { getMetadata } from '../../common/utils';
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -44,33 +44,33 @@ export function Notifications() {
         if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless)
           return;
 
-        console.debug("Metadata updated", notification.data);
+        console.debug('Metadata updated', notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
         ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(
           notification.data.id +
-            " changed their name to " +
+            ' changed their name to ' +
             notification.data.name
         );
         break;
       case HMSNotificationTypes.ERROR:
         if (
           notification.data?.isTerminal &&
-          notification.data?.action !== "INIT"
+          notification.data?.action !== 'INIT'
         ) {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            logMessage("Disconnected");
+            logMessage('Disconnected');
             // show button action when the error is terminal
             const toastId = ToastManager.addToast({
               title:
                 notification.data?.message ||
-                "We couldn’t reconnect you. When you’re back online, try joining the room.",
+                'We couldn’t reconnect you. When you’re back online, try joining the room.',
               inlineAction: true,
               action: (
                 <Button
@@ -91,8 +91,8 @@ export function Notifications() {
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
             const previewLocation = window.location.pathname.replace(
-              "meeting",
-              "leave"
+              'meeting',
+              'leave'
             );
             ToastManager.clearAllToast();
             navigate(previewLocation);
@@ -107,7 +107,7 @@ export function Notifications() {
         ) {
           return;
         }
-        if (notification.data?.action === "INIT") {
+        if (notification.data?.action === 'INIT') {
           return;
         }
         if (!subscribedNotifications.ERROR) return;
@@ -145,8 +145,8 @@ export function Notifications() {
         });
         setTimeout(() => {
           const leaveLocation = window.location.pathname.replace(
-            "meeting",
-            "leave"
+            'meeting',
+            'leave'
           );
           navigate(leaveLocation);
           ToastManager.clearAllToast();

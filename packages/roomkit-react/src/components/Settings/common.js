@@ -1,4 +1,4 @@
-import { css } from '../base-components';
+import { css } from '../baseComponents';
 export const settingOverflow = css({
   flex: '1 1 0',
   pr: '$12',

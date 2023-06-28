@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Footer as AppFooter } from "../base-components";
+import { Box, Flex, Footer as AppFooter } from "../baseComponents";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { EmojiReaction } from "../EmojiReaction";
 import { StreamActions } from "../Header/StreamActions";

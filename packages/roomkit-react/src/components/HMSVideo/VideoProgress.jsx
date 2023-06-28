@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { getPercentage } from "./HMSVIdeoUtils";
-import { Box, Flex } from "../base-components";
+import React, { useEffect, useRef, useState } from 'react';
+import { Box, Flex } from '../baseComponents';
+import { getPercentage } from './HMSVIdeoUtils';
 
 export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   const [videoProgress, setVideoProgress] = useState(0);
@@ -24,11 +24,11 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
       setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
     };
     if (videoEl) {
-      videoEl.addEventListener("timeupdate", timeupdateHandler);
+      videoEl.addEventListener('timeupdate', timeupdateHandler);
     }
     return function cleanup() {
       if (videoEl) {
-        videoEl.removeEventListener("timeupdate", timeupdateHandler);
+        videoEl.removeEventListener('timeupdate', timeupdateHandler);
       }
     };
   }, []);
@@ -48,32 +48,32 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   return hlsPlayer.getVideoElement() ? (
     <Flex
       ref={progressRootRef}
-      css={{ paddingLeft: "$8", paddingRight: "$8", cursor: "pointer" }}
+      css={{ paddingLeft: '$8', paddingRight: '$8', cursor: 'pointer' }}
       onClick={onProgressChangeHandler}
     >
       <Box
         id="video-actual"
         css={{
-          display: "inline",
+          display: 'inline',
           width: `${videoProgress}%`,
-          background: "$primaryDefault",
-          height: "0.3rem",
+          background: '$primaryDefault',
+          height: '0.3rem',
         }}
       />
       <Box
         id="video-buffer"
         css={{
           width: `${bufferProgress - videoProgress}%`,
-          background: "$primaryDark",
-          height: "0.3rem",
+          background: '$primaryDark',
+          height: '0.3rem',
         }}
       />
       <Box
         id="video-rest"
         css={{
           width: `${100 - bufferProgress}%`,
-          background: "$grayLight",
-          height: "0.3rem",
+          background: '$grayLight',
+          height: '0.3rem',
         }}
       />
     </Flex>

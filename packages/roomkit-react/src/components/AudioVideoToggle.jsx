@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react';
 import {
   selectIsConnectedToRoom,
   selectLocalVideoTrackID,
@@ -6,18 +6,18 @@ import {
   useAVToggle,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   CameraFlipIcon,
   MicOffIcon,
   MicOnIcon,
   VideoOffIcon,
   VideoOnIcon,
-} from "@100mslive/react-icons";
-import { ToastManager } from "./Toast/ToastManager";
-import { Tooltip } from "../base-components";
-import { isMacOS } from "../common/constants";
-import IconButton from "../IconButton";
+} from '@100mslive/react-icons';
+import { ToastManager } from './Toast/ToastManager';
+import { Tooltip } from '../baseComponents';
+import IconButton from '../IconButton';
+import { isMacOS } from '../common/constants';
 
 export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
@@ -31,8 +31,8 @@ export const AudioVideoToggle = () => {
     <Fragment>
       {toggleAudio ? (
         <Tooltip
-          title={`Turn ${isLocalAudioEnabled ? "off" : "on"} audio (${
-            isMacOS ? "⌘" : "ctrl"
+          title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${
+            isMacOS ? '⌘' : 'ctrl'
           } + d)`}
         >
           <IconButton
@@ -51,8 +51,8 @@ export const AudioVideoToggle = () => {
       ) : null}
       {toggleVideo ? (
         <Tooltip
-          title={`Turn ${isLocalVideoEnabled ? "off" : "on"} video (${
-            isMacOS ? "⌘" : "ctrl"
+          title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${
+            isMacOS ? '⌘' : 'ctrl'
           } + e)`}
         >
           <IconButton
@@ -77,8 +77,8 @@ export const AudioVideoToggle = () => {
                 await actions.switchCamera();
               } catch (e) {
                 ToastManager.addToast({
-                  title: `Error while flipping camera ${e.message || ""}`,
-                  variant: "error",
+                  title: `Error while flipping camera ${e.message || ''}`,
+                  variant: 'error',
                 });
               }
             }}

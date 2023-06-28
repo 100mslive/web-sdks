@@ -1,11 +1,11 @@
-import React from "react";
-import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
-import { BrbIcon, HandIcon } from "@100mslive/react-icons";
-import { useIsFeatureEnabled } from "./hooks/useFeatures";
-import { useMyMetadata } from "./hooks/useMetadata";
-import { Flex, Tooltip } from "../base-components";
-import { FEATURE_LIST } from "../common/constants";
-import IconButton from "../IconButton";
+import React from 'react';
+import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
+import { BrbIcon, HandIcon } from '@100mslive/react-icons';
+import { Flex, Tooltip } from '../baseComponents';
+import IconButton from '../IconButton';
+import { useIsFeatureEnabled } from './hooks/useFeatures';
+import { useMyMetadata } from './hooks/useMetadata';
+import { FEATURE_LIST } from '../common/constants';
 
 const MetaActions = ({ isMobile = false, compact = false }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -18,14 +18,14 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
   }
 
   return (
-    <Flex align="center" css={{ gap: compact ? "$4" : "$8" }}>
+    <Flex align="center" css={{ gap: compact ? '$4' : '$8' }}>
       {isHandRaiseEnabled && (
-        <Tooltip title={`${!isHandRaised ? "Raise" : "Unraise"} hand`}>
+        <Tooltip title={`${!isHandRaised ? 'Raise' : 'Unraise'} hand`}>
           <IconButton
             onClick={toggleHandRaise}
             active={!isHandRaised}
             data-testid={`${
-              isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
+              isMobile ? 'raise_hand_btn_mobile' : 'raise_hand_btn'
             }`}
           >
             <HandIcon />

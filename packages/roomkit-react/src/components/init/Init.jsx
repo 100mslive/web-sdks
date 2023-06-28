@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect } from 'react';
 import {
   selectLocalPeerID,
   selectLocalPeerName,
   selectLocalPeerRoleName,
   selectSessionId,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { useTheme } from "../base-components";
-import { setUpZipy } from "./initUtils";
-import { FeatureFlagsInit } from "../../services/FeatureFlags";
+} from '@100mslive/react-sdk';
+import { useTheme } from '../baseComponents';
+import { setUpZipy } from './initUtils';
+import { FeatureFlagsInit } from '../../services/FeatureFlags';
 
 const Init = () => {
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -31,11 +31,11 @@ const Init = () => {
       }px`;
     }
     // reset the height whenever the window's resized
-    window.addEventListener("resize", resetHeight);
+    window.addEventListener('resize', resetHeight);
     // called to initially set the height.
     resetHeight();
     return () => {
-      window.removeEventListener("resize", resetHeight);
+      window.removeEventListener('resize', resetHeight);
     };
   }, []);
 

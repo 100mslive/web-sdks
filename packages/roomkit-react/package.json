@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.7-alpha.0",
+  "version": "0.0.1",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -32,6 +32,12 @@
   "devDependencies": {
     "@types/lodash.merge": "^4.6.6",
     "@types/react": "^18.0.8",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint": "^8.9.0",
+    "eslint-config-react-app": "^7.0.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-simple-import-sort": "^8.0.0",
     "react": "^17.0.0",
     "rollup": "^2.70.1",
     "rollup-plugin-esbuild": "^4.9.3",

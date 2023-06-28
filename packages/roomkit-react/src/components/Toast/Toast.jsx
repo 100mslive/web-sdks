@@ -1,5 +1,5 @@
-import React from "react";
-import { Toast as ToastPrimitive } from "../base-components";
+import React from 'react';
+import { Toast as ToastPrimitive } from '../baseComponents';
 
 export const Toast = ({
   title,

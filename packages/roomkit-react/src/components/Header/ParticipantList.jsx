@@ -1,6 +1,6 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
-import { useDebounce, useMeasure } from "react-use";
-import { FixedSizeList } from "react-window";
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import { useDebounce, useMeasure } from 'react-use';
+import { FixedSizeList } from 'react-window';
 import {
   selectAudioTrackByPeerID,
   selectLocalPeerID,
@@ -10,7 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
   useParticipants,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
   CrossIcon,
@@ -20,15 +20,8 @@ import {
   SearchIcon,
   SpeakerIcon,
   VerticalMenuIcon,
-} from "@100mslive/react-icons";
-import { ParticipantFilter } from "./ParticipantFilter";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
-import { isInternalRole } from "../../common/utils";
-import IconButton from "../../IconButton";
-import {
-  useIsSidepaneTypeOpen,
-  useSidepaneToggle,
-} from "../AppData/useSidepane";
+} from '@100mslive/react-icons';
+import IconButton from '../../IconButton';
 import {
   Avatar,
   Box,
@@ -38,9 +31,16 @@ import {
   Slider,
   Text,
   textEllipsis,
-} from "../base-components";
-import { ConnectionIndicator } from "../Connection/ConnectionIndicator";
-import { RoleChangeModal } from "../RoleChangeModal";
+} from '../baseComponents';
+import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
+import { RoleChangeModal } from '../RoleChangeModal';
+import { ParticipantFilter } from './ParticipantFilter';
+import {
+  useIsSidepaneTypeOpen,
+  useSidepaneToggle,
+} from '../AppData/useSidepane';
+import { isInternalRole } from '../../common/utils';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -63,9 +63,9 @@ export const ParticipantList = () => {
 
   return (
     <Fragment>
-      <Flex direction="column" css={{ size: "100%" }}>
-        <Flex align="center" css={{ w: "100%", mb: "$10" }}>
-          <Text css={{ fontWeight: "$semiBold", mr: "$4" }}>Participants</Text>
+      <Flex direction="column" css={{ size: '100%' }}>
+        <Flex align="center" css={{ w: '100%', mb: '$10' }}>
+          <Text css={{ fontWeight: '$semiBold', mr: '$4' }}>Participants</Text>
           <ParticipantFilter
             selection={filter}
             onSelection={setFilter}
@@ -74,7 +74,7 @@ export const ParticipantList = () => {
           />
           <IconButton
             onClick={toggleSidepane}
-            css={{ w: "$11", h: "$11", ml: "auto" }}
+            css={{ w: '$11', h: '$11', ml: 'auto' }}
           >
             <CrossIcon />
           </IconButton>
@@ -83,9 +83,9 @@ export const ParticipantList = () => {
           <ParticipantSearch onSearch={onSearch} />
         )}
         {participants.length === 0 && (
-          <Flex align="center" justify="center" css={{ w: "100%", p: "$8 0" }}>
+          <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
             <Text variant="sm">
-              {!filter ? "No participants" : "No matching participants"}
+              {!filter ? 'No participants' : 'No matching participants'}
             </Text>
           </Flex>
         )}
@@ -125,9 +125,9 @@ export const ParticipantCount = () => {
   return (
     <IconButton
       css={{
-        w: "auto",
-        p: "$4",
-        h: "auto",
+        w: 'auto',
+        p: '$4',
+        h: 'auto',
       }}
       onClick={() => {
         if (peerCount > 0) {
@@ -138,7 +138,7 @@ export const ParticipantCount = () => {
       data-testid="participant_list"
     >
       <PeopleIcon />
-      <Text variant="sm" css={{ mx: "$4", c: "inherit" }}>
+      <Text variant="sm" css={{ mx: '$4', c: 'inherit' }}>
         {peerCount}
       </Text>
     </IconButton>
@@ -159,8 +159,8 @@ const VirtualizedParticipants = ({
     <Box
       ref={ref}
       css={{
-        flex: "1 1 0",
-        mr: "-$10",
+        flex: '1 1 0',
+        mr: '-$10',
       }}
     >
       <FixedSizeList
@@ -194,25 +194,25 @@ const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
     <Fragment>
       <Flex
         key={peer.id}
-        css={{ w: "100%", py: "$4", pr: "$10" }}
+        css={{ w: '100%', py: '$4', pr: '$10' }}
         align="center"
-        data-testid={"participant_" + peer.name}
+        data-testid={'participant_' + peer.name}
       >
         <Avatar
           name={peer.name}
           css={{
-            position: "unset",
-            transform: "unset",
-            mr: "$8",
-            fontSize: "$sm",
-            size: "$12",
-            p: "$4",
+            position: 'unset',
+            transform: 'unset',
+            mr: '$8',
+            fontSize: '$sm',
+            size: '$12',
+            p: '$4',
           }}
         />
-        <Flex direction="column" css={{ flex: "1 1 0" }}>
+        <Flex direction="column" css={{ flex: '1 1 0' }}>
           <Text
             variant="md"
-            css={{ ...textEllipsis(150), fontWeight: "$semiBold" }}
+            css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}
           >
             {peer.name}
           </Text>
@@ -270,7 +270,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
       <Dropdown.Trigger
         asChild
         data-testid="participant_more_actions"
-        css={{ p: "$2", r: "$0" }}
+        css={{ p: '$2', r: '$0' }}
         tabIndex={0}
       >
         <Text>
@@ -278,11 +278,11 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
         </Text>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={8} css={{ w: "$64" }}>
+        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64' }}>
           {canChangeRole && (
             <Dropdown.Item onClick={() => onRoleChange(peerId)}>
               <ChangeRoleIcon />
-              <Text css={{ ml: "$4" }}>Change Role</Text>
+              <Text css={{ ml: '$4' }}>Change Role</Text>
             </Dropdown.Item>
           )}
           <ParticipantVolume peerId={peerId} />
@@ -290,14 +290,14 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
             <Dropdown.Item
               onClick={async () => {
                 try {
-                  await actions.removePeer(peerId, "");
+                  await actions.removePeer(peerId, '');
                 } catch (error) {
                   // TODO: Toast here
                 }
               }}
             >
               <RemoveUserIcon />
-              <Text css={{ ml: "$4", color: "$error" }}>
+              <Text css={{ ml: '$4', color: '$error' }}>
                 Remove Participant
               </Text>
             </Dropdown.Item>
@@ -318,16 +318,16 @@ const ParticipantVolume = ({ peerId }) => {
   }
 
   return (
-    <Dropdown.Item css={{ h: "auto" }}>
-      <Flex direction="column" css={{ w: "100%" }}>
+    <Dropdown.Item css={{ h: 'auto' }}>
+      <Flex direction="column" css={{ w: '100%' }}>
         <Flex align="center">
           <SpeakerIcon />
-          <Text css={{ ml: "$4" }}>
-            Volume{audioTrack.volume ? `(${audioTrack.volume})` : ""}
+          <Text css={{ ml: '$4' }}>
+            Volume{audioTrack.volume ? `(${audioTrack.volume})` : ''}
           </Text>
         </Flex>
         <Slider
-          css={{ my: "0.5rem" }}
+          css={{ my: '0.5rem' }}
           step={5}
           value={[audioTrack.volume]}
           onValueChange={e => {
@@ -340,7 +340,7 @@ const ParticipantVolume = ({ peerId }) => {
 };
 
 export const ParticipantSearch = ({ onSearch, placeholder }) => {
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState('');
   useDebounce(
     () => {
       onSearch(value);
@@ -349,22 +349,22 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
     [value, onSearch]
   );
   return (
-    <Box css={{ p: "$4 0", my: "$8", position: "relative" }}>
+    <Box css={{ p: '$4 0', my: '$8', position: 'relative' }}>
       <Box
         css={{
-          position: "absolute",
-          left: "$4",
-          top: "$2",
-          transform: "translateY(50%)",
-          color: "$textMedEmp",
+          position: 'absolute',
+          left: '$4',
+          top: '$2',
+          transform: 'translateY(50%)',
+          color: '$textMedEmp',
         }}
       >
         <SearchIcon />
       </Box>
       <Input
         type="text"
-        placeholder={placeholder || "Find what you are looking for"}
-        css={{ w: "100%", pl: "$14" }}
+        placeholder={placeholder || 'Find what you are looking for'}
+        css={{ w: '100%', pl: '$14' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();

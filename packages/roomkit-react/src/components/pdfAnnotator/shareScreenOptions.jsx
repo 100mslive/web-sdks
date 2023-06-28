@@ -1,12 +1,11 @@
-import React, { Fragment, useState } from "react";
-import { useScreenShare } from "@100mslive/react-sdk";
+import React, { Fragment, useState } from 'react';
+import { useScreenShare } from '@100mslive/react-sdk';
 import {
   PdfShare,
   ScreenShare,
   StarIcon,
   VerticalMenuIcon,
-} from "@100mslive/react-icons";
-import { PDFFileOptions } from "./pdfFileOptions";
+} from '@100mslive/react-icons';
 import {
   Box,
   Button,
@@ -15,13 +14,14 @@ import {
   IconButton,
   Text,
   Tooltip,
-} from "../base-components";
-import { ShareMenuIcon } from "../ScreenShare";
+} from '../baseComponents';
+import { ShareMenuIcon } from '../ScreenShare';
+import { PDFFileOptions } from './pdfFileOptions';
 
 const MODALS = {
-  SHARE: "share",
-  SCREEN_SHARE: "screenShare",
-  PDF_SHARE: "pdfShare",
+  SHARE: 'share',
+  SCREEN_SHARE: 'screenShare',
+  PDF_SHARE: 'pdfShare',
 };
 
 export function ShareScreenOptions() {
@@ -61,21 +61,21 @@ export function ShareScreenOptions() {
         <Dropdown.Content
           sideOffset={5}
           css={{
-            w: "$96",
-            maxHeight: "$96",
+            w: '$96',
+            maxHeight: '$96',
             p: 0,
           }}
         >
           <Dropdown.Item
             css={{
-              flexDirection: "column",
-              alignItems: "flex-start",
-              px: "$10",
-              pt: "$10",
-              pb: "$6",
-              "&:hover": {
-                bg: "$transparent",
-                cursor: "default",
+              flexDirection: 'column',
+              alignItems: 'flex-start',
+              px: '$10',
+              pt: '$10',
+              pb: '$6',
+              '&:hover': {
+                bg: '$transparent',
+                cursor: 'default',
               },
             }}
           >
@@ -84,14 +84,14 @@ export function ShareScreenOptions() {
           </Dropdown.Item>
           <Dropdown.Item
             css={{
-              flexDirection: "row",
-              alignItems: "flex-start",
-              gap: "$8",
-              px: "$10",
-              py: "$6",
-              "&:hover": {
-                bg: "$transparent",
-                cursor: "default",
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              gap: '$8',
+              px: '$10',
+              py: '$6',
+              '&:hover': {
+                bg: '$transparent',
+                cursor: 'default',
               },
             }}
           >
@@ -99,28 +99,28 @@ export function ShareScreenOptions() {
               direction="column"
               align="center"
               css={{
-                gap: "$6",
+                gap: '$6',
               }}
             >
               <IconButton
                 as="div"
                 onClick={() => toggleScreenShare()}
                 css={{
-                  p: "$6",
-                  display: "flex",
-                  justifyContent: "center",
-                  border: "1px solid $grayDefault",
-                  r: "$2",
-                  bg: "$surfaceLighter",
-                  pb: "0",
+                  p: '$6',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  border: '1px solid $grayDefault',
+                  r: '$2',
+                  bg: '$surfaceLighter',
+                  pb: '0',
                 }}
               >
                 <ScreenShare
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "$0",
-                    borderTopRightRadius: "$0",
+                    borderTopLeftRadius: '$0',
+                    borderTopRightRadius: '$0',
                   }}
                 />
               </IconButton>
@@ -129,8 +129,8 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: "$textDisabled",
-                    textAlign: "center",
+                    c: '$textDisabled',
+                    textAlign: 'center',
                   }}
                 >
                   Share your tab, window or your entire screen
@@ -141,7 +141,7 @@ export function ShareScreenOptions() {
               direction="column"
               align="center"
               css={{
-                gap: "$6",
+                gap: '$6',
               }}
             >
               <IconButton
@@ -150,42 +150,42 @@ export function ShareScreenOptions() {
                 }}
                 disabled={amIScreenSharing}
                 css={{
-                  p: "$6",
-                  display: "flex",
-                  justifyContent: "center",
-                  border: "$grayDefault 1px solid",
-                  r: "$2",
-                  bg: "$surfaceLight",
-                  pb: "0",
+                  p: '$6',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  border: '$grayDefault 1px solid',
+                  r: '$2',
+                  bg: '$surfaceLight',
+                  pb: '0',
                 }}
               >
                 <PdfShare
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "$0",
-                    borderTopRightRadius: "$0",
+                    borderTopLeftRadius: '$0',
+                    borderTopRightRadius: '$0',
                   }}
                 />
                 <Flex
                   direction="row"
                   css={{
-                    position: "absolute",
-                    top: "29%",
-                    left: "54%",
-                    padding: "$2 $4",
-                    r: "$2",
-                    bg: "$primaryLight",
-                    zIndex: "2",
+                    position: 'absolute',
+                    top: '29%',
+                    left: '54%',
+                    padding: '$2 $4',
+                    r: '$2',
+                    bg: '$primaryLight',
+                    zIndex: '2',
                   }}
                 >
                   <IconButton
                     css={{
-                      w: "$10",
-                      h: "$8",
-                      "&:hover": {
-                        bg: "$transparent !important",
-                        border: "none",
+                      w: '$10',
+                      h: '$8',
+                      '&:hover': {
+                        bg: '$transparent !important',
+                        border: 'none',
                       },
                     }}
                   >
@@ -194,9 +194,9 @@ export function ShareScreenOptions() {
                   <Text
                     variant="xs"
                     css={{
-                      fontWeight: "$semiBold",
-                      c: "$white",
-                      pr: "$4",
+                      fontWeight: '$semiBold',
+                      c: '$white',
+                      pr: '$4',
                     }}
                   >
                     New
@@ -208,8 +208,8 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: "$textDisabled",
-                    textAlign: "center",
+                    c: '$textDisabled',
+                    textAlign: 'center',
                   }}
                 >
                   Annotate, draw shapes, and more over PDFs
@@ -219,12 +219,12 @@ export function ShareScreenOptions() {
           </Dropdown.Item>
           <Dropdown.Item
             css={{
-              px: "$10",
-              pb: "$10",
-              pt: "$6",
-              "&:hover": {
-                bg: "$transparent",
-                cursor: "default",
+              px: '$10',
+              pb: '$10',
+              pt: '$6',
+              '&:hover': {
+                bg: '$transparent',
+                cursor: 'default',
               },
             }}
           >
@@ -237,7 +237,7 @@ export function ShareScreenOptions() {
               }}
               data-testid="share_btn"
               css={{
-                w: "100%",
+                w: '100%',
               }}
             >
               Cancel

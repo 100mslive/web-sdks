@@ -1,12 +1,11 @@
-import React, { useCallback, useState } from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { MicOffIcon } from "@100mslive/react-icons";
-import { useFilteredRoles } from "../../common/hooks";
+import React, { useCallback, useState } from 'react';
+import { useHMSActions } from '@100mslive/react-sdk';
+import { MicOffIcon } from '@100mslive/react-icons';
 import {
   DialogContent,
   DialogRow,
   DialogSelect,
-} from "../../primitives/DialogContent";
+} from '../../primitives/DialogContent';
 import {
   Button,
   Dialog,
@@ -14,19 +13,20 @@ import {
   Label,
   RadioGroup,
   Text,
-} from "../base-components";
+} from '../baseComponents';
+import { useFilteredRoles } from '../../common/hooks';
 
 const trackSourceOptions = [
-  { label: "All Track Sources", value: "" },
-  { label: "regular", value: "regular" },
-  { label: "screen", value: "screen" },
-  { label: "audioplaylist", value: "audioplaylist" },
-  { label: "videoplaylist", value: "videoplaylist" },
+  { label: 'All Track Sources', value: '' },
+  { label: 'regular', value: 'regular' },
+  { label: 'screen', value: 'screen' },
+  { label: 'audioplaylist', value: 'audioplaylist' },
+  { label: 'videoplaylist', value: 'videoplaylist' },
 ];
 const trackTypeOptions = [
-  { label: "All Track Types", value: "" },
-  { label: "audio", value: "audio" },
-  { label: "video", value: "video" },
+  { label: 'All Track Types', value: '' },
+  { label: 'audio', value: 'audio' },
+  { label: 'video', value: 'video' },
 ];
 export const MuteAllModal = ({ onOpenChange }) => {
   const roles = useFilteredRoles();
@@ -59,7 +59,7 @@ export const MuteAllModal = ({ onOpenChange }) => {
         <DialogSelect
           title="Role"
           options={[
-            { label: "All Roles", value: "" },
+            { label: 'All Roles', value: '' },
             ...roles.map(role => ({ label: role, value: role })),
           ]}
           selected={selectedRole}
@@ -86,21 +86,21 @@ export const MuteAllModal = ({ onOpenChange }) => {
         <DialogRow>
           <Text variant="md">Track status</Text>
           <RadioGroup.Root value={enabled} onValueChange={setEnabled}>
-            <Flex align="center" css={{ mr: "$8" }}>
+            <Flex align="center" css={{ mr: '$8' }}>
               <RadioGroup.Item
                 value={false}
                 id="trackDisableRadio"
-                css={{ mr: "$4" }}
+                css={{ mr: '$4' }}
               >
                 <RadioGroup.Indicator />
               </RadioGroup.Item>
               <Label htmlFor="trackDisableRadio">Mute</Label>
             </Flex>
-            <Flex align="center" css={{ cursor: "pointer" }}>
+            <Flex align="center" css={{ cursor: 'pointer' }}>
               <RadioGroup.Item
                 value={true}
                 id="trackEnableRadio"
-                css={{ mr: "$4" }}
+                css={{ mr: '$4' }}
               >
                 <RadioGroup.Indicator />
               </RadioGroup.Item>

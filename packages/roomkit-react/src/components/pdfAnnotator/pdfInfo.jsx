@@ -1,26 +1,26 @@
-import React from "react";
-import { InfoIcon } from "@100mslive/react-icons";
-import { DialogRow } from "../../primitives/DialogContent";
-import { Text } from "../base-components";
+import React from 'react';
+import { InfoIcon } from '@100mslive/react-icons';
+import { DialogRow } from '../../primitives/DialogContent';
+import { Text } from '../baseComponents';
 
 export const PDFInfo = () => {
   return (
     <DialogRow
       css={{
-        px: "$8",
-        py: "$3",
-        bg: "$surfaceLight",
-        r: "$1",
-        outline: "none",
-        border: "1px solid $borderLight",
-        minHeight: "$11",
+        px: '$8',
+        py: '$3',
+        bg: '$surfaceLight',
+        r: '$1',
+        outline: 'none',
+        border: '1px solid $borderLight',
+        minHeight: '$11',
       }}
     >
       <InfoIcon
         width="64px"
         height="64px"
         style={{
-          paddingRight: "16px",
+          paddingRight: '16px',
         }}
       />
       <Text variant="caption">

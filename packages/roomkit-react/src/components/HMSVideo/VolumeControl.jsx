@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { SpeakerIcon } from "@100mslive/react-icons";
-import { Flex, Slider } from "../base-components";
+import React, { useState } from 'react';
+import { SpeakerIcon } from '@100mslive/react-icons';
+import { Flex, Slider } from '../baseComponents';
 
 export const VolumeControl = ({ hlsPlayer }) => {
   const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);
 
   return (
-    <Flex align="center" css={{ color: "$white" }}>
+    <Flex align="center" css={{ color: '$white' }}>
       <SpeakerIcon
-        style={{ cursor: "pointer" }}
+        style={{ cursor: 'pointer' }}
         onClick={() => {
           setVolume(0);
           if (hlsPlayer) {
@@ -18,11 +18,11 @@ export const VolumeControl = ({ hlsPlayer }) => {
       />
       <Slider
         css={{
-          mx: "$4",
-          w: "$20",
-          cursor: "pointer",
-          "@sm": { w: "$14" },
-          "@xs": { w: "$14" },
+          mx: '$4',
+          w: '$20',
+          cursor: 'pointer',
+          '@sm': { w: '$14' },
+          '@xs': { w: '$14' },
         }}
         min={0}
         max={100}
@@ -32,7 +32,7 @@ export const VolumeControl = ({ hlsPlayer }) => {
           hlsPlayer.setVolume(volume);
           setVolume(volume);
         }}
-        thumbStyles={{ w: "$6", h: "$6" }}
+        thumbStyles={{ w: '$6', h: '$6' }}
       />
     </Flex>
   );

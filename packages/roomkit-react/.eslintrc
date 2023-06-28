@@ -1,9 +1,10 @@
 {
   "extends": [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
-    "react-app",
-    "react-app/jest"
+    "plugin:import/typescript",
+    "react-app"
   ],
   "plugins": ["prettier", "simple-import-sort"],
   "rules": {

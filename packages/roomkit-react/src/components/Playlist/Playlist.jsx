@@ -1,21 +1,21 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState } from 'react';
 import {
   HMSPlaylistType,
   selectIsAllowedToPublish,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   AudioPlayerIcon,
   CrossIcon,
   VideoPlayerIcon,
-} from "@100mslive/react-icons";
-import { AudioPlaylistControls } from "./PlaylistControls";
-import { PlaylistItem } from "./PlaylistItem";
-import { FEATURE_LIST } from "../../common/constants";
-import IconButton from "../../IconButton";
-import { Box, Dropdown, Flex, Text, Tooltip } from "../base-components";
-import { useIsFeatureEnabled } from "../hooks/useFeatures";
-import { usePlaylist } from "../hooks/usePlaylist";
+} from '@100mslive/react-icons';
+import IconButton from '../../IconButton';
+import { Box, Dropdown, Flex, Text, Tooltip } from '../baseComponents';
+import { AudioPlaylistControls } from './PlaylistControls';
+import { PlaylistItem } from './PlaylistItem';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { usePlaylist } from '../hooks/usePlaylist';
+import { FEATURE_LIST } from '../../common/constants';
 
 const BrowseAndPlayFromLocal = ({ type, actions }) => {
   return (
@@ -24,14 +24,14 @@ const BrowseAndPlayFromLocal = ({ type, actions }) => {
         as="label"
         htmlFor={`${type}PlaylistBrowse`}
         variant="sm"
-        css={{ cursor: "pointer", mr: "$2" }}
+        css={{ cursor: 'pointer', mr: '$2' }}
       >
         Browse
       </Text>
       <input
         type="file"
         id={`${type}PlaylistBrowse`}
-        accept={type === HMSPlaylistType.audio ? "audio/*" : "video/*"}
+        accept={type === HMSPlaylistType.audio ? 'audio/*' : 'video/*'}
         onChange={e => {
           const file = e.target.files[0];
           const id = file.lastModified;
@@ -45,7 +45,7 @@ const BrowseAndPlayFromLocal = ({ type, actions }) => {
           ]);
           actions.play(id);
         }}
-        style={{ display: "none" }}
+        style={{ display: 'none' }}
       />
     </Fragment>
   );
@@ -74,12 +74,12 @@ export const Playlist = ({ type }) => {
         <Dropdown.Trigger
           asChild
           data-testid={
-            type === HMSPlaylistType.audio ? "audio_playlist" : "video_playlist"
+            type === HMSPlaylistType.audio ? 'audio_playlist' : 'video_playlist'
           }
         >
           <IconButton active={!active}>
             <Tooltip
-              title={isAudioPlaylist ? "Audio Playlist" : "Video Playlist"}
+              title={isAudioPlaylist ? 'Audio Playlist' : 'Video Playlist'}
             >
               <Box>
                 {isAudioPlaylist ? <AudioPlayerIcon /> : <VideoPlayerIcon />}
@@ -91,27 +91,27 @@ export const Playlist = ({ type }) => {
           sideOffset={5}
           align="center"
           css={{
-            maxHeight: "unset",
-            width: "$60",
-            p: "$0",
-            bg: "$bgSecondary",
-            border: "1px solid $menuBg",
+            maxHeight: 'unset',
+            width: '$60',
+            p: '$0',
+            bg: '$bgSecondary',
+            border: '1px solid $menuBg',
           }}
         >
           <Flex
             align="center"
             css={{
-              p: "$4 $8",
-              borderBottom: "1px solid $borderLight",
-              bg: "$menuBg",
+              p: '$4 $8',
+              borderBottom: '1px solid $borderLight',
+              bg: '$menuBg',
             }}
           >
-            <Text variant="md" css={{ flex: "1 1 0" }}>
-              {isAudioPlaylist ? "Audio Player" : "Video Playlist"}
+            <Text variant="md" css={{ flex: '1 1 0' }}>
+              {isAudioPlaylist ? 'Audio Player' : 'Video Playlist'}
             </Text>
             <BrowseAndPlayFromLocal type={type} actions={actions} />
             <IconButton
-              css={{ mr: "-$4" }}
+              css={{ mr: '-$4' }}
               onClick={async () => {
                 if (active) {
                   await actions.stop();
@@ -124,7 +124,7 @@ export const Playlist = ({ type }) => {
             </IconButton>
           </Flex>
           {!collapse && (
-            <Box css={{ maxHeight: "$96", overflowY: "auto" }}>
+            <Box css={{ maxHeight: '$96', overflowY: 'auto' }}>
               {playlist.map(playlistItem => {
                 return (
                   <PlaylistItem

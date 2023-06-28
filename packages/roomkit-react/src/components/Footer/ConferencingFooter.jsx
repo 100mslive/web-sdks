@@ -12,7 +12,7 @@ import {
   Flex,
   Footer as AppFooter,
   Tooltip,
-} from "../base-components";
+} from "../baseComponents";
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";

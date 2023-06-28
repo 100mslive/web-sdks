@@ -29,7 +29,7 @@ import {
   styled,
   Text,
   Tooltip,
-} from "../base-components";
+} from "../baseComponents";
 import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
 
 const formatTime = date => {

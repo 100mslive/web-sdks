@@ -4,7 +4,7 @@ import { PDFHeader } from "./pdfHeader";
 import { PDFInfo } from "./pdfInfo";
 import { SubmitPDF } from "./submitPdf";
 import { DialogRow } from "../../primitives/DialogContent";
-import { Dialog, Flex, Text } from "../base-components";
+import { Dialog, Flex, Text } from "../baseComponents";
 
 export const UploadedFile = ({
   pdfFile,

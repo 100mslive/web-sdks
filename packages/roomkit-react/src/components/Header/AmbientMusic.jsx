@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { MusicIcon } from "@100mslive/react-icons";
-import { UI_SETTINGS } from "../../common/constants";
-import { useWhenAloneInRoom } from "../../common/hooks";
-import { useSetUiSettings } from "../AppData/useUISettings";
-import { IconButton, Tooltip } from "../base-components";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { MusicIcon } from '@100mslive/react-icons';
+import { IconButton, Tooltip } from '../baseComponents';
+import { useSetUiSettings } from '../AppData/useUISettings';
+import { useWhenAloneInRoom } from '../../common/hooks';
+import { UI_SETTINGS } from '../../common/constants';
 
 const ambientMusicURL = process.env.REACT_APP_AMBIENT_MUSIC;
 /**
@@ -46,7 +46,7 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
       audioRef.current.loop = true;
       audioRef.current
         .play()
-        .catch(err => console.error("Unable to play Ambient Music", err));
+        .catch(err => console.error('Unable to play Ambient Music', err));
       setPlaying(true);
     }
   }, [shouldMusicBePlayed]);
@@ -88,7 +88,7 @@ export const AmbientMusic = () => {
       key="ambient-music"
     >
       <IconButton
-        css={{ mx: "$4" }}
+        css={{ mx: '$4' }}
         onClick={toggleAmbientMusic}
         active={!playing}
       >

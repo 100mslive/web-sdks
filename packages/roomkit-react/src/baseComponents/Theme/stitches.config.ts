@@ -1,7 +1,12 @@
 import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
-import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
+import {
+  baseConfig,
+  defaultMedia,
+  defaultThemeMap,
+  defaultUtils,
+} from './base.config';
 import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
@@ -57,7 +62,11 @@ export const createTheme = ({
   }
   return createThemeBase(
     className || `${themeType}-theme`,
-    merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
+    merge(
+      baseConfig.theme,
+      themeType === 'dark' ? darkTheme : lightTheme,
+      theme || {}
+    )
   );
 };
 

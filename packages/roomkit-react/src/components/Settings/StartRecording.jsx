@@ -7,7 +7,7 @@ import {
   useRecordingStreaming,
 } from "@100mslive/react-sdk";
 import { AlertTriangleIcon } from "@100mslive/react-icons";
-import { Button, Dialog, Flex, Text } from "../base-components";
+import { Button, Dialog, Flex, Text } from "../baseComponents";
 import { ResolutionInput } from "../Streaming/ResolutionInput";
 import { getResolution } from "../Streaming/RTMPStreaming";
 import { ToastManager } from "../Toast/ToastManager";

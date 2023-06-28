@@ -1,12 +1,12 @@
-import React from "react";
-import { useMedia } from "react-use";
-import { Logo, SpeakerTag } from "./HeaderComponents";
-import { ParticipantCount } from "./ParticipantList";
-import { LiveStatus, RecordingStatus, StreamActions } from "./StreamActions";
-import { config as cssConfig, Flex } from "../base-components";
-import { EmojiReaction } from "../EmojiReaction";
-import { LeaveRoom } from "../LeaveRoom";
-import MetaActions from "../MetaActions";
+import React from 'react';
+import { useMedia } from 'react-use';
+import { config as cssConfig, Flex } from '../baseComponents';
+import { EmojiReaction } from '../EmojiReaction';
+import { LeaveRoom } from '../LeaveRoom';
+import MetaActions from '../MetaActions';
+import { Logo, SpeakerTag } from './HeaderComponents';
+import { ParticipantCount } from './ParticipantList';
+import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
 export const StreamingHeader = ({ isPreview }) => {
   const isMobile = useMedia(cssConfig.media.md);
@@ -14,13 +14,13 @@ export const StreamingHeader = ({ isPreview }) => {
     <Flex
       justify="between"
       align="center"
-      css={{ position: "relative", height: "100%" }}
+      css={{ position: 'relative', height: '100%' }}
     >
       <Flex
         align="center"
         css={{
-          position: "absolute",
-          left: "$10",
+          position: 'absolute',
+          left: '$10',
         }}
       >
         <Logo />
@@ -37,9 +37,9 @@ export const StreamingHeader = ({ isPreview }) => {
       <Flex
         align="center"
         css={{
-          position: "absolute",
-          right: "$10",
-          gap: "$4",
+          position: 'absolute',
+          right: '$10',
+          gap: '$4',
         }}
       >
         {isMobile ? (
@@ -48,7 +48,7 @@ export const StreamingHeader = ({ isPreview }) => {
             <MetaActions compact />
           </>
         ) : (
-          <Flex css={{ gap: "$4" }}>
+          <Flex css={{ gap: '$4' }}>
             <StreamActions />
           </Flex>
         )}

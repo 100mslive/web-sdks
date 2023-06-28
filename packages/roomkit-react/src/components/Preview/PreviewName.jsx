@@ -1,6 +1,6 @@
-import React from "react";
-import { isStreamingKit } from "../../common/utils";
-import { Button, Input, styled } from "../base-components";
+import React from 'react';
+import { Button, Input, styled } from '../baseComponents';
+import { isStreamingKit } from '../../common/utils';
 
 const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
   const formSubmit = e => {
@@ -11,7 +11,7 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
       <Input
         required
         id="name"
-        css={{ w: "100%" }}
+        css={{ w: '100%' }}
         value={name}
         onChange={e => onChange(e.target.value)}
         placeholder="Enter your name"
@@ -19,19 +19,19 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
         autoComplete="name"
       />
       <Button type="submit" disabled={!name || !enableJoin} onClick={onJoin}>
-        {isStreamingKit() ? "Join Studio" : "Join Room"}
+        {isStreamingKit() ? 'Join Studio' : 'Join Room'}
       </Button>
     </Form>
   );
 };
 
-const Form = styled("form", {
-  width: "100%",
-  display: "flex",
-  alignItems: "center",
-  gap: "$4",
-  mt: "$10",
-  mb: "$10",
+const Form = styled('form', {
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '$4',
+  mt: '$10',
+  mb: '$10',
 });
 
 export default PreviewName;

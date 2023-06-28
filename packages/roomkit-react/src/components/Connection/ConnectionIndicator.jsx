@@ -5,7 +5,7 @@ import {
 } from "@100mslive/react-sdk";
 import { PoorConnectivityIcon } from "@100mslive/react-icons";
 import { getColor, getTooltipText } from "./connectionQualityUtils";
-import { styled, Tooltip, useTheme } from "../base-components";
+import { styled, Tooltip, useTheme } from "../baseComponents";
 
 const Wrapper = styled("span", {
   width: "28px",

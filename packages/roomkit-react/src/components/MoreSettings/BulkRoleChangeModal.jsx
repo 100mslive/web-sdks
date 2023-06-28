@@ -1,13 +1,12 @@
-import React, { useCallback, useRef, useState } from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
+import React, { useCallback, useRef, useState } from 'react';
+import { useHMSActions } from '@100mslive/react-sdk';
 import {
   AlertTriangleIcon,
   ChangeRoleIcon,
   CheckIcon,
-} from "@100mslive/react-icons";
-import { useFilteredRoles } from "../../common/hooks";
-import { DialogContent, DialogRow } from "../../primitives/DialogContent";
-import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
+} from '@100mslive/react-icons';
+import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import {
   Button,
   Checkbox,
@@ -16,7 +15,8 @@ import {
   Flex,
   Loading,
   Text,
-} from "../base-components";
+} from '../baseComponents';
+import { useFilteredRoles } from '../../common/hooks';
 
 export const BulkRoleChangeModal = ({ onOpenChange }) => {
   const roles = useFilteredRoles();
@@ -24,10 +24,10 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
   const ref = useRef(null);
   const roleRef = useRef(null);
   const [selectedBulkRole, setBulkRole] = useState([]);
-  const [selectedRole, setRole] = useState("");
+  const [selectedRole, setRole] = useState('');
   const [bulkRoleDialog, setBulkRoleDialog] = useState(false);
   const [roleDialog, setRoleDialog] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState('');
   const [isSubmiting, setIsSubmiting] = useState(false);
 
   const changeBulkRole = useCallback(async () => {
@@ -39,10 +39,10 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
           selectedRole
         );
         setIsSubmiting(false);
-        setErrorMessage("");
+        setErrorMessage('');
         onOpenChange(false);
       } catch (err) {
-        setErrorMessage(err?.message ? err?.message : "Unknown error");
+        setErrorMessage(err?.message ? err?.message : 'Unknown error');
         setIsSubmiting(false);
       }
     }
@@ -66,12 +66,12 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
               ref={ref}
               title={
                 selectedBulkRole.length === 0
-                  ? "Select Multiple Roles"
+                  ? 'Select Multiple Roles'
                   : selectedBulkRole.toString()
               }
               css={{
-                w: "70%",
-                p: "$8",
+                w: '70%',
+                p: '$8',
               }}
               open={bulkRoleDialog}
             />
@@ -97,11 +97,11 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                                 selectedRole => selectedRole !== role
                               );
                         });
-                        setErrorMessage("");
+                        setErrorMessage('');
                       }}
                     >
                       <Checkbox.Root
-                        css={{ margin: "$2" }}
+                        css={{ margin: '$2' }}
                         checked={selectedBulkRole.includes(role)}
                       >
                         <Checkbox.Indicator>
@@ -123,10 +123,10 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
           >
             <DialogDropdownTrigger
               ref={roleRef}
-              title={selectedRole || "Select Role"}
+              title={selectedRole || 'Select Role'}
               css={{
-                w: "70%",
-                p: "$8",
+                w: '70%',
+                p: '$8',
               }}
               open={roleDialog}
             />
@@ -140,7 +140,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                       key={role}
                       onSelect={() => {
                         setRole(role);
-                        setErrorMessage("");
+                        setErrorMessage('');
                       }}
                     >
                       {role}
@@ -152,9 +152,9 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow>
           {errorMessage && (
-            <Flex gap={2} css={{ c: "$error", w: "70%", ml: "auto" }}>
+            <Flex gap={2} css={{ c: '$error', w: '70%', ml: 'auto' }}>
               <AlertTriangleIcon />
-              <Text css={{ c: "inherit" }}>{errorMessage}</Text>
+              <Text css={{ c: 'inherit' }}>{errorMessage}</Text>
             </Flex>
           )}
         </DialogRow>
@@ -164,7 +164,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
             onClick={changeBulkRole}
             disabled={!(selectedRole && selectedBulkRole.length > 0)}
           >
-            {isSubmiting && <Loading css={{ color: "$textSecondary" }} />}
+            {isSubmiting && <Loading css={{ color: '$textSecondary' }} />}
             Apply
           </Button>
         </DialogRow>

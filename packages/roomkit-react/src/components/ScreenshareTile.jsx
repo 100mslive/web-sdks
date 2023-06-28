@@ -1,30 +1,30 @@
-import React, { useRef, useState } from "react";
-import { useFullscreen } from "react-use";
-import screenfull from "screenfull";
+import React, { useRef, useState } from 'react';
+import { useFullscreen } from 'react-use';
+import screenfull from 'screenfull';
 import {
   selectLocalPeerID,
   selectPeerByID,
   selectScreenShareAudioByPeerID,
   selectScreenShareByPeerID,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { getVideoTileLabel } from "./peerTileUtils";
-import TileMenu from "./TileMenu";
-import { StyledVideoTile, Video, VideoTileStats } from "../base-components";
-import { UI_SETTINGS } from "../common/constants";
+} from '@100mslive/react-sdk';
+import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { StyledVideoTile, Video, VideoTileStats } from '../baseComponents';
+import { getVideoTileLabel } from './peerTileUtils';
+import TileMenu from './TileMenu';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {
-  position: "unset",
-  width: "100%",
-  textAlign: "center",
-  transform: "none",
-  mt: "$2",
+  position: 'unset',
+  width: '100%',
+  textAlign: 'center',
+  transform: 'none',
+  mt: '$2',
   flexShrink: 0,
 };
 
-const Tile = ({ peerId, width = "100%", height = "100%" }) => {
+const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const isLocal = useHMSStore(selectLocalPeerID) === peerId;
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -55,7 +55,7 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
         <StyledVideoTile.Container
           transparentBg
           ref={fullscreenRef}
-          css={{ flexDirection: "column" }}
+          css={{ flexDirection: 'column' }}
           onMouseEnter={() => setIsMouseHovered(true)}
           onMouseLeave={() => {
             setIsMouseHovered(false);
@@ -79,7 +79,7 @@ const Tile = ({ peerId, width = "100%", height = "100%" }) => {
           {track ? (
             <Video
               screenShare={true}
-              mirror={peer.isLocal && track?.source === "regular"}
+              mirror={peer.isLocal && track?.source === 'regular'}
               attach={!isAudioOnly}
               trackId={track.id}
             />

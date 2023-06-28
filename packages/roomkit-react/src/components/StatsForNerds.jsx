@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   selectHMSStats,
   selectLocalPeerID,
@@ -6,9 +6,7 @@ import {
   selectTracksMap,
   useHMSStatsStore,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { useSetUiSettings } from "./AppData/useUISettings";
-import { useDropdownSelection } from "./hooks/useDropdownSelection";
+} from '@100mslive/react-sdk';
 import {
   Box,
   Dialog,
@@ -18,15 +16,17 @@ import {
   Label,
   Switch,
   Text,
-} from "../base-components";
-import { UI_SETTINGS } from "../common/constants";
-import { DialogDropdownTrigger } from "../primitives/DropdownTrigger";
+} from '../baseComponents';
+import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
+import { useSetUiSettings } from './AppData/useUISettings';
+import { useDropdownSelection } from './hooks/useDropdownSelection';
+import { UI_SETTINGS } from '../common/constants';
 
 export const StatsForNerds = ({ onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(
     () => [
-      { id: "local-peer", label: "Local Peer Stats" },
+      { id: 'local-peer', label: 'Local Peer Stats' },
       ...tracksWithLabels,
     ],
     [tracksWithLabels]
@@ -41,10 +41,10 @@ export const StatsForNerds = ({ onOpenChange }) => {
 
   useEffect(() => {
     if (
-      selectedStat.id !== "local-peer" &&
+      selectedStat.id !== 'local-peer' &&
       !tracksWithLabels.find(track => track.id === selectedStat.id)
     ) {
-      setSelectedStat("local-peer");
+      setSelectedStat('local-peer');
     }
   }, [tracksWithLabels, selectedStat]);
 
@@ -54,15 +54,15 @@ export const StatsForNerds = ({ onOpenChange }) => {
         <Dialog.Overlay />
         <Dialog.Content
           css={{
-            width: "min(500px, 95%)",
-            maxHeight: "100%",
-            overflowY: "auto",
+            width: 'min(500px, 95%)',
+            maxHeight: '100%',
+            overflowY: 'auto',
           }}
         >
           {/* Title */}
-          <Dialog.Title css={{ p: "$4 0" }}>
+          <Dialog.Title css={{ p: '$4 0' }}>
             <Flex justify="between">
-              <Flex align="center" css={{ mb: "$1" }}>
+              <Flex align="center" css={{ mb: '$1' }}>
                 <Text variant="h6" inline>
                   Stats For Nerds
                 </Text>
@@ -70,14 +70,14 @@ export const StatsForNerds = ({ onOpenChange }) => {
               <Dialog.DefaultClose data-testid="stats_dialog_close_icon" />
             </Flex>
           </Dialog.Title>
-          <HorizontalDivider css={{ mt: "0.8rem" }} />
+          <HorizontalDivider css={{ mt: '0.8rem' }} />
           {/* Switch */}
-          <Flex justify="start" gap={4} css={{ m: "$10 0" }}>
+          <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
             <Switch
               checked={showStatsOnTiles}
               onCheckedChange={setShowStatsOnTiles}
             />
-            <Text variant="body2" css={{ fontWeight: "$semiBold" }}>
+            <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
               Show Stats on Tiles
             </Text>
           </Flex>
@@ -85,8 +85,8 @@ export const StatsForNerds = ({ onOpenChange }) => {
           <Flex
             direction="column"
             css={{
-              mb: "$12",
-              position: "relative",
+              mb: '$12',
+              position: 'relative',
               minWidth: 0,
             }}
           >
@@ -97,8 +97,8 @@ export const StatsForNerds = ({ onOpenChange }) => {
               onOpenChange={setOpen}
             >
               <DialogDropdownTrigger
-                title={selectedStat.label || "Select Stats"}
-                css={{ mt: "$4" }}
+                title={selectedStat.label || 'Select Stats'}
+                css={{ mt: '$4' }}
                 titleCSS={{ mx: 0 }}
                 open={open}
                 ref={ref}
@@ -115,14 +115,14 @@ export const StatsForNerds = ({ onOpenChange }) => {
                       option.layer === selectedStat.layer;
                     return (
                       <Dropdown.Item
-                        key={`${option.id}-${option.layer || ""}`}
+                        key={`${option.id}-${option.layer || ''}`}
                         onClick={() => {
                           setSelectedStat(option);
                         }}
                         css={{
-                          px: "$9",
+                          px: '$9',
                           bg: isSelected ? selectionBg : undefined,
-                          c: isSelected ? "$white" : "$textPrimary",
+                          c: isSelected ? '$white' : '$textPrimary',
                         }}
                       >
                         {option.label}
@@ -134,7 +134,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
             </Dropdown.Root>
           </Flex>
           {/* Stats */}
-          {selectedStat.id === "local-peer" ? (
+          {selectedStat.id === 'local-peer' ? (
             <LocalPeerStats />
           ) : (
             <TrackStats
@@ -191,20 +191,20 @@ const LocalPeerStats = () => {
   }
 
   return (
-    <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
+    <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
       <StatsRow
         label="Publish Bitrate"
-        value={formatBytes(stats.publish?.bitrate, "b/s")}
+        value={formatBytes(stats.publish?.bitrate, 'b/s')}
       />
       <StatsRow
         label="Subscribe Bitrate"
-        value={formatBytes(stats.subscribe?.bitrate, "b/s")}
+        value={formatBytes(stats.subscribe?.bitrate, 'b/s')}
       />
       <StatsRow
         label="Available Outgoing Bitrate"
-        value={formatBytes(stats.publish?.availableOutgoingBitrate, "b/s")}
+        value={formatBytes(stats.publish?.availableOutgoingBitrate, 'b/s')}
       />
       <StatsRow
         label="Total Bytes Sent"
@@ -238,19 +238,19 @@ const TrackStats = ({ trackID, layer, local }) => {
   if (!stats) {
     return null;
   }
-  const inbound = stats.type.includes("inbound");
+  const inbound = stats.type.includes('inbound');
 
   return (
-    <Flex css={{ flexWrap: "wrap", gap: "$10" }}>
-      <StatsRow label="Type" value={stats.type + " " + stats.kind} />
-      <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, "b/s")} />
+    <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
+      <StatsRow label="Type" value={stats.type + ' ' + stats.kind} />
+      <StatsRow label="Bitrate" value={formatBytes(stats.bitrate, 'b/s')} />
       <StatsRow label="Packets Lost" value={stats.packetsLost} />
       <StatsRow label="Jitter" value={stats.jitter?.toFixed(3)} />
       <StatsRow
-        label={inbound ? "Bytes Received" : "Bytes Sent"}
+        label={inbound ? 'Bytes Received' : 'Bytes Sent'}
         value={formatBytes(inbound ? stats.bytesReceived : stats.bytesSent)}
       />
-      {stats.kind === "video" && (
+      {stats.kind === 'video' && (
         <>
           <StatsRow label="Framerate" value={stats.framesPerSecond} />
           {!inbound && (
@@ -263,44 +263,44 @@ const TrackStats = ({ trackID, layer, local }) => {
       )}
       <StatsRow
         label="Round Trip Time"
-        value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : "-"}
+        value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : '-'}
       />
     </Flex>
   );
 };
 
 const StatsRow = React.memo(({ label, value }) => (
-  <Box css={{ bg: "$surfaceLight", w: "calc(50% - $6)", p: "$8", r: "$3" }}>
+  <Box css={{ bg: '$surfaceLight', w: 'calc(50% - $6)', p: '$8', r: '$3' }}>
     <Text
       variant="overline"
       css={{
-        fontWeight: "$semiBold",
-        color: "$textMedEmp",
-        textTransform: "uppercase",
+        fontWeight: '$semiBold',
+        color: '$textMedEmp',
+        textTransform: 'uppercase',
       }}
     >
-      {label}{" "}
+      {label}{' '}
     </Text>
     <Text
       variant="sub1"
-      css={{ fontWeight: "$semiBold", color: "$textHighEmp" }}
+      css={{ fontWeight: '$semiBold', color: '$textHighEmp' }}
     >
-      {value || "-"}
+      {value || '-'}
     </Text>
   </Box>
 ));
 
-const formatBytes = (bytes, unit = "B", decimals = 2) => {
-  if (bytes === undefined) return "-";
-  if (bytes === 0) return "0 " + unit;
+const formatBytes = (bytes, unit = 'B', decimals = 2) => {
+  if (bytes === undefined) return '-';
+  if (bytes === 0) return '0 ' + unit;
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["", "K", "M", "G", "T", "P", "E", "Z", "Y"].map(
+  const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'].map(
     size => size + unit
   );
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };

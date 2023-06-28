@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { HMSHLSPlayerEvents } from "@100mslive/hls-player";
-import { getDurationFromSeconds } from "./HMSVIdeoUtils";
-import { Text } from "../base-components";
+import React, { useEffect, useState } from 'react';
+import { HMSHLSPlayerEvents } from '@100mslive/hls-player';
+import { Text } from '../baseComponents';
+import { getDurationFromSeconds } from './HMSVIdeoUtils';
 
 export const VideoTime = ({ hlsPlayer }) => {
-  const [videoTime, setVideoTime] = useState("");
+  const [videoTime, setVideoTime] = useState('');
 
   useEffect(() => {
     const timeupdateHandler = currentTime =>
@@ -22,10 +22,10 @@ export const VideoTime = ({ hlsPlayer }) => {
   return hlsPlayer ? (
     <Text
       css={{
-        minWidth: "$16",
+        minWidth: '$16',
       }}
       variant={{
-        "@sm": "xs",
+        '@sm': 'xs',
       }}
     >{`${videoTime}`}</Text>
   ) : null;

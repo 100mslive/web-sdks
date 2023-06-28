@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   selectLocalPeerName,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { Box, Button, Dialog, Flex, Input, Text } from "../base-components";
+} from '@100mslive/react-sdk';
+import { Box, Button, Dialog, Flex, Input, Text } from '../baseComponents';
+import { ToastManager } from '../Toast/ToastManager';
 import {
   UserPreferencesKeys,
   useUserPreferences,
-} from "../hooks/useUserPreferences";
-import { ToastManager } from "../Toast/ToastManager";
+} from '../hooks/useUserPreferences';
 
 export const ChangeNameModal = ({ onOpenChange }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
@@ -31,7 +31,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
         name,
       });
     } catch (error) {
-      console.error("failed to update name", error);
+      console.error('failed to update name', error);
       ToastManager.addToast({ title: error.message });
     } finally {
       onOpenChange(false);
@@ -42,8 +42,8 @@ export const ChangeNameModal = ({ onOpenChange }) => {
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
-          <Dialog.Title css={{ p: "0 $4" }}>
+        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
+          <Dialog.Title css={{ p: '0 $4' }}>
             <Text variant="h6"> Change Name</Text>
           </Dialog.Title>
           <form
@@ -52,9 +52,9 @@ export const ChangeNameModal = ({ onOpenChange }) => {
               await changeName();
             }}
           >
-            <Flex justify="center" align="center" css={{ my: "$8", w: "100%" }}>
+            <Flex justify="center" align="center" css={{ my: '$8', w: '100%' }}>
               <Input
-                css={{ width: "100%" }}
+                css={{ width: '100%' }}
                 value={currentName}
                 onChange={e => {
                   setCurrentName(e.target.value);
@@ -69,16 +69,16 @@ export const ChangeNameModal = ({ onOpenChange }) => {
               justify="between"
               align="center"
               css={{
-                width: "100%",
-                gap: "$md",
-                mt: "$10",
+                width: '100%',
+                gap: '$md',
+                mt: '$10',
               }}
             >
-              <Box css={{ w: "50%" }}>
-                <Dialog.Close css={{ w: "100%" }}>
+              <Box css={{ w: '50%' }}>
+                <Dialog.Close css={{ w: '100%' }}>
                   <Button
                     variant="standard"
-                    css={{ w: "100%" }}
+                    css={{ w: '100%' }}
                     outlined
                     type="submit"
                     disabled={!localPeerName}
@@ -87,10 +87,10 @@ export const ChangeNameModal = ({ onOpenChange }) => {
                   </Button>
                 </Dialog.Close>
               </Box>
-              <Box css={{ w: "50%" }}>
+              <Box css={{ w: '50%' }}>
                 <Button
                   variant="primary"
-                  css={{ width: "100%" }}
+                  css={{ width: '100%' }}
                   type="submit"
                   disabled={
                     !currentName.trim() || currentName.trim() === localPeerName

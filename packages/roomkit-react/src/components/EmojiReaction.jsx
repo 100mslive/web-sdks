@@ -1,6 +1,6 @@
-import React, { Fragment, useCallback, useMemo, useState } from "react";
-import data from "@emoji-mart/data/sets/14/apple.json";
-import { init } from "emoji-mart";
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import data from '@emoji-mart/data/sets/14/apple.json';
+import { init } from 'emoji-mart';
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
@@ -10,43 +10,36 @@ import {
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-} from "@100mslive/react-sdk";
-import { EmojiIcon } from "@100mslive/react-icons";
-import { useHLSViewerRole } from "./AppData/useUISettings";
-import { useDropdownList } from "./hooks/useDropdownList";
-import { useIsFeatureEnabled } from "./hooks/useFeatures";
-import {
-  Box,
-  Dropdown,
-  Flex,
-  styled,
-  Text,
-  Tooltip,
-} from "../base-components";
+} from '@100mslive/react-sdk';
+import { EmojiIcon } from '@100mslive/react-icons';
+import { Box, Dropdown, Flex, styled, Text, Tooltip } from '../baseComponents';
+import IconButton from '../IconButton';
+import { useHLSViewerRole } from './AppData/useUISettings';
+import { useDropdownList } from './hooks/useDropdownList';
+import { useIsFeatureEnabled } from './hooks/useFeatures';
 import {
   EMOJI_REACTION_TYPE,
   FEATURE_LIST,
   HLS_TIMED_METADATA_DOC_URL,
-} from "../common/constants";
-import IconButton from "../IconButton";
+} from '../common/constants';
 
 init({ data });
 
 // When changing emojis in the grid, keep in mind that the payload used in sendHLSTimedMetadata has a limit of 100 characters. Using bigger emoji Ids can cause the limit to be exceeded.
 const emojiReactionList = [
   [
-    { emojiId: "+1" },
-    { emojiId: "-1" },
-    { emojiId: "wave" },
-    { emojiId: "clap" },
-    { emojiId: "fire" },
+    { emojiId: '+1' },
+    { emojiId: '-1' },
+    { emojiId: 'wave' },
+    { emojiId: 'clap' },
+    { emojiId: 'fire' },
   ],
   [
-    { emojiId: "tada" },
-    { emojiId: "heart_eyes" },
-    { emojiId: "joy" },
-    { emojiId: "open_mouth" },
-    { emojiId: "sob" },
+    { emojiId: 'tada' },
+    { emojiId: 'heart_eyes' },
+    { emojiId: 'joy' },
+    { emojiId: 'open_mouth' },
+    { emojiId: 'sob' },
   ],
 ];
 
@@ -64,7 +57,7 @@ export const EmojiReaction = () => {
     () => roles.filter(role => role !== hlsViewerRole),
     [roles, hlsViewerRole]
   );
-  useDropdownList({ open: open, name: "EmojiReaction" });
+  useDropdownList({ open: open, name: 'EmojiReaction' });
 
   const onEmojiEvent = useCallback(data => {
     window.showFlyingEmoji(data?.emojiId, data?.senderId);
@@ -110,10 +103,10 @@ export const EmojiReaction = () => {
         <Dropdown.Content
           sideOffset={5}
           align="center"
-          css={{ p: "$8", bg: "$surfaceDefault" }}
+          css={{ p: '$8', bg: '$surfaceDefault' }}
         >
           {emojiReactionList.map((emojiLine, index) => (
-            <Flex key={index} justify="between" css={{ mb: "$8" }}>
+            <Flex key={index} justify="between" css={{ mb: '$8' }}>
               {emojiLine.map(emoji => (
                 <EmojiContainer
                   key={emoji.emojiId}
@@ -128,22 +121,22 @@ export const EmojiReaction = () => {
               ))}
             </Flex>
           ))}
-          <div style={{ textAlign: "center" }}>
+          <div style={{ textAlign: 'center' }}>
             <Text
               variant="sm"
               inline={true}
               css={{
-                color: "$textSecondary",
+                color: '$textSecondary',
               }}
             >
-              Reactions will be timed for Live Streaming viewers.{" "}
+              Reactions will be timed for Live Streaming viewers.{' '}
             </Text>
             <Text
               variant="sm"
               inline={true}
               css={{
-                color: "$primaryLight",
-                fontWeight: "$semiBold",
+                color: '$primaryLight',
+                fontWeight: '$semiBold',
               }}
             >
               <a
@@ -151,7 +144,7 @@ export const EmojiReaction = () => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {"Learn more ->"}
+                {'Learn more ->'}
               </a>
             </Text>
           </div>
@@ -161,15 +154,15 @@ export const EmojiReaction = () => {
   );
 };
 
-const EmojiContainer = styled("span", {
-  position: "relative",
-  cursor: "pointer",
-  width: "$16",
-  height: "$16",
-  p: "$4",
-  "&:hover": {
-    p: "7px",
-    bg: "$surfaceLighter",
-    borderRadius: "$1",
+const EmojiContainer = styled('span', {
+  position: 'relative',
+  cursor: 'pointer',
+  width: '$16',
+  height: '$16',
+  p: '$4',
+  '&:hover': {
+    p: '7px',
+    bg: '$surfaceLighter',
+    borderRadius: '$1',
   },
 });

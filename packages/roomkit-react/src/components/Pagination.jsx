@@ -1,6 +1,6 @@
-import React from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
-import { StyledPagination } from "../base-components";
+import React from 'react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
+import { StyledPagination } from '../baseComponents';
 
 export const Pagination = ({ page, setPage, numPages }) => {
   const disableLeft = page === 0;
@@ -17,7 +17,7 @@ export const Pagination = ({ page, setPage, numPages }) => {
         <ChevronLeftIcon
           width={16}
           height={16}
-          style={{ cursor: disableLeft ? "not-allowed" : "pointer" }}
+          style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }}
         />
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
@@ -33,7 +33,7 @@ export const Pagination = ({ page, setPage, numPages }) => {
         <ChevronRightIcon
           width={16}
           height={16}
-          style={{ cursor: disableRight ? "not-allowed" : "pointer" }}
+          style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }}
         />
       </StyledPagination.Chevron>
     </StyledPagination.Root>

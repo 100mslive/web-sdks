@@ -1,17 +1,17 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   selectLocalPeerID,
   useHMSStore,
   useVideoList,
-} from "@100mslive/react-sdk";
-import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import { Pagination } from "./Pagination";
-import ScreenshareTile from "./ScreenshareTile";
-import VideoTile from "./VideoTile";
-import { StyledVideoList, useTheme } from "../base-components";
-import { UI_SETTINGS } from "../common/constants";
-import useSortedPeers from "../common/useSortedPeers";
+} from '@100mslive/react-sdk';
+import { StyledVideoList, useTheme } from '../baseComponents';
+import { Pagination } from './Pagination';
+import ScreenshareTile from './ScreenshareTile';
+import VideoTile from './VideoTile';
+import useSortedPeers from '../common/useSortedPeers';
+import { useAppConfig } from './AppData/useAppConfig';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 const List = ({
   maxTileCount,
@@ -21,7 +21,7 @@ const List = ({
   includeScreenShareForPeer,
 }) => {
   const { aspectRatio } = useTheme();
-  const tileOffset = useAppConfig("headlessConfig", "tileOffset");
+  const tileOffset = useAppConfig('headlessConfig', 'tileOffset');
   const isHeadless = useIsHeadless();
   const hideLocalVideo = useUISettings(UI_SETTINGS.hideLocalVideo);
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -48,7 +48,7 @@ const List = ({
   return (
     <StyledVideoList.Root ref={ref}>
       <StyledVideoList.Container
-        css={{ flexWrap: "wrap", placeContent: "center" }}
+        css={{ flexWrap: 'wrap', placeContent: 'center' }}
       >
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles[page]?.map(tile => {
@@ -57,7 +57,7 @@ const List = ({
               }
               return (
                 <Fragment key={tile.track?.id || tile.peer.id}>
-                  {tile.track?.source === "screen" ? (
+                  {tile.track?.source === 'screen' ? (
                     <ScreenshareTile
                       width={tile.width}
                       height={tile.height}

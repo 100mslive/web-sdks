@@ -1,23 +1,23 @@
-import React, { memo } from "react";
-import { CloseIcon } from "@100mslive/react-icons";
-import { Flex, IconButton, Text } from "../base-components";
+import React, { memo } from 'react';
+import { CloseIcon } from '@100mslive/react-icons';
+import { Flex, IconButton, Text } from '../baseComponents';
 
 export function HlsStatsOverlay({ hlsStatsState, onClose }) {
   return (
     <Flex
       css={{
-        position: "absolute",
-        width: "$80",
-        marginLeft: "$8",
-        padding: "$8 $8 $10",
+        position: 'absolute',
+        width: '$80',
+        marginLeft: '$8',
+        padding: '$8 $8 $10',
         zIndex: 10,
-        backgroundColor: "rgba(55,59,66, 0.84)",
-        borderRadius: "$1",
+        backgroundColor: 'rgba(55,59,66, 0.84)',
+        borderRadius: '$1',
       }}
       direction="column"
     >
       <IconButton
-        css={{ position: "absolute", top: "$2", right: "$2" }}
+        css={{ position: 'absolute', top: '$2', right: '$2' }}
         onClick={onClose}
       >
         <CloseIcon />
@@ -25,7 +25,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <HlsStatsRow label="URL">
         <Flex align="center">
           <a
-            style={{ cursor: "pointer", textDecoration: "underline" }}
+            style={{ cursor: 'pointer', textDecoration: 'underline' }}
             href={hlsStatsState?.url}
             target="_blank"
             rel="noreferrer"
@@ -38,7 +38,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
         {` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}
       </HlsStatsRow>
       <HlsStatsRow label="Buffer duration">
-        {hlsStatsState?.bufferedDuration?.toFixed(2)}{" "}
+        {hlsStatsState?.bufferedDuration?.toFixed(2)}{' '}
       </HlsStatsRow>
       <HlsStatsRow label="Connection speed">
         {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(
@@ -70,12 +70,12 @@ export function getDurationFromSeconds(timeInSeconds) {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time - minutes * 60);
 
-  const prefixedMinutes = `${minutes < 10 ? "0" + minutes : minutes}`;
-  const prefixedSeconds = `${seconds < 10 ? "0" + seconds : seconds}`;
+  const prefixedMinutes = `${minutes < 10 ? '0' + minutes : minutes}`;
+  const prefixedSeconds = `${seconds < 10 ? '0' + seconds : seconds}`;
 
   let videoTimeStr = `${prefixedMinutes}:${prefixedSeconds}`;
   if (hours) {
-    const prefixedHours = `${hours < 10 ? "0" + hours : hours}`;
+    const prefixedHours = `${hours < 10 ? '0' + hours : hours}`;
     videoTimeStr = `${prefixedHours}:${prefixedMinutes}:${prefixedSeconds}`;
   }
   return videoTimeStr;
@@ -83,12 +83,12 @@ export function getDurationFromSeconds(timeInSeconds) {
 
 const HlsStatsRow = memo(({ label, children }) => {
   return (
-    <Flex gap={4} justify="center" css={{ width: "100%" }}>
+    <Flex gap={4} justify="center" css={{ width: '100%' }}>
       <Text
         css={{
-          width: "50%",
-          "@md": { fontSize: "$md" },
-          "@sm": { fontSize: "$sm" },
+          width: '50%',
+          '@md': { fontSize: '$md' },
+          '@sm': { fontSize: '$sm' },
           // textAlign: "right",
         }}
       >
@@ -96,10 +96,10 @@ const HlsStatsRow = memo(({ label, children }) => {
       </Text>
       <Text
         css={{
-          "@md": { fontSize: "$md" },
-          "@sm": { fontSize: "$sm" },
-          width: "50%",
-          overflowWrap: "break-word",
+          '@md': { fontSize: '$md' },
+          '@sm': { fontSize: '$sm' },
+          width: '50%',
+          overflowWrap: 'break-word',
           // textAlign: "left",
         }}
       >

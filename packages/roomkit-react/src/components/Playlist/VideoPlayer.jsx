@@ -1,17 +1,14 @@
-import React, { useRef } from "react";
-import { useFullscreen, useToggle } from "react-use";
-import screenfull from "screenfull";
+import React, { useRef } from 'react';
+import { useFullscreen, useToggle } from 'react-use';
+import screenfull from 'screenfull';
 import {
   selectVideoPlaylist,
   selectVideoPlaylistAudioTrackByPeerID,
   selectVideoPlaylistVideoTrackByPeerID,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { CrossIcon, ExpandIcon, ShrinkIcon } from "@100mslive/react-icons";
-import { VideoPlaylistControls } from "./PlaylistControls";
-import { UI_SETTINGS } from "../../common/constants";
-import { useUISettings } from "../AppData/useUISettings";
+} from '@100mslive/react-sdk';
+import { CrossIcon, ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import {
   Box,
   Flex,
@@ -19,7 +16,10 @@ import {
   Text,
   Video,
   VideoTileStats,
-} from "../base-components";
+} from '../baseComponents';
+import { VideoPlaylistControls } from './PlaylistControls';
+import { useUISettings } from '../AppData/useUISettings';
+import { UI_SETTINGS } from '../../common/constants';
 
 export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));
@@ -38,7 +38,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
     <Flex
       direction="column"
       justify="center"
-      css={{ w: "100%", h: "100%" }}
+      css={{ w: '100%', h: '100%' }}
       ref={ref}
     >
       {active && (
@@ -46,16 +46,16 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           justify="between"
           align="center"
           css={{
-            bg: "$menuBg",
-            p: "$2 $2 $2 $6",
-            borderTopLeftRadius: "$1",
-            borderTopRightRadius: "$1",
+            bg: '$menuBg',
+            p: '$2 $2 $2 $6',
+            borderTopLeftRadius: '$1',
+            borderTopRightRadius: '$1',
           }}
         >
-          <Text css={{ color: "$textPrimary" }}>{active.name}</Text>
+          <Text css={{ color: '$textPrimary' }}>{active.name}</Text>
           <IconButton
             css={{
-              color: "$white",
+              color: '$white',
             }}
             onClick={() => {
               hmsActions.videoPlaylist.stop();
@@ -67,7 +67,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
         </Flex>
       )}
       {showStatsOnTiles ? (
-        <Box css={{ "& > div": { top: "$14", left: "$8" } }}>
+        <Box css={{ '& > div': { top: '$14', left: '$8' } }}>
           <VideoTileStats
             audioTrackID={audioTrack?.id}
             videoTrackID={videoTrack?.id}
@@ -80,9 +80,9 @@ export const VideoPlayer = React.memo(({ peerId }) => {
         trackId={videoTrack?.id}
         attach={!isAudioOnly}
         css={{
-          objectFit: "contain",
-          h: "auto",
-          r: "$1",
+          objectFit: 'contain',
+          h: 'auto',
+          r: '$1',
           borderTopLeftRadius: 0,
           borderTopRightRadius: 0,
         }}
@@ -92,10 +92,10 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           <IconButton
             onClick={() => toggle()}
             css={{
-              color: "$white",
-              height: "max-content",
-              alignSelf: "center",
-              cursor: "pointer",
+              color: '$white',
+              height: 'max-content',
+              alignSelf: 'center',
+              cursor: 'pointer',
             }}
           >
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}

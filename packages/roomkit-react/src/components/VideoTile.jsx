@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from "react";
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -8,32 +8,32 @@ import {
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   BrbIcon,
   HandRaiseFilledIcon,
   MicOffIcon,
-} from "@100mslive/react-icons";
-import { useAppConfig } from "./AppData/useAppConfig";
-import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
-import TileConnection from "./Connection/TileConnection";
-import { getVideoTileLabel } from "./peerTileUtils";
-import TileMenu from "./TileMenu";
+} from '@100mslive/react-icons';
+import TileConnection from './Connection/TileConnection';
 import {
   Avatar,
   StyledVideoTile,
   useBorderAudioLevel,
   Video,
   VideoTileStats,
-} from "../base-components";
-import { UI_SETTINGS } from "../common/constants";
+} from '../baseComponents';
+import { getVideoTileLabel } from './peerTileUtils';
+import TileMenu from './TileMenu';
+import { useAppConfig } from './AppData/useAppConfig';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
   peerId,
   trackId,
   width,
   height,
-  objectFit = "cover",
+  objectFit = 'cover',
   rootCSS = {},
   containerCSS = {},
 }) => {
@@ -60,9 +60,9 @@ const Tile = ({
     isLocal,
   });
   const onHoverHandler = useCallback(event => {
-    setIsMouseHovered(event.type === "mouseenter");
+    setIsMouseHovered(event.type === 'mouseenter');
   }, []);
-  const headlessConfig = useAppConfig("headlessConfig");
+  const headlessConfig = useAppConfig('headlessConfig');
   const hideLabel = isHeadless && headlessConfig?.hideTileName;
   const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
   const avatarSize = useMemo(() => {
@@ -70,11 +70,11 @@ const Tile = ({
       return undefined;
     }
     if (width <= 150 || height <= 150) {
-      return "small";
+      return 'small';
     } else if (width <= 300 || height <= 300) {
-      return "medium";
+      return 'medium';
     }
-    return "large";
+    return 'large';
   }, [width, height]);
 
   return (
@@ -119,8 +119,8 @@ const Tile = ({
               mirror={
                 mirrorLocalVideo &&
                 peerId === localPeerID &&
-                track?.source === "regular" &&
-                track?.facingMode !== "environment"
+                track?.source === 'regular' &&
+                track?.facingMode !== 'environment'
               }
               degraded={isVideoDegraded}
               noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
@@ -133,7 +133,7 @@ const Tile = ({
           {isVideoMuted || isVideoDegraded || (!isLocal && isAudioOnly) ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar
-                name={peerName || ""}
+                name={peerName || ''}
                 data-testid="participant_avatar_icon"
                 size={avatarSize}
               />
@@ -149,8 +149,8 @@ const Tile = ({
               data-testid="participant_audio_mute_icon"
               size={
                 width && height && (width < 180 || height < 180)
-                  ? "small"
-                  : "medium"
+                  ? 'small'
+                  : 'medium'
               }
             >
               <MicOffIcon />
@@ -177,7 +177,7 @@ const Tile = ({
   );
 };
 
-const metaStyles = { top: "$4", left: "$4" };
+const metaStyles = { top: '$4', left: '$4' };
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));

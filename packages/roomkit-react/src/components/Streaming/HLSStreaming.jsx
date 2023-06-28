@@ -1,11 +1,11 @@
-import React, { Fragment, useCallback, useEffect, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import {
   selectAppData,
   selectRoomID,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-} from "@100mslive/react-sdk";
+} from '@100mslive/react-sdk';
 import {
   EndStreamIcon,
   EyeOpenIcon,
@@ -15,39 +15,39 @@ import {
   PeopleIcon,
   SupportIcon,
   WrenchIcon,
-} from "@100mslive/react-icons";
+} from '@100mslive/react-icons';
+import { Box, Button, Flex, Loading, Text } from '../baseComponents';
 import {
   Container,
   ContentBody,
   ContentHeader,
   ErrorText,
   RecordStream,
-} from "./Common";
-import { APP_DATA } from "../../common/constants";
-import { useFilteredRoles } from "../../common/hooks";
-import { getDefaultMeetingUrl } from "../../common/utils";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { Box, Button, Flex, Loading, Text } from "../base-components";
+} from './Common';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useFilteredRoles } from '../../common/hooks';
+import { getDefaultMeetingUrl } from '../../common/utils';
+import { APP_DATA } from '../../common/constants';
 
 const getCardData = (roleName, roomId) => {
   let data = {};
   const formattedRoleName = roleName[0].toUpperCase() + roleName.slice(1);
 
   switch (roleName) {
-    case "broadcaster": {
+    case 'broadcaster': {
       data = {
         title: formattedRoleName,
         content:
-          "Broadcasters can livestream audio or video, manage stream appearance and control the room via HLS.",
+          'Broadcasters can livestream audio or video, manage stream appearance and control the room via HLS.',
         icon: <SupportIcon />,
       };
       break;
     }
-    case "hls-viewer": {
+    case 'hls-viewer': {
       data = {
-        title: "HLS Viewer",
+        title: 'HLS Viewer',
         content:
-          "Viewers can view and send chat messages, but need to be made broadcasters to participate with audio or video.",
+          'Viewers can view and send chat messages, but need to be made broadcasters to participate with audio or video.',
         icon: <EyeOpenIcon />,
       };
       break;
@@ -60,7 +60,7 @@ const getCardData = (roleName, roomId) => {
         order: 1,
       };
   }
-  data["link"] = `/${roomId}/${roleName}`;
+  data['link'] = `/${roomId}/${roleName}`;
   return data;
 };
 
@@ -70,19 +70,19 @@ const Card = ({ title, icon, link, content, isHLSRunning, order = 0 }) => {
     <Box
       key={title}
       css={{
-        backgroundColor: "$surfaceLight",
-        padding: "$10",
+        backgroundColor: '$surfaceLight',
+        padding: '$10',
         order,
-        borderRadius: "$2",
+        borderRadius: '$2',
       }}
     >
-      <Flex align="center" gap="2" css={{ color: "$primaryLight" }}>
+      <Flex align="center" gap="2" css={{ color: '$primaryLight' }}>
         {icon}
-        <Text variant="h6" css={{ fontWeight: "$semiBold" }}>
+        <Text variant="h6" css={{ fontWeight: '$semiBold' }}>
           {title}
         </Text>
       </Flex>
-      <Text variant="sm" css={{ color: "$textMedEmp", mt: "$6" }}>
+      <Text variant="sm" css={{ color: '$textMedEmp', mt: '$6' }}>
         {content}
       </Text>
       <Button
@@ -92,14 +92,14 @@ const Card = ({ title, icon, link, content, isHLSRunning, order = 0 }) => {
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         }}
-        css={{ w: "100%", r: "$1", mt: "$10", fontWeight: "$semiBold" }}
+        css={{ w: '100%', r: '$1', mt: '$10', fontWeight: '$semiBold' }}
         icon
       >
         {copied ? (
           <>Link copied!</>
         ) : (
           <>
-            <LinkIcon style={{ color: "inherit" }} />
+            <LinkIcon style={{ color: 'inherit' }} />
             Copy Invite Link
           </>
         )}
@@ -138,7 +138,7 @@ export const HLSStreaming = ({ onBack }) => {
 
       <Flex
         direction="column"
-        css={{ gap: "$10", p: "$0 $10", overflowY: "auto", mb: "$10" }}
+        css={{ gap: '$10', p: '$0 $10', overflowY: 'auto', mb: '$10' }}
       >
         {cards.map(card => (
           <Card key={card.title} {...card} isHLSRunning={isHLSRunning} />
@@ -161,13 +161,13 @@ const StartHLS = () => {
           return;
         }
         setHLSStarted(true);
-        setError("");
+        setError('');
         await hmsActions.startHLSStreaming({
           variants,
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {
-        if (error.message.includes("invalid input")) {
+        if (error.message.includes('invalid input')) {
           await startHLS([
             { meetingURL: recordingUrl || getDefaultMeetingUrl() },
           ]);
@@ -187,11 +187,11 @@ const StartHLS = () => {
         setRecord={setRecord}
         testId="hls-recording"
       />
-      <Box css={{ p: "$4 $10" }}>
+      <Box css={{ p: '$4 $10' }}>
         <ErrorText error={error} />
         <Button
           data-testid="start_hls"
-          css={{ w: "100%", r: "$0" }}
+          css={{ w: '100%', r: '$0' }}
           icon
           onClick={() => startHLS()}
           disabled={isHLSStarted}
@@ -201,14 +201,14 @@ const StartHLS = () => {
           ) : (
             <GoLiveIcon />
           )}
-          {isHLSStarted ? "Starting stream..." : "Go Live"}
+          {isHLSStarted ? 'Starting stream...' : 'Go Live'}
         </Button>
       </Box>
-      <Flex align="center" css={{ p: "$4 $10" }}>
+      <Flex align="center" css={{ p: '$4 $10' }}>
         <Text>
           <InfoIcon width={16} height={16} />
         </Text>
-        <Text variant="tiny" color="$textMedEmp" css={{ mx: "$8" }}>
+        <Text variant="tiny" color="$textMedEmp" css={{ mx: '$8' }}>
           You cannot start recording once the stream starts, you will have to
           stop the stream to enable recording.
         </Text>
@@ -221,7 +221,7 @@ const EndHLS = ({ setShowLinks }) => {
   const hmsActions = useHMSActions();
 
   const [inProgress, setInProgress] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const { isHLSRunning } = useRecordingStreaming();
 
   useEffect(() => {
@@ -231,12 +231,12 @@ const EndHLS = ({ setShowLinks }) => {
   }, [inProgress, isHLSRunning]);
 
   return (
-    <Box css={{ p: "$4 $10" }}>
+    <Box css={{ p: '$4 $10' }}>
       <ErrorText error={error} />
       <Button
         data-testid="stop_hls"
         variant="danger"
-        css={{ w: "100%", r: "$0", mt: "$8" }}
+        css={{ w: '100%', r: '$0', mt: '$8' }}
         icon
         loading={inProgress}
         disabled={inProgress}
@@ -255,7 +255,7 @@ const EndHLS = ({ setShowLinks }) => {
       </Button>
       <Button
         icon
-        css={{ w: "100%", r: "$0", mt: "$8" }}
+        css={{ w: '100%', r: '$0', mt: '$8' }}
         onClick={() => setShowLinks(true)}
       >
         <PeopleIcon /> Invite People

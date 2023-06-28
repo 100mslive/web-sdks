@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Label, Switch } from "../base-components";
+import { Flex, Label, Switch } from "../baseComponents";
 
 const SwitchWithLabel = ({
   label,

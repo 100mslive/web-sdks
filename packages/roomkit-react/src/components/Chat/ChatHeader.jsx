@@ -14,7 +14,7 @@ import {
   IconButton,
   Text,
   textEllipsis,
-} from "../base-components";
+} from "../baseComponents";
 
 export const ChatHeader = React.memo(
   ({ selection, selectorOpen, onToggle, onSelect, role, peerId }) => {

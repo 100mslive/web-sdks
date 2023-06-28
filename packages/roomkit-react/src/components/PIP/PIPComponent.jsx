@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   selectLocalPeerRoleName,
   selectPeers,
@@ -7,14 +7,14 @@ import {
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
-} from "@100mslive/react-sdk";
-import { PipIcon } from "@100mslive/react-icons";
-import { PictureInPicture } from "./PIPManager";
-import { MediaSession } from "./SetupMediaSession";
-import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from "../../common/constants";
-import IconButton from "../../IconButton";
-import { Tooltip } from "../base-components";
-import { useIsFeatureEnabled } from "../hooks/useFeatures";
+} from '@100mslive/react-sdk';
+import { PipIcon } from '@100mslive/react-icons';
+import IconButton from '../../IconButton';
+import { Tooltip } from '../baseComponents';
+import { PictureInPicture } from './PIPManager';
+import { MediaSession } from './SetupMediaSession';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
 
 /**
  * shows a button which when clicked shows some videos in PIP, clicking
@@ -30,12 +30,12 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
   const onPipToggle = useCallback(() => {
     if (!isPipOn) {
       PictureInPicture.start(hmsActions, setIsPipOn).catch(err =>
-        console.error("error in starting pip", err)
+        console.error('error in starting pip', err)
       );
       MediaSession.setup(hmsActions, store);
     } else {
       PictureInPicture.stop().catch(err =>
-        console.error("error in stopping pip", err)
+        console.error('error in stopping pip', err)
       );
     }
   }, [hmsActions, isPipOn, store]);
@@ -44,7 +44,7 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
   useEffect(() => {
     return () => {
       PictureInPicture.stop().catch(err =>
-        console.error("error in stopping pip on unmount", err)
+        console.error('error in stopping pip on unmount', err)
       );
     };
   }, []);
@@ -59,7 +59,7 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
   return (
     <>
       <Tooltip
-        title={`${isPipOn ? "Deactivate" : "Activate"} picture in picture view`}
+        title={`${isPipOn ? 'Deactivate' : 'Activate'} picture in picture view`}
       >
         <IconButton
           active={!isPipOn}
@@ -91,7 +91,7 @@ const ActivatedPIP = ({ showLocalPeer, peers }) => {
       pipPeers = storePeers.filter(peer => peers.includes(peer.id));
     }
     PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
-      console.error("error in updating pip", err);
+      console.error('error in updating pip', err);
     });
   }, [peers, storePeers, tracksMap]);
 

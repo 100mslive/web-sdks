@@ -1,29 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { ErrorDialog } from "../../primitives/DialogContent";
-import { Text } from "../base-components";
+import React, { useEffect, useState } from 'react';
+import { ErrorDialog } from '../../primitives/DialogContent';
+import { Text } from '../baseComponents';
 
 export const InitErrorModal = ({ notification }) => {
   const [showModal, setShowModal] = useState(false);
-  const [info, setInfo] = useState({ title: "Init Error", description: "" });
+  const [info, setInfo] = useState({ title: 'Init Error', description: '' });
 
   useEffect(() => {
     const data = notification?.data;
-    if (!data || data.action !== "INIT") {
+    if (!data || data.action !== 'INIT') {
       return;
     }
     let description;
     let title;
-    if (data.description.includes("role is invalid")) {
+    if (data.description.includes('role is invalid')) {
       description =
-        "This role does not exist for the given room. Try again with a valid role.";
-      title = "Invalid Role";
-    } else if (data.description.includes("room is not active")) {
-      title = "Room is disabled";
+        'This role does not exist for the given room. Try again with a valid role.';
+      title = 'Invalid Role';
+    } else if (data.description.includes('room is not active')) {
+      title = 'Room is disabled';
       description =
-        "This room is disabled and cannot be joined. To enable the room, use the 100ms dashboard or the API.";
+        'This room is disabled and cannot be joined. To enable the room, use the 100ms dashboard or the API.';
     } else {
       description = data.description;
-      title = "Init Error";
+      title = 'Init Error';
     }
     setInfo({ title, description });
     setShowModal(true);
@@ -35,7 +35,7 @@ export const InitErrorModal = ({ notification }) => {
       onOpenChange={setShowModal}
       title={info.title}
     >
-      <Text variant="sm" css={{ wordBreak: "break-word" }}>
+      <Text variant="sm" css={{ wordBreak: 'break-word' }}>
         {info.description} <br />
         Current URL - {window.location.href}
       </Text>

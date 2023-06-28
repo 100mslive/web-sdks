@@ -17,7 +17,7 @@ import {
   HorizontalDivider,
   Text,
   Tooltip,
-} from "../base-components";
+} from "../baseComponents";
 import { ParticipantSearch } from "../Header/ParticipantList";
 
 const ChatDotIcon = () => {
