@@ -6,11 +6,10 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { AddCircleIcon, CheckIcon, TrashIcon } from "@100mslive/react-icons";
+import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
   Box,
   Button,
-  Checkbox,
   Dropdown,
   Flex,
   Input,
@@ -20,6 +19,8 @@ import {
 import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
+import { MultipleChoiceOptionInputs } from "./MultipleChoiceOptions";
+import { SingleChoiceOptionInputs } from "./SingleChoiceOptions";
 import { useWidgetState } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
 import {
@@ -50,16 +51,14 @@ export function LaunchPollsQuizMenu() {
   const interaction = useHMSStore(selectPollByID(id));
 
   const launchPoll = async () => {
-    await actions.interactivityCenter.addQuestionsToPoll(
-      id,
-      questions
-        .filter(question => isValidQuestion(question))
-        .map(question => ({
-          text: question.text,
-          type: question.type,
-          options: question.options?.map(option => ({ text: option })),
-        }))
-    );
+    const validQuestions = questions
+      .filter(question => isValidQuestion(question))
+      .map(question => ({
+        text: question.text,
+        type: question.type,
+        options: question.options,
+      }));
+    await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
     setWidgetView(WIDGET_VIEWS.VOTE);
   };
@@ -186,7 +185,12 @@ const QuestionForm = ({
     question.type || QUESTION_TYPE.SINGLE_CHOICE
   );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState(question.options || ["", ""]);
+  const [options, setOptions] = useState([
+    { text: "", isCorrectAnswer: false },
+    { text: "", isCorrectAnswer: false },
+  ]);
+
+  console.log(options);
 
   return (
     <>
@@ -236,46 +240,32 @@ const QuestionForm = ({
       />
       {type === "single-choice" || type === "multiple-choice" ? (
         <>
-          {isQuiz ? (
-            <Checkbox.Root
-              onCheckedChange={() => {}}
-              css={
-                {
-                  // cursor: voted ? "not-allowed" : "pointer",
-                }
-              }
-            >
-              <Checkbox.Indicator>
-                <CheckIcon width={16} height={16} />
-              </Checkbox.Indicator>
-            </Checkbox.Root>
-          ) : null}
-          <Text
-            variant="body2"
-            css={{ my: "$md", c: "$textMedEmp", ml: isQuiz ? "$md" : 0 }}
-          >
+          <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
             Options
           </Text>
-          {options.map((option, index) => (
-            <Input
-              placeholder={`Option ${index + 1}`}
-              css={{ mb: "$md" }}
-              key={index}
-              value={option}
-              onChange={event => {
-                const newOptions = [...options];
-                newOptions[index] = event.target.value;
-                setOptions(newOptions);
-              }}
+          {type === "single-choice" && (
+            <SingleChoiceOptionInputs
+              isQuiz={isQuiz}
+              options={options}
+              setOptions={setOptions}
             />
-          ))}
+          )}
+          {type === "multiple-choice" && (
+            <MultipleChoiceOptionInputs
+              isQuiz={isQuiz}
+              options={options}
+              setOptions={setOptions}
+            />
+          )}
           <Flex
             css={{
               c: "$textMedEmp",
               cursor: "pointer",
               "&:hover": { c: "$textHighEmp" },
             }}
-            onClick={() => setOptions([...options, ""])}
+            onClick={() =>
+              setOptions([...options, { text: "", isCorrectAnswer: false }])
+            }
           >
             <AddCircleIcon />
             <Text

@@ -1,7 +1,7 @@
 // @ts-check
-import React from "react";
+import React, { useCallback } from "react";
 import { CheckIcon } from "@100mslive/react-icons";
-import { Checkbox, Flex, Progress, Text } from "@100mslive/react-ui";
+import { Checkbox, Flex, Input, Progress, Text } from "@100mslive/react-ui";
 // import { Votes } from "./OptionComponents/Votes";
 
 export const MultipleChoiceOptions = ({
@@ -65,6 +65,61 @@ export const MultipleChoiceOptions = ({
                 </Progress.Root>
               ) : null}
             </Flex>
+          </Flex>
+        );
+      })}
+    </Flex>
+  );
+};
+
+export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
+  const selectAnswer = useCallback(
+    (checked, index) => {
+      if (!isQuiz) {
+        return;
+      }
+      const newOptions = [...options];
+      newOptions[index] = {
+        ...newOptions[index],
+        isCorrectAnswer: checked,
+      };
+      setOptions(newOptions);
+    },
+    [options, setOptions, isQuiz]
+  );
+
+  return (
+    <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
+      {options.map((option, index) => {
+        return (
+          <Flex align="center" key={index} css={{ w: "100%", gap: "$9" }}>
+            {isQuiz && (
+              <Checkbox.Root
+                onCheckedChange={checked => selectAnswer(checked, index)}
+                checked={option.isCorrectAnswer}
+                css={{
+                  cursor: "pointer",
+                }}
+              >
+                <Checkbox.Indicator>
+                  <CheckIcon width={16} height={16} />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+            )}
+            <Input
+              placeholder={`Option ${index + 1}`}
+              css={{ w: "100%" }}
+              key={index}
+              value={option.text}
+              onChange={event => {
+                const newOptions = [...options];
+                newOptions[index] = {
+                  ...newOptions[index],
+                  text: event.target.value,
+                };
+                setOptions(newOptions);
+              }}
+            />
           </Flex>
         );
       })}

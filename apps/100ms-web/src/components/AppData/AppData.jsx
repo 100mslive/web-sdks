@@ -83,7 +83,7 @@ const initialAppData = {
   [APP_DATA.dropdownList]: [],
   [APP_DATA.widgetState]: {
     [WIDGET_STATE.pollInView]: "",
-    [WIDGET_STATE.view]: "",
+    [WIDGET_STATE.view]: WIDGET_VIEWS.CREATE_POLL_QUIZ,
   },
 };
 

@@ -1,4 +1,6 @@
-import { Flex, Progress, RadioGroup, Text } from "@100mslive/react-ui";
+// @ts-check
+import React, { useCallback } from "react";
+import { Flex, Input, Progress, RadioGroup, Text } from "@100mslive/react-ui";
 // import { Votes } from "./OptionComponents/Votes";
 
 export const SingleChoiceOptions = ({
@@ -71,6 +73,83 @@ export const SingleChoiceOptions = ({
                   </Progress.Root>
                 ) : null}
               </Flex>
+            </Flex>
+          );
+        })}
+      </Flex>
+    </RadioGroup.Root>
+  );
+};
+
+export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
+  const selectAnswer = useCallback(
+    index => {
+      if (!isQuiz) {
+        return;
+      }
+      const newOptions = [...options];
+      newOptions[index] = {
+        ...newOptions[index],
+        isCorrectAnswer: true,
+      };
+      setOptions(newOptions);
+    },
+    [options, setOptions, isQuiz]
+  );
+
+  return (
+    <RadioGroup.Root onValueChange={selectAnswer}>
+      <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
+        {options.map((option, index) => {
+          return (
+            <Flex
+              align="center"
+              key={`option-${index}`}
+              css={{ w: "100%", gap: "$9" }}
+            >
+              {isQuiz && (
+                <RadioGroup.Item
+                  css={{
+                    background: "none",
+                    h: "$9",
+                    w: "$9",
+                    border: "2px solid",
+                    borderColor: "$textHighEmp",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    '&[data-state="checked"]': {
+                      borderColor: "$primaryLight",
+                      borderWidth: "2px",
+                    },
+                  }}
+                  value={index}
+                >
+                  <RadioGroup.Indicator
+                    css={{
+                      h: "80%",
+                      w: "80%",
+                      background: "$primaryLight",
+                      borderRadius: "$round",
+                    }}
+                  />
+                </RadioGroup.Item>
+              )}
+
+              <Input
+                placeholder={`Option ${index + 1}`}
+                css={{ w: "100%" }}
+                key={index}
+                onChange={event => {
+                  const newOptions = [...options];
+                  newOptions[index] = {
+                    ...newOptions[index],
+                    text: event.target.value,
+                  };
+                  setOptions(newOptions);
+                }}
+              />
             </Flex>
           );
         })}
