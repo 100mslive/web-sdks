@@ -43,10 +43,10 @@
     "webpack-manifest-plugin": "^4.1.1"
   },
   "scripts": {
-    "lint": "lerna run lint --parallel",
-    "lint:fix": "lerna run lint:fix --parallel",
-    "format": "lerna run format --parallel",
-    "test": "yarn build && lerna run test --stream",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "format": "lerna run format",
+    "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream --ignore @100mslive/roomkit-react",
     "size": "size-limit",

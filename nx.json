@@ -4,8 +4,7 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": ["build"],
-        "parellel": 7
+        "cacheableOperations": ["build"]
       }
     }
   }

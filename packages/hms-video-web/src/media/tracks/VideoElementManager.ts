@@ -28,9 +28,9 @@ export class VideoElementManager {
   updateSinks() {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
-        this.track.addSink(videoElement);
+        this.track.addSink(videoElement, false);
       } else {
-        this.track.removeSink(videoElement);
+        this.track.removeSink(videoElement, false);
       }
     }
   }
@@ -93,14 +93,14 @@ export class VideoElementManager {
     const isVisibile = getComputedStyle(entry.target).visibility === 'visible';
     // .contains check is needed for pip component as the video tiles are not mounted to dom element
     if (this.track.enabled && ((entry.isIntersecting && isVisibile) || !document.contains(entry.target))) {
-      HMSLogger.d(this.TAG, 'add sink intersection', this.track, this.id);
+      HMSLogger.d(this.TAG, 'add sink intersection', `${this.track}`, this.id);
+      this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
+      await this.selectMaxLayer();
       await this.track.addSink(entry.target as HTMLVideoElement);
     } else {
-      HMSLogger.d(this.TAG, 'remove sink intersection', this.track, this.id);
+      HMSLogger.d(this.TAG, 'remove sink intersection', `${this.track}`, this.id);
       await this.track.removeSink(entry.target as HTMLVideoElement);
     }
-    this.entries.set(entry.target as HTMLVideoElement, entry.boundingClientRect);
-    await this.selectMaxLayer();
   };
 
   private handleResize = async (entry: ResizeObserverEntry) => {
@@ -141,17 +141,21 @@ export class VideoElementManager {
     );
   }
 
+  // eslint-disable-next-line complexity
   private async selectMaxLayer() {
-    let maxLayer!: HMSPreferredSimulcastLayer;
-    if (!(this.track instanceof HMSRemoteVideoTrack)) {
+    if (!(this.track instanceof HMSRemoteVideoTrack) || this.videoElements.size === 0) {
       return;
     }
+    let maxLayer!: HMSPreferredSimulcastLayer;
     for (const element of this.videoElements) {
       const entry = this.entries.get(element);
       if (!entry) {
         continue;
       }
       const { width, height } = entry;
+      if (width === 0 || height === 0) {
+        continue;
+      }
       const layer = getClosestLayer(this.track.getSimulcastDefinitions(), { width, height });
       if (!maxLayer) {
         maxLayer = layer;
@@ -159,9 +163,10 @@ export class VideoElementManager {
         maxLayer = layerToIntMapping[layer] > layerToIntMapping[maxLayer] ? layer : maxLayer;
       }
     }
-
-    HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
-    await this.track.setPreferredLayer(maxLayer);
+    if (maxLayer) {
+      HMSLogger.d(this.TAG, `selecting max layer ${maxLayer} for the track`, `${this.track}`);
+      await this.track.setPreferredLayer(maxLayer);
+    }
   }
 
   cleanup = () => {

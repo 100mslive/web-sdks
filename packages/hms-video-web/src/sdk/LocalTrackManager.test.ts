@@ -23,6 +23,8 @@ const testObserver: ITransportObserver = {
     // console.log('sdk Failure Callback', _s);
   },
 
+  onConnected(): void {},
+
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
 };
 
@@ -95,10 +97,20 @@ testStore.addPeer(localPeer);
 const mockMediaStream = {
   id: 'native-stream-id',
   getVideoTracks: jest.fn(() => [
-    { id: 'video-id', kind: 'video', getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })) },
+    {
+      id: 'video-id',
+      kind: 'video',
+      getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })),
+      addEventListener: jest.fn(() => {}),
+    },
   ]),
   getAudioTracks: jest.fn(() => [
-    { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
+    {
+      id: 'audio-id',
+      kind: 'audio',
+      getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })),
+      addEventListener: jest.fn(() => {}),
+    },
   ]),
   addTrack: jest.fn(() => {}),
 };
