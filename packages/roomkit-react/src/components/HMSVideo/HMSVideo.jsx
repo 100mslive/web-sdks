@@ -1,5 +1,5 @@
 import React, { forwardRef } from 'react';
-import { Flex } from '../baseComponents';
+import { Flex } from '@100mslive/react-ui';
 
 export const HMSVideo = forwardRef(({ children }, videoRef) => {
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Text, useTheme } from '../baseComponents';
+import { Box, Flex, Text, useTheme } from '@100mslive/react-ui';
 import { CREATE_ROOM_DOC_URL } from '../common/constants';
 
 function ErrorPage({ error }) {

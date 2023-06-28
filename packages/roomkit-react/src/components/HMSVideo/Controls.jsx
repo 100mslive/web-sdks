@@ -1,4 +1,4 @@
-import { Flex, styled } from '../baseComponents';
+import { Flex, styled } from '@100mslive/react-ui';
 
 export const VideoControls = styled(Flex, {
   justifyContent: 'center',

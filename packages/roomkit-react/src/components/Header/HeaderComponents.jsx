@@ -13,7 +13,7 @@ import {
   Text,
   textEllipsis,
   useTheme,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import { useLogo } from '../AppData/useUISettings';
 import { isStreamingKit } from '../../common/utils';
 

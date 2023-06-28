@@ -16,7 +16,7 @@ import {
   Label,
   Switch,
   Text,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';

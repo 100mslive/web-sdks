@@ -16,7 +16,7 @@ import {
   Text,
   Video,
   VideoTileStats,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import { VideoPlaylistControls } from './PlaylistControls';
 import { useUISettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';

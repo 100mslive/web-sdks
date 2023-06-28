@@ -1,15 +1,14 @@
-import React, { Fragment, useMemo, useState } from "react";
-import { useMeasure } from "react-use";
-import { FixedSizeList } from "react-window";
+import React, { Fragment, useMemo, useState } from 'react';
+import { useMeasure } from 'react-use';
+import { FixedSizeList } from 'react-window';
 import {
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
   selectRemotePeers,
   selectUnreadHMSMessagesCount,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { CheckIcon } from "@100mslive/react-icons";
-import { useFilteredRoles } from "../../common/hooks";
+} from '@100mslive/react-sdk';
+import { CheckIcon } from '@100mslive/react-icons';
 import {
   Box,
   Dropdown,
@@ -17,12 +16,13 @@ import {
   HorizontalDivider,
   Text,
   Tooltip,
-} from "../baseComponents";
-import { ParticipantSearch } from "../Header/ParticipantList";
+} from '@100mslive/react-ui';
+import { ParticipantSearch } from '../Header/ParticipantList';
+import { useFilteredRoles } from '../../common/hooks';
 
 const ChatDotIcon = () => {
   return (
-    <Box css={{ size: "$6", bg: "$brandDefault", mx: "$2", r: "$round" }} />
+    <Box css={{ size: '$6', bg: '$brandDefault', mx: '$2', r: '$round' }} />
   );
 };
 
@@ -30,14 +30,14 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
     <Dropdown.Item
       data-testid="chat_members"
-      css={{ align: "center", px: "$10" }}
+      css={{ align: 'center', px: '$10' }}
       onClick={onClick}
     >
       <Text variant="sm">{value}</Text>
-      <Flex align="center" css={{ ml: "auto", color: "$textPrimary" }}>
+      <Flex align="center" css={{ ml: 'auto', color: '$textPrimary' }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
-            <Box css={{ mr: active ? "$3" : 0 }}>
+            <Box css={{ mr: active ? '$3' : 0 }}>
               <ChatDotIcon />
             </Box>
           </Tooltip>
@@ -52,7 +52,7 @@ const SelectorHeader = React.memo(({ children }) => {
   return (
     <Box css={{ flexShrink: 0 }}>
       <HorizontalDivider space={4} />
-      <Text variant="md" css={{ p: "$4 $10", fontWeight: "$semiBold" }}>
+      <Text variant="md" css={{ p: '$4 $10', fontWeight: '$semiBold' }}>
         {children}
       </Text>
     </Box>
@@ -67,7 +67,7 @@ const Everyone = React.memo(({ onSelect, active }) => {
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
-        onSelect({ role: "", peerId: "", selection: "Everyone" });
+        onSelect({ role: '', peerId: '', selection: 'Everyone' });
       }}
     />
   );
@@ -95,7 +95,7 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
-        onSelect({ role: "", peerId, selection: name });
+        onSelect({ role: '', peerId, selection: name });
       }}
     />
   );
@@ -160,7 +160,7 @@ const VirtualizedSelectItemList = ({
   }, [onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
-    <Dropdown.Group ref={ref} css={{ height: "$64", overflowY: "auto" }}>
+    <Dropdown.Group ref={ref} css={{ height: '$64', overflowY: 'auto' }}>
       <FixedSizeList
         itemSize={52}
         itemCount={listItems.length}
@@ -179,12 +179,12 @@ const VirtualizedSelectItemList = ({
 
 export const ChatSelector = ({ role, peerId, onSelect }) => {
   const peers = useHMSStore(selectRemotePeers);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   return (
     <Fragment>
       {peers.length > 0 && (
-        <Box css={{ px: "$8" }}>
+        <Box css={{ px: '$8' }}>
           <ParticipantSearch
             onSearch={setSearch}
             placeholder="Search participants"

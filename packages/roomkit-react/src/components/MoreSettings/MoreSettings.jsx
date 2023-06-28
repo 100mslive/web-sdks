@@ -21,7 +21,6 @@ import {
   SettingsIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import IconButton from '../../IconButton';
 import {
   Box,
   Checkbox,
@@ -30,7 +29,8 @@ import {
   Flex,
   Text,
   Tooltip,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import IconButton from '../../IconButton';
 import { RoleChangeModal } from '../RoleChangeModal';
 import SettingsModal from '../Settings/SettingsModal';
 import StartRecording from '../Settings/StartRecording';

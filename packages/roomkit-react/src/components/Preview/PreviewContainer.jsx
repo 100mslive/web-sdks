@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
+import { Box, Flex, Loading } from '@100mslive/react-ui';
 import SidePane from '../../layouts/SidePane';
-import { Box, Flex, Loading } from '../baseComponents';
 import { Header } from '../Header';
 import PreviewJoin from './PreviewJoin';
 import { useAuthToken } from '../AppData/useUISettings';

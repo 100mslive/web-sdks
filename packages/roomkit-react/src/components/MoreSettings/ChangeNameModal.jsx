@@ -4,7 +4,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { Box, Button, Dialog, Flex, Input, Text } from '../baseComponents';
+import { Box, Button, Dialog, Flex, Input, Text } from '@100mslive/react-ui';
 import { ToastManager } from '../Toast/ToastManager';
 import {
   UserPreferencesKeys,

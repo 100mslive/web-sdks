@@ -8,7 +8,7 @@ import {
   Text,
   ThemeContext,
   Tooltip,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {

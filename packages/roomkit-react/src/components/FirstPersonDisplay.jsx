@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Text } from '../baseComponents';
+import { Box, Flex, Text } from '@100mslive/react-ui';
 import PlaceholderBg from '../images/first_person.png';
 
 export const FirstPersonDisplay = React.memo(() => {

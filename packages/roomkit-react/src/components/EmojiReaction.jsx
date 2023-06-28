@@ -12,7 +12,14 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, styled, Text, Tooltip } from '../baseComponents';
+import {
+  Box,
+  Dropdown,
+  Flex,
+  styled,
+  Text,
+  Tooltip,
+} from '@100mslive/react-ui';
 import IconButton from '../IconButton';
 import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';

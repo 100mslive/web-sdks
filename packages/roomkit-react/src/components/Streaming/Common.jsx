@@ -13,7 +13,7 @@ import {
   slideLeftAndFade,
   Switch,
   Text,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 
 export const StreamCard = ({
   title,

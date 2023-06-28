@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, IconButton, Tooltip } from '../baseComponents';
+import { Flex, IconButton, Tooltip } from '@100mslive/react-ui';
 
 export const FullScreenButton = ({ isFullScreen, icon, onToggle }) => {
   return (

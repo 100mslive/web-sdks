@@ -2,18 +2,18 @@ import React, { useCallback, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
 import {
-  DialogContent,
-  DialogRow,
-  DialogSelect,
-} from '../../primitives/DialogContent';
-import {
   Button,
   Dialog,
   Flex,
   Label,
   RadioGroup,
   Text,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import {
+  DialogContent,
+  DialogRow,
+  DialogSelect,
+} from '../../primitives/DialogContent';
 import { useFilteredRoles } from '../../common/hooks';
 
 const trackSourceOptions = [

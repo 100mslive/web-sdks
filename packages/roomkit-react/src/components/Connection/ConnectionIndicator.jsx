@@ -1,25 +1,25 @@
-import React from "react";
+import React from 'react';
 import {
   selectConnectionQualityByPeerID,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { PoorConnectivityIcon } from "@100mslive/react-icons";
-import { getColor, getTooltipText } from "./connectionQualityUtils";
-import { styled, Tooltip, useTheme } from "../baseComponents";
+} from '@100mslive/react-sdk';
+import { PoorConnectivityIcon } from '@100mslive/react-icons';
+import { styled, Tooltip, useTheme } from '@100mslive/react-ui';
+import { getColor, getTooltipText } from './connectionQualityUtils';
 
-const Wrapper = styled("span", {
-  width: "28px",
-  height: "28px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "$transparentBg",
-  borderRadius: "$round",
+const Wrapper = styled('span', {
+  width: '28px',
+  height: '28px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '$transparentBg',
+  borderRadius: '$round',
   variants: {
     isTile: {
       true: {
-        width: "unset",
-        height: "unset",
+        width: 'unset',
+        height: 'unset',
       },
     },
   },
@@ -39,7 +39,7 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
       <Tooltip title={getTooltipText(downlinkQuality)}>
         <Wrapper
           isTile={isTile}
-          css={{ color: "#ED4C5A" }}
+          css={{ color: '#ED4C5A' }}
           data-testid="tile_network"
         >
           <PoorConnectivityIcon />
@@ -58,9 +58,9 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
           xmlns="http://www.w3.org/2000/svg"
           xmlSpace="preserve"
           style={{
-            fillRule: "evenodd",
-            clipRule: "evenodd",
-            strokeLinejoin: "round",
+            fillRule: 'evenodd',
+            clipRule: 'evenodd',
+            strokeLinejoin: 'round',
             strokeMiterlimit: 2,
           }}
         >

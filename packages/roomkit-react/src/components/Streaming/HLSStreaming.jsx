@@ -16,7 +16,7 @@ import {
   SupportIcon,
   WrenchIcon,
 } from '@100mslive/react-icons';
-import { Box, Button, Flex, Loading, Text } from '../baseComponents';
+import { Box, Button, Flex, Loading, Text } from '@100mslive/react-ui';
 import {
   Container,
   ContentBody,

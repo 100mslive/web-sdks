@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
+import { Box, Button, Flex, Text, textEllipsis } from '@100mslive/react-ui';
 import { ToastManager } from './Toast/ToastManager';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { Box, Button, Flex, Text, textEllipsis } from '../baseComponents';
 import { Header } from './Header';
 import { useNavigation } from './hooks/useNavigation';
 import {

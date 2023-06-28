@@ -9,8 +9,8 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Box, Flex } from '@100mslive/react-ui';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { Box, Flex } from '../baseComponents';
 import { ConferenceMainView } from '../layouts/mainView';
 import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';

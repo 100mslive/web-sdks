@@ -10,7 +10,7 @@ import {
   VideoPlayerIcon,
 } from '@100mslive/react-icons';
 import IconButton from '../../IconButton';
-import { Box, Dropdown, Flex, Text, Tooltip } from '../baseComponents';
+import { Box, Dropdown, Flex, Text, Tooltip } from '@100mslive/react-ui';
 import { AudioPlaylistControls } from './PlaylistControls';
 import { PlaylistItem } from './PlaylistItem';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';

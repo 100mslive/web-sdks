@@ -14,14 +14,14 @@ import {
   HandRaiseFilledIcon,
   MicOffIcon,
 } from '@100mslive/react-icons';
-import TileConnection from './Connection/TileConnection';
 import {
   Avatar,
   StyledVideoTile,
   useBorderAudioLevel,
   Video,
   VideoTileStats,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import TileConnection from './Connection/TileConnection';
 import { getVideoTileLabel } from './peerTileUtils';
 import TileMenu from './TileMenu';
 import { useAppConfig } from './AppData/useAppConfig';

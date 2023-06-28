@@ -22,7 +22,7 @@ import {
   Label,
   Loading,
   Text,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import {
   Container,
   ContentBody,

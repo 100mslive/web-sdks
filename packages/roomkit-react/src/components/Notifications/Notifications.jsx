@@ -5,7 +5,7 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from '@100mslive/react-sdk';
-import { Button } from '../baseComponents';
+import { Button } from '@100mslive/react-ui';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';

@@ -8,8 +8,6 @@ import {
   usePreviewJoin,
 } from '@100mslive/react-sdk';
 import { SettingsIcon } from '@100mslive/react-icons';
-import IconButton from '../../IconButton';
-import { AudioVideoToggle } from '../AudioVideoToggle';
 import {
   Avatar,
   Flex,
@@ -22,7 +20,9 @@ import {
   useBorderAudioLevel,
   useTheme,
   Video,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import IconButton from '../../IconButton';
+import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';

@@ -14,8 +14,8 @@ import {
   VideoOffIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
+import { Tooltip } from '@100mslive/react-ui';
 import { ToastManager } from './Toast/ToastManager';
-import { Tooltip } from '../baseComponents';
 import IconButton from '../IconButton';
 import { isMacOS } from '../common/constants';
 

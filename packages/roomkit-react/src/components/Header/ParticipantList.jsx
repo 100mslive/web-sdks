@@ -21,7 +21,6 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import IconButton from '../../IconButton';
 import {
   Avatar,
   Box,
@@ -31,7 +30,8 @@ import {
   Slider,
   Text,
   textEllipsis,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { ParticipantFilter } from './ParticipantFilter';

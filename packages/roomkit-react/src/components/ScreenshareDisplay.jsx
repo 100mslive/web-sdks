@@ -1,7 +1,7 @@
 import React from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { CrossIcon, ShareScreenIcon } from '@100mslive/react-icons';
-import { Button, Flex, Text } from '../baseComponents';
+import { Button, Flex, Text } from '@100mslive/react-ui';
 
 export const ScreenshareDisplay = () => {
   const hmsActions = useHMSActions();

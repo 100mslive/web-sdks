@@ -12,7 +12,7 @@ import {
   Flex,
   Footer as AppFooter,
   Tooltip,
-} from "../baseComponents";
+} from "@100mslive/react-ui";
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";

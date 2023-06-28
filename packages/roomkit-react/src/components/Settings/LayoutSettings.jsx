@@ -5,7 +5,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, Flex, Slider, Text } from "../baseComponents";
+import { Box, Flex, Slider, Text } from "@100mslive/react-ui";
 import SwitchWithLabel from "./SwitchWithLabel";
 import { useSetUiSettings } from "../AppData/useUISettings";
 import { settingOverflow } from "./common.js";

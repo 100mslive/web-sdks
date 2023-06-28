@@ -1,4 +1,4 @@
-import { useTheme } from '../baseComponents';
+import { useTheme } from '@100mslive/react-ui';
 
 export const useDropdownSelection = () => {
   const { themeType } = useTheme();

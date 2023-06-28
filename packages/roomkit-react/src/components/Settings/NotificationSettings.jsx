@@ -6,7 +6,7 @@ import {
   HandIcon,
   PersonIcon,
 } from "@100mslive/react-icons";
-import { Box } from "../baseComponents";
+import { Box } from "@100mslive/react-ui";
 import SwitchWithLabel from "./SwitchWithLabel";
 import {
   useSetSubscribedNotifications,

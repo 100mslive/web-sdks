@@ -1,7 +1,7 @@
 import React from 'react';
 import { InfoIcon } from '@100mslive/react-icons';
+import { Text } from '@100mslive/react-ui';
 import { DialogRow } from '../../primitives/DialogContent';
-import { Text } from '../baseComponents';
 
 export const PdfErrorView = ({ isPDFUrlValid }) => {
   return (

@@ -14,7 +14,7 @@ import {
   IconButton,
   Text,
   Tooltip,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import { ShareMenuIcon } from '../ScreenShare';
 import { PDFFileOptions } from './pdfFileOptions';
 

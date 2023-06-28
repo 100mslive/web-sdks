@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { ViewIcon } from '@100mslive/react-icons';
+import { Button, Dialog, Dropdown, Text } from '@100mslive/react-ui';
 import {
   DialogContent,
   DialogInput,
   DialogRow,
 } from '../../primitives/DialogContent';
-import { Button, Dialog, Dropdown, Text } from '../baseComponents';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 

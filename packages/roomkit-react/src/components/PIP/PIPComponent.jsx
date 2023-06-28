@@ -9,8 +9,8 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
+import { Tooltip } from '@100mslive/react-ui';
 import IconButton from '../../IconButton';
-import { Tooltip } from '../baseComponents';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';

@@ -17,7 +17,7 @@ import {
   PrevIcon,
   SpeakerIcon,
 } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Slider, Text } from '../baseComponents';
+import { Box, Flex, IconButton, Slider, Text } from '@100mslive/react-ui';
 import { usePlaylist } from '../hooks/usePlaylist';
 
 const Progress = ({ type, duration }) => {

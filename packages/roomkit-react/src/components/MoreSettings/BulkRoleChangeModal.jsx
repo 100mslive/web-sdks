@@ -5,8 +5,6 @@ import {
   ChangeRoleIcon,
   CheckIcon,
 } from '@100mslive/react-icons';
-import { DialogContent, DialogRow } from '../../primitives/DialogContent';
-import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import {
   Button,
   Checkbox,
@@ -15,7 +13,9 @@ import {
   Flex,
   Loading,
   Text,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useFilteredRoles } from '../../common/hooks';
 
 export const BulkRoleChangeModal = ({ onOpenChange }) => {

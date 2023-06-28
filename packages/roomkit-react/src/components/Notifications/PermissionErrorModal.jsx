@@ -3,7 +3,7 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from '@100mslive/react-sdk';
-import { Dialog, Text } from '../baseComponents';
+import { Dialog, Text } from '@100mslive/react-ui';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);

@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { CloseIcon } from '@100mslive/react-icons';
-import { Flex, IconButton, Text } from '../baseComponents';
+import { Flex, IconButton, Text } from '@100mslive/react-ui';
 
 export function HlsStatsOverlay({ hlsStatsState, onClose }) {
   return (

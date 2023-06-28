@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   ChevronDownIcon,
   ChevronUpIcon,
   CrossIcon,
-} from "@100mslive/react-icons";
-import { ChatSelector } from "./ChatSelector";
-import { SIDE_PANE_OPTIONS } from "../../common/constants";
-import { useSidepaneToggle } from "../AppData/useSidepane";
+} from '@100mslive/react-icons';
 import {
   Box,
   Dropdown,
@@ -14,7 +11,10 @@ import {
   IconButton,
   Text,
   textEllipsis,
-} from "../baseComponents";
+} from '@100mslive/react-ui';
+import { ChatSelector } from './ChatSelector';
+import { useSidepaneToggle } from '../AppData/useSidepane';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ChatHeader = React.memo(
   ({ selection, selectorOpen, onToggle, onSelect, role, peerId }) => {
@@ -25,9 +25,9 @@ export const ChatHeader = React.memo(
         onClick={onToggle}
         align="center"
         css={{
-          color: "$textPrimary",
-          h: "$16",
-          mb: "$2",
+          color: '$textPrimary',
+          h: '$16',
+          mb: '$2',
         }}
       >
         <Text variant="h6">Chat </Text>
@@ -36,10 +36,10 @@ export const ChatHeader = React.memo(
             asChild
             data-testid="participant_list_filter"
             css={{
-              border: "1px solid $textDisabled",
-              r: "$0",
-              p: "$2 $4",
-              ml: "$8",
+              border: '1px solid $textDisabled',
+              r: '$0',
+              p: '$2 $4',
+              ml: '$8',
             }}
             tabIndex={0}
           >
@@ -47,7 +47,7 @@ export const ChatHeader = React.memo(
               <Text variant="sm" css={{ ...textEllipsis(80) }}>
                 {selection}
               </Text>
-              <Box css={{ ml: "$2", color: "$textDisabled" }}>
+              <Box css={{ ml: '$2', color: '$textDisabled' }}>
                 {open ? (
                   <ChevronUpIcon width={14} height={14} />
                 ) : (
@@ -58,9 +58,9 @@ export const ChatHeader = React.memo(
           </Dropdown.Trigger>
           <Dropdown.Content
             css={{
-              w: "$64",
-              overflow: "hidden",
-              maxHeight: "unset",
+              w: '$64',
+              overflow: 'hidden',
+              maxHeight: 'unset',
             }}
             align="start"
             sideOffset={8}
@@ -69,7 +69,7 @@ export const ChatHeader = React.memo(
           </Dropdown.Content>
         </Dropdown.Root>
         <IconButton
-          css={{ ml: "auto" }}
+          css={{ ml: 'auto' }}
           onClick={e => {
             e.stopPropagation();
             selectorOpen ? onToggle() : toggleChat();

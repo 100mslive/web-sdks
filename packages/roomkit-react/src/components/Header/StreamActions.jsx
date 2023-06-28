@@ -18,7 +18,7 @@ import {
   Popover,
   Text,
   Tooltip,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
 import GoLiveButton from '../GoLiveButton';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';

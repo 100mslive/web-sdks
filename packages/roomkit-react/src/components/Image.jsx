@@ -1,4 +1,4 @@
-import { styled } from '../baseComponents';
+import { styled } from '@100mslive/react-ui';
 
 export const Image = styled('img', {
   width: '100%',

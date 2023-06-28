@@ -5,8 +5,8 @@ import {
   useScreenShare,
 } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
+import { Box, Flex, styled, Tooltip } from '@100mslive/react-ui';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
-import { Box, Flex, styled, Tooltip } from '../baseComponents';
 import IconButton from '../IconButton';
 import { useUISettings } from './AppData/useUISettings';
 import { isScreenshareSupported } from '../common/utils';

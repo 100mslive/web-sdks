@@ -1,6 +1,6 @@
-import React from "react";
-import { DialogCol } from "../../primitives/DialogContent";
-import { Dialog, Text } from "../baseComponents";
+import React from 'react';
+import { Dialog, Text } from '@100mslive/react-ui';
+import { DialogCol } from '../../primitives/DialogContent';
 
 export const PDFHeader = () => {
   return (
@@ -8,7 +8,7 @@ export const PDFHeader = () => {
       align="start"
       css={{
         mt: 0,
-        mb: "$6",
+        mb: '$6',
       }}
     >
       <Dialog.Title asChild>
@@ -20,7 +20,7 @@ export const PDFHeader = () => {
         <Text
           variant="sm"
           css={{
-            c: "$textMedEmp",
+            c: '$textMedEmp',
           }}
         >
           Choose PDF you want to annotate and share

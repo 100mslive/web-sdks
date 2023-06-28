@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, VerticalDivider } from '../baseComponents';
+import { Flex, VerticalDivider } from '@100mslive/react-ui';
 import { Logo, SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { StreamActions } from './StreamActions';

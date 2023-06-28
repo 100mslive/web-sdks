@@ -12,8 +12,6 @@ import {
   HangUpIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { ToastManager } from './Toast/ToastManager';
-import { useHMSPrebuiltContext } from '../AppContext';
 import {
   Box,
   Button,
@@ -24,7 +22,9 @@ import {
   styled,
   Text,
   Tooltip,
-} from '../baseComponents';
+} from '@100mslive/react-ui';
+import { ToastManager } from './Toast/ToastManager';
+import { useHMSPrebuiltContext } from '../AppContext';
 import {
   DialogCheckbox,
   DialogContent,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, Flex, Text } from '../baseComponents';
+import { Dropdown, Flex, Text } from '@100mslive/react-ui';
 
 function formatDuration(duration) {
   if (!duration) {

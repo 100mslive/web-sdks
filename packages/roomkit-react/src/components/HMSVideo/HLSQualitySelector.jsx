@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircleIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, Text, Tooltip } from '../baseComponents';
+import { Box, Dropdown, Flex, Text, Tooltip } from '@100mslive/react-ui';
 
 export function HLSQualitySelector({
   layers,

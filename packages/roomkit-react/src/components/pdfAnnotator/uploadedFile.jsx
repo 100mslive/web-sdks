@@ -1,10 +1,10 @@
-import React from "react";
-import { TrashIcon } from "@100mslive/react-icons";
-import { PDFHeader } from "./pdfHeader";
-import { PDFInfo } from "./pdfInfo";
-import { SubmitPDF } from "./submitPdf";
-import { DialogRow } from "../../primitives/DialogContent";
-import { Dialog, Flex, Text } from "../baseComponents";
+import React from 'react';
+import { TrashIcon } from '@100mslive/react-icons';
+import { Dialog, Flex, Text } from '@100mslive/react-ui';
+import { DialogRow } from '../../primitives/DialogContent';
+import { PDFHeader } from './pdfHeader';
+import { PDFInfo } from './pdfInfo';
+import { SubmitPDF } from './submitPdf';
 
 export const UploadedFile = ({
   pdfFile,
@@ -15,56 +15,56 @@ export const UploadedFile = ({
   setIsValidateProgress,
   onOpenChange,
 }) => {
-  const [fileName, ext] = pdfFile.name.split(".");
+  const [fileName, ext] = pdfFile.name.split('.');
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content
           css={{
-            w: "min(420px,80%)",
-            overflow: "auto",
-            p: "$10",
+            w: 'min(420px,80%)',
+            overflow: 'auto',
+            p: '$10',
           }}
         >
           <Flex direction="column">
             <PDFHeader />
             <DialogRow
               css={{
-                fontFamily: "$sans",
-                bg: "$surfaceLight",
-                r: "$1",
-                outline: "none",
-                border: "1px solid $borderLight",
-                p: "$4 $6",
-                minHeight: "$11",
-                c: "$textPrimary",
-                fs: "$md",
-                w: "100%",
-                "&:focus": {
-                  boxShadow: "0 0 0 1px $colors$borderAccent",
-                  border: "1px solid $transparent",
+                fontFamily: '$sans',
+                bg: '$surfaceLight',
+                r: '$1',
+                outline: 'none',
+                border: '1px solid $borderLight',
+                p: '$4 $6',
+                minHeight: '$11',
+                c: '$textPrimary',
+                fs: '$md',
+                w: '100%',
+                '&:focus': {
+                  boxShadow: '0 0 0 1px $colors$borderAccent',
+                  border: '1px solid $transparent',
                 },
                 mb: 0,
-                mt: "$6",
+                mt: '$6',
               }}
             >
-              <Flex direction="row" css={{ flexGrow: "1", maxWidth: "88%" }}>
+              <Flex direction="row" css={{ flexGrow: '1', maxWidth: '88%' }}>
                 <Text
                   css={{
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {fileName}
                 </Text>
-                <Text css={{ whiteSpace: "nowrap" }}>.{ext}</Text>
+                <Text css={{ whiteSpace: 'nowrap' }}>.{ext}</Text>
               </Flex>
               <TrashIcon
                 onClick={() => setPDFFile(null)}
                 style={{
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 }}
               />
             </DialogRow>

@@ -5,10 +5,10 @@ import React, {
   useLayoutEffect,
   useRef,
   useState,
-} from "react";
-import { useInView } from "react-intersection-observer";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { VariableSizeList } from "react-window";
+} from 'react';
+import { useInView } from 'react-intersection-observer';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { VariableSizeList } from 'react-window';
 import {
   selectHMSMessages,
   selectLocalPeerID,
@@ -19,8 +19,8 @@ import {
   selectPermissions,
   useHMSActions,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { HorizontalMenuIcon, PinIcon } from "@100mslive/react-icons";
+} from '@100mslive/react-sdk';
+import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
 import {
   Box,
   Dropdown,
@@ -29,21 +29,21 @@ import {
   styled,
   Text,
   Tooltip,
-} from "../baseComponents";
-import { useSetPinnedMessage } from "../hooks/useSetPinnedMessage";
+} from '@100mslive/react-ui';
+import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
-    return "";
+    return '';
   }
   let hours = date.getHours();
   let mins = date.getMinutes();
-  const suffix = hours > 11 ? "PM" : "AM";
+  const suffix = hours > 11 ? 'PM' : 'AM';
   if (hours < 10) {
-    hours = "0" + hours;
+    hours = '0' + hours;
   }
   if (mins < 10) {
-    mins = "0" + mins;
+    mins = '0' + mins;
   }
   return `${hours}:${mins} ${suffix}`;
 };
@@ -53,21 +53,21 @@ const MessageTypeContainer = ({ left, right }) => {
     <Flex
       align="center"
       css={{
-        ml: "auto",
-        mr: "$4",
-        p: "$2 $4",
-        border: "1px solid $textDisabled",
-        r: "$0",
+        ml: 'auto',
+        mr: '$4',
+        p: '$2 $4',
+        border: '1px solid $textDisabled',
+        r: '$0',
       }}
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
+        <SenderName variant="tiny" as="span" css={{ color: '$textMedEmp' }}>
           {left}
         </SenderName>
       )}
       {left && right && (
         <Box
-          css={{ borderLeft: "1px solid $textDisabled", mx: "$4", h: "$8" }}
+          css={{ borderLeft: '1px solid $textDisabled', mx: '$4', h: '$8' }}
         />
       )}
       {right && (
@@ -86,7 +86,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
     return (
       <MessageTypeContainer
         left={
-          hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ""}` : "TO YOU"
+          hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ''}` : 'TO YOU'
         }
         right="PRIVATE"
       />
@@ -97,7 +97,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
     return (
       <MessageTypeContainer
         left="TO"
-        right={hasCurrentUserSent ? roles.join(",") : localPeerRoleName}
+        right={hasCurrentUserSent ? roles.join(',') : localPeerRoleName}
       />
     );
   }
@@ -107,11 +107,11 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
 const URL_REGEX =
   /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
-const Link = styled("a", {
-  color: "$brandDefault",
-  wordBreak: "break-word",
-  "&:hover": {
-    textDecoration: "underline",
+const Link = styled('a', {
+  color: '$brandDefault',
+  wordBreak: 'break-word',
+  '&:hover': {
+    textDecoration: 'underline',
   },
 });
 
@@ -145,9 +145,9 @@ export const AnnotisedMessage = ({ message }) => {
 
 const getMessageType = ({ roles, receiver }) => {
   if (roles && roles.length > 0) {
-    return "role";
+    return 'role';
   }
-  return receiver ? "private" : "";
+  return receiver ? 'private' : '';
 };
 
 const ChatActions = ({ onPin }) => {
@@ -165,10 +165,10 @@ const ChatActions = ({ onPin }) => {
         </IconButton>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content sideOffset={5} align="end" css={{ width: "$48" }}>
+        <Dropdown.Content sideOffset={5} align="end" css={{ width: '$48' }}>
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
-            <Text variant="sm" css={{ ml: "$4" }}>
+            <Text variant="sm" css={{ ml: '$4' }}>
               Pin Message
             </Text>
           </Dropdown.Item>
@@ -179,10 +179,10 @@ const ChatActions = ({ onPin }) => {
 };
 
 const SenderName = styled(Text, {
-  overflow: "hidden",
-  textOverflow: "ellipsis",
-  whiteSpace: "nowrap",
-  maxWidth: "24ch",
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  maxWidth: '24ch',
   minWidth: 0,
 });
 
@@ -213,36 +213,36 @@ const ChatMessage = React.memo(
     }, [message.read, hmsActions, inView, message.id]);
 
     return (
-      <Box ref={ref} as="div" css={{ mb: "$10", pr: "$10" }} style={style}>
+      <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>
         <Flex
           ref={rowRef}
           align="center"
           css={{
-            flexWrap: "wrap",
-            bg: messageType ? "$surfaceLight" : undefined,
-            r: messageType ? "$1" : undefined,
-            px: messageType ? "$4" : "$2",
-            py: messageType ? "$4" : 0,
-            userSelect: "none",
+            flexWrap: 'wrap',
+            bg: messageType ? '$surfaceLight' : undefined,
+            r: messageType ? '$1' : undefined,
+            px: messageType ? '$4' : '$2',
+            py: messageType ? '$4' : 0,
+            userSelect: 'none',
           }}
           key={message.time}
           data-testid="chat_msg"
         >
           <Text
             css={{
-              color: "$textHighEmp",
-              fontWeight: "$semiBold",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
+              color: '$textHighEmp',
+              fontWeight: '$semiBold',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
             }}
             as="div"
           >
             <Flex align="center">
-              {message.senderName === "You" || !message.senderName ? (
+              {message.senderName === 'You' || !message.senderName ? (
                 <SenderName as="span">
-                  {message.senderName || "Anonymous"}
+                  {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
                 <Tooltip title={message.senderName} side="top" align="start">
@@ -253,8 +253,8 @@ const ChatMessage = React.memo(
                 as="span"
                 variant="sm"
                 css={{
-                  ml: "$4",
-                  color: "$textSecondary",
+                  ml: '$4',
+                  color: '$textSecondary',
                   flexShrink: 0,
                 }}
               >
@@ -271,11 +271,11 @@ const ChatMessage = React.memo(
           <Text
             variant="body2"
             css={{
-              w: "100%",
-              mt: "$2",
-              wordBreak: "break-word",
-              whiteSpace: "pre-wrap",
-              userSelect: "all",
+              w: '100%',
+              mt: '$2',
+              wordBreak: 'break-word',
+              whiteSpace: 'pre-wrap',
+              userSelect: 'all',
             }}
             onClick={e => e.stopPropagation()}
           >
@@ -307,7 +307,7 @@ const ChatList = React.forwardRef(
         width={width}
         height={height - 1}
         style={{
-          overflowX: "hidden",
+          overflowX: 'hidden',
         }}
       >
         {({ index, style }) => (
@@ -345,14 +345,14 @@ const VirtualizedChatMessages = React.forwardRef(
     return (
       <Box
         css={{
-          mr: "-$10",
-          h: "100%",
+          mr: '-$10',
+          h: '100%',
         }}
         as="div"
       >
         <AutoSizer
           style={{
-            width: "90%",
+            width: '90%',
           }}
         >
           {({ height, width }) => (
@@ -385,10 +385,10 @@ export const ChatBody = React.forwardRef(
       return (
         <Flex
           css={{
-            width: "100%",
-            height: "100%",
-            textAlign: "center",
-            px: "$4",
+            width: '100%',
+            height: '100%',
+            textAlign: 'center',
+            px: '$4',
           }}
           align="center"
           justify="center"

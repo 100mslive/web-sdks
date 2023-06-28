@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toast as ToastPrimitive } from '../baseComponents';
+import { Toast as ToastPrimitive } from '@100mslive/react-ui';
 
 export const Toast = ({
   title,

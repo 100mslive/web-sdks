@@ -1,6 +1,6 @@
-import React from "react";
-import { ConnectionIndicator } from "./ConnectionIndicator";
-import { styled, Text, textEllipsis } from "../baseComponents";
+import React from 'react';
+import { styled, Text, textEllipsis } from '@100mslive/react-ui';
+import { ConnectionIndicator } from './ConnectionIndicator';
 
 const TileConnection = ({ name, peerId, hideLabel, width }) => {
   return (
@@ -8,7 +8,7 @@ const TileConnection = ({ name, peerId, hideLabel, width }) => {
       {!hideLabel ? (
         <Text
           css={{
-            c: "$textHighEmp",
+            c: '$textHighEmp',
             ...textEllipsis(width - 60),
           }}
           variant="xs"
@@ -21,19 +21,19 @@ const TileConnection = ({ name, peerId, hideLabel, width }) => {
   );
 };
 
-const Wrapper = styled("div", {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  position: "absolute",
-  bottom: "$2",
-  left: "$2",
-  backgroundColor: "$backgroundDark",
-  borderRadius: "$1",
-  maxWidth: "85%",
+const Wrapper = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  position: 'absolute',
+  bottom: '$2',
+  left: '$2',
+  backgroundColor: '$backgroundDark',
+  borderRadius: '$1',
+  maxWidth: '85%',
   zIndex: 1,
-  "& p,span": {
-    p: "$2 $3",
+  '& p,span': {
+    p: '$2 $3',
   },
 });
 

@@ -1,7 +1,7 @@
-import React, { useCallback } from "react";
-import { APP_DATA } from "../../common/constants";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { Button, Flex } from "../baseComponents";
+import React, { useCallback } from 'react';
+import { Button, Flex } from '@100mslive/react-ui';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA } from '../../common/constants';
 
 export const SubmitPDF = ({
   pdfFile,
@@ -15,19 +15,19 @@ export const SubmitPDF = ({
 
   const isValidPDF = useCallback(
     pdfURL => {
-      const extension = pdfURL.split(".").pop().toLowerCase();
+      const extension = pdfURL.split('.').pop().toLowerCase();
       setIsValidateProgress(true);
-      if (extension === "pdf") {
+      if (extension === 'pdf') {
         setIsPDFUrlValid(true);
         setIsValidateProgress(false);
         setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
         onOpenChange(false);
       }
 
-      fetch(pdfURL, { method: "HEAD" })
-        .then(response => response.headers.get("content-type"))
+      fetch(pdfURL, { method: 'HEAD' })
+        .then(response => response.headers.get('content-type'))
         .then(contentType => {
-          if (contentType === "application/pdf") {
+          if (contentType === 'application/pdf') {
             setIsPDFUrlValid(true);
             setIsValidateProgress(false);
             setPDFConfig({ state: true, file: pdfFile, url: pdfURL });
@@ -54,9 +54,9 @@ export const SubmitPDF = ({
     <Flex
       direction="row"
       css={{
-        mb: "0",
-        mt: "auto",
-        gap: "$8",
+        mb: '0',
+        mt: 'auto',
+        gap: '$8',
       }}
     >
       <Button
@@ -66,7 +66,7 @@ export const SubmitPDF = ({
         onClick={() => {
           onOpenChange(false);
         }}
-        css={{ w: "50%" }}
+        css={{ w: '50%' }}
       >
         Cancel
       </Button>
@@ -85,7 +85,7 @@ export const SubmitPDF = ({
         loading={isValidateProgress}
         data-testid="share_pdf_btn"
         css={{
-          w: "50%",
+          w: '50%',
         }}
       >
         Start Sharing
