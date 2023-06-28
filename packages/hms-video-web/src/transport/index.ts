@@ -715,10 +715,10 @@ export default class HMSTransport implements ITransport {
       .catch(error => HMSLogger.w(TAG, 'Failed setting maxBitrate and maxFramerate', error));
 
     // on publishing track check for devices
-    if (track.type === HMSTrackType.AUDIO) {
-      this.eventBus.localAudioEnabled.publish({ enabled: true, track: track as HMSLocalAudioTrack });
-    } else if (track.type === HMSTrackType.VIDEO) {
-      this.eventBus.localVideoEnabled.publish({ enabled: true, track: track as HMSLocalVideoTrack });
+    if (track.type === HMSTrackType.AUDIO && track.enabled) {
+      this.eventBus.localAudioEnabled.publish({ enabled: track.enabled, track: track as HMSLocalAudioTrack });
+    } else if (track.type === HMSTrackType.VIDEO && track.enabled) {
+      this.eventBus.localVideoEnabled.publish({ enabled: track.enabled, track: track as HMSLocalVideoTrack });
     }
     track.isPublished = true;
 
