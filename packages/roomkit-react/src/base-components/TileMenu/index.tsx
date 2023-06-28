@@ -1,0 +1,1 @@
+export { StyledMenuTile } from './StyledMenuTile';
