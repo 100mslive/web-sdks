@@ -18,7 +18,6 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
   let pdfIframeURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
 
   const pdfIframeRef = useRef(); // Create a ref to access the iframe element
-  const contentRegionRef = useRef(); // Create a ref to access the parent element of the iframe to region capture on Chrome
   const themeType = useTheme().themeType; // Get the current theme type from the theme context
 
   const [isPDFLoaded, setIsPDFLoaded] = useState(false);
@@ -67,7 +66,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
       screenShareAttemptInProgress.current = true;
       toggleScreenShare({
         forceCurrentTab: isChrome,
-        cropElement: contentRegionRef.current,
+        cropElement: pdfIframeRef.current,
         preferCurrentTab: isChrome,
       })
         .then(() => {
@@ -97,7 +96,6 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
 
   return (
     <Box
-      ref={contentRegionRef}
       css={{
         mx: "$8",
         flex: "3 1 0",
