@@ -6,7 +6,7 @@ import { HMSAudioTrackSettings as IHMSAudioTrackSettings } from '../../interface
 import { HMSAudioPlugin, HMSPluginSupportResult } from '../../plugins';
 import { HMSAudioPluginsManager } from '../../plugins/audio';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isIOS } from '../../utils/support';
+import { isBrowser, isFirefox, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
@@ -242,7 +242,17 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
 
     if (hasPropertyChanged('advanced')) {
-      await this.replaceTrackWith(settings);
+      if (isFirefox()) {
+        const advanced = (settings.advanced || []).reduce((acc, constraint) => {
+          Object.keys(constraint).forEach(key => {
+            acc[key as keyof MediaTrackConstraintSet] = constraint[key as keyof MediaTrackConstraintSet];
+          });
+          return acc;
+        }, {} as Record<keyof MediaTrackConstraintSet, any>);
+        await this.nativeTrack.applyConstraints(advanced);
+      } else {
+        await this.replaceTrackWith(settings);
+      }
     }
   };
 

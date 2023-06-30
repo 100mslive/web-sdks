@@ -28,3 +28,5 @@ export const isMobile = () => parsedUserAgent.getDevice().type === 'mobile';
 export const isPageHidden = () => typeof document !== 'undefined' && document.hidden;
 
 export const isIOS = () => parsedUserAgent.getOS().name?.toLowerCase() === 'ios';
+
+export const isFirefox = () => parsedUserAgent.getBrowser().name?.toLowerCase().includes('firefox');
