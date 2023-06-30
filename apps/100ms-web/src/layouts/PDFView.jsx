@@ -15,28 +15,32 @@ export const PDFView = () => {
 };
 
 export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
-  const ref = useRef();
-  const themeType = useTheme().themeType;
+  let pdfIframeURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
+
+  const pdfIframeRef = useRef(); // Create a ref to access the iframe element
+  const contentRegionRef = useRef(); // Create a ref to access the parent element of the iframe to region capture on Chrome
+  const themeType = useTheme().themeType; // Get the current theme type from the theme context
+
   const [isPDFLoaded, setIsPDFLoaded] = useState(false);
-  let pdfJSURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
+  const [wasScreenShared, setWasScreenShared] = useState(false);
+
+  // If a PDF URL is provided instead of a file, update the PDF iFrame URL with the URL parameter
   if (pdfConfig.url && !pdfConfig.file) {
-    pdfJSURL = pdfJSURL + "?file=" + encodeURIComponent(pdfConfig.url);
+    pdfIframeURL = pdfIframeURL + "?file=" + encodeURIComponent(pdfConfig.url);
   }
 
-  const [wasScreenShared, setWasScreenShared] = useState(false);
   // to handle - https://github.com/facebook/react/issues/24502
   const screenShareAttemptInProgress = useRef(false);
-  const iframeRef = useRef();
 
   const resetEmbedConfig = useCallback(() => {
-    setPDFConfig({ state: false });
+    setPDFConfig({ isPDFBeingShared: false });
   }, [setPDFConfig]);
 
   const sendDataToPDFIframe = (themeType, file = null) => {
-    if (ref.current) {
-      ref.current.contentWindow.postMessage(
+    if (pdfIframeRef.current) {
+      pdfIframeRef.current.contentWindow.postMessage(
         {
           theme: themeType,
           file: file,
@@ -45,26 +49,29 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
       );
     }
   };
+
+  // Send theme and file information to the PDF iframe when the PDF is loaded
   useEffect(() => {
-    if (isPDFLoaded && ref.current) {
+    if (isPDFLoaded && pdfIframeRef.current) {
       sendDataToPDFIframe(themeType === ThemeTypes.dark ? 2 : 1);
     }
   }, [isPDFLoaded, themeType]);
+
   useEffect(() => {
+    // Start screen sharing when the component is mounted and not already screen sharing
     if (
       !amIScreenSharing &&
       !wasScreenShared &&
       !screenShareAttemptInProgress.current
     ) {
       screenShareAttemptInProgress.current = true;
-      // start screenshare on load for others in the room to see
       toggleScreenShare({
         forceCurrentTab: isChrome,
-        cropElement: iframeRef.current,
+        cropElement: contentRegionRef.current,
         preferCurrentTab: isChrome,
       })
         .then(() => {
-          setWasScreenShared(true);
+          setWasScreenShared(true); // Set the state to indicate screen sharing has started
         })
         .catch(resetEmbedConfig)
         .finally(() => {
@@ -90,7 +97,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
 
   return (
     <Box
-      ref={iframeRef}
+      ref={contentRegionRef}
       css={{
         mx: "$8",
         flex: "3 1 0",
@@ -102,9 +109,9 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
       }}
     >
       <iframe
-        src={pdfJSURL}
+        src={pdfIframeURL}
         title="PDF Annotator"
-        ref={ref}
+        ref={pdfIframeRef}
         style={{
           width: "100%",
           height: "100%",
@@ -114,7 +121,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
         referrerPolicy="no-referrer"
         onLoad={() => {
-          if (ref.current && pdfConfig.file) {
+          if (pdfIframeRef.current && pdfConfig.file) {
             // setting theme dark -> 2 and light -> 1
             requestAnimationFrame(() => {
               sendDataToPDFIframe(
