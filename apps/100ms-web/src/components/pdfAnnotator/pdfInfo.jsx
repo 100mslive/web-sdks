@@ -1,8 +1,13 @@
 import { InfoIcon } from "@100mslive/react-icons";
 import { Text } from "@100mslive/react-ui";
+import { isChrome } from "../../common/constants";
 import { DialogRow } from "../../primitives/DialogContent";
 
 export const PDFInfo = () => {
+  if (!isChrome) {
+    return null;
+  }
+
   return (
     <DialogRow
       css={{
@@ -24,7 +29,7 @@ export const PDFInfo = () => {
       <Text variant="caption" css={{ color: "$textMedEmp" }}>
         On the next screen, ensure you select{" "}
         <span style={{ fontWeight: "600" }}>“This Tab”</span> and click on{" "}
-        <span style={{ fontWeight: "600" }}>“Share” </span>.
+        <span style={{ fontWeight: "600" }}>“Share” </span>
       </Text>
     </DialogRow>
   );
