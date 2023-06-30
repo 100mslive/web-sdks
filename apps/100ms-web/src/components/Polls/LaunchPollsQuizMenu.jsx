@@ -239,14 +239,7 @@ const QuestionForm = ({
       {type === "single-choice" || type === "multiple-choice" ? (
         <>
           {isQuiz ? (
-            <Checkbox.Root
-              onCheckedChange={() => {}}
-              css={
-                {
-                  // cursor: voted ? "not-allowed" : "pointer",
-                }
-              }
-            >
+            <Checkbox.Root onCheckedChange={() => {}}>
               <Checkbox.Indicator>
                 <CheckIcon width={16} height={16} />
               </Checkbox.Indicator>
