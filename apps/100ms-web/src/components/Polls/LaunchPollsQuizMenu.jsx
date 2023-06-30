@@ -82,8 +82,6 @@ export function LaunchPollsQuizMenu() {
               index={index}
               length={questions.length}
               onSave={questionParams => {
-                const newQuestions = [...questions];
-                newQuestions[index] = questionParams;
                 setQuestions(questions => [
                   ...questions.slice(0, index),
                   questionParams,

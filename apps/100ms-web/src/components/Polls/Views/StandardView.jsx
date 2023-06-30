@@ -8,10 +8,10 @@ import { QuestionCard } from "../QuestionCard";
  * @returns
  */
 export const StandardView = ({ poll }) => {
-  if (!poll.questions) {
+  if (!poll?.questions) {
     return null;
   }
-  return poll.questions.map((question, index) => (
+  return poll.questions?.map((question, index) => (
     <QuestionCard
       pollID={poll.id}
       key={`${question.text}-${index}`}
@@ -19,7 +19,7 @@ export const StandardView = ({ poll }) => {
       text={question.text}
       type={question.type}
       totalResponses={question.totalResponses}
-      totalQuestions={poll.questions?.length || 0}
+      totalQuestions={poll.questions.length}
       options={question.options}
       skippable={question?.skippable}
     />
