@@ -1,26 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { throwErrorHandler, useScreenShare } from "@100mslive/react-sdk";
 import { Box, ThemeTypes, useTheme } from "@100mslive/react-ui";
-import { EmbebScreenShareView } from "./EmbedView";
+import { EmbedScreenShareView } from "./EmbedView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA, isChrome } from "../common/constants";
 
 export const PDFView = () => {
+  const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   return (
-    <EmbebScreenShareView>
-      <PDFEmbedComponent />
-    </EmbebScreenShareView>
+    <EmbedScreenShareView>
+      <PDFEmbedComponent pdfConfig={pdfConfig} setPDFConfig={setPDFConfig} />
+    </EmbedScreenShareView>
   );
 };
 
-export const PDFEmbedComponent = () => {
+export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
   const ref = useRef();
   const themeType = useTheme().themeType;
   const [isPDFLoaded, setIsPDFLoaded] = useState(false);
   let pdfJSURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
   const { amIScreenSharing, toggleScreenShare } =
     useScreenShare(throwErrorHandler);
-  const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   if (pdfConfig.url && !pdfConfig.file) {
     pdfJSURL = pdfJSURL + "?file=" + encodeURIComponent(pdfConfig.url);
   }
