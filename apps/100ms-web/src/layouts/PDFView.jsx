@@ -5,6 +5,10 @@ import { EmbedScreenShareView } from "./EmbedView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA, isChrome } from "../common/constants";
 
+/**
+ * PDFView component is responsible for rendering the PDFEmbedComponent within an EmbedScreenShareView.
+ * It manages the PDF configuration state and passes it to the PDFEmbedComponent as props.
+ */
 export const PDFView = () => {
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   return (
@@ -14,6 +18,10 @@ export const PDFView = () => {
   );
 };
 
+/**
+ * PDFEmbedComponent is responsible for rendering the PDF iframe and managing the screen sharing functionality.
+ * It receives the pdfConfig and setPDFConfig as props for accessing and updating the PDF configuration state.
+ */
 export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
   let pdfIframeURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
 
@@ -33,7 +41,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
   // to handle - https://github.com/facebook/react/issues/24502
   const screenShareAttemptInProgress = useRef(false);
 
-  const resetEmbedConfig = useCallback(() => {
+  const resetPDFEmbedConfig = useCallback(() => {
     setPDFConfig({ isPDFBeingShared: false });
   }, [setPDFConfig]);
 
@@ -72,7 +80,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
         .then(() => {
           setWasScreenShared(true); // Set the state to indicate screen sharing has started
         })
-        .catch(resetEmbedConfig)
+        .catch(resetPDFEmbedConfig) // Handle the screen sharing error and reset the PDF configuration
         .finally(() => {
           screenShareAttemptInProgress.current = false;
         });
@@ -81,18 +89,18 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
   }, []);
 
   useEffect(() => {
-    // reset embed when screenshare is closed from anywhere
+    // Reset embed configuration when screen sharing is stopped from anywhere
     if (wasScreenShared && !amIScreenSharing) {
-      resetEmbedConfig();
+      resetPDFEmbedConfig();
     }
     return () => {
-      // close screenshare when this component is being unmounted
+      // Stop screen sharing when the component is unmounted
       if (wasScreenShared && amIScreenSharing) {
-        resetEmbedConfig();
-        toggleScreenShare(); // stop
+        resetPDFEmbedConfig();
+        toggleScreenShare(); // Stop screen sharing
       }
     };
-  }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
+  }, [wasScreenShared, amIScreenSharing, resetPDFEmbedConfig, toggleScreenShare]);
 
   return (
     <Box
@@ -120,7 +128,7 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
         referrerPolicy="no-referrer"
         onLoad={() => {
           if (pdfIframeRef.current && pdfConfig.file) {
-            // setting theme dark -> 2 and light -> 1
+            // Set PDF theme on config change. Dark -> 2 and Light -> 1
             requestAnimationFrame(() => {
               sendDataToPDFIframe(
                 themeType === ThemeTypes.dark ? 2 : 1,
