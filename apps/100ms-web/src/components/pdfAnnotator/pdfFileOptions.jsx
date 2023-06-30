@@ -36,7 +36,11 @@ export function PDFFileOptions({ onOpenChange }) {
           }}
         >
           <Flex direction="column">
-            <PDFHeader onOpenChange={onOpenChange} />
+            <PDFHeader
+              onOpenChange={onOpenChange}
+              title="Start PDF Sharing"
+              subtitle="Choose a PDF to annotate and share"
+            />
             <Tabs
               options={Object.values(PDF_SHARING_OPTIONS)}
               activeTab={activeTab}
@@ -67,7 +71,7 @@ export function PDFFileOptions({ onOpenChange }) {
                   Enter PDF URL
                 </Text>
                 <Input
-                  css={{ w: "100%", mb: "$10" }}
+                  css={{ w: "100%" }}
                   value={pdfURL}
                   onFocus={() => {
                     setIsPDFUrlValid(true);

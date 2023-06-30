@@ -27,7 +27,11 @@ export const UploadedFile = ({
           }}
         >
           <Flex direction="column">
-            <PDFHeader />
+            <PDFHeader
+              onOpenChange={onOpenChange}
+              title="Ready to Share?"
+              subtitle="Please check that the PDF selected is correct"
+            />
             <DialogRow
               css={{
                 fontFamily: "$sans",
