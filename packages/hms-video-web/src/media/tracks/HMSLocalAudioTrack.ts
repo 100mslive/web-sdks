@@ -253,6 +253,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       } else {
         await this.replaceTrackWith(settings);
       }
+      console.log(this.nativeTrack.getConstraints());
     }
   };
 

@@ -3,11 +3,13 @@ import { useMedia } from "react-use";
 import {
   HMSPlaylistType,
   selectIsAllowedToPublish,
+  useHMSActions,
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { MusicIcon } from "@100mslive/react-icons";
 import {
+  Button,
   config as cssConfig,
   Flex,
   Footer as AppFooter,
@@ -85,6 +87,8 @@ const ScreenshareAudio = () => {
 
 export const ConferencingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
+  const actions = useHMSActions();
+  const [, setEnableNS] = useState(true);
   return (
     <AppFooter.Root>
       <AppFooter.Left>
@@ -114,6 +118,22 @@ export const ConferencingFooter = () => {
         <ScreenshareToggle />
         <PIP />
         <MoreSettings />
+        <Button
+          onClick={() => {
+            setEnableNS(prev => {
+              actions.setAudioSettings({
+                advanced: [
+                  {
+                    noiseSuppression: !prev,
+                  },
+                ],
+              });
+              return prev;
+            });
+          }}
+        >
+          Toggle NS
+        </Button>
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}
