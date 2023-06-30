@@ -100,7 +100,12 @@ export const PDFEmbedComponent = ({ pdfConfig, setPDFConfig }) => {
         toggleScreenShare(); // Stop screen sharing
       }
     };
-  }, [wasScreenShared, amIScreenSharing, resetPDFEmbedConfig, toggleScreenShare]);
+  }, [
+    wasScreenShared,
+    amIScreenSharing,
+    resetPDFEmbedConfig,
+    toggleScreenShare,
+  ]);
 
   return (
     <Box
