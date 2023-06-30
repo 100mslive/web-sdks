@@ -25,9 +25,6 @@ export default class RoleChangeManager {
     }
 
     await this.diffRolesAndPublishTracks({ oldRole, newRole });
-    if (newRole.publishParams.allowed.length > 0) {
-      await this.deviceManager.init(true);
-    }
     this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, localPeer);
   };
 
@@ -69,8 +66,14 @@ export default class RoleChangeManager {
 
     // call publish with new settings, local track manager will diff policies
     await this.publish(initialSettings);
+    await this.syncDevices(initialSettings, newRole);
   };
 
+  private async syncDevices(initialSettings: InitialSettings, newRole: HMSRole) {
+    if ((!initialSettings.isAudioMuted || !initialSettings.isVideoMuted) && newRole.publishParams.allowed.length > 0) {
+      await this.deviceManager.init(true);
+    }
+  }
   private async removeVideoTracks(removeVideo: boolean) {
     if (!removeVideo) {
       return;
