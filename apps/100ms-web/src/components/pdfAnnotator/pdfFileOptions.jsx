@@ -12,12 +12,17 @@ import { PDFHeader } from "./pdfHeader";
 import { PDFInfo } from "./pdfInfo";
 import { SubmitPDF } from "./submitPdf";
 import { UploadedFile } from "./uploadedFile";
+import Tabs from "../Tabs";
+import { PDF_SHARING_OPTIONS } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
   const [isPDFUrlValid, setIsPDFUrlValid] = useState(true);
   const [isValidateProgress, setIsValidateProgress] = useState(false);
   const [pdfFile, setPDFFile] = useState(null);
   const [pdfURL, setPDFURL] = useState("");
+  const [activeTab, setActiveTab] = useState(
+    PDF_SHARING_OPTIONS.FROM_YOUR_COMPUTER
+  );
 
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
@@ -31,63 +36,57 @@ export function PDFFileOptions({ onOpenChange }) {
           }}
         >
           <Flex direction="column">
-            <PDFHeader />
-            <DialogInputFile
-              onChange={target => {
-                setPDFFile(target.files[0]);
-              }}
-              placeholder="Click to upload"
-              type="file"
-              accept=".pdf"
+            <PDFHeader onOpenChange={onOpenChange} />
+            <Tabs
+              options={Object.values(PDF_SHARING_OPTIONS)}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
-            <DialogRow
-              css={{
-                m: "$10 0",
-              }}
-            >
-              <HorizontalDivider
-                css={{
-                  mr: "$4",
-                }}
-              />
-              <Text
-                variant="tiny"
-                css={{
-                  color: "$textDisabled",
-                }}
-              >
-                OR
-              </Text>
-              <HorizontalDivider
-                css={{
-                  ml: "$4",
-                }}
-              />
-            </DialogRow>
-            <Text
-              variant="sm"
-              css={{
-                py: "$2",
-              }}
-            >
-              Import from URL
-            </Text>
-            <Input
-              css={{ w: "100%", mb: "$10" }}
-              value={pdfURL}
-              onFocus={() => {
-                setIsPDFUrlValid(true);
-                setIsValidateProgress(false);
-              }}
-              onChange={e => {
-                setPDFURL(e.target.value);
-              }}
-              placeholder="Add PDF URL"
-              type="text"
-              error={!isPDFUrlValid}
-            />
-            {!isPDFUrlValid && <PdfErrorView isPDFUrlValid={isPDFUrlValid} />}
-            <PDFInfo />
+            {activeTab === PDF_SHARING_OPTIONS.FROM_YOUR_COMPUTER ? (
+              <>
+                <DialogInputFile
+                  onChange={target => {
+                    setPDFFile(target.files[0]);
+                  }}
+                  placeholder="Click to upload"
+                  type="file"
+                  accept=".pdf"
+                />
+              </>
+            ) : null}
+
+            {activeTab === PDF_SHARING_OPTIONS.FROM_A_URL ? (
+              <>
+                <Text
+                  variant="sm"
+                  css={{
+                    mt: "$8",
+                    pb: "$2",
+                  }}
+                >
+                  Enter PDF URL
+                </Text>
+                <Input
+                  css={{ w: "100%", mb: "$10" }}
+                  value={pdfURL}
+                  onFocus={() => {
+                    setIsPDFUrlValid(true);
+                    setIsValidateProgress(false);
+                  }}
+                  onChange={e => {
+                    setPDFURL(e.target.value);
+                  }}
+                  placeholder="e.g. https://www.coin.co/whitepaper.pdf"
+                  type="text"
+                  error={!isPDFUrlValid}
+                />
+                {!isPDFUrlValid && (
+                  <PdfErrorView isPDFUrlValid={isPDFUrlValid} />
+                )}
+                <PDFInfo />
+              </>
+            ) : null}
+
             <SubmitPDF
               pdfFile={pdfFile}
               pdfURL={pdfURL}
@@ -95,6 +94,7 @@ export function PDFFileOptions({ onOpenChange }) {
               setIsPDFUrlValid={setIsPDFUrlValid}
               setIsValidateProgress={setIsValidateProgress}
               onOpenChange={onOpenChange}
+              hideSecondaryCTA
             />
           </Flex>
         </Dialog.Content>

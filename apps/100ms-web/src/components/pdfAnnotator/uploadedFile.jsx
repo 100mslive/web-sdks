@@ -75,6 +75,7 @@ export const UploadedFile = ({
               setIsPDFUrlValid={setIsPDFUrlValid}
               setIsValidateProgress={setIsValidateProgress}
               onOpenChange={onOpenChange}
+              setPDFFile={setPDFFile}
             />
           </Flex>
         </Dialog.Content>
