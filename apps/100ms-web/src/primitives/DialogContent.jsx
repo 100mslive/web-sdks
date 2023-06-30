@@ -286,7 +286,7 @@ export const DialogInputFile = ({
         r: "$1",
         height: "max(140px, 30%)",
         alignItems: "center",
-        my: "$9",
+        m: "$6 0",
       }}
       gap="8"
     >
@@ -295,7 +295,6 @@ export const DialogInputFile = ({
         css={{
           border: "none",
           background: "none",
-          mb: "$1",
           "&:hover": {
             border: "none",
             background: "none",

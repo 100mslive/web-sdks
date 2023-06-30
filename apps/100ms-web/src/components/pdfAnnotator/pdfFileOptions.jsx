@@ -1,18 +1,12 @@
 import React, { useState } from "react";
-import {
-  Dialog,
-  Flex,
-  HorizontalDivider,
-  Input,
-  Text,
-} from "@100mslive/react-ui";
-import { DialogInputFile, DialogRow } from "../../primitives/DialogContent";
+import { Dialog, Flex, Box, Input, Text } from "@100mslive/react-ui";
+import { DialogInputFile } from "../../primitives/DialogContent";
+import Tabs from "../Tabs";
 import { PdfErrorView } from "./pdfErrorView";
 import { PDFHeader } from "./pdfHeader";
 import { PDFInfo } from "./pdfInfo";
 import { SubmitPDF } from "./submitPdf";
 import { UploadedFile } from "./uploadedFile";
-import Tabs from "../Tabs";
 import { PDF_SHARING_OPTIONS } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
@@ -47,7 +41,7 @@ export function PDFFileOptions({ onOpenChange }) {
               setActiveTab={setActiveTab}
             />
             {activeTab === PDF_SHARING_OPTIONS.FROM_YOUR_COMPUTER ? (
-              <>
+              <Box css={{ mt: "$6", mb: "$3" }}>
                 <DialogInputFile
                   onChange={target => {
                     setPDFFile(target.files[0]);
@@ -56,7 +50,7 @@ export function PDFFileOptions({ onOpenChange }) {
                   type="file"
                   accept=".pdf"
                 />
-              </>
+              </Box>
             ) : null}
 
             {activeTab === PDF_SHARING_OPTIONS.FROM_A_URL ? (

@@ -1,4 +1,4 @@
-import { Flex, Box, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/react-ui";
 
 const Tabs = ({ options, activeTab, setActiveTab }) => {
   return (
