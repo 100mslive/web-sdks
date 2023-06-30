@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Dialog, Flex, Box, Input, Text } from "@100mslive/react-ui";
+import { Box, Dialog, Flex, Input, Text } from "@100mslive/react-ui";
 import { DialogInputFile } from "../../primitives/DialogContent";
 import Tabs from "../Tabs";
 import { PdfErrorView } from "./pdfErrorView";
