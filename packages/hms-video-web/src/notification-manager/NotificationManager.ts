@@ -13,7 +13,6 @@ import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
   OnTrackLayerUpdateNotification,
-  onTrackRemovedNotification,
   PolicyParams,
   SpeakerList,
   TrackStateNotification,
@@ -135,12 +134,12 @@ export class NotificationManager {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
         break;
       }
-      case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {
-        this.trackManager.handleTrackLayerUpdate(notification as OnTrackLayerUpdateNotification);
+      case HMSNotificationMethod.TRACK_REMOVE: {
+        this.trackManager.handleTrackRemovedPermanently(notification as TrackStateNotification);
         break;
       }
-      case HMSNotificationMethod.ON_SFU_TRACK_REMOVED: {
-        this.trackManager.handleTrackRemovedPermanently(notification as onTrackRemovedNotification);
+      case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {
+        this.trackManager.handleTrackLayerUpdate(notification as OnTrackLayerUpdateNotification);
         break;
       }
       case HMSNotificationMethod.ACTIVE_SPEAKERS:

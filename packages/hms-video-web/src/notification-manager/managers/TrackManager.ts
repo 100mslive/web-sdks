@@ -4,12 +4,7 @@ import { HMSPeer, HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../..
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
-import {
-  OnTrackLayerUpdateNotification,
-  onTrackRemovedNotification,
-  TrackState,
-  TrackStateNotification,
-} from '../HMSNotifications';
+import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
 /**
  * Handles:
@@ -58,7 +53,7 @@ export class TrackManager {
     this.processPendingTracks();
   };
 
-  handleTrackRemovedPermanently = (notification: onTrackRemovedNotification) => {
+  handleTrackRemovedPermanently = (notification: TrackStateNotification) => {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, notification);
     const trackIds = Object.keys(notification.tracks);
 
