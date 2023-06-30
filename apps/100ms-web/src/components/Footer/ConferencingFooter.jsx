@@ -128,7 +128,7 @@ export const ConferencingFooter = () => {
                   },
                 ],
               });
-              return prev;
+              return !prev;
             });
           }}
         >
