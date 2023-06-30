@@ -24,6 +24,7 @@ export const PDFEmbedComponent = () => {
   if (pdfConfig.url && !pdfConfig.file) {
     pdfJSURL = pdfJSURL + "?file=" + encodeURIComponent(pdfConfig.url);
   }
+
   const [wasScreenShared, setWasScreenShared] = useState(false);
   // to handle - https://github.com/facebook/react/issues/24502
   const screenShareAttemptInProgress = useRef(false);
@@ -32,14 +33,21 @@ export const PDFEmbedComponent = () => {
   const resetEmbedConfig = useCallback(() => {
     setPDFConfig({ state: false });
   }, [setPDFConfig]);
-  useEffect(() => {
-    if (isPDFLoaded && ref.current) {
+
+  const sendDataToPDFIframe = (themeType, file = null) => {
+    if (ref.current) {
       ref.current.contentWindow.postMessage(
         {
-          theme: themeType === ThemeTypes.dark ? 2 : 1,
+          theme: themeType,
+          file: file,
         },
         "*"
       );
+    }
+  };
+  useEffect(() => {
+    if (isPDFLoaded && ref.current) {
+      sendDataToPDFIframe(themeType === ThemeTypes.dark ? 2 : 1);
     }
   }, [isPDFLoaded, themeType]);
   useEffect(() => {
@@ -109,12 +117,9 @@ export const PDFEmbedComponent = () => {
           if (ref.current && pdfConfig.file) {
             // setting theme dark -> 2 and light -> 1
             requestAnimationFrame(() => {
-              ref.current.contentWindow.postMessage(
-                {
-                  file: pdfConfig.file,
-                  theme: themeType === ThemeTypes.dark ? 2 : 1,
-                },
-                "*"
+              sendDataToPDFIframe(
+                themeType === ThemeTypes.dark ? 2 : 1,
+                pdfConfig.file
               );
               setIsPDFLoaded(true);
             }, 1000);
