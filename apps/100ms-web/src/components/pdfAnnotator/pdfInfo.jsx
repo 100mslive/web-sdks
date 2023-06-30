@@ -16,6 +16,7 @@ export const PDFInfo = () => {
         r: "$1",
         outline: "none",
         border: "1px solid $borderLight",
+        mt: "$0",
       }}
     >
       <InfoIcon

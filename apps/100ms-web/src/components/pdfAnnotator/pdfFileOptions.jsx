@@ -65,7 +65,7 @@ export function PDFFileOptions({ onOpenChange }) {
                   Enter PDF URL
                 </Text>
                 <Input
-                  css={{ w: "100%" }}
+                  css={{ w: "100%", mb: "$10" }}
                   value={pdfURL}
                   onFocus={() => {
                     setIsPDFUrlValid(true);

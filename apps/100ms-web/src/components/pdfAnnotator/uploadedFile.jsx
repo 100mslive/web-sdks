@@ -48,7 +48,7 @@ export const UploadedFile = ({
                   boxShadow: "0 0 0 1px $colors$borderAccent",
                   border: "1px solid $transparent",
                 },
-                mb: 0,
+                mb: "$8",
                 mt: "$6",
               }}
             >
