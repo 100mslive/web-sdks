@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { DownloadIcon } from '@100mslive/react-icons';
 import {
   Box,
   Button,
@@ -7,7 +8,6 @@ import {
   flexCenter,
   Text,
 } from '@100mslive/roomkit-react';
-import { DownloadIcon } from '@100mslive/react-icons';
 import { DialogContent } from './DialogContent';
 
 const Step = ({ value, opacity }) => (

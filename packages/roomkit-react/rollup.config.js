@@ -17,7 +17,7 @@ const config = {
   input: 'src/index.ts',
   external: [...deps, ...peerDeps],
   output: [
-    { dir: 'dist/cjs', format: 'cjs', sourcemap: true },
+    { file: pkg.main, format: 'cjs', sourcemap: true, inlineDynamicImports: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
   plugins: [
@@ -26,7 +26,7 @@ const config = {
     image(),
     json(),
     esbuild({ format: 'esm' }),
-    resolve({ preferBuiltins: true }),
+    resolve({ preferBuiltins: false }),
     isProduction && terser(),
     typescript({ sourceMap: true, exclude: '**/*.stories.tsx' }),
   ],
