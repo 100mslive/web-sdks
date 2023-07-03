@@ -135,6 +135,10 @@ export class NotificationManager {
         break;
       }
       case HMSNotificationMethod.TRACK_REMOVE: {
+        if (!notification.peer) {
+          HMSLogger.d(this.TAG, `Ignoring sfu notification - ${method}`, { notification });
+          return;
+        }
         this.trackManager.handleTrackRemovedPermanently(notification as TrackStateNotification);
         break;
       }
