@@ -286,7 +286,7 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(({ messages, setPinnedMessage, scrollToBottom }, listRef) => {
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {

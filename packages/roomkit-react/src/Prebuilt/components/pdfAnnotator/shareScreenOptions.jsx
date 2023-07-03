@@ -1,9 +1,9 @@
 import React, { Fragment, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
 import { PdfShare, ScreenShare, StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { PDFFileOptions } from './pdfFileOptions';
 import { Box, Button, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
+import { PDFFileOptions } from './pdfFileOptions';
 
 const MODALS = {
   SHARE: 'share',

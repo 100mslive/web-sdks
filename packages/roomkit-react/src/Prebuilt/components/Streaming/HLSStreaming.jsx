@@ -10,12 +10,12 @@ import {
   SupportIcon,
   WrenchIcon,
 } from '@100mslive/react-icons';
-import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
 import { Box, Button, Flex, Loading, Text } from '../../../';
-import { APP_DATA } from '../../common/constants';
+import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useFilteredRoles } from '../../common/hooks';
 import { getDefaultMeetingUrl } from '../../common/utils';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA } from '../../common/constants';
 
 const getCardData = (roleName, roomId) => {
   let data = {};

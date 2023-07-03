@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Input, styled } from '../../';
+import { Button, Input, styled } from '../../../';
 import { isStreamingKit } from '../../common/utils';
 
 const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {

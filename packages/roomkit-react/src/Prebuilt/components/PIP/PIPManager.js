@@ -40,6 +40,7 @@ class PipManager {
     this.hmsActions = null; // for attaching detaching
     this.videoElements = []; // for attaching tracks
     this.tracksToShow = [];
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     this.onStateChange = () => {}; // for user of this class to listen to changes
     this.state = PIPStates.stopped;
   }

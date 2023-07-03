@@ -13,8 +13,11 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { normalizeAppPolicyConfig } from '../init/initUtils';
+import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneState, useSidepaneToggle } from './useSidepane';
 import { useSetAppDataByKey } from './useUISettings';
+import { getMetadata } from '../../common/utils';
 import {
   APP_DATA,
   CHAT_SELECTOR,
@@ -27,9 +30,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
-import { getMetadata } from '../../common/utils';
-import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { normalizeAppPolicyConfig } from '../init/initUtils';
 
 export const getAppDetails = appDetails => {
   try {

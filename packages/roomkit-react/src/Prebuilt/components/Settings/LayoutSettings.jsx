@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
 import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { settingOverflow } from './common.js';
-import SwitchWithLabel from './SwitchWithLabel';
 import { Box, Flex, Slider, Text } from '../../../';
-import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID, UI_SETTINGS } from '../../common/constants';
+import SwitchWithLabel from './SwitchWithLabel';
 import { useSetUiSettings } from '../AppData/useUISettings';
+import { settingOverflow } from './common.js';
+import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID, UI_SETTINGS } from '../../common/constants';
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();

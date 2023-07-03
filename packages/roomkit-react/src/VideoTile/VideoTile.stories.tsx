@@ -1,6 +1,6 @@
 import React from 'react';
 import { MicOffIcon } from '@100mslive/react-icons';
-import Video from '../Video/Video';
+import { Video } from '../Video/Video';
 import { StyledVideoTile } from './StyledVideoTile';
 import VideoTileDocs from './VideoTile.mdx';
 

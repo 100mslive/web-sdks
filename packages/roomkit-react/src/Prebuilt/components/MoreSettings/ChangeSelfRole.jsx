@@ -9,10 +9,10 @@ import {
 } from '@100mslive/react-sdk';
 import { ArrowRightIcon, CheckIcon, PersonIcon } from '@100mslive/react-icons';
 import { config, Dropdown, Text } from '../../';
+import { ToastManager } from '../Toast/ToastManager';
+import { useAppLayout } from '../AppData/useAppLayout';
 import { useFilteredRoles } from '../../common/hooks';
 import { arrayIntersection } from '../../common/utils';
-import { useAppLayout } from '../AppData/useAppLayout';
-import { ToastManager } from '../Toast/ToastManager';
 
 export const ChangeSelfRole = ({ onClick }) => {
   const roles = useFilteredRoles();
@@ -44,7 +44,7 @@ export const ChangeSelfRole = ({ onClick }) => {
         <ArrowRightIcon />
       </Dropdown.TriggerItem>
       <Dropdown.SubMenuContent sideOffset={8} alignOffset={-5} css={{ '@md': { w: '$64' } }}>
-        {availableSelfChangeRoles.map((role, i) => (
+        {availableSelfChangeRoles.map(role => (
           <Dropdown.Item
             key={role}
             css={{ justifyContent: 'space-between' }}

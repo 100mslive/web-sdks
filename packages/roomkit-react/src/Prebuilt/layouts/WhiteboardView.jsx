@@ -1,9 +1,9 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { selectPeers, selectRoomID, useHMSStore } from '@100mslive/react-sdk';
+import { Box, config as cssConfig, Flex } from '../';
 import { SidePane } from './screenShareView';
 import { Whiteboard } from '../plugins/whiteboard';
-import { Box, config as cssConfig, Flex } from '../';
 
 const Editor = React.memo(({ roomId }) => {
   return (

@@ -1,14 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import PreviewJoin from './PreviewJoin';
 import { Box, Flex, Loading } from '../../../';
-import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 import SidePane from '../../layouts/SidePane';
-import { useAuthToken } from '../AppData/useUISettings';
 import { Header } from '../Header';
+import PreviewJoin from './PreviewJoin';
+import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
+import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();

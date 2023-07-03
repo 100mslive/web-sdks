@@ -10,7 +10,9 @@ const defaultAspectRatio = {
 };
 
 export enum ThemeTypes {
+  // eslint-disable-next-line no-unused-vars
   light = 'light',
+  // eslint-disable-next-line no-unused-vars
   dark = 'dark',
 }
 

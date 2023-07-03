@@ -12,12 +12,12 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
+import { Box, Dropdown, Flex, styled, Text, Tooltip } from '../../';
+import IconButton from '../IconButton';
 import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { Box, Dropdown, Flex, styled, Text, Tooltip } from '../../';
 import { EMOJI_REACTION_TYPE, FEATURE_LIST, HLS_TIMED_METADATA_DOC_URL } from '../common/constants';
-import IconButton from '../IconButton';
 
 init({ data });
 

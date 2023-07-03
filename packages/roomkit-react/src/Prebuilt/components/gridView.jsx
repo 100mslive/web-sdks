@@ -1,11 +1,11 @@
 import React, { Fragment } from 'react';
 import { useMedia } from 'react-use';
-import { useAppConfig } from './AppData/useAppConfig';
-import { useIsHeadless } from './AppData/useUISettings';
+import { Box, config as cssConfig, Flex } from '../../';
 import { FirstPersonDisplay } from './FirstPersonDisplay';
 import { Image } from './Image';
 import VideoList from './VideoList';
-import { Box, config as cssConfig, Flex } from '../../';
+import { useAppConfig } from './AppData/useAppConfig';
+import { useIsHeadless } from './AppData/useUISettings';
 
 const MAX_TILES_FOR_MOBILE = 4;
 

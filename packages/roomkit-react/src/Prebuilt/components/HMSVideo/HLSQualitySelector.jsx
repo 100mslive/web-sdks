@@ -58,7 +58,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
       </Dropdown.Trigger>
       {layers.length > 0 && (
         <Dropdown.Content sideOffset={5} align="end" css={{ height: 'auto', maxHeight: '$96', w: '$64' }}>
-          <Dropdown.Item onClick={_ => onQualityChange({ height: 'auto' })} key="auto">
+          <Dropdown.Item onClick={() => onQualityChange({ height: 'auto' })} key="auto">
             <Text css={{ flex: '1 1 0' }}>Automatic</Text>
             {isAuto && <CheckCircleIcon />}
           </Dropdown.Item>

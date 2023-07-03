@@ -2,11 +2,11 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
 import { selectAppData, selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
-import { APP_DATA } from '../common/constants';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
-import { useRolePreference } from '../components/hooks/useFeatures';
 import VideoTile from '../components/VideoTile';
 import { Box, config as cssConfig, Flex } from '../';
+import { useRolePreference } from '../components/hooks/useFeatures';
+import { APP_DATA } from '../common/constants';
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];

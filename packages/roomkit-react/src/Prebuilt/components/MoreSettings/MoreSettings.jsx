@@ -21,22 +21,22 @@ import {
   SettingsIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
+import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../';
+import IconButton from '../../IconButton';
+import { RoleChangeModal } from '../RoleChangeModal';
+import SettingsModal from '../Settings/SettingsModal';
+import StartRecording from '../Settings/StartRecording';
+import { StatsForNerds } from '../StatsForNerds';
 import { BulkRoleChangeModal } from './BulkRoleChangeModal';
 import { ChangeNameModal } from './ChangeNameModal';
 import { ChangeSelfRole } from './ChangeSelfRole';
 import { EmbedUrl, EmbedUrlModal } from './EmbedUrl';
 import { FullScreenItem } from './FullScreenItem';
 import { MuteAllModal } from './MuteAllModal';
-import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../';
-import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
-import IconButton from '../../IconButton';
-import { FeatureFlags } from '../../services/FeatureFlags';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { RoleChangeModal } from '../RoleChangeModal';
-import SettingsModal from '../Settings/SettingsModal';
-import StartRecording from '../Settings/StartRecording';
-import { StatsForNerds } from '../StatsForNerds';
+import { FeatureFlags } from '../../services/FeatureFlags';
+import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
 
 const isMobileOS = isAndroid || isIOS;
 

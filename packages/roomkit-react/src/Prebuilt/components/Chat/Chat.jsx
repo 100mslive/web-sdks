@@ -10,14 +10,14 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { Box, Button, Flex, IconButton, Text } from '../../';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatHeader } from './ChatHeader';
-import { useUnreadCount } from './useUnreadCount';
-import { Box, Button, Flex, IconButton, Text } from '../../';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useUnreadCount } from './useUnreadCount';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);

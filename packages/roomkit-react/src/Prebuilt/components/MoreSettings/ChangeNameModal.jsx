@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Button, Dialog, Flex, Input, Text } from '../../';
-import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { ToastManager } from '../Toast/ToastManager';
+import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 
 export const ChangeNameModal = ({ onOpenChange }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW);

@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react';
 import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
-import { useUISettings } from './AppData/useUISettings';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
-import { ScreenShareButton } from './ShareMenuIcon';
 import { Box, Flex, Tooltip } from '../../';
-import { UI_SETTINGS } from '../common/constants';
+import { ScreenShareButton } from './ShareMenuIcon';
+import { useUISettings } from './AppData/useUISettings';
 import { isScreenshareSupported } from '../common/utils';
+import { UI_SETTINGS } from '../common/constants';
 
 export const ScreenshareToggle = ({ css = {} }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);

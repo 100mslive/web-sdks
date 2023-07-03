@@ -49,7 +49,6 @@
             // Internal packages.
             "^@100mslive/react-sdk",
             "^@100mslive/react-icons",
-            "^@100mslive/roomkit-react",
             // Side effect imports.
             "^\\u0000",
             

@@ -4,7 +4,6 @@ import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/h
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
@@ -12,6 +11,7 @@ import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBloc
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Box, Flex, IconButton, Loading, Text, Tooltip, useTheme } from '../';
+import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;
 
@@ -51,7 +51,7 @@ const HLSView = () => {
       videoEl?.removeEventListener('playing', hideLoader);
       videoEl?.removeEventListener('waiting', showLoader);
     };
-  }, [videoRef.current]);
+  }, []);
 
   /**
    * initialize HMSHLSPlayer and add event listeners.

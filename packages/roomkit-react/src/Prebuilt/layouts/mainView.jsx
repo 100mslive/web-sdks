@@ -9,14 +9,16 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import EmbedView from './EmbedView';
+import FullPageProgress from '../components/FullPageProgress';
+import { Flex } from '../';
+import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';
-import PDFView from './PDFView';
+import { PDFView } from './PDFView';
 import ScreenShareView from './screenShareView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
-import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import { useAppConfig } from '../components/AppData/useAppConfig';
 import {
   useHLSViewerRole,
@@ -27,9 +29,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import FullPageProgress from '../components/FullPageProgress';
-import { useWhiteboardMetadata } from '../plugins/whiteboard';
-import { Flex } from '../';
+import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));

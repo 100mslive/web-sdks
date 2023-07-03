@@ -2,10 +2,10 @@ import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../';
-import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../common/constants';
 import IconButton from '../../IconButton';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ChatToggle = () => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);

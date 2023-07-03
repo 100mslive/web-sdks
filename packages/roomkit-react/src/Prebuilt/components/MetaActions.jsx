@@ -1,11 +1,11 @@
 import React from 'react';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, HandIcon } from '@100mslive/react-icons';
+import { Flex, Tooltip } from '../../';
+import IconButton from '../IconButton';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { useMyMetadata } from './hooks/useMetadata';
-import { Flex, Tooltip } from '../../';
 import { FEATURE_LIST } from '../common/constants';
-import IconButton from '../IconButton';
 
 const MetaActions = ({ isMobile = false, compact = false }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);

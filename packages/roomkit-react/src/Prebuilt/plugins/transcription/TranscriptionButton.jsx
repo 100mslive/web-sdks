@@ -7,8 +7,8 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { ClosedCaptionIcon } from '@100mslive/react-icons';
-import { Transcriber } from './Transcriber';
 import { Box, IconButton, Text, Tooltip } from '../../../';
+import { Transcriber } from './Transcriber';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 export function TranscriptionButton() {

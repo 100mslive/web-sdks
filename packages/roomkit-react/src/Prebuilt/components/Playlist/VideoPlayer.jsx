@@ -9,10 +9,10 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CrossIcon, ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-import { VideoPlaylistControls } from './PlaylistControls';
 import { Box, Flex, IconButton, Text, Video, VideoTileStats } from '../../';
-import { UI_SETTINGS } from '../../common/constants';
+import { VideoPlaylistControls } from './PlaylistControls';
 import { useUISettings } from '../AppData/useUISettings';
+import { UI_SETTINGS } from '../../common/constants';
 
 export const VideoPlayer = React.memo(({ peerId }) => {
   const videoTrack = useHMSStore(selectVideoPlaylistVideoTrackByPeerID(peerId));

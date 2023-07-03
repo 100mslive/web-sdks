@@ -18,6 +18,7 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 
   useEffect(() => {
     if (alone && !cbTimeout.current) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       cbTimeout.current = setTimeout(() => {
         setAloneForLong(true);

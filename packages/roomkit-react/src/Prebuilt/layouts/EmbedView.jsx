@@ -9,10 +9,10 @@ import {
   useHMSStore,
   useScreenShare,
 } from '@100mslive/react-sdk';
-import { SidePane } from './screenShareView';
-import { APP_DATA } from '../common/constants';
-import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { Box, config as cssConfig, Flex } from '../';
+import { SidePane } from './screenShareView';
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
+import { APP_DATA } from '../common/constants';
 
 export const EmbedView = () => {
   return (
@@ -138,5 +138,3 @@ const EmbedComponent = () => {
     </Box>
   );
 };
-
-export default EmbedView;

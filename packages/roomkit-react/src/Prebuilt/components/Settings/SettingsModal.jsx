@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
-import { settingContent } from './common.js';
+import { Box, config as cssConfig, Dialog, Flex, IconButton, Tabs, Text } from '../../../';
 import DeviceSettings from './DeviceSettings';
 import { LayoutSettings } from './LayoutSettings';
 import { NotificationSettings } from './NotificationSettings';
-import { Box, config as cssConfig, Dialog, Flex, IconButton, Tabs, Text } from '../../';
 import { useHLSViewerRole } from '../AppData/useUISettings';
+import { settingContent } from './common.js';
 
 const settings = [
   {

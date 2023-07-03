@@ -10,11 +10,11 @@ import {
   VideoPlayerIcon,
 } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
-import { UI_SETTINGS } from '../../common/constants';
 import { useWhiteboardMetadata } from '../../plugins/whiteboard/useWhiteboardMetadata';
 import { useUISettings } from '../AppData/useUISettings';
 import { usePlaylistMusic } from '../hooks/usePlaylistMusic';
 import { useScreenshareAudio } from '../hooks/useScreenshareAudio';
+import { UI_SETTINGS } from '../../common/constants';
 
 export const getRecordingText = ({ isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn }, delimiter = ', ') => {
   if (!isBrowserRecordingOn && !isServerRecordingOn && !isHLSRecordingOn) {

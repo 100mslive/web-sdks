@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Button, Flex } from '../../';
-import { APP_DATA } from '../../common/constants';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA } from '../../common/constants';
 
 export const SubmitPDF = ({
   pdfFile,
@@ -37,7 +37,7 @@ export const SubmitPDF = ({
             setIsValidateProgress(false);
           }
         })
-        .catch(error => {
+        .catch(() => {
           setIsPDFUrlValid(false);
           setIsValidateProgress(false);
         });

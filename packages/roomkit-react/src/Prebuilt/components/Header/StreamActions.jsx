@@ -9,15 +9,15 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { RecordIcon, WrenchIcon } from '@100mslive/react-icons';
-import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { Box, Button, config as cssConfig, Flex, Loading, Popover, Text, Tooltip } from '../../../';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
-import { useSidepaneState, useSidepaneToggle } from '../AppData/useSidepane';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
 import GoLiveButton from '../GoLiveButton';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
+import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
+import { useSidepaneState, useSidepaneToggle } from '../AppData/useSidepane';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();

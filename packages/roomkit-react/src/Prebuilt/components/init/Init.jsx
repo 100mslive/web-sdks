@@ -6,8 +6,8 @@ import {
   selectSessionId,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { setUpZipy } from './initUtils';
 import { useTheme } from '../../../';
+import { setUpZipy } from './initUtils';
 import { FeatureFlagsInit } from '../../services/FeatureFlags';
 
 const Init = () => {

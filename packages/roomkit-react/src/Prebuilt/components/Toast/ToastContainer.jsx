@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
+import { Toast as ToastPrimitive } from '../../../';
 import { Toast } from './Toast';
 import { ToastManager } from './ToastManager';
-import { Toast as ToastPrimitive } from '../../../';
 import { MAX_TOASTS } from '../../common/constants';
 
 export const ToastContainer = () => {

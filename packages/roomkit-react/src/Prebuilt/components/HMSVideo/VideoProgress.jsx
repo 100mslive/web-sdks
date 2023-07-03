@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { getPercentage } from './HMSVIdeoUtils';
 import { Box, Flex } from '../../../';
+import { getPercentage } from './HMSVIdeoUtils';
 
 export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   const [videoProgress, setVideoProgress] = useState(0);
@@ -27,7 +27,7 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
         videoEl.removeEventListener('timeupdate', timeupdateHandler);
       }
     };
-  }, []);
+  }, [hlsPlayer]);
 
   const onProgressChangeHandler = e => {
     const userClickedX = e.clientX - progressRootRef.current.offsetLeft;

@@ -8,11 +8,11 @@ import {
 } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);

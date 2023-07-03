@@ -1,4 +1,4 @@
-import { css } from '../../';
+import { css } from '../../..';
 export const settingOverflow = css({
   flex: '1 1 0',
   pr: '$12',

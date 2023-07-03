@@ -21,14 +21,14 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { ParticipantFilter } from './ParticipantFilter';
 import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../../';
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
-import { isInternalRole } from '../../common/utils';
 import IconButton from '../../IconButton';
-import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
+import { ParticipantFilter } from './ParticipantFilter';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { isInternalRole } from '../../common/utils';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();

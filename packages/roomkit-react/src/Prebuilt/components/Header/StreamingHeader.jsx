@@ -1,12 +1,12 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { Logo, SpeakerTag } from './HeaderComponents';
-import { ParticipantCount } from './ParticipantList';
-import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 import { config as cssConfig, Flex } from '../../../';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import MetaActions from '../MetaActions';
+import { Logo, SpeakerTag } from './HeaderComponents';
+import { ParticipantCount } from './ParticipantList';
+import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
 export const StreamingHeader = ({ isPreview }) => {
   const isMobile = useMedia(cssConfig.media.md);

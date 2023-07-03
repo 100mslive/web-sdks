@@ -3,12 +3,12 @@ import { matchPath, useLocation } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { v4 as uuid } from 'uuid';
 import { useHMSActions } from '@100mslive/react-sdk';
-import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
 import { styled } from '../../';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from '../common/constants';
 import { ErrorDialog } from '../primitives/DialogContent';
+import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
 import getToken from '../services/tokenService';
+import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from '../common/constants';
 
 /**
  * query params exposed -

@@ -2,13 +2,13 @@ import React, { Fragment, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ExitIcon, HangUpIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { useDropdownList } from './hooks/useDropdownList';
-import { useNavigation } from './hooks/useNavigation';
 import { ToastManager } from './Toast/ToastManager';
 import { Box, Button, Dialog, Dropdown, Flex, IconButton, styled, Text, Tooltip } from '../../';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { isStreamingKit } from '../common/utils';
 import { DialogCheckbox, DialogContent, DialogRow } from '../primitives/DialogContent';
+import { useDropdownList } from './hooks/useDropdownList';
+import { useNavigation } from './hooks/useNavigation';
+import { isStreamingKit } from '../common/utils';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();

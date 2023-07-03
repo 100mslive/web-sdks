@@ -8,7 +8,6 @@ import {
   usePreviewJoin,
 } from '@100mslive/react-sdk';
 import { SettingsIcon } from '@100mslive/react-icons';
-import PreviewName from './PreviewName';
 import {
   Avatar,
   Flex,
@@ -21,16 +20,17 @@ import {
   useBorderAudioLevel,
   useTheme,
   Video,
-} from '../../';
+} from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
-import { UI_SETTINGS } from '../../common/constants';
 import IconButton from '../../IconButton';
-import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackground';
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
-import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import SettingsModal from '../Settings/SettingsModal';
+import PreviewName from './PreviewName';
+import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackground';
+import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { UI_SETTINGS } from '../../common/constants';
 
 const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(

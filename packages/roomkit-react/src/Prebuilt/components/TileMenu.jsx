@@ -23,12 +23,12 @@ import {
   VideoOffIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
+import { ToastManager } from './Toast/ToastManager';
+import { Box, Flex, Slider, StyledMenuTile, Text } from '../../';
 import { useSetAppDataByKey } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { ToastManager } from './Toast/ToastManager';
-import { Box, Flex, Slider, StyledMenuTile, Text } from '../../';
 import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../common/constants';
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>

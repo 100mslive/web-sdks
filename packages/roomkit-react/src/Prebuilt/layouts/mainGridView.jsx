@@ -7,12 +7,12 @@ import {
   selectRolesMap,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { NonPublisherView } from './NonPublisherView';
-import { UI_SETTINGS } from '../common/constants';
-import { useAppLayout } from '../components/AppData/useAppLayout';
-import { useUISettings } from '../components/AppData/useUISettings';
 import { GridCenterView, GridSidePaneView } from '../components/gridView';
 import { Flex } from '../';
+import { NonPublisherView } from './NonPublisherView';
+import { useAppLayout } from '../components/AppData/useAppLayout';
+import { useUISettings } from '../components/AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 export const MainGridView = () => {
   const centerRoles = useAppLayout('center') || [];

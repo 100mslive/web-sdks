@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ViewIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Text } from '../../';
-import { APP_DATA } from '../../common/constants';
 import { DialogContent, DialogInput, DialogRow } from '../../primitives/DialogContent';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA } from '../../common/constants';
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
   if (!window.CropTarget) {

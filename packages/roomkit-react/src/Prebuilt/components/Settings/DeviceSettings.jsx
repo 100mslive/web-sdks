@@ -8,12 +8,12 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon, VideoOnIcon } from '@100mslive/react-icons';
-import { settingOverflow } from './common.js';
 import { Box, Button, Dropdown, Flex, StyledVideoTile, Text, Video } from '../../../';
-import { UI_SETTINGS } from '../../common/constants';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useUISettings } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
+import { settingOverflow } from './common.js';
+import { UI_SETTINGS } from '../../common/constants';
 
 /**
  * wrap the button on click of whom settings should open, this component will take care of the rest,

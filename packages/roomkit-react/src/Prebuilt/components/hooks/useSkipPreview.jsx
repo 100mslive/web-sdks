@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParam } from 'react-use';
-import { QUERY_PARAM_SKIP_PREVIEW, QUERY_PARAM_SKIP_PREVIEW_HEADFUL, UI_SETTINGS } from '../../common/constants';
 import { useSetUiSettings } from '../AppData/useUISettings';
+import { QUERY_PARAM_SKIP_PREVIEW, QUERY_PARAM_SKIP_PREVIEW_HEADFUL, UI_SETTINGS } from '../../common/constants';
 
 export const useSkipPreview = () => {
   // way to skip preview for automated tests, beam recording and streaming

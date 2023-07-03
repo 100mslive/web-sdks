@@ -1,8 +1,8 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import { selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { Box, Button, Checkbox, Dialog, Dropdown, Flex, Label, Text, textEllipsis, Tooltip } from '../../';
+import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (

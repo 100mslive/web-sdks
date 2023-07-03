@@ -10,12 +10,12 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BrbIcon, HandRaiseFilledIcon, MicOffIcon } from '@100mslive/react-icons';
-import { useAppConfig } from './AppData/useAppConfig';
-import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import TileConnection from './Connection/TileConnection';
+import { Avatar, StyledVideoTile, useBorderAudioLevel, Video, VideoTileStats } from '../../';
 import { getVideoTileLabel } from './peerTileUtils';
 import TileMenu from './TileMenu';
-import { Avatar, StyledVideoTile, useBorderAudioLevel, Video, VideoTileStats } from '../../';
+import { useAppConfig } from './AppData/useAppConfig';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
 const Tile = ({ peerId, trackId, width, height, objectFit = 'cover', rootCSS = {}, containerCSS = {} }) => {

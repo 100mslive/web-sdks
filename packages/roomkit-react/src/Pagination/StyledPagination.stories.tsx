@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '.';
@@ -15,10 +15,13 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
 
-  function handlePageChange(page: number) {
-    setPage(page);
-    propsSetPage(page);
-  }
+  const handlePageChange = useCallback(
+    (page: number) => {
+      setPage(page);
+      propsSetPage(page);
+    },
+    [propsSetPage],
+  );
 
   const nextPage = () => {
     handlePageChange(Math.min(page + 1, numPages - 1));
@@ -30,7 +33,7 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
 
   useEffect(() => {
     handlePageChange(propsPage);
-  }, [propsPage]);
+  }, [propsPage, handlePageChange]);
 
   return (
     <StyledPagination.Root>

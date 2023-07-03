@@ -78,7 +78,6 @@ export const SidePane = ({
   isPresenterInSmallTiles,
   peerScreenSharing, // the peer who is screensharing
   smallTilePeers,
-  totalPeers,
   showSidebarInBottom,
 }) => {
   // The main peer's screenshare is already being shown in center view
@@ -139,7 +138,7 @@ const ScreenShareComponent = ({ amIPresenting, peerPresenting, peerSharingPlayli
   );
 };
 
-const SmallTilePeersView = ({ smallTilePeers, shouldShowScreenFn, showStatsOnTiles, showSidebarInBottom }) => {
+const SmallTilePeersView = ({ smallTilePeers, shouldShowScreenFn, showSidebarInBottom }) => {
   return (
     <Flex
       css={{

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
-import { ChatSelector } from './ChatSelector';
 import { Box, Dropdown, Flex, IconButton, Text, textEllipsis } from '../../';
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { ChatSelector } from './ChatSelector';
 import { useSidepaneToggle } from '../AppData/useSidepane';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ChatHeader = React.memo(({ selection, selectorOpen, onToggle, onSelect, role, peerId }) => {
   const [open, setOpen] = useState(false);

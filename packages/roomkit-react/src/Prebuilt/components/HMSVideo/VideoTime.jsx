@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { HMSHLSPlayerEvents } from '@100mslive/hls-player';
-import { getDurationFromSeconds } from './HMSVIdeoUtils';
 import { Text } from '../../../';
+import { getDurationFromSeconds } from './HMSVIdeoUtils';
 
 export const VideoTime = ({ hlsPlayer }) => {
   const [videoTime, setVideoTime] = useState('');

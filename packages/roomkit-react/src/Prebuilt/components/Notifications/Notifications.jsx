@@ -2,6 +2,9 @@
 import React, { useEffect } from 'react';
 import { logMessage } from 'zipyai';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { Button } from '../../../';
+import { ToastBatcher } from '../Toast/ToastBatcher';
+import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { InitErrorModal } from './InitErrorModal';
 import { MessageNotifications } from './MessageNotifications';
@@ -11,12 +14,9 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { Button } from '../../../';
-import { getMetadata } from '../../common/utils';
 import { useHLSViewerRole, useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
-import { ToastBatcher } from '../Toast/ToastBatcher';
-import { ToastManager } from '../Toast/ToastManager';
+import { getMetadata } from '../../common/utils';
 
 export function Notifications() {
   const notification = useHMSNotifications();

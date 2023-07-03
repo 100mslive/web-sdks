@@ -9,17 +9,17 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { useAuthToken, useIsHeadless } from './AppData/useUISettings';
-import { useNavigation } from './hooks/useNavigation';
-import { useSkipPreview } from './hooks/useSkipPreview';
+import { Box, Flex } from '../../';
+import { useHMSPrebuiltContext } from '../AppContext';
+import { ConferenceMainView } from '../layouts/mainView';
 import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
-import { Box, Flex } from '../../';
-import { useHMSPrebuiltContext } from '../AppContext';
+import { useAuthToken, useIsHeadless } from './AppData/useUISettings';
+import { useNavigation } from './hooks/useNavigation';
+import { useSkipPreview } from './hooks/useSkipPreview';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
-import { ConferenceMainView } from '../layouts/mainView';
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -39,7 +39,7 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
 
-  const toggleControls = e => {
+  const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
       setHideControls(value => !value);
     }

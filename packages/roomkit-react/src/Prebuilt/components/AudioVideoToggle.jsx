@@ -10,8 +10,8 @@ import {
 import { CameraFlipIcon, MicOffIcon, MicOnIcon, VideoOffIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
 import { Tooltip } from '../../';
-import { isMacOS } from '../common/constants';
 import IconButton from '../IconButton';
+import { isMacOS } from '../common/constants';
 
 export const AudioVideoToggle = () => {
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();

@@ -10,8 +10,8 @@ import {
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../';
-import { useFilteredRoles } from '../../common/hooks';
 import { ParticipantSearch } from '../Header/ParticipantList';
+import { useFilteredRoles } from '../../common/hooks';
 
 const ChatDotIcon = () => {
   return <Box css={{ size: '$6', bg: '$brandDefault', mx: '$2', r: '$round' }} />;

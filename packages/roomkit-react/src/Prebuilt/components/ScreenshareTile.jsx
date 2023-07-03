@@ -9,10 +9,10 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { StyledVideoTile, Video, VideoTileStats } from '../../';
 import { getVideoTileLabel } from './peerTileUtils';
 import TileMenu from './TileMenu';
-import { StyledVideoTile, Video, VideoTileStats } from '../../';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {

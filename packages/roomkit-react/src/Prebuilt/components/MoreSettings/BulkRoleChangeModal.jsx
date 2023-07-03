@@ -2,9 +2,9 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, ChangeRoleIcon, CheckIcon } from '@100mslive/react-icons';
 import { Button, Checkbox, Dialog, Dropdown, Flex, Loading, Text } from '../../';
-import { useFilteredRoles } from '../../common/hooks';
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
+import { useFilteredRoles } from '../../common/hooks';
 
 export const BulkRoleChangeModal = ({ onOpenChange }) => {
   const roles = useFilteredRoles();

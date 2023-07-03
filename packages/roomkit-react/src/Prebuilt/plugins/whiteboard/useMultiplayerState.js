@@ -80,7 +80,9 @@ export function useMultiplayerState(roomId) {
     state => {
       app === null || app === void 0
         ? void 0
-        : app.replacePageContent(
+        : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          app.replacePageContent(
             state.shapes,
             state.bindings,
             {}, // Object.fromEntries(lAssets.entries())
@@ -139,7 +141,7 @@ export function useMultiplayerState(roomId) {
 
   // Update the live shapes when the app's shapes change.
   const onChangePage = useCallback(
-    (_app, shapes, bindings, _assets) => {
+    (_app, shapes, bindings) => {
       updateLocalState({ shapes, bindings });
       room.broadcastEvent(Events.STATE_CHANGE, { shapes, bindings });
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import { ChatToggle } from './ChatToggle';
 import { Box, Flex, Footer as AppFooter } from '../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
@@ -9,6 +8,7 @@ import MetaActions from '../MetaActions';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
+import { ChatToggle } from './ChatToggle';
 
 export const StreamingFooter = () => {
   return (

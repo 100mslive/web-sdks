@@ -1,13 +1,13 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { selectLocalPeerID, useHMSStore, useVideoList } from '@100mslive/react-sdk';
-import { useAppConfig } from './AppData/useAppConfig';
-import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { StyledVideoList, useTheme } from '../../';
 import { Pagination } from './Pagination';
 import ScreenshareTile from './ScreenshareTile';
 import VideoTile from './VideoTile';
-import { StyledVideoList, useTheme } from '../../';
-import { UI_SETTINGS } from '../common/constants';
 import useSortedPeers from '../common/useSortedPeers';
+import { useAppConfig } from './AppData/useAppConfig';
+import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { UI_SETTINGS } from '../common/constants';
 
 const List = ({ maxTileCount, peers, maxColCount, maxRowCount, includeScreenShareForPeer }) => {
   const { aspectRatio } = useTheme();

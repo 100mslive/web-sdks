@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
-import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
-import { useSubscribedNotifications } from '../AppData/useUISettings';
 import { ToastBatcher } from '../Toast/ToastBatcher';
+import { useSubscribedNotifications } from '../AppData/useUISettings';
+import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,

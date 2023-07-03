@@ -9,12 +9,12 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
+import { Tooltip } from '../../';
+import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
-import { Tooltip } from '../../';
-import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
-import IconButton from '../../IconButton';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
 
 /**
  * shows a button which when clicked shows some videos in PIP, clicking

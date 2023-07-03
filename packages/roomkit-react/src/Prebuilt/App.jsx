@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { HMSRoomProvider, selectIsConnectedToRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { getRoutePrefix, shadeColor } from './common/utils';
 import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
@@ -14,13 +13,14 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { Box, HMSThemeProvider } from '../Theme';
+import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
+import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+import { getRoutePrefix, shadeColor } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
-import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
-import { Box, HMSThemeProvider } from '../Theme';
 
 const Conference = React.lazy(() => import('./components/conference'));
 

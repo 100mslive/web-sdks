@@ -9,11 +9,11 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
-import { getRandomVirtualBackground } from './vbutils';
 import { Loading, Tooltip } from '../../../';
-import { FEATURE_LIST } from '../../common/constants';
-import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
 import IconButton from '../../IconButton';
+import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
+import { getRandomVirtualBackground } from './vbutils';
+import { FEATURE_LIST } from '../../common/constants';
 
 export const VirtualBackground = () => {
   const pluginRef = useRef(null);

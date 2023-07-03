@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { logMessage } from 'zipyai';
 import { CopyIcon } from '@100mslive/react-icons';
-import { ErrorWithSupportLink } from './AuthToken';
 import { Box, Button, Flex, Text, ThemeContext, Tooltip } from '../../';
+import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {
   constructor(props) {

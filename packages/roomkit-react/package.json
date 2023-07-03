@@ -23,7 +23,7 @@
     "prestart": "rm -rf dist",
     "start": "rollup -c -w",
     "build": "rm -rf dist && NODE_ENV=production rollup -c",
-    "lint": "eslint -c .eslintrc src/** --no-error-on-unmatched-pattern",
+    "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext .jsx --ext .ts --ext .tsx",
     "lint:fix": "yarn lint --fix",
     "format": "prettier -w src/**",
     "storybook": "start-storybook -p 6006",

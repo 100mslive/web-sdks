@@ -1,12 +1,12 @@
 import React from 'react';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { PencilDrawIcon } from '@100mslive/react-icons';
-import { useWhiteboardMetadata } from './useWhiteboardMetadata';
 import { Tooltip } from '../../../';
-import { FEATURE_LIST } from '../../common/constants';
+import IconButton from '../../IconButton';
 import { useHLSViewerRole } from '../../components/AppData/useUISettings';
 import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
-import IconButton from '../../IconButton';
+import { useWhiteboardMetadata } from './useWhiteboardMetadata';
+import { FEATURE_LIST } from '../../common/constants';
 
 export const ToggleWhiteboard = () => {
   const {

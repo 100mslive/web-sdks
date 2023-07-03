@@ -7,11 +7,11 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Box, Dialog, Dropdown, Flex, HorizontalDivider, Label, Switch, Text } from '../../';
+import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
-import { Box, Dialog, Dropdown, Flex, HorizontalDivider, Label, Switch, Text } from '../../';
 import { UI_SETTINGS } from '../common/constants';
-import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 
 export const StatsForNerds = ({ onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();

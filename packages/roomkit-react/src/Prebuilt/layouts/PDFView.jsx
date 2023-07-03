@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { throwErrorHandler, useScreenShare } from '@100mslive/react-sdk';
-import { EmbebScreenShareView } from './EmbedView';
-import { APP_DATA, isChrome } from '../common/constants';
-import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { Box, ThemeTypes, useTheme } from '../';
+import { EmbebScreenShareView } from './EmbedView';
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
+import { APP_DATA, isChrome } from '../common/constants';
 
 export const PDFView = () => {
   return (
@@ -119,5 +119,3 @@ export const PDFEmbedComponent = () => {
     </Box>
   );
 };
-
-export default PDFView;

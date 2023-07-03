@@ -3,10 +3,10 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { Box, Flex, IconButton, Popover, styled } from '../../';
-import { useChatDraftMessage } from '../AppData/useChatState';
 import { ToastManager } from '../Toast/ToastManager';
+import { useChatDraftMessage } from '../AppData/useChatState';
+import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
 const TextArea = styled('textarea', {
   width: '100%',
