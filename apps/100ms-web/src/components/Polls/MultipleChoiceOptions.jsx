@@ -2,7 +2,6 @@
 import React, { useCallback } from "react";
 import { CheckIcon } from "@100mslive/react-icons";
 import { Checkbox, Flex, Input, Progress, Text } from "@100mslive/react-ui";
-// import { Votes } from "./OptionComponents/Votes";
 
 export const MultipleChoiceOptions = ({
   options,

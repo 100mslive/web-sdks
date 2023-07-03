@@ -19,12 +19,12 @@ export const Voting = ({ id }) => {
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
 
-  // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = poll?.duration && poll.duration > 0;
-
   if (!poll) {
     return null;
   }
+
+  // Sets view - linear or vertical, toggles timer indicator
+  const isTimed = poll?.duration && poll.duration > 0;
 
   return (
     <Container rounded>

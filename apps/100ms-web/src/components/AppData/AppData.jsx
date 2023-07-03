@@ -38,7 +38,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
   WIDGET_STATE,
-  WIDGET_VIEWS,
 } from "../../common/constants";
 
 export const getAppDetails = appDetails => {

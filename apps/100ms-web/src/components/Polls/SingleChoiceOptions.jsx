@@ -1,7 +1,6 @@
 // @ts-check
 import React, { useCallback } from "react";
 import { Flex, Input, Progress, RadioGroup, Text } from "@100mslive/react-ui";
-// import { Votes } from "./OptionComponents/Votes";
 
 export const SingleChoiceOptions = ({
   options,
