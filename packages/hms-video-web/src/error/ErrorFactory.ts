@@ -303,6 +303,16 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    StatsFailed(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.STATS_FAILED,
+        'StatsFailed',
+        action,
+        `Failed to WebRTC get stats - ${description}`,
+        description,
+      );
+    },
   },
 
   WebsocketMethodErrors: {
