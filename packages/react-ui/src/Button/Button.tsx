@@ -11,13 +11,20 @@ import { flexCenter } from '../utils/styles';
  * @returns CSS object based on the state
  */
 
-const getOutlinedVariants = (base: string, hover: string, active: string, disabled: string) => {
+const getOutlinedVariants = (
+  base: string,
+  hover: string,
+  active: string,
+  disabled: string,
+  text: string,
+  textDisabled: string,
+) => {
   return {
     bg: '$transparent',
     border: `solid $space$px ${base}`,
-    c: '$textHighEmp',
+    c: text,
     '&[disabled]': {
-      c: '$textAccentDisabled',
+      c: textDisabled,
       bg: '$transparent',
       border: `solid $space$px ${disabled}`,
       cursor: 'not-allowed',
@@ -36,13 +43,20 @@ const getOutlinedVariants = (base: string, hover: string, active: string, disabl
   };
 };
 
-const getButtonVariants = (base: string, hover: string, active: string, disabled: string) => {
+const getButtonVariants = (
+  base: string,
+  hover: string,
+  active: string,
+  disabled: string,
+  text: string,
+  textDisabled: string,
+) => {
   return {
     bg: base,
     border: `1px solid ${base}`,
-    c: '$textAccentHigh',
+    c: text,
     '&[disabled]': {
-      c: '$textAccentDisabled',
+      c: textDisabled,
       cursor: 'not-allowed',
       bg: disabled,
       border: `1px solid ${disabled}`,
@@ -70,7 +84,7 @@ const StyledButton = styled('button', {
   border: 'none',
   fs: '$md',
   r: '$1',
-  backgroundColor: '$primaryDefault',
+  backgroundColor: '$primary_default',
   fontWeight: '500',
   whiteSpace: 'nowrap',
   p: '$4 $8',
@@ -78,31 +92,73 @@ const StyledButton = styled('button', {
     outline: 'none',
   },
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$primaryDefault',
+    boxShadow: '0 0 0 3px $colors$primary_default',
   },
   transition: 'all 0.2s  ease',
   compoundVariants: [
     {
       variant: 'standard',
       outlined: true,
-      css: getOutlinedVariants('$secondaryDefault', '$secondaryLight', '$secondaryDark', '$secondaryDisabled'),
+      css: getOutlinedVariants(
+        '$secondary_default',
+        '$secondary_bright',
+        '$secondary_dim',
+        '$secondary_disabled',
+        'on_secondary_high',
+        'on_secondary_low',
+      ),
     },
     {
       variant: 'danger',
       outlined: true,
-      css: getOutlinedVariants('$errorDefault', '$errorLight', '$errorDark', '$errorDisabled'),
+      css: getOutlinedVariants(
+        '$alert_error_default',
+        '$alert_error_bright',
+        '$alert_error_dim',
+        '$alert_error_brighter',
+        '$on_surface_high',
+        '$on_surface_low',
+      ),
     },
     {
       variant: 'primary',
       outlined: true,
-      css: getOutlinedVariants('$primaryDefault', '$primaryLight', '$primaryDark', '$primaryDisabled'),
+      css: getOutlinedVariants(
+        '$primary_default',
+        '$primary_bright',
+        '$primary_dim',
+        '$primary_disabled',
+        '$on_primary_high',
+        '$on_primary_low',
+      ),
     },
   ],
   variants: {
     variant: {
-      standard: getButtonVariants('$secondaryDefault', '$secondaryLight', '$secondaryDark', '$secondaryDisabled'),
-      danger: getButtonVariants('$errorDefault', '$errorLight', '$errorDark', '$errorDisabled'),
-      primary: getButtonVariants('$primaryDefault', '$primaryLight', '$primaryDark', '$primaryDisabled'),
+      standard: getButtonVariants(
+        '$secondary_default',
+        '$secondary_bright',
+        '$secondary_dim',
+        '$secondary_disabled',
+        'on_secondary_high',
+        'on_secondary_low',
+      ),
+      danger: getButtonVariants(
+        '$alert_error_default',
+        '$alert_error_bright',
+        '$alert_error_dim',
+        '$alert_error_brighter',
+        '$on_surface_high',
+        '$on_surface_low',
+      ),
+      primary: getButtonVariants(
+        '$primary_default',
+        '$primary_bright',
+        '$primary_dim',
+        '$primary_disabled',
+        '$on_primary_high',
+        '$on_primary_low',
+      ),
     },
     outlined: {
       true: {},

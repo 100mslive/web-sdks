@@ -6,16 +6,16 @@ import { styled } from '../Theme';
 
 export const Input = styled('input', {
   fontFamily: '$sans',
-  backgroundColor: '$surfaceLight',
+  backgroundColor: '$surface_bright',
   borderRadius: '8px',
   outline: 'none',
-  border: '1px solid $borderLight',
+  border: '1px solid $border_brightt',
   padding: '0.5rem 0.75rem',
   minHeight: '30px',
   color: '$textPrimary',
   fontSize: '$md',
   '&:focus': {
-    boxShadow: '0 0 0 1px $colors$borderAccent',
+    boxShadow: '0 0 0 1px $colors$primary_default',
     border: '1px solid transparent',
   },
   '&::placeholder': {
@@ -25,7 +25,7 @@ export const Input = styled('input', {
     error: {
       true: {
         '&:focus': {
-          boxShadow: '0 0 0 3px $colors$error',
+          boxShadow: '0 0 0 3px $colors$alert_error_default',
         },
       },
     },
@@ -68,7 +68,7 @@ const PasswordIcons = React.forwardRef<HTMLDivElement, PropsWithChildren<Compone
           height: '100%',
           zIndex: 10,
           right: '$4',
-          bg: '$surfaceLight',
+          bg: '$surface_bright',
           alignItems: 'center',
           ...css,
         }}

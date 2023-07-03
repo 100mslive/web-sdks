@@ -27,9 +27,9 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
       <Dropdown.Trigger asChild>
         <Box
           css={{
-            color: '$textPrimary',
+            color: '$on_surface_high',
             borderRadius: '$1',
-            border: '1px solid $textDisabled',
+            border: '1px solid $border_default',
             padding: '$4 $4',
             width: '$80',
           }}
@@ -76,7 +76,7 @@ const Template: ComponentStory<typeof Dropdown.Content> = () => {
                     <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
                       {peer.name}
                     </Text>
-                    <Text variant="sub2" css={{ color: '$textMedEmp' }}>
+                    <Text variant="sub2" css={{ color: '$on_surface_medium' }}>
                       {peer.roleName}
                     </Text>
                   </Flex>

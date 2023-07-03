@@ -21,49 +21,49 @@ const DropdownTrigger = styled(Trigger, {
   cursor: 'pointer',
   appearance: 'none !important',
   '&[data-state="open"]': {
-    backgroundColor: '$surfaceLight',
+    backgroundColor: '$surface_bright',
   },
   '&:focus': {
     outline: 'none',
   },
   '&:focus-visible': {
-    boxShadow: '0 0 0 3px $colors$primaryDefault',
+    boxShadow: '0 0 0 3px $colors$primary_default',
   },
 });
 
 const DropdownTriggerItem = styled(SubTrigger, {
   w: '100%',
-  color: '$textPrimary',
+  color: '$on_surface_high',
   p: '$8',
   display: 'flex',
   alignItems: 'center',
   '&:hover': {
     cursor: 'pointer',
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
   '&:focus-visible': {
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
 });
 
 const DropdownItem = styled(Item, {
-  color: '$textPrimary',
+  color: '$on_surface_high',
   p: '$8',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
   '&:hover': {
     cursor: 'pointer',
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
   '&:focus-visible': {
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
 });
 
 const DropdownItemSeparator = styled(Separator, {
   h: 1,
-  backgroundColor: '$grayDefault',
+  backgroundColor: '$border_default',
   m: '$4 $8',
 });
 
@@ -72,7 +72,7 @@ const DropdownContent = styled(Content, {
   maxHeight: '$64',
   r: '$1',
   py: '$4',
-  backgroundColor: '$surfaceLight',
+  backgroundColor: '$surface_bright',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
@@ -95,24 +95,24 @@ const DropdownSubMenuContent = styled(SubContent, {
   maxHeight: '$64',
   r: '$1',
   py: '$4',
-  backgroundColor: '$surfaceLight',
+  backgroundColor: '$surface_bright',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
 });
 
 const DropdownCheckboxItem = styled(CheckboxItem, {
-  color: '$textPrimary',
+  color: '$on_surface_high',
   p: '$8',
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
   '&:hover': {
     cursor: 'pointer',
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
   '&:focus-visible': {
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
   },
   gap: '$2',
 });

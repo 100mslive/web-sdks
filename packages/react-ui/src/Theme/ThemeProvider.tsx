@@ -10,8 +10,7 @@ const defaultAspectRatio = {
 };
 
 export enum ThemeTypes {
-  light = 'light',
-  dark = 'dark',
+  default = 'default',
 }
 
 export type ThemeContextValue = {
@@ -34,7 +33,7 @@ export type ThemeProviderProps = {
 };
 
 const defaultContext = {
-  themeType: ThemeTypes.dark,
+  themeType: ThemeTypes.default,
   theme,
   aspectRatio: { width: 1, height: 1 },
   toggleTheme: (_themeToUpdateTo?: ThemeTypes) => {
@@ -56,7 +55,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
   aspectRatio = defaultAspectRatio,
   children,
 }) => {
-  const systemTheme = useMedia('prefers-color-scheme: dark') ? ThemeTypes.dark : ThemeTypes.light;
+  const systemTheme = ThemeTypes.default;
   const [currentTheme, setCurrentTheme] = useState(themeType || systemTheme);
   const previousClassName = useRef('');
   const { isBrowser } = useSSR();
@@ -79,7 +78,7 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
         setCurrentTheme(themeToUpdateTo);
         return;
       }
-      setCurrentTheme(currentTheme === ThemeTypes.dark ? ThemeTypes.light : ThemeTypes.dark);
+      setCurrentTheme(ThemeTypes.default);
     },
     [currentTheme],
   );

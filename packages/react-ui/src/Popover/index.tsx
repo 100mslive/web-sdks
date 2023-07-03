@@ -5,7 +5,7 @@ import { popoverAnimation } from '../utils/animations';
 const StyledContent = styled(Content, {
   padding: '$6',
   borderRadius: '$2',
-  backgroundColor: '$bgSecondary',
+  backgroundColor: '$background_default',
   boxShadow: '$sm',
   zIndex: 12,
   ...popoverAnimation,

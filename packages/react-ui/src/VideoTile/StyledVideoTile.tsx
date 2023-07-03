@@ -18,7 +18,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$tileBg',
+  background: '$surface_default',
   variants: {
     transparentBg: {
       true: {
@@ -40,7 +40,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -63,8 +63,8 @@ const AudioIndicator = styled('div', {
   position: 'absolute',
   top: '$2',
   right: '$2',
-  color: '$white',
-  bg: '$error',
+  color: '#FFFFFF',
+  bg: '$alert_error_default',
   borderRadius: '$round',
   width: '$13',
   height: '$13',
@@ -73,22 +73,22 @@ const AudioIndicator = styled('div', {
   variants: {
     size: {
       small: {
-        width: "$10",
-        height: "$10",
-         '& > svg': {
-           width: '$8',
-           height: '$8'
-         } 
+        width: '$10',
+        height: '$10',
+        '& > svg': {
+          width: '$8',
+          height: '$8',
+        },
       },
       medium: {
         width: '$13',
         height: '$13',
-      }
-    }
+      },
+    },
   },
   defaultVariants: {
-    size: 'medium'
-  }
+    size: 'medium',
+  },
 });
 
 const FullScreenButton = styled('button', {
@@ -96,7 +96,7 @@ const FullScreenButton = styled('button', {
   height: '2.25rem',
   color: '$textHighEmp',
   borderRadius: '$round',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_default',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -106,7 +106,7 @@ const FullScreenButton = styled('button', {
   zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandLight',
+    boxShadow: '0 0 0 3px $colors$primary_bright',
   },
 });
 
@@ -120,9 +120,9 @@ const AvatarContainer = styled(Box, {
   width: '40%',
   height: '40%',
   '& > div': {
-    maxHeight: "$20",
-    height: "100%"
-  }
+    maxHeight: '$20',
+    height: '100%',
+  },
 });
 
 interface VideoTileType {

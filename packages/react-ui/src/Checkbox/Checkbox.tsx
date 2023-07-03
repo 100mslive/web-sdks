@@ -3,8 +3,8 @@ import { styled } from '../Theme';
 
 const CheckboxRoot = styled(CheckboxPrimitive.Root, {
   all: 'unset',
-  border: '1px solid $brandDefault',
-  backgroundColor: '$white',
+  border: '1px solid $primary_default',
+  backgroundColor: '#FFFFFF',
   width: '$8',
   height: '$8',
   borderRadius: '$0',
@@ -19,12 +19,12 @@ const CheckboxRoot = styled(CheckboxPrimitive.Root, {
     outline: 'none',
   },
   '&[data-state="checked"]': {
-    backgroundColor: '$brandDefault',
+    backgroundColor: '$primary_default',
   },
 });
 
 const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
-  color: '$white',
+  color: '#FFFFFF',
 });
 
 export const Checkbox = {

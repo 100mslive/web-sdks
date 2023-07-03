@@ -49,7 +49,7 @@ const Template: ComponentStory<typeof Tabs.Root> = ({
     >
       <Tabs.List
         aria-label="tabs example"
-        css={{ bg: '$bgSecondary', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
+        css={{ bg: '$background_dim', r: '$1', '&[data-orientation="vertical"]': { flexDirection: 'column' } }}
       >
         <Tabs.Trigger value="tab1">One</Tabs.Trigger>
         <Tabs.Trigger value="tab2">Two</Tabs.Trigger>

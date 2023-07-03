@@ -10,7 +10,7 @@ const TooltipBox = styled(BaseTooltip.Content, {
   fontSize: '$xs',
 
   color: '$textHighEmp',
-  backgroundColor: '$surfaceLight',
+  backgroundColor: '$surface_bright',
   '@media (prefers-reduced-motion: no-preference)': {
     animationDuration: '400ms',
     animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
@@ -25,8 +25,8 @@ const TooltipBox = styled(BaseTooltip.Content, {
   variants: {
     outlined: {
       true: {
-        backgroundColor: '$backgroundDark',
-        border: 'solid $space$px $borderLight',
+        backgroundColor: '$background_dim',
+        border: 'solid $space$px $border_light',
       },
     },
   },

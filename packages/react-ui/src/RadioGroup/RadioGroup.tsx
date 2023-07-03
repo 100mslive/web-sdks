@@ -7,10 +7,10 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root, {
 });
 
 const RadioGroupItem = styled(RadioGroupPrimitive.Item, {
-  bg: '$white',
+  bg: '#FFFFFF',
   width: '$8',
   height: '$8',
-  border: '1px solid $brandDefault',
+  border: '1px solid $primary_default',
   cursor: 'pointer',
   borderRadius: '$round',
   '&:focus': {
@@ -23,7 +23,7 @@ const RadioGroupItem = styled(RadioGroupPrimitive.Item, {
   },
 });
 const RadioGroupIndicator = styled(RadioGroupPrimitive.Indicator, {
-  bg: '$brandDefault',
+  bg: '$primary_default',
 });
 
 export const RadioGroup = {

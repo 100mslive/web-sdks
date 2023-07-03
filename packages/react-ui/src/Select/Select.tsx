@@ -19,15 +19,15 @@ const SelectRoot = styled('select', {
   fontSize: '$md',
   fontWeight: '500',
   appearance: 'none',
-  color: '$textAccentHigh',
+  color: '$on_secondary_high',
   padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: '$secondaryDefault',
+  backgroundColor: '$secondary_default',
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandDefault',
+    boxShadow: '0 0 0 3px $colors$primary_default',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -36,7 +36,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$textAccentMedium',
+  color: '$on_secondary_high',
   width: '30px',
   height: '100%',
   position: 'absolute',

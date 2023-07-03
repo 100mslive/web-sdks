@@ -32,7 +32,7 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
               setShowPassword(!showPassword);
             }}
             css={{
-              color: '$textPrimary',
+              color: '$on_primary_high',
             }}
           />
           <PasswordInput.CopyIcon
@@ -40,7 +40,7 @@ const Template: ComponentStory<typeof PasswordInput.Root> = args => {
               navigator.clipboard.writeText(text);
             }}
             css={{
-              color: '$textPrimary',
+              color: '$on_primary_high',
             }}
           />
         </PasswordInput.Icons>

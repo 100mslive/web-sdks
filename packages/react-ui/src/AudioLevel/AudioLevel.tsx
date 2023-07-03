@@ -9,15 +9,13 @@ import { useTheme } from '../Theme';
  */
 export function useBorderAudioLevel(audioTrackId?: HMSTrackID) {
   const { theme } = useTheme();
-  const color = theme.colors.brandDefault.value;
+  const color = theme.colors.primary_default.value;
   const getStyle = useCallback(
     (level: number) => {
       const style: Record<string, string> = {
         transition: 'outline 0.4s ease-in-out',
       };
-      style['outline'] = level
-        ? `${sigmoid(level) * 4}px solid ${color}`
-        : '0px solid transparent';
+      style['outline'] = level ? `${sigmoid(level) * 4}px solid ${color}` : '0px solid transparent';
       return style;
     },
     [color],

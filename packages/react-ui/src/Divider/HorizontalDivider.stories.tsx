@@ -17,7 +17,7 @@ export default {
 
 const HorizontalDividerComponent: ComponentStory<typeof HorizontalDivider> = ({ space, css }) => {
   return (
-    <Flex align="center" direction="column" css={{ width: 'max-content', bg: '$bgTertiary', p: '$8', r: '$4' }}>
+    <Flex align="center" direction="column" css={{ width: 'max-content', bg: '$surface_bright', p: '$8', r: '$4' }}>
       <ul style={{ listStyle: 'none', padding: '0px', margin: '0px', textAlign: 'center' }}>
         <Text as="li">Item 1</Text>
         <Text as="li">Item 2</Text>
