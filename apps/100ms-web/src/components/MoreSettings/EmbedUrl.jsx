@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ViewIcon } from "@100mslive/react-icons";
-import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
+import { Button, Dialog, Dropdown, Text } from "@100mslive/roomkit-react";
 import {
   DialogContent,
   DialogInput,

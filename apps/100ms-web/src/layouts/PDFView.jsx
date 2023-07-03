@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { throwErrorHandler, useScreenShare } from "@100mslive/react-sdk";
-import { Box, ThemeTypes, useTheme } from "@100mslive/react-ui";
+import { Box, ThemeTypes, useTheme } from "@100mslive/roomkit-react";
 import { EmbedScreenShareView } from "./EmbedView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA, isChrome } from "../common/constants";
