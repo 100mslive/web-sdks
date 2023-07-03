@@ -24,6 +24,9 @@ export interface BaseSample {
   avg_available_outgoing_bitrate_bps?: number;
   total_packets_sent?: number;
   total_packet_sent_delay_sec?: number;
+  total_nack_count?: number;
+  total_fir_count?: number;
+  total_pli_count?: number;
 }
 
 export interface VideoSample extends BaseSample {
