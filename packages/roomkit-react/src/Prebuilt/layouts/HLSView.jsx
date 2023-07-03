@@ -10,7 +10,7 @@ import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
-import { Box, Flex, IconButton, Loading, Text, Tooltip, useTheme } from '../';
+import { Box, Flex, IconButton, Loading, Text, Tooltip, useTheme } from '../../';
 import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;

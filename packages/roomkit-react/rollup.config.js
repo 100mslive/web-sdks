@@ -17,7 +17,7 @@ const config = {
   input: 'src/index.ts',
   external: [...deps, ...peerDeps],
   output: [
-    { file: pkg.main, format: 'cjs', sourcemap: true },
+    { dir: 'dist/cjs', format: 'cjs', sourcemap: true },
     { dir: 'dist', format: 'esm', preserveModules: true, preserveModulesRoot: 'src', sourcemap: true },
   ],
   plugins: [

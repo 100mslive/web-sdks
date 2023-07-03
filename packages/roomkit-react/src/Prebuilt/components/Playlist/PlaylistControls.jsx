@@ -10,7 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { NextIcon, PauseIcon, PlayIcon, PlaylistIcon, PrevIcon, SpeakerIcon } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Slider, Text } from '../../';
+import { Box, Flex, IconButton, Slider, Text } from '../../../';
 import { usePlaylist } from '../hooks/usePlaylist';
 
 const Progress = ({ type, duration }) => {

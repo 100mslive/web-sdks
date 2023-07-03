@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, Flex, Text } from '../../';
+import { Dropdown, Flex, Text } from '../../../';
 
 function formatDuration(duration) {
   if (!duration) {

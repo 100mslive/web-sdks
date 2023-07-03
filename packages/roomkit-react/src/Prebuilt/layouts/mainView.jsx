@@ -10,7 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
-import { Flex } from '../';
+import { Flex } from '../../';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';

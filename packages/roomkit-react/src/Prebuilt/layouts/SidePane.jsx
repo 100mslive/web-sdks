@@ -3,7 +3,7 @@ import { selectAppData, useHMSStore } from '@100mslive/react-sdk';
 import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Header/ParticipantList';
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
-import { Box } from '../';
+import { Box } from '../../';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({ css = {} }) => {

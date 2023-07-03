@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dialog, Flex, HorizontalDivider, Input, Text } from '../../';
+import { Dialog, Flex, HorizontalDivider, Input, Text } from '../../../';
 import { DialogInputFile, DialogRow } from '../../primitives/DialogContent';
 import { PdfErrorView } from './pdfErrorView';
 import { PDFHeader } from './pdfHeader';

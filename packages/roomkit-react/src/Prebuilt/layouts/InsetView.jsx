@@ -4,7 +4,7 @@ import { useMedia } from 'react-use';
 import { selectAppData, selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
 import VideoTile from '../components/VideoTile';
-import { Box, config as cssConfig, Flex } from '../';
+import { Box, config as cssConfig, Flex } from '../../';
 import { useRolePreference } from '../components/hooks/useFeatures';
 import { APP_DATA } from '../common/constants';
 

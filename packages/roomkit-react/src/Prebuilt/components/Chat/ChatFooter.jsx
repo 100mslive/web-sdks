@@ -3,7 +3,7 @@ import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Popover, styled } from '../../';
+import { Box, Flex, IconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';

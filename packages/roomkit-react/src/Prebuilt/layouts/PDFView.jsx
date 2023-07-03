@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { throwErrorHandler, useScreenShare } from '@100mslive/react-sdk';
-import { Box, ThemeTypes, useTheme } from '../';
+import { Box, ThemeTypes, useTheme } from '../../';
 import { EmbebScreenShareView } from './EmbedView';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA, isChrome } from '../common/constants';

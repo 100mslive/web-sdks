@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, IconButton, styled, Text, Tooltip } from '../../';
+import { Box, Dropdown, Flex, IconButton, styled, Text, Tooltip } from '../../../';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { TrashIcon } from '@100mslive/react-icons';
-import { Dialog, Flex, Text } from '../../';
+import { Dialog, Flex, Text } from '../../../';
 import { DialogRow } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';

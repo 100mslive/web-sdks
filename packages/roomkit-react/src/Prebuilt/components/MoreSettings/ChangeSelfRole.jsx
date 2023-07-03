@@ -8,7 +8,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ArrowRightIcon, CheckIcon, PersonIcon } from '@100mslive/react-icons';
-import { config, Dropdown, Text } from '../../';
+import { config, Dropdown, Text } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
 import { useAppLayout } from '../AppData/useAppLayout';
 import { useFilteredRoles } from '../../common/hooks';

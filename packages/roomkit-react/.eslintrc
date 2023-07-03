@@ -37,6 +37,7 @@
       }
     ],
     "import/first": "error",
+    "import/namespace": [2, { "allowComputed": true}],
     "import/no-duplicates": "error",
     "simple-import-sort/imports": [
       "error",

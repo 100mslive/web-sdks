@@ -1,7 +1,7 @@
 import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../';
+import { Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';

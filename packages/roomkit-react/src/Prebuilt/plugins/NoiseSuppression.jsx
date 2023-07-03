@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { selectIsLocalAudioPluginPresent, useDevices, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AudioLevelIcon } from '@100mslive/react-icons';
 import { ToastManager } from '../components/Toast/ToastManager';
-import { Tooltip } from '..';
+import { Tooltip } from '../../';
 import IconButton from '../IconButton';
 import { useIsFeatureEnabled } from '../components/hooks/useFeatures';
 import { FeatureFlags } from '../services/FeatureFlags';

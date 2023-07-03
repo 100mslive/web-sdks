@@ -13,7 +13,7 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { Box, HMSThemeProvider } from '../Theme';
+import { Box, HMSThemeProvider } from '../';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';

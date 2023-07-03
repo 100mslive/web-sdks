@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import { HMSPlaylistType, selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { MusicIcon } from '@100mslive/react-icons';
 import { Playlist } from '../../components/Playlist/Playlist';
-import { config as cssConfig, Flex, Footer as AppFooter, Tooltip } from '../../';
+import { config as cssConfig, Flex, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';

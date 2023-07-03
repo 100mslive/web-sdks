@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
-import { Button, Dialog, Flex, Label, RadioGroup, Text } from '../../';
+import { Button, Dialog, Flex, Label, RadioGroup, Text } from '../../../';
 import { DialogContent, DialogRow, DialogSelect } from '../../primitives/DialogContent';
 import { useFilteredRoles } from '../../common/hooks';
 

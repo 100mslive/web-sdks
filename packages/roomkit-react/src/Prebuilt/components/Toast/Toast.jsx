@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toast as ToastPrimitive } from '../../';
+import { Toast as ToastPrimitive } from '../../../';
 
 export const Toast = ({ title, description, close = true, open, duration, onOpenChange, icon, ...props }) => {
   return (

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Button, Flex } from '../../';
+import { Button, Flex } from '../../../';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 

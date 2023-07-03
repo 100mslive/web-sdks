@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { Box, Button, Dialog, Flex, Input, Text } from '../../';
+import { Box, Button, Dialog, Flex, Input, Text } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 

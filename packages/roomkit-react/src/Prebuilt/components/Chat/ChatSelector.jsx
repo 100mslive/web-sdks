@@ -9,7 +9,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../';
+import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../../';
 import { ParticipantSearch } from '../Header/ParticipantList';
 import { useFilteredRoles } from '../../common/hooks';
 

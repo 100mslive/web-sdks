@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { selectDominantSpeaker, selectPeers, useHMSStore } from '@100mslive/react-sdk';
 import { GridSidePaneView } from '../components/gridView';
 import VideoTile from '../components/VideoTile';
-import { Box, Flex } from '../';
+import { Box, Flex } from '../../';
 
 const ActiveSpeakerView = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);

@@ -9,7 +9,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CrossIcon, ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Text, Video, VideoTileStats } from '../../';
+import { Box, Flex, IconButton, Text, Video, VideoTileStats } from '../../../';
 import { VideoPlaylistControls } from './PlaylistControls';
 import { useUISettings } from '../AppData/useUISettings';
 import { UI_SETTINGS } from '../../common/constants';
