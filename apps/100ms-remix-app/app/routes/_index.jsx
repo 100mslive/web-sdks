@@ -1,5 +1,8 @@
+// import { HMSPrebuilt } from 'ssss-roomkit-react';
+// "ssss-roomkit-react": "^0.0.5",
+
 export const meta = () => {
-  return [{ title: 'New Remix App' }, { name: 'description', content: 'Welcome to Remix!' }];
+  return [{ title: 'Prebuilt Remix' }, { name: 'description', content: 'Welcome to Remix!' }];
 };
 
 export default function Index() {
@@ -10,14 +13,13 @@ export default function Index() {
           aspectRatio: '4-3',
           theme: 'dark',
           color: 'red',
-          logo: logo,
-          font: font,
+          logo: '',
+          font: '',
         }}
         roomCode="tjq-olkm-aih"
         endPoints={{
           token: 'https://auth-nonprod.100ms.live/v2/token',
-
-          init: `https://qa-init.100ms.live/init`,
+          init: `https://dev-init.100ms.live/init`,
         }}
       /> */}
     </div>
