@@ -22,11 +22,6 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   // This is to handle audio playing when seekTo is called when audio is paused
   private seeked = false;
 
-  constructor() {
-    super();
-    this.audioElement = this.getAudioElement();
-  }
-
   async play(url: string) {
     this.audioElement = this.getAudioElement();
     return new Promise<MediaStreamTrack[]>((resolve, reject) => {
@@ -80,6 +75,9 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   getElement() {
+    if (!this.audioElement) {
+      this.audioElement = this.getAudioElement();
+    }
     return this.audioElement;
   }
 

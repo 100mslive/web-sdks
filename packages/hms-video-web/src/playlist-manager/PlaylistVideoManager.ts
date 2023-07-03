@@ -30,10 +30,6 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   // This is to handle video playing when seekTo is called when video is paused
   private seeked = false;
 
-  constructor() {
-    super();
-    this.videoElement = this.getVideoElement();
-  }
   play(url: string) {
     this.videoElement = this.getVideoElement();
     this.createCanvas();
@@ -104,6 +100,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   getElement() {
+    if (!this.videoElement) {
+      this.videoElement = this.getVideoElement();
+    }
     return this.videoElement;
   }
 
