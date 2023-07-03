@@ -20,11 +20,21 @@ const TabButton = styled('button', {
   },
 });
 
-export default function RoomSettings({ onClose, settings, change, handleLogoChange, onSave, onCancel }) {
+export default function RoomSettings({
+  onClose,
+  settings,
+  change,
+  handleLogoChange,
+  onSave,
+  onCancel,
+}) {
   const [tab, setTab] = useState(0);
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
-      <DialogContent title="Customise your app" css={{ width: 'min(700px, 100%)', height: 'min(700px, 90%)' }}>
+      <DialogContent
+        title="Customise your app"
+        css={{ width: 'min(700px, 100%)', height: 'min(700px, 90%)' }}
+      >
         <Flex css={{ size: '100%', overflow: 'hidden' }}>
           <Box css={{ flex: '1 1 0', pt: '$6' }}>
             <Flex direction="column">
@@ -37,8 +47,16 @@ export default function RoomSettings({ onClose, settings, change, handleLogoChan
             </Flex>
           </Box>
           <Box css={{ flex: '3 1 0', ml: '$8', overflowY: 'auto' }}>
-            {tab === 0 && <ThemeSettings change={change} settings={settings} handleLogoChange={handleLogoChange} />}
-            {tab === 1 && <StreamingRecordingSettings change={change} settings={settings} />}
+            {tab === 0 && (
+              <ThemeSettings
+                change={change}
+                settings={settings}
+                handleLogoChange={handleLogoChange}
+              />
+            )}
+            {tab === 1 && (
+              <StreamingRecordingSettings change={change} settings={settings} />
+            )}
           </Box>
         </Flex>
         <Flex justify="end" align="center" css={{ mt: '$8' }}>

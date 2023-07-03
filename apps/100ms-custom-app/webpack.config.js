@@ -21,7 +21,9 @@ module.exports = {
     publicPath: '/',
     clean: true,
     devtoolModuleFilenameTemplate: info => {
-      return path.relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath).replace(/\\/g, '/');
+      return path
+        .relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath)
+        .replace(/\\/g, '/');
     },
   },
   devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
@@ -115,7 +117,9 @@ module.exports = {
           manifest[file.name] = file.path;
           return manifest;
         }, seed);
-        const entrypointFiles = entrypoints.main.filter(fileName => !fileName.endsWith('.map'));
+        const entrypointFiles = entrypoints.main.filter(
+          fileName => !fileName.endsWith('.map')
+        );
 
         return {
           files: manifestFiles,
@@ -144,9 +148,6 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, './public/index.html'),
       base: '/',
-    }),
-    new webpack.ProvidePlugin({
-      React: 'react',
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),

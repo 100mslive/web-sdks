@@ -5,7 +5,13 @@ import { IconButton } from '../IconButton';
 import { styled } from '../Theme';
 import { dialogClose, dialogOpen } from '../utils/animations';
 
-export const DialogClose = styled(DialogPrimitive.Close, {});
+export const DialogClose = styled(DialogPrimitive.Close, {
+  backgroundColor: 'transparent',
+  padding: '0',
+  margin: '0',
+  border: 'none',
+  backgroundImage: 'none'
+});
 
 export const StyledDialogTrigger = styled(DialogPrimitive.Trigger, {
   appearance: 'none !important', // Needed for safari it shows white overlay

@@ -1,10 +1,14 @@
-import React, { useState, Suspense, useCallback } from 'react';
-import { InviteIcon, CodeIcon, EditIcon } from '@100mslive/react-icons';
+import React, { Suspense, useCallback, useState } from 'react';
+import { CodeIcon, EditIcon, InviteIcon } from '@100mslive/react-icons';
 import { Button, Flex, styled, Text } from '@100mslive/react-ui';
 import { AppAnalytics } from '../utils/analytics';
-import { apiBasePath, getInitialsFromEmail, getRandomColor } from '../utils/utils';
-import logo from '../assets/images/100ms_logo.svg';
+import {
+  apiBasePath,
+  getInitialsFromEmail,
+  getRandomColor,
+} from '../utils/utils';
 import darkLogo from '../assets/images/100ms_dark.svg';
+import logo from '../assets/images/100ms_logo.svg';
 
 const DownloadCodeModal = React.lazy(() => import('./DownloadCodeModal'));
 const InviteLinksModal = React.lazy(() => import('./InviteLinksModal'));
@@ -18,26 +22,40 @@ const LogoImg = styled('img', {
 });
 const randomColor = getRandomColor();
 
-export default function Header({ savingData, refreshData, settings, roomLinks, onlyEmail, toggleModal }) {
+export default function Header({
+  savingData,
+  refreshData,
+  settings,
+  roomLinks,
+  onlyEmail,
+  toggleModal,
+}) {
   const [modal, togModal] = useState(false);
   const [codeModal, setCodeModal] = useState(false);
 
   const generateEnvData = useCallback(
     logo => {
-      return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${settings.theme}\nREACT_APP_COLOR=${
-        settings.brand_color
-      }\nREACT_APP_LOGO=${logo || ''}\nREACT_APP_FONT=${settings.font}\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
+      return `REACT_APP_TILE_SHAPE=${settings.tile_shape}\nREACT_APP_THEME=${
+        settings.theme
+      }\nREACT_APP_COLOR=${settings.brand_color}\nREACT_APP_LOGO=${
+        logo || ''
+      }\nREACT_APP_FONT=${
+        settings.font
+      }\nREACT_APP_TOKEN_GENERATION_ENDPOINT=${`${
         apiBasePath + window.location.hostname
       }/`}\nREACT_APP_ENV=${process.env.REACT_APP_ENV}\n`;
     },
-    [settings.tile_shape, settings.brand_color, settings.theme, settings.font],
+    [settings.tile_shape, settings.brand_color, settings.theme, settings.font]
   );
 
   const downloadCode = async () => {
     await refreshData().then(logo => {
       var envFile = document.createElement('a');
       const data = generateEnvData(logo);
-      envFile.setAttribute('href', `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`);
+      envFile.setAttribute(
+        'href',
+        `data:text/plain;charset=utf-8,${encodeURIComponent(data)}`
+      );
       envFile.download = 'example.env';
       envFile.style.display = 'none';
       document.body.appendChild(envFile);
@@ -51,7 +69,11 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
       <Flex
         align="center"
         justify="between"
-        css={{ p: '$6 $4', bg: '$mainBg', borderBottom: '1px solid $borderLight' }}
+        css={{
+          p: '$6 $4',
+          bg: '$mainBg',
+          borderBottom: '1px solid $borderLight',
+        }}
       >
         <LogoImg
           onClick={() => {
@@ -98,24 +120,38 @@ export default function Header({ savingData, refreshData, settings, roomLinks, o
               >
                 <CodeIcon />
               </Button>
-              <Button variant="standard" css={{ mr: '$4', px: '$6' }} onClick={toggleModal}>
+              <Button
+                variant="standard"
+                css={{ mr: '$4', px: '$6' }}
+                onClick={toggleModal}
+              >
                 <EditIcon />
               </Button>
             </>
           )}
-          <Flex align="center" justify="center" css={{ bg: randomColor, w: '$14', h: '$14', r: '$round' }}>
+          <Flex
+            align="center"
+            justify="center"
+            css={{ bg: randomColor, w: '$14', h: '$14', r: '$round' }}
+          >
             <Text css={{ color: '$white' }}>{getInitialsFromEmail()}</Text>
           </Flex>
         </Flex>
       </Flex>
       {codeModal && (
         <Suspense fallback={null}>
-          <DownloadCodeModal downloadEnv={downloadCode} onClose={() => setCodeModal(false)} />
+          <DownloadCodeModal
+            downloadEnv={downloadCode}
+            onClose={() => setCodeModal(false)}
+          />
         </Suspense>
       )}
       {modal && (
         <Suspense fallback={null}>
-          <InviteLinksModal onClose={() => togModal(false)} roomLinks={roomLinks} />
+          <InviteLinksModal
+            onClose={() => togModal(false)}
+            roomLinks={roomLinks}
+          />
         </Suspense>
       )}
     </>

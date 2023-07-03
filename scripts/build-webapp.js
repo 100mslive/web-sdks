@@ -13,8 +13,8 @@ async function main() {
   }
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const source = './src/App.js';
-  const external = Object.keys(pkg.dependencies || {});
+  const source = './src/index.js';
+  const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
@@ -52,8 +52,7 @@ async function main() {
         ...commonOptions,
       })
       .then(() => {
-        fs.renameSync('./dist/App.js', './dist/index.js');
-        fs.renameSync('./dist/App.css', './dist/index.css');
+        fs.copyFileSync('./src/index.d.ts', './dist/index.d.ts');
       });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
