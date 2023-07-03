@@ -7,24 +7,17 @@ import IconButton from "../IconButton";
 import { useWidgetToggle } from "./AppData/useSidepane";
 import { useWidgetState } from "./AppData/useUISettings";
 
-const GetWidgetsButton = () => {
-  const toggleWidgets = useWidgetToggle();
+const ToggleWidgets = () => {
+  const toggle = useWidgetToggle();
   const { widgetView } = useWidgetState();
 
   return (
     <Tooltip title="Toggle Widget Menu">
-      <IconButton
-        data-testid="get_widgets"
-        onClick={() => {
-          toggleWidgets();
-          window.sessionStorage.setItem("userOpenedWidgetsMenu", "true");
-        }}
-        icon
-      >
+      <IconButton data-testid="get_widgets" onClick={toggle} icon>
         {widgetView ? <InteractionOpenIcon /> : <InteractionClosedIcon />}
       </IconButton>
     </Tooltip>
   );
 };
 
-export default GetWidgetsButton;
+export default ToggleWidgets;

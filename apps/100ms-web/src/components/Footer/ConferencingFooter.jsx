@@ -17,13 +17,13 @@ import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import { EmojiReaction } from "../EmojiReaction";
-import GetWidgetsButton from "../GetWidgetsButton";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
 import { PIP } from "../PIP";
 import { ScreenshareToggle } from "../ScreenShare";
 import { ScreenShareHintModal } from "../ScreenshareHintModal";
+import ToggleWidgets from "../ToggleWidgets";
 import { ChatToggle } from "./ChatToggle";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
@@ -89,7 +89,7 @@ export const ConferencingFooter = () => {
   return (
     <AppFooter.Root>
       <AppFooter.Left>
-        <GetWidgetsButton />
+        <ToggleWidgets />
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
