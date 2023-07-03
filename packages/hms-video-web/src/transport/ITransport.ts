@@ -10,6 +10,8 @@ import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
   MultiTrackUpdateRequestParams,
+  SetSessionMetadataParams,
+  SetSessionMetadataResponse,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
 
@@ -55,9 +57,11 @@ export default interface ITransport {
 
   changeMetadata(metadata: string): Promise<void>;
 
-  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+  getSessionMetadata(key?: string): Promise<GetSessionMetadataResponse>;
 
-  setSessionMetadata(metadata: any): Promise<void>;
+  setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
+
+  listenMetadataChange(keys: string[]): Promise<void>;
 
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 

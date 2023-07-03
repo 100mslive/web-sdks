@@ -1,4 +1,5 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
+import { VideoElementManager } from './VideoElementManager';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import {
   HMSPreferredSimulcastLayer,
@@ -7,7 +8,8 @@ import {
 } from '../../interfaces/simulcast-layers';
 import { MAINTAIN_TRACK_HISTORY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { isEmptyTrack } from '../../utils/track';
+import { HMSRemoteStream } from '../streams';
 
 export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _degraded = false;
@@ -15,6 +17,20 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private history = new TrackHistory();
   private preferredLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
+  private bizTrackId!: string;
+
+  constructor(stream: HMSRemoteStream, track: MediaStreamTrack, source?: string) {
+    super(stream, track, source);
+    this.setVideoHandler(new VideoElementManager(this));
+  }
+
+  setTrackId(trackId: string) {
+    this.bizTrackId = trackId;
+  }
+
+  get trackId(): string {
+    return this.bizTrackId || super.trackId;
+  }
 
   public get degraded() {
     return this._degraded;
@@ -29,7 +45,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
       return;
     }
 
-    await super.setEnabled(value);
+    super.setEnabled(value);
+    this.videoHandler.updateSinks(true);
   }
 
   async setPreferredLayer(layer: HMSPreferredSimulcastLayer) {
@@ -44,8 +61,11 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     }
     if (!this.hasSinks()) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Track does not have any sink, saving ${layer}, source=${this.source}`,
+        `[Remote Track] ${this.logIdentifier}
+        streamId=${this.stream.id} 
+        trackId=${this.trackId}
+        saving ${layer}, source=${this.source}
+        Track does not have any sink`,
       );
       return;
     }
@@ -69,15 +89,32 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this.preferredLayer;
   }
 
-  async addSink(videoElement: HTMLVideoElement) {
-    super.addSink(videoElement);
-    await this.updateLayer('addSink');
+  replaceTrack(track: HMSRemoteVideoTrack) {
+    this.nativeTrack = track.nativeTrack;
+    if (track.transceiver) {
+      this.transceiver = track.transceiver;
+    }
+    this.videoHandler.updateSinks();
+  }
+
+  async addSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
+    // if the native track is empty track, just request the preferred layer else attach it
+    if (isEmptyTrack(this.nativeTrack)) {
+      await this.requestLayer(this.preferredLayer, 'addSink');
+    } else {
+      super.addSink(videoElement);
+      if (shouldSendVideoLayer) {
+        await this.updateLayer('addSink');
+      }
+    }
     this.pushInHistory(`uiSetLayer-high`);
   }
 
-  async removeSink(videoElement: HTMLVideoElement) {
+  async removeSink(videoElement: HTMLVideoElement, shouldSendVideoLayer = true) {
     super.removeSink(videoElement);
-    await this.updateLayer('removeSink');
+    if (shouldSendVideoLayer) {
+      await this.updateLayer('removeSink');
+    }
     this._degraded = false;
     this.pushInHistory('uiSetLayer-none');
   }
@@ -104,16 +141,21 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
    * */
   setLayerFromServer(layerUpdate: VideoTrackLayerUpdate) {
     this._degraded =
+      this.enabled &&
       (layerUpdate.publisher_degraded || layerUpdate.subscriber_degraded) &&
       layerUpdate.current_layer === HMSSimulcastLayer.NONE;
     this._degradedAt = this._degraded ? new Date() : this._degradedAt;
     const currentLayer = layerUpdate.current_layer;
     HMSLogger.d(
-      `[Remote Track] ${this.logIdentifier} ${this.stream.id} - layer update from sfu`,
-      `currLayer=${layerUpdate.current_layer}, preferredLayer=${layerUpdate.expected_layer}`,
-      `sub_degraded=${layerUpdate.subscriber_degraded}`,
-      `pub_degraded=${layerUpdate.publisher_degraded}`,
-      `isDegraded=${this._degraded}`,
+      `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id} 
+      trackId=${this.trackId}
+      layer update from sfu
+      currLayer=${layerUpdate.current_layer}
+      preferredLayer=${layerUpdate.expected_layer}
+      sub_degraded=${layerUpdate.subscriber_degraded}
+      pub_degraded=${layerUpdate.publisher_degraded}
+      isDegraded=${this._degraded}`,
     );
     // No need to send preferLayer update, as server has done it already
     (this.stream as HMSRemoteStream).setVideoLayerLocally(currentLayer, this.logIdentifier, 'setLayerFromServer');
@@ -121,20 +163,8 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     return this._degraded;
   }
 
-  /**
-   * @internal
-   * If degradation is being managed by sdk, sdk will let the track know of status
-   * post which it'll set it as well and send prefer layer message to SFU.
-   * */
-  setDegradedFromSdk(value: boolean) {
-    this._degraded = value;
-    this._degradedAt = value ? new Date() : this._degradedAt;
-    this.updateLayer('sdkDegradation');
-    this.pushInHistory(value ? 'sdkDegraded-none' : 'sdkRecovered-high');
-  }
-
   private async updateLayer(source: string) {
-    const newLayer = this.degraded || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
+    const newLayer = this.degraded || !this.enabled || !this.hasSinks() ? HMSSimulcastLayer.NONE : this.preferredLayer;
     if (!this.shouldSendVideoLayer(newLayer, source)) {
       return;
     }
@@ -155,12 +185,20 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
         this.logIdentifier,
         source,
       );
-      HMSLogger.d(`[Remote Track] ${this.logIdentifier}`, `Requested layer ${layer}, source=${this.source}`);
+      HMSLogger.d(
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Requested layer ${layer}, source=${source}`,
+      );
       return response;
     } catch (error) {
       HMSLogger.d(
-        `[Remote Track] ${this.logIdentifier}`,
-        `Failed to set layer ${layer}, source=${this.source}, ${(error as Error).message}`,
+        `[Remote Track] ${this.logIdentifier} 
+      streamId=${this.stream.id}
+      trackId=${this.trackId}
+      Failed to set layer ${layer}, source=${source}
+      error=${(error as Error).message}`,
       );
       throw error;
     }

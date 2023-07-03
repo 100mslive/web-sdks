@@ -18,7 +18,7 @@ export interface SimulcastResolution {
 }
 
 export interface SimulcastLayers {
-  layers: SimulcastLayer[];
+  layers?: SimulcastLayer[];
 }
 
 export type HMSPreferredSimulcastLayer = Exclude<HMSSimulcastLayer, HMSSimulcastLayer.NONE>;

@@ -1,4 +1,4 @@
-import { HMSAction } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 
 export interface JsonRpcRequest {
   id: string;
@@ -42,6 +42,7 @@ export enum HMSSignalMethod {
   HLS_TIMED_METADATA = 'hls-timed-metadata',
   SET_METADATA = 'set-metadata',
   GET_METADATA = 'get-metadata',
+  LISTEN_METADATA_CHANGE = 'listen-metadata-change',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

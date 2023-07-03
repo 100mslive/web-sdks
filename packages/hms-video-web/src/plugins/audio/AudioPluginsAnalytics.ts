@@ -1,5 +1,6 @@
 import MediaPluginsAnalyticsFactory from '../../analytics/MediaPluginsAnalyticsFactory';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
 import HMSLogger from '../../utils/logger';

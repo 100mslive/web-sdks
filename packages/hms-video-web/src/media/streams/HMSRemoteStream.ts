@@ -1,10 +1,10 @@
-import HMSMediaStream from './HMSMediaStream';
+import { HMSMediaStream } from './HMSMediaStream';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
 import HMSLogger from '../../utils/logger';
 
 /** @internal */
-export default class HMSRemoteStream extends HMSMediaStream {
+export class HMSRemoteStream extends HMSMediaStream {
   private readonly connection: HMSSubscribeConnection;
   private audio = true;
   private video = HMSSimulcastLayer.NONE;
@@ -20,7 +20,12 @@ export default class HMSRemoteStream extends HMSMediaStream {
     }
 
     this.audio = enabled;
-    HMSLogger.d(`[Remote stream] ${identifier || ''} ${this.id}`, `subscribing audio - ${this.audio}`);
+    HMSLogger.d(
+      `[Remote stream] ${identifier || ''} 
+    streamId=${this.id}
+    trackId=${trackId}
+    subscribing audio - ${this.audio}`,
+    );
     await this.connection.sendOverApiDataChannelWithResponse({
       params: {
         subscribed: this.audio,
@@ -38,7 +43,10 @@ export default class HMSRemoteStream extends HMSMediaStream {
    */
   setVideoLayerLocally(layer: HMSSimulcastLayer, identifier: string, source: string) {
     this.video = layer;
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `source: ${source} Setting layer field to - ${layer}`);
+    HMSLogger.d(`[Remote stream] ${identifier}
+    streamId=${this.id}
+    source: ${source}
+    Setting layer field to=${layer}`);
   }
 
   /**
@@ -48,8 +56,13 @@ export default class HMSRemoteStream extends HMSMediaStream {
    * @param identifier is stream identifier to be printed in logs
    */
   setVideoLayer(layer: HMSSimulcastLayer, trackId: string, identifier: string, source: string) {
+    HMSLogger.d(
+      `[Remote stream] ${identifier} 
+      streamId=${this.id}
+      trackId=${trackId} 
+      source: ${source} request ${layer} layer`,
+    );
     this.setVideoLayerLocally(layer, identifier, source);
-    HMSLogger.d(`[Remote stream] ${identifier} - ${this.id}`, `request ${layer} layer`);
     return this.connection.sendOverApiDataChannelWithResponse({
       params: {
         max_spatial_layer: this.video,

@@ -18,3 +18,7 @@ test.skip(`Screenshare check`, async () => {
   await page.click(page.footer.screen_share_btn);
   await page.click(page.footer.stop_screen_share_btn);
 });
+
+test(`Verify screenshare button is displayed`, async () => {
+  await page.assertVisible(page.footer.screen_share_btn);
+});

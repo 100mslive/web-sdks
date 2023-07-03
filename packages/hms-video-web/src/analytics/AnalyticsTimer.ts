@@ -13,6 +13,7 @@ export enum TimedEvent {
   PEER_LIST = 'peer_list_time',
   ROOM_STATE = 'room_state_time',
   JOIN_RESPONSE = 'join_response_time',
+  GET_TOKEN = 'GET_TOKEN',
 }
 
 const defaultEventNames = [
@@ -23,6 +24,7 @@ const defaultEventNames = [
   TimedEvent.LOCAL_VIDEO_TRACK,
   TimedEvent.PEER_LIST,
   TimedEvent.ROOM_STATE,
+  TimedEvent.JOIN_RESPONSE,
 ];
 
 export class AnalyticsTimer {
@@ -52,7 +54,7 @@ export class AnalyticsTimer {
     );
   }
 
-  cleanUp() {
+  cleanup() {
     this.eventPerformanceMeasures = {};
   }
 }

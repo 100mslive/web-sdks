@@ -30,7 +30,7 @@ function CheckboxWithLabelComponent({ label, checked = true, css, onCheckedChang
 
   useEffect(() => {
     handleOnCheckedChange(checked);
-  }, [checked]);
+  }, [checked]); //eslint-disable-line
 
   function handleOnCheckedChange(checked: boolean) {
     setInternalChecked(checked);

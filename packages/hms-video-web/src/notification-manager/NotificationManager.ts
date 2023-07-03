@@ -1,11 +1,13 @@
 import { ActiveSpeakerManager } from './managers/ActiveSpeakerManager';
 import { BroadcastManager } from './managers/BroadcastManager';
 import { ConnectionQualityManager } from './managers/ConnectionQualityManager';
+import { OnDemandTrackManager } from './managers/onDemandTrackManager';
 import { PeerListManager } from './managers/PeerListManager';
 import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
 import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
+import { SessionMetadataManager } from './managers/SessionMetadataManager';
 import { TrackManager } from './managers/TrackManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
@@ -19,6 +21,8 @@ import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
+import { InitFlags } from '../signal/init/models';
+import HMSTransport from '../transport';
 import HMSLogger from '../utils/logger';
 
 export class NotificationManager {
@@ -32,6 +36,7 @@ export class NotificationManager {
   private policyChangeManager: PolicyChangeManager;
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
+  private sessionMetadataManager: SessionMetadataManager;
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
@@ -42,11 +47,16 @@ export class NotificationManager {
   constructor(
     private store: IStore,
     eventBus: EventBus,
+    private transport: HMSTransport,
     private listener?: HMSUpdateListener,
     private audioListener?: HMSAudioListener,
     private connectionQualityListener?: HMSConnectionQualityListener,
   ) {
-    this.trackManager = new TrackManager(this.store, eventBus, this.listener);
+    const isOnDemandTracksEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    this.trackManager = isOnDemandTracksEnabled
+      ? new OnDemandTrackManager(this.store, eventBus, this.transport, this.listener)
+      : new TrackManager(this.store, eventBus, this.listener);
+
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
     this.broadcastManager = new BroadcastManager(this.store, this.listener);
@@ -55,6 +65,7 @@ export class NotificationManager {
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
     this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
+    this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -66,6 +77,7 @@ export class NotificationManager {
     this.requestManager.listener = listener;
     this.activeSpeakerManager.listener = listener;
     this.roomUpdateManager.listener = listener;
+    this.sessionMetadataManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {
@@ -107,6 +119,7 @@ export class NotificationManager {
     this.requestManager.handleNotification(method, notification);
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
+    this.sessionMetadataManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
   }
 
@@ -119,6 +132,14 @@ export class NotificationManager {
       }
       case HMSNotificationMethod.TRACK_UPDATE: {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
+        break;
+      }
+      case HMSNotificationMethod.TRACK_REMOVE: {
+        if (!notification.peer) {
+          HMSLogger.d(this.TAG, `Ignoring sfu notification - ${method}`, { notification });
+          return;
+        }
+        this.trackManager.handleTrackRemovedPermanently(notification as TrackStateNotification);
         break;
       }
       case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {

@@ -1,16 +1,16 @@
 import { HMSPlaylistManager } from './sdkTypes';
 import { HMSLogger } from '../../common/ui-logger';
 import { IHMSStore } from '../IHMSStore';
-import { HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
+import { HMSGenericTypes, HMSPlaylistItem, HMSPlaylistType, IHMSPlaylistActions } from '../schema';
 import { selectAudioPlaylist, selectVideoPlaylist } from '../selectors';
 
-export class HMSPlaylist implements IHMSPlaylistActions {
+export class HMSPlaylist<T extends HMSGenericTypes> implements IHMSPlaylistActions {
   private type: HMSPlaylistType;
   constructor(
     private playlistManager: HMSPlaylistManager,
     type: HMSPlaylistType,
     private syncPlaylistState: (action: string) => void,
-    private store: IHMSStore,
+    private store: IHMSStore<T>,
   ) {
     this.type = type;
   }

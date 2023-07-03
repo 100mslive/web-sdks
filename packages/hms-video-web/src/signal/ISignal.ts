@@ -8,7 +8,8 @@ import {
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
-  SessionMetadataUpdateParams,
+  SetSessionMetadataParams,
+  SetSessionMetadataResponse,
   StartRTMPOrRecordingRequestParams,
   Track,
   TrackUpdateRequestParams,
@@ -31,6 +32,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
     simulcast: boolean,
+    onDemandTracks: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
@@ -74,9 +76,11 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   updatePeer(params: UpdatePeerRequestParams): Promise<void>;
 
-  getSessionMetadata(): Promise<GetSessionMetadataResponse>;
+  getSessionMetadata(key?: string): Promise<GetSessionMetadataResponse>;
 
-  setSessionMetadata(params: SessionMetadataUpdateParams): Promise<void>;
+  setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
+
+  listenMetadataChange(keys: string[]): Promise<void>;
 
   close(): Promise<void>;
 }

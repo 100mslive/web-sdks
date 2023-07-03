@@ -18,7 +18,7 @@ export const ErrorCodes = {
     ABNORMAL_CLOSE: 1006,
   },
 
-  InitAPIErrors: {
+  APIErrors: {
     // [INIT]: Server error
     SERVER_ERRORS: 2000,
     //init config not available
@@ -93,6 +93,8 @@ export const ErrorCodes = {
 
     // [{action}]: Ice connection state FAILED
     ICE_DISCONNECTED: 4006,
+
+    STATS_FAILED: 4007,
   },
 
   WebsocketMethodErrors: {

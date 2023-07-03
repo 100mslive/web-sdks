@@ -30,6 +30,8 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
   bytesSent?: number;
   packetsSent?: number;
   qualityLimitationReason?: string;
+  qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
+  totalPacketSendDelay?: number;
   rid?: RID;
 }
 
@@ -49,6 +51,7 @@ interface BaseTrackStats extends RTCRtpStreamStats {
   peerName?: string;
   bitrate: number;
   codec?: string;
+  enabled?: boolean;
 }
 
 /**

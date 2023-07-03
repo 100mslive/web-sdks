@@ -9,3 +9,5 @@ export * from './error';
 export * from './requests';
 export * from './device-change';
 export * from './playlist';
+export * from './session-store';
+export * from './playlist-selectors';

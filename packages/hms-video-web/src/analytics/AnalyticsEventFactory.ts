@@ -1,10 +1,10 @@
+import { PublishAnalyticPayload } from './publish-stats/interfaces';
 import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
-import { SelectedDevices } from '../device-manager';
 import { HMSException } from '../error/HMSException';
-import { DeviceMap } from '../interfaces';
+import { DeviceMap, SelectedDevices } from '../interfaces';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
 import { HMSRemoteVideoTrack } from '../media/tracks';
 
@@ -104,6 +104,13 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static hlsPlayerError(error: HMSException) {
+    return new AnalyticsEvent({
+      name: 'hlsPlayerError',
+      level: AnalyticsEventLevel.ERROR,
+      properties: this.getErrorProperties(error),
+    });
+  }
   static subscribeFail(error: Error) {
     const name = this.eventNameFor('subscribe', false);
     const level = AnalyticsEventLevel.ERROR;
@@ -165,6 +172,13 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static rtcStatsFailed(error: HMSException) {
+    const name = 'rtc.stats.failed';
+    const level = AnalyticsEventLevel.ERROR;
+
+    return new AnalyticsEvent({ name, level, properties: this.getErrorProperties(error) });
+  }
+
   /**
    * TODO: remove once everything is switched to server side degradation, this
    * event can be handled on server side as well.
@@ -199,6 +213,14 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({
       name: 'perf.networkquality.preview',
       level: properties.error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
+  static publishStats(properties: PublishAnalyticPayload) {
+    return new AnalyticsEvent({
+      name: 'publisher.stats',
+      level: AnalyticsEventLevel.INFO,
       properties,
     });
   }

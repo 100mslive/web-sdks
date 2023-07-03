@@ -10,6 +10,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
+import { PublishStatsAnalytics } from '../analytics/publish-stats';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
@@ -18,12 +19,13 @@ import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConn
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
@@ -36,6 +38,7 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   MultiTrackUpdateRequestParams,
+  SetSessionMetadataParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
@@ -78,8 +81,9 @@ export default class HMSTransport implements ITransport {
   private joinParameters?: JoinParameters;
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
+  private publishStatsAnalytics?: PublishStatsAnalytics;
   private maxSubscribeBitrate = 0;
-  private joinRetryCount = 0;
+  joinRetryCount = 0;
 
   constructor(
     private observer: ITransportObserver,
@@ -108,6 +112,9 @@ export default class HMSTransport implements ITransport {
       const currentSubscribeBitrate = stats.getLocalPeerStats()?.subscribe?.bitrate || 0;
       this.maxSubscribeBitrate = Math.max(this.maxSubscribeBitrate, currentSubscribeBitrate);
     });
+
+    this.eventBus.localAudioEnabled.subscribe(({ track }) => this.trackUpdate(track));
+    this.eventBus.localVideoEnabled.subscribe(({ track }) => this.trackUpdate(track));
   }
 
   /**
@@ -384,7 +391,7 @@ export default class HMSTransport implements ITransport {
       throw ex;
     }
 
-    HMSLogger.i(TAG, '✅ join: successful');
+    HMSLogger.d(TAG, '✅ join: successful');
     this.state = TransportState.Joined;
     this.observer.onStateChange(this.state);
   }
@@ -415,7 +422,7 @@ export default class HMSTransport implements ITransport {
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
           ErrorCodes.WebSocketConnectionErrors.FAILED_TO_CONNECT,
           ErrorCodes.WebSocketConnectionErrors.ABNORMAL_CLOSE,
-          ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+          ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         ].includes(error.code) ||
           error.code.toString().startsWith('5') ||
           error.code.toString().startsWith('429'));
@@ -446,7 +453,8 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, 'leaving in transport');
     try {
       this.state = TransportState.Leaving;
-      this.webrtcInternals?.cleanUp();
+      this.publishStatsAnalytics?.stop();
+      this.webrtcInternals?.cleanup();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (notifyServer) {
@@ -475,7 +483,7 @@ export default class HMSTransport implements ITransport {
       return;
     }
 
-    HMSLogger.i(
+    HMSLogger.d(
       TAG,
       'Local peer role updated to webrtc role, creating PeerConnections and performing inital publish negotiation ⏳',
     );
@@ -649,12 +657,16 @@ export default class HMSTransport implements ITransport {
     });
   }
 
-  getSessionMetadata() {
-    return this.signal.getSessionMetadata();
+  getSessionMetadata(key?: string) {
+    return this.signal.getSessionMetadata(key);
   }
 
-  async setSessionMetadata(metadata: any) {
-    await this.signal.setSessionMetadata({ data: metadata });
+  setSessionMetadata(params: SetSessionMetadataParams) {
+    return this.signal.setSessionMetadata(params);
+  }
+
+  listenMetadataChange(keys: string[]): Promise<void> {
+    return this.signal.listenMetadataChange(keys);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
@@ -735,7 +747,7 @@ export default class HMSTransport implements ITransport {
     await p;
     await track.cleanup();
     // remove track from store on unpublish
-    this.store.removeTrack(track.trackId);
+    this.store.removeTrack(track);
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
@@ -775,7 +787,6 @@ export default class HMSTransport implements ITransport {
           this.signal,
           this.initConfig.rtcConfiguration,
           this.publishConnectionObserver,
-          this,
         );
       }
 
@@ -783,6 +794,7 @@ export default class HMSTransport implements ITransport {
         this.subscribeConnection = new HMSSubscribeConnection(
           this.signal,
           this.initConfig.rtcConfiguration,
+          this.isFlagEnabled.bind(this),
           this.subscribeConnectionObserver,
         );
       }
@@ -810,6 +822,10 @@ export default class HMSTransport implements ITransport {
       const shouldRetry =
         parseInt(`${hmsError.code / 100}`) === 5 ||
         [ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST, 429].includes(hmsError.code);
+
+      if (hmsError.code === 410) {
+        hmsError.isTerminal = true;
+      }
 
       if (shouldRetry) {
         this.joinRetryCount = 0;
@@ -856,7 +872,16 @@ export default class HMSTransport implements ITransport {
     await this.publishConnection.setLocalDescription(offer);
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const answer = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+      offer,
+    );
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -870,7 +895,15 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const response = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+    );
     return !!response;
   }
 
@@ -976,6 +1009,7 @@ export default class HMSTransport implements ITransport {
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
+      this.observer.onConnected();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
@@ -993,7 +1027,7 @@ export default class HMSTransport implements ITransport {
           ),
         );
       }
-      HMSLogger.d(TAG, '❌ internal connect: failed', error);
+      HMSLogger.e(TAG, '❌ internal connect: failed', error);
       throw error;
     }
   }
@@ -1009,7 +1043,7 @@ export default class HMSTransport implements ITransport {
 
   private async openSignal(token: string, peerId: string) {
     if (!this.initConfig) {
-      throw ErrorFactory.InitAPIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
+      throw ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
 
     HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);
@@ -1031,6 +1065,15 @@ export default class HMSTransport implements ITransport {
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,
     });
+
+    if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
+      this.publishStatsAnalytics = new PublishStatsAnalytics(
+        this.store,
+        this.eventBus,
+        this.initConfig?.config.publishStats?.maxSampleWindowSize,
+        this.initConfig?.config.publishStats?.maxSamplePushInterval,
+      );
+    }
   }
 
   /**
@@ -1106,17 +1149,15 @@ export default class HMSTransport implements ITransport {
     // Check if ws is disconnected - otherwise if only publishIce fails
     // and ws connect is success then we don't need to reconnect to WebSocket
     if (!this.signal.isConnected) {
-      try {
-        await this.internalConnect(
-          this.joinParameters!.authToken,
-          this.joinParameters!.endpoint,
-          this.joinParameters!.peerId,
-        );
-      } catch (ex) {}
+      await this.internalConnect(
+        this.joinParameters!.authToken,
+        this.joinParameters!.endpoint,
+        this.joinParameters!.peerId,
+      );
     }
 
     // Only retry publish failed task after joining the call - not needed in preview signal reconnect
-    const ok = this.store.getRoom().joinedAt
+    const ok = this.store.getRoom()?.joinedAt
       ? this.signal.isConnected && (await this.retryPublishIceFailedTask())
       : this.signal.isConnected;
     // Send track update to sync local track state changes during reconnection
@@ -1183,6 +1224,10 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
+  }
+
+  getSubscribeConnection() {
+    return this.subscribeConnection;
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {

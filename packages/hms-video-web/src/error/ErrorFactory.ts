@@ -6,27 +6,18 @@
  */
 
 import { ErrorCodes } from './ErrorCodes';
+import { HMSAction } from './HMSAction';
 import { HMSException } from './HMSException';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 
-export enum HMSAction {
-  NONE = 'NONE',
-  TRACK = 'TRACK',
-  INIT = 'INIT',
-  PUBLISH = 'PUBLISH',
-  UNPUBLISH = 'UNPUBLISH',
-  JOIN = 'JOIN',
-  SUBSCRIBE = 'SUBSCRIBE',
-  DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
-  RESTART_ICE = 'RESTART_ICE',
-  VIDEO_PLUGINS = 'VIDEO_PLUGINS',
-  AUDIO_PLUGINS = 'AUDIO_PLUGINS',
-  AUTOPLAY = 'AUTOPLAY',
-  RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
-  VALIDATION = 'VALIDATION',
-  PLAYLIST = 'PLAYLIST',
-  PREVIEW = 'PREVIEW',
-}
+const terminalActions: (HMSSignalMethod | HMSAction)[] = [
+  HMSSignalMethod.JOIN,
+  HMSSignalMethod.OFFER,
+  HMSSignalMethod.ANSWER,
+  HMSSignalMethod.TRICKLE,
+  HMSSignalMethod.SERVER_ERROR,
+  HMSAction.JOIN,
+];
 
 export const ErrorFactory = {
   WebSocketConnectionErrors: {
@@ -61,14 +52,21 @@ export const ErrorFactory = {
     },
   },
 
-  InitAPIErrors: {
-    ServerErrors(code: number, action: HMSAction, description = '') {
-      return new HMSException(code, 'ServerErrors', action, `[INIT]: Server error ${description}`, description, true);
+  APIErrors: {
+    ServerErrors(code: number, action: HMSAction, description = '', isTerminal = true) {
+      return new HMSException(
+        code,
+        'ServerErrors',
+        action,
+        `[${action}]: Server error ${description}`,
+        description,
+        isTerminal,
+      );
     },
 
     EndpointUnreachable(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.ENDPOINT_UNREACHABLE,
+        ErrorCodes.APIErrors.ENDPOINT_UNREACHABLE,
         'EndpointUnreachable',
         action,
         `Endpoint is not reachable - ${description}`,
@@ -78,7 +76,7 @@ export const ErrorFactory = {
 
     InvalidTokenFormat(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.INVALID_TOKEN_FORMAT,
+        ErrorCodes.APIErrors.INVALID_TOKEN_FORMAT,
         'InvalidTokenFormat',
         action,
         `Token is not in proper JWT format - ${description}`,
@@ -89,7 +87,7 @@ export const ErrorFactory = {
 
     InitConfigNotAvailable(action: HMSAction, description = '') {
       return new HMSException(
-        ErrorCodes.InitAPIErrors.INIT_CONFIG_NOT_AVAILABLE,
+        ErrorCodes.APIErrors.INIT_CONFIG_NOT_AVAILABLE,
         'InitError',
         action,
         `[INIT]: ${description}`,
@@ -305,11 +303,21 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    StatsFailed(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.STATS_FAILED,
+        'StatsFailed',
+        action,
+        `Failed to WebRTC get stats - ${description}`,
+        description,
+      );
+    },
   },
 
   WebsocketMethodErrors: {
     ServerErrors(code: number, action: HMSAction | HMSSignalMethod, description: string) {
-      return new HMSException(code, 'ServerErrors', action, description, description, true);
+      return new HMSException(code, 'ServerErrors', action, description, description, terminalActions.includes(action));
     },
 
     AlreadyJoined(action: HMSAction, description = '') {

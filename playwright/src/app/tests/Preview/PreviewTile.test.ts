@@ -2,7 +2,7 @@ import { PageWrapper } from '../../PageWrapper';
 import { test } from '@playwright/test';
 
 let page: PageWrapper;
-const name = `${process.env.peer_name}1`;
+const name = `${process.env.peer_name}`;
 
 test.beforeEach(async ({ page: nativePage }) => {
   page = new PageWrapper(nativePage);
@@ -38,4 +38,12 @@ test(`Verify video tile and avatar tile`, async () => {
   await page.click(page.preview.preview_video_btn);
   await page.assertVisible(page.preview.preview_video_off_btn);
   await page.assertVisible(page.preview.preview_avatar_tile);
+});
+
+test(`Verify network status is displayed`, async () => {
+  await page.assertVisible(page.preview.preview_network_status);
+});
+
+test(`Verify name textbox is displayed`, async () => {
+  await page.assertVisible(page.preview.preview_name_field);
 });

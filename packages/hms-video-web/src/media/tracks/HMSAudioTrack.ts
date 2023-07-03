@@ -1,8 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import HMSLogger from '../../utils/logger';
-import HMSMediaStream from '../streams/HMSMediaStream';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { HMSMediaStream, HMSRemoteStream } from '../streams';
 
 export class HMSAudioTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.AUDIO;
@@ -27,11 +26,12 @@ export class HMSAudioTrack extends HMSTrack {
     // Don't subscribe to audio when volume is 0
     await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
-      this.audioElement.volume = value / 100;
+      this.audioElement.volume = Math.floor(value / 100);
     }
   }
 
   setAudioElement(element: HTMLAudioElement | null) {
+    HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'adding audio element', `${this}`, element);
     this.audioElement = element;
   }
 
@@ -56,9 +56,14 @@ export class HMSAudioTrack extends HMSTrack {
     }
   }
 
-  async setOutputDevice(device: MediaDeviceInfo) {
+  async setOutputDevice(device?: MediaDeviceInfo) {
+    if (!device) {
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'device is null', `${this}`);
+      return;
+    }
     if (!this.audioElement) {
-      HMSLogger.d('audio-track', 'no audio element to set output');
+      HMSLogger.d('[HMSAudioTrack]', this.logIdentifier, 'no audio element to set output', `${this}`);
+      this.outputDevice = device;
       return;
     }
     try {
@@ -69,7 +74,7 @@ export class HMSAudioTrack extends HMSTrack {
         this.outputDevice = device;
       }
     } catch (error) {
-      HMSLogger.d('audio-track', error);
+      HMSLogger.d('[HMSAudioTrack]', 'error in setSinkId', error);
     }
   }
 

@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from "react";
+import { useMedia } from "react-use";
 import {
   HMSPlaylistType,
   selectIsAllowedToPublish,
@@ -6,10 +7,16 @@ import {
   useScreenShare,
 } from "@100mslive/react-sdk";
 import { MusicIcon } from "@100mslive/react-icons";
-import { Flex, Footer as AppFooter, Tooltip } from "@100mslive/react-ui";
+import {
+  config as cssConfig,
+  Flex,
+  Footer as AppFooter,
+  Tooltip,
+} from "@100mslive/react-ui";
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";
+import { EmojiReaction } from "../EmojiReaction";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
 import { MoreSettings } from "../MoreSettings/MoreSettings";
@@ -20,8 +27,10 @@ import { ChatToggle } from "./ChatToggle";
 import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
+import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
+import { FEATURE_LIST } from "../../common/constants";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
@@ -37,7 +46,14 @@ const ScreenshareAudio = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioScreenshare = amIScreenSharing && !video && !!audio;
   const [showModal, setShowModal] = useState(false);
-  if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
+  const isFeatureEnabled = useIsFeatureEnabled(
+    FEATURE_LIST.AUDIO_ONLY_SCREENSHARE
+  );
+  if (
+    !isFeatureEnabled ||
+    !isAllowedToPublish.screen ||
+    !isScreenshareSupported()
+  ) {
     return null;
   }
   return (
@@ -68,6 +84,7 @@ const ScreenshareAudio = () => {
 };
 
 export const ConferencingFooter = () => {
+  const isMobile = useMedia(cssConfig.media.md);
   return (
     <AppFooter.Root>
       <AppFooter.Left>
@@ -77,16 +94,18 @@ export const ConferencingFooter = () => {
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
         <NoiseSuppression />
-        {FeatureFlags.enableTranscription && <TranscriptionButton />}
+        {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
         <Flex
           align="center"
           css={{
             display: "none",
             "@md": {
               display: "flex",
+              gap: "$8",
             },
           }}
         >
+          {isMobile && <EmojiReaction />}
           <MetaActions isMobile />
         </Flex>
       </AppFooter.Left>
@@ -95,15 +114,16 @@ export const ConferencingFooter = () => {
         <ScreenshareToggle />
         <PIP />
         <MoreSettings />
-        <LeaveRoom />
         <Flex
           align="center"
           css={{ display: "none", "@md": { display: "flex" } }}
         >
           <ChatToggle />
         </Flex>
+        <LeaveRoom />
       </AppFooter.Center>
       <AppFooter.Right>
+        {!isMobile && <EmojiReaction />}
         <MetaActions />
         <ChatToggle />
       </AppFooter.Right>

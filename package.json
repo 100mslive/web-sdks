@@ -43,10 +43,10 @@
     "webpack-manifest-plugin": "^4.1.1"
   },
   "scripts": {
-    "lint": "lerna run lint --stream",
-    "lint:fix": "lerna run lint:fix --stream",
-    "format": "lerna run format --stream",
-    "test": "yarn build --no-private && lerna run test --stream",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "format": "lerna run format",
+    "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream --ignore 100ms_edtech_template",
     "size": "size-limit",
@@ -57,6 +57,7 @@
     "sdk": "cd packages/hms-video-web && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
+    "controller": "cd packages/hls-controller && yarn start",
     "reactui": "cd packages/react-ui && yarn start",
     "storybook": "cd packages/react-ui && yarn storybook",
     "build-storybook": "cd packages/react-ui && build-storybook"
@@ -84,7 +85,7 @@
   "size-limit": [
     {
       "path": "packages/hms-video-web/dist/index.cjs.js",
-      "limit": "60 KB"
+      "limit": "80 KB"
     },
     {
       "path": "packages/hms-video-web/dist/index.js",

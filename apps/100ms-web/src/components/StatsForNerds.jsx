@@ -55,6 +55,8 @@ export const StatsForNerds = ({ onOpenChange }) => {
         <Dialog.Content
           css={{
             width: "min(500px, 95%)",
+            maxHeight: "100%",
+            overflowY: "auto",
           }}
         >
           {/* Title */}
@@ -201,6 +203,10 @@ const LocalPeerStats = () => {
         value={formatBytes(stats.subscribe?.bitrate, "b/s")}
       />
       <StatsRow
+        label="Available Outgoing Bitrate"
+        value={formatBytes(stats.publish?.availableOutgoingBitrate, "b/s")}
+      />
+      <StatsRow
         label="Total Bytes Sent"
         value={formatBytes(stats.publish?.bytesSent)}
       />
@@ -210,11 +216,13 @@ const LocalPeerStats = () => {
       />
       <StatsRow
         label="Round Trip Time"
-        value={(
-          ((stats.publish?.currentRoundTripTime || "") +
-            (stats.subscribe?.currentRoundTripTime || "")) /
-          2
-        ).toFixed(3)}
+        value={`${
+          (
+            ((stats.publish?.currentRoundTripTime || 0) +
+              (stats.subscribe?.currentRoundTripTime || 0)) /
+            2
+          ).toFixed(3) * 1000
+        } ms`}
       />
     </Flex>
   );
@@ -253,7 +261,10 @@ const TrackStats = ({ trackID, layer, local }) => {
           )}
         </>
       )}
-      <StatsRow label="Round Trip Time" value={stats.roundTripTime} />
+      <StatsRow
+        label="Round Trip Time"
+        value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : "-"}
+      />
     </Flex>
   );
 };

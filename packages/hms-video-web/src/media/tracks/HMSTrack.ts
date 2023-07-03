@@ -1,7 +1,7 @@
 import { HMSTrackType } from './HMSTrackType';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
-import HMSMediaStream from '../streams/HMSMediaStream';
+import { HMSMediaStream } from '../streams';
 
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 
@@ -12,6 +12,7 @@ export abstract class HMSTrack {
   readonly stream: HMSMediaStream;
   source?: HMSTrackSource;
   peerId?: string;
+  transceiver?: RTCRtpTransceiver;
 
   /**
    * @internal to print as a helpful identifier alongside logs
@@ -101,6 +102,7 @@ export abstract class HMSTrack {
       streamId: ${this.stream.id};
       peerId: ${this.peerId};
       trackId: ${this.trackId};
+      mid: ${this.transceiver?.mid || '-'};
       logIdentifier: ${this.logIdentifier};
       source: ${this.source};
       enabled: ${this.enabled};

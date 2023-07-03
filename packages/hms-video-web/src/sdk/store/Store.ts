@@ -1,9 +1,10 @@
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -15,6 +16,7 @@ import {
 import {
   HMSAudioTrack,
   HMSLocalTrack,
+  HMSRemoteAudioTrack,
   HMSRemoteVideoTrack,
   HMSTrack,
   HMSTrackSource,
@@ -32,7 +34,8 @@ class Store implements IStore {
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;
   private peers: Record<string, HMSPeer> = {};
-  private tracks: Record<string, HMSTrack> = {};
+  private tracks = new Map<HMSTrack, HMSTrack>();
+  private templateAppData?: Record<string, string>;
   // Not used currently. Will be used exclusively for preview tracks.
   // private previewTracks: Record<string, HMSTrack> = {};
   private peerTrackStates: Record<string, TrackStateEntry> = {};
@@ -65,7 +68,7 @@ class Store implements IStore {
   }
 
   getRoom() {
-    return this.room!;
+    return this.room;
   }
 
   getPolicyForRole(role: string) {
@@ -74,6 +77,10 @@ class Store implements IStore {
 
   getKnownRoles() {
     return this.knownRoles;
+  }
+
+  getTemplateAppData() {
+    return this.templateAppData;
   }
 
   getLocalPeer() {
@@ -91,6 +98,10 @@ class Store implements IStore {
     return Object.values(this.peers);
   }
 
+  getPeerMap() {
+    return this.peers;
+  }
+
   getPeerById(peerId: string) {
     if (this.peers[peerId]) {
       return this.peers[peerId];
@@ -103,7 +114,7 @@ class Store implements IStore {
   }
 
   getTracks() {
-    return Object.values(this.tracks);
+    return Array.from(this.tracks.values());
   }
 
   getVideoTracks() {
@@ -130,8 +141,12 @@ class Store implements IStore {
     return this.getPeerTracks(this.localPeerId) as HMSLocalTrack[];
   }
 
+  hasTrack(track: HMSTrack) {
+    return this.tracks.has(track);
+  }
+
   getTrackById(trackId: string) {
-    const track = this.tracks[trackId];
+    const track = Array.from(this.tracks.values()).find(track => track.trackId === trackId);
     if (track) {
       return track;
     }
@@ -155,8 +170,8 @@ class Store implements IStore {
   }
 
   getPeerByTrackId(trackId: string) {
-    const track = this.tracks[trackId];
-    return track.peerId ? this.peers[track.peerId] : undefined;
+    const track = Array.from(this.tracks.values()).find(track => track.trackId === trackId);
+    return track?.peerId ? this.peers[track.peerId] : undefined;
   }
 
   getSpeakers() {
@@ -182,6 +197,7 @@ class Store implements IStore {
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
     this.roleDetailsArrived = true;
+    this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
       return;
     }
@@ -215,6 +231,8 @@ class Store implements IStore {
         }
       }
     }
+    config.autoManageVideo = config.autoManageVideo !== false;
+    config.autoManageWakeLock = config.autoManageWakeLock !== false;
     this.config = config;
     this.setEnv();
   }
@@ -232,7 +250,7 @@ class Store implements IStore {
    * Note: Only use this method to add published tracks not preview traks
    */
   addTrack(track: HMSTrack) {
-    this.tracks[track.trackId] = track;
+    this.tracks.set(track, track);
   }
 
   getTrackState(trackId: string) {
@@ -250,8 +268,8 @@ class Store implements IStore {
     delete this.peers[peerId];
   }
 
-  removeTrack(trackId: string) {
-    delete this.tracks[trackId];
+  removeTrack(track: HMSTrack) {
+    this.tracks.delete(track);
   }
 
   updateSpeakers(speakers: HMSSpeaker[]) {
@@ -267,13 +285,16 @@ class Store implements IStore {
   async updateAudioOutputDevice(device: MediaDeviceInfo) {
     const promises: Promise<void>[] = [];
     this.getAudioTracks().forEach(track => {
-      promises.push(track.setOutputDevice(device));
+      if (track instanceof HMSRemoteAudioTrack) {
+        promises.push(track.setOutputDevice(device));
+      }
     });
     await Promise.all(promises);
   }
 
   getSimulcastLayers(source: HMSTrackSource): SimulcastLayer[] {
-    if (!this.simulcastEnabled) {
+    // Enable only when backend enables and source is video or screen. ignore videoplaylist
+    if (!this.simulcastEnabled || !['screen', 'regular'].includes(source)) {
       return [];
     }
     if (source === 'screen') {
@@ -326,8 +347,8 @@ class Store implements IStore {
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];
         const resolution = {
-          width: width / value.scaleResolutionDownBy,
-          height: height / value.scaleResolutionDownBy,
+          width: Math.floor(width / value.scaleResolutionDownBy),
+          height: Math.floor(height / value.scaleResolutionDownBy),
         };
         return {
           layer,
@@ -341,7 +362,7 @@ class Store implements IStore {
     return this.errorListener;
   }
 
-  cleanUp() {
+  cleanup() {
     const tracks = this.getTracks();
     for (const track of tracks) {
       track.cleanup();

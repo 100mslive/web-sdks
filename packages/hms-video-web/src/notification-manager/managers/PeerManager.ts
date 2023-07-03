@@ -1,5 +1,6 @@
 import { TrackManager } from './TrackManager';
 import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import { convertDateNumToDate } from '../../utils/date';
@@ -106,6 +107,7 @@ export class PeerManager {
     if (peer.role && peer.role.name !== notification.role) {
       const newRole = this.store.getPolicyForRole(notification.role);
       peer.updateRole(newRole);
+      this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
     this.handlePeerInfoUpdate({ peer, ...notification.info });
@@ -142,11 +144,25 @@ export class PeerManager {
     }
 
     for (const trackId in peer.tracks) {
+      const trackInfo = peer.tracks[trackId];
       this.store.setTrackState({
         peerId: peer.peer_id,
-        trackInfo: peer.tracks[trackId],
+        trackInfo,
       });
+      if (trackInfo.type === 'video') {
+        this.trackManager.processTrackInfo(trackInfo, peer.peer_id, false);
+      }
     }
     return hmsPeer;
+  }
+
+  private updateSimulcastLayersForPeer(peer: HMSPeer) {
+    this.store.getPeerTracks(peer.peerId).forEach(track => {
+      if (track.type === 'video' && ['regular', 'screen'].includes(track.source!)) {
+        const remoteTrack = track as HMSRemoteVideoTrack;
+        const simulcastDefinitions = this.store.getSimulcastDefinitionsForPeer(peer, remoteTrack.source!);
+        remoteTrack.setSimulcastDefinitons(simulcastDefinitions);
+      }
+    });
   }
 }

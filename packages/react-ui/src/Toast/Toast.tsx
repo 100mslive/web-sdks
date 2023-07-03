@@ -1,4 +1,5 @@
 import React, { ComponentProps } from 'react';
+import type { ToastProps } from '@radix-ui/react-toast'
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
@@ -26,6 +27,12 @@ const getToastVariant = (base: string) => {
       height: '100%',
       zIndex: 10,
     },
+    "@sm": {
+      "&:before": {
+        content: 'none',
+      },
+      border: `solid $space$px ${base}`
+    }
   };
 };
 
@@ -40,6 +47,9 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   border: 'solid $space$px $borderLight',
   overflow: 'hidden',
   ...toastAnimation,
+  "@sm": {
+    p: "$8 $11",
+  },
   variants: {
     variant: {
       standard: getToastVariant('$secondaryDefault'),
@@ -77,6 +87,10 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   padding: '$8',
   gap: 10,
   width: 390,
+  '@sm': {
+    width: '100%',
+    padding: "$6"
+  },
   maxWidth: '100vw',
   margin: 0,
   listStyle: 'none',
@@ -93,7 +107,7 @@ const DefaultClose = ({ css }: Pick<ComponentProps<typeof ToastClose>, 'css'>) =
   );
 };
 
-interface HMSToastProps extends ToastPrimitives.ToastProps {
+interface HMSToastProps extends ToastProps {
   title: string;
   description?: string;
   isClosable?: boolean;

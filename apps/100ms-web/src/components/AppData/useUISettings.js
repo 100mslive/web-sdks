@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import {
   selectAppData,
   selectAppDataByPath,
+  selectSessionStore,
   selectTrackByID,
   useHMSActions,
   useHMSStore,
@@ -11,7 +12,11 @@ import {
   UserPreferencesKeys,
   useUserPreferences,
 } from "../hooks/useUserPreferences";
-import { APP_DATA, UI_SETTINGS } from "../../common/constants";
+import {
+  APP_DATA,
+  SESSION_STORE_KEY,
+  UI_SETTINGS,
+} from "../../common/constants";
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -53,6 +58,11 @@ export const useIsHeadless = () => {
   return isHeadless;
 };
 
+export const useActiveSpeakerSorting = () => {
+  const activeSpeakerSorting = useUISettings(UI_SETTINGS.activeSpeakerSorting);
+  return activeSpeakerSorting;
+};
+
 export const useHLSViewerRole = () => {
   return useHMSStore(selectAppData(APP_DATA.hlsViewerRole));
 };
@@ -80,9 +90,15 @@ export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
 
+export const usePDFAnnotator = () => {
+  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.isPDFBeingShared;
+};
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
-  return useHMSStore(selectTrackByID(pinnedTrackId));
+  const spotlightTrackId = useHMSStore(
+    selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)
+  );
+  return useHMSStore(selectTrackByID(pinnedTrackId || spotlightTrackId));
 };
 
 export const useSubscribedNotifications = notificationKey => {

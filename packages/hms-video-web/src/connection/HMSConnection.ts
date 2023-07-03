@@ -1,5 +1,6 @@
 import { HMSConnectionRole } from './model';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
@@ -44,7 +45,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.connectionState;
   }
 
-  private get action(): HMSAction {
+  private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
   }
 
@@ -91,6 +92,10 @@ export default abstract class HMSConnection {
   }
 
   async addIceCandidate(candidate: RTCIceCandidateInit): Promise<void> {
+    if (this.nativeConnection.signalingState === 'closed') {
+      HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate signalling state closed`);
+      return;
+    }
     HMSLogger.d(TAG, `[role=${this.role}] addIceCandidate candidate=${JSON.stringify(candidate, null, 1)}`);
     await this.nativeConnection.addIceCandidate(candidate);
   }

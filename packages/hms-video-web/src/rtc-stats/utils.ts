@@ -1,4 +1,7 @@
-import { HMSWebrtcStats } from './HMSWebrtcStats';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
+import { EventBus } from '../events/EventBus';
 import {
   HMSPeerStats,
   HMSTrackStats,
@@ -6,24 +9,23 @@ import {
   PeerConnectionType,
   RTCRemoteInboundRtpStreamStats,
 } from '../interfaces/webrtc-stats';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSRemoteTrack } from '../media/tracks';
 import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
 
 export const getLocalTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
+  eventBus: EventBus,
   track: HMSLocalTrack,
   peerName?: string,
   prevTrackStats?: Record<string, HMSTrackStats>,
 ): Promise<Record<string, HMSTrackStats> | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   const trackStats: Record<string, HMSTrackStats> = {};
-  if (!(track.stream as HMSLocalStream).hasSender(track)) {
+  if (!track.transceiver?.sender.track) {
     return;
   }
   try {
-    trackReport = await getStats['publish']?.(track.getTrackBeingSent());
+    trackReport = await track.transceiver.sender.getStats();
     const mimeTypes: { [key: string]: string } = {}; // codecId -> mimeType
     const outbound: Record<string, RTCOutboundRtpStreamStats> = {};
     const inbound: Record<string, RTCInboundRtpStreamStats & MissingInboundStats> = {};
@@ -61,25 +63,42 @@ export const getLocalTrackStats = async (
         totalRoundTripTime: inStats?.totalRoundTripTime,
         peerName,
         peerID: track.peerId,
+        enabled: track.enabled,
         codec,
       };
     });
-  } catch (err) {
+  } catch (err: any) {
+    eventBus.analytics.publish(
+      AnalyticsEventFactory.rtcStatsFailed(
+        ErrorFactory.WebrtcErrors.StatsFailed(
+          HMSAction.TRACK,
+          `Error getting local track stats ${track.trackId} - ${err.message}`,
+        ),
+      ),
+    );
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err, (err as Error).name);
   }
   return trackStats;
 };
 
 export const getTrackStats = async (
-  getStats: HMSWebrtcStats['getStats'],
+  eventBus: EventBus,
   track: HMSRemoteTrack,
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
 ): Promise<HMSTrackStats | undefined> => {
   let trackReport: RTCStatsReport | undefined;
   try {
-    trackReport = await getStats['subscribe']?.(track.nativeTrack);
-  } catch (err) {
+    trackReport = await track.transceiver?.receiver.getStats();
+  } catch (err: any) {
+    eventBus.analytics.publish(
+      AnalyticsEventFactory.rtcStatsFailed(
+        ErrorFactory.WebrtcErrors.StatsFailed(
+          HMSAction.TRACK,
+          `Error getting remote track stats ${track.trackId} - ${err.message}`,
+        ),
+      ),
+    );
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);
@@ -100,6 +119,7 @@ export const getTrackStats = async (
       bitrate,
       packetsLostRate,
       peerId: track.peerId,
+      enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
     })
@@ -149,7 +169,7 @@ const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
 
 export const getLocalPeerStatsFromReport = (
   type: PeerConnectionType,
-  report: RTCStatsReport,
+  report?: RTCStatsReport,
   prevStats?: HMSPeerStats,
 ): (RTCIceCandidatePairStats & { bitrate: number }) | undefined => {
   const activeCandidatePair = getActiveCandidatePairFromReport(report);
@@ -162,19 +182,19 @@ export const getLocalPeerStatsFromReport = (
   return activeCandidatePair && Object.assign(activeCandidatePair, { bitrate });
 };
 
-export const getActiveCandidatePairFromReport = (report: RTCStatsReport): RTCIceCandidatePairStats | undefined => {
+export const getActiveCandidatePairFromReport = (report?: RTCStatsReport): RTCIceCandidatePairStats | undefined => {
   let activeCandidatePair: RTCIceCandidatePairStats | undefined;
-  report.forEach(stat => {
+  report?.forEach(stat => {
     if (stat.type === 'transport') {
       // TS doesn't have correct types for RTCStatsReports
       // @ts-expect-error
-      activeCandidatePair = report.get(stat.selectedCandidatePairId);
+      activeCandidatePair = report?.get(stat.selectedCandidatePairId);
     }
   });
 
   // Fallback for Firefox.
   if (!activeCandidatePair) {
-    report.forEach(stat => {
+    report?.forEach(stat => {
       if (stat.type === 'candidate-pair' && stat.selected) {
         activeCandidatePair = stat;
       }

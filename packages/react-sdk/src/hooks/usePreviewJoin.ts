@@ -40,6 +40,17 @@ export interface usePreviewInput {
    */
   captureNetworkQualityInPreview?: boolean;
   asRole?: string;
+  /**
+   * if this flag is enabled, the SDK takes care of unsubscribing to the video when it goes out of view.
+   * Additionally if simulcast is enabled, it takes care of auto managing simulcast layers based on the
+   * dimensions of the video element to conserve bandwidth.
+   */
+  autoManageVideo?: boolean;
+  /**
+   * if this flag is enabled, wake lock will be acquired automatically(if supported) when joining the room, so the device
+   * will be kept awake.
+   */
+  autoManageWakeLock?: boolean;
 }
 
 export interface usePreviewResult {
@@ -77,6 +88,8 @@ export const usePreviewJoin = ({
   initialSettings,
   captureNetworkQualityInPreview,
   asRole,
+  autoManageVideo,
+  autoManageWakeLock,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -93,8 +106,20 @@ export const usePreviewJoin = ({
       initEndpoint: initEndpoint,
       asRole,
       captureNetworkQualityInPreview,
+      autoManageVideo,
+      autoManageWakeLock,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole]);
+  }, [
+    name,
+    token,
+    metadata,
+    initEndpoint,
+    initialSettings,
+    captureNetworkQualityInPreview,
+    asRole,
+    autoManageVideo,
+    autoManageWakeLock,
+  ]);
 
   const preview = useCallback(async () => {
     if (!token) {

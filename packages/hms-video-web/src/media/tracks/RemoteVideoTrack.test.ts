@@ -1,12 +1,12 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const streamId = '123';
 const trackId = '456';
 const nativeStream = { id: streamId } as MediaStream;
-const videoElement = { srcObject: null } as HTMLVideoElement;
+let videoElement!: HTMLVideoElement;
 
 describe('remoteVideoTrack', () => {
   let stream: HMSRemoteStream;
@@ -14,6 +14,7 @@ describe('remoteVideoTrack', () => {
   let track: HMSRemoteVideoTrack;
   let nativeTrack: MediaStreamTrack;
   beforeEach(() => {
+    videoElement = document.createElement('video');
     sendOverApiDataChannelWithResponse = jest.fn();
     const connection = { sendOverApiDataChannelWithResponse } as unknown as HMSSubscribeConnection;
     stream = new HMSRemoteStream(nativeStream, connection);
@@ -89,7 +90,7 @@ describe('remoteVideoTrack', () => {
   });
 
   test('multiple addsink and removesink', async () => {
-    const videoElement2 = { srcObject: null } as HTMLVideoElement;
+    const videoElement2 = document.createElement('video');
     await track.addSink(videoElement);
     await track.addSink(videoElement2);
     expectLayersSent([HMSSimulcastLayer.HIGH]);
@@ -111,40 +112,6 @@ describe('remoteVideoTrack', () => {
     await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.MEDIUM, true);
     expectLayersSent([HMSSimulcastLayer.LOW, HMSSimulcastLayer.MEDIUM]);
-  });
-
-  test('sdk degradation', async () => {
-    await track.addSink(videoElement);
-    expectNonDegradedVisible();
-    track.setDegradedFromSdk(true);
-    expectDegradedVisible();
-    track.setDegradedFromSdk(false); // recover
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.HIGH, true);
-    track.setDegradedFromSdk(true);
-
-    await track.removeSink(videoElement);
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
-    expectLayersSent([
-      HMSSimulcastLayer.HIGH,
-      HMSSimulcastLayer.NONE,
-      HMSSimulcastLayer.HIGH,
-      HMSSimulcastLayer.NONE,
-      HMSSimulcastLayer.NONE,
-    ]);
-  });
-
-  test('sdk degradation + track mute', async () => {
-    expect(track.enabled).toBe(true);
-    await track.addSink(videoElement);
-    expectNonDegradedVisible();
-    track.setDegradedFromSdk(true);
-    expectDegradedVisible();
-    track.setEnabled(false);
-    expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
-    // video goes out of view
-    await track.removeSink(videoElement);
-    expectNonDegradedNotVisible();
-    expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE, HMSSimulcastLayer.NONE]);
   });
 
   /**

@@ -63,7 +63,7 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
               return;
             }
             this.videoElement.onplay = this.drawImage;
-            this.audioContextManager.resumeContext();
+            await this.audioContextManager.resumeContext();
             await this.videoElement.play();
             const audioTrack = this.audioContextManager.getAudioTrack();
             stream.addTrack(audioTrack);

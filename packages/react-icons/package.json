@@ -4,13 +4,20 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.6.5-alpha.4",
+  "version": "0.8.7-alpha.8",
   "author": "100ms",
   "license": "MIT",
   "files": [
     "dist",
     "src"
   ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "sideEffects": false,
   "scripts": {
     "svg-build": "svgr --icon --typescript --replace-attr-values '#fff=currentColor' --svg-props width='24px' --svg-props height='24px' -d src assets && yarn format",

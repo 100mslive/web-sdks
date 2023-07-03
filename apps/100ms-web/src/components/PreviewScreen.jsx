@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSearchParam } from "react-use";
-import { v4 } from "uuid";
+import { v4 as uuid } from "uuid";
+import { useHMSActions } from "@100mslive/react-sdk";
 import { Box, Flex, Loading, styled } from "@100mslive/react-ui";
 import PreviewContainer from "./Preview/PreviewContainer";
 import SidePane from "../layouts/SidePane";
@@ -30,8 +31,9 @@ import {
  */
 
 const env = process.env.REACT_APP_ENV;
-const PreviewScreen = React.memo(({ getUserToken }) => {
+const PreviewScreen = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const navigate = useNavigation();
+  const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
   const [, setIsHeadless] = useSetUiSettings(UI_SETTINGS.isHeadless);
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
@@ -51,7 +53,6 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? "Beam" : "");
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
-
   useEffect(() => {
     if (authToken) {
       setToken(authToken);
@@ -60,9 +61,16 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
     if (!tokenEndpoint || !urlRoomId) {
       return;
     }
-    const getTokenFn = !userRole
-      ? () => getUserToken(v4())
-      : () => getToken(tokenEndpoint, v4(), userRole, urlRoomId);
+    const roomCode = !userRole && urlRoomId;
+
+    const getTokenFn = roomCode
+      ? () =>
+          hmsActions.getAuthTokenByRoomCode(
+            { roomCode },
+            { endpoint: authTokenByRoomCodeEndpoint }
+          )
+      : () => getToken(tokenEndpoint, uuid(), userRole, urlRoomId);
+
     getTokenFn()
       .then(token => {
         setToken(token);
@@ -70,7 +78,14 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
       .catch(error => {
         setError(convertPreviewError(error));
       });
-  }, [tokenEndpoint, urlRoomId, getUserToken, userRole, authToken]);
+  }, [
+    hmsActions,
+    tokenEndpoint,
+    urlRoomId,
+    userRole,
+    authToken,
+    authTokenByRoomCodeEndpoint,
+  ]);
 
   const onJoin = () => {
     !directJoinHeadful && setIsHeadless(skipPreview);
@@ -125,7 +140,28 @@ const PreviewScreen = React.memo(({ getUserToken }) => {
 
 const convertPreviewError = error => {
   console.error("[error]", { error });
-  if (error.response && error.response.status === 404) {
+  if (error.action === "GET_TOKEN" && error.code === 403) {
+    return {
+      title: "Room code is disabled",
+      body: ErrorWithSupportLink(
+        "Room code corresponding to this link is no more active."
+      ),
+    };
+  } else if (error.action === "GET_TOKEN" && error.code === 404) {
+    return {
+      title: "Room code does not exist",
+      body: ErrorWithSupportLink(
+        "We could not find a room code corresponding to this link."
+      ),
+    };
+  } else if (error.action === "GET_TOKEN" && error.code === 2003) {
+    return {
+      title: "Endpoint is not reachable",
+      body: ErrorWithSupportLink(
+        `Endpoint is not reachable. ${error.description}.`
+      ),
+    };
+  } else if (error.response && error.response.status === 404) {
     return {
       title: "Room does not exist",
       body: ErrorWithSupportLink(
