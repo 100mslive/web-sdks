@@ -59,6 +59,7 @@ export class HMSWebrtcInternals {
         subscribe: this.subscribeConnection?.getStats.bind(this.subscribeConnection),
       },
       this.store,
+      this.eventBus,
     );
   }
 
