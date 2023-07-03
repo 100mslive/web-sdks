@@ -74,7 +74,7 @@ export function PDFFileOptions({ onOpenChange }) {
                   onChange={e => {
                     setPDFURL(e.target.value);
                   }}
-                  placeholder="e.g. https://www.coin.co/whitepaper.pdf"
+                  placeholder="Enter a valid PDF link to share"
                   type="text"
                   error={!isPDFUrlValid}
                 />
