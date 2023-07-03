@@ -8,7 +8,7 @@ import {
   Label,
   RadioGroup,
   Text,
-} from '@100mslive/react-ui';
+} from '@100mslive/roomkit-react';
 
 const CheckboxItem = ({ onClick, type, label, checked }) => {
   return (

@@ -1,8 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { HMSPrebuilt } from '@100mslive/roomkit-react';
 import merge from 'lodash.merge';
 import { logError } from 'zipyai';
-import { Box, Flex, Loading } from '@100mslive/react-ui';
+import { Box, Flex, HMSPrebuilt, Loading } from '@100mslive/roomkit-react';
 import {
   apiBasePath,
   getAuthInfo,

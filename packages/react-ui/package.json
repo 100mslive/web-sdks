@@ -1,5 +1,5 @@
 {
-  "name": "@100mslive/react-ui",
+  "name": "@100mslive/roomkit-react",
   "source": "src/index.ts",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",

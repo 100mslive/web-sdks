@@ -4,7 +4,7 @@ import {
   Flex,
   HorizontalDivider,
   Text,
-} from '@100mslive/react-ui';
+} from '@100mslive/roomkit-react';
 
 export const DialogContent = ({
   Icon,
