@@ -469,7 +469,7 @@ export default class HMSTransport implements ITransport {
     try {
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
-      this.webrtcInternals?.cleanUp();
+      this.webrtcInternals?.cleanup();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (notifyServer) {

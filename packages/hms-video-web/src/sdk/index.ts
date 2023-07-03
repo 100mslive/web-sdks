@@ -455,6 +455,7 @@ export class HMSSdk implements HMSInterface {
     this.roleChangeManager = new RoleChangeManager(
       this.store,
       this.transport,
+      this.deviceManager,
       this.getAndPublishTracks.bind(this),
       this.removeTrack.bind(this),
       this.listener,
@@ -499,15 +500,16 @@ export class HMSSdk implements HMSInterface {
     }
   }
 
-  private cleanUp() {
+  private cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
-    this.analyticsTimer.cleanUp();
+    this.analyticsTimer.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
     this.wakeLockManager?.cleanup();
+    LocalTrackManager.cleanup();
     this.notificationManager = undefined;
-    HMSLogger.cleanUp();
+    HMSLogger.cleanup();
     this.sdkState = { ...INITIAL_STATE };
     /**
      * when leave is called after preview itself without join.
@@ -519,7 +521,7 @@ export class HMSSdk implements HMSInterface {
       this.localPeer.videoTrack?.cleanup();
       this.localPeer.videoTrack = undefined;
     }
-    this.store.cleanUp();
+    this.store.cleanup();
     this.listener = undefined;
     if (this.roleChangeManager) {
       this.eventBus.localRoleUpdate.unsubscribe(this.handleLocalRoleUpdate);
@@ -542,7 +544,7 @@ export class HMSSdk implements HMSInterface {
       // we would want leave to succeed to stop stucked peer for others. The followup cleanup however is important
       // for cases where uses stays on the page post leave.
       await this.transport?.leave(notifyServer);
-      this.cleanUp();
+      this.cleanup();
       HMSLogger.d(this.TAG, `✅ Left room ${roomId}`);
     }
   }
@@ -1012,8 +1014,8 @@ export class HMSSdk implements HMSInterface {
     this.eventBus.deviceChange.unsubscribe(this.handleDeviceChange);
     this.eventBus.audioPluginFailed.unsubscribe(this.handleAudioPluginError);
     this.eventBus.autoplayError.unsubscribe(this.handleAutoplayError);
-    this.deviceManager.cleanUp();
-    this.audioSinkManager.cleanUp();
+    this.deviceManager.cleanup();
+    this.audioSinkManager.cleanup();
   }
 
   private initPreviewTrackAudioLevelMonitor() {

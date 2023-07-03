@@ -80,5 +80,5 @@ export interface IStore {
   setPoll(poll: HMSPoll): void;
   getPoll(id: string): HMSPoll | undefined;
 
-  cleanUp(): void;
+  cleanup(): void;
 }

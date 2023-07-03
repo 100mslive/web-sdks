@@ -49,39 +49,59 @@ export class TrackManager {
    */
   handleTrackAdd = (track: HMSRemoteTrack) => {
     HMSLogger.d(this.TAG, `ONTRACKADD`, `${track}`);
-    this.store.addTrack(track);
     this.tracksToProcess.set(track.trackId, track);
     this.processPendingTracks();
+  };
+
+  handleTrackRemovedPermanently = (notification: TrackStateNotification) => {
+    HMSLogger.d(this.TAG, `ONTRACKREMOVE`, notification);
+    const trackIds = Object.keys(notification.tracks);
+
+    trackIds.forEach(trackId => {
+      const trackStateEntry = this.store.getTrackState(trackId);
+
+      if (!trackStateEntry) {
+        return;
+      }
+
+      const track = this.store.getTrackById(trackId);
+      if (!track) {
+        HMSLogger.d(this.TAG, 'Track not found in store');
+        return;
+      }
+
+      // emit this event here as peer will already be removed(if left the room) by the time this event is received
+      track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+      this.store.removeTrack(track);
+      const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
+      if (!hmsPeer) {
+        return;
+      }
+      this.removePeerTracks(hmsPeer, track as HMSRemoteTrack);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+    });
   };
 
   /**
    * Sets the track of corresponding peer to null and returns the peer
    */
-  handleTrackRemove(track: HMSRemoteTrack): boolean {
+  handleTrackRemove(track: HMSRemoteTrack) {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
 
     const trackStateEntry = this.store.getTrackState(track.trackId);
 
     if (!trackStateEntry) {
-      return false;
+      return;
     }
 
     const storeHasTrack = this.store.hasTrack(track);
     if (!storeHasTrack) {
       HMSLogger.d(this.TAG, 'Track not found in store');
-      return false;
+      return;
     }
 
     // emit this event here as peer will already be removed(if left the room) by the time this event is received
     track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
-    this.store.removeTrack(track);
-    const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
-    if (!hmsPeer) {
-      return false;
-    }
-    this.removePeerTracks(hmsPeer, track);
-    this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
-    return true;
   }
 
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
@@ -208,6 +228,7 @@ export class TrackManager {
     } else {
       hmsPeer.auxiliaryTracks.push(track);
     }
+    this.store.addTrack(track);
     HMSLogger.d(this.TAG, 'audio track added', `${track}`);
   }
 
@@ -222,14 +243,17 @@ export class TrackManager {
       if (!hmsPeer.videoTrack) {
         hmsPeer.videoTrack = remoteTrack;
       } else {
-        (hmsPeer.videoTrack as HMSRemoteVideoTrack).replaceTrack(remoteTrack.nativeTrack);
+        (hmsPeer.videoTrack as HMSRemoteVideoTrack).replaceTrack(remoteTrack);
       }
+      this.store.addTrack(hmsPeer.videoTrack);
     } else {
       const index = hmsPeer.auxiliaryTracks.findIndex(track => track.trackId === remoteTrack.trackId);
       if (index === -1) {
         hmsPeer.auxiliaryTracks.push(remoteTrack);
+        this.store.addTrack(remoteTrack);
       } else {
-        hmsPeer.auxiliaryTracks.splice(index, 1, remoteTrack);
+        (hmsPeer.auxiliaryTracks[index] as HMSRemoteVideoTrack).replaceTrack(remoteTrack);
+        this.store.addTrack(hmsPeer.auxiliaryTracks[index]);
       }
     }
     HMSLogger.d(this.TAG, 'video track added', `${track}`);

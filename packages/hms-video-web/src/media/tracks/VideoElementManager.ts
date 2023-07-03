@@ -25,12 +25,12 @@ export class VideoElementManager {
     this.id = uuid();
   }
 
-  updateSinks() {
+  updateSinks(requestLayer = false) {
     for (const videoElement of this.videoElements) {
       if (this.track.enabled) {
-        this.track.addSink(videoElement);
+        this.track.addSink(videoElement, requestLayer);
       } else {
-        this.track.removeSink(videoElement);
+        this.track.removeSink(videoElement, requestLayer);
       }
     }
   }
