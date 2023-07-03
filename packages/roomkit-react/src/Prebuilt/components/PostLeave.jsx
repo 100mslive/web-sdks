@@ -2,11 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
 import { useNavigation } from './hooks/useNavigation';
-import {
-  defaultPreviewPreference,
-  UserPreferencesKeys,
-  useUserPreferences,
-} from './hooks/useUserPreferences';
+import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { ToastManager } from './Toast/ToastManager';
 import { Header } from './Header';
 import { Box, Button, Flex, Text, textEllipsis } from '../../';
@@ -17,10 +13,7 @@ const PostLeave = () => {
   const navigate = useNavigation();
   const { showPreview, roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
-  const [previewPreference] = useUserPreferences(
-    UserPreferencesKeys.PREVIEW,
-    defaultPreviewPreference
-  );
+  const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
     <Flex direction="column" css={{ size: '100%' }}>
       <Box css={{ h: '$18', '@md': { h: '$17' } }} data-testid="header">
@@ -35,10 +28,7 @@ const PostLeave = () => {
         <Text variant="h2" css={{ fontWeight: '$semiBold' }}>
           👋
         </Text>
-        <Text
-          variant="h4"
-          css={{ color: '$textHighEmp', fontWeight: '$semiBold', mt: '$12' }}
-        >
+        <Text variant="h4" css={{ color: '$textHighEmp', fontWeight: '$semiBold', mt: '$12' }}>
           You left the {getRoutePrefix() ? 'stream' : 'room'}
         </Text>
         <Text
@@ -59,17 +49,12 @@ const PostLeave = () => {
           !
         </Text>
         <Flex css={{ mt: '$14', gap: '$10', alignItems: 'center' }}>
-          <Text
-            variant="body1"
-            css={{ color: '$textMedEmp', fontWeight: '$regular' }}
-          >
+          <Text variant="body1" css={{ color: '$textMedEmp', fontWeight: '$regular' }}>
             Left by mistake?
           </Text>
           <Button
             onClick={() => {
-              let redirectUrl = `${showPreview ? '/preview/' : '/meeting/'}${
-                roomCode || roomId
-              }`;
+              let redirectUrl = `${showPreview ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
               if (role && roomId) redirectUrl += '/' + role;
               navigate(redirectUrl);
               ToastManager.clearAllToast();
@@ -77,9 +62,7 @@ const PostLeave = () => {
             data-testid="join_again_btn"
           >
             <ExitIcon />
-            <Text css={{ ml: '$3', fontWeight: '$semiBold', color: 'inherit' }}>
-              Rejoin
-            </Text>
+            <Text css={{ ml: '$3', fontWeight: '$semiBold', color: 'inherit' }}>Rejoin</Text>
           </Button>
         </Flex>
       </Flex>

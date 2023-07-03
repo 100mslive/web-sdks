@@ -1,5 +1,5 @@
-import React, { Fragment, useCallback, useMemo } from "react";
-import { useMedia } from "react-use";
+import React, { Fragment, useCallback, useMemo } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
   selectLocalPeerRoleName,
@@ -8,13 +8,13 @@ import {
   selectPeerSharingVideoPlaylist,
   selectScreenShareByPeerID,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { VideoPlayer } from "../components/Playlist/VideoPlayer";
-import { ScreenshareDisplay } from "../components/ScreenshareDisplay";
-import ScreenshareTile from "../components/ScreenshareTile";
-import VideoList from "../components/VideoList";
-import VideoTile from "../components/VideoTile";
-import { Box, config as cssConfig, Flex } from "../";
+} from '@100mslive/react-sdk';
+import { VideoPlayer } from '../components/Playlist/VideoPlayer';
+import { ScreenshareDisplay } from '../components/ScreenshareDisplay';
+import ScreenshareTile from '../components/ScreenshareTile';
+import VideoList from '../components/VideoList';
+import VideoTile from '../components/VideoTile';
+import { Box, config as cssConfig, Flex } from '../';
 
 const ScreenShareView = () => {
   // for smaller screen we will show sidebar in bottom
@@ -25,11 +25,9 @@ const ScreenShareView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const isPresenterFromMyRole =
-    peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
+  const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
   const amIPresenting = localPeerID === peerPresenting?.id;
-  const showPresenterInSmallTile =
-    showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
+  const showPresenterInSmallTile = showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
@@ -42,9 +40,9 @@ const ScreenShareView = () => {
   return (
     <Flex
       css={{
-        size: "100%",
+        size: '100%',
       }}
-      direction={showSidebarInBottom ? "column" : "row"}
+      direction={showSidebarInBottom ? 'column' : 'row'}
     >
       <ScreenShareComponent
         amIPresenting={amIPresenting}
@@ -52,13 +50,13 @@ const ScreenShareView = () => {
         peerSharingPlaylist={peerSharingPlaylist}
       />
       <Flex
-        direction={{ "@initial": "column", "@lg": "row" }}
+        direction={{ '@initial': 'column', '@lg': 'row' }}
         css={{
-          overflow: "hidden",
-          p: "$4 $8",
-          flex: "0 0 20%",
-          "@xl": {
-            flex: "1 1 0",
+          overflow: 'hidden',
+          p: '$4 $8',
+          flex: '0 0 20%',
+          '@xl': {
+            flex: '1 1 0',
           },
         }}
       >
@@ -86,13 +84,11 @@ export const SidePane = ({
   // The main peer's screenshare is already being shown in center view
   const shouldShowScreenFn = useCallback(
     peer => peerScreenSharing && peer.id !== peerScreenSharing.id,
-    [peerScreenSharing]
+    [peerScreenSharing],
   );
   return (
     <Fragment>
-      {!isPresenterInSmallTiles && (
-        <LargeTilePeerView peerScreenSharing={peerScreenSharing} />
-      )}
+      {!isPresenterInSmallTiles && <LargeTilePeerView peerScreenSharing={peerScreenSharing} />}
       <SmallTilePeersView
         showSidebarInBottom={showSidebarInBottom}
         smallTilePeers={smallTilePeers}
@@ -102,25 +98,19 @@ export const SidePane = ({
   );
 };
 
-const ScreenShareComponent = ({
-  amIPresenting,
-  peerPresenting,
-  peerSharingPlaylist,
-}) => {
-  const screenshareTrack = useHMSStore(
-    selectScreenShareByPeerID(peerPresenting?.id)
-  );
+const ScreenShareComponent = ({ amIPresenting, peerPresenting, peerSharingPlaylist }) => {
+  const screenshareTrack = useHMSStore(selectScreenShareByPeerID(peerPresenting?.id));
 
   if (peerSharingPlaylist) {
     return (
       <Box
         css={{
-          mx: "$8",
-          flex: "3 1 0",
-          "@xl": {
-            flex: "2 1 0",
-            display: "flex",
-            alignItems: "center",
+          mx: '$8',
+          flex: '3 1 0',
+          '@xl': {
+            flex: '2 1 0',
+            display: 'flex',
+            alignItems: 'center',
           },
         }}
       >
@@ -132,17 +122,14 @@ const ScreenShareComponent = ({
   return (
     <Box
       css={{
-        flex: "3 1 0",
-        mx: "$8",
-        "@xl": { ml: "$4", maxHeight: "80%", minHeight: 0 },
+        flex: '3 1 0',
+        mx: '$8',
+        '@xl': { ml: '$4', maxHeight: '80%', minHeight: 0 },
       }}
     >
       {peerPresenting &&
-        (amIPresenting &&
-        !["browser", "window", "application"].includes(
-          screenshareTrack?.displaySurface
-        ) ? (
-          <Box css={{ objectFit: "contain", h: "100%" }}>
+        (amIPresenting && !['browser', 'window', 'application'].includes(screenshareTrack?.displaySurface) ? (
+          <Box css={{ objectFit: 'contain', h: '100%' }}>
             <ScreenshareDisplay />
           </Box>
         ) : (
@@ -152,16 +139,11 @@ const ScreenShareComponent = ({
   );
 };
 
-const SmallTilePeersView = ({
-  smallTilePeers,
-  shouldShowScreenFn,
-  showStatsOnTiles,
-  showSidebarInBottom,
-}) => {
+const SmallTilePeersView = ({ smallTilePeers, shouldShowScreenFn, showStatsOnTiles, showSidebarInBottom }) => {
   return (
     <Flex
       css={{
-        flex: "2 1 0",
+        flex: '2 1 0',
       }}
     >
       {smallTilePeers && smallTilePeers.length > 0 && (
@@ -180,27 +162,22 @@ const LargeTilePeerView = ({ peerScreenSharing, showStatsOnTiles }) => {
   return peerScreenSharing ? (
     <Box
       css={{
-        flex: "1 1 0",
-        minHeight: "25%",
-        py: "$4",
-        "@lg": {
-          mr: "$4",
-          minHeight: "unset",
+        flex: '1 1 0',
+        minHeight: '25%',
+        py: '$4',
+        '@lg': {
+          mr: '$4',
+          minHeight: 'unset',
           py: 0,
         },
-        "@sm": {
-          height: "100%",
-          maxHeight: "75%",
-          alignSelf: "center",
+        '@sm': {
+          height: '100%',
+          maxHeight: '75%',
+          alignSelf: 'center',
         },
       }}
     >
-      <VideoTile
-        showStatsOnTiles={showStatsOnTiles}
-        width="100%"
-        height="100%"
-        peerId={peerScreenSharing.id}
-      />
+      <VideoTile showStatsOnTiles={showStatsOnTiles} width="100%" height="100%" peerId={peerScreenSharing.id} />
     </Box>
   ) : null;
 };

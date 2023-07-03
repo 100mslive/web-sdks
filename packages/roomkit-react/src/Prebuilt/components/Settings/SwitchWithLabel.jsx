@@ -1,36 +1,29 @@
-import React from "react";
-import { Flex, Label, Switch } from "../../../";
+import React from 'react';
+import { Flex, Label, Switch } from '../../../';
 
-const SwitchWithLabel = ({
-  label,
-  icon,
-  id,
-  onChange,
-  checked,
-  hide = false,
-}) => {
+const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) => {
   return (
     <Flex
       align="center"
       css={{
-        my: "$2",
-        py: "$8",
-        w: "100%",
-        borderBottom: "1px solid $borderDefault",
-        display: hide ? "none" : "flex",
+        my: '$2',
+        py: '$8',
+        w: '100%',
+        borderBottom: '1px solid $borderDefault',
+        display: hide ? 'none' : 'flex',
       }}
     >
       <Label
         htmlFor={id}
         css={{
-          fontSize: "$md",
-          fontWeight: "$semiBold",
-          color: checked ? "$textHighEmp" : "$textDisabled",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "$8",
-          flex: "1 1 0",
+          fontSize: '$md',
+          fontWeight: '$semiBold',
+          color: checked ? '$textHighEmp' : '$textDisabled',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '$8',
+          flex: '1 1 0',
         }}
       >
         {icon}

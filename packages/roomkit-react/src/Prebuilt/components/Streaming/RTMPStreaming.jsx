@@ -1,59 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  selectAppData,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
-import {
-  AddCircleIcon,
-  EndStreamIcon,
-  GoLiveIcon,
-  PencilIcon,
-  SettingsIcon,
-  TrashIcon,
-} from '@100mslive/react-icons';
-import {
-  Container,
-  ContentBody,
-  ContentHeader,
-  ErrorText,
-  RecordStream,
-} from './Common';
+import { selectAppData, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+import { AddCircleIcon, EndStreamIcon, GoLiveIcon, PencilIcon, SettingsIcon, TrashIcon } from '@100mslive/react-icons';
+import { Accordion, Box, Button, Flex, Input, Label, Loading, Text } from '../../../';
+import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
 import { ResolutionInput } from './ResolutionInput';
-import {
-  Accordion,
-  Box,
-  Button,
-  Flex,
-  Input,
-  Label,
-  Loading,
-  Text,
-} from '../../';
-import {
-  APP_DATA,
-  RTMP_RECORD_DEFAULT_RESOLUTION,
-} from '../../common/constants';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-import {
-  UserPreferencesKeys,
-  useUserPreferences,
-} from '../hooks/useUserPreferences';
+import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export const RTMPStreaming = ({ onBack }) => {
   const { isRTMPRunning } = useRecordingStreaming();
 
   return (
     <Container>
-      <ContentHeader
-        title="Start Streaming"
-        content="Choose a destination"
-        onBack={onBack}
-      />
+      <ContentHeader title="Start Streaming" content="Choose a destination" onBack={onBack} />
       <ContentBody Icon={SettingsIcon} title="RTMP">
-        Live Stream your call to Twitch, YouTube, Facebook and any app which
-        supports RTMP, all at the same time
+        Live Stream your call to Twitch, YouTube, Facebook and any app which supports RTMP, all at the same time
       </ContentBody>
       {!isRTMPRunning ? <StartRTMP /> : <EndRTMP />}
     </Container>
@@ -61,9 +23,7 @@ export const RTMPStreaming = ({ onBack }) => {
 };
 
 const StartRTMP = () => {
-  const [rtmpPreference = [], setRTMPPreference] = useUserPreferences(
-    UserPreferencesKeys.RTMP_URLS
-  );
+  const [rtmpPreference = [], setRTMPPreference] = useUserPreferences(UserPreferencesKeys.RTMP_URLS);
   const [rtmpStreams, setRTMPStreams] = useState(
     rtmpPreference.length > 0
       ? rtmpPreference
@@ -74,19 +34,15 @@ const StartRTMP = () => {
             rtmpURL: '',
             streamKey: '',
           },
-        ]
+        ],
   );
   const hmsActions = useHMSActions();
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [error, setError] = useState(false);
   const [record, setRecord] = useState(false);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
-  const [isRTMPStarted, setRTMPStarted] = useSetAppDataByKey(
-    APP_DATA.rtmpStarted
-  );
-  const hasRTMPURL = rtmpStreams.some(
-    value => value.rtmpURL && value.streamKey
-  );
+  const [isRTMPStarted, setRTMPStarted] = useSetAppDataByKey(APP_DATA.rtmpStarted);
+  const hasRTMPURL = rtmpStreams.some(value => value.rtmpURL && value.streamKey);
 
   return (
     <Box
@@ -98,11 +54,7 @@ const StartRTMP = () => {
     >
       {rtmpStreams.length > 0 && (
         <Box css={{ px: '$10' }}>
-          <Accordion.Root
-            type="single"
-            collapsible
-            defaultValue={rtmpStreams[0].id}
-          >
+          <Accordion.Root type="single" collapsible defaultValue={rtmpStreams[0].id}>
             {rtmpStreams.map((rtmp, index) => {
               return (
                 <Accordion.Item
@@ -114,16 +66,9 @@ const StartRTMP = () => {
                     my: '$4',
                   }}
                 >
-                  <AccordionHeader
-                    rtmp={rtmp}
-                    setRTMPStreams={setRTMPStreams}
-                  />
+                  <AccordionHeader rtmp={rtmp} setRTMPStreams={setRTMPStreams} />
                   <Accordion.Content css={{ px: '$8', py: 0 }}>
-                    <RTMPForm
-                      {...rtmp}
-                      setRTMPStreams={setRTMPStreams}
-                      testId={`${index}_rtmp`}
-                    />
+                    <RTMPForm {...rtmp} setRTMPStreams={setRTMPStreams} testId={`${index}_rtmp`} />
                   </Accordion.Content>
                 </Accordion.Item>
               );
@@ -141,11 +86,7 @@ const StartRTMP = () => {
           my: '$8',
         }}
       />
-      <RecordStream
-        record={record}
-        setRecord={setRecord}
-        testId="rtmp_recording"
-      />
+      <RecordStream record={record} setRecord={setRecord} testId="rtmp_recording" />
       <Box css={{ p: '$8 $10', '@lg': { display: 'flex', gap: '$4' } }}>
         {rtmpStreams.length < 3 && (
           <Button
@@ -180,20 +121,14 @@ const StartRTMP = () => {
           onClick={async () => {
             try {
               const hasInvalidData = rtmpStreams.find(
-                value =>
-                  (value.rtmpURL && !value.streamKey) ||
-                  (value.streamKey && !value.rtmpURL)
+                value => (value.rtmpURL && !value.streamKey) || (value.streamKey && !value.rtmpURL),
               );
               if (hasInvalidData || (rtmpStreams.length > 0 && !hasRTMPURL)) {
                 return;
               }
               setError('');
               setRTMPStarted(true);
-              const urls = hasRTMPURL
-                ? rtmpStreams.map(
-                    value => `${value.rtmpURL}/${value.streamKey}`
-                  )
-                : [];
+              const urls = hasRTMPURL ? rtmpStreams.map(value => `${value.rtmpURL}/${value.streamKey}`) : [];
               await hmsActions.startRTMPOrRecording({
                 rtmpURLs: urls,
                 meetingURL: recordingUrl,
@@ -208,11 +143,7 @@ const StartRTMP = () => {
             }
           }}
         >
-          {isRTMPStarted ? (
-            <Loading size={24} color="currentColor" />
-          ) : (
-            <GoLiveIcon />
-          )}
+          {isRTMPStarted ? <Loading size={24} color="currentColor" /> : <GoLiveIcon />}
           {isRTMPStarted ? 'Starting stream...' : 'Go Live'}
         </Button>
         <ErrorText error={error} />
@@ -270,10 +201,7 @@ const ActionIcon = ({ icon: Icon, onClick }) => {
 
 const FormLabel = ({ id, children }) => {
   return (
-    <Label
-      htmlFor={id}
-      css={{ color: '$textHighEmp', my: '$4', fontSize: '$sm' }}
-    >
+    <Label htmlFor={id} css={{ color: '$textHighEmp', my: '$4', fontSize: '$sm' }}>
       {children}
     </Label>
   );
@@ -300,7 +228,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
               id,
               value: e.target.value,
               key: e.target.name,
-            })
+            }),
           );
         }}
         required
@@ -322,7 +250,7 @@ const RTMPForm = ({ rtmpURL, id, streamKey, setRTMPStreams, testId }) => {
               id,
               value: e.target.value,
               key: e.target.name,
-            })
+            }),
           );
         }}
         required
@@ -355,7 +283,7 @@ const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
                     stream.name = value;
                   }
                   return stream;
-                })
+                }),
               );
               setEdit(false);
             }
@@ -374,9 +302,7 @@ const AccordionHeader = ({ rtmp, setRTMPStreams }) => {
         />
         <ActionIcon
           onClick={() => {
-            setRTMPStreams(streams =>
-              streams.filter(stream => stream.id !== rtmp.id)
-            );
+            setRTMPStreams(streams => streams.filter(stream => stream.id !== rtmp.id));
           }}
           icon={TrashIcon}
         />

@@ -1,9 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import {
-  selectLocalPeerID,
-  useHMSStore,
-  useVideoList,
-} from '@100mslive/react-sdk';
+import { selectLocalPeerID, useHMSStore, useVideoList } from '@100mslive/react-sdk';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { Pagination } from './Pagination';
@@ -13,13 +9,7 @@ import { StyledVideoList, useTheme } from '../../';
 import { UI_SETTINGS } from '../common/constants';
 import useSortedPeers from '../common/useSortedPeers';
 
-const List = ({
-  maxTileCount,
-  peers,
-  maxColCount,
-  maxRowCount,
-  includeScreenShareForPeer,
-}) => {
+const List = ({ maxTileCount, peers, maxColCount, maxRowCount, includeScreenShareForPeer }) => {
   const { aspectRatio } = useTheme();
   const tileOffset = useAppConfig('headlessConfig', 'tileOffset');
   const isHeadless = useIsHeadless();
@@ -47,9 +37,7 @@ const List = ({
   }, [pagesWithTiles.length, page]);
   return (
     <StyledVideoList.Root ref={ref}>
-      <StyledVideoList.Container
-        css={{ flexWrap: 'wrap', placeContent: 'center' }}
-      >
+      <StyledVideoList.Container css={{ flexWrap: 'wrap', placeContent: 'center' }}>
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles[page]?.map(tile => {
               if (tile.width === 0 || tile.height === 0) {
@@ -58,11 +46,7 @@ const List = ({
               return (
                 <Fragment key={tile.track?.id || tile.peer.id}>
                   {tile.track?.source === 'screen' ? (
-                    <ScreenshareTile
-                      width={tile.width}
-                      height={tile.height}
-                      peerId={tile.peer.id}
-                    />
+                    <ScreenshareTile width={tile.width} height={tile.height} peerId={tile.peer.id} />
                   ) : (
                     <VideoTile
                       width={tile.width}
@@ -77,11 +61,7 @@ const List = ({
           : null}
       </StyledVideoList.Container>
       {!isHeadless && pagesWithTiles.length > 1 ? (
-        <Pagination
-          page={page}
-          setPage={setPage}
-          numPages={pagesWithTiles.length}
-        />
+        <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} />
       ) : null}
     </StyledVideoList.Root>
   );

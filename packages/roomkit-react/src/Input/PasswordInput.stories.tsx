@@ -1,8 +1,8 @@
 import React from 'react';
 import { useMeasure } from 'react-use';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { PasswordInput } from './Input';
 import { Box } from '../Layout';
+import { PasswordInput } from './Input';
 
 export default {
   title: 'UI Components/PasswordInput',

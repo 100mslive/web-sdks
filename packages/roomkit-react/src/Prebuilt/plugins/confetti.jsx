@@ -1,15 +1,15 @@
-import React, { useCallback, useEffect, useRef } from "react";
-import { useMedia } from "react-use";
-import JSConfetti from "js-confetti";
-import { useCustomEvent } from "@100mslive/react-sdk";
+import React, { useCallback, useEffect, useRef } from 'react';
+import { useMedia } from 'react-use';
+import JSConfetti from 'js-confetti';
+import { useCustomEvent } from '@100mslive/react-sdk';
 
-const confettiMsgType = "CONFETTI";
+const confettiMsgType = 'CONFETTI';
 
 const emojiCollections = {
-  hearts: ["❤️", "😍", "♥️"],
-  birthday: ["🎂", "🍰", "🎁"],
-  yes: ["🙌", "✨", "🔥", "❤️"],
-  no: ["🙅", "⛔", "❌"],
+  hearts: ['❤️', '😍', '♥️'],
+  birthday: ['🎂', '🍰', '🎁'],
+  yes: ['🙌', '✨', '🔥', '❤️'],
+  no: ['🙅', '⛔', '❌'],
 };
 
 /**
@@ -19,7 +19,7 @@ const emojiCollections = {
  */
 export function Confetti() {
   // https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
-  const disableMotion = useMedia("(prefers-reduced-motion: reduce)");
+  const disableMotion = useMedia('(prefers-reduced-motion: reduce)');
   const jsConfetti = useRef(null);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export function Confetti() {
         jsConfetti.current.addConfetti(config);
       }
     },
-    [disableMotion]
+    [disableMotion],
   );
 
   const { sendEvent } = useCustomEvent({
@@ -48,7 +48,7 @@ export function Confetti() {
       }
       sendEvent({ emojis });
     },
-    [sendEvent]
+    [sendEvent],
   );
 
   // putting the function to send on window for quick access

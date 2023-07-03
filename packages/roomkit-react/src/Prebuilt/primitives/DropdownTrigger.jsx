@@ -1,48 +1,46 @@
-import React from "react";
-import { ChevronDownIcon, ChevronUpIcon } from "@100mslive/react-icons";
-import { Dropdown, Flex, Text, textEllipsis } from "../";
+import React from 'react';
+import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
+import { Dropdown, Flex, Text, textEllipsis } from '../';
 
-const DialogDropdownTrigger = React.forwardRef(
-  ({ title, css, open, icon, titleCSS = {} }, ref) => {
-    return (
-      <Dropdown.Trigger
-        asChild
-        data-testid={`${title}_selector`}
+const DialogDropdownTrigger = React.forwardRef(({ title, css, open, icon, titleCSS = {} }, ref) => {
+  return (
+    <Dropdown.Trigger
+      asChild
+      data-testid={`${title}_selector`}
+      css={{
+        border: '1px solid $borderLight',
+        bg: '$surfaceLight',
+        r: '$1',
+        p: '$6 $9',
+        zIndex: 10,
+        ...css,
+      }}
+      ref={ref}
+    >
+      <Flex
         css={{
-          border: "1px solid $borderLight",
-          bg: "$surfaceLight",
-          r: "$1",
-          p: "$6 $9",
-          zIndex: 10,
-          ...css,
+          display: 'flex',
+          justifyContent: 'space-between',
+          color: '$textHighEmp',
+          w: '100%',
         }}
-        ref={ref}
       >
-        <Flex
+        {icon}
+        <Text
           css={{
-            display: "flex",
-            justifyContent: "space-between",
-            color: "$textHighEmp",
-            w: "100%",
+            color: 'inherit',
+            ...textEllipsis('90%'),
+            flex: '1 1 0',
+            mx: icon ? '$6' : '0',
+            ...titleCSS,
           }}
         >
-          {icon}
-          <Text
-            css={{
-              color: "inherit",
-              ...textEllipsis("90%"),
-              flex: "1 1 0",
-              mx: icon ? "$6" : "0",
-              ...titleCSS,
-            }}
-          >
-            {title}
-          </Text>
-          {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
-        </Flex>
-      </Dropdown.Trigger>
-    );
-  }
-);
+          {title}
+        </Text>
+        {open ? <ChevronUpIcon /> : <ChevronDownIcon />}
+      </Flex>
+    </Dropdown.Trigger>
+  );
+});
 
 export { DialogDropdownTrigger };

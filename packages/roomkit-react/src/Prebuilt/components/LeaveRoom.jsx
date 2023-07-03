@@ -1,38 +1,14 @@
 import React, { Fragment, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  selectIsConnectedToRoom,
-  selectPermissions,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
-import {
-  AlertTriangleIcon,
-  ExitIcon,
-  HangUpIcon,
-  VerticalMenuIcon,
-} from '@100mslive/react-icons';
+import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { AlertTriangleIcon, ExitIcon, HangUpIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useNavigation } from './hooks/useNavigation';
 import { ToastManager } from './Toast/ToastManager';
-import {
-  Box,
-  Button,
-  Dialog,
-  Dropdown,
-  Flex,
-  IconButton,
-  styled,
-  Text,
-  Tooltip,
-} from '../../';
+import { Box, Button, Dialog, Dropdown, Flex, IconButton, styled, Text, Tooltip } from '../../';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { isStreamingKit } from '../common/utils';
-import {
-  DialogCheckbox,
-  DialogContent,
-  DialogRow,
-} from '../primitives/DialogContent';
+import { DialogCheckbox, DialogContent, DialogRow } from '../primitives/DialogContent';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
@@ -94,10 +70,7 @@ export const LeaveRoom = () => {
                   <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
                     <ExitIcon key="hangUp" />
                   </Box>
-                  <Text
-                    css={{ '@md': { display: 'none' }, color: 'inherit' }}
-                    variant="button"
-                  >
+                  <Text css={{ '@md': { display: 'none' }, color: 'inherit' }} variant="button">
                     Leave Studio
                   </Text>
                 </Flex>
@@ -113,10 +86,7 @@ export const LeaveRoom = () => {
                 },
               }}
             >
-              <MenuTriggerButton
-                variant="danger"
-                data-testid="leave_end_dropdown_trigger"
-              >
+              <MenuTriggerButton variant="danger" data-testid="leave_end_dropdown_trigger">
                 <VerticalMenuIcon />
               </MenuTriggerButton>
             </Dropdown.Trigger>
@@ -142,19 +112,13 @@ export const LeaveRoom = () => {
                   </Flex>
                 </Flex>
               </Dropdown.Item>
-              <Dropdown.Item
-                css={{ bg: '$surfaceDefault' }}
-                onClick={leaveRoom}
-                data-testid="just_leave_btn"
-              >
+              <Dropdown.Item css={{ bg: '$surfaceDefault' }} onClick={leaveRoom} data-testid="just_leave_btn">
                 <Flex gap={4}>
                   <Box>
                     <ExitIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="lg">
-                      Leave {isStreamKit ? 'Studio' : 'Room'}
-                    </Text>
+                    <Text variant="lg">Leave {isStreamKit ? 'Studio' : 'Room'}</Text>
                     <Text variant="sm" css={{ c: '$textMedEmp', mt: '$2' }}>
                       You can always rejoin later
                     </Text>
@@ -165,12 +129,7 @@ export const LeaveRoom = () => {
           </Dropdown.Root>
         </Flex>
       ) : (
-        <LeaveIconButton
-          onClick={leaveRoom}
-          variant="danger"
-          key="LeaveRoom"
-          data-testid="leave_room_btn"
-        >
+        <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
             <Box>
               {isStreamKit ? (
@@ -195,18 +154,9 @@ export const LeaveRoom = () => {
         }}
       >
         <DialogContent title="End Room" Icon={HangUpIcon}>
-          <DialogCheckbox
-            id="lockRoom"
-            title="Disable future joins"
-            value={lockRoom}
-            onChange={setLockRoom}
-          />
+          <DialogCheckbox id="lockRoom" title="Disable future joins" value={lockRoom} onChange={setLockRoom} />
           <DialogRow justify="end">
-            <Button
-              variant="danger"
-              onClick={endRoom}
-              data-testid="lock_end_room"
-            >
+            <Button variant="danger" onClick={endRoom} data-testid="lock_end_room">
               End Room
             </Button>
           </DialogRow>

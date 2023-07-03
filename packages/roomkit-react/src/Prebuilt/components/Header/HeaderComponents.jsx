@@ -1,36 +1,17 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import {
-  selectDominantSpeaker,
-  selectIsConnectedToRoom,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import {
-  config as cssConfig,
-  Flex,
-  styled,
-  Text,
-  textEllipsis,
-  useTheme,
-} from '../../';
+import { config as cssConfig, Flex, styled, Text, textEllipsis, useTheme } from '../../../';
 import { isStreamingKit } from '../../common/utils';
 import { useLogo } from '../AppData/useUISettings';
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
-    <Flex
-      align="center"
-      justify="center"
-      css={{ flex: '1 1 0', color: '$textPrimary', '@md': { display: 'none' } }}
-    >
+    <Flex align="center" justify="center" css={{ flex: '1 1 0', color: '$textPrimary', '@md': { display: 'none' } }}>
       <VolumeOneIcon />
-      <Text
-        variant="md"
-        css={{ ...textEllipsis(200), ml: '$2' }}
-        title={dominantSpeaker.name}
-      >
+      <Text variant="md" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
         {dominantSpeaker.name}
       </Text>
     </Flex>
@@ -60,10 +41,7 @@ export const Logo = () => {
   return (
     <LogoImg
       src={
-        logo ||
-        (themeType === 'dark'
-          ? require('../../images/logo-light.svg')
-          : require('../../images/logo-dark.svg'))
+        logo || (themeType === 'dark' ? import('../../images/logo-light.svg') : import('../../images/logo-dark.svg'))
       }
       alt="Brand Logo"
       width={132}

@@ -35,6 +35,7 @@ export interface LinkProps extends React.ComponentProps<typeof LinkComponent> {
 }
 
 export const Link = ({ iconSide = 'left', icon, color = 'primary', children, ...rest }: LinkProps) => {
+  // eslint-disable-next-line import/namespace
   const Icon = icon ? icons[icon] : React.Fragment;
   const renderedIcon = icon ? (
     <Flex as="span">

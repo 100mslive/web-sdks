@@ -29,23 +29,14 @@ import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { ToastManager } from './Toast/ToastManager';
 import { Box, Flex, Slider, StyledMenuTile, Text } from '../../';
-import {
-  APP_DATA,
-  FEATURE_LIST,
-  REMOTE_STOP_SCREENSHARE_TYPE,
-  SESSION_STORE_KEY,
-} from '../common/constants';
+import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../common/constants';
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
-  trackId &&
-  ((videoTrackID && videoTrackID === trackId) ||
-    (audioTrackID && audioTrackID === trackId));
+  trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
   const hmsActions = useHMSActions();
-  const spotlightTrackId = useHMSStore(
-    selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)
-  );
+  const spotlightTrackId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const isTileSpotlighted = isSameTile({
     trackId: spotlightTrackId,
     videoTrackID,
@@ -59,26 +50,16 @@ const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
 
   return (
     <StyledMenuTile.ItemButton
-      onClick={() =>
-        isTileSpotlighted
-          ? setSpotlightTrackId()
-          : setSpotlightTrackId(videoTrackID || audioTrackID)
-      }
+      onClick={() => (isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(videoTrackID || audioTrackID))}
     >
       <StarIcon />
-      <span>
-        {isTileSpotlighted
-          ? 'Remove from Spotlight'
-          : 'Spotlight Tile for everyone'}
-      </span>
+      <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
     </StyledMenuTile.ItemButton>
   );
 };
 
 const PinActions = ({ audioTrackID, videoTrackID }) => {
-  const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(
-    APP_DATA.pinnedTrackId
-  );
+  const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
 
   const isTilePinned = isSameTile({
     trackId: pinnedTrackId,
@@ -89,11 +70,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
   return (
     <>
       <StyledMenuTile.ItemButton
-        onClick={() =>
-          isTilePinned
-            ? setPinnedTrackId()
-            : setPinnedTrackId(videoTrackID || audioTrackID)
-        }
+        onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
         <PinIcon />
         <span>{`${isTilePinned ? 'Unpin' : 'Pin'}`} Tile for myself</span>
@@ -107,56 +84,33 @@ const showSpotlight = process.env.REACT_APP_ENV === 'qa';
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
-const TileMenu = ({
-  audioTrackID,
-  videoTrackID,
-  peerID,
-  isScreenshare = false,
-}) => {
+const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false }) => {
   const [open, setOpen] = useState(false);
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
   const { removeOthers } = useHMSStore(selectPermissions);
-  const {
-    isAudioEnabled,
-    isVideoEnabled,
-    setVolume,
-    toggleAudio,
-    toggleVideo,
-    volume,
-  } = useRemoteAVToggle(audioTrackID, videoTrackID);
+  const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
+    audioTrackID,
+    videoTrackID,
+  );
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
-  const isPrimaryVideoTrack =
-    useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
+  const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
   const uiMode = useHMSStore(selectTemplateAppData).uiMode;
   const isInset = uiMode === 'inset';
 
   const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
-  const showPinAction =
-    isPinEnabled &&
-    (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) &&
-    !isInset;
+  const showPinAction = isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
-  const hideSimulcastLayers =
-    !track?.layerDefinitions?.length || track.degraded || !track.enabled;
+  const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
 
   useDropdownList({ open, name: 'TileMenu' });
 
-  if (
-    !(
-      removeOthers ||
-      toggleAudio ||
-      toggleVideo ||
-      setVolume ||
-      showPinAction
-    ) &&
-    hideSimulcastLayers
-  ) {
+  if (!(removeOthers || toggleAudio || toggleVideo || setVolume || showPinAction) && hideSimulcastLayers) {
     return null;
   }
 
@@ -166,26 +120,15 @@ const TileMenu = ({
 
   return (
     <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
-      <StyledMenuTile.Trigger
-        data-testid="participant_menu_btn"
-        onClick={e => e.stopPropagation()}
-      >
+      <StyledMenuTile.Trigger data-testid="participant_menu_btn" onClick={e => e.stopPropagation()}>
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
       <StyledMenuTile.Content side="top" align="end">
         {isLocal ? (
           showPinAction && (
             <>
-              <PinActions
-                audioTrackID={audioTrackID}
-                videoTrackID={videoTrackID}
-              />
-              {showSpotlight && (
-                <SpotlightActions
-                  audioTrackID={audioTrackID}
-                  videoTrackID={videoTrackID}
-                />
-              )}
+              <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
+              {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
             </>
           )
         ) : (
@@ -193,11 +136,7 @@ const TileMenu = ({
             {toggleVideo ? (
               <StyledMenuTile.ItemButton
                 onClick={toggleVideo}
-                data-testid={
-                  isVideoEnabled
-                    ? 'mute_video_participant_btn'
-                    : 'unmute_video_participant_btn'
-                }
+                data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
               >
                 {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
                 <span>{`${isVideoEnabled ? 'Mute' : 'Request Unmute'}`}</span>
@@ -206,11 +145,7 @@ const TileMenu = ({
             {toggleAudio ? (
               <StyledMenuTile.ItemButton
                 onClick={toggleAudio}
-                data-testid={
-                  isVideoEnabled
-                    ? 'mute_audio_participant_btn'
-                    : 'unmute_audio_participant_btn'
-                }
+                data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
               >
                 {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
                 <span>{`${isAudioEnabled ? 'Mute' : 'Request Unmute'}`}</span>
@@ -224,26 +159,13 @@ const TileMenu = ({
                     Volume ({volume})
                   </Box>
                 </Flex>
-                <Slider
-                  css={{ my: '0.5rem' }}
-                  step={5}
-                  value={[volume]}
-                  onValueChange={e => setVolume(e[0])}
-                />
+                <Slider css={{ my: '0.5rem' }} step={5} value={[volume]} onValueChange={e => setVolume(e[0])} />
               </StyledMenuTile.VolumeItem>
             ) : null}
             {showPinAction && (
               <>
-                <PinActions
-                  audioTrackID={audioTrackID}
-                  videoTrackID={videoTrackID}
-                />
-                {showSpotlight && (
-                  <SpotlightActions
-                    audioTrackID={audioTrackID}
-                    videoTrackID={videoTrackID}
-                  />
-                )}
+                <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
+                {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
               </>
             )}
             <SimulcastLayers trackId={videoTrackID} />
@@ -283,14 +205,10 @@ const SimulcastLayers = ({ trackId }) => {
   if (!track?.layerDefinitions?.length || track.degraded || !track.enabled) {
     return null;
   }
-  const currentLayer = track.layerDefinitions.find(
-    layer => layer.layer === track.layer
-  );
+  const currentLayer = track.layerDefinitions.find(layer => layer.layer === track.layer);
   return (
     <Fragment>
-      <StyledMenuTile.ItemButton
-        css={{ color: '$textMedEmp', cursor: 'default' }}
-      >
+      <StyledMenuTile.ItemButton css={{ color: '$textMedEmp', cursor: 'default' }}>
         Select maximum resolution
       </StyledMenuTile.ItemButton>
       {track.layerDefinitions.map(layer => {
@@ -313,10 +231,7 @@ const SimulcastLayers = ({ trackId }) => {
               css={{
                 textTransform: 'capitalize',
                 mr: '$2',
-                fontWeight:
-                  track.preferredLayer === layer.layer
-                    ? '$semiBold'
-                    : '$regular',
+                fontWeight: track.preferredLayer === layer.layer ? '$semiBold' : '$regular',
               }}
             >
               {layer.layer}
@@ -342,8 +257,7 @@ const SimulcastLayers = ({ trackId }) => {
           >
             {currentLayer ? (
               <>
-                {track.layer} ({currentLayer.resolution.width}x
-                {currentLayer.resolution.height})
+                {track.layer} ({currentLayer.resolution.width}x{currentLayer.resolution.height})
               </>
             ) : (
               '-'

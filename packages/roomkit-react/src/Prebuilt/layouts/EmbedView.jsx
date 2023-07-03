@@ -1,11 +1,5 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { useMedia } from "react-use";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
   selectLocalPeerRoleName,
@@ -14,11 +8,11 @@ import {
   throwErrorHandler,
   useHMSStore,
   useScreenShare,
-} from "@100mslive/react-sdk";
-import { SidePane } from "./screenShareView";
-import { APP_DATA } from "../common/constants";
-import { useSetAppDataByKey } from "../components/AppData/useUISettings";
-import { Box, config as cssConfig, Flex } from "../";
+} from '@100mslive/react-sdk';
+import { SidePane } from './screenShareView';
+import { APP_DATA } from '../common/constants';
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
+import { Box, config as cssConfig, Flex } from '../';
 
 export const EmbedView = () => {
   return (
@@ -36,11 +30,9 @@ export const EmbebScreenShareView = ({ children }) => {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
-  const isPresenterFromMyRole =
-    peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
+  const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
   const amIPresenting = localPeerID === peerPresenting?.id;
-  const showPresenterInSmallTile =
-    showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
+  const showPresenterInSmallTile = showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
@@ -50,19 +42,16 @@ export const EmbebScreenShareView = ({ children }) => {
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
   return (
-    <Flex
-      css={{ size: "100%" }}
-      direction={showSidebarInBottom ? "column" : "row"}
-    >
+    <Flex css={{ size: '100%' }} direction={showSidebarInBottom ? 'column' : 'row'}>
       {children}
       <Flex
-        direction={{ "@initial": "column", "@lg": "row" }}
+        direction={{ '@initial': 'column', '@lg': 'row' }}
         css={{
-          overflow: "hidden",
-          p: "$4 $8",
-          flex: "0 0 20%",
-          "@xl": {
-            flex: "1 1 0",
+          overflow: 'hidden',
+          p: '$4 $8',
+          flex: '0 0 20%',
+          '@xl': {
+            flex: '1 1 0',
           },
         }}
       >
@@ -79,11 +68,8 @@ export const EmbebScreenShareView = ({ children }) => {
 };
 
 const EmbedComponent = () => {
-  const { amIScreenSharing, toggleScreenShare } =
-    useScreenShare(throwErrorHandler);
-  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(
-    APP_DATA.embedConfig
-  );
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(throwErrorHandler);
+  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
   const [wasScreenShared, setWasScreenShared] = useState(false);
   // to handle - https://github.com/facebook/react/issues/24502
   const screenShareAttemptInProgress = useRef(false);
@@ -92,17 +78,12 @@ const EmbedComponent = () => {
 
   const resetEmbedConfig = useCallback(() => {
     if (src) {
-      setEmbedConfig({ url: "" });
+      setEmbedConfig({ url: '' });
     }
   }, [src, setEmbedConfig]);
 
   useEffect(() => {
-    if (
-      embedConfig.shareScreen &&
-      !amIScreenSharing &&
-      !wasScreenShared &&
-      !screenShareAttemptInProgress.current
-    ) {
+    if (embedConfig.shareScreen && !amIScreenSharing && !wasScreenShared && !screenShareAttemptInProgress.current) {
       screenShareAttemptInProgress.current = true;
       // start screenshare on load for others in the room to see
       toggleScreenShare({
@@ -138,19 +119,19 @@ const EmbedComponent = () => {
     <Box
       ref={iframeRef}
       css={{
-        mx: "$8",
-        flex: "3 1 0",
-        "@lg": {
-          flex: "2 1 0",
-          display: "flex",
-          alignItems: "center",
+        mx: '$8',
+        flex: '3 1 0',
+        '@lg': {
+          flex: '2 1 0',
+          display: 'flex',
+          alignItems: 'center',
         },
       }}
     >
       <iframe
         src={src}
         title={src}
-        style={{ width: "100%", height: "100%", border: 0 }}
+        style={{ width: '100%', height: '100%', border: 0 }}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
         referrerPolicy="no-referrer"
       />

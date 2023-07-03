@@ -1,4 +1,4 @@
-import { Flex, styled } from '../../';
+import { Flex, styled } from '../../../';
 
 export const VideoControls = styled(Flex, {
   justifyContent: 'center',

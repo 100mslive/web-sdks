@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Flex } from '../Layout';
 import { Switch } from './Switch';
 import SwitchDocs from './Switch.mdx';
-import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/Switch',

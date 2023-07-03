@@ -1,6 +1,6 @@
 import React from 'react';
 import { ConnectionIndicator } from './ConnectionIndicator';
-import { styled, Text, textEllipsis } from '../../';
+import { styled, Text, textEllipsis } from '../../../';
 
 const TileConnection = ({ name, peerId, hideLabel, width }) => {
   return (

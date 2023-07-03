@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SpeakerIcon } from '@100mslive/react-icons';
-import { Flex, Slider } from '../../';
+import { Flex, Slider } from '../../../';
 
 export const VolumeControl = ({ hlsPlayer }) => {
   const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);

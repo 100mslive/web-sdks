@@ -1,19 +1,10 @@
-import React from "react";
-import {
-  AlertOctagonIcon,
-  ChatIcon,
-  ExitIcon,
-  HandIcon,
-  PersonIcon,
-} from "@100mslive/react-icons";
-import { settingOverflow } from "./common.js";
-import SwitchWithLabel from "./SwitchWithLabel";
-import { Box } from "../../../";
-import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
-import {
-  useSetSubscribedNotifications,
-  useSubscribedNotifications,
-} from "../AppData/useUISettings";
+import React from 'react';
+import { AlertOctagonIcon, ChatIcon, ExitIcon, HandIcon, PersonIcon } from '@100mslive/react-icons';
+import { settingOverflow } from './common.js';
+import SwitchWithLabel from './SwitchWithLabel';
+import { Box } from '../../../';
+import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
+import { useSetSubscribedNotifications, useSubscribedNotifications } from '../AppData/useUISettings';
 
 const NotificationItem = ({ type, label, icon, checked }) => {
   const [, setSubscribedNotifications] = useSetSubscribedNotifications(type);

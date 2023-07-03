@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import { Logo, SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
-import { config as cssConfig, Flex } from '../../';
+import { config as cssConfig, Flex } from '../../../';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import MetaActions from '../MetaActions';
@@ -11,11 +11,7 @@ import MetaActions from '../MetaActions';
 export const StreamingHeader = ({ isPreview }) => {
   const isMobile = useMedia(cssConfig.media.md);
   return (
-    <Flex
-      justify="between"
-      align="center"
-      css={{ position: 'relative', height: '100%' }}
-    >
+    <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex
         align="center"
         css={{

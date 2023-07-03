@@ -10,21 +10,8 @@ import {
 } from '@100mslive/react-sdk';
 import { RecordIcon, WrenchIcon } from '@100mslive/react-icons';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
-import {
-  Box,
-  Button,
-  config as cssConfig,
-  Flex,
-  Loading,
-  Popover,
-  Text,
-  Tooltip,
-} from '../../';
-import {
-  APP_DATA,
-  RTMP_RECORD_DEFAULT_RESOLUTION,
-  SIDE_PANE_OPTIONS,
-} from '../../common/constants';
+import { Box, Button, config as cssConfig, Flex, Loading, Popover, Text, Tooltip } from '../../../';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
 import { useSidepaneState, useSidepaneToggle } from '../AppData/useSidepane';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import GoLiveButton from '../GoLiveButton';
@@ -51,24 +38,16 @@ export const LiveStatus = () => {
 };
 
 export const RecordingStatus = () => {
-  const {
-    isBrowserRecordingOn,
-    isServerRecordingOn,
-    isHLSRecordingOn,
-    isRecordingOn,
-  } = useRecordingStreaming();
+  const { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn, isRecordingOn } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
 
   if (
     !isRecordingOn ||
     // if only browser recording is enabled, stop recording is shown
     // so no need to show this as it duplicates
-    [
-      permissions?.browserRecording,
-      !isServerRecordingOn,
-      !isHLSRecordingOn,
-      isBrowserRecordingOn,
-    ].every(value => !!value)
+    [permissions?.browserRecording, !isServerRecordingOn, !isHLSRecordingOn, isBrowserRecordingOn].every(
+      value => !!value,
+    )
   ) {
     return null;
   }
@@ -96,8 +75,7 @@ const EndStream = () => {
   const sidePane = useSidepaneState();
   useEffect(() => {
     if (window && !sidePane) {
-      const userStartedStream =
-        window.sessionStorage.getItem('userStartedStream');
+      const userStartedStream = window.sessionStorage.getItem('userStartedStream');
       if (userStartedStream === 'true') {
         toggleStreaming();
         window.sessionStorage.setItem('userStartedStream', '');
@@ -106,12 +84,7 @@ const EndStream = () => {
   }, [sidePane, toggleStreaming]);
 
   return (
-    <Button
-      data-testid="end_stream"
-      variant="danger"
-      icon
-      onClick={toggleStreaming}
-    >
+    <Button data-testid="end_stream" variant="danger" icon onClick={toggleStreaming}>
       <WrenchIcon />
       Manage Stream
     </Button>
@@ -123,11 +96,8 @@ const StartRecording = () => {
   const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   const [open, setOpen] = useState(false);
-  const [recordingStarted, setRecordingState] = useSetAppDataByKey(
-    APP_DATA.recordingStarted
-  );
-  const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } =
-    useRecordingStreaming();
+  const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
+  const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
   if (!permissions?.browserRecording || isHLSRunning) {
     return null;
@@ -136,18 +106,9 @@ const StartRecording = () => {
     return (
       <Popover.Root open={open} onOpenChange={setOpen}>
         <Popover.Trigger asChild>
-          <Button
-            variant="danger"
-            data-testid="stop_recording"
-            icon
-            outlined
-            onClick={() => setOpen(true)}
-          >
+          <Button variant="danger" data-testid="stop_recording" icon outlined onClick={() => setOpen(true)}>
             <RecordIcon />
-            <Text
-              as="span"
-              css={{ '@md': { display: 'none' }, color: 'currentColor' }}
-            >
+            <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
               Stop Recording
             </Text>
           </Button>
@@ -191,15 +152,8 @@ const StartRecording = () => {
           disabled={recordingStarted || isStreamingOn}
           onClick={() => setOpen(true)}
         >
-          {recordingStarted ? (
-            <Loading size={24} color="currentColor" />
-          ) : (
-            <RecordIcon />
-          )}
-          <Text
-            as="span"
-            css={{ '@md': { display: 'none' }, color: 'currentColor' }}
-          >
+          {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}
+          <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
             {recordingStarted ? 'Starting' : 'Start'} Recording
           </Text>
         </Button>
@@ -263,12 +217,9 @@ export const StreamActions = () => {
         <RecordingStatus />
       </Flex>
       {isConnected && !isMobile ? <StartRecording /> : null}
-      {isConnected &&
-        (permissions.hlsStreaming || permissions.rtmpStreaming) && (
-          <Fragment>
-            {isStreamingOn ? <EndStream /> : <GoLiveButton />}
-          </Fragment>
-        )}
+      {isConnected && (permissions.hlsStreaming || permissions.rtmpStreaming) && (
+        <Fragment>{isStreamingOn ? <EndStream /> : <GoLiveButton />}</Fragment>
+      )}
     </Flex>
   );
 };

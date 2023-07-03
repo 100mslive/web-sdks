@@ -4,13 +4,7 @@ import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';
 import { SubmitPDF } from './submitPdf';
 import { UploadedFile } from './uploadedFile';
-import {
-  Dialog,
-  Flex,
-  HorizontalDivider,
-  Input,
-  Text,
-} from '../../';
+import { Dialog, Flex, HorizontalDivider, Input, Text } from '../../';
 import { DialogInputFile, DialogRow } from '../../primitives/DialogContent';
 
 export function PDFFileOptions({ onOpenChange }) {

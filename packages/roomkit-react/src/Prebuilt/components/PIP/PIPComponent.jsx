@@ -29,44 +29,27 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
 
   const onPipToggle = useCallback(() => {
     if (!isPipOn) {
-      PictureInPicture.start(hmsActions, setIsPipOn).catch(err =>
-        console.error('error in starting pip', err)
-      );
+      PictureInPicture.start(hmsActions, setIsPipOn).catch(err => console.error('error in starting pip', err));
       MediaSession.setup(hmsActions, store);
     } else {
-      PictureInPicture.stop().catch(err =>
-        console.error('error in stopping pip', err)
-      );
+      PictureInPicture.stop().catch(err => console.error('error in stopping pip', err));
     }
   }, [hmsActions, isPipOn, store]);
 
   // stop pip on unmount
   useEffect(() => {
     return () => {
-      PictureInPicture.stop().catch(err =>
-        console.error('error in stopping pip on unmount', err)
-      );
+      PictureInPicture.stop().catch(err => console.error('error in stopping pip on unmount', err));
     };
   }, []);
 
-  if (
-    !PictureInPicture.isSupported() ||
-    localPeerRole === DEFAULT_HLS_VIEWER_ROLE ||
-    !isFeatureEnabled
-  ) {
+  if (!PictureInPicture.isSupported() || localPeerRole === DEFAULT_HLS_VIEWER_ROLE || !isFeatureEnabled) {
     return null;
   }
   return (
     <>
-      <Tooltip
-        title={`${isPipOn ? 'Deactivate' : 'Activate'} picture in picture view`}
-      >
-        <IconButton
-          active={!isPipOn}
-          key="pip"
-          onClick={() => onPipToggle()}
-          data-testid="pip_btn"
-        >
+      <Tooltip title={`${isPipOn ? 'Deactivate' : 'Activate'} picture in picture view`}>
+        <IconButton active={!isPipOn} key="pip" onClick={() => onPipToggle()} data-testid="pip_btn">
           <PipIcon />
         </IconButton>
       </Tooltip>
@@ -81,9 +64,7 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
  */
 const ActivatedPIP = ({ showLocalPeer, peers }) => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const storePeers = useHMSStore(
-    showLocalPeer ? selectPeers : selectRemotePeers
-  );
+  const storePeers = useHMSStore(showLocalPeer ? selectPeers : selectRemotePeers);
 
   useEffect(() => {
     let pipPeers = storePeers;

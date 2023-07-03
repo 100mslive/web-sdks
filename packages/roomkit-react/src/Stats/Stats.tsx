@@ -10,9 +10,9 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Tooltip } from '../Tooltip';
 import { formatBytes } from './formatBytes';
 import { Stats } from './StyledStats';
-import { Tooltip } from '../Tooltip';
 
 export interface VideoTileStatsProps {
   videoTrackID?: HMSTrackID;
@@ -57,7 +57,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
                 const layer = stat.rid ? simulcastMapping[stat.rid as RID] : '';
                 return (
                   <Fragment>
-                    {layer && <StatsRow label={layer.toUpperCase()} value=""></StatsRow>}
+                    {layer && <StatsRow label={layer.toUpperCase()} value="" />}
                     <StatsRow
                       show={isNotNullishAndNot0(stat.frameWidth)}
                       label="Width"

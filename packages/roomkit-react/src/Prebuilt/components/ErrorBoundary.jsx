@@ -2,14 +2,7 @@ import React, { Component } from 'react';
 import { logMessage } from 'zipyai';
 import { CopyIcon } from '@100mslive/react-icons';
 import { ErrorWithSupportLink } from './AuthToken';
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-  ThemeContext,
-  Tooltip,
-} from '../../';
+import { Box, Button, Flex, Text, ThemeContext, Tooltip } from '../../';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -26,12 +19,8 @@ export class ErrorBoundary extends Component {
         errorInfo: errorInfo,
       },
       () => {
-        logMessage(
-          `uiError - ${this.state.error} - ${JSON.stringify(
-            this.state.errorInfo
-          )}`
-        );
-      }
+        logMessage(`uiError - ${this.state.error} - ${JSON.stringify(this.state.errorInfo)}`);
+      },
     );
   }
 
@@ -55,8 +44,8 @@ export class ErrorBoundary extends Component {
                   <img
                     src={
                       themeType === 'dark'
-                        ? require('../images/error-bg-dark.svg')
-                        : require('../images/error-bg-light.svg')
+                        ? import('../images/error-bg-dark.svg')
+                        : import('../images/error-bg-light.svg')
                     }
                     alt="error background"
                   />
@@ -96,15 +85,14 @@ export class ErrorBoundary extends Component {
                         JSON.stringify({
                           error,
                           errorInfo,
-                        })
+                        }),
                       );
                       this.setState({ isErrorCopied: true });
                     }}
                     css={{ mx: '$4' }}
                     data-testid="join_again_btn"
                   >
-                    <CopyIcon />{' '}
-                    {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}
+                    <CopyIcon /> {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}
                   </Button>
                 </Tooltip>
               </Flex>

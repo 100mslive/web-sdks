@@ -1,17 +1,13 @@
 import React, { Fragment, useState } from 'react';
-import {
-  selectPermissions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ColoredHandIcon, CrossIcon, GoLiveIcon } from '@100mslive/react-icons';
+import { Box, Flex, IconButton, Text } from '../../../';
 import { StreamCard } from './Common';
 import { HLSStreaming } from './HLSStreaming';
 import { RTMPIcon } from './RTMPIcon';
 import { RTMPStreaming } from './RTMPStreaming';
-import { Box, Flex, IconButton, Text } from '../../';
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
 import { useSidepaneToggle } from '../AppData/useSidepane';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const StreamingLanding = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
@@ -42,11 +38,7 @@ export const StreamingLanding = () => {
           <Text variant="sm">Welcome !</Text>
           <Text variant="h6">Let’s get you started</Text>
         </Box>
-        <IconButton
-          onClick={toggleStreaming}
-          css={{ alignSelf: 'flex-start' }}
-          data-testid="close_streaming"
-        >
+        <IconButton onClick={toggleStreaming} css={{ alignSelf: 'flex-start' }} data-testid="close_streaming">
           <CrossIcon />
         </IconButton>
       </Flex>

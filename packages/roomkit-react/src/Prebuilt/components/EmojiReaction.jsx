@@ -15,39 +15,16 @@ import { EmojiIcon } from '@100mslive/react-icons';
 import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
-import {
-  Box,
-  Dropdown,
-  Flex,
-  styled,
-  Text,
-  Tooltip,
-} from '../../';
-import {
-  EMOJI_REACTION_TYPE,
-  FEATURE_LIST,
-  HLS_TIMED_METADATA_DOC_URL,
-} from '../common/constants';
+import { Box, Dropdown, Flex, styled, Text, Tooltip } from '../../';
+import { EMOJI_REACTION_TYPE, FEATURE_LIST, HLS_TIMED_METADATA_DOC_URL } from '../common/constants';
 import IconButton from '../IconButton';
 
 init({ data });
 
 // When changing emojis in the grid, keep in mind that the payload used in sendHLSTimedMetadata has a limit of 100 characters. Using bigger emoji Ids can cause the limit to be exceeded.
 const emojiReactionList = [
-  [
-    { emojiId: '+1' },
-    { emojiId: '-1' },
-    { emojiId: 'wave' },
-    { emojiId: 'clap' },
-    { emojiId: 'fire' },
-  ],
-  [
-    { emojiId: 'tada' },
-    { emojiId: 'heart_eyes' },
-    { emojiId: 'joy' },
-    { emojiId: 'open_mouth' },
-    { emojiId: 'sob' },
-  ],
+  [{ emojiId: '+1' }, { emojiId: '-1' }, { emojiId: 'wave' }, { emojiId: 'clap' }, { emojiId: 'fire' }],
+  [{ emojiId: 'tada' }, { emojiId: 'heart_eyes' }, { emojiId: 'joy' }, { emojiId: 'open_mouth' }, { emojiId: 'sob' }],
 ];
 
 export const EmojiReaction = () => {
@@ -60,10 +37,7 @@ export const EmojiReaction = () => {
   const hlsViewerRole = useHLSViewerRole();
   const { isStreamingOn } = useRecordingStreaming();
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.EMOJI_REACTION);
-  const filteredRoles = useMemo(
-    () => roles.filter(role => role !== hlsViewerRole),
-    [roles, hlsViewerRole]
-  );
+  const filteredRoles = useMemo(() => roles.filter(role => role !== hlsViewerRole), [roles, hlsViewerRole]);
   useDropdownList({ open: open, name: 'EmojiReaction' });
 
   const onEmojiEvent = useCallback(data => {
@@ -107,23 +81,12 @@ export const EmojiReaction = () => {
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
-        <Dropdown.Content
-          sideOffset={5}
-          align="center"
-          css={{ p: '$8', bg: '$surfaceDefault' }}
-        >
+        <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surfaceDefault' }}>
           {emojiReactionList.map((emojiLine, index) => (
             <Flex key={index} justify="between" css={{ mb: '$8' }}>
               {emojiLine.map(emoji => (
-                <EmojiContainer
-                  key={emoji.emojiId}
-                  onClick={() => sendReaction(emoji.emojiId)}
-                >
-                  <em-emoji
-                    id={emoji.emojiId}
-                    size="100%"
-                    set="apple"
-                  ></em-emoji>
+                <EmojiContainer key={emoji.emojiId} onClick={() => sendReaction(emoji.emojiId)}>
+                  <em-emoji id={emoji.emojiId} size="100%" set="apple"></em-emoji>
                 </EmojiContainer>
               ))}
             </Flex>
@@ -146,11 +109,7 @@ export const EmojiReaction = () => {
                 fontWeight: '$semiBold',
               }}
             >
-              <a
-                href={HLS_TIMED_METADATA_DOC_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href={HLS_TIMED_METADATA_DOC_URL} target="_blank" rel="noopener noreferrer">
                 {'Learn more ->'}
               </a>
             </Text>

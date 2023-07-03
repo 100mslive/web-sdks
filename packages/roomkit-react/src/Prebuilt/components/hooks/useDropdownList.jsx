@@ -1,11 +1,9 @@
-import { useEffect } from "react";
-import { APP_DATA } from "../../common/constants";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
+import { useEffect } from 'react';
+import { APP_DATA } from '../../common/constants';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
 
 export const useDropdownList = ({ name, open }) => {
-  const [dropdownList = [], setDropdownList] = useSetAppDataByKey(
-    APP_DATA.dropdownList
-  );
+  const [dropdownList = [], setDropdownList] = useSetAppDataByKey(APP_DATA.dropdownList);
 
   useEffect(() => {
     if (open) {

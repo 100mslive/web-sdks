@@ -1,11 +1,8 @@
-import { useEffect } from "react";
-import {
-  HMSNotificationTypes,
-  useHMSNotifications,
-} from "@100mslive/react-sdk";
-import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
-import { useSubscribedNotifications } from "../AppData/useUISettings";
-import { ToastBatcher } from "../Toast/ToastBatcher";
+import { useEffect } from 'react';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
+import { useSubscribedNotifications } from '../AppData/useUISettings';
+import { ToastBatcher } from '../Toast/ToastBatcher';
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
@@ -15,12 +12,8 @@ const notificationTypes = [
 
 export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
-  const isPeerJoinSubscribed = useSubscribedNotifications(
-    SUBSCRIBED_NOTIFICATIONS.PEER_JOINED
-  );
-  const isPeerLeftSubscribed = useSubscribedNotifications(
-    SUBSCRIBED_NOTIFICATIONS.PEER_LEFT
-  );
+  const isPeerJoinSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_JOINED);
+  const isPeerLeftSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_LEFT);
   useEffect(() => {
     if (!notification) {
       return;

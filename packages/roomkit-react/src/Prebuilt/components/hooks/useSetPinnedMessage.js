@@ -7,8 +7,8 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { SESSION_STORE_KEY } from '../../common/constants';
 import { ToastManager } from '../Toast/ToastManager';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
 /**
  * set pinned chat message by updating the session store

@@ -18,8 +18,8 @@ import {
   VideoOffIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
-import { Flex, StyledMenuTile } from './StyledMenuTile';
 import { Slider } from '../Slider';
+import { Flex, StyledMenuTile } from './StyledMenuTile';
 
 export interface TileMenuProps {
   peerId: HMSPeerID;

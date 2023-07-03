@@ -1,25 +1,25 @@
-import React from "react";
-import { useMedia } from "react-use";
-import { selectPeers, selectRoomID, useHMSStore } from "@100mslive/react-sdk";
-import { SidePane } from "./screenShareView";
-import { Whiteboard } from "../plugins/whiteboard";
-import { Box, config as cssConfig, Flex } from "../";
+import React from 'react';
+import { useMedia } from 'react-use';
+import { selectPeers, selectRoomID, useHMSStore } from '@100mslive/react-sdk';
+import { SidePane } from './screenShareView';
+import { Whiteboard } from '../plugins/whiteboard';
+import { Box, config as cssConfig, Flex } from '../';
 
 const Editor = React.memo(({ roomId }) => {
   return (
     <Box
       css={{
-        mx: "$4",
-        flex: "3 1 0",
-        "@lg": {
-          flex: "2 1 0",
-          "& video": {
-            objectFit: "contain",
+        mx: '$4',
+        flex: '3 1 0',
+        '@lg': {
+          flex: '2 1 0',
+          '& video': {
+            objectFit: 'contain',
           },
         },
       }}
     >
-      <Box css={{ position: "relative", width: "100%", height: "100%" }}>
+      <Box css={{ position: 'relative', width: '100%', height: '100%' }}>
         <Whiteboard roomId={roomId} />
       </Box>
     </Box>
@@ -35,19 +35,19 @@ const WhiteboardView = () => {
   return (
     <Flex
       css={{
-        size: "100%",
+        size: '100%',
       }}
-      direction={showSidebarInBottom ? "column" : "row"}
+      direction={showSidebarInBottom ? 'column' : 'row'}
     >
       <Editor roomId={roomId} />
       <Flex
-        direction={{ "@initial": "column", "@lg": "row" }}
+        direction={{ '@initial': 'column', '@lg': 'row' }}
         css={{
-          overflow: "hidden",
-          p: "$4",
-          flex: "0 0 20%",
-          "@lg": {
-            flex: "1 1 0",
+          overflow: 'hidden',
+          p: '$4',
+          flex: '0 0 20%',
+          '@lg': {
+            flex: '1 1 0',
           },
         }}
       >

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   selectLocalPeerID,
   selectLocalPeerRole,
@@ -6,30 +6,26 @@ import {
   selectPeersByRoles,
   selectRolesMap,
   useHMSStore,
-} from "@100mslive/react-sdk";
-import { NonPublisherView } from "./NonPublisherView";
-import { UI_SETTINGS } from "../common/constants";
-import { useAppLayout } from "../components/AppData/useAppLayout";
-import { useUISettings } from "../components/AppData/useUISettings";
-import { GridCenterView, GridSidePaneView } from "../components/gridView";
-import { Flex } from "../";
+} from '@100mslive/react-sdk';
+import { NonPublisherView } from './NonPublisherView';
+import { UI_SETTINGS } from '../common/constants';
+import { useAppLayout } from '../components/AppData/useAppLayout';
+import { useUISettings } from '../components/AppData/useUISettings';
+import { GridCenterView, GridSidePaneView } from '../components/gridView';
+import { Flex } from '../';
 
 export const MainGridView = () => {
-  const centerRoles = useAppLayout("center") || [];
-  const sidepaneRoles = useAppLayout("sidepane") || [];
+  const centerRoles = useAppLayout('center') || [];
+  const sidepaneRoles = useAppLayout('sidepane') || [];
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const peers = useHMSStore(selectPeers);
   const roles = useHMSStore(selectRolesMap);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const centerPeers = peers.filter(peer => centerRoles.includes(peer.roleName));
-  const sidebarPeers = peers.filter(peer =>
-    sidepaneRoles.includes(peer.roleName)
-  );
+  const sidebarPeers = peers.filter(peer => sidepaneRoles.includes(peer.roleName));
   const localRole = useHMSStore(selectLocalPeerRole);
-  const peersByRoles = useHMSStore(
-    selectPeersByRoles(localRole.subscribeParams.subscribeToRoles || [])
-  );
-  const [placeholder, setPlaceholder] = useState("");
+  const peersByRoles = useHMSStore(selectPeersByRoles(localRole.subscribeParams.subscribeToRoles || []));
+  const [placeholder, setPlaceholder] = useState('');
 
   useEffect(() => {
     const hasPublishingPeers = peers.some(peer => {
@@ -46,20 +42,15 @@ export const MainGridView = () => {
       return true;
     });
     if (!hasPublishingPeers) {
-      setPlaceholder("None of the roles can publish video, audio or screen");
+      setPlaceholder('None of the roles can publish video, audio or screen');
     } else if (!localRole.subscribeParams.subscribeToRoles?.length) {
       setPlaceholder("This role isn't subscribed to any role");
     } else if (!hasSubscribedRolePublishing) {
-      setPlaceholder("This role subscribed to roles is not publishing");
+      setPlaceholder('This role subscribed to roles is not publishing');
     } else {
-      setPlaceholder("");
+      setPlaceholder('');
     }
-  }, [
-    localRole.subscribeParams.subscribeToRoles?.length,
-    peers,
-    peersByRoles,
-    roles,
-  ]);
+  }, [localRole.subscribeParams.subscribeToRoles?.length, peers, peersByRoles, roles]);
   /**
    * If there are peers from many publishing roles, then it's possible to divide
    * them into two parts, those who show in center and those who show in sidepane.
@@ -74,19 +65,18 @@ export const MainGridView = () => {
   if (centerPeers.length === 0) {
     // we'll show the sidepane for banner in this case too if 1). it's only me
     // in the room. or 2). noone is publishing in the room
-    const itsOnlyMeInTheRoom =
-      peers.length === 1 && peers[0].id === localPeerId;
+    const itsOnlyMeInTheRoom = peers.length === 1 && peers[0].id === localPeerId;
     const nooneIsPublishing = sidebarPeers.length === 0;
     showSidePane = itsOnlyMeInTheRoom || nooneIsPublishing;
   }
   return (
     <Flex
       css={{
-        size: "100%",
+        size: '100%',
       }}
       direction={{
-        "@initial": "row",
-        "@md": "column",
+        '@initial': 'row',
+        '@md': 'column',
       }}
     >
       {placeholder ? (
@@ -100,9 +90,7 @@ export const MainGridView = () => {
             hideSidePane={!showSidePane}
             totalPeers={peers.length}
           />
-          {showSidePane && (
-            <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />
-          )}
+          {showSidePane && <GridSidePaneView peers={sidebarPeers} totalPeers={peers.length} />}
         </>
       )}
     </Flex>

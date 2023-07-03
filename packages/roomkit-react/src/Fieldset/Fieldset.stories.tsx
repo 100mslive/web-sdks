@@ -1,9 +1,9 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Fieldset } from '.';
 import { Input } from '../Input';
 import { Label } from '../Label';
 import { Text } from '../Text';
+import { Fieldset } from '.';
 
 export default {
   title: 'UI Components/Fieldset',

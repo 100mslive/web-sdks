@@ -1,28 +1,20 @@
-import React from "react";
-import { useMeasure } from "react-use";
-import {
-  selectPeers,
-  selectVideoTrackByPeerID,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { usePinnedTrack } from "../components/AppData/useUISettings";
-import { GridSidePaneView } from "../components/gridView";
-import VideoTile from "../components/VideoTile";
-import { Flex, useTheme } from "../";
+import React from 'react';
+import { useMeasure } from 'react-use';
+import { selectPeers, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
+import { usePinnedTrack } from '../components/AppData/useUISettings';
+import { GridSidePaneView } from '../components/gridView';
+import VideoTile from '../components/VideoTile';
+import { Flex, useTheme } from '../';
 
 const PinnedPeerView = () => {
   const { aspectRatio } = useTheme();
   // can be audio or video track, if tile with only audio track is pinned
   const pinnedTrack = usePinnedTrack();
-  const peerVideoTrack = useHMSStore(
-    selectVideoTrackByPeerID(pinnedTrack.peerId)
-  );
-  const pinnedVideoTrack =
-    pinnedTrack && pinnedTrack.type === "audio" ? peerVideoTrack : pinnedTrack;
+  const peerVideoTrack = useHMSStore(selectVideoTrackByPeerID(pinnedTrack.peerId));
+  const pinnedVideoTrack = pinnedTrack && pinnedTrack.type === 'audio' ? peerVideoTrack : pinnedTrack;
   const [ref, { height, width }] = useMeasure();
   const peers = (useHMSStore(selectPeers) || []).filter(
-    peer =>
-      peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0
+    peer => peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0,
   );
   if (peers.length === 0) {
     return null;
@@ -38,15 +30,15 @@ const PinnedPeerView = () => {
   }
 
   return (
-    <Flex css={{ size: "100%", "@lg": { flexDirection: "column" } }}>
+    <Flex css={{ size: '100%', '@lg': { flexDirection: 'column' } }}>
       <Flex
         css={{
-          flex: "1 1 0",
-          p: "$8",
+          flex: '1 1 0',
+          p: '$8',
           minHeight: 0,
           minWidth: 0,
-          justifyContent: "center",
-          alignItems: "center",
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
         ref={ref}
       >
@@ -58,11 +50,7 @@ const PinnedPeerView = () => {
           width={finalWidth}
         />
       </Flex>
-      {showSidePane && (
-        <GridSidePaneView
-          peers={peers.filter(peer => peer.id !== pinnedTrack.peerId)}
-        />
-      )}
+      {showSidePane && <GridSidePaneView peers={peers.filter(peer => peer.id !== pinnedTrack.peerId)} />}
     </Flex>
   );
 };

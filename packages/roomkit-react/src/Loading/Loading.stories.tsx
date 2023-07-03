@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Flex } from '../Layout';
 import mdx from './Loading.mdx';
 import { Loading } from '.';
-import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/Loading',

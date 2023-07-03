@@ -1,11 +1,8 @@
 import React from 'react';
-import {
-  selectConnectionQualityByPeerID,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectConnectionQualityByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { PoorConnectivityIcon } from '@100mslive/react-icons';
+import { styled, Tooltip, useTheme } from '../../../';
 import { getColor, getTooltipText } from './connectionQualityUtils';
-import { styled, Tooltip, useTheme } from '../../';
 
 const Wrapper = styled('span', {
   width: '28px',
@@ -26,9 +23,7 @@ const Wrapper = styled('span', {
 });
 
 export const ConnectionIndicator = ({ peerId, isTile = false }) => {
-  const downlinkQuality = useHMSStore(
-    selectConnectionQualityByPeerID(peerId)
-  )?.downlinkQuality;
+  const downlinkQuality = useHMSStore(selectConnectionQualityByPeerID(peerId))?.downlinkQuality;
   const { theme } = useTheme();
   const defaultColor = theme.colors.bgTertiary;
   if (downlinkQuality === -1 || downlinkQuality === undefined) {
@@ -37,11 +32,7 @@ export const ConnectionIndicator = ({ peerId, isTile = false }) => {
   if (downlinkQuality === 0) {
     return (
       <Tooltip title={getTooltipText(downlinkQuality)}>
-        <Wrapper
-          isTile={isTile}
-          css={{ color: '#ED4C5A' }}
-          data-testid="tile_network"
-        >
+        <Wrapper isTile={isTile} css={{ color: '#ED4C5A' }} data-testid="tile_network">
           <PoorConnectivityIcon />
         </Wrapper>
       </Tooltip>

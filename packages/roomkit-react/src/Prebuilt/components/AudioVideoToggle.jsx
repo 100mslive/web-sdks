@@ -7,21 +7,14 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  CameraFlipIcon,
-  MicOffIcon,
-  MicOnIcon,
-  VideoOffIcon,
-  VideoOnIcon,
-} from '@100mslive/react-icons';
+import { CameraFlipIcon, MicOffIcon, MicOnIcon, VideoOffIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
 import { Tooltip } from '../../';
 import { isMacOS } from '../common/constants';
 import IconButton from '../IconButton';
 
 export const AudioVideoToggle = () => {
-  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } =
-    useAVToggle();
+  const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
   const videoTracKId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTracKId));
@@ -30,17 +23,8 @@ export const AudioVideoToggle = () => {
   return (
     <Fragment>
       {toggleAudio ? (
-        <Tooltip
-          title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${
-            isMacOS ? '⌘' : 'ctrl'
-          } + d)`}
-        >
-          <IconButton
-            active={isLocalAudioEnabled}
-            onClick={toggleAudio}
-            key="toggleAudio"
-            data-testid="audio_btn"
-          >
+        <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
+          <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
             {!isLocalAudioEnabled ? (
               <MicOffIcon data-testid="audio_off_btn" />
             ) : (
@@ -50,17 +34,8 @@ export const AudioVideoToggle = () => {
         </Tooltip>
       ) : null}
       {toggleVideo ? (
-        <Tooltip
-          title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${
-            isMacOS ? '⌘' : 'ctrl'
-          } + e)`}
-        >
-          <IconButton
-            key="toggleVideo"
-            active={isLocalVideoEnabled}
-            onClick={toggleVideo}
-            data-testid="video_btn"
-          >
+        <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
+          <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
             {!isLocalVideoEnabled ? (
               <VideoOffIcon data-testid="video_off_btn" />
             ) : (

@@ -10,7 +10,7 @@ export const DialogClose = styled(DialogPrimitive.Close, {
   padding: '0',
   margin: '0',
   border: 'none',
-  backgroundImage: 'none'
+  backgroundImage: 'none',
 });
 
 export const StyledDialogTrigger = styled(DialogPrimitive.Trigger, {

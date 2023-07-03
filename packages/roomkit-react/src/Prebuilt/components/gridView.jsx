@@ -31,16 +31,12 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
         css={{
           flex: '1 1 0',
           height: '100%',
-          mx:
-            isHeadless && Number(headlessConfig?.tileOffset) === 0 ? '0' : '$8',
+          mx: isHeadless && Number(headlessConfig?.tileOffset) === 0 ? '0' : '$8',
           '@md': { flex: '2 1 0' },
         }}
       >
         {peers && peers.length > 0 ? (
-          <VideoList
-            peers={peers}
-            maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount}
-          />
+          <VideoList peers={peers} maxTileCount={limitMaxTiles ? MAX_TILES_FOR_MOBILE : maxTileCount} />
         ) : eventRoomIDs.some(id => window.location.href.includes(id)) ? (
           <Box
             css={{
@@ -51,11 +47,7 @@ export const GridCenterView = ({ peers, maxTileCount }) => {
             }}
           >
             <a href={webinarInfoLink} target="_blank" rel="noreferrer">
-              <Image
-                css={{ p: '$4', boxShadow: '$sm' }}
-                alt="Event template"
-                src={eventsImg}
-              />
+              <Image css={{ p: '$4', boxShadow: '$sm' }} alt="Event template" src={eventsImg} />
             </a>
           </Box>
         ) : (
@@ -85,9 +77,7 @@ export const GridSidePaneView = ({ peers }) => {
       }}
     >
       <Flex css={{ flex: '1 1 0' }} align="end">
-        {peers && peers.length > 0 && (
-          <VideoList peers={peers} maxColCount={1} />
-        )}
+        {peers && peers.length > 0 && <VideoList peers={peers} maxColCount={1} />}
       </Flex>
     </Flex>
   );

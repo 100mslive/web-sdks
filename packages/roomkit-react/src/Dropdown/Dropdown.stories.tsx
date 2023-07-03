@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { ChevronDownIcon, ChevronUpIcon, PeopleIcon } from '@100mslive/react-icons';
-import { Dropdown } from './Dropdown';
 import { Avatar, Box, Flex, Text, textEllipsis } from '..';
+import { Dropdown } from './Dropdown';
 
 export default {
   title: 'UI Components/Dropdown',

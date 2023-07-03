@@ -1,11 +1,7 @@
-import React from "react";
-import {
-  selectRoleChangeRequest,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { useIsHeadless } from "./AppData/useUISettings";
-import { RequestDialog } from "../primitives/DialogContent";
+import React from 'react';
+import { selectRoleChangeRequest, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { useIsHeadless } from './AppData/useUISettings';
+import { RequestDialog } from '../primitives/DialogContent';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
@@ -19,9 +15,7 @@ export const RoleChangeRequestModal = () => {
   return (
     <RequestDialog
       title="Role Change Request"
-      onOpenChange={value =>
-        !value && hmsActions.rejectChangeRole(roleChangeRequest)
-      }
+      onOpenChange={value => !value && hmsActions.rejectChangeRole(roleChangeRequest)}
       body={`${roleChangeRequest?.requestedBy?.name} has requested you to change your role to ${roleChangeRequest?.role?.name}.`}
       onAction={() => {
         hmsActions.acceptChangeRole(roleChangeRequest);

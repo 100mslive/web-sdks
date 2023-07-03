@@ -1,18 +1,11 @@
-import { useCallback, useState } from "react";
-import {
-  selectLocalPeerID,
-  selectPeerMetadata,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
+import { useCallback, useState } from 'react';
+import { selectLocalPeerID, selectPeerMetadata, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 
 export const useMyMetadata = () => {
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
   const metaData = useHMSStore(selectPeerMetadata(localPeerId));
-  const [isHandRaised, setHandRaised] = useState(
-    metaData?.isHandRaised || false
-  );
+  const [isHandRaised, setHandRaised] = useState(metaData?.isHandRaised || false);
   const [isBRBOn, setBRBOn] = useState(metaData?.isBRBOn || false); // BRB = be right back
 
   const update = async updatedFields => {
@@ -20,7 +13,7 @@ export const useMyMetadata = () => {
       await hmsActions.changeMetadata(Object.assign(metaData, updatedFields));
       return true;
     } catch (error) {
-      console.error("failed to update metadata ", metaData, updatedFields);
+      console.error('failed to update metadata ', metaData, updatedFields);
     }
   };
 

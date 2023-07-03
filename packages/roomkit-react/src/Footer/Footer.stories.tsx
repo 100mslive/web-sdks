@@ -9,9 +9,9 @@ import {
   ShareScreenIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
-import { Footer } from '.';
 import { Button } from '../Button';
 import { IconButton } from '../IconButton';
+import { Footer } from '.';
 
 export default {
   title: 'UI Components/Footer',

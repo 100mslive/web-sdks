@@ -1,10 +1,7 @@
 /* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
 import { logMessage } from 'zipyai';
-import {
-  HMSNotificationTypes,
-  useHMSNotifications,
-} from '@100mslive/react-sdk';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { InitErrorModal } from './InitErrorModal';
 import { MessageNotifications } from './MessageNotifications';
@@ -14,13 +11,9 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { Button } from '../../';
+import { Button } from '../../../';
 import { getMetadata } from '../../common/utils';
-import {
-  useHLSViewerRole,
-  useIsHeadless,
-  useSubscribedNotifications,
-} from '../AppData/useUISettings';
+import { useHLSViewerRole, useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
@@ -41,25 +34,17 @@ export function Notifications() {
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless)
-          return;
+        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless) return;
 
         console.debug('Metadata updated', notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
         ToastBatcher.showToast({ notification });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
-        console.log(
-          notification.data.id +
-            ' changed their name to ' +
-            notification.data.name
-        );
+        console.log(notification.data.id + ' changed their name to ' + notification.data.name);
         break;
       case HMSNotificationTypes.ERROR:
-        if (
-          notification.data?.isTerminal &&
-          notification.data?.action !== 'INIT'
-        ) {
+        if (notification.data?.isTerminal && notification.data?.action !== 'INIT') {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
@@ -90,21 +75,14 @@ export function Notifications() {
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
-            const previewLocation = window.location.pathname.replace(
-              'meeting',
-              'leave'
-            );
+            const previewLocation = window.location.pathname.replace('meeting', 'leave');
             ToastManager.clearAllToast();
             navigate(previewLocation);
           }, 2000);
           return;
         }
         // Autoplay error or user denied screen share(cancelled browser pop-up)
-        if (
-          notification.data?.code === 3008 ||
-          notification.data?.code === 3001 ||
-          notification.data?.code === 3011
-        ) {
+        if (notification.data?.code === 3008 || notification.data?.code === 3001 || notification.data?.code === 3011) {
           return;
         }
         if (notification.data?.action === 'INIT') {
@@ -138,16 +116,10 @@ export function Notifications() {
       case HMSNotificationTypes.ROOM_ENDED:
         ToastManager.addToast({
           title: `${notification.message}. 
-              ${
-                notification.data.reason &&
-                `Reason: ${notification.data.reason}`
-              }`,
+              ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
         setTimeout(() => {
-          const leaveLocation = window.location.pathname.replace(
-            'meeting',
-            'leave'
-          );
+          const leaveLocation = window.location.pathname.replace('meeting', 'leave');
           navigate(leaveLocation);
           ToastManager.clearAllToast();
         }, 2000);
@@ -161,12 +133,7 @@ export function Notifications() {
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    notification,
-    subscribedNotifications.ERROR,
-    subscribedNotifications.METADATA_UPDATED,
-    HLS_VIEWER_ROLE,
-  ]);
+  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED, HLS_VIEWER_ROLE]);
 
   return (
     <>

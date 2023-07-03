@@ -9,41 +9,24 @@ import {
 } from '@100mslive/react-sdk';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
-import {
-  Box,
-  Dialog,
-  Dropdown,
-  Flex,
-  HorizontalDivider,
-  Label,
-  Switch,
-  Text,
-} from '../../';
+import { Box, Dialog, Dropdown, Flex, HorizontalDivider, Label, Switch, Text } from '../../';
 import { UI_SETTINGS } from '../common/constants';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 
 export const StatsForNerds = ({ onOpenChange }) => {
   const tracksWithLabels = useTracksWithLabel();
   const statsOptions = useMemo(
-    () => [
-      { id: 'local-peer', label: 'Local Peer Stats' },
-      ...tracksWithLabels,
-    ],
-    [tracksWithLabels]
+    () => [{ id: 'local-peer', label: 'Local Peer Stats' }, ...tracksWithLabels],
+    [tracksWithLabels],
   );
   const [selectedStat, setSelectedStat] = useState(statsOptions[0]);
-  const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(
-    UI_SETTINGS.showStatsOnTiles
-  );
+  const [showStatsOnTiles, setShowStatsOnTiles] = useSetUiSettings(UI_SETTINGS.showStatsOnTiles);
   const [open, setOpen] = useState(false);
   const ref = useRef();
   const selectionBg = useDropdownSelection();
 
   useEffect(() => {
-    if (
-      selectedStat.id !== 'local-peer' &&
-      !tracksWithLabels.find(track => track.id === selectedStat.id)
-    ) {
+    if (selectedStat.id !== 'local-peer' && !tracksWithLabels.find(track => track.id === selectedStat.id)) {
       setSelectedStat('local-peer');
     }
   }, [tracksWithLabels, selectedStat]);
@@ -73,10 +56,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
           <HorizontalDivider css={{ mt: '0.8rem' }} />
           {/* Switch */}
           <Flex justify="start" gap={4} css={{ m: '$10 0' }}>
-            <Switch
-              checked={showStatsOnTiles}
-              onCheckedChange={setShowStatsOnTiles}
-            />
+            <Switch checked={showStatsOnTiles} onCheckedChange={setShowStatsOnTiles} />
             <Text variant="body2" css={{ fontWeight: '$semiBold' }}>
               Show Stats on Tiles
             </Text>
@@ -91,11 +71,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
             }}
           >
             <Label variant="body2">Stats For</Label>
-            <Dropdown.Root
-              data-testid="dialog_select_Stats For"
-              open={open}
-              onOpenChange={setOpen}
-            >
+            <Dropdown.Root data-testid="dialog_select_Stats For" open={open} onOpenChange={setOpen}>
               <DialogDropdownTrigger
                 title={selectedStat.label || 'Select Stats'}
                 css={{ mt: '$4' }}
@@ -104,15 +80,9 @@ export const StatsForNerds = ({ onOpenChange }) => {
                 ref={ref}
               />
               <Dropdown.Portal>
-                <Dropdown.Content
-                  align="start"
-                  sideOffset={8}
-                  css={{ w: ref.current?.clientWidth, zIndex: 1000 }}
-                >
+                <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
                   {statsOptions.map(option => {
-                    const isSelected =
-                      option.id === selectedStat.id &&
-                      option.layer === selectedStat.layer;
+                    const isSelected = option.id === selectedStat.id && option.layer === selectedStat.layer;
                     return (
                       <Dropdown.Item
                         key={`${option.id}-${option.layer || ''}`}
@@ -137,11 +107,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
           {selectedStat.id === 'local-peer' ? (
             <LocalPeerStats />
           ) : (
-            <TrackStats
-              trackID={selectedStat.id}
-              layer={selectedStat.layer}
-              local={selectedStat.local}
-            />
+            <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
           )}
         </Dialog.Content>
       </Dialog.Portal>
@@ -167,7 +133,7 @@ const useTracksWithLabel = () => {
                 local: true,
                 label: `${peerName} ${track.source} ${track.type} - ${layer}`,
               };
-            })
+            }),
           );
           return res;
         }
@@ -178,7 +144,7 @@ const useTracksWithLabel = () => {
         });
         return res;
       }, []),
-    [tracksMap, peersMap, localPeerID]
+    [tracksMap, peersMap, localPeerID],
   );
   return tracksWithLabels;
 };
@@ -194,34 +160,19 @@ const LocalPeerStats = () => {
     <Flex css={{ flexWrap: 'wrap', gap: '$10' }}>
       <StatsRow label="Packets Lost" value={stats.subscribe?.packetsLost} />
       <StatsRow label="Jitter" value={stats.subscribe?.jitter} />
-      <StatsRow
-        label="Publish Bitrate"
-        value={formatBytes(stats.publish?.bitrate, 'b/s')}
-      />
-      <StatsRow
-        label="Subscribe Bitrate"
-        value={formatBytes(stats.subscribe?.bitrate, 'b/s')}
-      />
+      <StatsRow label="Publish Bitrate" value={formatBytes(stats.publish?.bitrate, 'b/s')} />
+      <StatsRow label="Subscribe Bitrate" value={formatBytes(stats.subscribe?.bitrate, 'b/s')} />
       <StatsRow
         label="Available Outgoing Bitrate"
         value={formatBytes(stats.publish?.availableOutgoingBitrate, 'b/s')}
       />
-      <StatsRow
-        label="Total Bytes Sent"
-        value={formatBytes(stats.publish?.bytesSent)}
-      />
-      <StatsRow
-        label="Total Bytes Received"
-        value={formatBytes(stats.subscribe?.bytesReceived)}
-      />
+      <StatsRow label="Total Bytes Sent" value={formatBytes(stats.publish?.bytesSent)} />
+      <StatsRow label="Total Bytes Received" value={formatBytes(stats.subscribe?.bytesReceived)} />
       <StatsRow
         label="Round Trip Time"
         value={`${
-          (
-            ((stats.publish?.currentRoundTripTime || 0) +
-              (stats.subscribe?.currentRoundTripTime || 0)) /
-            2
-          ).toFixed(3) * 1000
+          (((stats.publish?.currentRoundTripTime || 0) + (stats.subscribe?.currentRoundTripTime || 0)) / 2).toFixed(3) *
+          1000
         } ms`}
       />
     </Flex>
@@ -253,18 +204,10 @@ const TrackStats = ({ trackID, layer, local }) => {
       {stats.kind === 'video' && (
         <>
           <StatsRow label="Framerate" value={stats.framesPerSecond} />
-          {!inbound && (
-            <StatsRow
-              label="Quality Limitation Reason"
-              value={stats.qualityLimitationReason}
-            />
-          )}
+          {!inbound && <StatsRow label="Quality Limitation Reason" value={stats.qualityLimitationReason} />}
         </>
       )}
-      <StatsRow
-        label="Round Trip Time"
-        value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : '-'}
-      />
+      <StatsRow label="Round Trip Time" value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : '-'} />
     </Flex>
   );
 };
@@ -281,10 +224,7 @@ const StatsRow = React.memo(({ label, value }) => (
     >
       {label}{' '}
     </Text>
-    <Text
-      variant="sub1"
-      css={{ fontWeight: '$semiBold', color: '$textHighEmp' }}
-    >
+    <Text variant="sub1" css={{ fontWeight: '$semiBold', color: '$textHighEmp' }}>
       {value || '-'}
     </Text>
   </Box>
@@ -296,9 +236,7 @@ const formatBytes = (bytes, unit = 'B', decimals = 2) => {
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'].map(
-    size => size + unit
-  );
+  const sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'].map(size => size + unit);
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 

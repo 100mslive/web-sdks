@@ -1,4 +1,4 @@
-import { useTheme } from '../../';
+import { useTheme } from '../../../';
 
 export const useDropdownSelection = () => {
   const { themeType } = useTheme();

@@ -2,11 +2,7 @@ import React, { useState } from 'react';
 import { ViewIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Text } from '../../';
 import { APP_DATA } from '../../common/constants';
-import {
-  DialogContent,
-  DialogInput,
-  DialogRow,
-} from '../../primitives/DialogContent';
+import { DialogContent, DialogInput, DialogRow } from '../../primitives/DialogContent';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
@@ -30,9 +26,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
 };
 
 export function EmbedUrlModal({ onOpenChange }) {
-  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(
-    APP_DATA.embedConfig
-  );
+  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
   const [url, setUrl] = useState(embedConfig?.url || '');
 
   const isAnythingEmbedded = !!embedConfig?.url;
@@ -41,18 +35,11 @@ export function EmbedUrlModal({ onOpenChange }) {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Embed URL" Icon={ViewIcon}>
-        <DialogInput
-          title="URL"
-          value={url}
-          onChange={setUrl}
-          placeholder="https://www.tldraw.com/"
-          type="url"
-        />
+        <DialogInput title="URL" value={url} onChange={setUrl} placeholder="https://www.tldraw.com/" type="url" />
         <DialogRow>
           <Text>
-            Embed a url and share with everyone in the room. Ensure that you're
-            sharing the current tab when the prompt opens. Note that not all
-            websites support being embedded.
+            Embed a url and share with everyone in the room. Ensure that you're sharing the current tab when the prompt
+            opens. Note that not all websites support being embedded.
           </Text>
         </DialogRow>
         <DialogRow justify="end">

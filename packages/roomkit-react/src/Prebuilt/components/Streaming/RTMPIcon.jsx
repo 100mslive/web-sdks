@@ -1,30 +1,9 @@
-import React from "react";
+import React from 'react';
 export const RTMPIcon = props => {
   return (
-    <svg
-      width="49"
-      height="50"
-      viewBox="0 0 49 50"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <rect
-        x="1.36775"
-        y="22.6295"
-        width="21.1485"
-        height="21.1485"
-        rx="10.5742"
-        fill="white"
-      />
-      <rect
-        x="1.36775"
-        y="22.6295"
-        width="21.1485"
-        height="21.1485"
-        rx="10.5742"
-        fill="url(#pattern0)"
-      />
+    <svg width="49" height="50" viewBox="0 0 49 50" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect x="1.36775" y="22.6295" width="21.1485" height="21.1485" rx="10.5742" fill="white" />
+      <rect x="1.36775" y="22.6295" width="21.1485" height="21.1485" rx="10.5742" fill="url(#pattern0)" />
       <rect
         x="1.36775"
         y="22.6295"
@@ -44,22 +23,8 @@ export const RTMPIcon = props => {
         stroke="#1B1F26"
         strokeWidth="1.42857"
       />
-      <rect
-        x="20.2432"
-        y="21.0294"
-        width="27.8927"
-        height="27.8927"
-        rx="13.9464"
-        fill="#9146FF"
-      />
-      <rect
-        x="20.2432"
-        y="21.0294"
-        width="27.8927"
-        height="27.8927"
-        rx="13.9464"
-        fill="url(#pattern2)"
-      />
+      <rect x="20.2432" y="21.0294" width="27.8927" height="27.8927" rx="13.9464" fill="#9146FF" />
+      <rect x="20.2432" y="21.0294" width="27.8927" height="27.8927" rx="13.9464" fill="url(#pattern2)" />
       <rect
         x="20.2432"
         y="21.0294"
@@ -70,38 +35,14 @@ export const RTMPIcon = props => {
         strokeWidth="1.42857"
       />
       <defs>
-        <pattern
-          id="pattern0"
-          patternContentUnits="objectBoundingBox"
-          width="1"
-          height="1"
-        >
-          <use
-            xlinkHref="#image0_3622_12940"
-            transform="translate(0.0938539 0.0951671) scale(0.000996094)"
-          />
+        <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlinkHref="#image0_3622_12940" transform="translate(0.0938539 0.0951671) scale(0.000996094)" />
         </pattern>
-        <pattern
-          id="pattern1"
-          patternContentUnits="objectBoundingBox"
-          width="1"
-          height="1"
-        >
-          <use
-            xlinkHref="#image1_3622_12940"
-            transform="translate(-0.0178571) scale(0.000647321 0.000625)"
-          />
+        <pattern id="pattern1" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlinkHref="#image1_3622_12940" transform="translate(-0.0178571) scale(0.000647321 0.000625)" />
         </pattern>
-        <pattern
-          id="pattern2"
-          patternContentUnits="objectBoundingBox"
-          width="1"
-          height="1"
-        >
-          <use
-            xlinkHref="#image2_3622_12940"
-            transform="translate(0.078125 0.09375) scale(0.00117187)"
-          />
+        <pattern id="pattern2" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlinkHref="#image2_3622_12940" transform="translate(0.078125 0.09375) scale(0.00117187)" />
         </pattern>
         <image
           id="image0_3622_12940"

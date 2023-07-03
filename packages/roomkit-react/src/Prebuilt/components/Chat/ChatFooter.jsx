@@ -48,12 +48,7 @@ function EmojiPicker({ onSelect }) {
             }}
             ref={ref}
           >
-            <Picker
-              onEmojiSelect={onSelect}
-              data={data}
-              previewPosition="none"
-              skinPosition="search"
-            />
+            <Picker onEmojiSelect={onSelect} data={data} previewPosition="none" skinPosition="search" />
           </Box>
         </Popover.Content>
       </Popover.Portal>

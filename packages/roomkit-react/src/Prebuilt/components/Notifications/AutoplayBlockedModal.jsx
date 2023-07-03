@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAutoplayError } from '@100mslive/react-sdk';
-import { Button, Dialog, Text } from '../../';
+import { Button, Dialog, Text } from '../../../';
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 
 export function AutoplayBlockedModal() {
@@ -18,8 +18,7 @@ export function AutoplayBlockedModal() {
       <DialogContent title="Permission Error" closeable={false}>
         <DialogRow>
           <Text variant="md">
-            The browser wants us to get a confirmation for playing the Audio.
-            Please allow audio to proceed.
+            The browser wants us to get a confirmation for playing the Audio. Please allow audio to proceed.
           </Text>
         </DialogRow>
         <DialogRow justify="end">

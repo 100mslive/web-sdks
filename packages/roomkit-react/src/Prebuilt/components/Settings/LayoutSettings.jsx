@@ -1,33 +1,17 @@
-import React, { useCallback } from "react";
-import {
-  selectIsLocalScreenShared,
-  selectIsLocalVideoEnabled,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { settingOverflow } from "./common.js";
-import SwitchWithLabel from "./SwitchWithLabel";
-import { Box, Flex, Slider, Text } from "../../../";
-import {
-  UI_MODE_ACTIVE_SPEAKER,
-  UI_MODE_GRID,
-  UI_SETTINGS,
-} from "../../common/constants";
-import { useSetUiSettings } from "../AppData/useUISettings";
+import React, { useCallback } from 'react';
+import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { settingOverflow } from './common.js';
+import SwitchWithLabel from './SwitchWithLabel';
+import { Box, Flex, Slider, Text } from '../../../';
+import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID, UI_SETTINGS } from '../../common/constants';
+import { useSetUiSettings } from '../AppData/useUISettings';
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
   const [
-    {
-      isAudioOnly,
-      uiViewMode,
-      maxTileCount,
-      mirrorLocalVideo,
-      activeSpeakerSorting,
-      hideLocalVideo,
-    },
+    { isAudioOnly, uiViewMode, maxTileCount, mirrorLocalVideo, activeSpeakerSorting, hideLocalVideo },
     setUISettings,
   ] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
@@ -39,7 +23,7 @@ export const LayoutSettings = () => {
       }
       setUISettings({ [UI_SETTINGS.isAudioOnly]: isAudioOnlyModeOn });
     },
-    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings]
+    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings],
   );
 
   return (
@@ -48,9 +32,7 @@ export const LayoutSettings = () => {
         checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
         onChange={value => {
           setUISettings({
-            [UI_SETTINGS.uiViewMode]: value
-              ? UI_MODE_ACTIVE_SPEAKER
-              : UI_MODE_GRID,
+            [UI_SETTINGS.uiViewMode]: value ? UI_MODE_ACTIVE_SPEAKER : UI_MODE_GRID,
           });
         }}
         id="activeSpeakerMode"
@@ -66,12 +48,7 @@ export const LayoutSettings = () => {
           });
         }}
       />
-      <SwitchWithLabel
-        label="Audio Only Mode"
-        id="audioOnlyMode"
-        checked={isAudioOnly}
-        onChange={toggleIsAudioOnly}
-      />
+      <SwitchWithLabel label="Audio Only Mode" id="audioOnlyMode" checked={isAudioOnly} onChange={toggleIsAudioOnly} />
       <SwitchWithLabel
         label="Mirror Local Video"
         id="mirrorMode"
@@ -92,14 +69,11 @@ export const LayoutSettings = () => {
           });
         }}
       />
-      <Flex
-        align="center"
-        css={{ w: "100%", my: "$2", py: "$8", "@md": { display: "none" } }}
-      >
-        <Text variant="md" css={{ fontWeight: "$semiBold" }}>
+      <Flex align="center" css={{ w: '100%', my: '$2', py: '$8', '@md': { display: 'none' } }}>
+        <Text variant="md" css={{ fontWeight: '$semiBold' }}>
           Tiles In View({maxTileCount})
         </Text>
-        <Flex justify="end" css={{ flex: "1 1 0" }}>
+        <Flex justify="end" css={{ flex: '1 1 0' }}>
           <Slider
             step={1}
             value={[maxTileCount]}
@@ -108,7 +82,7 @@ export const LayoutSettings = () => {
             onValueChange={e => {
               setUISettings({ [UI_SETTINGS.maxTileCount]: e[0] });
             }}
-            css={{ w: "70%" }}
+            css={{ w: '70%' }}
           />
         </Flex>
       </Flex>

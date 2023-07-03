@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
+import { Flex } from '../Layout';
 import { QRCode } from './QRCode';
 import QRCodeDocs from './QRCode.mdx';
-import { Flex } from '../Layout';
 
 export default {
   title: 'UI Components/QRCode',

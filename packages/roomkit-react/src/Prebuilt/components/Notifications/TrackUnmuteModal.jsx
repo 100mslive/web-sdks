@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
-import {
-  HMSNotificationTypes,
-  useHMSActions,
-  useHMSNotifications,
-} from "@100mslive/react-sdk";
-import { MicOnIcon } from "@100mslive/react-icons";
-import { RequestDialog } from "../../primitives/DialogContent";
+import React, { useEffect, useState } from 'react';
+import { HMSNotificationTypes, useHMSActions, useHMSNotifications } from '@100mslive/react-sdk';
+import { MicOnIcon } from '@100mslive/react-icons';
+import { RequestDialog } from '../../primitives/DialogContent';
 
 export const TrackUnmuteModal = () => {
   const hmsActions = useHMSActions();

@@ -18,13 +18,7 @@ import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
 import { Box, Flex } from '../../';
 import { useHMSPrebuiltContext } from '../AppContext';
-import {
-  APP_DATA,
-  EMOJI_REACTION_TYPE,
-  isAndroid,
-  isIOS,
-  isIPadOS,
-} from '../common/constants';
+import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 import { ConferenceMainView } from '../layouts/mainView';
 
 const Conference = () => {
@@ -77,32 +71,15 @@ const Conference = () => {
     }
     if (
       !prevState &&
-      !(
-        roomState === HMSRoomState.Connecting ||
-        roomState === HMSRoomState.Reconnecting ||
-        isConnectedToRoom
-      )
+      !(roomState === HMSRoomState.Connecting || roomState === HMSRoomState.Reconnecting || isConnectedToRoom)
     ) {
       if (role) navigate(`/preview/${roomId || ''}/${role}`);
       else navigate(`/preview/${roomId || ''}`);
     }
-  }, [
-    isConnectedToRoom,
-    prevState,
-    roomState,
-    navigate,
-    role,
-    roomId,
-    showPreview,
-  ]);
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, showPreview]);
 
   useEffect(() => {
-    if (
-      authTokenInAppData &&
-      !isConnectedToRoom &&
-      !showPreview &&
-      roomState !== HMSRoomState.Connecting
-    ) {
+    if (authTokenInAppData && !isConnectedToRoom && !showPreview && roomState !== HMSRoomState.Connecting) {
       hmsActions
         .join({
           userName: 'Test',
@@ -118,14 +95,7 @@ const Conference = () => {
         })
         .catch(console.error);
     }
-  }, [
-    authTokenInAppData,
-    skipPreview,
-    hmsActions,
-    isConnectedToRoom,
-    showPreview,
-    roomState,
-  ]);
+  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, showPreview, roomState]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
@@ -146,9 +116,7 @@ const Conference = () => {
           css={{
             h: '$18',
             transition: 'margin 0.3s ease-in-out',
-            marginTop: performAutoHide
-              ? `-${headerRef.current?.clientHeight}px`
-              : 'none',
+            marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
             '@md': {
               h: '$17',
             },
@@ -178,9 +146,7 @@ const Conference = () => {
             flexShrink: 0,
             maxHeight: '$24',
             transition: 'margin 0.3s ease-in-out',
-            marginBottom: performAutoHide
-              ? `-${footerRef.current?.clientHeight}px`
-              : undefined,
+            marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
             '@md': {
               maxHeight: 'unset',
             },

@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { HorizontalDivider } from '.';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
+import { HorizontalDivider } from '.';
 
 export default {
   title: 'UI Components/Divider',

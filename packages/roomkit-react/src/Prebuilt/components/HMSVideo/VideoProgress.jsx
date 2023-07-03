@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getPercentage } from './HMSVIdeoUtils';
-import { Box, Flex } from '../../';
+import { Box, Flex } from '../../../';
 
 export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   const [videoProgress, setVideoProgress] = useState(0);
@@ -10,14 +10,10 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   useEffect(() => {
     const videoEl = hlsPlayer.getVideoElement();
     const timeupdateHandler = () => {
-      const videoProgress = Math.floor(
-        getPercentage(videoEl.currentTime, videoEl.duration)
-      );
+      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, videoEl.duration));
       let bufferProgress = 0;
       if (videoEl.buffered.length > 0) {
-        bufferProgress = Math.floor(
-          getPercentage(videoEl.buffered?.end(0), videoEl.duration)
-        );
+        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), videoEl.duration));
       }
 
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);

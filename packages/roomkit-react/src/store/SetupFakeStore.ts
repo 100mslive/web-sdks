@@ -1,11 +1,12 @@
 import create from 'zustand';
 import { createDefaultStoreState, HMSReactiveStore, HMSStore } from '@100mslive/react-sdk';
-import { StoryBookSDK } from './StorybookSDK';
 import { fakeMessages } from '../fixtures/chats';
 import { fakeParticipants } from '../fixtures/peers';
+import { StoryBookSDK } from './StorybookSDK';
 
 const store = HMSReactiveStore.createNewHMSStore('HMSStore', createDefaultStoreState);
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 export const storyBookStore = create<HMSStore>(store);
 export const storyBookSDK = new StoryBookSDK(store);

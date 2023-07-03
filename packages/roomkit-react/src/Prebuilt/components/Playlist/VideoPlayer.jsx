@@ -10,14 +10,7 @@ import {
 } from '@100mslive/react-sdk';
 import { CrossIcon, ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { VideoPlaylistControls } from './PlaylistControls';
-import {
-  Box,
-  Flex,
-  IconButton,
-  Text,
-  Video,
-  VideoTileStats,
-} from '../../';
+import { Box, Flex, IconButton, Text, Video, VideoTileStats } from '../../';
 import { UI_SETTINGS } from '../../common/constants';
 import { useUISettings } from '../AppData/useUISettings';
 
@@ -35,12 +28,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
 
   return (
-    <Flex
-      direction="column"
-      justify="center"
-      css={{ w: '100%', h: '100%' }}
-      ref={ref}
-    >
+    <Flex direction="column" justify="center" css={{ w: '100%', h: '100%' }} ref={ref}>
       {active && (
         <Flex
           justify="between"

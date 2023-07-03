@@ -1,1 +1,1 @@
-export { TranscriptionButton as default } from "./TranscriptionButton";
+export { TranscriptionButton as default } from './TranscriptionButton';

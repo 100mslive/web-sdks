@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { RadioGroup } from './RadioGroup';
 import { Label } from '../Label';
 import { Flex } from '../Layout';
+import { RadioGroup } from './RadioGroup';
 
 export default {
   title: 'UI Components/RadioGroup',

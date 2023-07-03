@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { MusicIcon } from '@100mslive/react-icons';
-import { IconButton, Tooltip } from '../../';
+import { IconButton, Tooltip } from '../../../';
 import { UI_SETTINGS } from '../../common/constants';
 import { useWhenAloneInRoom } from '../../common/hooks';
 import { useSetUiSettings } from '../AppData/useUISettings';
@@ -30,9 +30,7 @@ if (ambientMusicURL) {
  */
 const useAmbientMusic = (threshold = 5 * 1000) => {
   const audioRef = useRef(ambientAudio);
-  const [userHasEnabled, setEnableAmbientMusic] = useSetUiSettings(
-    UI_SETTINGS.enableAmbientMusic
-  ); // user settings
+  const [userHasEnabled, setEnableAmbientMusic] = useSetUiSettings(UI_SETTINGS.enableAmbientMusic); // user settings
   const [playing, setPlaying] = useState(false);
   const { alone: aloneRightNow, aloneForLong } = useWhenAloneInRoom(threshold);
   // play if user has enabled the setting and been alone for some time
@@ -44,9 +42,7 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
     if (shouldMusicBePlayed && audioRef.current) {
       audioRef.current.volume = 0.2;
       audioRef.current.loop = true;
-      audioRef.current
-        .play()
-        .catch(err => console.error('Unable to play Ambient Music', err));
+      audioRef.current.play().catch(err => console.error('Unable to play Ambient Music', err));
       setPlaying(true);
     }
   }, [shouldMusicBePlayed]);
@@ -70,7 +66,7 @@ const useAmbientMusic = (threshold = 5 * 1000) => {
 
   const toggleAmbientMusic = useCallback(
     () => setEnableAmbientMusic(!playing), // save user settings
-    [playing, setEnableAmbientMusic]
+    [playing, setEnableAmbientMusic],
   );
 
   return { ready: aloneForLong, playing, toggleAmbientMusic };
@@ -83,15 +79,8 @@ export const AmbientMusic = () => {
   }
 
   return (
-    <Tooltip
-      title={`${playing ? `Disable Ambient Music` : `Play Ambient Music`}`}
-      key="ambient-music"
-    >
-      <IconButton
-        css={{ mx: '$4' }}
-        onClick={toggleAmbientMusic}
-        active={!playing}
-      >
+    <Tooltip title={`${playing ? `Disable Ambient Music` : `Play Ambient Music`}`} key="ambient-music">
+      <IconButton css={{ mx: '$4' }} onClick={toggleAmbientMusic} active={!playing}>
         <MusicIcon />
       </IconButton>
     </Tooltip>

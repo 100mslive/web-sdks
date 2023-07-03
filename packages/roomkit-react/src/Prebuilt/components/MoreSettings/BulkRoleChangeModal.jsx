@@ -1,19 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
-import {
-  AlertTriangleIcon,
-  ChangeRoleIcon,
-  CheckIcon,
-} from '@100mslive/react-icons';
-import {
-  Button,
-  Checkbox,
-  Dialog,
-  Dropdown,
-  Flex,
-  Loading,
-  Text,
-} from '../../';
+import { AlertTriangleIcon, ChangeRoleIcon, CheckIcon } from '@100mslive/react-icons';
+import { Button, Checkbox, Dialog, Dropdown, Flex, Loading, Text } from '../../';
 import { useFilteredRoles } from '../../common/hooks';
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
@@ -34,10 +22,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
     if (selectedBulkRole.length > 0 && selectedRole) {
       try {
         setIsSubmiting(true);
-        await hmsActions.changeRoleOfPeersWithRoles(
-          selectedBulkRole,
-          selectedRole
-        );
+        await hmsActions.changeRoleOfPeersWithRoles(selectedBulkRole, selectedRole);
         setIsSubmiting(false);
         setErrorMessage('');
         onOpenChange(false);
@@ -64,11 +49,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
           >
             <DialogDropdownTrigger
               ref={ref}
-              title={
-                selectedBulkRole.length === 0
-                  ? 'Select Multiple Roles'
-                  : selectedBulkRole.toString()
-              }
+              title={selectedBulkRole.length === 0 ? 'Select Multiple Roles' : selectedBulkRole.toString()}
               css={{
                 w: '70%',
                 p: '$8',
@@ -91,19 +72,12 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
                       checked={selectedBulkRole.includes(role)}
                       onCheckedChange={value => {
                         setBulkRole(selection => {
-                          return value
-                            ? [...selection, role]
-                            : selection.filter(
-                                selectedRole => selectedRole !== role
-                              );
+                          return value ? [...selection, role] : selection.filter(selectedRole => selectedRole !== role);
                         });
                         setErrorMessage('');
                       }}
                     >
-                      <Checkbox.Root
-                        css={{ margin: '$2' }}
-                        checked={selectedBulkRole.includes(role)}
-                      >
+                      <Checkbox.Root css={{ margin: '$2' }} checked={selectedBulkRole.includes(role)}>
                         <Checkbox.Indicator>
                           <CheckIcon width={16} height={16} />
                         </Checkbox.Indicator>
@@ -117,10 +91,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow>
           <Text>To Role: </Text>
-          <Dropdown.Root
-            open={roleDialog}
-            onOpenChange={value => setRoleDialog(value)}
-          >
+          <Dropdown.Root open={roleDialog} onOpenChange={value => setRoleDialog(value)}>
             <DialogDropdownTrigger
               ref={roleRef}
               title={selectedRole || 'Select Role'}
@@ -130,9 +101,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
               }}
               open={roleDialog}
             />
-            <Dropdown.Content
-              css={{ w: roleRef.current?.clientWidth, zIndex: 1000 }}
-            >
+            <Dropdown.Content css={{ w: roleRef.current?.clientWidth, zIndex: 1000 }}>
               {roles &&
                 roles.map(role => {
                   return (
@@ -159,11 +128,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
           )}
         </DialogRow>
         <DialogRow justify="end">
-          <Button
-            variant="primary"
-            onClick={changeBulkRole}
-            disabled={!(selectedRole && selectedBulkRole.length > 0)}
-          >
+          <Button variant="primary" onClick={changeBulkRole} disabled={!(selectedRole && selectedBulkRole.length > 0)}>
             {isSubmiting && <Loading css={{ color: '$textSecondary' }} />}
             Apply
           </Button>

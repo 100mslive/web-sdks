@@ -1,12 +1,12 @@
-import React from "react";
-import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
-import { PencilDrawIcon } from "@100mslive/react-icons";
-import { useWhiteboardMetadata } from "./useWhiteboardMetadata";
-import { Tooltip } from "../../../";
-import { FEATURE_LIST } from "../../common/constants";
-import { useHLSViewerRole } from "../../components/AppData/useUISettings";
-import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";
-import IconButton from "../../IconButton";
+import React from 'react';
+import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
+import { PencilDrawIcon } from '@100mslive/react-icons';
+import { useWhiteboardMetadata } from './useWhiteboardMetadata';
+import { Tooltip } from '../../../';
+import { FEATURE_LIST } from '../../common/constants';
+import { useHLSViewerRole } from '../../components/AppData/useUISettings';
+import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
+import IconButton from '../../IconButton';
 
 export const ToggleWhiteboard = () => {
   const {
@@ -19,22 +19,14 @@ export const ToggleWhiteboard = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.WHITEBOARD);
 
-  if (
-    !whiteboardEnabled ||
-    localPeerRole === hlsViewerRole ||
-    !isFeatureEnabled
-  ) {
+  if (!whiteboardEnabled || localPeerRole === hlsViewerRole || !isFeatureEnabled) {
     return null;
   }
 
   return (
     <Tooltip
       title={`${
-        whiteboardActive
-          ? amIWhiteboardOwner
-            ? `Stop whiteboard`
-            : `Can't stop whiteboard`
-          : "Start whiteboard"
+        whiteboardActive ? (amIWhiteboardOwner ? `Stop whiteboard` : `Can't stop whiteboard`) : 'Start whiteboard'
       }`}
       key="whiteboard"
     >

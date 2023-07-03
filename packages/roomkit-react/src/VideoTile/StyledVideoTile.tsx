@@ -73,22 +73,22 @@ const AudioIndicator = styled('div', {
   variants: {
     size: {
       small: {
-        width: "$10",
-        height: "$10",
-         '& > svg': {
-           width: '$8',
-           height: '$8'
-         } 
+        width: '$10',
+        height: '$10',
+        '& > svg': {
+          width: '$8',
+          height: '$8',
+        },
       },
       medium: {
         width: '$13',
         height: '$13',
-      }
-    }
+      },
+    },
   },
   defaultVariants: {
-    size: 'medium'
-  }
+    size: 'medium',
+  },
 });
 
 const FullScreenButton = styled('button', {
@@ -120,9 +120,9 @@ const AvatarContainer = styled(Box, {
   width: '40%',
   height: '40%',
   '& > div': {
-    maxHeight: "$20",
-    height: "100%"
-  }
+    maxHeight: '$20',
+    height: '100%',
+  },
 });
 
 interface VideoTileType {

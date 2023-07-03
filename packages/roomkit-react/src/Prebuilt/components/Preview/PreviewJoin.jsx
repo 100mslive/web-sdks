@@ -29,17 +29,13 @@ import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackgr
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
-import {
-  defaultPreviewPreference,
-  UserPreferencesKeys,
-  useUserPreferences,
-} from '../hooks/useUserPreferences';
+import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import SettingsModal from '../Settings/SettingsModal';
 
 const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
-    defaultPreviewPreference
+    defaultPreviewPreference,
   );
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
@@ -71,14 +67,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     });
     join();
     onJoin && onJoin();
-  }, [
-    join,
-    isLocalAudioEnabled,
-    isLocalVideoEnabled,
-    name,
-    setPreviewPreference,
-    onJoin,
-  ]);
+  }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -94,10 +83,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
         Get Started
       </Text>
-      <Text
-        css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }}
-        variant="body1"
-      >
+      <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
       <Flex
@@ -109,16 +95,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         }}
       >
         <PreviewTile name={name} error={previewError} />
-        <PreviewControls
-          enableJoin={enableJoin}
-          savePreferenceAndJoin={savePreferenceAndJoin}
-        />
-        <PreviewName
-          name={name}
-          onChange={setName}
-          enableJoin={enableJoin}
-          onJoin={savePreferenceAndJoin}
-        />
+        <PreviewControls enableJoin={enableJoin} savePreferenceAndJoin={savePreferenceAndJoin} />
+        <PreviewName name={name} onChange={setName} enableJoin={enableJoin} onJoin={savePreferenceAndJoin} />
       </Flex>
     </Container>
   );
@@ -204,10 +182,7 @@ const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
   return (
     <Fragment>
-      <IconButton
-        data-testid="preview_setting_btn"
-        onClick={() => setOpen(value => !value)}
-      >
+      <IconButton data-testid="preview_setting_btn" onClick={() => setOpen(value => !value)}>
         <SettingsIcon />
       </IconButton>
       {open && <SettingsModal open={open} onOpenChange={setOpen} />}

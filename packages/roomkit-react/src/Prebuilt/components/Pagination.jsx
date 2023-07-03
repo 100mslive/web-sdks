@@ -14,27 +14,15 @@ export const Pagination = ({ page, setPage, numPages }) => {
   return (
     <StyledPagination.Root>
       <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>
-        <ChevronLeftIcon
-          width={16}
-          height={16}
-          style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }}
-        />
+        <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
         {[...Array(numPages)].map((_, i) => (
-          <StyledPagination.Dot
-            key={i}
-            active={page === i}
-            onClick={() => setPage(i)}
-          />
+          <StyledPagination.Dot key={i} active={page === i} onClick={() => setPage(i)} />
         ))}
       </StyledPagination.Dots>
       <StyledPagination.Chevron disabled={disableRight} onClick={nextPage}>
-        <ChevronRightIcon
-          width={16}
-          height={16}
-          style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }}
-        />
+        <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
     </StyledPagination.Root>
   );

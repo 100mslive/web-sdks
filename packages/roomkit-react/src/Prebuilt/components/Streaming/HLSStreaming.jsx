@@ -1,11 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import {
-  selectAppData,
-  selectRoomID,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectAppData, selectRoomID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import {
   EndStreamIcon,
   EyeOpenIcon,
@@ -16,14 +10,8 @@ import {
   SupportIcon,
   WrenchIcon,
 } from '@100mslive/react-icons';
-import {
-  Container,
-  ContentBody,
-  ContentHeader,
-  ErrorText,
-  RecordStream,
-} from './Common';
-import { Box, Button, Flex, Loading, Text } from '../../';
+import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
+import { Box, Button, Flex, Loading, Text } from '../../../';
 import { APP_DATA } from '../../common/constants';
 import { useFilteredRoles } from '../../common/hooks';
 import { getDefaultMeetingUrl } from '../../common/utils';
@@ -37,8 +25,7 @@ const getCardData = (roleName, roomId) => {
     case 'broadcaster': {
       data = {
         title: formattedRoleName,
-        content:
-          'Broadcasters can livestream audio or video, manage stream appearance and control the room via HLS.',
+        content: 'Broadcasters can livestream audio or video, manage stream appearance and control the room via HLS.',
         icon: <SupportIcon />,
       };
       break;
@@ -118,28 +105,17 @@ export const HLSStreaming = ({ onBack }) => {
   return !showLinks ? (
     <Container rounded>
       <ContentHeader title="Start Streaming" content="HLS" onBack={onBack} />
-      <ContentBody
-        title="HLS Streaming"
-        Icon={GoLiveIcon}
-        removeVerticalPadding
-      >
-        Stream directly from the browser using any device with multiple hosts
-        and real-time messaging, all within this platform.
+      <ContentBody title="HLS Streaming" Icon={GoLiveIcon} removeVerticalPadding>
+        Stream directly from the browser using any device with multiple hosts and real-time messaging, all within this
+        platform.
       </ContentBody>
       {isHLSRunning ? <EndHLS setShowLinks={setShowLinks} /> : <StartHLS />}
     </Container>
   ) : (
     <Container rounded>
-      <ContentHeader
-        title="Invite People"
-        content="Start the conversation"
-        onBack={() => setShowLinks(false)}
-      />
+      <ContentHeader title="Invite People" content="Start the conversation" onBack={() => setShowLinks(false)} />
 
-      <Flex
-        direction="column"
-        css={{ gap: '$10', p: '$0 $10', overflowY: 'auto', mb: '$10' }}
-      >
+      <Flex direction="column" css={{ gap: '$10', p: '$0 $10', overflowY: 'auto', mb: '$10' }}>
         {cards.map(card => (
           <Card key={card.title} {...card} isHLSRunning={isHLSRunning} />
         ))}
@@ -168,25 +144,19 @@ const StartHLS = () => {
         });
       } catch (error) {
         if (error.message.includes('invalid input')) {
-          await startHLS([
-            { meetingURL: recordingUrl || getDefaultMeetingUrl() },
-          ]);
+          await startHLS([{ meetingURL: recordingUrl || getDefaultMeetingUrl() }]);
           return;
         }
         setHLSStarted(false);
         setError(error.message);
       }
     },
-    [hmsActions, record, isHLSStarted, setHLSStarted, recordingUrl]
+    [hmsActions, record, isHLSStarted, setHLSStarted, recordingUrl],
   );
 
   return (
     <Fragment>
-      <RecordStream
-        record={record}
-        setRecord={setRecord}
-        testId="hls-recording"
-      />
+      <RecordStream record={record} setRecord={setRecord} testId="hls-recording" />
       <Box css={{ p: '$4 $10' }}>
         <ErrorText error={error} />
         <Button
@@ -196,11 +166,7 @@ const StartHLS = () => {
           onClick={() => startHLS()}
           disabled={isHLSStarted}
         >
-          {isHLSStarted ? (
-            <Loading size={24} color="currentColor" />
-          ) : (
-            <GoLiveIcon />
-          )}
+          {isHLSStarted ? <Loading size={24} color="currentColor" /> : <GoLiveIcon />}
           {isHLSStarted ? 'Starting stream...' : 'Go Live'}
         </Button>
       </Box>
@@ -209,8 +175,7 @@ const StartHLS = () => {
           <InfoIcon width={16} height={16} />
         </Text>
         <Text variant="tiny" color="$textMedEmp" css={{ mx: '$8' }}>
-          You cannot start recording once the stream starts, you will have to
-          stop the stream to enable recording.
+          You cannot start recording once the stream starts, you will have to stop the stream to enable recording.
         </Text>
       </Flex>
     </Fragment>
@@ -253,11 +218,7 @@ const EndHLS = ({ setShowLinks }) => {
         <EndStreamIcon />
         End Stream
       </Button>
-      <Button
-        icon
-        css={{ w: '100%', r: '$0', mt: '$8' }}
-        onClick={() => setShowLinks(true)}
-      >
+      <Button icon css={{ w: '100%', r: '$0', mt: '$8' }} onClick={() => setShowLinks(true)}>
         <PeopleIcon /> Invite People
       </Button>
     </Box>

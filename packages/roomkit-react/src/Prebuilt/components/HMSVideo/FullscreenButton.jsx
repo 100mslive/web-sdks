@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, IconButton, Tooltip } from '../../';
+import { Flex, IconButton, Tooltip } from '../../../';
 
 export const FullScreenButton = ({ isFullScreen, icon, onToggle }) => {
   return (

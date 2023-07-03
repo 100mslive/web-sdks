@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import {
-  HMSNotificationTypes,
-  useHMSNotifications,
-} from '@100mslive/react-sdk';
-import { Dialog, Text } from '../../';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { Dialog, Text } from '../../../';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
@@ -13,8 +10,7 @@ export function PermissionErrorModal() {
     if (
       !notification ||
       (notification.data?.code !== 3001 && notification.data?.code !== 3011) ||
-      (notification.data?.code === 3001 &&
-        notification.data?.message.includes('screen'))
+      (notification.data?.code === 3001 && notification.data?.message.includes('screen'))
     ) {
       return;
     }
@@ -55,13 +51,8 @@ export function PermissionErrorModal() {
               pb: '$8',
             }}
           >
-            <Text css={{ fontWeight: '$semiBold' }}>
-              {deviceType} permissions are blocked
-            </Text>
-            <Dialog.DefaultClose
-              data-testid="dialoge_cross_icon"
-              css={{ alignSelf: 'start' }}
-            />
+            <Text css={{ fontWeight: '$semiBold' }}>{deviceType} permissions are blocked</Text>
+            <Dialog.DefaultClose data-testid="dialoge_cross_icon" css={{ alignSelf: 'start' }} />
           </Dialog.Title>
           <Text variant="md" css={{ py: '$10' }}>
             Access to {deviceType} is required.&nbsp;

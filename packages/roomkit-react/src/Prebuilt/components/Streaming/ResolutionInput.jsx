@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { InfoIcon } from '@100mslive/react-icons';
-import { Flex, Input, Label, Text, Tooltip } from '../../';
+import { Flex, Input, Label, Text, Tooltip } from '../../../';
 import {
   RTMP_RECORD_DEFAULT_RESOLUTION,
   RTMP_RECORD_RESOLUTION_MAX,
@@ -8,13 +8,7 @@ import {
 } from '../../common/constants';
 import { DialogRow } from '../../primitives/DialogContent';
 
-export const ResolutionInput = ({
-  onResolutionChange,
-  disabled,
-  tooltipText,
-  css,
-  testId,
-}) => {
+export const ResolutionInput = ({ onResolutionChange, disabled, tooltipText, css, testId }) => {
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
   const resolutionChangeHandler = useCallback(
@@ -35,7 +29,7 @@ export const ResolutionInput = ({
       };
       setResolution(newResolution);
     },
-    [resolution]
+    [resolution],
   );
 
   return (

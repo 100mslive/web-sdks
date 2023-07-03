@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text } from '../../';
+import { Text } from '../../../';
 import { ErrorDialog } from '../../primitives/DialogContent';
 
 export const InitErrorModal = ({ notification }) => {
@@ -14,8 +14,7 @@ export const InitErrorModal = ({ notification }) => {
     let description;
     let title;
     if (data.description.includes('role is invalid')) {
-      description =
-        'This role does not exist for the given room. Try again with a valid role.';
+      description = 'This role does not exist for the given room. Try again with a valid role.';
       title = 'Invalid Role';
     } else if (data.description.includes('room is not active')) {
       title = 'Room is disabled';
@@ -30,11 +29,7 @@ export const InitErrorModal = ({ notification }) => {
   }, [notification]);
 
   return (
-    <ErrorDialog
-      open={showModal}
-      onOpenChange={setShowModal}
-      title={info.title}
-    >
+    <ErrorDialog open={showModal} onOpenChange={setShowModal} title={info.title}>
       <Text variant="sm" css={{ wordBreak: 'break-word' }}>
         {info.description} <br />
         Current URL - {window.location.href}

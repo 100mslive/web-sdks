@@ -1,14 +1,6 @@
 import React, { Fragment, useState } from 'react';
-import {
-  HMSPlaylistType,
-  selectIsAllowedToPublish,
-  useHMSStore,
-} from '@100mslive/react-sdk';
-import {
-  AudioPlayerIcon,
-  CrossIcon,
-  VideoPlayerIcon,
-} from '@100mslive/react-icons';
+import { HMSPlaylistType, selectIsAllowedToPublish, useHMSStore } from '@100mslive/react-sdk';
+import { AudioPlayerIcon, CrossIcon, VideoPlayerIcon } from '@100mslive/react-icons';
 import { AudioPlaylistControls } from './PlaylistControls';
 import { PlaylistItem } from './PlaylistItem';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../';
@@ -20,12 +12,7 @@ import { usePlaylist } from '../hooks/usePlaylist';
 const BrowseAndPlayFromLocal = ({ type, actions }) => {
   return (
     <Fragment>
-      <Text
-        as="label"
-        htmlFor={`${type}PlaylistBrowse`}
-        variant="sm"
-        css={{ cursor: 'pointer', mr: '$2' }}
-      >
+      <Text as="label" htmlFor={`${type}PlaylistBrowse`} variant="sm" css={{ cursor: 'pointer', mr: '$2' }}>
         Browse
       </Text>
       <input
@@ -58,32 +45,19 @@ export const Playlist = ({ type }) => {
   const [collapse, setCollapse] = useState(false);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isFeatureEnabled = useIsFeatureEnabled(
-    isAudioPlaylist ? FEATURE_LIST.AUDIO_PLAYLIST : FEATURE_LIST.VIDEO_PLAYLIST
+    isAudioPlaylist ? FEATURE_LIST.AUDIO_PLAYLIST : FEATURE_LIST.VIDEO_PLAYLIST,
   );
-  if (
-    !isAllowedToPublish.screen ||
-    playlist.length === 0 ||
-    !isFeatureEnabled
-  ) {
+  if (!isAllowedToPublish.screen || playlist.length === 0 || !isFeatureEnabled) {
     return null;
   }
 
   return (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
-        <Dropdown.Trigger
-          asChild
-          data-testid={
-            type === HMSPlaylistType.audio ? 'audio_playlist' : 'video_playlist'
-          }
-        >
+        <Dropdown.Trigger asChild data-testid={type === HMSPlaylistType.audio ? 'audio_playlist' : 'video_playlist'}>
           <IconButton active={!active}>
-            <Tooltip
-              title={isAudioPlaylist ? 'Audio Playlist' : 'Video Playlist'}
-            >
-              <Box>
-                {isAudioPlaylist ? <AudioPlayerIcon /> : <VideoPlayerIcon />}
-              </Box>
+            <Tooltip title={isAudioPlaylist ? 'Audio Playlist' : 'Video Playlist'}>
+              <Box>{isAudioPlaylist ? <AudioPlayerIcon /> : <VideoPlayerIcon />}</Box>
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
@@ -147,11 +121,7 @@ export const Playlist = ({ type }) => {
               })}
             </Box>
           )}
-          {isAudioPlaylist && (
-            <AudioPlaylistControls
-              onToggle={() => setCollapse(value => !value)}
-            />
-          )}
+          {isAudioPlaylist && <AudioPlaylistControls onToggle={() => setCollapse(value => !value)} />}
         </Dropdown.Content>
       </Dropdown.Root>
     </Fragment>

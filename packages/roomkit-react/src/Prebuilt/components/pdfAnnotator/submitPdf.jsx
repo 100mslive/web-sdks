@@ -42,13 +42,7 @@ export const SubmitPDF = ({
           setIsValidateProgress(false);
         });
     },
-    [
-      onOpenChange,
-      pdfFile,
-      setIsPDFUrlValid,
-      setIsValidateProgress,
-      setPDFConfig,
-    ]
+    [onOpenChange, pdfFile, setIsPDFUrlValid, setIsValidateProgress, setPDFConfig],
   );
   return (
     <Flex

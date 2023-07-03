@@ -21,16 +21,10 @@ import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
-  const pinnedMessage = useHMSStore(
-    selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE)
-  );
+  const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
 
   return pinnedMessage ? (
-    <Flex
-      css={{ p: '$8', color: '$textMedEmp', bg: '$surfaceLight', r: '$1' }}
-      align="center"
-      justify="between"
-    >
+    <Flex css={{ p: '$8', color: '$textMedEmp', bg: '$surfaceLight', r: '$1' }} align="center" justify="between">
       <Box>
         <PinIcon />
       </Box>
@@ -58,32 +52,20 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
 export const Chat = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
-  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(
-    CHAT_SELECTOR.PEER_ID
-  );
-  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(
-    CHAT_SELECTOR.ROLE
-  );
+  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
-    selection: roleSelector
-      ? roleSelector
-      : peerSelector && peerName
-      ? peerName
-      : 'Everyone',
+    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
   });
   const [isSelectorOpen, setSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
   useEffect(() => {
-    if (
-      notification &&
-      notification.data &&
-      peerSelector === notification.data.id
-    ) {
+    if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
       setChatOptions({
         role: '',
@@ -106,7 +88,7 @@ export const Chat = () => {
         hmsActions.setMessageRead(true);
       }
     },
-    [hmsActions, messagesCount]
+    [hmsActions, messagesCount],
   );
 
   return (
@@ -131,23 +113,10 @@ export const Chat = () => {
       />
       <PinnedMessage clearPinnedMessage={setPinnedMessage} />
 
-      <ChatBody
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
-        ref={listRef}
-        scrollToBottom={scrollToBottom}
-      />
-      <ChatFooter
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
-        onSend={() => scrollToBottom(1)}
-      >
+      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
+      <ChatFooter role={chatOptions.role} peerId={chatOptions.peerId} onSend={() => scrollToBottom(1)}>
         {!isSelectorOpen && (
-          <NewMessageIndicator
-            role={chatOptions.role}
-            peerId={chatOptions.peerId}
-            scrollToBottom={scrollToBottom}
-          />
+          <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
         )}
       </ChatFooter>
     </Flex>

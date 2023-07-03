@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import { getDurationFromSeconds } from './HMSVIdeoUtils';
-import { Text } from '../../';
+import { Text } from '../../../';
 
 export const VideoTime = ({ hlsPlayer }) => {
   const [videoTime, setVideoTime] = useState('');
 
   useEffect(() => {
-    const timeupdateHandler = currentTime =>
-      setVideoTime(getDurationFromSeconds(currentTime));
+    const timeupdateHandler = currentTime => setVideoTime(getDurationFromSeconds(currentTime));
     if (hlsPlayer) {
       hlsPlayer.on(HMSHLSPlayerEvents.CURRENT_TIME, timeupdateHandler);
     }

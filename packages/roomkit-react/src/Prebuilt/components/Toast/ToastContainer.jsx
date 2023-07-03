@@ -17,13 +17,7 @@ export const ToastContainer = () => {
   return (
     <ToastPrimitive.Provider swipeDirection="left" duration={3000}>
       {toasts.slice(0, MAX_TOASTS).map(toast => {
-        return (
-          <Toast
-            key={toast.id}
-            {...toast}
-            onOpenChange={value => !value && ToastManager.removeToast(toast.id)}
-          />
-        );
+        return <Toast key={toast.id} {...toast} onOpenChange={value => !value && ToastManager.removeToast(toast.id)} />;
       })}
       <ToastPrimitive.Viewport
         css={{

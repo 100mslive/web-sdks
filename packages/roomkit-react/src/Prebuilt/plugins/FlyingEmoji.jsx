@@ -1,34 +1,23 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useMedia } from "react-use";
-import {
-  selectLocalPeerID,
-  selectPeerNameByID,
-  useHMSStore,
-  useHMSVanillaStore,
-} from "@100mslive/react-sdk";
-import {
-  Box,
-  config as cssConfig,
-  Flex,
-  keyframes,
-  Text,
-} from "../../";
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
+import { selectLocalPeerID, selectPeerNameByID, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { Box, config as cssConfig, Flex, keyframes, Text } from '../../';
 
 let emojiCount = 1;
 
 const flyAndFade = keyframes({
-  "20%": { opacity: 1 },
-  "100%": { bottom: "60%", opacity: 0 },
+  '20%': { opacity: 1 },
+  '100%': { bottom: '60%', opacity: 0 },
 });
 
 const wiggleLeftRight = keyframes({
-  "0%": { marginLeft: "-50px" },
-  "100%": { marginLeft: "50px" },
+  '0%': { marginLeft: '-50px' },
+  '100%': { marginLeft: '50px' },
 });
 
 const wiggleRightLeft = keyframes({
-  "0%": { marginLeft: "50px" },
-  "100%": { marginLeft: "-50px" },
+  '0%': { marginLeft: '50px' },
+  '100%': { marginLeft: '-50px' },
 });
 
 const getStartingPoints = isMobile => {
@@ -55,10 +44,8 @@ export function FlyingEmoji() {
       if (!emojiId || !senderId || document.hidden) {
         return;
       }
-      const senderPeerName = vanillaStore.getState(
-        selectPeerNameByID(senderId)
-      );
-      const nameToShow = localPeerId === senderId ? "You" : senderPeerName;
+      const senderPeerName = vanillaStore.getState(selectPeerNameByID(senderId));
+      const nameToShow = localPeerId === senderId ? 'You' : senderPeerName;
       const startingPoint = startingPoints[emojiCount % startingPoints.length];
       const id = emojiCount++;
 
@@ -75,7 +62,7 @@ export function FlyingEmoji() {
         ];
       });
     },
-    [localPeerId, vanillaStore, startingPoints]
+    [localPeerId, vanillaStore, startingPoints],
   );
 
   useEffect(() => {
@@ -85,14 +72,14 @@ export function FlyingEmoji() {
   return (
     <Box
       css={{
-        position: "absolute",
+        position: 'absolute',
         top: 0,
         bottom: 0,
         left: 0,
         right: 0,
-        overflow: "hidden",
-        pointerEvents: "none",
-        userSelect: "none",
+        overflow: 'hidden',
+        pointerEvents: 'none',
+        userSelect: 'none',
         zIndex: 999,
       }}
     >
@@ -102,9 +89,9 @@ export function FlyingEmoji() {
             key={emoji.id}
             css={{
               left: emoji.startingPoint,
-              flexDirection: "column",
-              alignItems: "center",
-              position: "absolute",
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'absolute',
               bottom: 0,
               animation: `${flyAndFade()} 5s forwards, ${
                 emoji.wiggleType === 0 ? wiggleLeftRight() : wiggleRightLeft()
@@ -119,17 +106,17 @@ export function FlyingEmoji() {
             </Box>
             <Box
               css={{
-                width: "fit-content",
-                padding: "$2 $4",
-                background: "$surfaceLight",
-                borderRadius: "$1",
+                width: 'fit-content',
+                padding: '$2 $4',
+                background: '$surfaceLight',
+                borderRadius: '$1',
               }}
             >
               <Text
                 css={{
-                  fontSize: "$space$6",
-                  lineHeight: "$xs",
-                  color: "$textHighEmp",
+                  fontSize: '$space$6',
+                  lineHeight: '$xs',
+                  color: '$textHighEmp',
                 }}
               >
                 {emoji.senderName}

@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { selectIsLocalAudioPluginPresent, useDevices, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AudioLevelIcon } from '@100mslive/react-icons';
-import { FEATURE_LIST } from '../common/constants';
-import { useIsFeatureEnabled } from '../components/hooks/useFeatures';
 import { ToastManager } from '../components/Toast/ToastManager';
+import { Tooltip } from '..';
 import IconButton from '../IconButton';
+import { useIsFeatureEnabled } from '../components/hooks/useFeatures';
 import { FeatureFlags } from '../services/FeatureFlags';
-import { Tooltip } from '../';
+import { FEATURE_LIST } from '../common/constants';
 
 export const NoiseSuppression = () => {
   const pluginRef = useRef(null);

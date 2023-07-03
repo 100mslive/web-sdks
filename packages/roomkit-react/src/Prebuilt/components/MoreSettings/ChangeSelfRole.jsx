@@ -22,10 +22,7 @@ export const ChangeSelfRole = ({ onClick }) => {
   const hmsActions = useHMSActions();
   const hideTriggerItem = useMedia(config.media.sm);
   const selfRoleChangeTo = useAppLayout('selfRoleChangeTo');
-  const availableSelfChangeRoles = useMemo(
-    () => arrayIntersection(selfRoleChangeTo, roles),
-    [roles, selfRoleChangeTo]
-  );
+  const availableSelfChangeRoles = useMemo(() => arrayIntersection(selfRoleChangeTo, roles), [roles, selfRoleChangeTo]);
 
   if (!permissions.changeRole) {
     return null;
@@ -46,11 +43,7 @@ export const ChangeSelfRole = ({ onClick }) => {
         </Text>
         <ArrowRightIcon />
       </Dropdown.TriggerItem>
-      <Dropdown.SubMenuContent
-        sideOffset={8}
-        alignOffset={-5}
-        css={{ '@md': { w: '$64' } }}
-      >
+      <Dropdown.SubMenuContent sideOffset={8} alignOffset={-5} css={{ '@md': { w: '$64' } }}>
         {availableSelfChangeRoles.map((role, i) => (
           <Dropdown.Item
             key={role}

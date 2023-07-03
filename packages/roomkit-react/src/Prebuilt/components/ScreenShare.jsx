@@ -1,9 +1,5 @@
 import React, { Fragment } from 'react';
-import {
-  selectIsAllowedToPublish,
-  useHMSStore,
-  useScreenShare,
-} from '@100mslive/react-sdk';
+import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import { useUISettings } from './AppData/useUISettings';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
@@ -16,11 +12,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
 
-  const {
-    amIScreenSharing,
-    screenShareVideoTrackId: video,
-    toggleScreenShare,
-  } = useScreenShare();
+  const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
   const isVideoScreenshare = amIScreenSharing && !!video;
   if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
     return null;
@@ -39,9 +31,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
             toggleScreenShare();
           }}
         >
-          <Tooltip
-            title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}
-          >
+          <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>
             <Box>
               <ShareScreenIcon />
             </Box>
@@ -52,5 +42,3 @@ export const ScreenshareToggle = ({ css = {} }) => {
     </Fragment>
   );
 };
-
-

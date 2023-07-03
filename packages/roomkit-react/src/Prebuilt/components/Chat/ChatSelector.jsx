@@ -9,30 +9,17 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
-import {
-  Box,
-  Dropdown,
-  Flex,
-  HorizontalDivider,
-  Text,
-  Tooltip,
-} from '../../';
+import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../';
 import { useFilteredRoles } from '../../common/hooks';
 import { ParticipantSearch } from '../Header/ParticipantList';
 
 const ChatDotIcon = () => {
-  return (
-    <Box css={{ size: '$6', bg: '$brandDefault', mx: '$2', r: '$round' }} />
-  );
+  return <Box css={{ size: '$6', bg: '$brandDefault', mx: '$2', r: '$round' }} />;
 };
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
-    <Dropdown.Item
-      data-testid="chat_members"
-      css={{ align: 'center', px: '$10' }}
-      onClick={onClick}
-    >
+    <Dropdown.Item data-testid="chat_members" css={{ align: 'center', px: '$10' }} onClick={onClick}>
       <Text variant="sm">{value}</Text>
       <Flex align="center" css={{ ml: 'auto', color: '$textPrimary' }}>
         {unreadCount > 0 && (
@@ -101,49 +88,29 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
   );
 };
 
-const VirtualizedSelectItemList = ({
-  peers,
-  selectedRole,
-  selectedPeerId,
-  searchValue,
-  onSelect,
-}) => {
+const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, searchValue, onSelect }) => {
   const [ref, { width, height }] = useMeasure();
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
       peers.filter(
         // search should be empty or search phrase should be included in name
-        peer =>
-          !searchValue ||
-          peer.name.toLowerCase().includes(searchValue.toLowerCase())
+        peer => !searchValue || peer.name.toLowerCase().includes(searchValue.toLowerCase()),
       ),
-    [peers, searchValue]
+    [peers, searchValue],
   );
 
   const listItems = useMemo(() => {
-    const selectItems = [
-      <Everyone
-        onSelect={onSelect}
-        active={!selectedRole && !selectedPeerId}
-      />,
-    ];
+    const selectItems = [<Everyone onSelect={onSelect} active={!selectedRole && !selectedPeerId} />];
 
-    roles.length > 0 &&
-      selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
+    roles.length > 0 && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
     roles.forEach(userRole =>
       selectItems.push(
-        <RoleItem
-          key={userRole}
-          active={selectedRole === userRole}
-          role={userRole}
-          onSelect={onSelect}
-        />
-      )
+        <RoleItem key={userRole} active={selectedRole === userRole} role={userRole} onSelect={onSelect} />,
+      ),
     );
 
-    filteredPeers.length > 0 &&
-      selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
+    filteredPeers.length > 0 && selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
     filteredPeers.forEach(peer =>
       selectItems.push(
         <PeerItem
@@ -152,8 +119,8 @@ const VirtualizedSelectItemList = ({
           peerId={peer.id}
           active={peer.id === selectedPeerId}
           onSelect={onSelect}
-        />
-      )
+        />,
+      ),
     );
 
     return selectItems;
@@ -161,12 +128,7 @@ const VirtualizedSelectItemList = ({
 
   return (
     <Dropdown.Group ref={ref} css={{ height: '$64', overflowY: 'auto' }}>
-      <FixedSizeList
-        itemSize={52}
-        itemCount={listItems.length}
-        width={width}
-        height={height}
-      >
+      <FixedSizeList itemSize={52} itemCount={listItems.length} width={width} height={height}>
         {({ index, style }) => (
           <div style={style} key={index}>
             {listItems[index]}
@@ -185,10 +147,7 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
     <Fragment>
       {peers.length > 0 && (
         <Box css={{ px: '$8' }}>
-          <ParticipantSearch
-            onSearch={setSearch}
-            placeholder="Search participants"
-          />
+          <ParticipantSearch onSearch={setSearch} placeholder="Search participants" />
         </Box>
       )}
       <VirtualizedSelectItemList

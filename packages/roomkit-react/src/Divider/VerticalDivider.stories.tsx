@@ -1,10 +1,10 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { AddIcon } from '@100mslive/react-icons';
-import { VerticalDivider } from '.';
 import { Button } from '../Button';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
+import { VerticalDivider } from '.';
 
 export default {
   title: 'UI Components/Divider',

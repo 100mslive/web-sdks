@@ -1,14 +1,14 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CrossIcon, InfoIcon } from '@100mslive/react-icons';
-import { Dialog } from './Dialog';
-import DialogDocs from './Dialog.mdx';
 import { Button } from '../Button';
 import { Fieldset } from '../Fieldset';
 import { Input } from '../Input';
 import { Label } from '../Label';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
+import { Dialog } from './Dialog';
+import DialogDocs from './Dialog.mdx';
 
 export default {
   title: 'UI Components/Dialog',

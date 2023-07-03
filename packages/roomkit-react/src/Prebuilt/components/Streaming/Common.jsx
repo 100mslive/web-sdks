@@ -1,28 +1,9 @@
 import React from 'react';
 import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CrossIcon,
-  RecordIcon,
-} from '@100mslive/react-icons';
-import {
-  Box,
-  Flex,
-  IconButton,
-  slideLeftAndFade,
-  Switch,
-  Text,
-} from '../../';
+import { ChevronLeftIcon, ChevronRightIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
+import { Box, Flex, IconButton, slideLeftAndFade, Switch, Text } from '../../../';
 
-export const StreamCard = ({
-  title,
-  subtitle,
-  Icon,
-  css = {},
-  onClick,
-  testId,
-}) => {
+export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick, testId }) => {
   return (
     <Flex
       css={{
@@ -79,11 +60,7 @@ export const ContentHeader = ({ onBack, title, content }) => {
         </Text>
         <Text variant="h6">{content}</Text>
       </Box>
-      <IconButton
-        onClick={onBack}
-        css={{ alignSelf: 'flex-start' }}
-        data-testid="close_stream_section"
-      >
+      <IconButton onClick={onBack} css={{ alignSelf: 'flex-start' }} data-testid="close_stream_section">
         <CrossIcon width={16} height={16} />
       </IconButton>
     </Flex>
@@ -112,12 +89,7 @@ export const Container = ({ children, rounded = false }) => {
   );
 };
 
-export const ContentBody = ({
-  Icon,
-  title,
-  removeVerticalPadding = false,
-  children,
-}) => {
+export const ContentBody = ({ Icon, title, removeVerticalPadding = false, children }) => {
   return (
     <Box css={{ p: removeVerticalPadding ? '$0 $10' : '$10' }}>
       <Text css={{ display: 'flex', alignItems: 'center', mb: '$4' }}>
@@ -136,21 +108,14 @@ export const ContentBody = ({
 export const RecordStream = ({ record, setRecord, testId }) => {
   const permissions = useHMSStore(selectPermissions);
   return permissions?.browserRecording ? (
-    <Flex
-      align="center"
-      css={{ bg: '$surfaceLight', m: '$8 $10', p: '$8', r: '$0' }}
-    >
+    <Flex align="center" css={{ bg: '$surfaceLight', m: '$8 $10', p: '$8', r: '$0' }}>
       <Text css={{ color: '$error' }}>
         <RecordIcon />
       </Text>
       <Text variant="sm" css={{ flex: '1 1 0', mx: '$8' }}>
         Record the stream
       </Text>
-      <Switch
-        checked={record}
-        onCheckedChange={setRecord}
-        data-testid={testId}
-      />
+      <Switch checked={record} onCheckedChange={setRecord} data-testid={testId} />
     </Flex>
   ) : null;
 };

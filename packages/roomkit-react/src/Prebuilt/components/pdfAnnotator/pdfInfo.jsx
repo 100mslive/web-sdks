@@ -24,8 +24,8 @@ export const PDFInfo = () => {
         }}
       />
       <Text variant="caption">
-        On the next screen, ensure you select “This Tab” and click on share.
-        Only the PDF viewer will be seen by other participants
+        On the next screen, ensure you select “This Tab” and click on share. Only the PDF viewer will be seen by other
+        participants
       </Text>
     </DialogRow>
   );

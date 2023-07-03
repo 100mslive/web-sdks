@@ -17,44 +17,35 @@ function formatDuration(duration) {
   return `${mins}:${secs}`;
 }
 
-export const PlaylistItem = React.memo(
-  ({ name, metadata, duration, selected, onClick }) => {
-    return (
-      <Dropdown.Item
-        css={{
-          flexDirection: 'column',
-          alignItems: 'flex-start',
-          h: '$18',
-          p: '$8',
-          '&:hover': {
-            cursor: 'pointer',
-            bg: '$menuBg',
-          },
-          '&:focus-visible': {
-            bg: '$menuBg',
-          },
-        }}
-        onClick={onClick}
-      >
-        <Flex
-          align="center"
-          justify="between"
-          css={{ width: '100%', minHeight: 0 }}
-        >
-          <Text
-            variant="md"
-            css={{ color: selected ? '$brandDefault' : '$textPrimary' }}
-          >
-            {name}
-          </Text>
-          <Text variant="xs">{formatDuration(duration)}</Text>
-        </Flex>
-        {metadata?.description && (
-          <Text variant="xs" css={{ mt: '$4' }}>
-            {metadata?.description}
-          </Text>
-        )}
-      </Dropdown.Item>
-    );
-  }
-);
+export const PlaylistItem = React.memo(({ name, metadata, duration, selected, onClick }) => {
+  return (
+    <Dropdown.Item
+      css={{
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        h: '$18',
+        p: '$8',
+        '&:hover': {
+          cursor: 'pointer',
+          bg: '$menuBg',
+        },
+        '&:focus-visible': {
+          bg: '$menuBg',
+        },
+      }}
+      onClick={onClick}
+    >
+      <Flex align="center" justify="between" css={{ width: '100%', minHeight: 0 }}>
+        <Text variant="md" css={{ color: selected ? '$brandDefault' : '$textPrimary' }}>
+          {name}
+        </Text>
+        <Text variant="xs">{formatDuration(duration)}</Text>
+      </Flex>
+      {metadata?.description && (
+        <Text variant="xs" css={{ mt: '$4' }}>
+          {metadata?.description}
+        </Text>
+      )}
+    </Dropdown.Item>
+  );
+});

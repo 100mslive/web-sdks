@@ -9,26 +9,15 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  NextIcon,
-  PauseIcon,
-  PlayIcon,
-  PlaylistIcon,
-  PrevIcon,
-  SpeakerIcon,
-} from '@100mslive/react-icons';
+import { NextIcon, PauseIcon, PlayIcon, PlaylistIcon, PrevIcon, SpeakerIcon } from '@100mslive/react-icons';
 import { Box, Flex, IconButton, Slider, Text } from '../../';
 import { usePlaylist } from '../hooks/usePlaylist';
 
 const Progress = ({ type, duration }) => {
-  const selectPlaylist =
-    type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
+  const selectPlaylist = type === HMSPlaylistType.audio ? selectAudioPlaylist : selectVideoPlaylist;
   const progress = useHMSStore(selectPlaylist.progress);
   const hmsActions = useHMSActions();
-  const playlistAction =
-    type === HMSPlaylistType.audio
-      ? hmsActions.audioPlaylist
-      : hmsActions.videoPlaylist;
+  const playlistAction = type === HMSPlaylistType.audio ? hmsActions.audioPlaylist : hmsActions.videoPlaylist;
 
   if (!duration) {
     return null;
@@ -57,15 +46,9 @@ export const PlaylistActive = ({ type, onToggle }) => {
       <Flex justify="between" css={{ w: '100%' }}>
         <Box>
           <Text variant="md">{active.name}</Text>
-          {active.metadata?.description && (
-            <Text variant="xs">{active.metadata?.description}</Text>
-          )}
+          {active.metadata?.description && <Text variant="xs">{active.metadata?.description}</Text>}
         </Box>
-        <IconButton
-          onClick={onToggle}
-          css={{ alignSelf: 'center' }}
-          data-testid="playlist_collapse_btn"
-        >
+        <IconButton onClick={onToggle} css={{ alignSelf: 'center' }} data-testid="playlist_collapse_btn">
           <PlaylistIcon />
         </IconButton>
       </Flex>
@@ -95,11 +78,7 @@ const Controls = ({ type, css = {} }) => {
         }}
         data-testid="playlist_play_pause_btn"
       >
-        {active.playing ? (
-          <PauseIcon width={32} height={32} />
-        ) : (
-          <PlayIcon width={32} height={32} />
-        )}
+        {active.playing ? <PauseIcon width={32} height={32} /> : <PlayIcon width={32} height={32} />}
       </IconButton>
       <IconButton
         disabled={!hasNext}
@@ -119,9 +98,7 @@ const VolumeControl = () => {
   const volume = useHMSStore(selectVideoPlaylist.volume);
   const active = useHMSStore(selectVideoPlaylist.selectedItem);
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
-  const audioTrack = useHMSStore(
-    selectVideoPlaylistAudioTrackByPeerID(peerSharingPlaylist?.id)
-  );
+  const audioTrack = useHMSStore(selectVideoPlaylistAudioTrackByPeerID(peerSharingPlaylist?.id));
   const audioTrackVolume = useHMSStore(selectAudioTrackVolume(audioTrack?.id));
   const sliderVolume = active ? volume : audioTrackVolume;
 
@@ -184,9 +161,7 @@ export const VideoPlaylistControls = ({ children }) => {
         },
       }}
     >
-      {active && (
-        <Progress type={HMSPlaylistType.video} duration={active.duration} />
-      )}
+      {active && <Progress type={HMSPlaylistType.video} duration={active.duration} />}
       <Flex align="center" justify="between">
         <VolumeControl />
         {active && <Controls css={{ flex: '1 1 0' }} />}

@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { throwErrorHandler, useScreenShare } from "@100mslive/react-sdk";
-import { EmbebScreenShareView } from "./EmbedView";
-import { APP_DATA, isChrome } from "../common/constants";
-import { useSetAppDataByKey } from "../components/AppData/useUISettings";
-import { Box, ThemeTypes, useTheme } from "../";
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { throwErrorHandler, useScreenShare } from '@100mslive/react-sdk';
+import { EmbebScreenShareView } from './EmbedView';
+import { APP_DATA, isChrome } from '../common/constants';
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
+import { Box, ThemeTypes, useTheme } from '../';
 
 export const PDFView = () => {
   return (
@@ -18,11 +18,10 @@ export const PDFEmbedComponent = () => {
   const themeType = useTheme().themeType;
   const [isPDFLoaded, setIsPDFLoaded] = useState(false);
   let pdfJSURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
-  const { amIScreenSharing, toggleScreenShare } =
-    useScreenShare(throwErrorHandler);
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(throwErrorHandler);
   const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
   if (pdfConfig.url && !pdfConfig.file) {
-    pdfJSURL = pdfJSURL + "?file=" + encodeURIComponent(pdfConfig.url);
+    pdfJSURL = pdfJSURL + '?file=' + encodeURIComponent(pdfConfig.url);
   }
   const [wasScreenShared, setWasScreenShared] = useState(false);
   // to handle - https://github.com/facebook/react/issues/24502
@@ -38,16 +37,12 @@ export const PDFEmbedComponent = () => {
         {
           theme: themeType === ThemeTypes.dark ? 2 : 1,
         },
-        "*"
+        '*',
       );
     }
   }, [isPDFLoaded, themeType]);
   useEffect(() => {
-    if (
-      !amIScreenSharing &&
-      !wasScreenShared &&
-      !screenShareAttemptInProgress.current
-    ) {
+    if (!amIScreenSharing && !wasScreenShared && !screenShareAttemptInProgress.current) {
       screenShareAttemptInProgress.current = true;
       // start screenshare on load for others in the room to see
       toggleScreenShare({
@@ -84,12 +79,12 @@ export const PDFEmbedComponent = () => {
     <Box
       ref={iframeRef}
       css={{
-        mx: "$8",
-        flex: "3 1 0",
-        "@lg": {
-          flex: "2 1 0",
-          display: "flex",
-          alignItems: "center",
+        mx: '$8',
+        flex: '3 1 0',
+        '@lg': {
+          flex: '2 1 0',
+          display: 'flex',
+          alignItems: 'center',
         },
       }}
     >
@@ -98,10 +93,10 @@ export const PDFEmbedComponent = () => {
         title="PDF Annotator"
         ref={ref}
         style={{
-          width: "100%",
-          height: "100%",
+          width: '100%',
+          height: '100%',
           border: 0,
-          borderRadius: "0.75rem",
+          borderRadius: '0.75rem',
         }}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
         referrerPolicy="no-referrer"
@@ -114,7 +109,7 @@ export const PDFEmbedComponent = () => {
                   file: pdfConfig.file,
                   theme: themeType === ThemeTypes.dark ? 2 : 1,
                 },
-                "*"
+                '*',
               );
               setIsPDFLoaded(true);
             }, 1000);

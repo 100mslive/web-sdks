@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, HandRaiseIcon, PeopleIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, Text, textEllipsis } from '../../';
+import { Box, Dropdown, Flex, Text, textEllipsis } from '../../../';
 import { isInternalRole } from '../../common/utils';
 
 export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }) => {

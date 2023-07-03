@@ -1,21 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
-import {
-  PdfShare,
-  ScreenShare,
-  StarIcon,
-  VerticalMenuIcon,
-} from '@100mslive/react-icons';
+import { PdfShare, ScreenShare, StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { PDFFileOptions } from './pdfFileOptions';
-import {
-  Box,
-  Button,
-  Dropdown,
-  Flex,
-  IconButton,
-  Text,
-  Tooltip,
-} from '../../../';
+import { Box, Button, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 
 const MODALS = {
@@ -41,15 +28,8 @@ export function ShareScreenOptions() {
   const { toggleScreenShare } = useScreenShare();
   return (
     <Fragment>
-      <Dropdown.Root
-        open={openModals.has(MODALS.SHARE)}
-        onOpenChange={value => updateState(MODALS.SHARE, value)}
-      >
-        <Dropdown.Trigger
-          asChild
-          data-testid="sharing_btn"
-          disabled={amIScreenSharing}
-        >
+      <Dropdown.Root open={openModals.has(MODALS.SHARE)} onOpenChange={value => updateState(MODALS.SHARE, value)}>
+        <Dropdown.Trigger asChild data-testid="sharing_btn" disabled={amIScreenSharing}>
           <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
               <Box>
@@ -246,9 +226,7 @@ export function ShareScreenOptions() {
         </Dropdown.Content>
       </Dropdown.Root>
       {openModals.has(MODALS.PDF_SHARE) && (
-        <PDFFileOptions
-          onOpenChange={value => updateState(MODALS.PDF_SHARE, value)}
-        />
+        <PDFFileOptions onOpenChange={value => updateState(MODALS.PDF_SHARE, value)} />
       )}
     </Fragment>
   );

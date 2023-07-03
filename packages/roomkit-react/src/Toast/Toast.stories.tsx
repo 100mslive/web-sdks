@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ComponentStory } from '@storybook/react';
-import { Toast } from './Toast';
-import ToastDocs from './Toast.mdx';
 import { Button } from '../Button';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
+import { Toast } from './Toast';
+import ToastDocs from './Toast.mdx';
 
 const ToastStory = ({ ...props }) => {
   return (

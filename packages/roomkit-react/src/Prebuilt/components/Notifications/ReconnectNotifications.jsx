@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { logMessage } from 'zipyai';
-import {
-  HMSNotificationTypes,
-  useHMSNotifications,
-} from '@100mslive/react-sdk';
-import { Dialog, Flex, Loading, Text } from '../../';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { Dialog, Flex, Loading, Text } from '../../../';
 import { ToastConfig } from '../Toast/ToastConfig';
 import { ToastManager } from '../Toast/ToastManager';
 
@@ -20,18 +17,12 @@ export const ReconnectNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    if (
-      notification?.type === HMSNotificationTypes.ERROR &&
-      notification?.data?.isTerminal
-    ) {
+    if (notification?.type === HMSNotificationTypes.ERROR && notification?.data?.isTerminal) {
       logMessage('Error ', notification.data?.description);
       setOpen(false);
     } else if (notification?.type === HMSNotificationTypes.RECONNECTED) {
       logMessage('Reconnected');
-      notificationId = ToastManager.replaceToast(
-        notificationId,
-        ToastConfig.RECONNECTED.single()
-      );
+      notificationId = ToastManager.replaceToast(notificationId, ToastConfig.RECONNECTED.single());
       setOpen(false);
     } else if (notification?.type === HMSNotificationTypes.RECONNECTING) {
       logMessage('Reconnecting');
@@ -41,7 +32,7 @@ export const ReconnectNotifications = () => {
       } else {
         notificationId = ToastManager.replaceToast(
           notificationId,
-          ToastConfig.RECONNECTING.single(notification.data.message)
+          ToastConfig.RECONNECTING.single(notification.data.message),
         );
       }
     }

@@ -2,20 +2,12 @@ import React from 'react';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { GoLiveIcon } from '@100mslive/react-icons';
 import { SIDE_PANE_OPTIONS } from './../common/constants';
-import {
-  useIsSidepaneTypeOpen,
-  useSidepaneToggle,
-} from './AppData/useSidepane';
-import {
-  useIsHLSStartedFromUI,
-  useIsRTMPStartedFromUI,
-} from './AppData/useUISettings';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from './AppData/useSidepane';
+import { useIsHLSStartedFromUI, useIsRTMPStartedFromUI } from './AppData/useUISettings';
 import { Button, Tooltip } from '../../';
 
 const GoLiveButton = () => {
-  const isStreamingSidepaneOpen = useIsSidepaneTypeOpen(
-    SIDE_PANE_OPTIONS.STREAMING
-  );
+  const isStreamingSidepaneOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.STREAMING);
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
   const { isStreamingOn, isBrowserRecordingOn } = useRecordingStreaming();
   const isHLSStartedFromUI = useIsHLSStartedFromUI();

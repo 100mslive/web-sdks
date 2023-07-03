@@ -1,8 +1,8 @@
 import React from 'react';
 import { ComponentMeta } from '@storybook/react';
-import { alignTooltip, sideTooltip, Tooltip } from './Tooltip';
 import { Flex } from '../Layout';
 import { Text } from '../Text';
+import { alignTooltip, sideTooltip, Tooltip } from './Tooltip';
 
 export default {
   title: 'UI Components/Tooltip',

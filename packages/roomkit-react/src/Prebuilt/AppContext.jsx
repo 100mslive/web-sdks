@@ -15,9 +15,7 @@ HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';
 export const useHMSPrebuiltContext = () => {
   const context = useContext(HMSPrebuiltContext);
   if (!context) {
-    throw Error(
-      'Make sure HMSPrebuiltContext.Provider is present at the top level of your application'
-    );
+    throw Error('Make sure HMSPrebuiltContext.Provider is present at the top level of your application');
   }
   return context;
 };

@@ -1,19 +1,14 @@
-import React, { useRef } from "react";
-import {
-  selectDominantSpeaker,
-  selectPeers,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { GridSidePaneView } from "../components/gridView";
-import VideoTile from "../components/VideoTile";
-import { Box, Flex } from "../";
+import React, { useRef } from 'react';
+import { selectDominantSpeaker, selectPeers, useHMSStore } from '@100mslive/react-sdk';
+import { GridSidePaneView } from '../components/gridView';
+import VideoTile from '../components/VideoTile';
+import { Box, Flex } from '../';
 
 const ActiveSpeakerView = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   const latestDominantSpeakerRef = useRef(dominantSpeaker);
   const peers = (useHMSStore(selectPeers) || []).filter(
-    peer =>
-      peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0
+    peer => peer.videoTrack || peer.audioTrack || peer.auxiliaryTracks.length > 0,
   );
   // if there is no current dominant speaker latest keeps pointing to last
   if (dominantSpeaker) {
@@ -27,15 +22,11 @@ const ActiveSpeakerView = () => {
   const showSidePane = activeSpeaker && peers.length > 1;
 
   return (
-    <Flex css={{ size: "100%", "@lg": { flexDirection: "column" } }}>
-      <Box css={{ flex: "1 1 0 " }}>
+    <Flex css={{ size: '100%', '@lg': { flexDirection: 'column' } }}>
+      <Box css={{ flex: '1 1 0 ' }}>
         <VideoTile peerId={activeSpeaker.id} width="100%" height="100%" />
       </Box>
-      {showSidePane && (
-        <GridSidePaneView
-          peers={peers.filter(peer => peer.id !== activeSpeaker.id)}
-        />
-      )}
+      {showSidePane && <GridSidePaneView peers={peers.filter(peer => peer.id !== activeSpeaker.id)} />}
     </Flex>
   );
 };

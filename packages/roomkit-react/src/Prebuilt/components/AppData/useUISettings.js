@@ -8,8 +8,8 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be

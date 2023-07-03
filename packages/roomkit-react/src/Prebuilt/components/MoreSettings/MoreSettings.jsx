@@ -27,22 +27,8 @@ import { ChangeSelfRole } from './ChangeSelfRole';
 import { EmbedUrl, EmbedUrlModal } from './EmbedUrl';
 import { FullScreenItem } from './FullScreenItem';
 import { MuteAllModal } from './MuteAllModal';
-import {
-  Box,
-  Checkbox,
-  config as cssConfig,
-  Dropdown,
-  Flex,
-  Text,
-  Tooltip,
-} from '../../';
-import {
-  APP_DATA,
-  FEATURE_LIST,
-  isAndroid,
-  isIOS,
-  isMacOS,
-} from '../../common/constants';
+import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../';
+import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
 import IconButton from '../../IconButton';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { useDropdownList } from '../hooks/useDropdownList';
@@ -122,9 +108,7 @@ export const MoreSettings = () => {
         >
           {isMobile && permissions?.browserRecording ? (
             <>
-              <Dropdown.Item
-                onClick={() => updateState(MODALS.START_RECORDING, true)}
-              >
+              <Dropdown.Item onClick={() => updateState(MODALS.START_RECORDING, true)}>
                 <RecordIcon />
                 <Text variant="sm" css={{ ml: '$4' }}>
                   {isBrowserRecordingOn ? 'Stop' : 'Start'} Recording
@@ -134,19 +118,14 @@ export const MoreSettings = () => {
             </>
           ) : null}
           {isChangeNameEnabled && (
-            <Dropdown.Item
-              onClick={() => updateState(MODALS.CHANGE_NAME, true)}
-              data-testid="change_name_btn"
-            >
+            <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">
               <PencilIcon />
               <Text variant="sm" css={{ ml: '$4' }}>
                 Change Name
               </Text>
             </Dropdown.Item>
           )}
-          <ChangeSelfRole
-            onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)}
-          />
+          <ChangeSelfRole onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)} />
           {permissions?.changeRole && (
             <Dropdown.Item
               onClick={() => updateState(MODALS.BULK_ROLE_CHANGE, true)}
@@ -160,15 +139,10 @@ export const MoreSettings = () => {
           )}
           <FullScreenItem />
           {isAllowedToPublish.screen && isEmbedEnabled && (
-            <EmbedUrl
-              setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)}
-            />
+            <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
           )}
           {permissions.mute && (
-            <Dropdown.Item
-              onClick={() => updateState(MODALS.MUTE_ALL, true)}
-              data-testid="mute_all_btn"
-            >
+            <Dropdown.Item onClick={() => updateState(MODALS.MUTE_ALL, true)} data-testid="mute_all_btn">
               <MicOffIcon />
               <Text variant="sm" css={{ ml: '$4' }}>
                 Mute All
@@ -176,10 +150,7 @@ export const MoreSettings = () => {
             </Dropdown.Item>
           )}
           <Dropdown.ItemSeparator />
-          <Dropdown.Item
-            onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)}
-            data-testid="device_settings_btn"
-          >
+          <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
               Settings
@@ -190,17 +161,13 @@ export const MoreSettings = () => {
             (localPeerRole === 'hls-viewer' ? (
               Hls.isSupported() ? (
                 <Dropdown.Item
-                  onClick={() =>
-                    hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)
-                  }
+                  onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
                   data-testid="hls_stats"
                 >
                   <Checkbox.Root
                     css={{ margin: '$2' }}
                     checked={enablHlsStats}
-                    onCheckedChange={() =>
-                      hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)
-                    }
+                    onCheckedChange={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
                   >
                     <Checkbox.Indicator>
                       <CheckIcon width={16} height={16} />
@@ -232,49 +199,26 @@ export const MoreSettings = () => {
         </Dropdown.Content>
       </Dropdown.Root>
       {openModals.has(MODALS.BULK_ROLE_CHANGE) && (
-        <BulkRoleChangeModal
-          onOpenChange={value => updateState(MODALS.BULK_ROLE_CHANGE, value)}
-        />
+        <BulkRoleChangeModal onOpenChange={value => updateState(MODALS.BULK_ROLE_CHANGE, value)} />
       )}
-      {openModals.has(MODALS.MUTE_ALL) && (
-        <MuteAllModal
-          onOpenChange={value => updateState(MODALS.MUTE_ALL, value)}
-        />
-      )}
+      {openModals.has(MODALS.MUTE_ALL) && <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />}
       {openModals.has(MODALS.CHANGE_NAME) && (
-        <ChangeNameModal
-          onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
-        />
+        <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
       )}
       {openModals.has(MODALS.DEVICE_SETTINGS) && (
-        <SettingsModal
-          open
-          onOpenChange={value => updateState(MODALS.DEVICE_SETTINGS, value)}
-        />
+        <SettingsModal open onOpenChange={value => updateState(MODALS.DEVICE_SETTINGS, value)} />
       )}
-      {FeatureFlags.enableStatsForNerds &&
-        openModals.has(MODALS.STATS_FOR_NERDS) && (
-          <StatsForNerds
-            open
-            onOpenChange={value => updateState(MODALS.STATS_FOR_NERDS, value)}
-          />
-        )}
+      {FeatureFlags.enableStatsForNerds && openModals.has(MODALS.STATS_FOR_NERDS) && (
+        <StatsForNerds open onOpenChange={value => updateState(MODALS.STATS_FOR_NERDS, value)} />
+      )}
       {openModals.has(MODALS.SELF_ROLE_CHANGE) && (
-        <RoleChangeModal
-          peerId={localPeerId}
-          onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)}
-        />
+        <RoleChangeModal peerId={localPeerId} onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)} />
       )}
       {openModals.has(MODALS.START_RECORDING) && (
-        <StartRecording
-          open
-          onOpenChange={value => updateState(MODALS.START_RECORDING, value)}
-        />
+        <StartRecording open onOpenChange={value => updateState(MODALS.START_RECORDING, value)} />
       )}
       {openModals.has(MODALS.EMBED_URL) && (
-        <EmbedUrlModal
-          onOpenChange={value => updateState(MODALS.EMBED_URL, value)}
-        />
+        <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
       )}
     </Fragment>
   );

@@ -1,27 +1,25 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   selectIsAllowedToPublish,
   selectSessionStore,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
-} from "@100mslive/react-sdk";
-import { ClosedCaptionIcon } from "@100mslive/react-icons";
-import { Transcriber } from "./Transcriber";
-import { Box, IconButton, Text, Tooltip } from "../../../";
-import { SESSION_STORE_KEY } from "../../common/constants";
+} from '@100mslive/react-sdk';
+import { ClosedCaptionIcon } from '@100mslive/react-icons';
+import { Transcriber } from './Transcriber';
+import { Box, IconButton, Text, Tooltip } from '../../../';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
 export function TranscriptionButton() {
-  const transcriptionState = useHMSStore(
-    selectSessionStore(SESSION_STORE_KEY.TRANSCRIPTION_STATE)
-  );
+  const transcriptionState = useHMSStore(selectSessionStore(SESSION_STORE_KEY.TRANSCRIPTION_STATE));
   const rawStore = useHMSVanillaStore();
   const isTranscriptionEnabled = !!transcriptionState?.enabled;
-  let transcript = "",
-    speakingPeer = "";
+  let transcript = '',
+    speakingPeer = '';
   if (isTranscriptionEnabled) {
-    transcript = transcriptionState.transcript || "";
-    speakingPeer = transcriptionState.speakingPeer || "";
+    transcript = transcriptionState.transcript || '';
+    speakingPeer = transcriptionState.speakingPeer || '';
   }
 
   const transcriber = useRef(null);
@@ -39,24 +37,18 @@ export function TranscriptionButton() {
         hmsStore: rawStore,
         setTranscriptAndSpeakingPeer: async (transcript, peerName) => {
           const transcriptionCurrentEnabledState = !!rawStore.getState(
-            selectSessionStore(SESSION_STORE_KEY.TRANSCRIPTION_STATE)
+            selectSessionStore(SESSION_STORE_KEY.TRANSCRIPTION_STATE),
           )?.enabled;
-          await hmsActions.sessionStore.set(
-            SESSION_STORE_KEY.TRANSCRIPTION_STATE,
-            {
-              enabled: transcriptionCurrentEnabledState,
-              transcript,
-              speakingPeer: peerName,
-            }
-          );
+          await hmsActions.sessionStore.set(SESSION_STORE_KEY.TRANSCRIPTION_STATE, {
+            enabled: transcriptionCurrentEnabledState,
+            transcript,
+            speakingPeer: peerName,
+          });
         },
         setIsTranscriptionEnabled: async newEnabledState => {
-          await hmsActions.sessionStore.set(
-            SESSION_STORE_KEY.TRANSCRIPTION_STATE,
-            {
-              enabled: newEnabledState,
-            }
-          );
+          await hmsActions.sessionStore.set(SESSION_STORE_KEY.TRANSCRIPTION_STATE, {
+            enabled: newEnabledState,
+          });
         },
       });
     }
@@ -82,55 +74,53 @@ export function TranscriptionButton() {
     <>
       <Box
         css={{
-          textAlign: "left",
-          fontWeight: "$medium",
-          bottom: "120px",
-          position: "fixed",
-          width: "100%",
-          fontSize: "$20px",
-          zIndex: "1000000",
-          color: "white",
-          textShadow: "0px 0px 6px #000",
-          whiteSpace: "pre-line",
-          paddingLeft: "40px",
+          textAlign: 'left',
+          fontWeight: '$medium',
+          bottom: '120px',
+          position: 'fixed',
+          width: '100%',
+          fontSize: '$20px',
+          zIndex: '1000000',
+          color: 'white',
+          textShadow: '0px 0px 6px #000',
+          whiteSpace: 'pre-line',
+          paddingLeft: '40px',
         }}
       />
       <Box
         css={{
-          textAlign: "center",
-          fontWeight: "$medium",
-          bottom: "90px",
-          position: "fixed",
-          width: "100%",
-          fontSize: "$20px",
-          zIndex: "1000000",
-          color: "white",
-          textShadow: "0px 0px 6px #000",
-          whiteSpace: "pre-line",
+          textAlign: 'center',
+          fontWeight: '$medium',
+          bottom: '90px',
+          position: 'fixed',
+          width: '100%',
+          fontSize: '$20px',
+          zIndex: '1000000',
+          color: 'white',
+          textShadow: '0px 0px 6px #000',
+          whiteSpace: 'pre-line',
         }}
       >
         <Text
           css={{
-            color: "white",
-            textShadow: "0px 0px 6px #000",
+            color: 'white',
+            textShadow: '0px 0px 6px #000',
           }}
         >
           {transcript}
         </Text>
         <Text
           css={{
-            color: "#c0bbbb",
-            textShadow: "0px 0px 6px #000",
-            textTransform: "capitalize",
+            color: '#c0bbbb',
+            textShadow: '0px 0px 6px #000',
+            textTransform: 'capitalize',
           }}
         >
           {speakingPeer}
         </Text>
       </Box>
       {isAllowedToPublish.audio && (
-        <Tooltip
-          title={`Turn ${!isTranscriptionEnabled ? "on" : "off"} transcription`}
-        >
+        <Tooltip title={`Turn ${!isTranscriptionEnabled ? 'on' : 'off'} transcription`}>
           <IconButton
             active={!isTranscriptionEnabled}
             onClick={toggleTranscriptionState}

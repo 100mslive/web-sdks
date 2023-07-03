@@ -1,18 +1,12 @@
-import React, { Fragment, useEffect, useRef } from "react";
-import Draggable from "react-draggable";
-import { useMedia } from "react-use";
-import {
-  selectAppData,
-  selectLocalPeer,
-  selectRemotePeers,
-  selectRolesMap,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { APP_DATA } from "../common/constants";
-import { FirstPersonDisplay } from "../components/FirstPersonDisplay";
-import { useRolePreference } from "../components/hooks/useFeatures";
-import VideoTile from "../components/VideoTile";
-import { Box, config as cssConfig, Flex } from "../";
+import React, { Fragment, useEffect, useRef } from 'react';
+import Draggable from 'react-draggable';
+import { useMedia } from 'react-use';
+import { selectAppData, selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import { APP_DATA } from '../common/constants';
+import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
+import { useRolePreference } from '../components/hooks/useFeatures';
+import VideoTile from '../components/VideoTile';
+import { Box, config as cssConfig, Flex } from '../';
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];
@@ -30,7 +24,7 @@ export function InsetView() {
   let centerPeers = [];
   let sidepanePeers = [];
   if (rolePreference) {
-    const center = rolePreference[localPeer.roleName]?.split(",") || [];
+    const center = rolePreference[localPeer.roleName]?.split(',') || [];
     for (const peer of remotePeers) {
       if (center.includes(peer.roleName)) {
         centerPeers.push(peer);
@@ -51,15 +45,15 @@ export function InsetView() {
     <Fragment>
       <Box
         css={{
-          display: "grid",
-          gridTemplateColumns: sidepanePeers.length > 0 ? "3fr 1fr" : "100%",
-          gridTemplateRows: "1fr",
-          gap: "$8",
-          px: "$10",
-          size: "100%",
-          "@md": {
-            gridTemplateColumns: "1fr",
-            gridTemplateRows: sidepanePeers.length > 0 ? `3fr 1fr` : "100%",
+          display: 'grid',
+          gridTemplateColumns: sidepanePeers.length > 0 ? '3fr 1fr' : '100%',
+          gridTemplateRows: '1fr',
+          gap: '$8',
+          px: '$10',
+          size: '100%',
+          '@md': {
+            gridTemplateColumns: '1fr',
+            gridTemplateRows: sidepanePeers.length > 0 ? `3fr 1fr` : '100%',
           },
         }}
       >
@@ -67,14 +61,14 @@ export function InsetView() {
           align="center"
           justify="center"
           css={{
-            size: "100%",
-            gap: "$8",
-            flexWrap: "wrap",
-            placeContent: "center",
+            size: '100%',
+            gap: '$8',
+            flexWrap: 'wrap',
+            placeContent: 'center',
             minHeight: 0,
             minWidth: 0,
-            "@lg": { flexFlow: "column" },
-            "@ls": { flexFlow: "row" },
+            '@lg': { flexFlow: 'column' },
+            '@ls': { flexFlow: 'row' },
           }}
         >
           {centerPeers.length > 0 ? (
@@ -90,17 +84,17 @@ export function InsetView() {
                     isMobile,
                   }),
                   padding: 0,
-                  height: "100%",
-                  maxWidth: "100%",
+                  height: '100%',
+                  maxWidth: '100%',
                   minWidth: 0,
                   minHeight: 0,
-                  flex: remotePeers.length === 1 ? undefined : "1 1 0",
-                  display: "flex",
-                  alignItems: "center",
-                  "@lg": {
-                    display: "block",
-                    padding: "0 !important",
-                    width: "100%",
+                  flex: remotePeers.length === 1 ? undefined : '1 1 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  '@lg': {
+                    display: 'block',
+                    padding: '0 !important',
+                    width: '100%',
                   },
                 }}
                 objectFit="contain"
@@ -115,54 +109,44 @@ export function InsetView() {
             align="center"
             justify="center"
             css={{
-              size: "100%",
-              gap: "$4",
-              flexFlow: "row wrap",
-              placeContent: "center",
+              size: '100%',
+              gap: '$4',
+              flexFlow: 'row wrap',
+              placeContent: 'center',
             }}
           >
-            {(hideInset ? [...sidepanePeers, localPeer] : sidepanePeers).map(
-              (peer, _, arr) => (
-                <VideoTile
-                  key={peer.videoTrack || peer.id}
-                  peerId={peer.id}
-                  trackId={peer.videoTrack}
-                  rootCSS={{
-                    aspectRatio: getAspectRatio({
-                      roleMap,
-                      roleName: peer.roleName,
-                      isMobile: false,
-                    }),
-                    flexBasis: "100%",
-                    "@ls": {
-                      aspectRatio: 1,
-                      flexBasis: "calc(50% - $4)",
-                    },
-                    "@md": {
-                      aspectRatio: 1,
-                      flexBasis:
-                        arr.length < 4 ? "calc(50% - $4)" : "calc(33% - $4)",
-                    },
-                    "@sm": {
-                      flexBasis:
-                        arr.length <= 4 ? "calc(50% - $4)" : "calc(33% - $4)",
-                    },
-                    padding: 0,
-                  }}
-                  objectFit="contain"
-                />
-              )
-            )}
+            {(hideInset ? [...sidepanePeers, localPeer] : sidepanePeers).map((peer, _, arr) => (
+              <VideoTile
+                key={peer.videoTrack || peer.id}
+                peerId={peer.id}
+                trackId={peer.videoTrack}
+                rootCSS={{
+                  aspectRatio: getAspectRatio({
+                    roleMap,
+                    roleName: peer.roleName,
+                    isMobile: false,
+                  }),
+                  flexBasis: '100%',
+                  '@ls': {
+                    aspectRatio: 1,
+                    flexBasis: 'calc(50% - $4)',
+                  },
+                  '@md': {
+                    aspectRatio: 1,
+                    flexBasis: arr.length < 4 ? 'calc(50% - $4)' : 'calc(33% - $4)',
+                  },
+                  '@sm': {
+                    flexBasis: arr.length <= 4 ? 'calc(50% - $4)' : 'calc(33% - $4)',
+                  },
+                  padding: 0,
+                }}
+                objectFit="contain"
+              />
+            ))}
           </Flex>
         )}
       </Box>
-      {!hideInset && (
-        <InsetTile
-          roleMap={roleMap}
-          isMobile={isMobile}
-          isLandscape={isLandscape}
-        />
-      )}
+      {!hideInset && <InsetTile roleMap={roleMap} isMobile={isMobile} isLandscape={isLandscape} />}
     </Fragment>
   );
 }
@@ -208,11 +192,11 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
       <Box
         ref={nodeRef}
         css={{
-          position: "absolute",
+          position: 'absolute',
           bottom: 0,
-          right: sidepane ? "$100" : "$10",
-          mr: sidepane ? "$14" : 0,
-          boxShadow: "0 0 8px 0 rgba(0,0,0,0.3)",
+          right: sidepane ? '$100' : '$10',
+          mr: sidepane ? '$14' : 0,
+          boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
           aspectRatio: aspectRatio,
           h: height,
@@ -222,11 +206,11 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
           peerId={localPeer.id}
           trackid={localPeer.videoTrack}
           rootCSS={{
-            size: "100%",
+            size: '100%',
             padding: 0,
           }}
           containerCSS={{
-            bg: "$surfaceDefault",
+            bg: '$surfaceDefault',
           }}
           width={width}
           height={height}

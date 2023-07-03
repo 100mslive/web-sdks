@@ -16,10 +16,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       }}
       direction="column"
     >
-      <IconButton
-        css={{ position: 'absolute', top: '$2', right: '$2' }}
-        onClick={onClose}
-      >
+      <IconButton css={{ position: 'absolute', top: '$2', right: '$2' }} onClick={onClose}>
         <CloseIcon />
       </IconButton>
       <HlsStatsRow label="URL">
@@ -37,23 +34,15 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <HlsStatsRow label="Video size">
         {` ${hlsStatsState?.videoSize?.width}x${hlsStatsState?.videoSize?.height}`}
       </HlsStatsRow>
-      <HlsStatsRow label="Buffer duration">
-        {hlsStatsState?.bufferedDuration?.toFixed(2)}{' '}
-      </HlsStatsRow>
+      <HlsStatsRow label="Buffer duration">{hlsStatsState?.bufferedDuration?.toFixed(2)} </HlsStatsRow>
       <HlsStatsRow label="Connection speed">
-        {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(
-          2
-        )} Mbps`}
+        {`${(hlsStatsState?.bandwidthEstimate / (1000 * 1000)).toFixed(2)} Mbps`}
       </HlsStatsRow>
-      <HlsStatsRow label="Bitrate">
-        {`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)} Mbps`}
-      </HlsStatsRow>
+      <HlsStatsRow label="Bitrate">{`${(hlsStatsState?.bitrate / (1000 * 1000)).toFixed(2)} Mbps`}</HlsStatsRow>
       <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
-      <HlsStatsRow label="Dropped frames">
-        {`${hlsStatsState?.droppedFrames}`}
-      </HlsStatsRow>
+      <HlsStatsRow label="Dropped frames">{`${hlsStatsState?.droppedFrames}`}</HlsStatsRow>
     </Flex>
   );
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { selectAppData } from '@100mslive/react-sdk';
 import { ChatIcon, ConnectivityIcon, HandIcon, PersonIcon, PoorConnectivityIcon } from '@100mslive/react-icons';
-import { Button } from '../../';
+import { Button } from '../../../';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../../common/constants';
 import { hmsActions, hmsStore } from '../../hms';
 

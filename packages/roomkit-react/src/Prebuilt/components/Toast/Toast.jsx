@@ -1,16 +1,7 @@
 import React from 'react';
 import { Toast as ToastPrimitive } from '../../';
 
-export const Toast = ({
-  title,
-  description,
-  close = true,
-  open,
-  duration,
-  onOpenChange,
-  icon,
-  ...props
-}) => {
+export const Toast = ({ title, description, close = true, open, duration, onOpenChange, icon, ...props }) => {
   return (
     <ToastPrimitive.HMSToast
       title={title}

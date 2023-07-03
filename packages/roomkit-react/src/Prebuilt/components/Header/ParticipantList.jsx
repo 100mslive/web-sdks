@@ -22,30 +22,17 @@ import {
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
 import { ParticipantFilter } from './ParticipantFilter';
-import {
-  Avatar,
-  Box,
-  Dropdown,
-  Flex,
-  Input,
-  Slider,
-  Text,
-  textEllipsis,
-} from '../../';
+import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../../';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 import { isInternalRole } from '../../common/utils';
 import IconButton from '../../IconButton';
-import {
-  useIsSidepaneTypeOpen,
-  useSidepaneToggle,
-} from '../AppData/useSidepane';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
-  const { participants, isConnected, peerCount, rolesWithParticipants } =
-    useParticipants(filter);
+  const { participants, isConnected, peerCount, rolesWithParticipants } = useParticipants(filter);
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
@@ -72,21 +59,14 @@ export const ParticipantList = () => {
             isConnected={isConnected}
             roles={rolesWithParticipants}
           />
-          <IconButton
-            onClick={toggleSidepane}
-            css={{ w: '$11', h: '$11', ml: 'auto' }}
-          >
+          <IconButton onClick={toggleSidepane} css={{ w: '$11', h: '$11', ml: 'auto' }}>
             <CrossIcon />
           </IconButton>
         </Flex>
-        {!filter?.search && participants.length === 0 ? null : (
-          <ParticipantSearch onSearch={onSearch} />
-        )}
+        {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} />}
         {participants.length === 0 && (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
-            <Text variant="sm">
-              {!filter ? 'No participants' : 'No matching participants'}
-            </Text>
+            <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
           </Flex>
         )}
         <VirtualizedParticipants
@@ -110,9 +90,7 @@ export const ParticipantList = () => {
 export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isParticipantsOpen = useIsSidepaneTypeOpen(
-    SIDE_PANE_OPTIONS.PARTICIPANTS
-  );
+  const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
   useEffect(() => {
     if (isParticipantsOpen && peerCount === 0) {
       toggleSidepane();
@@ -149,11 +127,7 @@ function itemKey(index, data) {
   return data.participants[index].id;
 }
 
-const VirtualizedParticipants = ({
-  participants,
-  isConnected,
-  setSelectedPeerId,
-}) => {
+const VirtualizedParticipants = ({ participants, isConnected, setSelectedPeerId }) => {
   const [ref, { width, height }] = useMeasure();
   return (
     <Box
@@ -210,10 +184,7 @@ const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
           }}
         />
         <Flex direction="column" css={{ flex: '1 1 0' }}>
-          <Text
-            variant="md"
-            css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}
-          >
+          <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
             {peer.name}
           </Text>
           <Text variant="sub2">{peer.roleName}</Text>
@@ -248,31 +219,21 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && <HandRaiseIcon />}
       {shouldShowMoreActions && !isInternalRole(role) && (
-        <ParticipantMoreActions
-          onRoleChange={onSettings}
-          peerId={peerId}
-          role={role}
-        />
+        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
       )}
     </Flex>
   );
 });
 
 const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
-  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } =
-    useHMSStore(selectPermissions);
+  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-      <Dropdown.Trigger
-        asChild
-        data-testid="participant_more_actions"
-        css={{ p: '$2', r: '$0' }}
-        tabIndex={0}
-      >
+      <Dropdown.Trigger asChild data-testid="participant_more_actions" css={{ p: '$2', r: '$0' }} tabIndex={0}>
         <Text>
           <VerticalMenuIcon />
         </Text>
@@ -297,9 +258,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
               }}
             >
               <RemoveUserIcon />
-              <Text css={{ ml: '$4', color: '$error' }}>
-                Remove Participant
-              </Text>
+              <Text css={{ ml: '$4', color: '$error' }}>Remove Participant</Text>
             </Dropdown.Item>
           )}
         </Dropdown.Content>
@@ -322,9 +281,7 @@ const ParticipantVolume = ({ peerId }) => {
       <Flex direction="column" css={{ w: '100%' }}>
         <Flex align="center">
           <SpeakerIcon />
-          <Text css={{ ml: '$4' }}>
-            Volume{audioTrack.volume ? `(${audioTrack.volume})` : ''}
-          </Text>
+          <Text css={{ ml: '$4' }}>Volume{audioTrack.volume ? `(${audioTrack.volume})` : ''}</Text>
         </Flex>
         <Slider
           css={{ my: '0.5rem' }}
@@ -346,7 +303,7 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
       onSearch(value);
     },
     300,
-    [value, onSearch]
+    [value, onSearch],
   );
   return (
     <Box css={{ p: '$4 0', my: '$8', position: 'relative' }}>

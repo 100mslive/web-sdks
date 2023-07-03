@@ -1,7 +1,7 @@
 import React from 'react';
 import { VariantProps } from '@stitches/react';
-import { getAvatarBg } from './getAvatarBg';
 import { styled } from '../Theme';
+import { getAvatarBg } from './getAvatarBg';
 import { flexCenter } from '../utils/styles';
 
 const getAvatarShape = (radii: string) => ({
@@ -23,11 +23,11 @@ export const StyledAvatar = styled('div', {
     size: {
       small: {
         height: '$16 !important',
-        fontSize: '$space$6'
+        fontSize: '$space$6',
       },
       medium: {
         height: '$18 !important',
-        fontSize: '$space$10'
+        fontSize: '$space$10',
       },
       large: {
         height: '$20 !important',

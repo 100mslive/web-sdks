@@ -1,5 +1,5 @@
 import React, { ComponentProps } from 'react';
-import type { ToastProps } from '@radix-ui/react-toast'
+import type { ToastProps } from '@radix-ui/react-toast';
 import * as ToastPrimitives from '@radix-ui/react-toast';
 import { CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../IconButton';
@@ -27,12 +27,12 @@ const getToastVariant = (base: string) => {
       height: '100%',
       zIndex: 10,
     },
-    "@sm": {
-      "&:before": {
+    '@sm': {
+      '&:before': {
         content: 'none',
       },
-      border: `solid $space$px ${base}`
-    }
+      border: `solid $space$px ${base}`,
+    },
   };
 };
 
@@ -47,8 +47,8 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   border: 'solid $space$px $borderLight',
   overflow: 'hidden',
   ...toastAnimation,
-  "@sm": {
-    p: "$8 $11",
+  '@sm': {
+    p: '$8 $11',
   },
   variants: {
     variant: {
@@ -89,7 +89,7 @@ const ToastViewport = styled(ToastPrimitives.Viewport, {
   width: 390,
   '@sm': {
     width: '100%',
-    padding: "$6"
+    padding: '$6',
   },
   maxWidth: '100vw',
   margin: 0,

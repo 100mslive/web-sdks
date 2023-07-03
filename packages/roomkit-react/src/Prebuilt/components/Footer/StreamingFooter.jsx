@@ -1,30 +1,30 @@
-import React from "react";
-import { ChatToggle } from "./ChatToggle";
-import { Box, Flex, Footer as AppFooter } from "../../";
-import { AudioVideoToggle } from "../AudioVideoToggle";
-import { EmojiReaction } from "../EmojiReaction";
-import { StreamActions } from "../Header/StreamActions";
-import { LeaveRoom } from "../LeaveRoom";
-import MetaActions from "../MetaActions";
-import { MoreSettings } from "../MoreSettings/MoreSettings";
-import { PIP } from "../PIP";
-import { ScreenshareToggle } from "../ScreenShare";
+import React from 'react';
+import { ChatToggle } from './ChatToggle';
+import { Box, Flex, Footer as AppFooter } from '../../';
+import { AudioVideoToggle } from '../AudioVideoToggle';
+import { EmojiReaction } from '../EmojiReaction';
+import { StreamActions } from '../Header/StreamActions';
+import { LeaveRoom } from '../LeaveRoom';
+import MetaActions from '../MetaActions';
+import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { PIP } from '../PIP';
+import { ScreenshareToggle } from '../ScreenShare';
 
 export const StreamingFooter = () => {
   return (
     <AppFooter.Root
       css={{
-        flexWrap: "nowrap",
-        "@md": {
-          justifyContent: "center",
+        flexWrap: 'nowrap',
+        '@md': {
+          justifyContent: 'center',
         },
       }}
     >
       <AppFooter.Left
         css={{
-          "@md": {
-            w: "unset",
-            p: "0",
+          '@md': {
+            w: 'unset',
+            p: '0',
           },
         }}
       >
@@ -32,35 +32,32 @@ export const StreamingFooter = () => {
       </AppFooter.Left>
       <AppFooter.Center
         css={{
-          "@md": {
-            w: "unset",
+          '@md': {
+            w: 'unset',
           },
         }}
       >
-        <ScreenshareToggle css={{ "@sm": { display: "none" } }} />
-        <Box css={{ "@md": { display: "none" } }}>
+        <ScreenshareToggle css={{ '@sm': { display: 'none' } }} />
+        <Box css={{ '@md': { display: 'none' } }}>
           <PIP />
         </Box>
         <Box
           css={{
-            display: "none",
-            "@md": {
-              display: "flex",
-              alignItems: "center",
-              mx: "$4",
+            display: 'none',
+            '@md': {
+              display: 'flex',
+              alignItems: 'center',
+              mx: '$4',
             },
           }}
         >
           <StreamActions />
         </Box>
         <MoreSettings />
-        <Box css={{ "@md": { display: "none" } }}>
+        <Box css={{ '@md': { display: 'none' } }}>
           <LeaveRoom />
         </Box>
-        <Flex
-          align="center"
-          css={{ display: "none", "@md": { display: "flex" } }}
-        >
+        <Flex align="center" css={{ display: 'none', '@md': { display: 'flex' } }}>
           <ChatToggle />
         </Flex>
       </AppFooter.Center>

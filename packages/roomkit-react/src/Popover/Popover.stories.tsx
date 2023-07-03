@@ -1,14 +1,14 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CrossIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Popover } from './index';
-import PopoverDocs from './Popover.mdx';
 import { Button } from '../Button';
 import { Fieldset } from '../Fieldset';
 import { Input } from '../Input';
 import { Label } from '../Label';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
+import { Popover } from './index';
+import PopoverDocs from './Popover.mdx';
 
 export default {
   title: 'UI Components/Popover',

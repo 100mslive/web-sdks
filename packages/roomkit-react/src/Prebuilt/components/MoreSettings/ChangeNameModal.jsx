@@ -1,20 +1,11 @@
 import React, { useState } from 'react';
-import {
-  selectLocalPeerName,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Button, Dialog, Flex, Input, Text } from '../../';
-import {
-  UserPreferencesKeys,
-  useUserPreferences,
-} from '../hooks/useUserPreferences';
+import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { ToastManager } from '../Toast/ToastManager';
 
 export const ChangeNameModal = ({ onOpenChange }) => {
-  const [previewPreference, setPreviewPreference] = useUserPreferences(
-    UserPreferencesKeys.PREVIEW
-  );
+  const [previewPreference, setPreviewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW);
   const hmsActions = useHMSActions();
   const localPeerName = useHMSStore(selectLocalPeerName);
   const [currentName, setCurrentName] = useState(localPeerName);
@@ -76,13 +67,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
             >
               <Box css={{ w: '50%' }}>
                 <Dialog.Close css={{ w: '100%' }}>
-                  <Button
-                    variant="standard"
-                    css={{ w: '100%' }}
-                    outlined
-                    type="submit"
-                    disabled={!localPeerName}
-                  >
+                  <Button variant="standard" css={{ w: '100%' }} outlined type="submit" disabled={!localPeerName}>
                     Cancel
                   </Button>
                 </Dialog.Close>
@@ -92,9 +77,7 @@ export const ChangeNameModal = ({ onOpenChange }) => {
                   variant="primary"
                   css={{ width: '100%' }}
                   type="submit"
-                  disabled={
-                    !currentName.trim() || currentName.trim() === localPeerName
-                  }
+                  disabled={!currentName.trim() || currentName.trim() === localPeerName}
                   data-testid="popup_change_btn"
                 >
                   Change
