@@ -29,19 +29,34 @@ import {
   WIDGET_VIEWS,
 } from "../../common/constants";
 
-const isValidQuestion = ({ text, type, options }) => {
-  if (!text) {
+const isValidQuestion = ({
+  text,
+  type,
+  options,
+  isQuiz = false,
+  skippable = true,
+}) => {
+  if (!text || !type) {
     return false;
   }
 
   if (
-    type === QUESTION_TYPE.SINGLE_CHOICE ||
-    type === QUESTION_TYPE.MULTIPLE_CHOICE
+    ![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)
   ) {
-    return options.every(option => option && option.length > 0);
-  } else {
     return true;
   }
+
+  const everyOptionHasText = options.every(
+    option => option && option.text.length > 0
+  );
+  const isCorrectAnswerRequired = isQuiz && !skippable;
+  const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
+
+  if (!isCorrectAnswerRequired) {
+    return everyOptionHasText;
+  }
+
+  return everyOptionHasText && hasCorrectAnswer;
 };
 
 export function LaunchPollsQuizMenu() {
@@ -57,6 +72,7 @@ export function LaunchPollsQuizMenu() {
         text: question.text,
         type: question.type,
         options: question.options,
+        skippable: question.skippable,
       }));
     await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
@@ -163,7 +179,8 @@ const SavedQuestion = ({ question, index, length }) => {
       </Text>
       {question.options.map(option => (
         <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
-          {option}
+          {option.text}
+          {option.isCorrectAnswer && ` ✅`}
         </Text>
       ))}
     </>
@@ -191,8 +208,7 @@ const QuestionForm = ({
     { text: "", isCorrectAnswer: false },
     { text: "", isCorrectAnswer: false },
   ]);
-
-  console.log(options);
+  const [skippable, setSkippable] = useState(true);
 
   return (
     <>
@@ -282,7 +298,11 @@ const QuestionForm = ({
           </Flex>
           {isQuiz ? (
             <Flex css={{ mt: "$md" }}>
-              <Switch css={{ mr: "$6" }} />
+              <Switch
+                css={{ mr: "$6" }}
+                defaultChecked={skippable}
+                onCheckedChange={checked => setSkippable(checked)}
+              />
               <Text>Not required to answer</Text>
             </Flex>
           ) : null}
@@ -301,9 +321,17 @@ const QuestionForm = ({
         </Box>
         <Button
           variant="standard"
-          disabled={!isValidQuestion({ text, type, options })}
+          disabled={
+            !isValidQuestion({
+              text,
+              type,
+              options,
+              isQuiz,
+              skippable,
+            })
+          }
           onClick={() => {
-            onSave({ saved: true, text, type, options });
+            onSave({ saved: true, text, type, options, skippable });
           }}
         >
           Save

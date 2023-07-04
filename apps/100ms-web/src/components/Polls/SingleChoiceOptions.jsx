@@ -82,18 +82,18 @@ export const SingleChoiceOptions = ({
 
 export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
   const selectAnswer = useCallback(
-    index => {
+    answerIndex => {
       if (!isQuiz) {
         return;
       }
-      const newOptions = [...options];
-      newOptions[index] = {
-        ...newOptions[index],
-        isCorrectAnswer: true,
-      };
-      setOptions(newOptions);
+      setOptions(options =>
+        options.map((option, index) => ({
+          ...option,
+          isCorrectAnswer: index === answerIndex,
+        }))
+      );
     },
-    [options, setOptions, isQuiz]
+    [setOptions, isQuiz]
   );
 
   return (

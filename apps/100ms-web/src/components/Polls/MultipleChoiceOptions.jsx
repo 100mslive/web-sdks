@@ -77,14 +77,13 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
       if (!isQuiz) {
         return;
       }
-      const newOptions = [...options];
-      newOptions[index] = {
-        ...newOptions[index],
-        isCorrectAnswer: checked,
-      };
-      setOptions(newOptions);
+      setOptions(options => [
+        ...options.slice(0, index),
+        { ...options[index], isCorrectAnswer: checked },
+        ...options.slice(index + 1),
+      ]);
     },
-    [options, setOptions, isQuiz]
+    [setOptions, isQuiz]
   );
 
   return (
