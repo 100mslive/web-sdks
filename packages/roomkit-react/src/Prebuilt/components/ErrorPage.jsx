@@ -17,7 +17,7 @@ function ErrorPage({ error }) {
     >
       <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
         <img
-          src={themeType === 'dark' ? import('../images/error-bg-dark.svg') : import('../images/error-bg-light.svg')}
+          src={themeType === 'dark' ? require('../images/error-bg-dark.svg') : require('../images/error-bg-light.svg')}
           alt="Error Background"
         />
         {!isSSR && window.location.hostname === 'localhost' ? (

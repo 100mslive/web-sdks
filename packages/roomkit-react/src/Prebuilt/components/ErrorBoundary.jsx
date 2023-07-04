@@ -44,8 +44,8 @@ export class ErrorBoundary extends Component {
                   <img
                     src={
                       themeType === 'dark'
-                        ? import('../images/error-bg-dark.svg')
-                        : import('../images/error-bg-light.svg')
+                        ? require('../images/error-bg-dark.svg')
+                        : require('../images/error-bg-light.svg')
                     }
                     alt="error background"
                   />
