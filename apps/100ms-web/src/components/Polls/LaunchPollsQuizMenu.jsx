@@ -256,19 +256,20 @@ const QuestionForm = ({
         value={text}
         onChange={event => setText(event.target.value)}
       />
-      {type === "single-choice" || type === "multiple-choice" ? (
+      {type === QUESTION_TYPE.SINGLE_CHOICE ||
+      type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
           <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
             Options
           </Text>
-          {type === "single-choice" && (
+          {type === QUESTION_TYPE.SINGLE_CHOICE && (
             <SingleChoiceOptionInputs
               isQuiz={isQuiz}
               options={options}
               setOptions={setOptions}
             />
           )}
-          {type === "multiple-choice" && (
+          {type === QUESTION_TYPE.MULTIPLE_CHOICE && (
             <MultipleChoiceOptionInputs
               isQuiz={isQuiz}
               options={options}

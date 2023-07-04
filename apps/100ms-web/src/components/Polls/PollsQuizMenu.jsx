@@ -238,9 +238,11 @@ const AddMenu = ({ interactionType }) => {
 };
 
 const PrevMenu = () => {
-  const polls = useHMSStore(selectPolls);
+  const polls = useHMSStore(selectPolls)?.filter(
+    poll => poll.state === "started" || poll.state === "stopped"
+  );
   return polls?.length ? (
-    <Flex direction="column">
+    <Flex direction="column" css={{ w: "100%" }}>
       <Text variant="h6" css={{ c: "$textHighEmp" }}>
         Previous Polls/Quiz
       </Text>
