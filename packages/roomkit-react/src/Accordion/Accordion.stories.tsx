@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Accordion } from '.';
+import { Accordion } from './';
 
 export default {
   title: 'UI Components/Accordion',
@@ -26,7 +26,7 @@ function AccordionItem({ value, header, content }: { value: string; header: stri
 
 const Template = () => {
   return (
-    <Accordion.Root type="multiple" defaultValue="item-1" collapsible css={{ width: '300px' }}>
+    <Accordion.Root type="multiple" defaultValue={['item-1']} css={{ width: '300px' }}>
       <AccordionItem
         value="item-1"
         header="Is it accessible?"
