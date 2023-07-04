@@ -13,7 +13,7 @@ const ToggleWidgets = () => {
 
   return (
     <Tooltip title="Toggle Widget Menu">
-      <IconButton data-testid="get_widgets" onClick={toggle} icon>
+      <IconButton data-testid="get_widgets" onClick={() => toggle()} icon>
         {widgetView ? <InteractionOpenIcon /> : <InteractionClosedIcon />}
       </IconButton>
     </Tooltip>
