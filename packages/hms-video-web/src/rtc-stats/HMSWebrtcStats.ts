@@ -6,6 +6,10 @@ import {
   getTrackStats,
   union,
 } from './utils';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
+import { EventBus } from '../events/EventBus';
 import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
 import { HMSLocalTrack, HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
 import { IStore } from '../sdk/store';
@@ -25,6 +29,7 @@ export class HMSWebrtcStats {
   constructor(
     private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
     private store: IStore,
+    private readonly eventBus: EventBus,
   ) {
     this.localPeerID = this.store.getLocalPeer()?.peerId;
   }
@@ -55,7 +60,10 @@ export class HMSWebrtcStats {
     let publishReport: RTCStatsReport | undefined;
     try {
       publishReport = await this.getStats.publish?.();
-    } catch (err) {
+    } catch (err: any) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.PUBLISH, err.message)),
+      );
       HMSLogger.w(this.TAG, 'Error in getting publish stats', err);
     }
     const publishStats: HMSPeerStats['publish'] | undefined =
@@ -64,7 +72,10 @@ export class HMSWebrtcStats {
     let subscribeReport: RTCStatsReport | undefined;
     try {
       subscribeReport = await this.getStats.subscribe?.();
-    } catch (err) {
+    } catch (err: any) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.SUBSCRIBE, err.message)),
+      );
       HMSLogger.w(this.TAG, 'Error in getting subscribe stats', err);
     }
     const baseSubscribeStats =
@@ -96,7 +107,7 @@ export class HMSWebrtcStats {
     for (const track of tracks) {
       const peerName = track.peerId && this.store.getPeerById(track.peerId)?.name;
       const prevTrackStats = this.getRemoteTrackStats(track.trackId);
-      const trackStats = await getTrackStats(track as HMSRemoteTrack, peerName, prevTrackStats);
+      const trackStats = await getTrackStats(this.eventBus, track as HMSRemoteTrack, peerName, prevTrackStats);
       if (trackStats) {
         this.remoteTrackStats[track.trackId] = trackStats;
       }
@@ -113,7 +124,7 @@ export class HMSWebrtcStats {
       const track = tracks[trackID] as HMSLocalTrack;
       if (track) {
         const peerName = this.store.getLocalPeer()?.name;
-        const trackStats = await getLocalTrackStats(track, peerName, this.localTrackStats[trackID]);
+        const trackStats = await getLocalTrackStats(this.eventBus, track, peerName, this.localTrackStats[trackID]);
         if (trackStats) {
           this.localTrackStats[trackID] = trackStats;
         }

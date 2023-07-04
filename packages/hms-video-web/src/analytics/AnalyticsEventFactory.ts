@@ -172,6 +172,13 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static rtcStatsFailed(error: HMSException) {
+    const name = 'rtc.stats.failed';
+    const level = AnalyticsEventLevel.ERROR;
+
+    return new AnalyticsEvent({ name, level, properties: this.getErrorProperties(error) });
+  }
+
   /**
    * TODO: remove once everything is switched to server side degradation, this
    * event can be handled on server side as well.

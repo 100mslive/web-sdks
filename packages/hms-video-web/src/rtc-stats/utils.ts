@@ -1,3 +1,7 @@
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
+import { EventBus } from '../events/EventBus';
 import {
   HMSPeerStats,
   HMSTrackStats,
@@ -10,6 +14,7 @@ import HMSLogger from '../utils/logger';
 import { isPresent } from '../utils/validations';
 
 export const getLocalTrackStats = async (
+  eventBus: EventBus,
   track: HMSLocalTrack,
   peerName?: string,
   prevTrackStats?: Record<string, HMSTrackStats>,
@@ -62,13 +67,22 @@ export const getLocalTrackStats = async (
         codec,
       };
     });
-  } catch (err) {
+  } catch (err: any) {
+    eventBus.analytics.publish(
+      AnalyticsEventFactory.rtcStatsFailed(
+        ErrorFactory.WebrtcErrors.StatsFailed(
+          HMSAction.TRACK,
+          `Error getting local track stats ${track.trackId} - ${err.message}`,
+        ),
+      ),
+    );
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting local track stats', track, err, (err as Error).name);
   }
   return trackStats;
 };
 
 export const getTrackStats = async (
+  eventBus: EventBus,
   track: HMSRemoteTrack,
   peerName?: string,
   prevTrackStats?: HMSTrackStats,
@@ -76,7 +90,15 @@ export const getTrackStats = async (
   let trackReport: RTCStatsReport | undefined;
   try {
     trackReport = await track.transceiver?.receiver.getStats();
-  } catch (err) {
+  } catch (err: any) {
+    eventBus.analytics.publish(
+      AnalyticsEventFactory.rtcStatsFailed(
+        ErrorFactory.WebrtcErrors.StatsFailed(
+          HMSAction.TRACK,
+          `Error getting remote track stats ${track.trackId} - ${err.message}`,
+        ),
+      ),
+    );
     HMSLogger.w('[HMSWebrtcStats]', 'Error in getting remote track stats', track, err);
   }
   const trackStats = getRelevantStatsFromTrackReport(trackReport);

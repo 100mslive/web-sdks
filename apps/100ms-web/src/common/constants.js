@@ -240,3 +240,8 @@ export const QUESTION_TYPE = {
   SHORT_ANSWER: "short-answer",
   LONG_ANSWER: "long-answer",
 };
+
+export const PDF_SHARING_OPTIONS = {
+  FROM_YOUR_COMPUTER: "From your Computer",
+  FROM_A_URL: "From a URL",
+};
