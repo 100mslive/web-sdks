@@ -48,7 +48,7 @@ class Store implements IStore {
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
-  private polls: Record<string, HMSPoll> = {};
+  private polls = new Map<string, HMSPoll>();
 
   getConfig() {
     return this.config;
@@ -360,11 +360,11 @@ class Store implements IStore {
   }
 
   setPoll(poll: HMSPoll) {
-    this.polls[poll.id] = poll;
+    this.polls.set(poll.id, poll);
   }
 
   getPoll(id: string): HMSPoll | undefined {
-    return this.polls[id];
+    return this.polls.get(id);
   }
 
   getErrorListener() {

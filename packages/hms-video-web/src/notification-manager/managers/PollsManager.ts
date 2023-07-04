@@ -55,8 +55,8 @@ export class PollsManager {
       };
 
       polls.push(poll);
+      this.store.setPoll(poll);
     }
-    polls.forEach(poll => this.store.setPoll(poll));
     this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STARTED, polls);
   }
 

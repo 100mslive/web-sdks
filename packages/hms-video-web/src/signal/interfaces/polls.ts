@@ -9,7 +9,7 @@ import {
 export interface PollInfoParams {
   poll_id: string; // unique poll id, optional, if not provided server will create one
   title: string; // title for poll
-  type?: 'poll' | 'quiz'; //type = quiz or poll
+  type: 'poll' | 'quiz'; //type = quiz or poll
   duration?: number; // number of second for which poll is active after start, 0 means poll can only be stopped by command or session end
   anonymous?: boolean; // poll is anonymous, peer id or user id is not stored, default: false
   visibility?: boolean; // default is false

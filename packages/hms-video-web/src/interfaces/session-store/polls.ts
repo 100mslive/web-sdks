@@ -4,12 +4,11 @@ export type HMSPollUserTrackingMode = 'peerID' | 'customerID' | 'userName';
 
 export type HMSPollState = 'created' | 'started' | 'stopped';
 
-// MARK: - Poll
 export interface HMSPoll {
   id: string;
   title: string;
   state?: HMSPollState;
-  type?: 'poll' | 'quiz';
+  type: 'poll' | 'quiz';
   duration?: number;
   anonymous?: boolean;
   visibility?: boolean;
@@ -45,7 +44,6 @@ export interface HMSPollCreateParams
   questions?: HMSPollQuestionCreateParams[];
 }
 
-// MARK: - Question
 export interface HMSPollQuestion {
   index: number;
   text: string;
@@ -84,7 +82,6 @@ export enum HMSPollQuestionType {
   LONG_ANSWER = 'long-answer',
 }
 
-// MARK: - Choice
 export interface HMSPollQuestionOption {
   index: number;
   text: string;
@@ -99,7 +96,7 @@ export interface HMSPollQuestionOptionCreateParams extends Pick<HMSPollQuestionO
 export interface HMSPollQuestionResponse {
   questionIndex: number;
   peer?: HMSPollResponsePeerInfo;
-  type?: HMSPollQuestionType; // private property
+  type?: HMSPollQuestionType;
   skipped?: boolean;
   option?: number;
   options?: number[];
