@@ -16,19 +16,21 @@ export const getClosestLayer = (
   simulcastLayers: HMSSimulcastLayerDefinition[],
   videoElementDimensions: { width: number; height: number },
 ): HMSPreferredSimulcastLayer => {
-  let closestLayer: HMSPreferredSimulcastLayer = HMSSimulcastLayer.HIGH;
   const layers = [...simulcastLayers].sort((a, b) => layerToIntMapping[a.layer] - layerToIntMapping[b.layer]);
-  const aspectRatio = videoElementDimensions.width / videoElementDimensions.height;
-  const maxWidth = videoElementDimensions.width * (window?.devicePixelRatio || 1);
-  const maxHeight = Math.floor(maxWidth / aspectRatio);
-  let minDiff = Number.POSITIVE_INFINITY;
-  for (const layer of layers) {
-    const diff = Math.min(Math.abs(maxWidth - layer.resolution.width), Math.abs(layer.resolution.height - maxHeight));
-    console.log(diff, layer);
-    if (diff <= minDiff) {
-      minDiff = diff;
-      closestLayer = layer.layer;
+  const v = Math.max(videoElementDimensions.height, videoElementDimensions.width);
+  let closestLayer = layers[0].layer;
+  for (let i = 1; i < layers.length; i++) {
+    const a = Math.max(layers[i - 1].resolution.width, layers[i - 1].resolution.height);
+    const b = Math.max(layers[i].resolution.width, layers[i].resolution.height);
+    const mid = Math.ceil(a + Math.abs(b - a) * 0.15);
+
+    if (v > mid) {
+      closestLayer = layers[i].layer;
+    } else {
+      break;
     }
   }
+
+  console.log(`chose:${closestLayer} for ${videoElementDimensions.width}x${videoElementDimensions.height}`, layers);
   return closestLayer;
 };
