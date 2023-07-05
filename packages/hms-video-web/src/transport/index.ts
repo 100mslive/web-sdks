@@ -684,36 +684,36 @@ export default class HMSTransport implements ITransport {
     return this.signal.listenMetadataChange(keys);
   }
 
-  pollInfoSet(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
-    return this.signal.pollInfoSet(params);
+  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
+    return this.signal.setPollInfo(params);
   }
 
-  pollInfoGet(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
-    return this.signal.pollInfoGet(params);
+  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
+    return this.signal.getPollInfo(params);
   }
 
-  pollQuestionsSet(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse> {
-    return this.signal.pollQuestionsSet(params);
+  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse> {
+    return this.signal.setPollQuestions(params);
   }
 
-  pollQuestionsGet(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
-    return this.signal.pollQuestionsGet(params);
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
+    return this.signal.getPollQuestions(params);
   }
 
-  pollStart(params: PollStartParams): Promise<PollStartResponse> {
-    return this.signal.pollStart(params);
+  startPoll(params: PollStartParams): Promise<PollStartResponse> {
+    return this.signal.startPoll(params);
   }
 
-  pollStop(params: PollStopParams): Promise<PollStartResponse> {
-    return this.signal.pollStop(params);
+  stopPoll(params: PollStopParams): Promise<PollStartResponse> {
+    return this.signal.stopPoll(params);
   }
 
-  pollResponseSet(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
-    return this.signal.pollResponseSet(params);
+  getPollReponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+    return this.signal.setPollResponses(params);
   }
 
-  pollList(params: PollListParams): Promise<PollListResponse> {
-    return this.signal.pollList(params);
+  getPollsList(params: PollListParams): Promise<PollListResponse> {
+    return this.signal.getPollsList(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

@@ -100,19 +100,19 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   close(): Promise<void>;
 
-  pollInfoSet(params: PollInfoSetParams): Promise<PollInfoSetResponse>;
+  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse>;
 
-  pollInfoGet(params: PollInfoGetParams): Promise<PollInfoGetResponse>;
+  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse>;
 
-  pollQuestionsSet(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse>;
+  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse>;
 
-  pollStart(params: PollStartParams): Promise<PollStartResponse>;
+  startPoll(params: PollStartParams): Promise<PollStartResponse>;
 
-  pollStop(params: PollStopParams): Promise<PollStopResponse>;
+  stopPoll(params: PollStopParams): Promise<PollStopResponse>;
 
-  pollQuestionsGet(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse>;
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse>;
 
-  pollResponseSet(params: PollResponseSetParams): Promise<PollResponseSetResponse>;
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse>;
 
-  pollList(params: PollListParams): Promise<PollListResponse>;
+  getPollsList(params: PollListParams): Promise<PollListResponse>;
 }

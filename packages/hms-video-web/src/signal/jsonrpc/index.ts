@@ -391,42 +391,42 @@ export default class JsonRpcSignal implements ISignal {
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
   }
 
-  pollInfoSet(params: PollInfoSetParams) {
+  setPollInfo(params: PollInfoSetParams) {
     this.valiateConnection();
     return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { version: '1.0', ...params });
   }
 
-  pollInfoGet(params: PollInfoGetParams) {
+  getPollInfo(params: PollInfoGetParams) {
     this.valiateConnection();
     return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { version: '1.0', ...params });
   }
 
-  pollQuestionsSet(params: PollQuestionsSetParams) {
+  setPollQuestions(params: PollQuestionsSetParams) {
     this.valiateConnection();
     return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { version: '1.0', ...params });
   }
 
-  pollStart(params: PollStartParams) {
+  startPoll(params: PollStartParams) {
     this.valiateConnection();
     return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { version: '1.0', ...params });
   }
 
-  pollStop(params: PollStopParams) {
+  stopPoll(params: PollStopParams) {
     this.valiateConnection();
     return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { version: '1.0', ...params });
   }
 
-  pollQuestionsGet(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
     this.valiateConnection();
     return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { version: '1.0', ...params });
   }
 
-  pollResponseSet(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
     this.valiateConnection();
     return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { version: '1.0', ...params });
   }
 
-  pollList(params: PollListParams): Promise<PollListResponse> {
+  getPollsList(params: PollListParams): Promise<PollListResponse> {
     this.valiateConnection();
     return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { version: '1.0', ...params });
   }

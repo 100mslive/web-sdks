@@ -21,7 +21,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async createPoll(pollParams: HMSPollCreateParams) {
-    const { poll_id: serverPollID } = await this.transport.pollInfoSet({
+    const { poll_id: serverPollID } = await this.transport.setPollInfo({
       ...pollParams,
       poll_id: pollParams.id,
       vote: pollParams.rolesThatCanVote,
@@ -36,7 +36,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       await this.addQuestionsToPoll(pollParams.id, pollParams.questions);
     }
 
-    const questions = await this.transport.pollQuestionsGet({ poll_id: pollParams.id, index: 0, count: 50 });
+    const questions = await this.transport.getPollQuestions({ poll_id: pollParams.id, index: 0, count: 50 });
 
     const poll: HMSPoll = {
       id: pollParams.id,
@@ -59,16 +59,16 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
   async startPoll(poll: string | HMSPollCreateParams): Promise<void> {
     if (typeof poll === 'string') {
-      await this.transport.pollStart({ poll_id: poll });
+      await this.transport.startPoll({ poll_id: poll });
     } else {
       await this.createPoll(poll);
-      await this.transport.pollStart({ poll_id: poll.id });
+      await this.transport.startPoll({ poll_id: poll.id });
     }
   }
 
   async addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void> {
     if (questions.length > 0) {
-      await this.transport.pollQuestionsSet({
+      await this.transport.setPollQuestions({
         poll_id: pollID,
         questions: questions.map((question, index) => this.createQuestionSetParams(question, index)),
       });
@@ -76,7 +76,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async stopPoll(pollID: string): Promise<void> {
-    await this.transport.pollStop({ poll_id: pollID });
+    await this.transport.stopPoll({ poll_id: pollID });
   }
 
   async addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
@@ -102,12 +102,16 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       return { duration: 0, type: question.type, question: response.questionIndex, ...response };
     });
 
-    await this.transport.pollResponseSet({ poll_id: pollID, responses: responsesParams });
+    await this.transport.getPollReponses({ poll_id: pollID, responses: responsesParams });
   }
 
   async getPolls(): Promise<HMSPoll[]> {
-    const { polls } = await this.transport.pollList({ count: 50 });
-    return polls.map(poll => ({ ...poll, id: poll.poll_id, mode: poll.mode as HMSPoll['mode'] }));
+    const { polls } = await this.transport.getPollsList({ count: 50 });
+    return polls.map(pollParams => {
+      const poll = { ...pollParams, id: pollParams.poll_id, mode: pollParams.mode as HMSPoll['mode'] };
+      this.store.setPoll(poll);
+      return poll;
+    });
   }
 
   getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {

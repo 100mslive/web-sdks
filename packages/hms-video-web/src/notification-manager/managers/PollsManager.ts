@@ -31,7 +31,7 @@ export class PollsManager {
   private async handlePollStart(notification: PollStartNotification) {
     const polls: HMSPoll[] = [];
     for (const pollParams of notification.polls) {
-      const questions = await this.transport.pollQuestionsGet({ poll_id: pollParams.poll_id, index: 0, count: 50 });
+      const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
       const poll: HMSPoll = {
         id: pollParams.poll_id,
         title: pollParams.title,
