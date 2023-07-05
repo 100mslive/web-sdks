@@ -21,7 +21,7 @@ export const StatusIndicator = ({ isTimed }) => {
         </Text>
       </Flex>
 
-      {isTimed ? (
+      {/* {isTimed ? (
         <Flex
           css={{
             borderRadius: "0 $0 $0 0",
@@ -39,7 +39,7 @@ export const StatusIndicator = ({ isTimed }) => {
             0:32
           </Text>
         </Flex>
-      ) : null}
+      ) : null} */}
     </Flex>
   );
 };

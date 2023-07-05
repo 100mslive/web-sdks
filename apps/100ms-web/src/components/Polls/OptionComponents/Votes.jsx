@@ -48,7 +48,7 @@ export const Votes = ({ voters }) => {
                 backgroundColor: "$secondaryDefault",
                 borderRadius: "$round",
                 position: "relative",
-                left: "-3px",
+                left: "$2",
                 p: "$2 $3",
               }}
             >
@@ -57,7 +57,7 @@ export const Votes = ({ voters }) => {
                 css={{
                   fontWeight: "$semiBold",
                   color: "$textHighEmp",
-                  fontSize: "9px",
+                  fontSize: "$tiny",
                 }}
               >
                 +{hiddenVotersCount}

@@ -129,6 +129,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
+
+    const playlistManager = this.sdk.getPlaylistManager();
+    this.audioPlaylist = new HMSPlaylist(
+      playlistManager,
+      HMSPlaylistType.audio,
+      this.syncPlaylistState.bind(this),
+      this.store,
+    );
+    this.videoPlaylist = new HMSPlaylist(
+      playlistManager,
+      HMSPlaylistType.video,
+      this.syncRoomState.bind(this),
+      this.store,
+    );
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -968,18 +982,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onJoin(sdkRoom: sdkTypes.HMSRoom) {
     const playlistManager = this.sdk.getPlaylistManager();
-    this.audioPlaylist = new HMSPlaylist(
-      playlistManager,
-      HMSPlaylistType.audio,
-      this.syncPlaylistState.bind(this),
-      this.store,
-    );
-    this.videoPlaylist = new HMSPlaylist(
-      playlistManager,
-      HMSPlaylistType.video,
-      this.syncRoomState.bind(this),
-      this.store,
-    );
     this.syncRoomState('joinSync');
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
