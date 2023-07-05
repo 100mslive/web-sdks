@@ -9,7 +9,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/roomkit-react";
 import { SidePane } from "./screenShareView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
 import { APP_DATA } from "../common/constants";

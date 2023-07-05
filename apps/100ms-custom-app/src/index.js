@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { init } from 'zipyai';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import '@100mslive/roomkit-react/dist/index.css';
+import './base.css';
 import './index.css';
 
 if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_ZIPY_KEY) {

@@ -14,7 +14,7 @@ import {
   IconButton,
   QRCode,
   Text,
-} from '@100mslive/react-ui';
+} from '@100mslive/roomkit-react';
 
 const InviteLinksModal = ({ onClose, roomLinks }) => {
   const roles = Object.keys(roomLinks);

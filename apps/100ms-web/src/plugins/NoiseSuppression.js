@@ -6,7 +6,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { AudioLevelIcon } from "@100mslive/react-icons";
-import { Tooltip } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/roomkit-react";
 import { ToastManager } from "../components/Toast/ToastManager";
 import IconButton from "../IconButton";
 import { useIsFeatureEnabled } from "../components/hooks/useFeatures";

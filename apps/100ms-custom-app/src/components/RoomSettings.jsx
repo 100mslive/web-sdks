@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Button, Dialog, Flex, styled } from '@100mslive/react-ui';
+import { Box, Button, Dialog, Flex, styled } from '@100mslive/roomkit-react';
 import { DialogContent } from './DialogContent';
 import StreamingRecordingSettings from './StreamingRecordingSettings';
 import ThemeSettings from './ThemeSettings';

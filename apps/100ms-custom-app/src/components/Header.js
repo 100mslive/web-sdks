@@ -1,6 +1,6 @@
 import React, { Suspense, useCallback, useState } from 'react';
 import { CodeIcon, EditIcon, InviteIcon } from '@100mslive/react-icons';
-import { Button, Flex, styled, Text } from '@100mslive/react-ui';
+import { Button, Flex, styled, Text } from '@100mslive/roomkit-react';
 import { AppAnalytics } from '../utils/analytics';
 import {
   apiBasePath,

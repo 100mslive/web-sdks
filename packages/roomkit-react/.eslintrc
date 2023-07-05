@@ -1,9 +1,11 @@
 {
   "extends": [
     "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
-    "react-app"
+    "react-app",
+    "react-app/jest"
   ],
   "plugins": ["prettier", "simple-import-sort"],
   "rules": {
@@ -28,7 +30,6 @@
         "html": false
       }
     ],
-    "react/react-in-jsx-scope": "error",
     "prettier/prettier": [
       "error",
       {
@@ -36,6 +37,7 @@
       }
     ],
     "import/first": "error",
+    "import/namespace": [2, { "allowComputed": true}],
     "import/no-duplicates": "error",
     "simple-import-sort/imports": [
       "error",
@@ -48,7 +50,6 @@
             // Internal packages.
             "^@100mslive/react-sdk",
             "^@100mslive/react-icons",
-            "^@100mslive/react-ui",
             // Side effect imports.
             "^\\u0000",
             
@@ -74,7 +75,7 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
       }
     }
   },

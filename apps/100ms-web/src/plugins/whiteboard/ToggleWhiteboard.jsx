@@ -1,6 +1,6 @@
 import { selectLocalPeerRoleName, useHMSStore } from "@100mslive/react-sdk";
 import { PencilDrawIcon } from "@100mslive/react-icons";
-import { Tooltip } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { useHLSViewerRole } from "../../components/AppData/useUISettings";
 import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";

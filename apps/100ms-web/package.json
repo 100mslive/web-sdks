@@ -14,7 +14,7 @@
     "@100mslive/hms-virtual-background": "1.11.7-alpha.8",
     "@100mslive/react-icons": "0.8.7-alpha.8",
     "@100mslive/react-sdk": "0.8.7-alpha.8",
-    "@100mslive/react-ui": "0.8.7-alpha.8",
+    "@100mslive/roomkit-react": "0.0.1",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@tldraw/tldraw": "^1.18.4",
@@ -43,6 +43,8 @@
     "prebuild": "rm -rf build",
     "build": "webpack --node-env production",
     "start": "webpack serve",
+    "esbuild": "node ../../scripts/build-webapp",
+    "dev": "node ../../scripts/dev-webapp",
     "format": "prettier -w src",
     "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
     "lint:fix": "yarn lint --fix"

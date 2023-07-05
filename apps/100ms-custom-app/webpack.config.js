@@ -34,6 +34,7 @@ module.exports = {
       path: false,
       fs: false,
       events: false,
+      crypto: false,
     },
   },
   ignoreWarnings: [/Failed to parse source map/], // some libraries do not provide proper source maps which throws this warning

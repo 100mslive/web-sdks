@@ -13,8 +13,12 @@ async function main() {
   }
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const source = './src/index.js';
-  const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
+  const source = './src/index.ts';
+  const external = [
+    '*.stories.tsx',
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+  ];
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
@@ -43,17 +47,13 @@ async function main() {
       ...commonOptions,
     });
 
-    esbuild
-      .build({
-        entryPoints: [source],
-        outdir: 'dist/',
-        format: 'esm',
-        splitting: true,
-        ...commonOptions,
-      })
-      .then(() => {
-        fs.copyFileSync('./src/index.d.ts', './dist/index.d.ts');
-      });
+    esbuild.build({
+      entryPoints: [source],
+      outdir: 'dist/',
+      format: 'esm',
+      splitting: true,
+      ...commonOptions,
+    });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);

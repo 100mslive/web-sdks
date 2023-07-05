@@ -7,7 +7,7 @@ import {
   Flex,
   flexCenter,
   Text,
-} from '@100mslive/react-ui';
+} from '@100mslive/roomkit-react';
 import { DialogContent } from './DialogContent';
 
 const Step = ({ value, opacity }) => (

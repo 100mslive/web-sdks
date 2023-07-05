@@ -8,7 +8,7 @@ import {
   Select,
   styled,
   Text,
-} from '@100mslive/react-ui';
+} from '@100mslive/roomkit-react';
 
 const Fonts = [
   'Inter',
