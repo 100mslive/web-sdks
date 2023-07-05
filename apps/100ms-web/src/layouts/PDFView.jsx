@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { throwErrorHandler, useScreenShare } from "@100mslive/react-sdk";
+import { useIframeScreenShare } from "@100mslive/react-sdk";
 import { Box, ThemeTypes, useTheme } from "@100mslive/react-ui";
 import { EmbedScreenShareView } from "./EmbedView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
-import { APP_DATA, isChrome } from "../common/constants";
+import { APP_DATA } from "../common/constants";
 
 /**
  * PDFView component is responsible for rendering the PDFEmbedComponent within an EmbedScreenShareView.
@@ -51,62 +51,6 @@ const usePDFConfig = () => {
   };
 };
 
-const usePDFScreenShare = pdfIframeRef => {
-  const { resetPDFEmbedConfig } = usePDFConfig();
-  const { amIScreenSharing, toggleScreenShare } =
-    useScreenShare(throwErrorHandler);
-  const [wasScreenShared, setWasScreenShared] = useState(false);
-  // to handle - https://github.com/facebook/react/issues/24502
-  const screenShareAttemptInProgress = useRef(false);
-
-  const stopScreenShare = useCallback(() => {
-    if (wasScreenShared && amIScreenSharing) {
-      resetPDFEmbedConfig();
-      toggleScreenShare(); // Stop screen sharing
-    }
-  }, [
-    wasScreenShared,
-    amIScreenSharing,
-    resetPDFEmbedConfig,
-    toggleScreenShare,
-  ]);
-  // Start screen sharing when the component is mounted and not already screen sharing
-  const startScreenShare = useCallback(() => {
-    if (
-      !amIScreenSharing &&
-      !wasScreenShared &&
-      !screenShareAttemptInProgress.current
-    ) {
-      screenShareAttemptInProgress.current = true;
-      toggleScreenShare({
-        forceCurrentTab: isChrome,
-        cropElement: pdfIframeRef.current,
-        preferCurrentTab: isChrome,
-      })
-        .then(() => {
-          setWasScreenShared(true); // Set the state to indicate screen sharing has started
-        })
-        .catch(resetPDFEmbedConfig) // Handle the screen sharing error and reset the PDF configuration
-        .finally(() => {
-          screenShareAttemptInProgress.current = false;
-        });
-    }
-  }, [
-    amIScreenSharing,
-    pdfIframeRef,
-    resetPDFEmbedConfig,
-    toggleScreenShare,
-    wasScreenShared,
-  ]);
-
-  return {
-    wasScreenShared,
-    amIScreenSharing,
-    stopScreenShare,
-    startScreenShare,
-  };
-};
-
 const sendDataToPDFIframe = (pdfIframeRef, themeType, file = null) => {
   if (pdfIframeRef.current) {
     pdfIframeRef.current.contentWindow.postMessage(
@@ -132,7 +76,7 @@ export const PDFEmbedComponent = () => {
     wasScreenShared,
     stopScreenShare,
     startScreenShare,
-  } = usePDFScreenShare(pdfIframeRef);
+  } = useIframeScreenShare(pdfIframeRef, resetPDFEmbedConfig);
 
   // Send theme information to the PDF iframe when theme is changed
   useEffect(() => {
@@ -154,10 +98,14 @@ export const PDFEmbedComponent = () => {
       resetPDFEmbedConfig();
     }
     return () => {
-      // Stop screen sharing when the component is unmounted
-      stopScreenShare();
+      // close screenshare when this component is being unmounted
+      if (wasScreenShared && amIScreenSharing) {
+        resetPDFEmbedConfig();
+        stopScreenShare(); // stop
+      }
     };
-  }, [amIScreenSharing, resetPDFEmbedConfig, stopScreenShare, wasScreenShared]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amIScreenSharing, resetPDFEmbedConfig, wasScreenShared]);
 
   return (
     <iframe
