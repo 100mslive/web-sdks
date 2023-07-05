@@ -2,7 +2,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
-import { Box, Flex, Input, styled, Text } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Input,
+  styled,
+  Text,
+} from "@100mslive/react-ui";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";
@@ -33,9 +40,8 @@ export const QuestionCard = ({
 }) => {
   const actions = useHMSActions();
   const [voted, setVoted] = useState(false);
-  const leftNavigationEnabled = index !== 0;
-  const rightNavigationEnabled =
-    index !== totalQuestions - 1 && (skippable || voted);
+  const prev = index !== 0;
+  const next = index !== totalQuestions - 1 && (skippable || voted);
   const [textAnswer, setTextAnswer] = useState("");
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
@@ -80,18 +86,19 @@ export const QuestionCard = ({
           variant="caption"
           css={{ color: "$textDisabled", fontWeight: "$semiBold" }}
         >
-          QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
+          QUESTION {index + 1} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
 
         {isTimed ? (
           <Flex align="center" css={{ gap: "$4" }}>
-            <Flex
+            <IconButton
+              disabled={!prev}
               onClick={() => {
                 setCurrentIndex(prev => Math.max(0, prev - 1));
                 setVoted(false);
               }}
               css={
-                leftNavigationEnabled
+                prev
                   ? { color: "$textHighEmp", cursor: "pointer" }
                   : {
                       color: "$textDisabled",
@@ -100,14 +107,15 @@ export const QuestionCard = ({
               }
             >
               <ChevronLeftIcon height={16} width={16} />
-            </Flex>
-            <Flex
+            </IconButton>
+            <IconButton
+              disabled={!next}
               onClick={() => {
                 setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
                 setVoted(false);
               }}
               css={
-                rightNavigationEnabled
+                next
                   ? { color: "$textHighEmp", cursor: "pointer" }
                   : {
                       color: "$textDisabled",
@@ -116,7 +124,7 @@ export const QuestionCard = ({
               }
             >
               <ChevronRightIcon height={16} width={16} />
-            </Flex>
+            </IconButton>
           </Flex>
         ) : null}
       </Flex>

@@ -15,12 +15,13 @@ export const TimedView = ({ poll }) => {
   }
   return (
     <QuestionCard
+      pollID={poll.id}
       index={currentIndex}
       text={activeQuestion.text}
       type={activeQuestion.type}
-      options={activeQuestion.options}
       totalResponses={activeQuestion.totalResponses}
       totalQuestions={poll.questions?.length || 0}
+      options={activeQuestion.options}
       skippable={activeQuestion?.skippable || false}
       setCurrentIndex={setCurrentIndex}
       isTimed

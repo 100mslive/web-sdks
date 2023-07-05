@@ -24,7 +24,7 @@ export const Voting = ({ id }) => {
   }
 
   // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = poll?.duration && poll.duration > 0;
+  const isTimed = (poll?.duration || 0) > 0;
 
   return (
     <Container rounded>
