@@ -50,13 +50,13 @@ const cardData = [
   {
     title: "Share Music",
     subtitle: "Play music from Spotify or any other tab",
-    imageSrc: "/audio.png",
+    imageSrc: require("../../images/audio.png"),
     onClick: () => {},
   },
   {
     title: "Whiteboard",
     subtitle: "Collaboratively sketch ideas",
-    imageSrc: "/whiteboard.png",
+    imageSrc: require("../../images/whiteboard.png"),
     onClick: () => {},
   },
 ];
