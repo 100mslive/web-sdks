@@ -48,7 +48,7 @@ export const Votes = ({ voters }) => {
                 backgroundColor: "$secondaryDefault",
                 borderRadius: "$round",
                 position: "relative",
-                left: "$2",
+                left: "-$2",
                 p: "$2 $3",
               }}
             >
