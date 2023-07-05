@@ -34,3 +34,4 @@ export * from './Tabs';
 export * from './QRCode';
 export * from './Link';
 export * from './Collapsible';
+export * from './Progress';

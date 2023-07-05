@@ -5,6 +5,22 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
+  PollInfoGetParams,
+  PollInfoGetResponse,
+  PollInfoSetParams,
+  PollInfoSetResponse,
+  PollListParams,
+  PollListResponse,
+  PollQuestionsGetParams,
+  PollQuestionsGetResponse,
+  PollQuestionsSetParams,
+  PollQuestionsSetResponse,
+  PollResponseSetParams,
+  PollResponseSetResponse,
+  PollStartParams,
+  PollStartResponse,
+  PollStopParams,
+  PollStopResponse,
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
@@ -83,4 +99,20 @@ export interface ISignal extends IAnalyticsTransportProvider {
   listenMetadataChange(keys: string[]): Promise<void>;
 
   close(): Promise<void>;
+
+  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse>;
+
+  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse>;
+
+  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse>;
+
+  startPoll(params: PollStartParams): Promise<PollStartResponse>;
+
+  stopPoll(params: PollStopParams): Promise<PollStopResponse>;
+
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse>;
+
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse>;
+
+  getPollsList(params: PollListParams): Promise<PollListResponse>;
 }
