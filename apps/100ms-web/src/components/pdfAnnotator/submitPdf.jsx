@@ -21,7 +21,6 @@ export const SubmitPDF = ({
         setIsValidateProgress(false);
         setValue({ isSharingPDF: true, url: pdfURL });
         onOpenChange(false);
-        return;
       }
 
       fetch(pdfURL, { method: "HEAD" })
