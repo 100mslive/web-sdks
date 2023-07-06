@@ -1,20 +1,24 @@
-// import { selectAppData } from '@100mslive/hms-video-store';
-// import { useHMSActions, useHMSStore, useHMSVanillaStore } from '../primitives/HmsRoomProvider';
-// import { useCallback } from 'react';
+import { useCallback } from 'react';
+import { selectAppData } from '@100mslive/hms-video-store';
+import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
 export const usePDFConfig = () => {
-  // const appData = useHMSStore(selectAppData('APP_DATA'));
-  // const actions = useHMSActions();
-  // const setValue = useCallback(
-  //   (value: any) => {
-  //     actions.setAppData(appData, value);
-  //   },
-  //   [actions, appData],
-  // );
-  // const resetValue = useCallback(() => {
-  //   appData
-  // });
-  // const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';
+  const actions = useHMSActions();
+  const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
+  const setValue = useCallback(
+    (value: { file?: File; url?: string; isSharingPDF?: boolean } = {}) => {
+      console.log({ value });
+      actions.setAppData('pdfConfig', value);
+    },
+    [actions],
+  );
+  const resetValue = useCallback(() => {
+    actions.setAppData('pdfConfig', {});
+  }, [actions]);
 
-  return {};
+  return {
+    pdfConfig,
+    setValue,
+    resetValue,
+  };
 };

@@ -1,7 +1,6 @@
 import { useCallback } from "react";
+import { usePDFConfig } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { APP_DATA } from "../../common/constants";
 
 export const SubmitPDF = ({
   pdfFile,
@@ -11,10 +10,8 @@ export const SubmitPDF = ({
   setIsValidateProgress,
   onOpenChange,
   hideSecondaryCTA = false,
-  setPDFFile = () => {},
 }) => {
-  const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-
+  const { setValue, resetValue } = usePDFConfig();
   const isValidPDF = useCallback(
     pdfURL => {
       const extension = pdfURL.split(".").pop().toLowerCase();
@@ -22,8 +19,9 @@ export const SubmitPDF = ({
       if (extension === "pdf") {
         setIsPDFUrlValid(true);
         setIsValidateProgress(false);
-        setPDFConfig({ isPDFBeingShared: true, file: pdfFile, url: pdfURL });
+        setValue({ isSharingPDF: true, url: pdfURL });
         onOpenChange(false);
+        return;
       }
 
       fetch(pdfURL, { method: "HEAD" })
@@ -32,9 +30,8 @@ export const SubmitPDF = ({
           if (contentType === "application/pdf") {
             setIsPDFUrlValid(true);
             setIsValidateProgress(false);
-            setPDFConfig({
-              isPDFBeingShared: true,
-              file: pdfFile,
+            setValue({
+              isSharingPDF: true,
               url: pdfURL,
             });
             onOpenChange(false);
@@ -48,13 +45,7 @@ export const SubmitPDF = ({
           setIsValidateProgress(false);
         });
     },
-    [
-      onOpenChange,
-      pdfFile,
-      setIsPDFUrlValid,
-      setIsValidateProgress,
-      setPDFConfig,
-    ]
+    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setValue]
   );
   return (
     <Flex
@@ -70,7 +61,7 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => setPDFFile(null)}
+          onClick={() => resetValue()}
           css={{ w: "50%" }}
         >
           Go Back
@@ -81,10 +72,9 @@ export const SubmitPDF = ({
         type="submit"
         onClick={() => {
           if (pdfFile) {
-            setPDFConfig({
-              isPDFBeingShared: true,
+            setValue({
+              isSharingPDF: true,
               file: pdfFile,
-              url: pdfURL,
             });
             onOpenChange(false);
           } else if (pdfURL) {

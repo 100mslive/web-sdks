@@ -91,7 +91,7 @@ export const useUrlToEmbed = () => {
 };
 
 export const usePDFAnnotator = () => {
-  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.isPDFBeingShared;
+  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.isSharingPDF;
 };
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
