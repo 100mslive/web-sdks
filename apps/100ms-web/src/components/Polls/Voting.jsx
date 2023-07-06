@@ -45,7 +45,7 @@ export const Voting = ({ id, toggleVoting }) => {
               "&:hover": { opacity: "0.8" },
             }}
           >
-            <CrossIcon onClick={() => toggleVoting()} />
+            <CrossIcon onClick={toggleVoting} />
           </Box>
         </Flex>
       </Box>
