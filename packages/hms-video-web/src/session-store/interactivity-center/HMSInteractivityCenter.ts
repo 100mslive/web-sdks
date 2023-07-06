@@ -102,7 +102,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       return { duration: 0, type: question.type, question: response.questionIndex, ...response };
     });
 
-    await this.transport.getPollReponses({ poll_id: pollID, responses: responsesParams });
+    await this.transport.setPollResponses({ poll_id: pollID, responses: responsesParams });
   }
 
   async getPolls(): Promise<HMSPoll[]> {
