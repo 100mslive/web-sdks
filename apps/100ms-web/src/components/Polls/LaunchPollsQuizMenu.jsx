@@ -1,5 +1,6 @@
 // @ts-check
 import React, { useRef, useState } from "react";
+import { v4 as uuid } from "uuid";
 import {
   selectPollByID,
   useHMSActions,
@@ -59,9 +60,7 @@ const isValidQuestion = ({
 };
 
 export function LaunchPollsQuizMenu() {
-  const [questions, setQuestions] = useState([
-    { draftID: crypto.randomUUID() },
-  ]);
+  const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
   const { pollInView: id, setWidgetView } = useWidgetState();
   const interaction = useHMSStore(selectPollByID(id));
@@ -122,9 +121,7 @@ export function LaunchPollsQuizMenu() {
             cursor: "pointer",
             "&:hover": { c: "$textMedEmp" },
           }}
-          onClick={() =>
-            setQuestions([...questions, { draftID: crypto.randomUUID() }])
-          }
+          onClick={() => setQuestions([...questions, { draftID: uuid() }])}
         >
           <AddCircleIcon />
           <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
