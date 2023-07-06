@@ -52,7 +52,7 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
-  const { isSharingPDF } = usePDFConfig();
+  const { pdfConfig } = usePDFConfig();
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -86,7 +86,7 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (isSharingPDF) {
+  } else if (pdfConfig?.isSharingPDF) {
     ViewComponent = PDFView;
   } else if (urlToIframe) {
     ViewComponent = EmbedView;
