@@ -48,6 +48,26 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
+  useEffect(() => {
+    const mutationCallback = (mutations: MutationRecord[]) => {
+      mutations.forEach(() => {
+        if (regionRef.current) {
+          regionRef.current.contentWindow?.postMessage(
+            {
+              theme: document.documentElement.classList.contains('dark-theme') ? 2 : 1,
+            },
+            '*',
+          );
+        }
+      });
+    };
+    const observer = new MutationObserver(mutationCallback);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   // Start screen sharing when the component is mounted and not already screen sharing
   useEffect(() => {
     // eslint-disable-next-line complexity
