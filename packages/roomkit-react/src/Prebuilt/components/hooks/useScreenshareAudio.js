@@ -15,7 +15,7 @@ export const useScreenshareAudio = () => {
     if (!peer.isLocal) {
       hmsActions.setVolume(!track.volume ? 100 : 0, track.id);
     } else {
-      hmsActions.setEnabledTrack(track.id, !track.enabled).catch(console.error);
+      hmsActions.setEnabledTrack(track.id, !track.enabled).catch(console.alert_error_default);
     }
   }, [peer, hmsActions, track]);
 

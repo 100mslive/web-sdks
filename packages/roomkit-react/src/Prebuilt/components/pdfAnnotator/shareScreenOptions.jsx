@@ -91,7 +91,7 @@ export function ShareScreenOptions() {
                   justifyContent: 'center',
                   border: '1px solid $grayDefault',
                   r: '$2',
-                  bg: '$surfaceLighter',
+                  bg: '$surface_brighter',
                   pb: '0',
                 }}
               >
@@ -109,7 +109,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$textDisabled',
+                    c: '$on_surface_low',
                     textAlign: 'center',
                   }}
                 >
@@ -135,7 +135,7 @@ export function ShareScreenOptions() {
                   justifyContent: 'center',
                   border: '$grayDefault 1px solid',
                   r: '$2',
-                  bg: '$surfaceLight',
+                  bg: '$surface_bright',
                   pb: '0',
                 }}
               >
@@ -155,7 +155,7 @@ export function ShareScreenOptions() {
                     left: '54%',
                     padding: '$2 $4',
                     r: '$2',
-                    bg: '$primaryLight',
+                    bg: '$primary_bright',
                     zIndex: '2',
                   }}
                 >
@@ -188,7 +188,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$textDisabled',
+                    c: '$on_surface_low',
                     textAlign: 'center',
                   }}
                 >

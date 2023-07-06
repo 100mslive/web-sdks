@@ -47,7 +47,7 @@ export function PDFFileOptions({ onOpenChange }) {
               <Text
                 variant="tiny"
                 css={{
-                  color: '$textDisabled',
+                  color: '$on_surface_low',
                 }}
               >
                 OR

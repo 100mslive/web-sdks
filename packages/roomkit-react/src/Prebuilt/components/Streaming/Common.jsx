@@ -11,7 +11,7 @@ export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick, testId })
         p: '$10',
         r: '$1',
         cursor: 'pointer',
-        bg: '$surfaceLight',
+        bg: '$surface_bright',
         mb: '$10',
         mt: '$8',
         ...css,
@@ -26,7 +26,7 @@ export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick, testId })
         <Text variant="h6" css={{ mb: '$4' }}>
           {title}
         </Text>
-        <Text variant="sm" css={{ color: '$textMedEmp' }}>
+        <Text variant="sm" css={{ color: '$on_surface_medium' }}>
           {subtitle}
         </Text>
       </Box>
@@ -41,7 +41,7 @@ export const ContentHeader = ({ onBack, title, content }) => {
   return (
     <Flex css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer' }}>
       <Text
-        css={{ p: '$2', bg: '$surfaceLight', r: '$round', alignSelf: 'center' }}
+        css={{ p: '$2', bg: '$surface_bright', r: '$round', alignSelf: 'center' }}
         onClick={onBack}
         data-testid="go_back"
       >
@@ -53,7 +53,7 @@ export const ContentHeader = ({ onBack, title, content }) => {
           css={{
             textTransform: 'uppercase',
             fontWeight: '$semiBold',
-            color: '$textMedEmp',
+            color: '$on_surface_medium',
           }}
         >
           {title}
@@ -76,7 +76,7 @@ export const Container = ({ children, rounded = false }) => {
         position: 'absolute',
         top: 0,
         left: 0,
-        bg: '$surfaceDefault',
+        bg: '$surface_default',
         transform: 'translateX(10%)',
         animation: `${slideLeftAndFade('10%')} 100ms ease-out forwards`,
         display: 'flex',
@@ -98,7 +98,7 @@ export const ContentBody = ({ Icon, title, removeVerticalPadding = false, childr
           {title}
         </Text>
       </Text>
-      <Text variant="sm" css={{ color: '$textMedEmp' }}>
+      <Text variant="sm" css={{ color: '$on_surface_medium' }}>
         {children}
       </Text>
     </Box>
@@ -108,8 +108,8 @@ export const ContentBody = ({ Icon, title, removeVerticalPadding = false, childr
 export const RecordStream = ({ record, setRecord, testId }) => {
   const permissions = useHMSStore(selectPermissions);
   return permissions?.browserRecording ? (
-    <Flex align="center" css={{ bg: '$surfaceLight', m: '$8 $10', p: '$8', r: '$0' }}>
-      <Text css={{ color: '$error' }}>
+    <Flex align="center" css={{ bg: '$surface_bright', m: '$8 $10', p: '$8', r: '$0' }}>
+      <Text css={{ color: '$alert_error_default' }}>
         <RecordIcon />
       </Text>
       <Text variant="sm" css={{ flex: '1 1 0', mx: '$8' }}>
@@ -125,7 +125,7 @@ export const ErrorText = ({ error }) => {
     return null;
   }
   return (
-    <Text variant="sm" css={{ mb: '$8', color: '$error' }}>
+    <Text variant="sm" css={{ mb: '$8', color: '$alert_error_default' }}>
       {error}
     </Text>
   );

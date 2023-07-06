@@ -36,7 +36,7 @@ export const PlaylistItem = React.memo(({ name, metadata, duration, selected, on
       onClick={onClick}
     >
       <Flex align="center" justify="between" css={{ width: '100%', minHeight: 0 }}>
-        <Text variant="md" css={{ color: selected ? '$brandDefault' : '$textPrimary' }}>
+        <Text variant="md" css={{ color: selected ? '$primary_default' : '$on_primary_high' }}>
           {name}
         </Text>
         <Text variant="xs">{formatDuration(duration)}</Text>

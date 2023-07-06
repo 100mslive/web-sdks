@@ -82,7 +82,7 @@ export const LeaveRoom = () => {
               asChild
               css={{
                 '&[data-state="open"]': {
-                  bg: '$errorDark',
+                  bg: '$alert_error_dim',
                 },
               }}
             >
@@ -99,27 +99,27 @@ export const LeaveRoom = () => {
                 data-testid="end_room_btn"
               >
                 <Flex gap={4}>
-                  <Box css={{ color: '$error' }}>
+                  <Box css={{ color: '$alert_error_default' }}>
                     <AlertTriangleIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ c: '$error' }}>
+                    <Text variant="lg" css={{ c: '$alert_error_default' }}>
                       End Room for All
                     </Text>
-                    <Text variant="sm" css={{ c: '$textMedEmp', mt: '$2' }}>
+                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
                       Warning: You can’t undo this action
                     </Text>
                   </Flex>
                 </Flex>
               </Dropdown.Item>
-              <Dropdown.Item css={{ bg: '$surfaceDefault' }} onClick={leaveRoom} data-testid="just_leave_btn">
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
                 <Flex gap={4}>
                   <Box>
                     <ExitIcon />
                   </Box>
                   <Flex direction="column" align="start">
                     <Text variant="lg">Leave {isStreamKit ? 'Studio' : 'Room'}</Text>
-                    <Text variant="sm" css={{ c: '$textMedEmp', mt: '$2' }}>
+                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
                       You can always rejoin later
                     </Text>
                   </Flex>
@@ -171,7 +171,7 @@ const LeaveIconButton = styled(IconButton, {
   h: '$14',
   px: '$8',
   r: '$1',
-  bg: '$error',
+  bg: '$alert_error_default',
   '&:not([disabled]):hover': {
     bg: '$errorTint',
   },
@@ -185,7 +185,7 @@ const LeaveIconButton = styled(IconButton, {
 });
 
 const MenuTriggerButton = styled(LeaveIconButton, {
-  borderLeft: '1px solid $errorDark',
+  borderLeft: '1px solid $alert_error_dim',
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
   px: '$3',

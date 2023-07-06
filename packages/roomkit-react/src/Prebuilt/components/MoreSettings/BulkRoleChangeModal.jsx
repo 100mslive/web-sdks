@@ -121,7 +121,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow>
           {errorMessage && (
-            <Flex gap={2} css={{ c: '$error', w: '70%', ml: 'auto' }}>
+            <Flex gap={2} css={{ c: '$alert_error_default', w: '70%', ml: 'auto' }}>
               <AlertTriangleIcon />
               <Text css={{ c: 'inherit' }}>{errorMessage}</Text>
             </Flex>
@@ -129,7 +129,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
         </DialogRow>
         <DialogRow justify="end">
           <Button variant="primary" onClick={changeBulkRole} disabled={!(selectedRole && selectedBulkRole.length > 0)}>
-            {isSubmiting && <Loading css={{ color: '$textSecondary' }} />}
+            {isSubmiting && <Loading css={{ color: '$on_primary_medium' }} />}
             Apply
           </Button>
         </DialogRow>

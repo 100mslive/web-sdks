@@ -44,7 +44,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   flexDirection: 'column',
   position: 'relative',
   fontFamily: '$sans',
-  border: 'solid $space$px $borderLight',
+  border: 'solid $space$px $border_bright',
   overflow: 'hidden',
   ...toastAnimation,
   '@sm': {
@@ -54,7 +54,7 @@ const ToastRoot = styled(ToastPrimitives.Root, {
     variant: {
       standard: getToastVariant('$secondary_default'),
       warning: getToastVariant('$warning'),
-      error: getToastVariant('$error'),
+      alert_error_default: getToastVariant('$alert_error_default'),
       success: getToastVariant('$success'),
     },
   },
@@ -65,14 +65,14 @@ const ToastRoot = styled(ToastPrimitives.Root, {
 
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
   fontWeight: '$semiBold',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
-  color: '$textMedEmp',
+  color: '$on_surface_medium',
 });
 const ToastClose = styled(ToastPrimitives.Close, {});
 const ToastAction = styled(ToastPrimitives.Action, {
@@ -142,7 +142,7 @@ const HMSToast: React.FC<HMSToastProps> = ({
         </ToastTitle>
         {description ? (
           <ToastDescription>
-            <Text variant="body1" css={{ fontWeight: '$regular', c: '$textMedEmp' }}>
+            <Text variant="body1" css={{ fontWeight: '$regular', c: '$on_surface_medium' }}>
               {description}
             </Text>
           </ToastDescription>

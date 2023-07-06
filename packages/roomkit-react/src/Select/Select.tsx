@@ -3,7 +3,7 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 
 const Root = styled('div', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   display: 'inline-flex',
   position: 'relative',
   outline: 'none',

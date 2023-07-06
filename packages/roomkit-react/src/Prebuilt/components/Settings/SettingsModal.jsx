@@ -122,7 +122,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                         position: 'absolute',
                         left: 0,
                         right: 0,
-                        bg: '$surfaceDefault',
+                        bg: '$surface_default',
                         width: '100%',
                         height: '100%',
                       }
@@ -159,7 +159,7 @@ const SettingsContentHeader = ({ children, isMobile, onBack }) => {
   return (
     <Text variant="h6" css={{ mb: '$12', display: 'flex', alignItems: 'center' }}>
       {isMobile && (
-        <Box as="span" css={{ bg: '$surfaceLight', mr: '$4', r: '$round', p: '$2' }} onClick={onBack}>
+        <Box as="span" css={{ bg: '$surface_bright', mr: '$4', r: '$round', p: '$2' }} onClick={onBack}>
           <ChevronLeftIcon />
         </Box>
       )}

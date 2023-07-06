@@ -1,9 +1,8 @@
 import React from 'react';
-import { Box, Flex, Text, useTheme } from '../../';
+import { Box, Flex, Text } from '../../';
 import { CREATE_ROOM_DOC_URL } from '../common/constants';
 
 function ErrorPage({ error }) {
-  const themeType = useTheme().themeType;
   const isSSR = typeof window === 'undefined';
   return (
     <Flex
@@ -11,15 +10,12 @@ function ErrorPage({ error }) {
       justify="center"
       css={{
         size: '100%',
-        color: '$textPrimary',
+        color: '$on_surface_high',
         backgroundColor: '$bgPrimary',
       }}
     >
       <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
-        <img
-          src={themeType === 'dark' ? require('../images/error-bg-dark.svg') : require('../images/error-bg-light.svg')}
-          alt="Error Background"
-        />
+        <img src={require('../images/error-bg-dark.svg')} alt="Error Background" />
         {!isSSR && window.location.hostname === 'localhost' ? (
           <Flex align="center" direction="column" css={{ position: 'absolute', size: '100%', top: '33.33%', left: 0 }}>
             <Text variant="h3">Almost There!</Text>

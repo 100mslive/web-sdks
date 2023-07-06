@@ -76,7 +76,7 @@ export const Playlist = ({ type }) => {
             align="center"
             css={{
               p: '$4 $8',
-              borderBottom: '1px solid $borderLight',
+              borderBottom: '1px solid $border_bright',
               bg: '$menuBg',
             }}
           >

@@ -53,7 +53,7 @@ export const HMSPrebuilt = React.forwardRef(
       themeConfig: {
         aspectRatio = '1-1',
         font = 'Roboto',
-        color = '#2F80FF',
+        color = '#2572ed',
         theme = 'dark',
         logo = '',
         metadata = '',

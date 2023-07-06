@@ -56,7 +56,7 @@ const Info = styled('div', {
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  color: '$textPrimary',
+  color: '$on_primary_high',
 });
 
 const AudioIndicator = styled('div', {
@@ -94,7 +94,7 @@ const AudioIndicator = styled('div', {
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
   borderRadius: '$round',
   backgroundColor: '$surface_default',
   display: 'flex',

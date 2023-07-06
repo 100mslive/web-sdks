@@ -52,7 +52,7 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
         css={{
           display: 'inline',
           width: `${videoProgress}%`,
-          background: '$primaryDefault',
+          background: '$primary_default',
           height: '0.3rem',
         }}
       />
@@ -60,7 +60,7 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
         id="video-buffer"
         css={{
           width: `${bufferProgress - videoProgress}%`,
-          background: '$primaryDark',
+          background: '$primary_dim',
           height: '0.3rem',
         }}
       />

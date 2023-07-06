@@ -24,14 +24,18 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
 
   return pinnedMessage ? (
-    <Flex css={{ p: '$8', color: '$textMedEmp', bg: '$surfaceLight', r: '$1' }} align="center" justify="between">
+    <Flex
+      css={{ p: '$8', color: '$on_surface_medium', bg: '$surface_bright', r: '$1' }}
+      align="center"
+      justify="between"
+    >
       <Box>
         <PinIcon />
       </Box>
       <Box
         css={{
           ml: '$8',
-          color: '$textMedEmp',
+          color: '$on_surface_medium',
           w: '100%',
           maxHeight: '$18',
           overflowY: 'auto',

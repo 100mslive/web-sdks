@@ -11,7 +11,7 @@ import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 const TextArea = styled('textarea', {
   width: '100%',
   bg: 'transparent',
-  color: '$textPrimary',
+  color: '$on_primary_high',
   resize: 'none',
   lineHeight: '1rem',
   position: 'relative',
@@ -101,7 +101,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        bg: '$surfaceLight',
+        bg: '$surface_bright',
         minHeight: '$16',
         maxHeight: '$24',
         position: 'relative',

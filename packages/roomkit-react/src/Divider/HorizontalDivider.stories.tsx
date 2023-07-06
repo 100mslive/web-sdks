@@ -22,7 +22,7 @@ const HorizontalDividerComponent: ComponentStory<typeof HorizontalDivider> = ({ 
         <Text as="li">Item 1</Text>
         <Text as="li">Item 2</Text>
         <Text as="li">Item 3</Text>
-        <HorizontalDivider space={space} css={{ bg: '$textSecondary', width: '80px', ...css }} />
+        <HorizontalDivider space={space} css={{ bg: '$on_primary_medium', width: '80px', ...css }} />
         <Text as="li">Item 4</Text>
         <Text as="li">Item 5</Text>
         <Text as="li">Item 6</Text>

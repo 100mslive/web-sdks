@@ -32,24 +32,14 @@ export class ErrorBoundary extends Component {
           justify="center"
           css={{
             size: '100%',
-            color: '$textPrimary',
+            color: '$on_primary_high',
             backgroundColor: '$bgPrimary',
           }}
         >
           <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
             <ThemeContext.Consumer>
-              {value => {
-                const { themeType } = value;
-                return (
-                  <img
-                    src={
-                      themeType === 'dark'
-                        ? require('../images/error-bg-dark.svg')
-                        : require('../images/error-bg-light.svg')
-                    }
-                    alt="error background"
-                  />
-                );
+              {() => {
+                return <img src={require('../images/error-bg-dark.svg')} alt="error background" />;
               }}
             </ThemeContext.Consumer>
             <Flex

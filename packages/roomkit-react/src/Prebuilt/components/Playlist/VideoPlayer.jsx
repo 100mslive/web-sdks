@@ -40,7 +40,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
             borderTopRightRadius: '$1',
           }}
         >
-          <Text css={{ color: '$textPrimary' }}>{active.name}</Text>
+          <Text css={{ color: '$on_primary_high' }}>{active.name}</Text>
           <IconButton
             css={{
               color: '$white',

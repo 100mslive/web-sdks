@@ -61,7 +61,7 @@ export class Transcriber {
 
   async listen(retryCount = 0) {
     if (retryCount > 5) {
-      console.error('transcription', 'Max retry count reached!!', retryCount);
+      console.alert_error_default('transcription', 'Max retry count reached!!', retryCount);
       this.cleanup();
       return;
     }
@@ -93,12 +93,12 @@ export class Transcriber {
               }
             }
           } catch (err) {
-            console.error('transcription', err);
+            console.alert_error_default('transcription', err);
           }
         };
 
         this.audioSocket.onerror = event => {
-          console.error('transcription', event);
+          console.alert_error_default('transcription', event);
           this.audioSocket.close();
         };
 
@@ -110,7 +110,7 @@ export class Transcriber {
               this.listen(retryCount++);
             }
           } catch (err) {
-            console.error('transcription', err);
+            console.alert_error_default('transcription', err);
           }
         };
 
@@ -118,10 +118,10 @@ export class Transcriber {
           this.observeLocalPeerTrack();
         };
       } else {
-        console.error('Unable to fetch dynamic token!!');
+        console.alert_error_default('Unable to fetch dynamic token!!');
       }
     } catch (err) {
-      console.error('transcription', err);
+      console.alert_error_default('transcription', err);
     }
   }
 
@@ -136,7 +136,7 @@ export class Transcriber {
       this.unsubscribes.push(unsub);
       this.getAndObserveStream(); // call it once to start observing initially
     } catch (err) {
-      console.error('transcription - observing local peer track', err);
+      console.alert_error_default('transcription - observing local peer track', err);
     }
   }
 
@@ -160,7 +160,7 @@ export class Transcriber {
       }
       this.recordRTCInstance = null;
     } catch (err) {
-      console.error('transcription - in destroying earlier instance', err);
+      console.alert_error_default('transcription - in destroying earlier instance', err);
     }
     const stream = new MediaStream([mediaTrack]);
     await this.observeStream(stream);
@@ -180,7 +180,7 @@ export class Transcriber {
             try {
               this.audioSocket.send(JSON.stringify({ audio_data: base64data.split('base64,')[1] }));
             } catch (err) {
-              console.error('transcription', err);
+              console.alert_error_default('transcription', err);
             }
           }
         };
@@ -197,7 +197,7 @@ export class Transcriber {
         this.audioSocket.close();
         this.audioSocket = null;
       } catch (err) {
-        console.error("transcription cleanup - couldn't close socket", err);
+        console.alert_error_default("transcription cleanup - couldn't close socket", err);
       }
     }
     if (this.recordRTCInstance) {
@@ -205,7 +205,7 @@ export class Transcriber {
         this.recordRTCInstance.destroy();
         this.recordRTCInstance = null;
       } catch (err) {
-        console.error("transcription cleanup - couldn't stop recording", err);
+        console.alert_error_default("transcription cleanup - couldn't stop recording", err);
       }
     }
     for (const unsub of this.unsubscribes) {

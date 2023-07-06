@@ -7,17 +7,15 @@ const ThemeStory = () => {
       <ColorItem
         title="theme.color.brand"
         subtitle="Brand Variants"
-        colors={{ brandLight: '#74AAFF', brandDefault: '#2F80FF', brandDark: '#0B326F', brandDisabled: '#D8E7FF' }}
+        colors={{ brandLight: '#74AAFF', primary_default: '#2F80FF', brandDark: '#0B326F', brandDisabled: '#D8E7FF' }}
       />
       <ColorItem
         title="theme.color.text"
         subtitle="Text Variants"
         colors={{
-          textHighEmp: 'rgba(250, 252, 255, 0.9)',
-          textMedEmp: 'rgba(215, 227, 245, 0.8)',
-          textDisabled: 'rgba(164, 176, 193, 0.5)',
-          textMedWhite: 'rgba(255, 255, 255, 0.72)',
-          textDarkWhite: 'rgba(255, 255, 255, 0.48)',
+          on_surface_high: 'rgba(250, 252, 255, 0.9)',
+          on_surface_medium: 'rgba(215, 227, 245, 0.8)',
+          on_surface_low: 'rgba(164, 176, 193, 0.5)',
         }}
       />
       <ColorItem

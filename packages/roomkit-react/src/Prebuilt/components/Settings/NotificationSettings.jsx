@@ -51,10 +51,10 @@ export const NotificationSettings = () => {
         checked={subscribedNotifications.METADATA_UPDATED}
       />
       <NotificationItem
-        label="Error"
-        type={SUBSCRIBED_NOTIFICATIONS.ERROR}
+        label="alert_error_default"
+        type={SUBSCRIBED_NOTIFICATIONS.alert_error_default}
         icon={<AlertOctagonIcon />}
-        checked={subscribedNotifications.ERROR}
+        checked={subscribedNotifications.alert_error_default}
       />
     </Box>
   );

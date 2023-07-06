@@ -2,14 +2,18 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Flex, styled, Text, textEllipsis, useTheme } from '../../../';
+import { config as cssConfig, Flex, styled, Text, textEllipsis } from '../../../';
 import { useLogo } from '../AppData/useUISettings';
 import { isStreamingKit } from '../../common/utils';
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
-    <Flex align="center" justify="center" css={{ flex: '1 1 0', color: '$textPrimary', '@md': { display: 'none' } }}>
+    <Flex
+      align="center"
+      justify="center"
+      css={{ flex: '1 1 0', color: '$on_primary_high', '@md': { display: 'none' } }}
+    >
       <VolumeOneIcon />
       <Text variant="md" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
         {dominantSpeaker.name}
@@ -30,7 +34,6 @@ const LogoImg = styled('img', {
 });
 
 export const Logo = () => {
-  const { themeType } = useTheme();
   const logo = useLogo();
   const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -38,14 +41,5 @@ export const Logo = () => {
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return (
-    <LogoImg
-      src={
-        logo || (themeType === 'dark' ? require('../../images/logo-light.svg') : require('../../images/logo-dark.svg'))
-      }
-      alt="Brand Logo"
-      width={132}
-      height={40}
-    />
-  );
+  return <LogoImg src={logo || require('../../images/logo-light.svg')} alt="Brand Logo" width={132} height={40} />;
 };

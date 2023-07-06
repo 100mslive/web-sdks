@@ -49,7 +49,7 @@ pre {
  * adds background color on its own
  * on hls-viewer on fullscreen
  */
-#hls-viewer-dark:fullscreen {
+#hls-viewer-default:fullscreen {
   background-color: black !important;
 }
 

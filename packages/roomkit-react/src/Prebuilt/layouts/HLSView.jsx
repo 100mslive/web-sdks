@@ -91,7 +91,7 @@ const HLSView = () => {
       }
     };
     const handleError = data => {
-      console.error('[HLSView] error in hls', `${data}`);
+      console.error('[HLSView] alert_error_default in hls', `${data}`);
     };
     const handleNoLongerLive = ({ isLive }) => {
       setIsVideoLive(isLive);
@@ -238,7 +238,7 @@ const HLSView = () => {
                             css={{
                               height: '$4',
                               width: '$4',
-                              background: isVideoLive ? '$error' : '$white',
+                              background: isVideoLive ? '$alert_error_default' : '$white',
                               r: '$1',
                             }}
                           />

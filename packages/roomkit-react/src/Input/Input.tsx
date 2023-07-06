@@ -12,17 +12,17 @@ export const Input = styled('input', {
   border: '1px solid $border_brightt',
   padding: '0.5rem 0.75rem',
   minHeight: '30px',
-  color: '$textPrimary',
+  color: '$on_primary_high',
   fontSize: '$md',
   '&:focus': {
     boxShadow: '0 0 0 1px $colors$primary_default',
     border: '1px solid transparent',
   },
   '&::placeholder': {
-    color: '$textDisabled',
+    color: '$on_surface_low',
   },
   variants: {
-    error: {
+    alert_error_default: {
       true: {
         '&:focus': {
           boxShadow: '0 0 0 3px $colors$alert_error_default',

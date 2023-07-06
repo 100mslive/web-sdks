@@ -134,7 +134,7 @@ export const AudioPlaylistControls = ({ onToggle }) => {
     <Box
       css={{
         p: '$8',
-        borderTop: '1px solid $borderLight',
+        borderTop: '1px solid $border_bright',
         bg: '$menuBg',
       }}
     >

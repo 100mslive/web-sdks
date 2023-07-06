@@ -10,7 +10,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{
-            color: '$textPrimary',
+            color: '$on_primary_high',
             r: '$1',
             cursor: 'pointer',
             p: '$2',
@@ -44,7 +44,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                         mx: '$2',
                         w: '$2',
                         h: '$2',
-                        background: '$textPrimary',
+                        background: '$on_primary_high',
                         r: '$1',
                       }}
                     />

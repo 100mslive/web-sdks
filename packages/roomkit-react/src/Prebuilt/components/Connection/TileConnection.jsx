@@ -8,7 +8,7 @@ const TileConnection = ({ name, peerId, hideLabel, width }) => {
       {!hideLabel ? (
         <Text
           css={{
-            c: '$textHighEmp',
+            c: '$on_surface_high',
             ...textEllipsis(width - 60),
           }}
           variant="xs"

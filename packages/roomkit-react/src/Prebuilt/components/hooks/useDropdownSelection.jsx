@@ -1,6 +1,4 @@
-import { useTheme } from '../../../';
-
 export const useDropdownSelection = () => {
-  const { themeType } = useTheme();
-  return themeType === 'dark' ? '$primaryDark' : '$grayLight';
+  // const { themeType } = useTheme();
+  return '$primary_dim';
 };

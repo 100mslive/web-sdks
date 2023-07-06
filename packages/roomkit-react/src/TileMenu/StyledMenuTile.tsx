@@ -78,7 +78,7 @@ export const Flex = styled('div', {
 });
 
 const RemoveMenuItem = styled(StyledItemButton, {
-  color: '$error',
+  color: '$alert_error_default',
   borderTop: '1px solid $border_light',
 });
 
