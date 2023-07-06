@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import {
   selectPollByID,
@@ -65,6 +65,10 @@ export function LaunchPollsQuizMenu() {
   const { pollInView: id, setWidgetView } = useWidgetState();
   const interaction = useHMSStore(selectPollByID(id));
 
+  useEffect(() => {
+    console.log(questions);
+  }, [questions]);
+
   const launchPoll = async () => {
     const validQuestions = questions
       .filter(question => isValidQuestion(question))
@@ -111,6 +115,17 @@ export function LaunchPollsQuizMenu() {
                   );
                 })
               }
+              convertToDraft={questionID =>
+                setQuestions(prev => {
+                  const copyOfQuestions = [...prev];
+                  copyOfQuestions.forEach(question => {
+                    if (questionID && question.draftID === questionID) {
+                      delete question.saved;
+                    }
+                  });
+                  return copyOfQuestions;
+                })
+              }
             />
           ))}
         </Flex>
@@ -144,6 +159,7 @@ const QuestionCard = ({
   length,
   removeQuestion,
   isQuiz,
+  convertToDraft,
 }) => {
   return (
     <Flex
@@ -151,7 +167,12 @@ const QuestionCard = ({
       css={{ p: "$md", bg: "$surfaceLight", r: "$1", mb: "$sm" }}
     >
       {question.saved ? (
-        <SavedQuestion question={question} index={index} length={length} />
+        <SavedQuestion
+          question={question}
+          index={index}
+          length={length}
+          convertToDraft={convertToDraft}
+        />
       ) : (
         <QuestionForm
           question={question}
@@ -166,7 +187,7 @@ const QuestionCard = ({
   );
 };
 
-const SavedQuestion = ({ question, index, length }) => {
+const SavedQuestion = ({ question, index, length, convertToDraft }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
@@ -181,6 +202,15 @@ const SavedQuestion = ({ question, index, length }) => {
           {option.isCorrectAnswer && ` ✅`}
         </Text>
       ))}
+      <Flex justify="end" css={{ w: "100%" }}>
+        <Button
+          variant="standard"
+          css={{ fontWeight: "$semiBold", p: "$4 $8" }}
+          onClick={() => convertToDraft(question.draftID)}
+        >
+          Edit
+        </Button>
+      </Flex>
     </>
   );
 };
@@ -197,15 +227,16 @@ const QuestionForm = ({
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
-
   const [type, setType] = useState(
     question.type || QUESTION_TYPE.SINGLE_CHOICE
   );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState([
-    { text: "", isCorrectAnswer: false },
-    { text: "", isCorrectAnswer: false },
-  ]);
+  const [options, setOptions] = useState(
+    question?.options || [
+      { text: "", isCorrectAnswer: false },
+      { text: "", isCorrectAnswer: false },
+    ]
+  );
   const [skippable, setSkippable] = useState(true);
 
   return (
@@ -330,7 +361,14 @@ const QuestionForm = ({
             })
           }
           onClick={() => {
-            onSave({ saved: true, text, type, options, skippable });
+            onSave({
+              saved: true,
+              text,
+              type,
+              options,
+              skippable,
+              draftID: question.draftID,
+            });
           }}
         >
           Save
