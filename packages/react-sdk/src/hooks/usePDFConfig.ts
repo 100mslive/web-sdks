@@ -7,7 +7,6 @@ export const usePDFConfig = () => {
   const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
   const setPDFConfig = useCallback(
     (value: { file?: File; url?: string; isSharingPDF?: boolean } = {}) => {
-      console.log({ value });
       actions.setAppData('pdfConfig', value);
     },
     [actions],
