@@ -46,11 +46,14 @@ const PreviewScreen = React.memo(({ authTokenByRoomCodeEndpoint }) => {
   const directJoinHeadfulFromEnv =
     process.env.REACT_APP_HEADLESS_JOIN === "true";
   const directJoinHeadful =
+    true ||
     useSearchParam(QUERY_PARAM_SKIP_PREVIEW_HEADFUL) === "true" ||
     directJoinHeadfulFromEnv;
   skipPreview = skipPreview || beamInToken || directJoinHeadful;
   const initialName =
-    useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? "Beam" : "");
+    "Eswar-local" ||
+    useSearchParam(QUERY_PARAM_NAME) ||
+    (skipPreview ? "Beam" : "");
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
   useEffect(() => {
