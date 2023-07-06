@@ -708,7 +708,7 @@ export default class HMSTransport implements ITransport {
     return this.signal.stopPoll(params);
   }
 
-  getPollReponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
     return this.signal.setPollResponses(params);
   }
 

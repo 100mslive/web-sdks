@@ -259,13 +259,13 @@ export interface PollStatsNotification {
     max_user: number;
     total_responses: number;
     user_count: number;
-    questions: {
+    questions?: {
       question: number;
       type: HMSPollQuestionType;
-      options: number[];
-      correct: number;
-      skipped: number;
-      total: number;
+      options?: number[];
+      correct?: number;
+      skipped?: number;
+      total?: number;
     }[];
   }[];
 }
