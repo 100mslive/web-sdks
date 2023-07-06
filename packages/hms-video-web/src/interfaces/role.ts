@@ -1,5 +1,7 @@
 import { SimulcastLayers } from './simulcast-layers';
 
+export type HMSRoleName = string;
+
 export interface HMSRole {
   name: string;
   publishParams: PublishParams;

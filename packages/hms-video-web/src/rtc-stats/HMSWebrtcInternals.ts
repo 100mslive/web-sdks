@@ -1,4 +1,7 @@
 import { HMSWebrtcStats } from './HMSWebrtcStats';
+import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { IStore } from '../sdk/store';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
@@ -56,6 +59,7 @@ export class HMSWebrtcInternals {
         subscribe: this.subscribeConnection?.getStats.bind(this.subscribeConnection),
       },
       this.store,
+      this.eventBus,
     );
   }
 
@@ -72,7 +76,12 @@ export class HMSWebrtcInternals {
     HMSLogger.d(this.TAG, 'Starting Webrtc Stats Monitor');
     this.startLoop()
       .then(() => HMSLogger.d(this.TAG, 'Stopping Webrtc Stats Monitor'))
-      .catch(e => HMSLogger.e(this.TAG, e.message));
+      .catch(e => {
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.rtcStatsFailed(ErrorFactory.WebrtcErrors.StatsFailed(HMSAction.PUBLISH, e.message)),
+        );
+        HMSLogger.e(this.TAG, e.message);
+      });
   }
 
   private stop() {

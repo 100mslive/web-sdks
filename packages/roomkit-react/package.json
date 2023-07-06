@@ -83,6 +83,7 @@
     "@radix-ui/react-tabs": "1.0.0",
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.0",
+    "@radix-ui/react-progress":"1.0.0",
     "@stitches/react": "^1.2.8",
     "@tldraw/tldraw": "^1.18.4",
     "emoji-mart": "^5.2.2",

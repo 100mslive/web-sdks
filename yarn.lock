@@ -3745,6 +3745,15 @@
     "@babel/runtime" "^7.13.10"
     "@radix-ui/react-slot" "1.0.2"
 
+"@radix-ui/react-progress@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@radix-ui/react-progress/-/react-progress-1.0.0.tgz#78ef64ee36273eabdae278c4c9580285122d4334"
+  integrity sha512-j+JHtTuDpIhF0eOolNug+8hpZqNXcXp2GhTtwz+lnFzhY2a8+LXRSU79iy0r0WUs7UqCXCEeIJIrhg7NS/vPGA==
+  dependencies:
+    "@babel/runtime" "^7.13.10"
+    "@radix-ui/react-context" "1.0.0"
+    "@radix-ui/react-primitive" "1.0.0"
+
 "@radix-ui/react-radio-group@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@radix-ui/react-radio-group/-/react-radio-group-1.0.0.tgz#16267bdfc3c1bd293a6ac1b34f3e9b484e88ebf8"

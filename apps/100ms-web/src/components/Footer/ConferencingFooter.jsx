@@ -23,8 +23,8 @@ import { MoreSettings } from "../MoreSettings/MoreSettings";
 import { PIP } from "../PIP";
 import { ScreenshareToggle } from "../ScreenShare";
 import { ScreenShareHintModal } from "../ScreenshareHintModal";
+import ToggleWidgets from "../ToggleWidgets";
 import { ChatToggle } from "./ChatToggle";
-import { NoiseSuppression } from "../../plugins/NoiseSuppression";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
 import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { useIsFeatureEnabled } from "../hooks/useFeatures";
@@ -88,12 +88,12 @@ export const ConferencingFooter = () => {
   return (
     <AppFooter.Root>
       <AppFooter.Left>
+        <ToggleWidgets />
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
-        <NoiseSuppression />
         {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
         <Flex
           align="center"

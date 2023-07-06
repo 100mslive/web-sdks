@@ -1,4 +1,4 @@
-import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
 import {
@@ -76,6 +76,9 @@ export interface IStore {
   updateAudioOutputDevice(device: MediaDeviceInfo): Promise<void>;
 
   hasRoleDetailsArrived(): boolean;
+
+  setPoll(poll: HMSPoll): void;
+  getPoll(id: string): HMSPoll | undefined;
 
   cleanup(): void;
 }

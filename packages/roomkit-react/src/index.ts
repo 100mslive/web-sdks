@@ -35,3 +35,4 @@ export * from './QRCode';
 export * from './Link';
 export * from './Collapsible';
 export * from './Prebuilt';
+export * from './Progress';
