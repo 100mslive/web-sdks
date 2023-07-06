@@ -11,7 +11,7 @@ export const SubmitPDF = ({
   onOpenChange,
   hideSecondaryCTA = false,
 }) => {
-  const { setValue, resetValue } = usePDFConfig();
+  const { setPDFConfig, resetPDFConfig } = usePDFConfig();
   const isValidPDF = useCallback(
     pdfURL => {
       const extension = pdfURL.split(".").pop().toLowerCase();
@@ -19,7 +19,7 @@ export const SubmitPDF = ({
       if (extension === "pdf") {
         setIsPDFUrlValid(true);
         setIsValidateProgress(false);
-        setValue({ isSharingPDF: true, url: pdfURL });
+        setPDFConfig({ isSharingPDF: true, url: pdfURL });
         onOpenChange(false);
       }
 
@@ -29,7 +29,7 @@ export const SubmitPDF = ({
           if (contentType === "application/pdf") {
             setIsPDFUrlValid(true);
             setIsValidateProgress(false);
-            setValue({
+            setPDFConfig({
               isSharingPDF: true,
               url: pdfURL,
             });
@@ -44,7 +44,7 @@ export const SubmitPDF = ({
           setIsValidateProgress(false);
         });
     },
-    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setValue]
+    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setPDFConfig]
   );
   return (
     <Flex
@@ -60,7 +60,7 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => resetValue()}
+          onClick={() => resetPDFConfig()}
           css={{ w: "50%" }}
         >
           Go Back
@@ -71,7 +71,7 @@ export const SubmitPDF = ({
         type="submit"
         onClick={() => {
           if (pdfFile) {
-            setValue({
+            setPDFConfig({
               isSharingPDF: true,
               file: pdfFile,
             });

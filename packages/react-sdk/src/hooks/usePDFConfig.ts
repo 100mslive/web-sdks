@@ -5,20 +5,20 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 export const usePDFConfig = () => {
   const actions = useHMSActions();
   const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
-  const setValue = useCallback(
+  const setPDFConfig = useCallback(
     (value: { file?: File; url?: string; isSharingPDF?: boolean } = {}) => {
       console.log({ value });
       actions.setAppData('pdfConfig', value);
     },
     [actions],
   );
-  const resetValue = useCallback(() => {
+  const resetPDFConfig = useCallback(() => {
     actions.setAppData('pdfConfig', {});
   }, [actions]);
 
   return {
     pdfConfig,
-    setValue,
-    resetValue,
+    setPDFConfig,
+    resetPDFConfig,
   };
 };

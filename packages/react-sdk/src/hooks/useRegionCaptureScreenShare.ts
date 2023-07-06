@@ -27,7 +27,7 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
   const regionRef = useRef<HTMLIFrameElement | null>(null);
   const inProgress = useRef(false);
   const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
-  const { pdfConfig, resetValue } = usePDFConfig();
+  const { pdfConfig, resetPDFConfig } = usePDFConfig();
 
   const sendDataToPDFIframe = useCallback((file: File) => {
     if (regionRef.current) {
@@ -74,11 +74,11 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
     return () => {
       // close screenshare when this component is being unmounted
       if (amIScreenSharing) {
-        resetValue();
+        resetPDFConfig();
         stopScreenShare(); // stop
       }
     };
-  }, [amIScreenSharing, resetValue, stopScreenShare]);
+  }, [amIScreenSharing, resetPDFConfig, stopScreenShare]);
 
   return {
     amIScreenSharing,
