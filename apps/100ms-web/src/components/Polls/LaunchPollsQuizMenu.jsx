@@ -116,7 +116,7 @@ export function LaunchPollsQuizMenu() {
                   const copyOfQuestions = [...prev];
                   copyOfQuestions.forEach(question => {
                     if (questionID && question.draftID === questionID) {
-                      delete question.saved;
+                      question.saved = false;
                     }
                   });
                   return copyOfQuestions;
