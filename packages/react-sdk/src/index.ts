@@ -37,7 +37,7 @@ export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
 export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
 export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
 export type { useRegionCaptureScreenShareResult } from './hooks/useRegionCaptureScreenShare';
-
+export type { usePDFConfigResult, PDFConfig } from './hooks/usePDFConfig';
 // helpers
 export { throwErrorHandler } from './utils/commons';
 

@@ -29,7 +29,7 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
   const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
   const { pdfConfig, resetPDFConfig } = usePDFConfig();
 
-  const sendDataToPDFIframe = useCallback((file: File) => {
+  const sendDataToPDFIframe = useCallback((file?: File) => {
     if (regionRef.current) {
       regionRef.current.contentWindow?.postMessage(
         {
