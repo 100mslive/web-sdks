@@ -177,7 +177,7 @@ export const QuestionCard = ({
 
       <QuestionCardFooter
         skippable={skippable}
-        skipFunction={() => {
+        skipQuestion={() => {
           setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
           setVoted(false);
         }}
