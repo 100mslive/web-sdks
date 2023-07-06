@@ -33,7 +33,7 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
     if (regionRef.current) {
       regionRef.current.contentWindow?.postMessage(
         {
-          theme: document.documentElement.className.includes('dark-theme') ? 2 : 1,
+          theme: document.documentElement.classList.contains('dark-theme') ? 2 : 1,
           file,
         },
         '*',
