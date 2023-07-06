@@ -14,11 +14,7 @@ async function main() {
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/index.ts';
-  const external = [
-    '*.stories.tsx',
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
-  ];
+  const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
@@ -30,7 +26,7 @@ async function main() {
     const commonOptions = {
       entryPoints: [source],
       assetNames: '[name]',
-      minify: false,
+      minify: true,
       bundle: true,
       target: 'es6',
       external,
