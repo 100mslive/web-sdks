@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useIframeScreenShare } from "@100mslive/react-sdk";
+import { useRegionCaptureScreenShare } from "@100mslive/react-sdk";
 import { Box, ThemeTypes, useTheme } from "@100mslive/react-ui";
 import { EmbedScreenShareView } from "./EmbedView";
 import { useSetAppDataByKey } from "../components/AppData/useUISettings";
@@ -67,51 +67,35 @@ const sendDataToPDFIframe = (pdfIframeRef, themeType, file = null) => {
  * PDFEmbedComponent is responsible for rendering the PDF iframe and managing the screen sharing functionality.
  */
 export const PDFEmbedComponent = () => {
-  const pdfIframeRef = useRef(null); // Create a ref to access the iframe element
   const themeType = useTheme().themeType; // Get the current theme type from the theme context
   const [isPDFLoaded, setIsPDFLoaded] = useState(false);
   const { pdfIframeURL, pdfFile, resetPDFEmbedConfig } = usePDFConfig();
-  const {
-    amIScreenSharing,
-    wasScreenShared,
-    stopScreenShare,
-    startScreenShare,
-  } = useIframeScreenShare(pdfIframeRef, resetPDFEmbedConfig);
+  const { amIScreenSharing, stopScreenShare, regionRef } =
+    useRegionCaptureScreenShare();
 
   // Send theme information to the PDF iframe when theme is changed
   useEffect(() => {
-    if (isPDFLoaded && pdfIframeRef.current) {
-      sendDataToPDFIframe(pdfIframeRef, themeType === ThemeTypes.dark ? 2 : 1);
+    if (isPDFLoaded && regionRef.current) {
+      sendDataToPDFIframe(regionRef, themeType === ThemeTypes.dark ? 2 : 1);
     }
-  }, [isPDFLoaded, themeType]);
-
-  // Start screen sharing when the component is mounted and not already screen sharing
-  useEffect(() => {
-    if (pdfIframeRef.current) {
-      startScreenShare();
-    }
-  }, [startScreenShare]);
+  }, [isPDFLoaded, regionRef, themeType]);
 
   useEffect(() => {
-    // Reset embed configuration when screen sharing is stopped from anywhere
-    if (wasScreenShared && !amIScreenSharing) {
-      resetPDFEmbedConfig();
-    }
     return () => {
       // close screenshare when this component is being unmounted
-      if (wasScreenShared && amIScreenSharing) {
+      if (amIScreenSharing) {
         resetPDFEmbedConfig();
         stopScreenShare(); // stop
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amIScreenSharing, resetPDFEmbedConfig, wasScreenShared]);
+  }, [amIScreenSharing, resetPDFEmbedConfig]);
 
   return (
     <iframe
       src={pdfIframeURL}
       title="PDF Annotator"
-      ref={pdfIframeRef}
+      ref={regionRef}
       style={{
         width: "100%",
         height: "100%",
@@ -121,11 +105,11 @@ export const PDFEmbedComponent = () => {
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
       referrerPolicy="no-referrer"
       onLoad={() => {
-        if (pdfIframeRef.current && pdfFile) {
+        if (regionRef.current && pdfFile) {
           // Set PDF theme on config change. Dark -> 2 and Light -> 1
           requestAnimationFrame(() => {
             sendDataToPDFIframe(
-              pdfIframeRef,
+              regionRef,
               themeType === ThemeTypes.dark ? 2 : 1,
               pdfFile
             );
