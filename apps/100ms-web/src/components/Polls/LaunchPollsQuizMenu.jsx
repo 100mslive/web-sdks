@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import {
   selectPollByID,
@@ -64,10 +64,6 @@ export function LaunchPollsQuizMenu() {
   const actions = useHMSActions();
   const { pollInView: id, setWidgetView } = useWidgetState();
   const interaction = useHMSStore(selectPollByID(id));
-
-  useEffect(() => {
-    console.log(questions);
-  }, [questions]);
 
   const launchPoll = async () => {
     const validQuestions = questions
