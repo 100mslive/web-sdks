@@ -104,10 +104,10 @@ export function LaunchPollsQuizMenu() {
                 ]);
               }}
               isQuiz={isQuiz}
-              removeQuestion={indexToRemove =>
+              removeQuestion={questionID =>
                 setQuestions(prev => {
                   return prev.filter(
-                    questionFromSet => indexToRemove !== questionFromSet.draftID
+                    questionFromSet => questionID !== questionFromSet.draftID
                   );
                 })
               }
