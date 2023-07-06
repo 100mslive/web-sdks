@@ -175,7 +175,7 @@ const AddMenu = ({ interactionType }) => {
               title,
               anonymous,
               type: interactionType.toLowerCase(),
-              duration: showTimerDropDown ? timer : undefined,
+              // duration: showTimerDropDown ? timer : undefined,
             })
             .then(() => handleCreate(id))
             .catch(err => setError(err.message));
