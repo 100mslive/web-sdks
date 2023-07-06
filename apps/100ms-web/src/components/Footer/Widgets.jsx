@@ -41,7 +41,9 @@ export const Widgets = () => {
       )}
       {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
       {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <LaunchPollsQuizMenu />}
-      {widgetView === WIDGET_VIEWS.VOTE && <Voting toggleVoting={toggleWidget} id={pollID} />}
+      {widgetView === WIDGET_VIEWS.VOTE && (
+        <Voting toggleVoting={toggleWidget} id={pollID} />
+      )}
     </Container>
   );
 };
