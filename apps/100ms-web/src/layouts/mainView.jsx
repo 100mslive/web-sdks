@@ -8,6 +8,7 @@ import {
   selectTemplateAppData,
   useHMSActions,
   useHMSStore,
+  usePDFConfig,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../components/FullPageProgress";
@@ -23,7 +24,6 @@ import { useAppConfig } from "../components/AppData/useAppConfig";
 import {
   useHLSViewerRole,
   useIsHeadless,
-  usePDFAnnotator,
   usePinnedTrack,
   useUISettings,
   useUrlToEmbed,
@@ -52,7 +52,7 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
-  const pdfAnntatorActive = usePDFAnnotator();
+  const { isSharingPDF } = usePDFConfig();
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -86,7 +86,7 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (pdfAnntatorActive) {
+  } else if (isSharingPDF) {
     ViewComponent = PDFView;
   } else if (urlToIframe) {
     ViewComponent = EmbedView;
