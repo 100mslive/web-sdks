@@ -38,7 +38,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
   WIDGET_STATE,
-  WIDGET_VIEWS,
 } from "../../common/constants";
 
 export const getAppDetails = appDetails => {
@@ -83,7 +82,7 @@ const initialAppData = {
   [APP_DATA.dropdownList]: [],
   [APP_DATA.widgetState]: {
     [WIDGET_STATE.pollInView]: "",
-    [WIDGET_STATE.view]: WIDGET_VIEWS.CREATE_POLL_QUIZ,
+    [WIDGET_STATE.view]: "",
   },
 };
 
