@@ -19,9 +19,9 @@ jobs:
           node-version: 16
           registry-url: https://registry.npmjs.org/
 
-      - name: Check for main branch if latest
-        if: (github.event.inputs.publishFlag == 'latest' || github.event.client_payload.slash_command.args.unnamed.arg1 == 'latest') && github.ref_name != 'main'
-        run: exit 1
+      # - name: Check for main branch if latest
+      #   if: (github.event.inputs.publishFlag == 'latest' || github.event.client_payload.slash_command.args.unnamed.arg1 == 'latest') && github.ref_name != 'main'
+      #   run: exit 1
 
       - name: Notify slack starting
         if: github.event.inputs.publishFlag == 'latest' && success()
