@@ -48,7 +48,19 @@ export const EmbedScreenShareView = ({ children }) => {
       css={{ size: "100%" }}
       direction={showSidebarInBottom ? "column" : "row"}
     >
-      {children}
+      <Box
+        css={{
+          mx: "$8",
+          flex: "3 1 0",
+          "@lg": {
+            flex: "2 1 0",
+            display: "flex",
+            alignItems: "center",
+          },
+        }}
+      >
+        {children}
+      </Box>
       <Flex
         direction={{ "@initial": "column", "@lg": "row" }}
         css={{
@@ -129,26 +141,14 @@ const EmbedComponent = () => {
   }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
 
   return (
-    <Box
+    <iframe
       ref={iframeRef}
-      css={{
-        mx: "$8",
-        flex: "3 1 0",
-        "@lg": {
-          flex: "2 1 0",
-          display: "flex",
-          alignItems: "center",
-        },
-      }}
-    >
-      <iframe
-        src={src}
-        title={src}
-        style={{ width: "100%", height: "100%", border: 0 }}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
-        referrerPolicy="no-referrer"
-      />
-    </Box>
+      src={src}
+      title={src}
+      style={{ width: "100%", height: "100%", border: 0 }}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
+      referrerPolicy="no-referrer"
+    />
   );
 };
 

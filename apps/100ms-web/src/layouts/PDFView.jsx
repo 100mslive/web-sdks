@@ -1,5 +1,4 @@
 import { useRegionCaptureScreenShare } from "@100mslive/react-sdk";
-import { Box } from "@100mslive/react-ui";
 import { EmbedScreenShareView } from "./EmbedView";
 
 /**
@@ -9,19 +8,7 @@ import { EmbedScreenShareView } from "./EmbedView";
 export const PDFView = () => {
   return (
     <EmbedScreenShareView>
-      <Box
-        css={{
-          mx: "$8",
-          flex: "3 1 0",
-          "@lg": {
-            flex: "2 1 0",
-            display: "flex",
-            alignItems: "center",
-          },
-        }}
-      >
-        <PDFEmbedComponent />
-      </Box>
+      <PDFEmbedComponent />
     </EmbedScreenShareView>
   );
 };
