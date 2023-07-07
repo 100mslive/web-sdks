@@ -197,9 +197,11 @@ const PrevMenu = () => {
       <Text variant="h6" css={{ c: "$textHighEmp" }}>
         Previous Polls/Quiz
       </Text>
-      {polls.map(poll => (
-        <InteractionCard {...poll} />
-      ))}
+      <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
+        {polls.map(poll => (
+          <InteractionCard {...poll} />
+        ))}
+      </Flex>
     </Flex>
   ) : null;
 };
@@ -216,25 +218,17 @@ const InteractionCard = ({ id, title, state = "stopped" }) => {
   };
 
   return (
-    <Flex direction="column">
+    <Flex
+      direction="column"
+      css={{ backgroundColor: "$surfaceLight", borderRadius: "$1", p: "$8" }}
+    >
       <Flex css={{ w: "100%", justifyContent: "space-between" }}>
         <Text
           variant="sub1"
-          css={{ mt: "$md", c: "$textHighEmp", fontWeight: "$semiBold" }}
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold" }}
         >
           {title}
         </Text>
-        {/* <Text
-          css={{
-            bg: ended ? "$surfaceLighter" : "$error",
-            p: "$2 $4",
-            fontWeight: "$semiBold",
-            fontSize: "$xs",
-            r: "$1",
-          }}
-        >
-          {ended ? "ENDED" : "LIVE"}
-        </Text> */}
       </Flex>
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
         <Button variant="standard">View results</Button>

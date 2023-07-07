@@ -1,6 +1,6 @@
 // @ts-check
 import React, { useRef, useState } from "react";
-import { isEqual } from "lodash";
+import { v4 as uuid } from "uuid";
 import {
   selectPollByID,
   useHMSActions,
@@ -60,7 +60,7 @@ const isValidQuestion = ({
 };
 
 export function LaunchPollsQuizMenu() {
-  const [questions, setQuestions] = useState([{}]);
+  const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
   const { pollInView: id, setWidgetView } = useWidgetState();
   const interaction = useHMSStore(selectPollByID(id));
@@ -92,7 +92,7 @@ export function LaunchPollsQuizMenu() {
         <Flex direction="column">
           {questions.map((question, index) => (
             <QuestionCard
-              key={index}
+              key={question.draftID}
               question={question}
               index={index}
               length={questions.length}
@@ -104,12 +104,23 @@ export function LaunchPollsQuizMenu() {
                 ]);
               }}
               isQuiz={isQuiz}
-              removeQuestion={() =>
-                setQuestions(prev =>
-                  prev.filter(
-                    questionFromSet => !isEqual(question, questionFromSet)
-                  )
-                )
+              removeQuestion={questionID =>
+                setQuestions(prev => {
+                  return prev.filter(
+                    questionFromSet => questionID !== questionFromSet.draftID
+                  );
+                })
+              }
+              convertToDraft={questionID =>
+                setQuestions(prev => {
+                  const copyOfQuestions = [...prev];
+                  copyOfQuestions.forEach(question => {
+                    if (questionID && question.draftID === questionID) {
+                      question.saved = false;
+                    }
+                  });
+                  return copyOfQuestions;
+                })
               }
             />
           ))}
@@ -121,7 +132,7 @@ export function LaunchPollsQuizMenu() {
             cursor: "pointer",
             "&:hover": { c: "$textMedEmp" },
           }}
-          onClick={() => setQuestions([...questions, {}])}
+          onClick={() => setQuestions([...questions, { draftID: uuid() }])}
         >
           <AddCircleIcon />
           <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
@@ -144,6 +155,7 @@ const QuestionCard = ({
   length,
   removeQuestion,
   isQuiz,
+  convertToDraft,
 }) => {
   return (
     <Flex
@@ -151,14 +163,17 @@ const QuestionCard = ({
       css={{ p: "$md", bg: "$surfaceLight", r: "$1", mb: "$sm" }}
     >
       {question.saved ? (
-        <SavedQuestion question={question} index={index} length={length} />
+        <SavedQuestion
+          question={question}
+          index={index}
+          length={length}
+          convertToDraft={convertToDraft}
+        />
       ) : (
         <QuestionForm
           question={question}
-          removeQuestion={removeQuestion}
-          onSave={params => {
-            onSave(params);
-          }}
+          removeQuestion={() => removeQuestion(question.draftID)}
+          onSave={params => onSave(params)}
           index={index}
           length={length}
           isQuiz={isQuiz}
@@ -168,7 +183,7 @@ const QuestionCard = ({
   );
 };
 
-const SavedQuestion = ({ question, index, length }) => {
+const SavedQuestion = ({ question, index, length, convertToDraft }) => {
   return (
     <>
       <Text variant="overline" css={{ c: "$textDisabled" }}>
@@ -183,6 +198,15 @@ const SavedQuestion = ({ question, index, length }) => {
           {option.isCorrectAnswer && ` ✅`}
         </Text>
       ))}
+      <Flex justify="end" css={{ w: "100%" }}>
+        <Button
+          variant="standard"
+          css={{ fontWeight: "$semiBold", p: "$4 $8" }}
+          onClick={() => convertToDraft(question.draftID)}
+        >
+          Edit
+        </Button>
+      </Flex>
     </>
   );
 };
@@ -199,15 +223,16 @@ const QuestionForm = ({
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
-
   const [type, setType] = useState(
     question.type || QUESTION_TYPE.SINGLE_CHOICE
   );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState([
-    { text: "", isCorrectAnswer: false },
-    { text: "", isCorrectAnswer: false },
-  ]);
+  const [options, setOptions] = useState(
+    question?.options || [
+      { text: "", isCorrectAnswer: false },
+      { text: "", isCorrectAnswer: false },
+    ]
+  );
   const [skippable, setSkippable] = useState(true);
 
   return (
@@ -332,7 +357,14 @@ const QuestionForm = ({
             })
           }
           onClick={() => {
-            onSave({ saved: true, text, type, options, skippable });
+            onSave({
+              saved: true,
+              text,
+              type,
+              options,
+              skippable,
+              draftID: question.draftID,
+            });
           }}
         >
           Save
