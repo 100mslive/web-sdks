@@ -49,10 +49,12 @@ export const MultipleChoiceOptions = ({
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   {option.text}
                 </Text>
-                <Text variant="sm" css={{ color: "$textMedEmp" }}>
-                  {option.voteCount}&nbsp;
-                  {option.voteCount !== 1 ? "votes" : "votes"}
-                </Text>
+                {voted && (
+                  <Text variant="sm" css={{ color: "$textMedEmp" }}>
+                    {option.voteCount}&nbsp;
+                    {option.voteCount !== 1 ? "votes" : "votes"}
+                  </Text>
+                )}
               </Flex>
               {voted ? (
                 <Progress.Root value={progressValue}>
