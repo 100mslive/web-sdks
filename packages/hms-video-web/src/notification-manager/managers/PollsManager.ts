@@ -1,4 +1,5 @@
-import { HMSPoll, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
+import { v4 as uuid } from 'uuid';
+import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
@@ -77,9 +78,9 @@ export class PollsManager {
     }
   }
 
-  private handlePollStats(notification: PollStatsNotification) {
+  private async handlePollStats(notification: PollStatsNotification) {
     const updatedPolls: HMSPoll[] = [];
-    notification.polls.forEach(updatedPoll => {
+    for (const updatedPoll of notification.polls) {
       const savedPoll = this.store.getPoll(updatedPoll.poll_id);
       if (!savedPoll) {
         return;
@@ -102,7 +103,42 @@ export class PollsManager {
           }
         });
       });
-    });
+
+      const serverResponseParams = await this.transport.getPollResponses({
+        poll_id: updatedPoll.poll_id,
+        index: 0,
+        count: 50,
+        self: false,
+      });
+
+      serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+        const question = savedPoll?.questions?.find(question => question.index === response.question);
+        if (!question) {
+          return;
+        }
+        const pollResponse: HMSPollQuestionResponse = {
+          // TODO: response_id is not coming from server
+          id: response.response_id || uuid(),
+          questionIndex: response.question,
+          option: response.option,
+          options: response.options,
+          text: response.text,
+          responseFinal: final,
+          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+          skipped: response.skipped,
+          type: response.type,
+          update: response.update,
+        };
+
+        if (Array.isArray(question.responses) && question.responses.length > 0) {
+          if (!question.responses.find(({ id }) => id === pollResponse.id)) {
+            question.responses.push(pollResponse);
+          }
+        } else {
+          question.responses = [pollResponse];
+        }
+      });
+    }
 
     if (updatedPolls.length > 0) {
       this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, updatedPolls);

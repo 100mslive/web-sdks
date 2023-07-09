@@ -85,12 +85,12 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       throw new Error('Invalid poll ID - Poll not found');
     }
     const responsesParams: PollResponseParams[] = responses.map(response => {
-      const { question } = this.getPollAndQuestion(poll, response.questionIndex);
+      const question = this.getQuestionInPoll(poll, response.questionIndex);
       if (question.type === HMSPollQuestionType.SINGLE_CHOICE) {
         response.option = response.option || response.options?.[0] || -1;
         delete response.text;
         delete response.options;
-      } else if (question.type === HMSPollQuestionType.MULTI_CHOICE) {
+      } else if (question.type === HMSPollQuestionType.MULTIPLE_CHOICE) {
         delete response.text;
         delete response.option;
       } else {
@@ -124,7 +124,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     const answer: HMSPollQuestionAnswer = questionParams.answer || { hidden: false };
     if (
       Array.isArray(questionParams.options) &&
-      [HMSPollQuestionType.SINGLE_CHOICE, HMSPollQuestionType.MULTI_CHOICE].includes(questionParams.type)
+      [HMSPollQuestionType.SINGLE_CHOICE, HMSPollQuestionType.MULTIPLE_CHOICE].includes(questionParams.type)
     ) {
       options = questionParams.options?.map((option, index) => ({
         index: index + 1,
@@ -148,12 +148,12 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return { question, options, answer };
   }
 
-  private getPollAndQuestion(poll: HMSPoll, questionIndex: number) {
+  private getQuestionInPoll(poll: HMSPoll, questionIndex: number) {
     const question = poll?.questions?.find(question => question.index === questionIndex);
     if (!question) {
       throw new Error('Invalid question index - Question not found in poll');
     }
 
-    return { poll, question };
+    return question;
   }
 }

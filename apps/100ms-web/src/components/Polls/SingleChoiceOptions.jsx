@@ -142,12 +142,11 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
                 value={option?.text || ""}
                 key={index}
                 onChange={event => {
-                  const newOptions = [...options];
-                  newOptions[index] = {
-                    ...newOptions[index],
-                    text: event.target.value,
-                  };
-                  setOptions(newOptions);
+                  setOptions(options => [
+                    ...options.slice(0, index),
+                    { ...options[index], text: event.target.value },
+                    ...options.slice(index + 1),
+                  ]);
                 }}
               />
             </Flex>
