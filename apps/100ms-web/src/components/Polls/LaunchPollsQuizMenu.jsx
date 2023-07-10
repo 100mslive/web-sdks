@@ -6,7 +6,11 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
+import {
+  AddCircleIcon,
+  CheckCircleIcon,
+  TrashIcon,
+} from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -193,10 +197,16 @@ const SavedQuestion = ({ question, index, length, convertToDraft }) => {
         {question.text}
       </Text>
       {question.options.map(option => (
-        <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
-          {option.text}
-          {option.isCorrectAnswer && ` ✅`}
-        </Text>
+        <Flex css={{ alignItems: "center" }}>
+          <Text variant="body2" css={{ my: "$xs", c: "$textMedEmp" }}>
+            {option.text}
+          </Text>
+          {option.isCorrectAnswer && (
+            <Box css={{ color: "$success", mx: "$xs" }}>
+              <CheckCircleIcon />
+            </Box>
+          )}
+        </Flex>
       ))}
       <Flex justify="end" css={{ w: "100%" }}>
         <Button
