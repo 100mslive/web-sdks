@@ -1,6 +1,10 @@
 // @ts-check
-import React, { useCallback, useState } from "react";
-import { useHMSActions, useHMSStore } from "@100mslive/react-sdk";
+import React, { useCallback, useMemo, useState } from "react";
+import {
+  selectLocalPeerID,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import {
   Box,
@@ -26,36 +30,42 @@ const TextArea = styled("textarea", {
   w: "100%",
 });
 
-const selectLocalPeerReponse =
-  (pollID, questionIndex) =>
-  (/** @type {import("@100mslive/react-sdk").HMSStore} */ store) => {
-    const localPeerID = store.room.localPeer;
-    const poll = pollID ? store.polls[pollID] : null;
-    const question = poll?.questions?.find(
-      question => question.index === questionIndex
-    );
-
-    return question?.responses?.find(
-      response => response.peer?.peerid === localPeerID
-    );
-  };
-
 export const QuestionCard = ({
   pollID,
+  isQuiz,
   index,
   totalQuestions,
   totalResponses,
   type,
   text,
   options = [],
+  answer,
   setCurrentIndex,
   skippable = false,
+  responses = [],
   isTimed = false,
 }) => {
   const actions = useHMSActions();
-  const response = useHMSStore(selectLocalPeerReponse(pollID, index));
+  const localPeerID = useHMSStore(selectLocalPeerID);
+  const localPeerResponse = responses?.find(
+    response => response.peer?.peerid === localPeerID
+  );
+
+  const isCorrectAnswer = useMemo(() => {
+    if (type === QUESTION_TYPE.SINGLE_CHOICE) {
+      return answer?.option === localPeerResponse?.option;
+    } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
+      return (
+        answer?.options &&
+        localPeerResponse?.options &&
+        JSON.stringify(answer?.options?.sort()) ===
+          JSON.stringify(localPeerResponse?.options?.sort())
+      );
+    }
+  }, [answer, localPeerResponse, type]);
+
   const prev = index !== 1;
-  const next = index !== totalQuestions && (skippable || response);
+  const next = index !== totalQuestions && (skippable || localPeerResponse);
   const [textAnswer, setTextAnswer] = useState("");
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
@@ -90,6 +100,10 @@ export const QuestionCard = ({
         borderRadius: "$1",
         p: "$md",
         mt: "$md",
+        border:
+          isQuiz && localPeerResponse
+            ? `1px solid ${isCorrectAnswer ? "$success" : "$error"}`
+            : "none",
       }}
     >
       <Flex align="center" justify="between">
@@ -144,7 +158,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
-          disabled={!!response}
+          disabled={!!localPeerResponse}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
           css={{
@@ -152,14 +166,14 @@ export const QuestionCard = ({
             backgroundColor: "$surfaceLighter",
             mb: "$md",
             border: "1px solid $borderDefault",
-            cursor: response ? "not-allowed" : "text",
+            cursor: localPeerResponse ? "not-allowed" : "text",
           }}
         />
       ) : null}
 
       {type === QUESTION_TYPE.LONG_ANSWER ? (
         <TextArea
-          disabled={!!response}
+          disabled={!!localPeerResponse}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
         />
@@ -167,7 +181,9 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions
-          response={response}
+          isQuiz={isQuiz}
+          response={localPeerResponse}
+          correctOptionIndex={answer?.option}
           options={options}
           setAnswer={setSingleOptionAnswer}
           totalResponses={totalResponses}
@@ -176,7 +192,9 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <MultipleChoiceOptions
-          response={response}
+          isQuiz={isQuiz}
+          response={localPeerResponse}
+          correctOptionIndexes={answer?.options}
           options={options}
           selectedOptions={multipleOptionAnswer}
           setSelectedOptions={setMultipleOptionAnswer}
@@ -189,7 +207,7 @@ export const QuestionCard = ({
         skipQuestion={() => {
           setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
         }}
-        response={response}
+        response={localPeerResponse}
         stringAnswerExpected={stringAnswerExpected}
         handleVote={handleVote}
       />

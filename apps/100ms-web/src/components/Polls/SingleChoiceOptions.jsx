@@ -1,10 +1,13 @@
 // @ts-check
 import React, { useCallback } from "react";
 import { Flex, Input, Progress, RadioGroup, Text } from "@100mslive/react-ui";
+import { VoteCount } from "./OptionComponents/VoteCount";
 
 export const SingleChoiceOptions = ({
+  isQuiz,
   options,
   response,
+  correctOptionIndex,
   setAnswer,
   totalResponses,
 }) => {
@@ -16,6 +19,7 @@ export const SingleChoiceOptions = ({
       <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
         {options.map(option => {
           const progressValue = (100 * option.voteCount) / totalResponses;
+          const isCorrectAnswer = option.index === correctOptionIndex;
 
           return (
             <Flex
@@ -58,10 +62,11 @@ export const SingleChoiceOptions = ({
                     {option.text}
                   </Text>
                   {response && (
-                    <Text variant="sm" css={{ color: "$textMedEmp" }}>
-                      {option.voteCount}&nbsp;
-                      {option.voteCount !== 1 ? "votes" : "votes"}
-                    </Text>
+                    <VoteCount
+                      isQuiz={isQuiz}
+                      isCorrectAnswer={isCorrectAnswer}
+                      voteCount={option.voteCount}
+                    />
                   )}
                 </Flex>
 
@@ -99,8 +104,12 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
     [setOptions, isQuiz]
   );
 
+  const correctOptionIndex = options.findIndex(
+    option => option.isCorrectAnswer
+  );
+
   return (
-    <RadioGroup.Root onValueChange={selectAnswer}>
+    <RadioGroup.Root value={correctOptionIndex} onValueChange={selectAnswer}>
       <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
         {options.map((option, index) => {
           return (

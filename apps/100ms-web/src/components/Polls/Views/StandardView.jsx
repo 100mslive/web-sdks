@@ -16,6 +16,7 @@ export const StandardView = ({ poll }) => {
       {poll.questions?.map((question, index) => (
         <QuestionCard
           pollID={poll.id}
+          isQuiz={poll.type === "quiz"}
           key={`${question.text}-${index}`}
           index={question.index}
           text={question.text}
@@ -23,7 +24,9 @@ export const StandardView = ({ poll }) => {
           totalResponses={question.totalResponses}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
-          skippable={question?.skippable}
+          skippable={question.skippable}
+          responses={question.responses}
+          answer={question.answer}
           setCurrentIndex={() => {}}
         />
       ))}

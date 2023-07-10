@@ -2,9 +2,12 @@
 import React, { useCallback } from "react";
 import { CheckIcon } from "@100mslive/react-icons";
 import { Checkbox, Flex, Input, Progress, Text } from "@100mslive/react-ui";
+import { VoteCount } from "./OptionComponents/VoteCount";
 
 export const MultipleChoiceOptions = ({
+  isQuiz,
   options,
+  correctOptionIndexes = [],
   response,
   totalResponses,
   selectedOptions,
@@ -24,6 +27,8 @@ export const MultipleChoiceOptions = ({
     <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
       {options.map(option => {
         const progressValue = (100 * option.voteCount) / totalResponses;
+        const isCorrectAnswer = correctOptionIndexes.includes(option.index);
+
         return (
           <Flex
             align="center"
@@ -51,10 +56,11 @@ export const MultipleChoiceOptions = ({
                   {option.text}
                 </Text>
                 {response && (
-                  <Text variant="sm" css={{ color: "$textMedEmp" }}>
-                    {option.voteCount}&nbsp;
-                    {option.voteCount !== 1 ? "votes" : "votes"}
-                  </Text>
+                  <VoteCount
+                    isQuiz={isQuiz}
+                    isCorrectAnswer={isCorrectAnswer}
+                    voteCount={option.voteCount}
+                  />
                 )}
               </Flex>
               {response ? (
