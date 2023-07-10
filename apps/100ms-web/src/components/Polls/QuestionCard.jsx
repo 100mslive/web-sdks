@@ -58,14 +58,23 @@ export const QuestionCard = ({
       return (
         answer?.options &&
         localPeerResponse?.options &&
-        JSON.stringify(answer?.options?.sort()) ===
-          JSON.stringify(localPeerResponse?.options?.sort())
+        JSON.stringify([...answer.options].sort()) ===
+          JSON.stringify([...localPeerResponse.options].sort())
       );
     }
   }, [answer, localPeerResponse, type]);
 
   const prev = index !== 1;
   const next = index !== totalQuestions && (skippable || localPeerResponse);
+
+  const moveNext = () => {
+    setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
+  };
+
+  const movePrev = () => {
+    setCurrentIndex(curr => Math.max(0, curr - 1));
+  };
+
   const [textAnswer, setTextAnswer] = useState("");
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
@@ -81,7 +90,7 @@ export const QuestionCard = ({
         questionIndex: index,
         text: textAnswer,
         option: singleOptionAnswer,
-        options: Array.from(multipleOptionAnswer).sort(),
+        options: Array.from(multipleOptionAnswer),
       },
     ]);
   }, [
@@ -92,6 +101,15 @@ export const QuestionCard = ({
     singleOptionAnswer,
     multipleOptionAnswer,
   ]);
+
+  const handleSkip = useCallback(async () => {
+    await actions.interactivityCenter.addResponsesToPoll(pollID, [
+      {
+        questionIndex: index,
+        skipped: true,
+      },
+    ]);
+  }, [actions, index, pollID]);
 
   return (
     <Box
@@ -118,9 +136,7 @@ export const QuestionCard = ({
           <Flex align="center" css={{ gap: "$4" }}>
             <IconButton
               disabled={!prev}
-              onClick={() => {
-                setCurrentIndex(prev => Math.max(0, prev - 1));
-              }}
+              onClick={movePrev}
               css={
                 prev
                   ? { color: "$textHighEmp", cursor: "pointer" }
@@ -134,9 +150,7 @@ export const QuestionCard = ({
             </IconButton>
             <IconButton
               disabled={!next}
-              onClick={() => {
-                setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
-              }}
+              onClick={moveNext}
               css={
                 next
                   ? { color: "$textHighEmp", cursor: "pointer" }
@@ -204,8 +218,9 @@ export const QuestionCard = ({
 
       <QuestionCardFooter
         skippable={skippable}
-        skipQuestion={() => {
-          setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
+        skipQuestion={async () => {
+          await handleSkip();
+          moveNext();
         }}
         response={localPeerResponse}
         stringAnswerExpected={stringAnswerExpected}

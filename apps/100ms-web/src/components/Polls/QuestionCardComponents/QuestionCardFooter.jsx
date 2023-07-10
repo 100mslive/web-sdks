@@ -9,7 +9,7 @@ export const QuestionCardFooter = ({
 }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
-      {/* {skippable && !voted ? (
+      {skippable && !response ? (
         <Button
           variant="standard"
           onClick={skipQuestion}
@@ -17,11 +17,15 @@ export const QuestionCardFooter = ({
         >
           Skip
         </Button>
-      ) : null} */}
+      ) : null}
 
       {response ? (
         <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
-          {stringAnswerExpected ? "Submitted" : "Voted"}
+          {response.skipped
+            ? "Skipped"
+            : stringAnswerExpected
+            ? "Submitted"
+            : "Voted"}
         </Text>
       ) : (
         <Button

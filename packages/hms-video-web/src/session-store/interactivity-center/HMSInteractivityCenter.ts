@@ -91,6 +91,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         delete response.text;
         delete response.options;
       } else if (question.type === HMSPollQuestionType.MULTIPLE_CHOICE) {
+        response.options?.sort();
         delete response.text;
         delete response.option;
       } else {
