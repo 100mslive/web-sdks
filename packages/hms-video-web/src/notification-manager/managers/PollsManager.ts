@@ -98,7 +98,6 @@ export class PollsManager {
           const savedOption = savedQuestion.options?.[index];
           if (savedOption && savedOption.voteCount !== updatedVoteCount) {
             savedOption.voteCount = updatedVoteCount;
-            updatedPolls.push(savedPoll);
           }
         });
       });
@@ -136,6 +135,8 @@ export class PollsManager {
           question.responses = [pollResponse];
         }
       });
+
+      updatedPolls.push(savedPoll);
     }
 
     if (updatedPolls.length > 0) {
