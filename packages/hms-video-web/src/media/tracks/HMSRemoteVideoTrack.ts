@@ -93,6 +93,7 @@ export class HMSRemoteVideoTrack extends HMSVideoTrack {
     this.nativeTrack = track.nativeTrack;
     if (track.transceiver) {
       this.transceiver = track.transceiver;
+      this.stream = track.stream;
     }
     this.videoHandler.updateSinks();
   }
