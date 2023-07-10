@@ -285,7 +285,12 @@ const QuestionForm = ({
       type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
           <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
-            Options
+            Options{" "}
+            {isQuiz && (
+              <Text variant="xs" css={{ c: "$textMedEmp" }}>
+                (Use checkboxes to indicate correct answers)
+              </Text>
+            )}
           </Text>
           {type === QUESTION_TYPE.SINGLE_CHOICE && (
             <SingleChoiceOptionInputs
