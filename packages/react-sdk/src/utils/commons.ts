@@ -16,7 +16,7 @@ export const throwErrorHandler: hooksErrHandler = (err: Error) => {
 export const validPDFUrl = (pdfURL: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     if (!pdfURL) {
-      reject('Pdf url is invalid');
+      reject('URL is empty');
     }
     const extension: string | undefined = pdfURL.split('.').pop();
     if (!extension || extension.toLowerCase() === 'pdf') {
@@ -28,7 +28,7 @@ export const validPDFUrl = (pdfURL: string): Promise<boolean> => {
         if (contentType === 'application/pdf') {
           resolve(true);
         } else {
-          reject('Pdf url is invalid');
+          reject('URL does not contain pdf');
         }
       })
       .catch(error => {

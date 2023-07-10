@@ -45,12 +45,12 @@ export interface useEmbedConfigResult {
   /**
    * reference for region to be removed
    */
-  regionRef: React.RefObject<HTMLDivElement | null>;
+  regionRef: React.RefObject<HTMLIFrameElement | null>;
 
   /**
    * stop screen share
    */
-  stopScreenShare: () => void;
+  stopScreenShare: () => Promise<void>;
 }
 
 export const useEmbedConfig = (): useEmbedConfigResult => {
