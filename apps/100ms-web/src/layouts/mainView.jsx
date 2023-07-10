@@ -15,7 +15,6 @@ import FullPageProgress from "../components/FullPageProgress";
 import EmbedView from "./EmbedView";
 import { InsetView } from "./InsetView";
 import { MainGridView } from "./mainGridView";
-import PDFView from "./PDFView";
 import ScreenShareView from "./screenShareView";
 import SidePane from "./SidePane";
 import { WaitingView } from "./WaitingView";
@@ -85,9 +84,7 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (embedConfig?.config?.isSharing) {
-    ViewComponent = PDFView;
-  } else if (embedConfig?.config?.data) {
+  } else if (embedConfig?.config?.data || embedConfig?.config?.isSharing) {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
