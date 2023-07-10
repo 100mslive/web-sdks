@@ -4,12 +4,15 @@ import { Flex, Input, Progress, RadioGroup, Text } from "@100mslive/react-ui";
 
 export const SingleChoiceOptions = ({
   options,
-  voted,
+  response,
   setAnswer,
   totalResponses,
 }) => {
   return (
-    <RadioGroup.Root onValueChange={value => setAnswer(value)}>
+    <RadioGroup.Root
+      value={response?.option}
+      onValueChange={value => setAnswer(value)}
+    >
       <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
         {options.map(option => {
           const progressValue = (100 * option.voteCount) / totalResponses;
@@ -30,13 +33,13 @@ export const SingleChoiceOptions = ({
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  cursor: voted ? "not-allowed" : "pointer",
+                  cursor: response ? "not-allowed" : "pointer",
                   '&[data-state="checked"]': {
                     borderColor: "$primaryLight",
                     borderWidth: "2px",
                   },
                 }}
-                disabled={voted}
+                disabled={!!response}
                 value={option.index}
               >
                 <RadioGroup.Indicator
@@ -50,11 +53,11 @@ export const SingleChoiceOptions = ({
               </RadioGroup.Item>
 
               <Flex direction="column" css={{ flexGrow: "1" }}>
-                <Flex css={{ w: "100%", mb: voted ? "$4" : "0" }}>
+                <Flex css={{ w: "100%", mb: response ? "$4" : "0" }}>
                   <Text css={{ display: "flex", flexGrow: "1" }}>
                     {option.text}
                   </Text>
-                  {voted && (
+                  {response && (
                     <Text variant="sm" css={{ color: "$textMedEmp" }}>
                       {option.voteCount}&nbsp;
                       {option.voteCount !== 1 ? "votes" : "votes"}
@@ -62,7 +65,7 @@ export const SingleChoiceOptions = ({
                   )}
                 </Flex>
 
-                {voted ? (
+                {response ? (
                   <Progress.Root value={progressValue}>
                     <Progress.Content
                       style={{

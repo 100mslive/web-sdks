@@ -224,7 +224,6 @@ const InteractionCard = ({ id, title, state = "stopped" }) => {
         </Text>
       </Flex>
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
-        <Button variant="standard">View results</Button>
         {!ended && (
           <Button variant="primary" onClick={() => goToVote(id)}>
             View

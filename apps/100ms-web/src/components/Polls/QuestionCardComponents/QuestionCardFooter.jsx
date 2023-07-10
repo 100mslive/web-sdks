@@ -2,14 +2,14 @@ import { Button, Flex, Text } from "@100mslive/react-ui";
 
 export const QuestionCardFooter = ({
   skippable,
-  voted,
+  response,
   stringAnswerExpected,
   handleVote,
   skipQuestion,
 }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
-      {skippable && !voted ? (
+      {/* {skippable && !voted ? (
         <Button
           variant="standard"
           onClick={skipQuestion}
@@ -17,9 +17,9 @@ export const QuestionCardFooter = ({
         >
           Skip
         </Button>
-      ) : null}
+      ) : null} */}
 
-      {voted ? (
+      {response ? (
         <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
           {stringAnswerExpected ? "Submitted" : "Voted"}
         </Text>

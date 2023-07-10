@@ -1,6 +1,6 @@
 // @ts-check
-import React, { useCallback, useEffect, useState } from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
+import React, { useCallback, useState } from "react";
+import { useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import {
   Box,
@@ -26,6 +26,20 @@ const TextArea = styled("textarea", {
   w: "100%",
 });
 
+const selectLocalPeerReponse =
+  (pollID, questionIndex) =>
+  (/** @type {import("@100mslive/react-sdk").HMSStore} */ store) => {
+    const localPeerID = store.room.localPeer;
+    const poll = pollID ? store.polls[pollID] : null;
+    const question = poll?.questions?.find(
+      question => question.index === questionIndex
+    );
+
+    return question?.responses?.find(
+      response => response.peer?.peerid === localPeerID
+    );
+  };
+
 export const QuestionCard = ({
   pollID,
   index,
@@ -34,14 +48,14 @@ export const QuestionCard = ({
   type,
   text,
   options = [],
-  setCurrentIndex = () => {},
+  setCurrentIndex,
   skippable = false,
   isTimed = false,
 }) => {
   const actions = useHMSActions();
-  const [voted, setVoted] = useState(false);
+  const response = useHMSStore(selectLocalPeerReponse(pollID, index));
   const prev = index !== 1;
-  const next = index !== totalQuestions && (skippable || voted);
+  const next = index !== totalQuestions && (skippable || response);
   const [textAnswer, setTextAnswer] = useState("");
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
@@ -50,8 +64,6 @@ export const QuestionCard = ({
     QUESTION_TYPE.LONG_ANSWER,
     QUESTION_TYPE.SHORT_ANSWER,
   ].includes(type);
-
-  useEffect(() => setVoted(false), [index]);
 
   const handleVote = useCallback(async () => {
     await actions.interactivityCenter.addResponsesToPoll(pollID, [
@@ -62,7 +74,6 @@ export const QuestionCard = ({
         options: Array.from(multipleOptionAnswer).sort(),
       },
     ]);
-    setVoted(true);
   }, [
     actions,
     index,
@@ -95,7 +106,6 @@ export const QuestionCard = ({
               disabled={!prev}
               onClick={() => {
                 setCurrentIndex(prev => Math.max(0, prev - 1));
-                setVoted(false);
               }}
               css={
                 prev
@@ -112,7 +122,6 @@ export const QuestionCard = ({
               disabled={!next}
               onClick={() => {
                 setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
-                setVoted(false);
               }}
               css={
                 next
@@ -135,7 +144,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
-          disabled={voted}
+          disabled={!!response}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
           css={{
@@ -143,14 +152,14 @@ export const QuestionCard = ({
             backgroundColor: "$surfaceLighter",
             mb: "$md",
             border: "1px solid $borderDefault",
-            cursor: voted ? "not-allowed" : "text",
+            cursor: response ? "not-allowed" : "text",
           }}
         />
       ) : null}
 
       {type === QUESTION_TYPE.LONG_ANSWER ? (
         <TextArea
-          disabled={voted}
+          disabled={!!response}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
         />
@@ -158,7 +167,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions
-          voted={voted}
+          response={response}
           options={options}
           setAnswer={setSingleOptionAnswer}
           totalResponses={totalResponses}
@@ -167,7 +176,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <MultipleChoiceOptions
-          voted={voted}
+          response={response}
           options={options}
           selectedOptions={multipleOptionAnswer}
           setSelectedOptions={setMultipleOptionAnswer}
@@ -179,9 +188,8 @@ export const QuestionCard = ({
         skippable={skippable}
         skipQuestion={() => {
           setCurrentIndex(prev => Math.min(totalQuestions, prev + 1));
-          setVoted(false);
         }}
-        voted={voted}
+        response={response}
         stringAnswerExpected={stringAnswerExpected}
         handleVote={handleVote}
       />

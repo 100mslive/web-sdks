@@ -5,7 +5,7 @@ import { Checkbox, Flex, Input, Progress, Text } from "@100mslive/react-ui";
 
 export const MultipleChoiceOptions = ({
   options,
-  voted,
+  response,
   totalResponses,
   selectedOptions,
   setSelectedOptions,
@@ -31,12 +31,13 @@ export const MultipleChoiceOptions = ({
             css={{ w: "100%", gap: "$9" }}
           >
             <Checkbox.Root
-              disabled={voted}
+              disabled={!!response}
+              checked={response?.options?.includes(option.index)}
               onCheckedChange={checked =>
                 handleCheckedChange(checked, option.index)
               }
               css={{
-                cursor: voted ? "not-allowed" : "pointer",
+                cursor: response ? "not-allowed" : "pointer",
               }}
             >
               <Checkbox.Indicator>
@@ -45,18 +46,18 @@ export const MultipleChoiceOptions = ({
             </Checkbox.Root>
 
             <Flex direction="column" css={{ flexGrow: "1" }}>
-              <Flex css={{ w: "100%", mb: voted ? "$4" : "0" }}>
+              <Flex css={{ w: "100%", mb: response ? "$4" : "0" }}>
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   {option.text}
                 </Text>
-                {voted && (
+                {response && (
                   <Text variant="sm" css={{ color: "$textMedEmp" }}>
                     {option.voteCount}&nbsp;
                     {option.voteCount !== 1 ? "votes" : "votes"}
                   </Text>
                 )}
               </Flex>
-              {voted ? (
+              {response ? (
                 <Progress.Root value={progressValue}>
                   <Progress.Content
                     style={{
