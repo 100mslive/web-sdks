@@ -36,3 +36,5 @@ export const validPDFUrl = (pdfURL: string): Promise<boolean> => {
       });
   });
 };
+
+export const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { parsedUserAgent } from '@100mslive/hms-video-store';
 import { usePDFConfig } from './usePDFConfig';
 import { useScreenShare } from './useScreenShare';
+import { chromiumBasedBrowsers } from '../utils/commons';
 
 const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';
 
@@ -25,7 +26,9 @@ export interface useRegionCaptureScreenShareResult {
 export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult => {
   const regionRef = useRef<HTMLIFrameElement | null>(null);
   const inProgress = useRef(false);
-  const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
+  const isChrome = chromiumBasedBrowsers.some(
+    (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
+  );
   const { pdfConfig, resetPDFConfig } = usePDFConfig();
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetPDFConfig);
 
