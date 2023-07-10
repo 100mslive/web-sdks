@@ -12,18 +12,12 @@ import {
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
-import { useSidepaneToggle } from "../AppData/useSidepane";
 import { useWidgetState } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import {
-  SIDE_PANE_OPTIONS,
-  WIDGET_STATE,
-  WIDGET_VIEWS,
-} from "../../common/constants";
+import { WIDGET_STATE, WIDGET_VIEWS } from "../../common/constants";
 
 const PollsQuizMenu = () => {
   const { setWidgetView } = useWidgetState();
-  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
