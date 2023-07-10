@@ -33,7 +33,6 @@ const PollsQuizMenu = () => {
       <ContentHeader
         content="Polls/Quiz"
         onBack={() => setWidgetView(WIDGET_VIEWS.LANDING)}
-        onClose={closeWidgets}
       />
       <Flex
         direction="column"
