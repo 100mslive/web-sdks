@@ -23,11 +23,11 @@ export interface useRegionCaptureScreenShareResult {
 }
 
 export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult => {
-  const { amIScreenSharing, toggleScreenShare } = useScreenShare();
   const regionRef = useRef<HTMLIFrameElement | null>(null);
   const inProgress = useRef(false);
   const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
   const { pdfConfig, resetPDFConfig } = usePDFConfig();
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetPDFConfig);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
     if (regionRef.current) {

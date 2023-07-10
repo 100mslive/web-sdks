@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { selectAppData } from '@100mslive/hms-video-store';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
+import { validPDFUrl } from '../utils/commons';
 
 export interface PDFConfig {
   file?: File;
@@ -16,7 +17,7 @@ export interface usePDFConfigResult {
   /**
    * set pdf config data
    */
-  setPDFConfig: () => void;
+  setPDFConfig: (value: PDFConfig) => void;
 
   /**
    * reset the pdf config data
@@ -28,7 +29,15 @@ export const usePDFConfig = (): usePDFConfigResult => {
   const actions = useHMSActions();
   const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
   const setPDFConfig = useCallback(
-    (value: PDFConfig = {}) => {
+    async (value: PDFConfig = {}) => {
+      // priority file first then url
+      if (value.file && value.url) {
+        value.url = '';
+      }
+      // validate url
+      if (value.url) {
+        await validPDFUrl(value.url);
+      }
       actions.setAppData('pdfConfig', value);
     },
     [actions],
