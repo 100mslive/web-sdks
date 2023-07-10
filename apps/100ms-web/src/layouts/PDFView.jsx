@@ -1,4 +1,7 @@
-import { useRegionCaptureScreenShare } from "@100mslive/react-sdk";
+import {
+  useEmbedConfig,
+  // useRegionCaptureScreenShare,s
+} from "@100mslive/react-sdk";
 import { EmbedScreenShareView } from "./EmbedView";
 
 /**
@@ -17,7 +20,8 @@ export const PDFView = () => {
  * PDFEmbedComponent is responsible for rendering the PDF iframe and managing the screen sharing functionality.
  */
 export const PDFEmbedComponent = () => {
-  const { regionRef } = useRegionCaptureScreenShare();
+  // const { regionRef } = useRegionCaptureScreenShare();
+  const { regionRef } = useEmbedConfig();
 
   return (
     <iframe

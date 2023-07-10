@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { parsedUserAgent } from '@100mslive/hms-video-store';
+// eslint-disable-next-line import/no-cycle
 import { EmbedType, useEmbedConfig } from './useEmbedConfig';
 import { useScreenShare } from './useScreenShare';
 import { chromiumBasedBrowsers } from '../utils/commons';
