@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
@@ -117,8 +116,7 @@ export class PollsManager {
           return;
         }
         const pollResponse: HMSPollQuestionResponse = {
-          // TODO: response_id is not coming from server
-          id: response.response_id || uuid(),
+          id: response.response_id,
           questionIndex: response.question,
           option: response.option,
           options: response.options,
