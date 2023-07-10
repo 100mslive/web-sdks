@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { parsedUserAgent } from '@100mslive/hms-video-store';
-import { usePDFConfig } from './usePDFConfig';
+import { EmbedType, useEmbedConfig } from './useEmbedConfig';
 import { useScreenShare } from './useScreenShare';
 import { chromiumBasedBrowsers } from '../utils/commons';
 
@@ -29,11 +29,11 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
   const isChrome = chromiumBasedBrowsers.some(
     (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
   );
-  const { pdfConfig, resetPDFConfig } = usePDFConfig();
-  const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetPDFConfig);
+  const { embedConfig, resetEmbedConfig } = useEmbedConfig();
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetEmbedConfig);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
-    if (regionRef.current) {
+    if (regionRef.current && embedConfig.config.type === EmbedType.PDF) {
       regionRef.current.contentWindow?.postMessage(
         {
           theme: document.documentElement.classList.contains('dark-theme') ? 2 : 1,
@@ -75,33 +75,42 @@ export const useRegionCaptureScreenShare = (): useRegionCaptureScreenShareResult
   useEffect(() => {
     // eslint-disable-next-line complexity
     (async () => {
-      if (!amIScreenSharing && regionRef.current && (pdfConfig.file || pdfConfig.url) && !inProgress.current) {
-        regionRef.current.src = `${pdfIframeURL}${pdfConfig.url ? `?file=${pdfConfig.url}` : ''}`;
+      if (!amIScreenSharing && regionRef.current && embedConfig?.config?.data && !inProgress.current) {
+        if (embedConfig.config.type === EmbedType.PDF) {
+          regionRef.current.src = `${pdfIframeURL}${
+            typeof embedConfig.config.data === 'string' ? `?file=${embedConfig.config.data}` : ''
+          }`;
+        } else {
+          regionRef.current.src = embedConfig.config.data;
+        }
         regionRef.current.onload = () => {
           requestAnimationFrame(() => {
-            sendDataToPDFIframe(pdfConfig.file);
+            sendDataToPDFIframe(embedConfig.config.data instanceof File ? embedConfig.config.data : undefined);
           });
         };
         inProgress.current = true;
-        await toggleScreenShare?.({
-          forceCurrentTab: isChrome,
-          cropElement: regionRef.current,
-          preferCurrentTab: isChrome,
-        });
+        if (embedConfig.config?.type === EmbedType.PDF || embedConfig.isSharing) {
+          await toggleScreenShare?.({
+            forceCurrentTab: isChrome,
+            cropElement: regionRef.current,
+            preferCurrentTab: isChrome,
+          });
+        }
         inProgress.current = false;
       }
     })();
-  }, [amIScreenSharing, isChrome, toggleScreenShare, pdfConfig, sendDataToPDFIframe]);
+  }, [amIScreenSharing, isChrome, toggleScreenShare, embedConfig, sendDataToPDFIframe]);
 
   useEffect(() => {
     return () => {
       // close screenshare when this component is being unmounted
       if (amIScreenSharing) {
-        resetPDFConfig();
+        resetEmbedConfig();
         stopScreenShare(); // stop
+        regionRef.current = null;
       }
     };
-  }, [amIScreenSharing, resetPDFConfig, stopScreenShare]);
+  }, [amIScreenSharing, resetEmbedConfig, stopScreenShare]);
 
   return {
     amIScreenSharing,

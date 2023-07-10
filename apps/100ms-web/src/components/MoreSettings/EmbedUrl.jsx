@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { EmbedType, useEmbedConfig } from "@100mslive/react-sdk";
 import { ViewIcon } from "@100mslive/react-icons";
 import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
 import {
@@ -6,8 +7,6 @@ import {
   DialogInput,
   DialogRow,
 } from "../../primitives/DialogContent";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
-import { APP_DATA } from "../../common/constants";
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
   if (!window.CropTarget) {
@@ -30,14 +29,21 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
 };
 
 export function EmbedUrlModal({ onOpenChange }) {
-  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(
-    APP_DATA.embedConfig
-  );
-  const [url, setUrl] = useState(embedConfig?.url || "");
+  const { embedConfig, setEmbedConfig } = useEmbedConfig();
+  const [url, setUrl] = useState(embedConfig?.config?.data || "");
 
-  const isAnythingEmbedded = !!embedConfig?.url;
-  const isModifying = isAnythingEmbedded && url && url !== embedConfig.url;
-
+  const isAnythingEmbedded = !!embedConfig?.config?.data;
+  const isModifying =
+    isAnythingEmbedded && url && url !== embedConfig?.config?.data;
+  const setEmbed = data => {
+    setEmbedConfig({
+      config: {
+        type: EmbedType.EMBED,
+        data: data.url,
+      },
+      isSharing: data.isSharing || false,
+    });
+  };
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Embed URL" Icon={ViewIcon}>
@@ -63,7 +69,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 type="submit"
                 disabled={!isModifying}
                 onClick={() => {
-                  setEmbedConfig({ url, shareScreen: embedConfig.shareScreen });
+                  setEmbed({ url, isSharing: embedConfig.isSharing });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -75,7 +81,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 variant="danger"
                 type="submit"
                 onClick={() => {
-                  setEmbedConfig({ url: "" });
+                  setEmbed({ url: "" });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -90,7 +96,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 type="submit"
                 disabled={!url.trim()}
                 onClick={() => {
-                  setEmbedConfig({ url });
+                  setEmbed({ url });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -103,7 +109,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 type="submit"
                 disabled={!url.trim()}
                 onClick={() => {
-                  setEmbedConfig({ url, shareScreen: true });
+                  setEmbed({ url, isSharing: true });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"

@@ -6,9 +6,9 @@ import {
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
   selectTemplateAppData,
+  useEmbedConfig,
   useHMSActions,
   useHMSStore,
-  usePDFConfig,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../components/FullPageProgress";
@@ -26,7 +26,6 @@ import {
   useIsHeadless,
   usePinnedTrack,
   useUISettings,
-  useUrlToEmbed,
   useWaitingViewerRole,
 } from "../components/AppData/useUISettings";
 import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from "../common/constants";
@@ -51,8 +50,8 @@ export const ConferenceMainView = () => {
   const { uiViewMode, isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
-  const urlToIframe = useUrlToEmbed();
-  const { pdfConfig } = usePDFConfig();
+  const { embedConfig } = useEmbedConfig();
+
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -86,9 +85,9 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (pdfConfig?.isSharingPDF) {
+  } else if (embedConfig?.config?.isSharing) {
     ViewComponent = PDFView;
-  } else if (urlToIframe) {
+  } else if (embedConfig?.config?.data) {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
