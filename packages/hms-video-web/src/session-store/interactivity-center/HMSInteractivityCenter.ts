@@ -94,9 +94,14 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         delete response.text;
         delete response.option;
       } else {
-        response.text = response.text || '';
         delete response.option;
         delete response.options;
+      }
+
+      if (response.skipped) {
+        delete response.option;
+        delete response.options;
+        delete response.text;
       }
 
       return { duration: 0, type: question.type, question: response.questionIndex, ...response };
