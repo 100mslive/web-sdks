@@ -16,7 +16,6 @@ import { SidePane } from "./screenShareView";
  */
 export const EmbedView = () => {
   const { regionRef } = useEmbedScreenShare();
-  console.log("region reff ", regionRef);
   return <EmbedScreenShareView ref={regionRef} />;
 };
 
