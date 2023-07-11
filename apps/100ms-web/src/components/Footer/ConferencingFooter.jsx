@@ -16,6 +16,7 @@ import {
 import { Playlist } from "../../components/Playlist/Playlist";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";
+import BottomSheet from "../BottomSheet";
 import { EmojiReaction } from "../EmojiReaction";
 import { LeaveRoom } from "../LeaveRoom";
 import MetaActions from "../MetaActions";
@@ -31,7 +32,6 @@ import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { FEATURE_LIST } from "../../common/constants";
-import BottomSheet from "../BottomSheet";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
