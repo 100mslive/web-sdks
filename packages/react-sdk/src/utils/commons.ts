@@ -1,3 +1,4 @@
+import { parsedUserAgent } from '@100mslive/hms-video-store';
 import HMSLogger from './logger';
 import { hooksErrHandler } from '../hooks/types';
 
@@ -13,14 +14,10 @@ export const throwErrorHandler: hooksErrHandler = (err: Error) => {
   throw err;
 };
 
-export const validPDFUrl = (pdfURL: string): Promise<boolean> => {
+export const isValidPDFUrl = (pdfURL: string): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     if (!pdfURL) {
-      reject('URL is empty');
-    }
-    const extension: string | undefined = pdfURL.split('.').pop();
-    if (!extension || extension.toLowerCase() === 'pdf') {
-      resolve(true);
+      reject(new Error('URL is empty'));
     }
     fetch(pdfURL, { method: 'HEAD' })
       .then(response => response.headers.get('content-type'))
@@ -28,13 +25,19 @@ export const validPDFUrl = (pdfURL: string): Promise<boolean> => {
         if (contentType === 'application/pdf') {
           resolve(true);
         } else {
-          reject('URL does not contain pdf');
+          reject(new Error('URL does not contain pdf'));
         }
       })
       .catch(error => {
-        reject(error);
+        reject(error as Error);
       });
   });
 };
 
-export const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];
+const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];
+
+export const isChromiumBased = chromiumBasedBrowsers.some(
+  (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
+);
+
+export const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';

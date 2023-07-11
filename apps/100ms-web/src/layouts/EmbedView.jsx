@@ -5,7 +5,7 @@ import {
   selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
-  useEmbedConfig,
+  useEmbedScreenShare,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
@@ -85,7 +85,7 @@ export const EmbedScreenShareView = ({ children }) => {
  * EmbedComponent is responsible for rendering the PDF iframe and managing the screen sharing functionality.
  */
 export const EmbedComponent = () => {
-  const { regionRef } = useEmbedConfig();
+  const { regionRef } = useEmbedScreenShare();
 
   return (
     <iframe

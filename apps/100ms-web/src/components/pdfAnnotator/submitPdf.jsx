@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { EmbedType, useEmbedConfig } from "@100mslive/react-sdk";
+import { EmbedType, useEmbedScreenShare } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 
 export const SubmitPDF = ({
@@ -11,7 +11,7 @@ export const SubmitPDF = ({
   onOpenChange,
   hideSecondaryCTA = false,
 }) => {
-  const { setEmbedConfig, resetEmbedConfig } = useEmbedConfig();
+  const { setEmbedConfig, resetEmbedConfig } = useEmbedScreenShare();
   const isValidPDF = useCallback(
     async pdfURL => {
       setIsValidateProgress(true);

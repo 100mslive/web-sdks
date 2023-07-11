@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { parsedUserAgent, selectAppData } from '@100mslive/hms-video-store';
+import { selectAppData } from '@100mslive/hms-video-store';
 import { useScreenShare } from './useScreenShare';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { chromiumBasedBrowsers, validPDFUrl } from '../utils/commons';
+import { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
 
-const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';
 export enum EmbedType {
   PDF = 'pdf',
   EMBED = 'embed',
@@ -22,7 +21,7 @@ export interface EmbedConfig {
   config: PDFData | EmbedData;
   isSharing?: boolean;
 }
-export interface useEmbedConfigResult {
+export interface useEmbedScreenShareResult {
   /**
    * embed Config data
    */
@@ -53,7 +52,7 @@ export interface useEmbedConfigResult {
   stopScreenShare: () => Promise<void>;
 }
 
-export const useEmbedConfig = (): useEmbedConfigResult => {
+export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   const actions = useHMSActions();
   const embedConfig = useHMSStore(selectAppData('embedConfig'));
   const setEmbedConfig = useCallback(
@@ -64,7 +63,7 @@ export const useEmbedConfig = (): useEmbedConfigResult => {
         return;
       }
       if (typeof value.config.data === 'string') {
-        await validPDFUrl(value.config.data);
+        await isValidPDFUrl(value.config.data);
       }
       actions.setAppData('embedConfig', value);
     },
@@ -77,9 +76,6 @@ export const useEmbedConfig = (): useEmbedConfigResult => {
     regionRef.current = null;
   }, [actions]);
   const inProgress = useRef(false);
-  const isChrome = chromiumBasedBrowsers.some(
-    (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
-  );
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetEmbedConfig);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
@@ -104,14 +100,7 @@ export const useEmbedConfig = (): useEmbedConfigResult => {
   useEffect(() => {
     const mutationCallback = (mutations: MutationRecord[]) => {
       mutations.forEach(() => {
-        if (regionRef.current) {
-          regionRef.current.contentWindow?.postMessage(
-            {
-              theme: document.documentElement.classList.contains('dark-theme') ? 2 : 1,
-            },
-            '*',
-          );
-        }
+        sendDataToPDFIframe();
       });
     };
     const observer = new MutationObserver(mutationCallback);
@@ -141,15 +130,15 @@ export const useEmbedConfig = (): useEmbedConfigResult => {
         inProgress.current = true;
         if (embedConfig.config?.type === EmbedType.PDF || embedConfig.isSharing) {
           await toggleScreenShare?.({
-            forceCurrentTab: isChrome,
+            forceCurrentTab: isChromiumBased,
             cropElement: regionRef.current,
-            preferCurrentTab: isChrome,
+            preferCurrentTab: isChromiumBased,
           });
         }
         inProgress.current = false;
       }
     })();
-  }, [amIScreenSharing, isChrome, toggleScreenShare, embedConfig, sendDataToPDFIframe]);
+  }, [amIScreenSharing, toggleScreenShare, embedConfig, sendDataToPDFIframe]);
 
   useEffect(() => {
     return () => {

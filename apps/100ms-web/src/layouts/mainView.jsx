@@ -6,7 +6,7 @@ import {
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
   selectTemplateAppData,
-  useEmbedConfig,
+  useEmbedScreenShare,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -49,7 +49,7 @@ export const ConferenceMainView = () => {
   const { uiViewMode, isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
-  const { embedConfig } = useEmbedConfig();
+  const { embedConfig } = useEmbedScreenShare();
 
   useEffect(() => {
     if (!isConnected) {

@@ -20,8 +20,7 @@ export { useRecordingStreaming } from './hooks/useRecordingStreaming';
 export { useAutoplayError } from './hooks/useAutoplayError';
 export { useCustomEvent } from './hooks/useCustomEvent';
 export { useParticipants } from './hooks/useParticipants';
-export { useRegionCaptureScreenShare } from './hooks/useRegionCaptureScreenShare';
-export { useEmbedConfig, EmbedType } from './hooks/useEmbedConfig';
+export { useEmbedScreenShare, EmbedType } from './hooks/useEmbedScreenShare';
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreviewJoin';
@@ -36,8 +35,7 @@ export type { useParticipantsResult, useParticipantsParams } from './hooks/usePa
 export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
 export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
 export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
-export type { useRegionCaptureScreenShareResult } from './hooks/useRegionCaptureScreenShare';
-export type { useEmbedConfigResult, EmbedConfig, EmbedData } from './hooks/useEmbedConfig';
+export type { useEmbedScreenShareResult, EmbedConfig, EmbedData } from './hooks/useEmbedScreenShare';
 // helpers
 export { throwErrorHandler } from './utils/commons';
 
