@@ -2,7 +2,7 @@
 import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
-import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
+import { CreateQuestions } from "../Polls/CreateQuestions";
 import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Voting } from "../Polls/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
@@ -40,7 +40,7 @@ export const Widgets = () => {
         </Flex>
       )}
       {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
-      {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <LaunchPollsQuizMenu />}
+      {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <CreateQuestions />}
       {widgetView === WIDGET_VIEWS.VOTE && (
         <Voting toggleVoting={toggleWidget} id={pollID} />
       )}

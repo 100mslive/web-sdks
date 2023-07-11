@@ -119,7 +119,7 @@ export const QuestionCard = ({
         p: "$md",
         mt: "$md",
         border:
-          isQuiz && localPeerResponse
+          isQuiz && localPeerResponse && !localPeerResponse.skipped
             ? `1px solid ${isCorrectAnswer ? "$success" : "$error"}`
             : "none",
       }}

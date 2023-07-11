@@ -63,7 +63,7 @@ const isValidQuestion = ({
   return everyOptionHasText && hasCorrectAnswer;
 };
 
-export function LaunchPollsQuizMenu() {
+export function CreateQuestions() {
   const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
   const { pollInView: id, setWidgetView } = useWidgetState();
