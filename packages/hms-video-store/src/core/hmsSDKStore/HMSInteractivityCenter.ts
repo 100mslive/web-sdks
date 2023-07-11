@@ -8,6 +8,7 @@ import {
 export interface IHMSInteractivityCenter {
   createPoll(poll: HMSPollCreateParams): Promise<void>;
   startPoll(poll: string | HMSPollCreateParams): Promise<void>;
+  stopPoll(poll: string): Promise<void>;
   addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void>;
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
 }
@@ -25,6 +26,10 @@ export class HMSInteractivityCenter implements IHMSInteractivityCenter {
 
   startPoll(poll: string | HMSPollCreateParams) {
     return this.sdkInteractivityCenter.startPoll(poll);
+  }
+
+  stopPoll(poll: string) {
+    return this.sdkInteractivityCenter.stopPoll(poll);
   }
 
   addQuestionsToPoll(poll: string, questions: HMSPollQuestionCreateParams[]) {

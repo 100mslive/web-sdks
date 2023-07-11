@@ -1,20 +1,24 @@
 // @ts-check
 import React from "react";
 import {
+  selectLocalPeerID,
   selectPeerNameByID,
   selectPollByID,
+  useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { CrossIcon } from "@100mslive/react-icons";
-import { Box, Flex, Text } from "@100mslive/react-ui";
+import { Box, Button, Flex, Text } from "@100mslive/react-ui";
 import { Container } from "../../Streaming/Common";
 import { StandardView } from "./StandardVoting";
 import { TimedView } from "./TimedVoting";
 import { StatusIndicator } from "../common/StatusIndicator";
 
 export const Voting = ({ id, toggleVoting }) => {
+  const actions = useHMSActions();
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
+  const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
 
   if (!poll) {
     return null;
@@ -55,9 +59,24 @@ export const Voting = ({ id, toggleVoting }) => {
       </Box>
 
       <Flex direction="column" css={{ p: "$8 $10" }}>
-        <Text css={{ color: "$textMedEmp", fontWeight: "$semiBold" }}>
-          {pollCreatorName || "Participant"} started a {poll.type}
-        </Text>
+        <Flex align="center">
+          <Box css={{ flex: "auto" }}>
+            <Text css={{ color: "$textMedEmp", fontWeight: "$semiBold" }}>
+              {pollCreatorName || "Participant"} started a {poll.type}
+            </Text>
+          </Box>
+          {poll.state === "started" && isLocalPeerCreator && (
+            <Box css={{ flex: "initial" }}>
+              <Button
+                variant="danger"
+                css={{ fontSize: "$sm", fontWeight: "$semiBold", p: "$3 $6" }}
+                onClick={() => actions.interactivityCenter.stopPoll(id)}
+              >
+                End Poll
+              </Button>
+            </Box>
+          )}
+        </Flex>
         {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
       </Flex>
     </Container>
