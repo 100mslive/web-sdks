@@ -12,6 +12,7 @@ import {
 import { IStore } from '../../sdk/store';
 import { PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
+import { convertDateNumToDate } from '../../utils/date';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
   constructor(private transport: HMSTransport, private store: IStore, private listener?: PollsListener) {}
@@ -112,12 +113,37 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async getPolls(): Promise<HMSPoll[]> {
-    const { polls } = await this.transport.getPollsList({ count: 50 });
-    return polls.map(pollParams => {
-      const poll = { ...pollParams, id: pollParams.poll_id, mode: pollParams.mode as HMSPoll['mode'] };
+    const pollsList = await this.transport.getPollsList({ count: 50 });
+    const polls: HMSPoll[] = [];
+    for (const pollParams of pollsList.polls) {
+      const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
+      const poll: HMSPoll = {
+        id: pollParams.poll_id,
+        title: pollParams.title,
+        startedBy: pollParams.started_by,
+        createdBy: pollParams.created_by,
+        anonymous: pollParams.anonymous,
+        type: pollParams.type,
+        duration: pollParams.duration,
+        locked: pollParams.locked, // poll is locked automatically when it starts
+        mode: pollParams.mode as HMSPoll['mode'],
+        visibility: pollParams.visibility,
+        rolesThatCanVote: pollParams.vote || [],
+        rolesThaCanViewResponses: pollParams.responses || [],
+        state: pollParams.state,
+        stoppedBy: pollParams.stopped_by,
+        startedAt: convertDateNumToDate(pollParams.started_at),
+        stoppedAt: convertDateNumToDate(pollParams.stopped_at),
+        createdAt: convertDateNumToDate(pollParams.created_at),
+
+        questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
+      };
+
+      polls.push(poll);
       this.store.setPoll(poll);
-      return poll;
-    });
+    }
+
+    return polls;
   }
 
   getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {

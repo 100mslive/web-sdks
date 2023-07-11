@@ -41,7 +41,7 @@ export class PollsManager {
         type: pollParams.type,
         duration: pollParams.duration,
         locked: pollParams.locked, // poll is locked automatically when it starts
-        // mode: pollParams.mode,
+        mode: pollParams.mode as HMSPoll['mode'],
         visibility: pollParams.visibility,
         rolesThatCanVote: pollParams.vote || [],
         rolesThaCanViewResponses: pollParams.responses || [],
