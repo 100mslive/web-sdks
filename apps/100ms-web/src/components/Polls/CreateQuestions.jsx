@@ -25,6 +25,7 @@ import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { MultipleChoiceOptionInputs } from "./MultipleChoiceOptions";
 import { SingleChoiceOptionInputs } from "./SingleChoiceOptions";
+import { useWidgetToggle } from "../AppData/useSidepane";
 import { useWidgetState } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
 import {
@@ -66,6 +67,7 @@ const isValidQuestion = ({
 export function CreateQuestions() {
   const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
+  const toggleWidget = useWidgetToggle();
   const { pollInView: id, setWidgetView } = useWidgetState();
   const interaction = useHMSStore(selectPollByID(id));
 
@@ -90,6 +92,7 @@ export function CreateQuestions() {
     <Container rounded>
       <ContentHeader
         content={headingTitle}
+        onClose={toggleWidget}
         onBack={() => setWidgetView(WIDGET_VIEWS.CREATE_POLL_QUIZ)}
       />
       <Flex direction="column" css={{ p: "$10" }}>

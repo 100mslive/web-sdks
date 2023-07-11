@@ -49,6 +49,7 @@ export const useWidgetToggle = () => {
 
   const toggleWidget = useCallback(
     id => {
+      id = typeof id === "string" ? id : undefined;
       setWidgetState({
         [WIDGET_STATE.pollInView]: id,
         [WIDGET_STATE.view]: id

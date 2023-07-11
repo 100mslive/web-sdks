@@ -37,7 +37,7 @@ export const Voting = ({ id, toggleVoting }) => {
           }}
         >
           <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
-          <StatusIndicator isTimed={isTimed} />
+          <StatusIndicator poll={poll} />
           <Box
             css={{
               marginLeft: "auto",

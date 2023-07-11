@@ -1,13 +1,17 @@
 import { Flex, Text } from "@100mslive/react-ui";
 
-export const StatusIndicator = ({ isTimed }) => {
+export const StatusIndicator = ({ poll }) => {
+  const isTimed = (poll?.duration || 0) > 0;
+  const isLive = poll?.state === "started";
+  const shouldShowTimer = isLive && isTimed;
+
   return (
     <Flex align="center">
       <Flex
         css={{
-          backgroundColor: "$error",
+          backgroundColor: isLive ? "$error" : "$secondaryDefault",
           p: "$2 $4",
-          borderRadius: isTimed ? "$0 0 0 $0" : "$0",
+          borderRadius: shouldShowTimer ? "$0 0 0 $0" : "$0",
         }}
       >
         <Text
@@ -17,16 +21,16 @@ export const StatusIndicator = ({ isTimed }) => {
             color: "$textHighEmp",
           }}
         >
-          LIVE
+          {isLive ? "LIVE" : "ENDED"}
         </Text>
       </Flex>
 
-      {/* {isTimed ? (
+      {shouldShowTimer ? (
         <Flex
           css={{
             borderRadius: "0 $0 $0 0",
             p: "$2 $4",
-            backgroundColor: "$surfaceLighter",
+            backgroundColor: "$backgroundDefault",
           }}
         >
           <Text
@@ -39,7 +43,7 @@ export const StatusIndicator = ({ isTimed }) => {
             0:32
           </Text>
         </Flex>
-      ) : null} */}
+      ) : null}
     </Flex>
   );
 };

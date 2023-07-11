@@ -12,11 +12,14 @@ import {
 } from "@100mslive/react-ui";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
+import { StatusIndicator } from "./StatusIndicator";
+import { useWidgetToggle } from "../AppData/useSidepane";
 import { useWidgetState } from "../AppData/useUISettings";
 import { useDropdownSelection } from "../hooks/useDropdownSelection";
 import { WIDGET_STATE, WIDGET_VIEWS } from "../../common/constants";
 
 const PollsQuizMenu = () => {
+  const toggleWidget = useWidgetToggle();
   const { setWidgetView } = useWidgetState();
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
@@ -27,6 +30,7 @@ const PollsQuizMenu = () => {
       <ContentHeader
         content="Polls/Quiz"
         onBack={() => setWidgetView(WIDGET_VIEWS.LANDING)}
+        onClose={toggleWidget}
       />
       <Flex
         direction="column"
@@ -192,15 +196,15 @@ const PrevMenu = () => {
       </Text>
       <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
         {polls.map(poll => (
-          <InteractionCard {...poll} />
+          <InteractionCard key={poll.id} poll={poll} />
         ))}
       </Flex>
     </Flex>
   ) : null;
 };
 
-const InteractionCard = ({ id, title, state = "stopped" }) => {
-  const ended = state === "stopped";
+const InteractionCard = ({ poll }) => {
+  const ended = poll.state === "stopped";
   const { setWidgetState } = useWidgetState();
 
   const goToVote = id => {
@@ -215,17 +219,18 @@ const InteractionCard = ({ id, title, state = "stopped" }) => {
       direction="column"
       css={{ backgroundColor: "$surfaceLight", borderRadius: "$1", p: "$8" }}
     >
-      <Flex css={{ w: "100%", justifyContent: "space-between" }}>
+      <Flex css={{ w: "100%", justifyContent: "space-between", mb: "$sm" }}>
         <Text
           variant="sub1"
           css={{ c: "$textHighEmp", fontWeight: "$semiBold" }}
         >
-          {title}
+          {poll.title}
         </Text>
+        <StatusIndicator poll={poll} />
       </Flex>
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
         {!ended && (
-          <Button variant="primary" onClick={() => goToVote(id)}>
+          <Button variant="primary" onClick={() => goToVote(poll.id)}>
             View
           </Button>
         )}
