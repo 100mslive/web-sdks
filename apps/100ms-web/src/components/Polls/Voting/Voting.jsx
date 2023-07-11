@@ -7,10 +7,10 @@ import {
 } from "@100mslive/react-sdk";
 import { CrossIcon } from "@100mslive/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
-import { StandardView } from "./Views/StandardView";
-import { TimedView } from "./Views/TimedView";
-import { Container } from "../Streaming/Common";
-import { StatusIndicator } from "./StatusIndicator";
+import { Container } from "../../Streaming/Common";
+import { StandardView } from "./StandardVoting";
+import { TimedView } from "./TimedVoting";
+import { StatusIndicator } from "../common/StatusIndicator";
 
 export const Voting = ({ id, toggleVoting }) => {
   const poll = useHMSStore(selectPollByID(id));

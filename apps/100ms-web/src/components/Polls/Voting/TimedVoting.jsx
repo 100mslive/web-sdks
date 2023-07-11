@@ -1,6 +1,6 @@
 // @ts-check
 import React, { useState } from "react";
-import { QuestionCard } from "../QuestionCard";
+import { QuestionCard } from "./QuestionCard";
 
 /**
  *

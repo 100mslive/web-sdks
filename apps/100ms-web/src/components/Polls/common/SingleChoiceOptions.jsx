@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useCallback } from "react";
 import { Flex, Input, Progress, RadioGroup, Text } from "@100mslive/react-ui";
-import { VoteCount } from "./OptionComponents/VoteCount";
+import { VoteCount } from "./VoteCount";
 
 export const SingleChoiceOptions = ({
   isQuiz,

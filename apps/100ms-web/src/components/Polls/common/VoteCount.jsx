@@ -1,3 +1,5 @@
+// @ts-check
+import React from "react";
 import { Flex, Text } from "@100mslive/react-ui";
 
 export const VoteCount = ({ isQuiz, voteCount, isCorrectAnswer }) => {

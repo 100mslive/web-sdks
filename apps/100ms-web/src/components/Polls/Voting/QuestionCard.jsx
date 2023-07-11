@@ -8,16 +8,16 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import {
   Box,
+  Button,
   Flex,
   IconButton,
   Input,
   styled,
   Text,
 } from "@100mslive/react-ui";
-import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
-import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
-import { SingleChoiceOptions } from "./SingleChoiceOptions";
-import { QUESTION_TYPE } from "../../common/constants";
+import { MultipleChoiceOptions } from "../common/MultipleChoiceOptions";
+import { SingleChoiceOptions } from "../common/SingleChoiceOptions";
+import { QUESTION_TYPE } from "../../../common/constants";
 
 const TextArea = styled("textarea", {
   backgroundColor: "$surfaceLighter",
@@ -239,5 +239,44 @@ export const QuestionCard = ({
         handleVote={handleVote}
       />
     </Box>
+  );
+};
+
+const QuestionCardFooter = ({
+  skippable,
+  response,
+  stringAnswerExpected,
+  handleVote,
+  skipQuestion,
+}) => {
+  return (
+    <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
+      {skippable && !response ? (
+        <Button
+          variant="standard"
+          onClick={skipQuestion}
+          css={{ p: "$xs $10", fontWeight: "$semiBold" }}
+        >
+          Skip
+        </Button>
+      ) : null}
+
+      {response ? (
+        <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
+          {response.skipped
+            ? "Skipped"
+            : stringAnswerExpected
+            ? "Submitted"
+            : "Voted"}
+        </Text>
+      ) : (
+        <Button
+          css={{ p: "$xs $10", fontWeight: "$semiBold" }}
+          onClick={() => handleVote()}
+        >
+          {stringAnswerExpected ? "Submit" : "Vote"}
+        </Button>
+      )}
+    </Flex>
   );
 };

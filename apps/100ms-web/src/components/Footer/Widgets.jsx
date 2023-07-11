@@ -2,9 +2,9 @@
 import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
 import { Flex, Text } from "@100mslive/react-ui";
-import { CreateQuestions } from "../Polls/CreateQuestions";
-import PollsQuizMenu from "../Polls/PollsQuizMenu";
-import { Voting } from "../Polls/Voting";
+import { PollsQuizMenu } from "../Polls/CreatePollQuiz/PollsQuizMenu";
+import { CreateQuestions } from "../Polls/CreateQuestions/CreateQuestions";
+import { Voting } from "../Polls/Voting/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useWidgetToggle } from "../AppData/useSidepane";
 import { useWidgetState } from "../AppData/useUISettings";
