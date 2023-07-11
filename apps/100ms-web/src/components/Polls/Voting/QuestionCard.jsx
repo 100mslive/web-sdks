@@ -15,6 +15,7 @@ import {
   styled,
   Text,
 } from "@100mslive/react-ui";
+import { compareArrays } from "../../../common/utils";
 import { MultipleChoiceOptions } from "../common/MultipleChoiceOptions";
 import { SingleChoiceOptions } from "../common/SingleChoiceOptions";
 import { QUESTION_TYPE } from "../../../common/constants";
@@ -29,19 +30,6 @@ const TextArea = styled("textarea", {
   p: "$2",
   w: "100%",
 });
-
-const compareArrays = (a, b) => {
-  if (a.length !== b.length) return false;
-  else {
-    // Comparing each element of your array
-    for (var i = 0; i < a.length; i++) {
-      if (a[i] !== b[i]) {
-        return false;
-      }
-    }
-    return true;
-  }
-};
 
 export const QuestionCard = ({
   pollID,
@@ -207,6 +195,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions
+          questionIndex={index}
           isQuiz={isQuiz}
           response={localPeerResponse}
           correctOptionIndex={answer?.option}
@@ -218,6 +207,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <MultipleChoiceOptions
+          questionIndex={index}
           isQuiz={isQuiz}
           response={localPeerResponse}
           correctOptionIndexes={answer?.options}

@@ -21,7 +21,7 @@ export const VoteCount = ({ isQuiz, voteCount, isCorrectAnswer }) => {
       )}
       <Text variant="sm" css={{ color: "$textMedEmp" }}>
         {voteCount}&nbsp;
-        {voteCount !== 1 ? "votes" : "votes"}
+        {voteCount === 1 ? "vote" : "votes"}
       </Text>
     </Flex>
   );
