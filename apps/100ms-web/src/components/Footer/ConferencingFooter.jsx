@@ -6,7 +6,7 @@ import {
   useHMSStore,
   useScreenShare,
 } from "@100mslive/react-sdk";
-import { MusicIcon } from "@100mslive/react-icons";
+import { MusicIcon, VerticalMenuIcon } from "@100mslive/react-icons";
 import {
   config as cssConfig,
   Flex,
@@ -31,6 +31,8 @@ import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
 import { FEATURE_LIST } from "../../common/constants";
+import BottomSheet from "../BottomSheet";
+import { Box } from "@100mslive/react-ui";
 
 const TranscriptionButton = React.lazy(() =>
   import("../../plugins/transcription")
@@ -112,6 +114,15 @@ export const ConferencingFooter = () => {
       <AppFooter.Center>
         <AudioVideoToggle />
         <ScreenshareToggle />
+
+        <BottomSheet
+          title="Settings"
+          triggerContent={
+            <IconButton>
+              <VerticalMenuIcon />
+            </IconButton>
+          }
+        />
         <PIP />
         <MoreSettings />
         <Flex
