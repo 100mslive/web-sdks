@@ -21,7 +21,6 @@ export const EmbedView = () => {
 
 export const EmbedScreenShareView = ({ children }) => {
   const peers = useHMSStore(selectPeers);
-
   const mediaQueryLg = cssConfig.media.xl;
   const showSidebarInBottom = useMedia(mediaQueryLg);
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -39,7 +38,7 @@ export const EmbedScreenShareView = ({ children }) => {
       smallTilePeers.unshift(peerPresenting); // put presenter on first page
     }
     return smallTilePeers;
-  }, [peers, peerPresenting, showPresenterInSmallTile]);
+  }, [peers, showPresenterInSmallTile, peerPresenting]);
   return (
     <Flex
       css={{ size: "100%" }}
@@ -97,7 +96,7 @@ export const EmbedComponent = () => {
         border: 0,
         borderRadius: "0.75rem",
       }}
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
+      allow="autoplay; clipboard-write;"
       referrerPolicy="no-referrer"
     />
   );

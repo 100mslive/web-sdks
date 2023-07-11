@@ -2,23 +2,10 @@ import { useCallback, useEffect, useRef } from 'react';
 import { selectAppData } from '@100mslive/hms-video-store';
 import { useScreenShare } from './useScreenShare';
 import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
-import { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
+import { isChromiumBased } from '../utils/commons';
 
-export enum EmbedType {
-  PDF = 'pdf',
-  EMBED = 'embed',
-}
-export interface PDFData {
-  type: EmbedType.PDF;
-  data: File | string;
-}
-
-export interface EmbedData {
-  type: EmbedType.EMBED;
-  data: string;
-}
 export interface EmbedConfig {
-  config: PDFData | EmbedData;
+  url: string;
   isSharing?: boolean;
 }
 export interface useEmbedScreenShareResult {
@@ -47,6 +34,11 @@ export interface useEmbedScreenShareResult {
   regionRef: React.RefObject<HTMLIFrameElement | null>;
 
   /**
+   * start screen share
+   */
+  startScreenShare: () => Promise<void>;
+
+  /**
    * stop screen share
    */
   stopScreenShare: () => Promise<void>;
@@ -56,15 +48,7 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   const actions = useHMSActions();
   const embedConfig = useHMSStore(selectAppData('embedConfig'));
   const setEmbedConfig = useCallback(
-    async (value: EmbedConfig) => {
-      // priority file first then url
-      if (value.config.type === EmbedType.EMBED) {
-        actions.setAppData('embedConfig', value);
-        return;
-      }
-      if (typeof value.config.data === 'string') {
-        await isValidPDFUrl(value.config.data);
-      }
+    (value: EmbedConfig) => {
       actions.setAppData('embedConfig', value);
     },
     [actions],
@@ -78,67 +62,35 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   const inProgress = useRef(false);
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetEmbedConfig);
 
-  const sendDataToPDFIframe = useCallback((file?: File) => {
-    if (regionRef.current && embedConfig.config.type === EmbedType.PDF) {
-      regionRef.current.contentWindow?.postMessage(
-        {
-          theme: document.documentElement.classList.contains('dark-theme') ? 2 : 1,
-          file,
-        },
-        '*',
-      );
+  const startScreenShare = useCallback(async () => {
+    if (regionRef.current) {
+      await toggleScreenShare?.({
+        forceCurrentTab: isChromiumBased,
+        cropElement: regionRef.current,
+        preferCurrentTab: isChromiumBased,
+      });
     }
-  }, []);
+  }, [toggleScreenShare]);
 
   const stopScreenShare = useCallback(async () => {
     if (amIScreenSharing) {
-      regionRef.current = null;
       await toggleScreenShare?.(); // Stop screen sharing
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
-  useEffect(() => {
-    const mutationCallback = (mutations: MutationRecord[]) => {
-      mutations.forEach(() => {
-        sendDataToPDFIframe();
-      });
-    };
-    const observer = new MutationObserver(mutationCallback);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
-
   // Start screen sharing when the component is mounted and not already screen sharing
   useEffect(() => {
-    // eslint-disable-next-line complexity
     (async () => {
-      if (!amIScreenSharing && regionRef.current && embedConfig?.config?.data && !inProgress.current) {
-        if (embedConfig.config.type === EmbedType.PDF) {
-          regionRef.current.src = `${pdfIframeURL}${
-            typeof embedConfig.config.data === 'string' ? `?file=${embedConfig.config.data}` : ''
-          }`;
-        } else {
-          regionRef.current.src = embedConfig.config.data;
-        }
-        regionRef.current.onload = () => {
-          requestAnimationFrame(() => {
-            sendDataToPDFIframe(embedConfig.config.data instanceof File ? embedConfig.config.data : undefined);
-          });
-        };
+      if (!amIScreenSharing && regionRef.current && embedConfig?.url && !inProgress.current) {
+        regionRef.current.src = embedConfig.url;
         inProgress.current = true;
-        if (embedConfig.config?.type === EmbedType.PDF || embedConfig.isSharing) {
-          await toggleScreenShare?.({
-            forceCurrentTab: isChromiumBased,
-            cropElement: regionRef.current,
-            preferCurrentTab: isChromiumBased,
-          });
+        if (embedConfig.isSharing) {
+          await startScreenShare();
         }
         inProgress.current = false;
       }
     })();
-  }, [amIScreenSharing, toggleScreenShare, embedConfig, sendDataToPDFIframe]);
+  }, [amIScreenSharing, toggleScreenShare, embedConfig, startScreenShare]);
 
   useEffect(() => {
     return () => {
@@ -156,6 +108,7 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
     resetEmbedConfig,
     regionRef,
     amIScreenSharing,
+    startScreenShare,
     stopScreenShare,
   };
 };

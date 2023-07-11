@@ -9,12 +9,14 @@ import {
   useEmbedScreenShare,
   useHMSActions,
   useHMSStore,
+  usePDFScreenShare,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../components/FullPageProgress";
 import EmbedView from "./EmbedView";
 import { InsetView } from "./InsetView";
 import { MainGridView } from "./mainGridView";
+import PDFView from "./PDFView";
 import ScreenShareView from "./screenShareView";
 import SidePane from "./SidePane";
 import { WaitingView } from "./WaitingView";
@@ -50,6 +52,7 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const { embedConfig } = useEmbedScreenShare();
+  const { pdfConfig } = usePDFScreenShare();
 
   useEffect(() => {
     if (!isConnected) {
@@ -84,8 +87,10 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (embedConfig?.config?.data || embedConfig?.config?.isSharing) {
+  } else if (embedConfig?.url) {
     ViewComponent = EmbedView;
+  } else if (pdfConfig?.isSharing) {
+    ViewComponent = PDFView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
   } else if (uiMode === "inset") {

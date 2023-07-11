@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { EmbedType, useEmbedScreenShare } from "@100mslive/react-sdk";
+import { usePDFScreenShare } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 
 export const SubmitPDF = ({
@@ -11,14 +11,14 @@ export const SubmitPDF = ({
   onOpenChange,
   hideSecondaryCTA = false,
 }) => {
-  const { setEmbedConfig, resetEmbedConfig } = useEmbedScreenShare();
+  const { setPDFConfig, resetPDFConfig } = usePDFScreenShare();
   const isValidPDF = useCallback(
     async pdfURL => {
       setIsValidateProgress(true);
       try {
-        await setEmbedConfig({
+        await setPDFConfig({
           isSharing: true,
-          config: { data: pdfURL, type: EmbedType.PDF },
+          url: pdfURL,
         });
         onOpenChange(false);
         setIsPDFUrlValid(true);
@@ -28,7 +28,7 @@ export const SubmitPDF = ({
         setIsValidateProgress(false);
       }
     },
-    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setEmbedConfig]
+    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setPDFConfig]
   );
   return (
     <Flex
@@ -44,7 +44,7 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => resetEmbedConfig()}
+          onClick={() => resetPDFConfig()}
           css={{ w: "50%" }}
         >
           Go Back
@@ -55,12 +55,9 @@ export const SubmitPDF = ({
         type="submit"
         onClick={async () => {
           if (pdfFile) {
-            setEmbedConfig({
+            setPDFConfig({
               isSharing: true,
-              config: {
-                type: EmbedType.PDF,
-                data: pdfFile,
-              },
+              file: pdfFile,
             });
             onOpenChange(false);
           } else if (pdfURL) {

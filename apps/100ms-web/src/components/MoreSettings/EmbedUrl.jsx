@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { EmbedType, useEmbedScreenShare } from "@100mslive/react-sdk";
+import { useEmbedScreenShare } from "@100mslive/react-sdk";
 import { ViewIcon } from "@100mslive/react-icons";
 import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
 import {
@@ -30,17 +30,13 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
 
 export function EmbedUrlModal({ onOpenChange }) {
   const { embedConfig, setEmbedConfig } = useEmbedScreenShare();
-  const [url, setUrl] = useState(embedConfig?.config?.data || "");
+  const [url, setUrl] = useState(embedConfig?.url || "");
 
-  const isAnythingEmbedded = !!embedConfig?.config?.data;
-  const isModifying =
-    isAnythingEmbedded && url && url !== embedConfig?.config?.data;
+  const isAnythingEmbedded = !!embedConfig?.url;
+  const isModifying = isAnythingEmbedded && url && url !== embedConfig?.url;
   const setConfig = data => {
     setEmbedConfig({
-      config: {
-        type: EmbedType.EMBED,
-        data: data.url,
-      },
+      url: data.url,
       isSharing: data.isSharing || false,
     });
   };

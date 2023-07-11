@@ -20,7 +20,9 @@ export { useRecordingStreaming } from './hooks/useRecordingStreaming';
 export { useAutoplayError } from './hooks/useAutoplayError';
 export { useCustomEvent } from './hooks/useCustomEvent';
 export { useParticipants } from './hooks/useParticipants';
-export { useEmbedScreenShare, EmbedType } from './hooks/useEmbedScreenShare';
+export { useEmbedScreenShare } from './hooks/useEmbedScreenShare';
+export { usePDFScreenShare } from './hooks/usePDFScreenShare';
+
 // types
 export type { hooksErrHandler } from './hooks/types';
 export type { usePreviewInput, usePreviewResult } from './hooks/usePreviewJoin';
@@ -35,7 +37,9 @@ export type { useParticipantsResult, useParticipantsParams } from './hooks/usePa
 export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
 export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
 export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
-export type { useEmbedScreenShareResult, EmbedConfig, EmbedData } from './hooks/useEmbedScreenShare';
+export type { useEmbedScreenShareResult, EmbedConfig } from './hooks/useEmbedScreenShare';
+export type { usePDFScreenShareResult, PDFConfig } from './hooks/usePDFScreenShare';
+
 // helpers
 export { throwErrorHandler } from './utils/commons';
 
