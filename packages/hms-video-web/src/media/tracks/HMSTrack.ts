@@ -9,7 +9,7 @@ export abstract class HMSTrack {
   /**
    * @internal
    */
-  readonly stream: HMSMediaStream;
+  stream: HMSMediaStream;
   source?: HMSTrackSource;
   peerId?: string;
   transceiver?: RTCRtpTransceiver;
