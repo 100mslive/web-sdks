@@ -21,7 +21,7 @@ export { useAutoplayError } from './hooks/useAutoplayError';
 export { useCustomEvent } from './hooks/useCustomEvent';
 export { useParticipants } from './hooks/useParticipants';
 export { useEmbedScreenShare } from './hooks/useEmbedScreenShare';
-export { usePDFScreenShare } from './hooks/usePDFScreenShare';
+export { usePDFAnnotator } from './hooks/usePDFAnnotator';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
@@ -38,7 +38,7 @@ export type { useVideoInput, useVideoOutput } from './hooks/useVideo';
 export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
 export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
 export type { useEmbedScreenShareResult, EmbedConfig } from './hooks/useEmbedScreenShare';
-export type { usePDFScreenShareResult, PDFConfig } from './hooks/usePDFScreenShare';
+export type { usePDFAnnotatorResult, PDFConfig } from './hooks/usePDFAnnotator';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';

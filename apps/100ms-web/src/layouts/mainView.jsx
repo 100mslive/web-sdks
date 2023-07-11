@@ -9,7 +9,7 @@ import {
   useEmbedScreenShare,
   useHMSActions,
   useHMSStore,
-  usePDFScreenShare,
+  usePDFAnnotator,
 } from "@100mslive/react-sdk";
 import { Flex } from "@100mslive/react-ui";
 import FullPageProgress from "../components/FullPageProgress";
@@ -51,8 +51,8 @@ export const ConferenceMainView = () => {
   const { uiViewMode, isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
-  const { embedConfig } = useEmbedScreenShare();
-  const { pdfConfig } = usePDFScreenShare();
+  const { config } = useEmbedScreenShare();
+  const { config: pdfConfig } = usePDFAnnotator();
 
   useEffect(() => {
     if (!isConnected) {
@@ -87,9 +87,9 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (embedConfig?.url) {
+  } else if (config?.url) {
     ViewComponent = EmbedView;
-  } else if (pdfConfig?.isSharing) {
+  } else if (pdfConfig?.file || pdfConfig?.url) {
     ViewComponent = PDFView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;

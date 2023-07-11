@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { usePDFScreenShare } from "@100mslive/react-sdk";
+import { usePDFAnnotator } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 
 export const SubmitPDF = ({
@@ -11,13 +11,12 @@ export const SubmitPDF = ({
   onOpenChange,
   hideSecondaryCTA = false,
 }) => {
-  const { setPDFConfig, resetPDFConfig } = usePDFScreenShare();
+  const { setConfig, resetConfig } = usePDFAnnotator();
   const isValidPDF = useCallback(
     async pdfURL => {
       setIsValidateProgress(true);
       try {
-        await setPDFConfig({
-          isSharing: true,
+        await setConfig({
           url: pdfURL,
         });
         onOpenChange(false);
@@ -28,7 +27,7 @@ export const SubmitPDF = ({
         setIsValidateProgress(false);
       }
     },
-    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setPDFConfig]
+    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setConfig]
   );
   return (
     <Flex
@@ -44,7 +43,7 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => resetPDFConfig()}
+          onClick={() => resetConfig()}
           css={{ w: "50%" }}
         >
           Go Back
@@ -55,8 +54,7 @@ export const SubmitPDF = ({
         type="submit"
         onClick={async () => {
           if (pdfFile) {
-            setPDFConfig({
-              isSharing: true,
+            setConfig({
               file: pdfFile,
             });
             onOpenChange(false);

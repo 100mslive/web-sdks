@@ -6,23 +6,22 @@ import { isChromiumBased } from '../utils/commons';
 
 export interface EmbedConfig {
   url: string;
-  isSharing?: boolean;
 }
 export interface useEmbedScreenShareResult {
   /**
    * embed Config data
    */
-  embedConfig: EmbedConfig;
+  config: EmbedConfig;
 
   /**
    * set pdf config data
    */
-  setEmbedConfig: (value: EmbedConfig) => void;
+  setConfig: (value: EmbedConfig) => void;
 
   /**
    * reset the Embed config data
    */
-  resetEmbedConfig: () => void;
+  resetConfig: () => void;
   /**
    * true if the local user is sharing screen, false otherwise
    */
@@ -32,16 +31,6 @@ export interface useEmbedScreenShareResult {
    * reference for region to be removed
    */
   regionRef: React.RefObject<HTMLIFrameElement | null>;
-
-  /**
-   * start screen share
-   */
-  startScreenShare: () => Promise<void>;
-
-  /**
-   * stop screen share
-   */
-  stopScreenShare: () => Promise<void>;
 }
 
 export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
@@ -84,9 +73,7 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
       if (!amIScreenSharing && regionRef.current && embedConfig?.url && !inProgress.current) {
         regionRef.current.src = embedConfig.url;
         inProgress.current = true;
-        if (embedConfig.isSharing) {
-          await startScreenShare();
-        }
+        await startScreenShare();
         inProgress.current = false;
       }
     })();
@@ -103,12 +90,10 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   }, [amIScreenSharing, resetEmbedConfig, stopScreenShare]);
 
   return {
-    embedConfig,
-    setEmbedConfig,
-    resetEmbedConfig,
+    config: embedConfig,
+    setConfig: setEmbedConfig,
+    resetConfig: resetEmbedConfig,
     regionRef,
     amIScreenSharing,
-    startScreenShare,
-    stopScreenShare,
   };
 };
