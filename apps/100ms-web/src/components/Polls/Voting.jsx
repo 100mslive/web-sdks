@@ -21,7 +21,8 @@ export const Voting = ({ id, toggleVoting }) => {
   }
 
   // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = (poll?.duration || 0) > 0;
+  const isTimed = (poll.duration || 0) > 0;
+  const isLive = poll.state === "started";
 
   return (
     <Container rounded>
@@ -37,7 +38,10 @@ export const Voting = ({ id, toggleVoting }) => {
           }}
         >
           <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
-          <StatusIndicator poll={poll} />
+          <StatusIndicator
+            isLive={isLive}
+            shouldShowTimer={isLive && isTimed}
+          />
           <Box
             css={{
               marginLeft: "auto",

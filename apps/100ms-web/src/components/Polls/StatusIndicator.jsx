@@ -1,10 +1,6 @@
 import { Flex, Text } from "@100mslive/react-ui";
 
-export const StatusIndicator = ({ poll }) => {
-  const isTimed = (poll?.duration || 0) > 0;
-  const isLive = poll?.state === "started";
-  const shouldShowTimer = isLive && isTimed;
-
+export const StatusIndicator = ({ isLive, shouldShowTimer }) => {
   return (
     <Flex align="center">
       <Flex

@@ -30,6 +30,19 @@ const TextArea = styled("textarea", {
   w: "100%",
 });
 
+const compareArrays = (a, b) => {
+  if (a.length !== b.length) return false;
+  else {
+    // Comparing each element of your array
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
 export const QuestionCard = ({
   pollID,
   isQuiz,
@@ -58,8 +71,7 @@ export const QuestionCard = ({
       return (
         answer?.options &&
         localPeerResponse?.options &&
-        JSON.stringify([...answer.options].sort()) ===
-          JSON.stringify([...localPeerResponse.options].sort())
+        compareArrays(answer?.options, localPeerResponse?.options)
       );
     }
   }, [answer, localPeerResponse, type]);
@@ -72,7 +84,7 @@ export const QuestionCard = ({
   };
 
   const movePrev = () => {
-    setCurrentIndex(curr => Math.max(0, curr - 1));
+    setCurrentIndex(curr => Math.max(1, curr - 1));
   };
 
   const [textAnswer, setTextAnswer] = useState("");
