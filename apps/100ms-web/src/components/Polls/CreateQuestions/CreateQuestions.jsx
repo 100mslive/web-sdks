@@ -99,7 +99,7 @@ export function CreateQuestions() {
         </Flex>
 
         <Flex css={{ w: "100%" }} justify="end">
-          <Button onClick={launchPoll}>Launch Poll</Button>
+          <Button onClick={launchPoll}>Launch {interaction.type}</Button>
         </Flex>
       </Flex>
     </Container>

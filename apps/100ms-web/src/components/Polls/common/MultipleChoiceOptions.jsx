@@ -110,7 +110,7 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
     <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
       {options.map((option, index) => {
         return (
-          <Flex align="center" key={index} css={{ w: "100%", gap: "$9" }}>
+          <Flex align="center" key={index} css={{ w: "100%", gap: "$5" }}>
             {isQuiz && (
               <Checkbox.Root
                 onCheckedChange={checked => selectAnswer(checked, index)}

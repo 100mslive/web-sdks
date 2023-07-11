@@ -33,7 +33,7 @@ export const SingleChoiceOptions = ({
             <Flex
               align="center"
               key={`${questionIndex}-${option.index}`}
-              css={{ w: "100%", gap: "$9" }}
+              css={{ w: "100%", gap: "$5" }}
             >
               <RadioGroup.Item
                 css={{
