@@ -39,6 +39,9 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
   const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
   const setPDFConfig = useCallback(
     async (value: PDFConfig) => {
+      if (!value.file && !value.url) {
+        throw new Error('File or url not found');
+      }
       if (value.file) {
         actions.setAppData('pdfConfig', value);
         return;
