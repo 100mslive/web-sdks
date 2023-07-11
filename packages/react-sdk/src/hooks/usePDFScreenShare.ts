@@ -88,7 +88,7 @@ export const usePDFScreenShare = (): usePDFScreenShareResult => {
     // eslint-disable-next-line complexity
     (async () => {
       if (!amIScreenSharing && regionRef.current && (pdfConfig?.file || pdfConfig?.url) && !inProgress.current) {
-        regionRef.current.src = `${pdfIframeURL}${pdfConfig.url ? `?file=${pdfConfig.config.data}` : ''}`;
+        regionRef.current.src = `${pdfIframeURL}${pdfConfig.url ? `?file=${pdfConfig.url}` : ''}`;
         regionRef.current.onload = () => {
           requestAnimationFrame(() => {
             sendDataToPDFIframe(pdfConfig.file);

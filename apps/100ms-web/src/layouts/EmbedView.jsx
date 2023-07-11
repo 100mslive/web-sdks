@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { useMedia } from "react-use";
 import {
   selectLocalPeerID,
@@ -11,16 +11,18 @@ import {
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { SidePane } from "./screenShareView";
 
+/**
+ * EmbedView is responsible for rendering the PDF iframe and managing the screen sharing functionality.
+ */
 export const EmbedView = () => {
-  return (
-    <EmbedScreenShareView>
-      <EmbedComponent />
-    </EmbedScreenShareView>
-  );
+  const { regionRef } = useEmbedScreenShare();
+  console.log("region reff ", regionRef);
+  return <EmbedScreenShareView ref={regionRef} />;
 };
 
-export const EmbedScreenShareView = ({ children }) => {
+export const EmbedScreenShareView = forwardRef((props, ref) => {
   const peers = useHMSStore(selectPeers);
+
   const mediaQueryLg = cssConfig.media.xl;
   const showSidebarInBottom = useMedia(mediaQueryLg);
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -55,7 +57,18 @@ export const EmbedScreenShareView = ({ children }) => {
           },
         }}
       >
-        {children}
+        <iframe
+          title="Embed View"
+          ref={ref}
+          style={{
+            width: "100%",
+            height: "100%",
+            border: 0,
+            borderRadius: "0.75rem",
+          }}
+          allow="autoplay; clipboard-write;"
+          referrerPolicy="no-referrer"
+        />
       </Box>
       <Flex
         direction={{ "@initial": "column", "@lg": "row" }}
@@ -78,28 +91,6 @@ export const EmbedScreenShareView = ({ children }) => {
       </Flex>
     </Flex>
   );
-};
-
-/**
- * EmbedComponent is responsible for rendering the PDF iframe and managing the screen sharing functionality.
- */
-export const EmbedComponent = () => {
-  const { regionRef } = useEmbedScreenShare();
-
-  return (
-    <iframe
-      title="Embed View"
-      ref={regionRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        border: 0,
-        borderRadius: "0.75rem",
-      }}
-      allow="autoplay; clipboard-write;"
-      referrerPolicy="no-referrer"
-    />
-  );
-};
+});
 
 export default EmbedView;
