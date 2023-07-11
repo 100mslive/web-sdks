@@ -45,6 +45,7 @@ export function useMultiplayerState(roomId) {
     const shapesIterator = rLiveShapes.current?.entries();
     const bindingsIterator = rLiveBindings.current?.entries();
     let initial = true;
+    // it will run until shapes and binding data is broadcast
     for (;;) {
       const shapes = shapesIterator.next();
       let shape = {};
