@@ -86,3 +86,13 @@ export const metadataPayloadParser = payload => {
     return { payload };
   }
 };
+
+// For bottom action sheet
+export const getUpdatedHeight = e => {
+  const heightToPercentage =
+    100 - ((e?.touches?.[0] || e).pageY / window.innerHeight) * 100;
+  // Snap to top if height > 80%
+  const sheetHeightInVH = heightToPercentage > 80 ? 100 : heightToPercentage;
+  console.log(sheetHeightInVH, "height");
+  return `${sheetHeightInVH}vh`;
+};
