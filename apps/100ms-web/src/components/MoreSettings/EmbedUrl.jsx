@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useEmbedScreenShare } from "@100mslive/react-sdk";
 import { ViewIcon } from "@100mslive/react-icons";
 import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
 import {
@@ -7,6 +6,8 @@ import {
   DialogInput,
   DialogRow,
 } from "../../primitives/DialogContent";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
+import { APP_DATA } from "../../common/constants";
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
   if (!window.CropTarget) {
@@ -29,11 +30,13 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
 };
 
 export function EmbedUrlModal({ onOpenChange }) {
-  const { config, setConfig } = useEmbedScreenShare();
-  const [url, setUrl] = useState(config?.url || "");
+  const [embedConfig, setEmbedConfig] = useSetAppDataByKey(
+    APP_DATA.embedConfig
+  );
+  const [url, setUrl] = useState(embedConfig || "");
 
-  const isAnythingEmbedded = !!config?.url;
-  const isModifying = isAnythingEmbedded && url && url !== config?.url;
+  const isAnythingEmbedded = !!embedConfig;
+  const isModifying = isAnythingEmbedded && url && url !== embedConfig;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Embed URL" Icon={ViewIcon}>
@@ -59,7 +62,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 type="submit"
                 disabled={!isModifying}
                 onClick={() => {
-                  setConfig({ url });
+                  setEmbedConfig({ data: url });
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -71,7 +74,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 variant="danger"
                 type="submit"
                 onClick={() => {
-                  setConfig({ url: "" });
+                  setEmbedConfig();
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -85,7 +88,7 @@ export function EmbedUrlModal({ onOpenChange }) {
               type="submit"
               disabled={!url.trim()}
               onClick={() => {
-                setConfig({ url });
+                setEmbedConfig({ data: url });
                 onOpenChange(false);
               }}
               data-testid="embed_url_btn"

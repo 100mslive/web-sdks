@@ -1,6 +1,7 @@
 import { useCallback } from "react";
-import { usePDFAnnotator } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
+import { useSetAppDataByKey } from "../AppData/useUISettings";
+import { APP_DATA } from "../../common/constants";
 
 export const SubmitPDF = ({
   pdfFile,
@@ -11,14 +12,13 @@ export const SubmitPDF = ({
   onOpenChange,
   hideSecondaryCTA = false,
 }) => {
-  const { setConfig, resetConfig } = usePDFAnnotator();
+  const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+
   const isValidPDF = useCallback(
     async pdfURL => {
       setIsValidateProgress(true);
       try {
-        await setConfig({
-          url: pdfURL,
-        });
+        setPDFConfig({ data: pdfURL });
         onOpenChange(false);
         setIsPDFUrlValid(true);
       } catch (err) {
@@ -27,8 +27,9 @@ export const SubmitPDF = ({
         setIsValidateProgress(false);
       }
     },
-    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setConfig]
+    [setIsValidateProgress, setPDFConfig, onOpenChange, setIsPDFUrlValid]
   );
+  const resetConfig = useCallback(() => setPDFConfig(), [setPDFConfig]);
   return (
     <Flex
       direction="row"
@@ -54,9 +55,7 @@ export const SubmitPDF = ({
         type="submit"
         onClick={async () => {
           if (pdfFile) {
-            setConfig({
-              file: pdfFile,
-            });
+            setPDFConfig({ data: pdfFile });
             onOpenChange(false);
           } else if (pdfURL) {
             await isValidPDF(pdfURL);

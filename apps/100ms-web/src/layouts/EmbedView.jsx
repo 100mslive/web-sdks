@@ -1,6 +1,7 @@
-import { forwardRef, useMemo } from "react";
+import { forwardRef, useEffect, useMemo } from "react";
 import { useMedia } from "react-use";
 import {
+  selectAppData,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeers,
@@ -10,12 +11,19 @@ import {
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { SidePane } from "./screenShareView";
+import { APP_DATA } from "../common/constants";
 
 /**
  * EmbedView is responsible for rendering the PDF iframe and managing the screen sharing functionality.
  */
 export const EmbedView = () => {
-  const { regionRef } = useEmbedScreenShare();
+  const { regionRef, startShare, amISharing } = useEmbedScreenShare();
+  const embedConfig = useHMSStore(selectAppData(APP_DATA.embedConfig));
+  useEffect(() => {
+    if (embedConfig?.data && !amISharing) {
+      startShare(embedConfig.data);
+    }
+  }, [amISharing, embedConfig, startShare]);
   return <EmbedScreenShareView ref={regionRef} />;
 };
 

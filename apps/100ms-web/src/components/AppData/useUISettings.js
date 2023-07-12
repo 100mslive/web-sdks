@@ -86,6 +86,21 @@ export const useLogo = () => {
   return useHMSStore(selectAppData(APP_DATA.logo));
 };
 
+export const useUrlToEmbed = () => {
+  return useHMSStore(selectAppData(APP_DATA.embedConfig))?.data;
+};
+
+export const usePDFConfig = () => {
+  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.data;
+};
+export const useResetPDFConfig = () => {
+  const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  return () => setPDFConfig();
+};
+export const useResetEmbedConfig = () => {
+  const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
+  return () => setEmbedConfig();
+};
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
   const spotlightTrackId = useHMSStore(

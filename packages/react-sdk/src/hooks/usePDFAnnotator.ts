@@ -1,66 +1,41 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { selectAppData } from '@100mslive/hms-video-store';
 import { useScreenShare } from './useScreenShare';
-import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
 
-export interface PDFConfig {
-  file?: File;
-  url?: string;
-}
 export interface usePDFAnnotatorResult {
   /**
-   * pdf Config data
+   * used to start screen share
+   * It throws error in given below scenarios:
+   * 1. When file or url is not passed.
+   * 2. Reference to a iframe or element is not yet attached.
+   * 3. Url is invalid or does not have pdf.
+   * 4. Unable to start screen share
    */
-  config: PDFConfig;
+  startShare: (value: File | string) => Promise<void>;
 
   /**
-   * set pdf config data
+   * stop your screen share.
    */
-  setConfig: (value: PDFConfig) => void;
+  stopShare: () => Promise<void>;
+  /**
+   * am I sharing pdf annotator in a room
+   */
+  amISharing: boolean;
 
   /**
-   * reset the pdf config data
-   */
-  resetConfig: () => void;
-  /**
-   * true if the local user is sharing screen, false otherwise
-   */
-  amIScreenSharing: boolean;
-
-  /**
-   * reference for region to be removed
+   * reference of iframe where pdf annotator will be launched
    */
   regionRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export const usePDFAnnotator = (): usePDFAnnotatorResult => {
-  const actions = useHMSActions();
-  const pdfConfig = useHMSStore(selectAppData('pdfConfig'));
-  const setPDFConfig = useCallback(
-    async (value: PDFConfig) => {
-      if (!value.file && !value.url) {
-        throw new Error('File or url not found');
-      }
-      if (value.file) {
-        actions.setAppData('pdfConfig', value);
-        return;
-      }
-      if (value.url) {
-        await isValidPDFUrl(value.url);
-        actions.setAppData('pdfConfig', value);
-      }
-    },
-    [actions],
-  );
-
   const regionRef = useRef<HTMLIFrameElement | null>(null);
-  const resetPDFConfig = useCallback(() => {
-    actions.setAppData('pdfConfig', {});
-    regionRef.current = null;
-  }, [actions]);
+
+  const handleScreenShareError = useCallback(() => {
+    throw new Error('unable to start screen share');
+  }, []);
   const inProgress = useRef(false);
-  const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetPDFConfig);
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
     if (regionRef.current) {
@@ -74,21 +49,36 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
     }
   }, []);
 
-  const stopScreenShare = useCallback(async () => {
+  const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
       await toggleScreenShare?.(); // Stop screen sharing
+      regionRef.current = null;
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
-  // Start screen sharing when the component is mounted and not already screen sharing
-  useEffect(() => {
+  const startShare = useCallback(
     // eslint-disable-next-line complexity
-    (async () => {
-      if (!amIScreenSharing && regionRef.current && (pdfConfig?.file || pdfConfig?.url) && !inProgress.current) {
-        regionRef.current.src = `${pdfIframeURL}${pdfConfig.url ? `?file=${pdfConfig.url}` : ''}`;
+    async (value: File | string) => {
+      if (!value) {
+        throw new Error('File or url not found');
+      }
+      if (amIScreenSharing) {
+        throw new Error('You are already sharing');
+      }
+      if (typeof value === 'string') {
+        // validate the url and throw error if failed.
+        await isValidPDFUrl(value);
+      }
+      if (!regionRef.current) {
+        throw new Error('Attach a reference `regionRef` to iframe for sharing');
+      }
+      if (!inProgress.current) {
+        regionRef.current.src = `${pdfIframeURL}${typeof value === 'string' ? `?file=${value}` : ''}`;
         regionRef.current.onload = () => {
           requestAnimationFrame(() => {
-            sendDataToPDFIframe(pdfConfig.file);
+            if (value instanceof File) {
+              sendDataToPDFIframe(value);
+            }
           });
         };
         inProgress.current = true;
@@ -99,24 +89,23 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
         });
         inProgress.current = false;
       }
-    })();
-  }, [amIScreenSharing, toggleScreenShare, pdfConfig, sendDataToPDFIframe]);
+    },
+    [amIScreenSharing, sendDataToPDFIframe, toggleScreenShare],
+  );
 
   useEffect(() => {
     return () => {
       // close screenshare when this component is being unmounted
       if (amIScreenSharing) {
-        resetPDFConfig();
-        stopScreenShare(); // stop
+        stopShare(); // stop
       }
     };
-  }, [amIScreenSharing, resetPDFConfig, stopScreenShare]);
+  }, [amIScreenSharing, stopShare]);
 
   return {
-    config: pdfConfig,
-    setConfig: setPDFConfig,
-    resetConfig: resetPDFConfig,
+    startShare,
+    stopShare,
     regionRef,
-    amIScreenSharing,
+    amISharing: amIScreenSharing,
   };
 };

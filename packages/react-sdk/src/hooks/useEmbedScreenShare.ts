@@ -1,99 +1,85 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { selectAppData } from '@100mslive/hms-video-store';
 import { useScreenShare } from './useScreenShare';
-import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 import { isChromiumBased } from '../utils/commons';
 
-export interface EmbedConfig {
-  url: string;
-}
 export interface useEmbedScreenShareResult {
   /**
-   * embed Config data
+   * used to start screen share
+   * It throws error in given below scenarios:
+   * 1. When url is not passed.
+   * 2. Reference to a iframe or element is not at attached.
+   * 3. Unable to start screen share
    */
-  config: EmbedConfig;
+  startShare: (value: string) => Promise<void>;
 
   /**
-   * set pdf config data
+   * stop your screen share.
    */
-  setConfig: (value: EmbedConfig) => void;
+  stopShare: () => Promise<void>;
+  /**
+   * am I sharing pdf annotator in a room
+   */
+  amISharing: boolean;
 
   /**
-   * reset the Embed config data
-   */
-  resetConfig: () => void;
-  /**
-   * true if the local user is sharing screen, false otherwise
-   */
-  amIScreenSharing: boolean;
-
-  /**
-   * reference for region to be removed
+   * reference of iframe where pdf annotator will be launched
    */
   regionRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
-  const actions = useHMSActions();
-  const embedConfig = useHMSStore(selectAppData('embedConfig'));
-  const setEmbedConfig = useCallback(
-    (value: EmbedConfig) => {
-      actions.setAppData('embedConfig', value);
-    },
-    [actions],
-  );
-
   const regionRef = useRef<HTMLIFrameElement | null>(null);
-  const resetEmbedConfig = useCallback(() => {
-    actions.setAppData('embedConfig', {});
-    regionRef.current = null;
-  }, [actions]);
+  const handleScreenShareError = useCallback(() => {
+    throw new Error('unable to start screen share');
+  }, []);
   const inProgress = useRef(false);
-  const { amIScreenSharing, toggleScreenShare } = useScreenShare(resetEmbedConfig);
+  const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
 
-  const startScreenShare = useCallback(async () => {
-    if (regionRef.current) {
-      await toggleScreenShare?.({
-        forceCurrentTab: isChromiumBased,
-        cropElement: regionRef.current,
-        preferCurrentTab: isChromiumBased,
-      });
-    }
-  }, [toggleScreenShare]);
-
-  const stopScreenShare = useCallback(async () => {
+  const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
       await toggleScreenShare?.(); // Stop screen sharing
+      regionRef.current = null;
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
-  // Start screen sharing when the component is mounted and not already screen sharing
-  useEffect(() => {
-    (async () => {
-      if (!amIScreenSharing && regionRef.current && embedConfig?.url && !inProgress.current) {
-        regionRef.current.src = embedConfig.url;
+  const startShare = useCallback(
+    async (value: string) => {
+      if (!value) {
+        throw new Error('URL not found');
+      }
+      if (amIScreenSharing) {
+        throw new Error('You are already sharing');
+      }
+      if (!regionRef.current) {
+        throw new Error('Attach a reference `regionRef` to iframe for sharing');
+      }
+      if (!inProgress.current) {
+        regionRef.current.src = value;
         inProgress.current = true;
-        await startScreenShare();
+        await toggleScreenShare?.({
+          forceCurrentTab: isChromiumBased,
+          cropElement: regionRef.current,
+          preferCurrentTab: isChromiumBased,
+        });
         inProgress.current = false;
       }
-    })();
-  }, [amIScreenSharing, toggleScreenShare, embedConfig, startScreenShare]);
+    },
+    [amIScreenSharing, toggleScreenShare],
+  );
 
   useEffect(() => {
     return () => {
       // close screenshare when this component is being unmounted
       if (amIScreenSharing) {
-        resetEmbedConfig();
-        stopScreenShare(); // stop
+        stopShare(); // stop
       }
     };
-  }, [amIScreenSharing, resetEmbedConfig, stopScreenShare]);
+  }, [amIScreenSharing, stopShare]);
 
   return {
-    config: embedConfig,
-    setConfig: setEmbedConfig,
-    resetConfig: resetEmbedConfig,
+    startShare,
+    stopShare,
     regionRef,
-    amIScreenSharing,
+    amISharing: amIScreenSharing,
   };
 };
