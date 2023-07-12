@@ -18,6 +18,8 @@ export const SubmitPDF = ({
     async pdfURL => {
       setIsValidateProgress(true);
       try {
+        // added for out ui purpose. Will be handled internally as well for client.
+        await isValidPDFUrl(pdfURL);
         setPDFConfig({ data: pdfURL });
         onOpenChange(false);
         setIsPDFUrlValid(true);
@@ -72,4 +74,24 @@ export const SubmitPDF = ({
       </Button>
     </Flex>
   );
+};
+
+export const isValidPDFUrl = pdfURL => {
+  return new Promise((resolve, reject) => {
+    if (!pdfURL) {
+      reject(new Error("URL is empty"));
+    }
+    fetch(pdfURL, { method: "HEAD" })
+      .then(response => response.headers.get("content-type"))
+      .then(contentType => {
+        if (contentType === "application/pdf") {
+          resolve(true);
+        } else {
+          reject(new Error("URL does not contain pdf"));
+        }
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 };

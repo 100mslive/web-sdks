@@ -17,12 +17,12 @@ export interface useEmbedScreenShareResult {
    */
   stopShare: () => Promise<void>;
   /**
-   * am I sharing pdf annotator in a room
+   * am I sharing embed view in a room
    */
   amISharing: boolean;
 
   /**
-   * reference of iframe where pdf annotator will be launched
+   * reference of iframe where embed url will be launched
    */
   regionRef: React.RefObject<HTMLIFrameElement | null>;
 }
