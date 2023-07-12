@@ -42,19 +42,33 @@ async function main() {
       plugins,
     };
 
-    esbuild.build({
-      outfile: 'dist/index.cjs.js',
-      format: 'cjs',
-      ...commonOptions,
-    });
+    await esbuild
+      .build({
+        outfile: 'dist/index.cjs.js',
+        format: 'cjs',
+        ...commonOptions,
+        metafile: true,
+      })
+      .then(({ metafile }) => {
+        console.log('cjs build successful');
+        console.log('creating build dependency file');
+        fs.writeFileSync('dist/meta.cjs.json', JSON.stringify(metafile, null, 2), 'utf-8');
+      });
 
-    esbuild.build({
-      entryPoints: [source],
-      outdir: 'dist/',
-      format: 'esm',
-      ...commonOptions,
-      metafile: true,
-    });
+    await esbuild
+      .build({
+        entryPoints: [source],
+        outdir: 'dist/',
+        format: 'esm',
+        splitting: true,
+        ...commonOptions,
+        metafile: true,
+      })
+      .then(({ metafile }) => {
+        console.log('esbuild successful');
+        console.log('creating build dependency file');
+        fs.writeFileSync('dist/meta.esbuild.json', JSON.stringify(metafile, null, 2), 'utf-8');
+      });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);
