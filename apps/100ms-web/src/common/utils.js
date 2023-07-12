@@ -99,3 +99,7 @@ export const compareArrays = (a, b) => {
     return true;
   }
 };
+
+export const validTextInput = (text, minLength = 2, maxLength = 100) => {
+  return text && text.length >= minLength && text.length <= maxLength;
+};
