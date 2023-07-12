@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
-
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
