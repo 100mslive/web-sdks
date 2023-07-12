@@ -35,14 +35,12 @@ const BottomSheet = ({
       >
         <Popover.Trigger asChild>{triggerContent}</Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content sideOffset={-48}>
+          <Popover.Content sideOffset={-50} style={{ zIndex: "2" }}>
             <Box
               css={{
                 w: "100vw",
                 py: "$8",
-                position: "relative",
                 opacity: sheetOpen ? "1" : "0.5",
-                zIndex: "30",
                 h: sheetHeight,
                 minHeight: "50vh",
                 overflowY: "auto",
