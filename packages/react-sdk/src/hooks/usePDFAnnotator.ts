@@ -26,6 +26,12 @@ export interface usePDFAnnotatorResult {
    * reference of iframe where pdf annotator will be launched
    */
   regionRef: React.RefObject<HTMLIFrameElement | null>;
+
+  /**
+   * validate your pdf url
+   * It will throw error when url does not contain pdf.
+   */
+  isValidPDFUrl: (url: string) => Promise<boolean>;
 }
 
 export const usePDFAnnotator = (): usePDFAnnotatorResult => {
@@ -107,5 +113,6 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
     stopShare,
     regionRef,
     amISharing: amIScreenSharing,
+    isValidPDFUrl,
   };
 };

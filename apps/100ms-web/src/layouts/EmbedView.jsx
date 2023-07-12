@@ -12,6 +12,7 @@ import {
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
 import { ToastManager } from "../components/Toast/ToastManager";
 import { SidePane } from "./screenShareView";
+import { useResetEmbedConfig } from "../components/AppData/useUISettings";
 import { APP_DATA } from "../common/constants";
 
 /**
@@ -20,12 +21,15 @@ import { APP_DATA } from "../common/constants";
 export const EmbedView = () => {
   const { regionRef, startShare, amISharing } = useEmbedScreenShare();
   const embedConfig = useHMSStore(selectAppData(APP_DATA.embedConfig));
+  const resetConfig = useResetEmbedConfig();
+
   useEffect(() => {
     (async () => {
       if (embedConfig && !amISharing) {
         try {
           await startShare(embedConfig);
         } catch (err) {
+          resetConfig();
           ToastManager.addToast({
             title: `Error while sharing embed url ${err.message || ""}`,
             variant: "error",
@@ -33,7 +37,7 @@ export const EmbedView = () => {
         }
       }
     })();
-  }, [amISharing, embedConfig, startShare]);
+  }, [amISharing, embedConfig, resetConfig, startShare]);
   return <EmbedScreenShareView ref={regionRef} />;
 };
 

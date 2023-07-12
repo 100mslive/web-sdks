@@ -7,7 +7,6 @@ export {
   useHMSVanillaNotifications,
   useHMSStatsStore,
 } from './primitives/HmsRoomProvider';
-export { isValidPDFUrl } from './utils/commons';
 export { usePreviewJoin } from './hooks/usePreviewJoin';
 export { useAVToggle } from './hooks/useAVToggle';
 export { useVideo } from './hooks/useVideo';

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { isValidPDFUrl } from "@100mslive/react-sdk";
+import { usePDFAnnotator } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 import {
   useResetPDFConfig,
@@ -17,6 +17,7 @@ export const SubmitPDF = ({
   hideSecondaryCTA = false,
 }) => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  const { isValidPDFUrl } = usePDFAnnotator();
 
   const isValidPDF = useCallback(
     async pdfURL => {
@@ -33,7 +34,13 @@ export const SubmitPDF = ({
         setIsValidateProgress(false);
       }
     },
-    [setIsValidateProgress, setPDFConfig, onOpenChange, setIsPDFUrlValid]
+    [
+      setIsValidateProgress,
+      isValidPDFUrl,
+      setPDFConfig,
+      onOpenChange,
+      setIsPDFUrlValid,
+    ]
   );
   const resetConfig = useResetPDFConfig();
   return (
