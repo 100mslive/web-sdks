@@ -92,6 +92,9 @@ export const getUpdatedHeight = e => {
   const heightToPercentage =
     100 - ((e?.touches?.[0] || e).pageY / window.innerHeight) * 100;
   // Snap to top if height > 80%
-  const sheetHeightInVH = heightToPercentage > 80 ? 100 : heightToPercentage;
+  const sheetHeightInVH = Math.max(
+    40,
+    heightToPercentage > 80 ? 100 : heightToPercentage
+  );
   return `${sheetHeightInVH}vh`;
 };

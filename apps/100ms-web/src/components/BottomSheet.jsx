@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as Popover from "@radix-ui/react-popover";
 import { CrossIcon } from "@100mslive/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
@@ -12,6 +12,14 @@ const BottomSheet = ({
 }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetHeight, setSheetHeight] = useState("50vh");
+  const closeRef = useRef();
+
+  useEffect(() => {
+    if (closeRef?.current && parseFloat(sheetHeight.slice(0, -2)) <= 40) {
+      setSheetOpen(false);
+      setTimeout(() => closeRef.current?.click(), 200);
+    }
+  }, [sheetHeight]);
 
   return (
     <>
@@ -32,8 +40,9 @@ const BottomSheet = ({
                 py: "$8",
                 position: "relative",
                 opacity: sheetOpen ? "1" : "0.5",
-                zIndex: "100",
+                zIndex: "30",
                 h: sheetHeight,
+                minHeight: "50vh",
                 overflowY: "auto",
                 backgroundColor: "$surfaceDefault",
                 transition: "all 0.2s linear",
@@ -42,7 +51,10 @@ const BottomSheet = ({
             >
               <Flex
                 justify="between"
-                onTouchMove={e => setSheetHeight(getUpdatedHeight(e))}
+                onTouchMove={e => {
+                  const updatedSheetHeight = getUpdatedHeight(e);
+                  setSheetHeight(updatedSheetHeight);
+                }}
                 css={{
                   borderBottom: "1px solid $borderLight",
                   px: "$8",
@@ -54,7 +66,7 @@ const BottomSheet = ({
                 <Text variant="h6" css={{ color: "$textHighEmp" }}>
                   {title}
                 </Text>
-                <Popover.Close aria-label="Close">
+                <Popover.Close aria-label="Close" ref={closeRef}>
                   <Box
                     css={{
                       color: "$textHighEmp",
