@@ -4,6 +4,7 @@ import {
   useHMSStore,
   usePDFAnnotator,
 } from "@100mslive/react-sdk";
+import { ToastManager } from "../components/Toast/ToastManager";
 import { EmbedScreenShareView } from "./EmbedView";
 import { APP_DATA } from "../common/constants";
 
@@ -15,11 +16,14 @@ export const PDFView = () => {
   const pdfConfig = useHMSStore(selectAppData(APP_DATA.pdfConfig));
   useEffect(() => {
     (async () => {
-      if (pdfConfig?.data && !amISharing) {
+      if (pdfConfig && !amISharing) {
         try {
-          await startShare(pdfConfig.data);
+          await startShare(pdfConfig);
         } catch (err) {
-          console.log("error while sharing annotator ", err);
+          ToastManager.addToast({
+            title: `Error while sharing annotator ${err.message || ""}`,
+            variant: "error",
+          });
         }
       }
     })();

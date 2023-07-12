@@ -87,11 +87,11 @@ export const useLogo = () => {
 };
 
 export const useUrlToEmbed = () => {
-  return useHMSStore(selectAppData(APP_DATA.embedConfig))?.data;
+  return useHMSStore(selectAppData(APP_DATA.embedConfig));
 };
 
 export const usePDFConfig = () => {
-  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.data;
+  return useHMSStore(selectAppData(APP_DATA.pdfConfig));
 };
 export const useResetPDFConfig = () => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);

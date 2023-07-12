@@ -1,6 +1,10 @@
 import { useCallback } from "react";
+import { isValidPDFUrl } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
+import {
+  useResetPDFConfig,
+  useSetAppDataByKey,
+} from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export const SubmitPDF = ({
@@ -20,7 +24,7 @@ export const SubmitPDF = ({
       try {
         // added for out ui purpose. Will be handled internally as well for client.
         await isValidPDFUrl(pdfURL);
-        setPDFConfig({ data: pdfURL });
+        setPDFConfig(pdfURL);
         onOpenChange(false);
         setIsPDFUrlValid(true);
       } catch (err) {
@@ -31,7 +35,7 @@ export const SubmitPDF = ({
     },
     [setIsValidateProgress, setPDFConfig, onOpenChange, setIsPDFUrlValid]
   );
-  const resetConfig = useCallback(() => setPDFConfig(), [setPDFConfig]);
+  const resetConfig = useResetPDFConfig();
   return (
     <Flex
       direction="row"
@@ -57,7 +61,7 @@ export const SubmitPDF = ({
         type="submit"
         onClick={async () => {
           if (pdfFile) {
-            setPDFConfig({ data: pdfFile });
+            setPDFConfig(pdfFile);
             onOpenChange(false);
           } else if (pdfURL) {
             await isValidPDF(pdfURL);
@@ -74,24 +78,4 @@ export const SubmitPDF = ({
       </Button>
     </Flex>
   );
-};
-
-export const isValidPDFUrl = pdfURL => {
-  return new Promise((resolve, reject) => {
-    if (!pdfURL) {
-      reject(new Error("URL is empty"));
-    }
-    fetch(pdfURL, { method: "HEAD" })
-      .then(response => response.headers.get("content-type"))
-      .then(contentType => {
-        if (contentType === "application/pdf") {
-          resolve(true);
-        } else {
-          reject(new Error("URL does not contain pdf"));
-        }
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
 };

@@ -6,7 +6,10 @@ import {
   DialogInput,
   DialogRow,
 } from "../../primitives/DialogContent";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
+import {
+  useResetEmbedConfig,
+  useSetAppDataByKey,
+} from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
@@ -37,6 +40,7 @@ export function EmbedUrlModal({ onOpenChange }) {
 
   const isAnythingEmbedded = !!embedConfig;
   const isModifying = isAnythingEmbedded && url && url !== embedConfig;
+  const resetConfig = useResetEmbedConfig();
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <DialogContent title="Embed URL" Icon={ViewIcon}>
@@ -62,7 +66,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 type="submit"
                 disabled={!isModifying}
                 onClick={() => {
-                  setEmbedConfig({ data: url });
+                  setEmbedConfig(url);
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -74,7 +78,7 @@ export function EmbedUrlModal({ onOpenChange }) {
                 variant="danger"
                 type="submit"
                 onClick={() => {
-                  setEmbedConfig();
+                  resetConfig();
                   onOpenChange(false);
                 }}
                 data-testid="embed_url_btn"
@@ -88,7 +92,7 @@ export function EmbedUrlModal({ onOpenChange }) {
               type="submit"
               disabled={!url.trim()}
               onClick={() => {
-                setEmbedConfig({ data: url });
+                setEmbedConfig(url);
                 onOpenChange(false);
               }}
               data-testid="embed_url_btn"
