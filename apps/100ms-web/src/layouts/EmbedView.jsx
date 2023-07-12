@@ -6,7 +6,7 @@ import {
   selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
-  useEmbedScreenShare,
+  useEmbedShare,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
@@ -19,15 +19,16 @@ import { APP_DATA } from "../common/constants";
  * EmbedView is responsible for rendering the iframe and managing the screen sharing functionality.
  */
 export const EmbedView = () => {
-  const { regionRef, startShare, amISharing } = useEmbedScreenShare();
+  const { iframeRef, startEmbedShare, isEmbedShareInProgress } =
+    useEmbedShare();
   const embedConfig = useHMSStore(selectAppData(APP_DATA.embedConfig));
   const resetConfig = useResetEmbedConfig();
 
   useEffect(() => {
     (async () => {
-      if (embedConfig && !amISharing) {
+      if (embedConfig && !isEmbedShareInProgress) {
         try {
-          await startShare(embedConfig);
+          await startEmbedShare(embedConfig);
         } catch (err) {
           resetConfig();
           ToastManager.addToast({
@@ -37,8 +38,8 @@ export const EmbedView = () => {
         }
       }
     })();
-  }, [amISharing, embedConfig, resetConfig, startShare]);
-  return <EmbedScreenShareView ref={regionRef} />;
+  }, [isEmbedShareInProgress, embedConfig, resetConfig, startEmbedShare]);
+  return <EmbedScreenShareView ref={iframeRef} />;
 };
 
 export const EmbedScreenShareView = forwardRef((props, ref) => {

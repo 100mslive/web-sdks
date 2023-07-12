@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useScreenShare } from './useScreenShare';
 import { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
 
-export interface usePDFAnnotatorResult {
+export interface usePDFShareResult {
   /**
    * used to start screen share
    * It throws error in given below scenarios:
@@ -11,21 +11,21 @@ export interface usePDFAnnotatorResult {
    * 3. Url is invalid or does not have pdf.
    * 4. Unable to start screen share
    */
-  startShare: (value: File | string) => Promise<void>;
+  startPDFShare: (value: File | string) => Promise<void>;
 
   /**
    * stop your screen share.
    */
-  stopShare: () => Promise<void>;
+  stopPDFShare: () => Promise<void>;
   /**
    * am I sharing pdf annotator in a room
    */
-  amISharing: boolean;
+  isPDFShareInProgress: boolean;
 
   /**
    * reference of iframe where pdf annotator will be launched
    */
-  regionRef: React.RefObject<HTMLIFrameElement | null>;
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
 
   /**
    * validate your pdf url
@@ -34,8 +34,8 @@ export interface usePDFAnnotatorResult {
   isValidPDFUrl: (url: string) => Promise<boolean>;
 }
 
-export const usePDFAnnotator = (): usePDFAnnotatorResult => {
-  const regionRef = useRef<HTMLIFrameElement | null>(null);
+export const usePDFShare = (): usePDFShareResult => {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const handleScreenShareError = useCallback(() => {
     throw new Error('unable to start screen share');
@@ -44,8 +44,8 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
-    if (regionRef.current) {
-      regionRef.current.contentWindow?.postMessage(
+    if (iframeRef.current) {
+      iframeRef.current.contentWindow?.postMessage(
         {
           theme: 2, // dark theme -> 2, light theme -> 1
           file,
@@ -58,7 +58,7 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
   const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
       await toggleScreenShare?.(); // Stop screen sharing
-      regionRef.current = null;
+      iframeRef.current = null;
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
@@ -75,12 +75,12 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
         // validate the url and throw error if failed.
         await isValidPDFUrl(value);
       }
-      if (!regionRef.current) {
-        throw new Error('Attach a reference `regionRef` to iframe for sharing');
+      if (!iframeRef.current) {
+        throw new Error('Attach a reference `iframeRef` to iframe for sharing');
       }
       if (!inProgress.current) {
-        regionRef.current.src = `${pdfIframeURL}${typeof value === 'string' ? `?file=${value}` : ''}`;
-        regionRef.current.onload = () => {
+        iframeRef.current.src = `${pdfIframeURL}${typeof value === 'string' ? `?file=${value}` : ''}`;
+        iframeRef.current.onload = () => {
           requestAnimationFrame(() => {
             if (value instanceof File) {
               sendDataToPDFIframe(value);
@@ -90,7 +90,7 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
         inProgress.current = true;
         await toggleScreenShare?.({
           forceCurrentTab: isChromiumBased,
-          cropElement: regionRef.current,
+          cropElement: iframeRef.current,
           preferCurrentTab: isChromiumBased,
         });
         inProgress.current = false;
@@ -109,10 +109,10 @@ export const usePDFAnnotator = (): usePDFAnnotatorResult => {
   }, [amIScreenSharing, stopShare]);
 
   return {
-    startShare,
-    stopShare,
-    regionRef,
-    amISharing: amIScreenSharing,
+    startPDFShare: startShare,
+    stopPDFShare: stopShare,
+    iframeRef,
+    isPDFShareInProgress: amIScreenSharing,
     isValidPDFUrl,
   };
 };

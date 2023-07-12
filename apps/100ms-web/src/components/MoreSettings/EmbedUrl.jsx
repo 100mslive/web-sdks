@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useScreenShare } from "@100mslive/react-sdk";
 import { ViewIcon } from "@100mslive/react-icons";
 import { Button, Dialog, Dropdown, Text } from "@100mslive/react-ui";
 import {
@@ -13,15 +14,18 @@ import {
 import { APP_DATA } from "../../common/constants";
 
 export const EmbedUrl = ({ setShowOpenUrl }) => {
+  const { amIScreenSharing } = useScreenShare();
   if (!window.CropTarget) {
     return null;
   }
-
   return (
     <Dropdown.Item
       onClick={() => {
-        setShowOpenUrl(true);
+        if (!amIScreenSharing) {
+          setShowOpenUrl(true);
+        }
       }}
+      disabled={amIScreenSharing}
       data-testid="embed_url_btn"
     >
       <ViewIcon />

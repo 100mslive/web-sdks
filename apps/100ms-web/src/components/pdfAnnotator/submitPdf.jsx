@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { usePDFAnnotator } from "@100mslive/react-sdk";
+import { usePDFShare } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 import {
   useResetPDFConfig,
@@ -17,7 +17,7 @@ export const SubmitPDF = ({
   hideSecondaryCTA = false,
 }) => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  const { isValidPDFUrl } = usePDFAnnotator();
+  const { isValidPDFUrl } = usePDFShare();
 
   const isValidPDF = useCallback(
     async pdfURL => {

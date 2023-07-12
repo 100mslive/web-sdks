@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useScreenShare } from './useScreenShare';
 import { isChromiumBased } from '../utils/commons';
 
-export interface useEmbedScreenShareResult {
+export interface useEmbedShareResult {
   /**
    * used to start screen share
    * It throws error in given below scenarios:
@@ -10,25 +10,25 @@ export interface useEmbedScreenShareResult {
    * 2. Reference to a iframe or element is not at attached.
    * 3. Unable to start screen share
    */
-  startShare: (value: string) => Promise<void>;
+  startEmbedShare: (value: string) => Promise<void>;
 
   /**
    * stop your screen share.
    */
-  stopShare: () => Promise<void>;
+  stopEmbedShare: () => Promise<void>;
   /**
    * am I sharing embed view in a room
    */
-  amISharing: boolean;
+  isEmbedShareInProgress: boolean;
 
   /**
    * reference of iframe where embed url will be launched
    */
-  regionRef: React.RefObject<HTMLIFrameElement | null>;
+  iframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
-export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
-  const regionRef = useRef<HTMLIFrameElement | null>(null);
+export const useEmbedShare = (): useEmbedShareResult => {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const handleScreenShareError = useCallback(() => {
     throw new Error('unable to start screen share');
   }, []);
@@ -38,7 +38,7 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
       await toggleScreenShare?.(); // Stop screen sharing
-      regionRef.current = null;
+      iframeRef.current = null;
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
@@ -50,15 +50,15 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
       if (amIScreenSharing) {
         throw new Error('You are already sharing');
       }
-      if (!regionRef.current) {
-        throw new Error('Attach a reference `regionRef` to iframe for sharing');
+      if (!iframeRef.current) {
+        throw new Error('Attach a reference `iframeRef` to iframe for sharing');
       }
       if (!inProgress.current) {
-        regionRef.current.src = value;
+        iframeRef.current.src = value;
         inProgress.current = true;
         await toggleScreenShare?.({
           forceCurrentTab: isChromiumBased,
-          cropElement: regionRef.current,
+          cropElement: iframeRef.current,
           preferCurrentTab: isChromiumBased,
         });
         inProgress.current = false;
@@ -77,9 +77,9 @@ export const useEmbedScreenShare = (): useEmbedScreenShareResult => {
   }, [amIScreenSharing, stopShare]);
 
   return {
-    startShare,
-    stopShare,
-    regionRef,
-    amISharing: amIScreenSharing,
+    startEmbedShare: startShare,
+    stopEmbedShare: stopShare,
+    iframeRef,
+    isEmbedShareInProgress: amIScreenSharing,
   };
 };
