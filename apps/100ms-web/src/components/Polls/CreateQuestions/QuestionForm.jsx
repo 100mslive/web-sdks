@@ -13,7 +13,7 @@ import {
 import { ErrorDialog } from "../../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../../primitives/DropdownTrigger";
 import { useDropdownSelection } from "../../hooks/useDropdownSelection";
-import { validTextInput } from "../../../common/utils";
+import { isValidTextInput } from "../../../common/utils";
 import { MultipleChoiceOptionInputs } from "../common/MultipleChoiceOptions";
 import { SingleChoiceOptionInputs } from "../common/SingleChoiceOptions";
 import { QUESTION_TYPE, QUESTION_TYPE_TITLE } from "../../../common/constants";
@@ -225,7 +225,7 @@ export const isValidQuestion = ({
   isQuiz = false,
   skippable = true,
 }) => {
-  if (!validTextInput(text) || !type) {
+  if (!isValidTextInput(text) || !type) {
     return false;
   }
 
@@ -236,7 +236,7 @@ export const isValidQuestion = ({
   }
 
   const everyOptionHasText = options.every(
-    option => option && validTextInput(option.text, 1)
+    option => option && isValidTextInput(option.text, 1)
   );
   const isCorrectAnswerRequired = isQuiz && !skippable;
   const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);

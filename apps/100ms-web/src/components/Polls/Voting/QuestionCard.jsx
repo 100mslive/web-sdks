@@ -242,8 +242,8 @@ export const QuestionCard = ({
       <QuestionCardFooter
         isValidVote={isValidVote}
         skippable={skippable}
-        handleSkip={handleSkip}
-        handleVote={handleVote}
+        onSkip={handleSkip}
+        onVote={handleVote}
         response={localPeerResponse}
         stringAnswerExpected={stringAnswerExpected}
       />
@@ -256,15 +256,15 @@ const QuestionCardFooter = ({
   skippable,
   response,
   stringAnswerExpected,
-  handleVote,
-  handleSkip,
+  onVote,
+  onSkip,
 }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: "$4", w: "100%" }}>
       {skippable && !response ? (
         <Button
           variant="standard"
-          onClick={handleSkip}
+          onClick={onSkip}
           css={{ p: "$xs $10", fontWeight: "$semiBold" }}
         >
           Skip
@@ -283,7 +283,7 @@ const QuestionCardFooter = ({
         <Button
           css={{ p: "$xs $10", fontWeight: "$semiBold" }}
           disabled={!isValidVote}
-          onClick={handleVote}
+          onClick={onVote}
         >
           {stringAnswerExpected ? "Submit" : "Vote"}
         </Button>
