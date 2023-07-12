@@ -14,9 +14,11 @@ const BottomSheet = ({
   const [sheetHeight, setSheetHeight] = useState("50vh");
   const closeRef = useRef();
 
+  // Close the sheet if height goes under 40vh
   useEffect(() => {
     if (closeRef?.current && parseFloat(sheetHeight.slice(0, -2)) <= 40) {
       setSheetOpen(false);
+      // Delay for showing the opacity animation, can be removed if not needed
       setTimeout(() => closeRef.current?.click(), 200);
     }
   }, [sheetHeight]);
