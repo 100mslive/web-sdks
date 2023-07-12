@@ -42,7 +42,7 @@ async function main() {
       plugins,
     };
 
-    await esbuild
+    esbuild
       .build({
         outfile: 'dist/index.cjs.js',
         format: 'cjs',
@@ -55,7 +55,7 @@ async function main() {
         fs.writeFileSync('dist/meta.cjs.json', JSON.stringify(metafile, null, 2), 'utf-8');
       });
 
-    await esbuild
+    esbuild
       .build({
         entryPoints: [source],
         outdir: 'dist/',
