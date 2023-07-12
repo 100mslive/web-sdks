@@ -47,7 +47,6 @@ async function main() {
         outfile: 'dist/index.cjs.js',
         format: 'cjs',
         ...commonOptions,
-        metafile: true,
       })
       .then(({ metafile }) => {
         console.log('cjs build successful');
@@ -62,7 +61,6 @@ async function main() {
         format: 'esm',
         splitting: true,
         ...commonOptions,
-        metafile: true,
       })
       .then(({ metafile }) => {
         console.log('esbuild successful');
