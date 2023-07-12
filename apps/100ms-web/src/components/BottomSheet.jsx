@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as Popover from "@radix-ui/react-popover";
-import { CrossIcon } from "@100mslive/react-icons";
+import { Cross2Icon } from "@radix-ui/react-icons";
 import { Box, Flex, Text } from "@100mslive/react-ui";
 import { getUpdatedHeight } from "../common/utils";
 
@@ -75,7 +75,7 @@ const BottomSheet = ({
                       borderRadius: "$round",
                     }}
                   >
-                    <CrossIcon />
+                    <Cross2Icon />
                   </Box>
                 </Popover.Close>
               </Flex>
