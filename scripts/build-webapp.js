@@ -36,6 +36,7 @@ async function main() {
       external,
       treeShaking: true,
       sourcemap: true,
+      metafile: true,
       loader,
       define,
       plugins,
@@ -51,8 +52,8 @@ async function main() {
       entryPoints: [source],
       outdir: 'dist/',
       format: 'esm',
-      splitting: true,
       ...commonOptions,
+      metafile: true,
     });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);

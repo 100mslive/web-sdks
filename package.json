@@ -54,6 +54,7 @@
     "postinstall": "husky install && lerna bootstrap",
     "cypress:open": "cypress open",
     "app": "cd apps/100ms-web && yarn start",
+    "app:custom": "cd apps/100ms-custom-app && yarn start",
     "sdk": "cd packages/hms-video-web && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
