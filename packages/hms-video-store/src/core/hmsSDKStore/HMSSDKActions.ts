@@ -838,6 +838,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
             ...question,
             answer: question.answer ? { ...question.answer } : undefined,
             options: question.options?.map(option => ({ ...option })),
+            responses: question.responses?.map(response => ({ ...response })),
           })),
         };
         return acc;

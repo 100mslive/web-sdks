@@ -110,3 +110,31 @@ export interface PollListResponse {
   last: string;
   polls: PollInfoParams[];
 }
+
+export interface PollResponsesGetParams {
+  poll_id: string;
+  index: number;
+  count: number;
+  self: boolean;
+}
+
+interface PollResponse
+  extends Pick<HMSPollQuestionResponse, 'type' | 'skipped' | 'option' | 'options' | 'text' | 'update'> {
+  question: number;
+  response_id: string;
+}
+
+export interface PollResponsesGetResponse {
+  poll_id: string;
+  last?: boolean;
+  responses?: {
+    final?: boolean;
+    response: PollResponse;
+    peer: {
+      hash: string;
+      peerid: string;
+      userid: string;
+      username: string;
+    };
+  }[];
+}
