@@ -9,7 +9,7 @@ import {
   Input,
   Switch,
   Text,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";

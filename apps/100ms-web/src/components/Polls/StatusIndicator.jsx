@@ -1,4 +1,4 @@
-import { Flex, Text } from "@100mslive/react-ui";
+import { Flex, Text } from "@100mslive/roomkit-react";
 
 export const StatusIndicator = ({ isTimed }) => {
   return (

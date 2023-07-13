@@ -6,7 +6,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { CrossIcon } from "@100mslive/react-icons";
-import { Box, Flex, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/roomkit-react";
 import { StandardView } from "./Views/StandardView";
 import { TimedView } from "./Views/TimedView";
 import { Container } from "../Streaming/Common";

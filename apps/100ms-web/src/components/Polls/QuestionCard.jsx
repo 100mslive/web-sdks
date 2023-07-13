@@ -9,7 +9,7 @@ import {
   Input,
   styled,
   Text,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";

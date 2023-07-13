@@ -1,7 +1,7 @@
 // @ts-check
 import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
-import { Flex, Text } from "@100mslive/react-ui";
+import { Flex, Text } from "@100mslive/roomkit-react";
 import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
 import PollsQuizMenu from "../Polls/PollsQuizMenu";
 import { Voting } from "../Polls/Voting";
