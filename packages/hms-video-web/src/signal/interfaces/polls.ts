@@ -3,6 +3,7 @@ import {
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
+  HMSPollQuestionType,
   HMSPollState,
 } from '../../interfaces';
 
@@ -137,4 +138,25 @@ export interface PollResponsesGetResponse {
       username: string;
     };
   }[];
+}
+
+export interface PollResult {
+  max_user: number;
+  total_response: number;
+  user_count: number;
+  questions?: {
+    question: number;
+    type: HMSPollQuestionType;
+    options?: number[];
+    correct?: number;
+    skipped?: number;
+    total?: number;
+  }[];
+}
+
+export type PollResultParams = PollID;
+
+export interface PollResultResponse {
+  poll_id: string;
+  result: PollResult;
 }
