@@ -238,7 +238,8 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to send join over WS connection',
       );
     }
-    const params = {
+
+    const params: any = {
       name,
       disableVidAutoSub,
       data,
@@ -247,6 +248,12 @@ export default class JsonRpcSignal implements ISignal {
       simulcast,
       onDemandTracks,
     };
+
+    const override = localStorage.getItem('join_override');
+    if (override) {
+      params.__override = JSON.parse(override);
+    }
+
     const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
