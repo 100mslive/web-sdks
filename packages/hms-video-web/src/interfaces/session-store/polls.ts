@@ -77,7 +77,7 @@ export interface HMSPollQuestionAnswer {
 
 export enum HMSPollQuestionType {
   SINGLE_CHOICE = 'single-choice',
-  MULTI_CHOICE = 'multi-choice',
+  MULTIPLE_CHOICE = 'multiple-choice',
   SHORT_ANSWER = 'short-answer',
   LONG_ANSWER = 'long-answer',
 }
@@ -94,6 +94,7 @@ export interface HMSPollQuestionOptionCreateParams extends Pick<HMSPollQuestionO
 }
 
 export interface HMSPollQuestionResponse {
+  id?: string;
   questionIndex: number;
   peer?: HMSPollResponsePeerInfo;
   type?: HMSPollQuestionType;

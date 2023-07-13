@@ -26,7 +26,6 @@ import { ScreenShareHintModal } from "../ScreenshareHintModal";
 import ToggleWidgets from "../ToggleWidgets";
 import { ChatToggle } from "./ChatToggle";
 import { VirtualBackground } from "../../plugins/VirtualBackground/VirtualBackground";
-import { ToggleWhiteboard } from "../../plugins/whiteboard";
 import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { isScreenshareSupported } from "../../common/utils";
 import { FeatureFlags } from "../../services/FeatureFlags";
@@ -92,7 +91,6 @@ export const ConferencingFooter = () => {
         <ScreenshareAudio />
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
-        {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
         <VirtualBackground />
         {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
         <Flex

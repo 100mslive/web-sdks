@@ -1,4 +1,4 @@
-import { HMSPoll, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
@@ -41,7 +41,7 @@ export class PollsManager {
         type: pollParams.type,
         duration: pollParams.duration,
         locked: pollParams.locked, // poll is locked automatically when it starts
-        // mode: pollParams.mode,
+        mode: pollParams.mode as HMSPoll['mode'],
         visibility: pollParams.visibility,
         rolesThatCanVote: pollParams.vote || [],
         rolesThaCanViewResponses: pollParams.responses || [],
@@ -77,16 +77,16 @@ export class PollsManager {
     }
   }
 
-  private handlePollStats(notification: PollStatsNotification) {
+  private async handlePollStats(notification: PollStatsNotification) {
     const updatedPolls: HMSPoll[] = [];
-    notification.polls.forEach(updatedPoll => {
+    for (const updatedPoll of notification.polls) {
       const savedPoll = this.store.getPoll(updatedPoll.poll_id);
       if (!savedPoll) {
         return;
       }
       savedPoll.totalUsers = updatedPoll.user_count;
       savedPoll.totalResponses = updatedPoll.total_responses;
-      updatedPoll.questions.forEach(updatedQuestion => {
+      updatedPoll.questions?.forEach(updatedQuestion => {
         const savedQuestion = savedPoll.questions?.find(question => question.index === updatedQuestion.question);
         if (!savedQuestion) {
           return;
@@ -94,15 +94,50 @@ export class PollsManager {
 
         savedQuestion.totalResponses = updatedQuestion.total;
 
-        updatedQuestion.options.forEach((updatedVoteCount, index) => {
+        updatedQuestion.options?.forEach((updatedVoteCount, index) => {
           const savedOption = savedQuestion.options?.[index];
           if (savedOption && savedOption.voteCount !== updatedVoteCount) {
             savedOption.voteCount = updatedVoteCount;
-            updatedPolls.push(savedPoll);
           }
         });
       });
-    });
+
+      const serverResponseParams = await this.transport.getPollResponses({
+        poll_id: updatedPoll.poll_id,
+        index: 0,
+        count: 50,
+        self: false,
+      });
+
+      serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+        const question = savedPoll?.questions?.find(question => question.index === response.question);
+        if (!question) {
+          return;
+        }
+        const pollResponse: HMSPollQuestionResponse = {
+          id: response.response_id,
+          questionIndex: response.question,
+          option: response.option,
+          options: response.options,
+          text: response.text,
+          responseFinal: final,
+          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+          skipped: response.skipped,
+          type: response.type,
+          update: response.update,
+        };
+
+        if (Array.isArray(question.responses) && question.responses.length > 0) {
+          if (!question.responses.find(({ id }) => id === pollResponse.id)) {
+            question.responses.push(pollResponse);
+          }
+        } else {
+          question.responses = [pollResponse];
+        }
+      });
+
+      updatedPolls.push(savedPoll);
+    }
 
     if (updatedPolls.length > 0) {
       this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, updatedPolls);
