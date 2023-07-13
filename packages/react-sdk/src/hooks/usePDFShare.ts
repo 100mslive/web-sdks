@@ -111,7 +111,7 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
     if (previouslySharing && !amIScreenSharing) {
       resetConfig?.();
       if (iframeRef.current) {
-        iframeRef.current.src = '';
+        iframeRef.current.removeAttribute('src');
       }
       inProgress.current = false;
       setSharing(false);

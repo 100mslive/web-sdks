@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useScreenShare } from './useScreenShare';
 import usePrevious, { isChromiumBased } from '../utils/commons';
 
@@ -33,6 +33,8 @@ export interface useEmbedShareResult {
  */
 export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [sharing, setSharing] = useState(false);
+
   const handleScreenShareError = useCallback(() => {
     throw new Error('unable to start screen share');
   }, []);
@@ -50,6 +52,9 @@ export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => 
 
   const startShare = useCallback(
     async (value: string) => {
+      if (inProgress.current) {
+        return;
+      }
       if (!value) {
         throw new Error('URL not found');
       }
@@ -59,16 +64,14 @@ export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => 
       if (!iframeRef.current) {
         throw new Error('Attach a reference `iframeRef` to iframe for sharing');
       }
-      if (!inProgress.current) {
-        iframeRef.current.src = value;
-        inProgress.current = true;
-        await toggleScreenShare?.({
-          forceCurrentTab: isChromiumBased,
-          cropElement: iframeRef.current,
-          preferCurrentTab: isChromiumBased,
-        });
-        inProgress.current = false;
-      }
+      iframeRef.current.src = value;
+      inProgress.current = true;
+      setSharing(true);
+      await toggleScreenShare?.({
+        forceCurrentTab: isChromiumBased,
+        cropElement: iframeRef.current,
+        preferCurrentTab: isChromiumBased,
+      });
     },
     [amIScreenSharing, toggleScreenShare],
   );
@@ -78,8 +81,9 @@ export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => 
       resetConfig?.();
       if (iframeRef.current) {
         iframeRef.current.src = '';
-        iframeRef.current = null;
       }
+      inProgress.current = false;
+      setSharing(false);
     }
   }, [amIScreenSharing, previouslySharing, resetConfig]);
 
@@ -87,6 +91,6 @@ export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => 
     startEmbedShare: startShare,
     stopEmbedShare: stopShare,
     iframeRef,
-    isEmbedShareInProgress: amIScreenSharing,
+    isEmbedShareInProgress: sharing,
   };
 };
