@@ -1,12 +1,12 @@
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
-import * as Popover from '@radix-ui/react-popover';
 import { Cross2Icon } from '@radix-ui/react-icons';
+import * as Popover from '@radix-ui/react-popover';
 import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { CSS } from '../Theme';
 import { getUpdatedHeight } from '../utils/helpers';
 
-const BottomSheet = ({
+export const BottomSheet = ({
   title = '',
   children = <></>,
   triggerContent,
@@ -99,5 +99,3 @@ const BottomSheet = ({
     </>
   );
 };
-
-export default BottomSheet;

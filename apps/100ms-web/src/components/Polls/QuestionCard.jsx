@@ -1,7 +1,5 @@
 // @ts-check
 import React, { useCallback, useEffect, useState } from "react";
-import { useHMSActions } from "@100mslive/react-sdk";
-import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import {
   Box,
   Flex,
@@ -10,6 +8,8 @@ import {
   styled,
   Text,
 } from "@100mslive/react-ui";
+import { useHMSActions } from "@100mslive/react-sdk";
+import { ChevronLeftIcon, ChevronRightIcon } from "@100mslive/react-icons";
 import { QuestionCardFooter } from "./QuestionCardComponents/QuestionCardFooter";
 import { MultipleChoiceOptions } from "./MultipleChoiceOptions";
 import { SingleChoiceOptions } from "./SingleChoiceOptions";

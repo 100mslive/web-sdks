@@ -1,12 +1,5 @@
 // @ts-check
 import React, { useRef, useState } from "react";
-import { isEqual } from "lodash";
-import {
-  selectPollByID,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -16,6 +9,13 @@ import {
   Switch,
   Text,
 } from "@100mslive/react-ui";
+import { isEqual } from "lodash";
+import {
+  selectPollByID,
+  useHMSActions,
+  useHMSStore,
+} from "@100mslive/react-sdk";
+import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import { ErrorDialog } from "../../primitives/DialogContent";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader } from "../Streaming/Common";

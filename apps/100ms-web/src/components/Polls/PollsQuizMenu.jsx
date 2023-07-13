@@ -1,7 +1,5 @@
 // @ts-check
 import React, { useRef, useState } from "react";
-import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
-import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import {
   Button,
   Dropdown,
@@ -10,6 +8,8 @@ import {
   Switch,
   Text,
 } from "@100mslive/react-ui";
+import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
+import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
 import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
 import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
 import { useSidepaneToggle } from "../AppData/useSidepane";

@@ -1,12 +1,12 @@
 // @ts-check
 import React from "react";
+import { Box, Flex, Text } from "@100mslive/react-ui";
 import {
   selectPeerNameByID,
   selectPollByID,
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { CrossIcon } from "@100mslive/react-icons";
-import { Box, Flex, Text } from "@100mslive/react-ui";
 import { StandardView } from "./Views/StandardView";
 import { TimedView } from "./Views/TimedView";
 import { Container } from "../Streaming/Common";
