@@ -51,6 +51,7 @@ export enum HMSSignalMethod {
   POLL_STOP = 'poll-stop',
   POLL_RESPONSE_SET = 'poll-response',
   POLL_LIST = 'poll-list',
+  POLL_RESPONSES = 'poll-responses',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

@@ -1,11 +1,5 @@
 // @ts-check
 import React, { useRef, useState } from "react";
-import { isEqual } from "lodash";
-import {
-  selectPollByID,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
 import { AddCircleIcon, TrashIcon } from "@100mslive/react-icons";
 import {
   Box,
@@ -16,178 +10,15 @@ import {
   Switch,
   Text,
 } from "@100mslive/roomkit-react";
-import { ErrorDialog } from "../../primitives/DialogContent";
-import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
-import { Container, ContentHeader } from "../Streaming/Common";
-import { MultipleChoiceOptionInputs } from "./MultipleChoiceOptions";
-import { SingleChoiceOptionInputs } from "./SingleChoiceOptions";
-import { useWidgetState } from "../AppData/useUISettings";
-import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import {
-  QUESTION_TYPE,
-  QUESTION_TYPE_TITLE,
-  WIDGET_VIEWS,
-} from "../../common/constants";
+import { ErrorDialog } from "../../../primitives/DialogContent";
+import { DialogDropdownTrigger } from "../../../primitives/DropdownTrigger";
+import { useDropdownSelection } from "../../hooks/useDropdownSelection";
+import { isValidTextInput } from "../../../common/utils";
+import { MultipleChoiceOptionInputs } from "../common/MultipleChoiceOptions";
+import { SingleChoiceOptionInputs } from "../common/SingleChoiceOptions";
+import { QUESTION_TYPE, QUESTION_TYPE_TITLE } from "../../../common/constants";
 
-const isValidQuestion = ({
-  text,
-  type,
-  options,
-  isQuiz = false,
-  skippable = true,
-}) => {
-  if (!text || !type) {
-    return false;
-  }
-
-  if (
-    ![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)
-  ) {
-    return true;
-  }
-
-  const everyOptionHasText = options.every(
-    option => option && option.text.length > 0
-  );
-  const isCorrectAnswerRequired = isQuiz && !skippable;
-  const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
-
-  if (!isCorrectAnswerRequired) {
-    return everyOptionHasText;
-  }
-
-  return everyOptionHasText && hasCorrectAnswer;
-};
-
-export function LaunchPollsQuizMenu() {
-  const [questions, setQuestions] = useState([{}]);
-  const actions = useHMSActions();
-  const { pollInView: id, setWidgetView } = useWidgetState();
-  const interaction = useHMSStore(selectPollByID(id));
-
-  const launchPoll = async () => {
-    const validQuestions = questions
-      .filter(question => isValidQuestion(question))
-      .map(question => ({
-        text: question.text,
-        type: question.type,
-        options: question.options,
-        skippable: question.skippable,
-      }));
-    await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
-    await actions.interactivityCenter.startPoll(id);
-    setWidgetView(WIDGET_VIEWS.VOTE);
-  };
-  const headingTitle = interaction?.type
-    ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
-    : "Polls/Quiz";
-  const isQuiz = interaction?.type === "quiz";
-  return (
-    <Container rounded>
-      <ContentHeader
-        content={headingTitle}
-        onBack={() => setWidgetView(WIDGET_VIEWS.CREATE_POLL_QUIZ)}
-      />
-      <Flex direction="column" css={{ p: "$10" }}>
-        <Flex direction="column">
-          {questions.map((question, index) => (
-            <QuestionCard
-              key={index}
-              question={question}
-              index={index}
-              length={questions.length}
-              onSave={questionParams => {
-                setQuestions(questions => [
-                  ...questions.slice(0, index),
-                  questionParams,
-                  ...questions.slice(index + 1),
-                ]);
-              }}
-              isQuiz={isQuiz}
-              removeQuestion={() =>
-                setQuestions(prev =>
-                  prev.filter(
-                    questionFromSet => !isEqual(question, questionFromSet)
-                  )
-                )
-              }
-            />
-          ))}
-        </Flex>
-        <Flex
-          css={{
-            c: "$textDisabled",
-            my: "$sm",
-            cursor: "pointer",
-            "&:hover": { c: "$textMedEmp" },
-          }}
-          onClick={() => setQuestions([...questions, {}])}
-        >
-          <AddCircleIcon />
-          <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
-            Add another question
-          </Text>
-        </Flex>
-
-        <Flex css={{ w: "100%" }} justify="end">
-          <Button onClick={launchPoll}>Launch Poll</Button>
-        </Flex>
-      </Flex>
-    </Container>
-  );
-}
-
-const QuestionCard = ({
-  question,
-  onSave,
-  index,
-  length,
-  removeQuestion,
-  isQuiz,
-}) => {
-  return (
-    <Flex
-      direction="column"
-      css={{ p: "$md", bg: "$surfaceLight", r: "$1", mb: "$sm" }}
-    >
-      {question.saved ? (
-        <SavedQuestion question={question} index={index} length={length} />
-      ) : (
-        <QuestionForm
-          question={question}
-          removeQuestion={removeQuestion}
-          onSave={params => {
-            onSave(params);
-          }}
-          index={index}
-          length={length}
-          isQuiz={isQuiz}
-        />
-      )}
-    </Flex>
-  );
-};
-
-const SavedQuestion = ({ question, index, length }) => {
-  return (
-    <>
-      <Text variant="overline" css={{ c: "$textDisabled" }}>
-        Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
-      </Text>
-      <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
-        {question.text}
-      </Text>
-      {question.options.map(option => (
-        <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
-          {option.text}
-          {option.isCorrectAnswer && ` ✅`}
-        </Text>
-      ))}
-    </>
-  );
-};
-
-const QuestionForm = ({
+export const QuestionForm = ({
   question,
   index,
   length,
@@ -199,15 +30,16 @@ const QuestionForm = ({
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
-
   const [type, setType] = useState(
     question.type || QUESTION_TYPE.SINGLE_CHOICE
   );
   const [text, setText] = useState(question.text);
-  const [options, setOptions] = useState([
-    { text: "", isCorrectAnswer: false },
-    { text: "", isCorrectAnswer: false },
-  ]);
+  const [options, setOptions] = useState(
+    question?.options || [
+      { text: "", isCorrectAnswer: false },
+      { text: "", isCorrectAnswer: false },
+    ]
+  );
   const [skippable, setSkippable] = useState(true);
 
   return (
@@ -253,6 +85,7 @@ const QuestionForm = ({
       <Input
         placeholder="Ask a question"
         css={{ mt: "$md" }}
+        type="text"
         value={text}
         onChange={event => setText(event.target.value)}
       />
@@ -260,7 +93,12 @@ const QuestionForm = ({
       type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
           <Text variant="body2" css={{ my: "$md", c: "$textMedEmp" }}>
-            Options
+            Options{" "}
+            {isQuiz && (
+              <Text variant="xs" css={{ c: "$textMedEmp" }}>
+                (Use checkboxes to indicate correct answers)
+              </Text>
+            )}
           </Text>
           {type === QUESTION_TYPE.SINGLE_CHOICE && (
             <SingleChoiceOptionInputs
@@ -332,7 +170,14 @@ const QuestionForm = ({
             })
           }
           onClick={() => {
-            onSave({ saved: true, text, type, options, skippable });
+            onSave({
+              saved: true,
+              text,
+              type,
+              options,
+              skippable,
+              draftID: question.draftID,
+            });
           }}
         >
           Save
@@ -371,4 +216,34 @@ const QuestionForm = ({
       </ErrorDialog>
     </>
   );
+};
+
+export const isValidQuestion = ({
+  text,
+  type,
+  options,
+  isQuiz = false,
+  skippable = true,
+}) => {
+  if (!isValidTextInput(text) || !type) {
+    return false;
+  }
+
+  if (
+    ![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)
+  ) {
+    return true;
+  }
+
+  const everyOptionHasText = options.every(
+    option => option && isValidTextInput(option.text, 1)
+  );
+  const isCorrectAnswerRequired = isQuiz && !skippable;
+  const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
+
+  if (!isCorrectAnswerRequired) {
+    return everyOptionHasText;
+  }
+
+  return everyOptionHasText && hasCorrectAnswer;
 };

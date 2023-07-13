@@ -1,10 +1,10 @@
 // @ts-check
 import React from "react";
 import { QuizIcon } from "@100mslive/react-icons";
-import { Flex, Text } from "@100mslive/roomkit-react";
-import { LaunchPollsQuizMenu } from "../Polls/LaunchPollsQuizMenu";
-import PollsQuizMenu from "../Polls/PollsQuizMenu";
-import { Voting } from "../Polls/Voting";
+import { Flex, Text } from "@100mslive/react-ui";
+import { PollsQuizMenu } from "../Polls/CreatePollQuiz/PollsQuizMenu";
+import { CreateQuestions } from "../Polls/CreateQuestions/CreateQuestions";
+import { Voting } from "../Polls/Voting/Voting";
 import { Container, ContentHeader } from "../Streaming/Common";
 import { useWidgetToggle } from "../AppData/useSidepane";
 import { useWidgetState } from "../AppData/useUISettings";
@@ -16,7 +16,7 @@ export const Widgets = () => {
 
   return (
     <Container rounded>
-      <ContentHeader content="Widgets" onBack={toggleWidget} />
+      <ContentHeader content="Widgets" onClose={toggleWidget} />
       {widgetView === WIDGET_VIEWS.LANDING && (
         <Flex direction="column" css={{ p: "$10" }}>
           <Flex css={{ gap: "$10", mb: "$12" }}>
@@ -40,8 +40,10 @@ export const Widgets = () => {
         </Flex>
       )}
       {widgetView === WIDGET_VIEWS.CREATE_POLL_QUIZ && <PollsQuizMenu />}
-      {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <LaunchPollsQuizMenu />}
-      {widgetView === WIDGET_VIEWS.VOTE && <Voting id={pollID} />}
+      {widgetView === WIDGET_VIEWS.CREATE_QUESTIONS && <CreateQuestions />}
+      {widgetView === WIDGET_VIEWS.VOTE && (
+        <Voting toggleVoting={toggleWidget} id={pollID} />
+      )}
     </Container>
   );
 };

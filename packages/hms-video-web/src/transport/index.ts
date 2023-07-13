@@ -50,6 +50,8 @@ import {
   PollQuestionsSetResponse,
   PollResponseSetParams,
   PollResponseSetResponse,
+  PollResponsesGetParams,
+  PollResponsesGetResponse,
   PollStartParams,
   PollStartResponse,
   PollStopParams,
@@ -708,8 +710,12 @@ export default class HMSTransport implements ITransport {
     return this.signal.stopPoll(params);
   }
 
-  getPollReponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
     return this.signal.setPollResponses(params);
+  }
+
+  getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
+    return this.signal.getPollResponses(params);
   }
 
   getPollsList(params: PollListParams): Promise<PollListResponse> {

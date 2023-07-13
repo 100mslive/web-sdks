@@ -1,29 +1,18 @@
 // @ts-check
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { selectPolls, useHMSActions, useHMSStore } from "@100mslive/react-sdk";
 import { QuestionIcon, StatsIcon } from "@100mslive/react-icons";
-import {
-  Button,
-  Dropdown,
-  Flex,
-  Input,
-  Switch,
-  Text,
-} from "@100mslive/roomkit-react";
-import { DialogDropdownTrigger } from "../../primitives/DropdownTrigger";
-import { Container, ContentHeader, ErrorText } from "../Streaming/Common";
-import { useSidepaneToggle } from "../AppData/useSidepane";
-import { useWidgetState } from "../AppData/useUISettings";
-import { useDropdownSelection } from "../hooks/useDropdownSelection";
-import {
-  SIDE_PANE_OPTIONS,
-  WIDGET_STATE,
-  WIDGET_VIEWS,
-} from "../../common/constants";
+import { Button, Flex, Input, Switch, Text } from "@100mslive/roomkit-react";
+import { Container, ContentHeader, ErrorText } from "../../Streaming/Common";
+import { useWidgetToggle } from "../../AppData/useSidepane";
+import { useWidgetState } from "../../AppData/useUISettings";
+import { isValidTextInput } from "../../../common/utils";
+import { StatusIndicator } from "../common/StatusIndicator";
+import { WIDGET_STATE, WIDGET_VIEWS } from "../../../common/constants";
 
-const PollsQuizMenu = () => {
+export const PollsQuizMenu = () => {
+  const toggleWidget = useWidgetToggle();
   const { setWidgetView } = useWidgetState();
-  const closeWidgets = useSidepaneToggle(SIDE_PANE_OPTIONS.WIDGET);
   const [interactionType, setInteractionType] = useState(
     interactionTypes["Poll"].title
   );
@@ -33,7 +22,7 @@ const PollsQuizMenu = () => {
       <ContentHeader
         content="Polls/Quiz"
         onBack={() => setWidgetView(WIDGET_VIEWS.LANDING)}
-        onClose={closeWidgets}
+        onClose={toggleWidget}
       />
       <Flex
         direction="column"
@@ -66,8 +55,6 @@ const PollsQuizMenu = () => {
     </Container>
   );
 };
-
-export default PollsQuizMenu;
 
 function InteractionSelectionCard({ title, icon, active, onClick }) {
   const activeBorderStyle = active
@@ -103,20 +90,8 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
   );
 }
 
-const timerSettings = {
-  10: "10 secs",
-  15: "15 secs",
-  20: "20 secs",
-  25: "25 secs",
-  30: "30 secs",
-  60: "1 min",
-  120: "2 mins",
-  300: "5 mins",
-};
-
 const AddMenu = ({ interactionType }) => {
   const actions = useHMSActions();
-  const selectionBg = useDropdownSelection();
   const [title, setTitle] = useState("");
   const [anonymous, setAnonymous] = useState(false);
   const [error, setError] = useState();
@@ -128,10 +103,8 @@ const AddMenu = ({ interactionType }) => {
       [WIDGET_STATE.view]: WIDGET_VIEWS.CREATE_QUESTIONS,
     });
   };
-  const [timer, setTimer] = useState(10);
-  const [showTimerDropDown, setShowTimerDropDown] = useState(false);
-  const [timerDropdownToggle, setTimerDropdownToggle] = useState(false);
-  const timerDropdownRef = useRef();
+  // const [timer, setTimer] = useState(10);
+  // const [showTimerDropDown, setShowTimerDropDown] = useState(false);
 
   return (
     <Flex direction="column">
@@ -159,63 +132,16 @@ const AddMenu = ({ interactionType }) => {
           Make Results Anonymous
         </Text>
       </Flex>
-      <Flex justify="between" align="center" css={{ mt: "$10" }}>
-        <Flex align="center">
-          <Switch
-            checked={showTimerDropDown}
-            onCheckedChange={setShowTimerDropDown}
-            css={{ mr: "$6" }}
-          />
-          <Text variant="body2" css={{ c: "$textMedEmp" }}>
-            Timer
-          </Text>
-        </Flex>
-        <Flex align="center">
-          {showTimerDropDown ? (
-            <Dropdown.Root
-              open={timerDropdownToggle}
-              onOpenChange={setTimerDropdownToggle}
-            >
-              <DialogDropdownTrigger
-                ref={timerDropdownRef}
-                title={timerSettings[timer]}
-                open={timerDropdownToggle}
-                titleCss={{ c: "$textHighEmp", ml: "$md" }}
-              />
-              <Dropdown.Portal>
-                <Dropdown.Content
-                  align="start"
-                  sideOffset={8}
-                  css={{
-                    w: timerDropdownRef.current?.clientWidth,
-                    zIndex: 1000,
-                  }}
-                >
-                  {Object.keys(timerSettings).map(value => {
-                    const val = parseInt(value);
-                    return (
-                      <Dropdown.Item
-                        key={value}
-                        onSelect={() => setTimer(val)}
-                        css={{
-                          px: "$9",
-                          bg: timer === val ? selectionBg : undefined,
-                        }}
-                      >
-                        {timerSettings[val]}
-                      </Dropdown.Item>
-                    );
-                  })}
-                </Dropdown.Content>
-              </Dropdown.Portal>
-            </Dropdown.Root>
-          ) : null}
-        </Flex>
-      </Flex>
+      {/* <Timer
+        timer={timer}
+        setTimer={setTimer}
+        showTimerDropDown={showTimerDropDown}
+        setShowTimerDropDown={setShowTimerDropDown}
+      /> */}
 
       <Button
         variant="primary"
-        disabled={!title}
+        disabled={!isValidTextInput(title)}
         css={{ mt: "$10" }}
         onClick={async () => {
           const id = Date.now().toString();
@@ -225,7 +151,7 @@ const AddMenu = ({ interactionType }) => {
               title,
               anonymous,
               type: interactionType.toLowerCase(),
-              duration: showTimerDropDown ? timer : undefined,
+              // duration: showTimerDropDown ? timer : undefined,
             })
             .then(() => handleCreate(id))
             .catch(err => setError(err.message));
@@ -247,15 +173,22 @@ const PrevMenu = () => {
       <Text variant="h6" css={{ c: "$textHighEmp" }}>
         Previous Polls/Quiz
       </Text>
-      {polls.map(poll => (
-        <InteractionCard {...poll} />
-      ))}
+      <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
+        {polls.map(poll => (
+          <InteractionCard
+            key={poll.id}
+            id={poll.id}
+            title={poll.title}
+            isLive={poll.state === "started"}
+            isTimed={(poll.duration || 0) > 0}
+          />
+        ))}
+      </Flex>
     </Flex>
   ) : null;
 };
 
-const InteractionCard = ({ id, title, state = "stopped" }) => {
-  const ended = state === "stopped";
+const InteractionCard = ({ id, title, isLive, isTimed }) => {
   const { setWidgetState } = useWidgetState();
 
   const goToVote = id => {
@@ -266,33 +199,23 @@ const InteractionCard = ({ id, title, state = "stopped" }) => {
   };
 
   return (
-    <Flex direction="column">
-      <Flex css={{ w: "100%", justifyContent: "space-between" }}>
+    <Flex
+      direction="column"
+      css={{ backgroundColor: "$surfaceLight", borderRadius: "$1", p: "$8" }}
+    >
+      <Flex css={{ w: "100%", justifyContent: "space-between", mb: "$sm" }}>
         <Text
           variant="sub1"
-          css={{ mt: "$md", c: "$textHighEmp", fontWeight: "$semiBold" }}
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold" }}
         >
           {title}
         </Text>
-        {/* <Text
-          css={{
-            bg: ended ? "$surfaceLighter" : "$error",
-            p: "$2 $4",
-            fontWeight: "$semiBold",
-            fontSize: "$xs",
-            r: "$1",
-          }}
-        >
-          {ended ? "ENDED" : "LIVE"}
-        </Text> */}
+        <StatusIndicator isLive={isLive} shouldShowTimer={isLive && isTimed} />
       </Flex>
       <Flex css={{ w: "100%", gap: "$4" }} justify="end">
-        <Button variant="standard">View results</Button>
-        {!ended && (
-          <Button variant="primary" onClick={() => goToVote(id)}>
-            View
-          </Button>
-        )}
+        <Button variant="primary" onClick={() => goToVote(id)}>
+          View
+        </Button>
       </Flex>
     </Flex>
   );
