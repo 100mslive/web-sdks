@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useScreenShare } from './useScreenShare';
-import usePrevious, { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
+import usePrevious, { isChromiumBased, pdfIframeURL } from '../utils/commons';
 
 export interface usePDFShareResult {
   /**
@@ -8,8 +8,7 @@ export interface usePDFShareResult {
    * It throws error in given below scenarios:
    * 1. When file or url is not passed.
    * 2. Reference to a iframe or element is not yet attached.
-   * 3. Url is invalid or does not have pdf.
-   * 4. Unable to start screen share
+   * 3. Unable to start screen share
    */
   startPDFShare: (value: File | string) => Promise<void>;
 
@@ -26,12 +25,6 @@ export interface usePDFShareResult {
    * reference of iframe where pdf annotator will be launched
    */
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
-
-  /**
-   * validate your pdf url
-   * It will throw error when url does not contain pdf.
-   */
-  isValidPDFUrl: (url: string) => Promise<boolean>;
 }
 
 /**
@@ -80,10 +73,6 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       if (amIScreenSharing) {
         throw new Error('You are already sharing');
       }
-      if (typeof value === 'string') {
-        // validate the url and throw error if failed.
-        await isValidPDFUrl(value);
-      }
       if (!iframeRef.current) {
         throw new Error('Attach a reference `iframeRef` to iframe for sharing');
       }
@@ -123,6 +112,5 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
     stopPDFShare: stopShare,
     iframeRef,
     isPDFShareInProgress: sharing,
-    isValidPDFUrl,
   };
 };

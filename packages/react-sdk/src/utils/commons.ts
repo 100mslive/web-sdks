@@ -15,26 +15,6 @@ export const throwErrorHandler: hooksErrHandler = (err: Error) => {
   throw err;
 };
 
-export const isValidPDFUrl = (pdfURL: string): Promise<boolean> => {
-  return new Promise((resolve, reject) => {
-    if (!pdfURL) {
-      reject(new Error('URL is empty'));
-    }
-    fetch(pdfURL, { method: 'HEAD' })
-      .then(response => response.headers.get('content-type'))
-      .then(contentType => {
-        if (contentType === 'application/pdf') {
-          resolve(true);
-        } else {
-          reject(new Error('URL does not contain pdf'));
-        }
-      })
-      .catch(error => {
-        reject(error as Error);
-      });
-  });
-};
-
 export default function usePrevious<T>(state: T): T | undefined {
   const ref = useRef<T>();
 

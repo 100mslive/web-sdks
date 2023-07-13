@@ -1,5 +1,3 @@
-import { useCallback } from "react";
-import { usePDFShare } from "@100mslive/react-sdk";
 import { Button, Flex } from "@100mslive/react-ui";
 import {
   useResetPDFConfig,
@@ -10,38 +8,11 @@ import { APP_DATA } from "../../common/constants";
 export const SubmitPDF = ({
   pdfFile,
   pdfURL,
-  isValidateProgress,
-  setIsPDFUrlValid,
-  setIsValidateProgress,
   onOpenChange,
   hideSecondaryCTA = false,
+  setPDFFile = () => {},
 }) => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  const { isValidPDFUrl } = usePDFShare();
-
-  const isValidPDF = useCallback(
-    async pdfURL => {
-      setIsValidateProgress(true);
-      try {
-        // added for out ui purpose. Will be handled internally as well for client.
-        await isValidPDFUrl(pdfURL);
-        setPDFConfig(pdfURL);
-        onOpenChange(false);
-        setIsPDFUrlValid(true);
-      } catch (err) {
-        setIsPDFUrlValid(false);
-      } finally {
-        setIsValidateProgress(false);
-      }
-    },
-    [
-      setIsValidateProgress,
-      isValidPDFUrl,
-      setPDFConfig,
-      onOpenChange,
-      setIsPDFUrlValid,
-    ]
-  );
   const resetConfig = useResetPDFConfig();
   return (
     <Flex
@@ -57,7 +28,10 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => resetConfig()}
+          onClick={() => {
+            resetConfig();
+            setPDFFile(null);
+          }}
           css={{ w: "50%" }}
         >
           Go Back
@@ -71,11 +45,11 @@ export const SubmitPDF = ({
             setPDFConfig(pdfFile);
             onOpenChange(false);
           } else if (pdfURL) {
-            await isValidPDF(pdfURL);
+            setPDFConfig(pdfURL);
+            onOpenChange(false);
           }
         }}
         disabled={!pdfFile && !pdfURL}
-        loading={isValidateProgress}
         data-testid="share_pdf_btn"
         css={{
           w: hideSecondaryCTA ? "100%" : "50%",
