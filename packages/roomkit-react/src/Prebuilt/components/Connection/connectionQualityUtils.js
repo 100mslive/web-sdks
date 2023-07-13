@@ -1,5 +1,3 @@
-import { useTheme } from '../../../Theme';
-
 const connectionTooltip = {
   0: 'Reconnecting',
   1: 'Very Bad Connection',
@@ -33,9 +31,9 @@ export const getColor = (position, connectionScore, defaultColor, theme) => {
   if (connectionScore >= 4) {
     return theme.color.alert_success || '#37F28D';
   } else if (connectionScore >= 3) {
-    return '#FAC919';
+    return theme.color.alert_warning || '#FAC919';
   } else if (connectionScore >= 1) {
-    return '#ED4C5A';
+    return theme.color.alert_default || '#ED4C5A';
   }
   return defaultColor;
 };

@@ -25,7 +25,7 @@ const Wrapper = styled('span', {
 export const ConnectionIndicator = ({ peerId, isTile = false }) => {
   const downlinkQuality = useHMSStore(selectConnectionQualityByPeerID(peerId))?.downlinkQuality;
   const { theme } = useTheme();
-  const defaultColor = theme.colors.surface_lighter;
+  const defaultColor = theme.colors.surface_brighter;
   if (downlinkQuality === -1 || downlinkQuality === undefined) {
     return null;
   }
