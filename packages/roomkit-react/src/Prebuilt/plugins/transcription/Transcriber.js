@@ -93,12 +93,12 @@ export class Transcriber {
               }
             }
           } catch (err) {
-            console.alert_error_default('transcription', err);
+            console.error('transcription', err);
           }
         };
 
         this.audioSocket.onerror = event => {
-          console.alert_error_default('transcription', event);
+          console.error('transcription', event);
           this.audioSocket.close();
         };
 
@@ -110,7 +110,7 @@ export class Transcriber {
               this.listen(retryCount++);
             }
           } catch (err) {
-            console.alert_error_default('transcription', err);
+            console.error('transcription', err);
           }
         };
 
@@ -118,10 +118,10 @@ export class Transcriber {
           this.observeLocalPeerTrack();
         };
       } else {
-        console.alert_error_default('Unable to fetch dynamic token!!');
+        console.error('Unable to fetch dynamic token!!');
       }
     } catch (err) {
-      console.alert_error_default('transcription', err);
+      console.error('transcription', err);
     }
   }
 
@@ -180,7 +180,7 @@ export class Transcriber {
             try {
               this.audioSocket.send(JSON.stringify({ audio_data: base64data.split('base64,')[1] }));
             } catch (err) {
-              console.alert_error_default('transcription', err);
+              console.error('transcription', err);
             }
           }
         };
