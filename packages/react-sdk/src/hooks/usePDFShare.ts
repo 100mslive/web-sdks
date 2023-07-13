@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useScreenShare } from './useScreenShare';
 import usePrevious, { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
 
@@ -40,6 +40,7 @@ export interface usePDFShareResult {
  */
 export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   const handleScreenShareError = useCallback(() => {
     throw new Error('unable to start screen share');
@@ -70,6 +71,9 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
   const startShare = useCallback(
     // eslint-disable-next-line complexity
     async (value: File | string) => {
+      if (inProgress.current) {
+        return;
+      }
       if (!value) {
         throw new Error('File or url not found');
       }
@@ -83,23 +87,22 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       if (!iframeRef.current) {
         throw new Error('Attach a reference `iframeRef` to iframe for sharing');
       }
-      if (!inProgress.current) {
-        iframeRef.current.src = `${pdfIframeURL}${typeof value === 'string' ? `?file=${value}` : ''}`;
-        iframeRef.current.onload = () => {
-          requestAnimationFrame(() => {
-            if (value instanceof File) {
-              sendDataToPDFIframe(value);
-            }
-          });
-        };
-        inProgress.current = true;
-        await toggleScreenShare?.({
-          forceCurrentTab: isChromiumBased,
-          cropElement: iframeRef.current,
-          preferCurrentTab: isChromiumBased,
+
+      iframeRef.current.src = `${pdfIframeURL}${typeof value === 'string' ? `?file=${value}` : ''}`;
+      iframeRef.current.onload = () => {
+        requestAnimationFrame(() => {
+          if (value instanceof File) {
+            sendDataToPDFIframe(value);
+          }
         });
-        inProgress.current = false;
-      }
+      };
+      inProgress.current = true;
+      setSharing(true);
+      await toggleScreenShare?.({
+        forceCurrentTab: isChromiumBased,
+        cropElement: iframeRef.current,
+        preferCurrentTab: isChromiumBased,
+      });
     },
     [amIScreenSharing, sendDataToPDFIframe, toggleScreenShare],
   );
@@ -109,8 +112,9 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       resetConfig?.();
       if (iframeRef.current) {
         iframeRef.current.src = '';
-        iframeRef.current = null;
       }
+      inProgress.current = false;
+      setSharing(false);
     }
   }, [amIScreenSharing, previouslySharing, resetConfig]);
 
@@ -118,17 +122,7 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
     startPDFShare: startShare,
     stopPDFShare: stopShare,
     iframeRef,
-    isPDFShareInProgress: amIScreenSharing,
+    isPDFShareInProgress: sharing,
     isValidPDFUrl,
   };
 };
-
-// set URL
-// show pdf view
-// start screene share
-
-// stop screene share
-// amIScreenSharing false
-// clean URL
-// amIsharing false
-// usePrevious to check previous state
