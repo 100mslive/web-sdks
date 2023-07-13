@@ -93,6 +93,8 @@ export const ErrorCodes = {
 
     // [{action}]: Ice connection state FAILED
     ICE_DISCONNECTED: 4006,
+
+    STATS_FAILED: 4007,
   },
 
   WebsocketMethodErrors: {

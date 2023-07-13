@@ -33,7 +33,7 @@ export class HMSLogger {
     this.log(HMSLogLevel.TIMEEND, '[HMSPerformanceTiming]', mark, mark);
   }
 
-  static cleanUp() {
+  static cleanup() {
     performance.clearMarks();
     performance.clearMeasures();
   }

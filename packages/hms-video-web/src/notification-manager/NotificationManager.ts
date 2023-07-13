@@ -5,6 +5,7 @@ import { OnDemandTrackManager } from './managers/onDemandTrackManager';
 import { PeerListManager } from './managers/PeerListManager';
 import { PeerManager } from './managers/PeerManager';
 import { PolicyChangeManager } from './managers/PolicyChangeManager';
+import { PollsManager } from './managers/PollsManager';
 import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { SessionMetadataManager } from './managers/SessionMetadataManager';
@@ -37,6 +38,7 @@ export class NotificationManager {
   private requestManager: RequestManager;
   private roomUpdateManager: RoomUpdateManager;
   private sessionMetadataManager: SessionMetadataManager;
+  private pollsManager: PollsManager;
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
@@ -66,6 +68,7 @@ export class NotificationManager {
     this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
     this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
+    this.pollsManager = new PollsManager(this.store, this.transport, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -78,6 +81,7 @@ export class NotificationManager {
     this.activeSpeakerManager.listener = listener;
     this.roomUpdateManager.listener = listener;
     this.sessionMetadataManager.listener = listener;
+    this.pollsManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {
@@ -120,6 +124,7 @@ export class NotificationManager {
     this.peerListManager.handleNotification(method, notification, isReconnecting);
     this.broadcastManager.handleNotification(method, notification);
     this.sessionMetadataManager.handleNotification(method, notification);
+    this.pollsManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
   }
 
@@ -132,6 +137,14 @@ export class NotificationManager {
       }
       case HMSNotificationMethod.TRACK_UPDATE: {
         this.trackManager.handleTrackUpdate(notification as TrackStateNotification);
+        break;
+      }
+      case HMSNotificationMethod.TRACK_REMOVE: {
+        if (!notification.peer) {
+          HMSLogger.d(this.TAG, `Ignoring sfu notification - ${method}`, { notification });
+          return;
+        }
+        this.trackManager.handleTrackRemovedPermanently(notification as TrackStateNotification);
         break;
       }
       case HMSNotificationMethod.ON_SFU_TRACK_LAYER_UPDATE: {

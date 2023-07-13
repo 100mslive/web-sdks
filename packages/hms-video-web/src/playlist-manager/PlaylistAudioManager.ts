@@ -75,6 +75,9 @@ export class PlaylistAudioManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   getElement() {
+    if (!this.audioElement) {
+      this.audioElement = this.getAudioElement();
+    }
     return this.audioElement;
   }
 

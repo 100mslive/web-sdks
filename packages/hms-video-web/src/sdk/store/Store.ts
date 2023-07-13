@@ -3,7 +3,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -48,6 +48,7 @@ class Store implements IStore {
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
+  private polls = new Map<string, HMSPoll>();
 
   getConfig() {
     return this.config;
@@ -358,11 +359,19 @@ class Store implements IStore {
     );
   }
 
+  setPoll(poll: HMSPoll) {
+    this.polls.set(poll.id, poll);
+  }
+
+  getPoll(id: string): HMSPoll | undefined {
+    return this.polls.get(id);
+  }
+
   getErrorListener() {
     return this.errorListener;
   }
 
-  cleanUp() {
+  cleanup() {
     const tracks = this.getTracks();
     for (const track of tracks) {
       track.cleanup();
