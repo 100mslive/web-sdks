@@ -11,6 +11,7 @@ import {
   DEFAULT_SIGNAL_PING_TIMEOUT,
   PONG_RESPONSE_TIMES_SIZE,
 } from '../../utils/constants';
+import { override } from '../../utils/infra_override';
 import HMSLogger from '../../utils/logger';
 import { PromiseCallbacks } from '../../utils/promise';
 import { Queue } from '../../utils/queue';
@@ -151,6 +152,10 @@ export default class JsonRpcSignal implements ISignal {
 
   open(uri: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      if (override) {
+        uri += '&additionalProps=true';
+      }
+
       let promiseSettled = false;
       // cleanup
       if (this.socket) {
@@ -238,7 +243,8 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to send join over WS connection',
       );
     }
-    const params = {
+
+    const params: any = {
       name,
       disableVidAutoSub,
       data,
@@ -247,6 +253,11 @@ export default class JsonRpcSignal implements ISignal {
       simulcast,
       onDemandTracks,
     };
+
+    if (override && override.join) {
+      params.__override = override.join;
+    }
+
     const response: RTCSessionDescriptionInit = await this.internalCall(HMSSignalMethod.JOIN, params);
 
     this.isJoinCompleted = true;
