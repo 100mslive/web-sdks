@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as Popover from "@radix-ui/react-popover";
 import { Cross2Icon } from "@radix-ui/react-icons";
+import * as Popover from "@radix-ui/react-popover";
 import { Box, Flex, Text } from "@100mslive/react-ui";
 import { getUpdatedHeight } from "../common/utils";
 
