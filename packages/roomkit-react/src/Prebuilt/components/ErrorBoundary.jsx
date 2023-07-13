@@ -33,7 +33,7 @@ export class ErrorBoundary extends Component {
           css={{
             size: '100%',
             color: '$on_primary_high',
-            backgroundColor: '$bgPrimary',
+            backgroundColor: '$background_default',
           }}
         >
           <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>

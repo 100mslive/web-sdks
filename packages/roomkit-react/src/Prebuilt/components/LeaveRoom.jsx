@@ -173,10 +173,10 @@ const LeaveIconButton = styled(IconButton, {
   r: '$1',
   bg: '$alert_error_default',
   '&:not([disabled]):hover': {
-    bg: '$errorTint',
+    bg: '$alert_error_default',
   },
   '&:not([disabled]):active': {
-    bg: '$errorTint',
+    bg: '$alert_error_default',
   },
   '@md': {
     px: '$4',

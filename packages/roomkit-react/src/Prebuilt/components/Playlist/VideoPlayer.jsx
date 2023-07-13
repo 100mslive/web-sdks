@@ -34,7 +34,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           justify="between"
           align="center"
           css={{
-            bg: '$menuBg',
+            bg: '$surface_default',
             p: '$2 $2 $2 $6',
             borderTopLeftRadius: '$1',
             borderTopRightRadius: '$1',

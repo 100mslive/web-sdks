@@ -27,10 +27,10 @@ export const PlaylistItem = React.memo(({ name, metadata, duration, selected, on
         p: '$8',
         '&:hover': {
           cursor: 'pointer',
-          bg: '$menuBg',
+          bg: '$surface_default',
         },
         '&:focus-visible': {
-          bg: '$menuBg',
+          bg: '$surface_default',
         },
       }}
       onClick={onClick}

@@ -135,7 +135,7 @@ export const AudioPlaylistControls = ({ onToggle }) => {
       css={{
         p: '$8',
         borderTop: '1px solid $border_bright',
-        bg: '$menuBg',
+        bg: '$surface_default',
       }}
     >
       <Controls type={HMSPlaylistType.audio} />

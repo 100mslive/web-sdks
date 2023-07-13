@@ -11,7 +11,7 @@ function ErrorPage({ error }) {
       css={{
         size: '100%',
         color: '$on_surface_high',
-        backgroundColor: '$bgPrimary',
+        backgroundColor: '$background_default',
       }}
     >
       <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>

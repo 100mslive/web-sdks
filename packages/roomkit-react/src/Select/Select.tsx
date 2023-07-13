@@ -9,7 +9,7 @@ const Root = styled('div', {
   outline: 'none',
   overflow: 'hidden',
   borderRadius: '$1',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_default',
   maxWidth: '100%',
 });
 

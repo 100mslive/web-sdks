@@ -90,7 +90,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               css={{
                 w: isMobile ? '100%' : '18.625rem',
                 flexDirection: 'column',
-                bg: '$backgroundDefault',
+                bg: '$background_default',
                 p: '$14 $10',
                 borderTopLeftRadius: '$4',
                 borderBottomLeftRadius: '$4',
