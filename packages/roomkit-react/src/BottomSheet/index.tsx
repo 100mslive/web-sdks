@@ -11,11 +11,15 @@ const BottomSheet = ({
   children = <></>,
   triggerContent,
   containerCSS = {},
+  sideOffset = -50,
 }: {
   title: string;
   children: ReactNode;
   triggerContent: ReactNode;
   containerCSS: CSS;
+  // By default the component starts just above the trigger.
+  // A negative offset allows it to start from the bottom of the screen.
+  sideOffset: number;
 }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetHeight, setSheetHeight] = useState('50vh');
@@ -42,7 +46,7 @@ const BottomSheet = ({
       >
         <Popover.Trigger asChild>{triggerContent}</Popover.Trigger>
         <Popover.Portal>
-          <Popover.Content sideOffset={-50} style={{ zIndex: '2' }}>
+          <Popover.Content sideOffset={sideOffset} style={{ zIndex: '2' }}>
             <Box
               css={{
                 w: '100vw',
