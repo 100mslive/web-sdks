@@ -9,25 +9,28 @@ import { APP_DATA } from "../common/constants";
  * PDFView is responsible for rendering the PDF iframe and managing the screen sharing functionality.
  */
 export const PDFView = () => {
-  const { iframeRef, startPDFShare, isPDFShareInProgress } = usePDFShare();
   const pdfConfig = useHMSStore(selectAppData(APP_DATA.pdfConfig));
   const resetConfig = useResetPDFConfig();
 
+  // need to send resetConfig to clear configuration, if stop screenshare occurs.
+  const { iframeRef, startPDFShare, isPDFShareInProgress } =
+    usePDFShare(resetConfig);
+
   useEffect(() => {
     (async () => {
-      if (pdfConfig && !isPDFShareInProgress) {
-        try {
+      try {
+        if (!isPDFShareInProgress && pdfConfig) {
           await startPDFShare(pdfConfig);
-        } catch (err) {
-          resetConfig();
-          ToastManager.addToast({
-            title: `Error while sharing annotator ${err.message || ""}`,
-            variant: "error",
-          });
         }
+      } catch (err) {
+        resetConfig();
+        ToastManager.addToast({
+          title: `Error while sharing annotator ${err.message || ""}`,
+          variant: "error",
+        });
       }
     })();
-  }, [isPDFShareInProgress, pdfConfig, iframeRef, resetConfig, startPDFShare]);
+  }, [isPDFShareInProgress, pdfConfig, resetConfig, startPDFShare]);
   return <EmbedScreenShareView ref={iframeRef} />;
 };
 

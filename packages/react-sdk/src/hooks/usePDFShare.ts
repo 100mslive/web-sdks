@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useScreenShare } from './useScreenShare';
-import { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
+import usePrevious, { isChromiumBased, isValidPDFUrl, pdfIframeURL } from '../utils/commons';
 
 export interface usePDFShareResult {
   /**
@@ -34,7 +34,11 @@ export interface usePDFShareResult {
   isValidPDFUrl: (url: string) => Promise<boolean>;
 }
 
-export const usePDFShare = (): usePDFShareResult => {
+/**
+ * @param resetConfig pass resetConfig where you were mounting the iframe, it will help to clear configuration when stop screen share occurs
+ * @returns usePDFShareResult
+ */
+export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
   const handleScreenShareError = useCallback(() => {
@@ -42,6 +46,8 @@ export const usePDFShare = (): usePDFShareResult => {
   }, []);
   const inProgress = useRef(false);
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
+  // store previous state of screensharing, it will help to reset the config after screensharing stop.
+  const previouslySharing = usePrevious(amIScreenSharing);
 
   const sendDataToPDFIframe = useCallback((file?: File) => {
     if (iframeRef.current) {
@@ -58,7 +64,6 @@ export const usePDFShare = (): usePDFShareResult => {
   const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
       await toggleScreenShare?.(); // Stop screen sharing
-      iframeRef.current = null;
     }
   }, [amIScreenSharing, toggleScreenShare]);
 
@@ -100,13 +105,14 @@ export const usePDFShare = (): usePDFShareResult => {
   );
 
   useEffect(() => {
-    return () => {
-      // close screenshare when this component is being unmounted
-      if (amIScreenSharing) {
-        stopShare(); // stop
+    if (previouslySharing && !amIScreenSharing) {
+      resetConfig?.();
+      if (iframeRef.current) {
+        iframeRef.current.src = '';
+        iframeRef.current = null;
       }
-    };
-  }, [amIScreenSharing, stopShare]);
+    }
+  }, [amIScreenSharing, previouslySharing, resetConfig]);
 
   return {
     startPDFShare: startShare,
@@ -116,3 +122,13 @@ export const usePDFShare = (): usePDFShareResult => {
     isValidPDFUrl,
   };
 };
+
+// set URL
+// show pdf view
+// start screene share
+
+// stop screene share
+// amIScreenSharing false
+// clean URL
+// amIsharing false
+// usePrevious to check previous state

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { parsedUserAgent } from '@100mslive/hms-video-store';
 import HMSLogger from './logger';
 import { hooksErrHandler } from '../hooks/types';
@@ -33,6 +34,16 @@ export const isValidPDFUrl = (pdfURL: string): Promise<boolean> => {
       });
   });
 };
+
+export default function usePrevious<T>(state: T): T | undefined {
+  const ref = useRef<T>();
+
+  useEffect(() => {
+    ref.current = state;
+  });
+
+  return ref.current;
+}
 
 const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];
 

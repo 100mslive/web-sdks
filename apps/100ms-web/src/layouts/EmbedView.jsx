@@ -19,10 +19,12 @@ import { APP_DATA } from "../common/constants";
  * EmbedView is responsible for rendering the iframe and managing the screen sharing functionality.
  */
 export const EmbedView = () => {
-  const { iframeRef, startEmbedShare, isEmbedShareInProgress } =
-    useEmbedShare();
   const embedConfig = useHMSStore(selectAppData(APP_DATA.embedConfig));
   const resetConfig = useResetEmbedConfig();
+
+  // need to send resetConfig to clear configuration, if stop screenshare occurs.
+  const { iframeRef, startEmbedShare, isEmbedShareInProgress } =
+    useEmbedShare(resetConfig);
 
   useEffect(() => {
     (async () => {
@@ -38,7 +40,8 @@ export const EmbedView = () => {
         }
       }
     })();
-  }, [isEmbedShareInProgress, embedConfig, resetConfig, startEmbedShare]);
+  }, [isEmbedShareInProgress, embedConfig, startEmbedShare, resetConfig]);
+
   return <EmbedScreenShareView ref={iframeRef} />;
 };
 

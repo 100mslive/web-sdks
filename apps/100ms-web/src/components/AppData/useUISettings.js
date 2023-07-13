@@ -95,7 +95,7 @@ export const usePDFConfig = () => {
 };
 export const useResetPDFConfig = () => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  return () => setPDFConfig();
+  return useCallback(() => setPDFConfig(), [setPDFConfig]);
 };
 export const useResetEmbedConfig = () => {
   const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);

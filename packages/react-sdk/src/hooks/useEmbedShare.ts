@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useScreenShare } from './useScreenShare';
-import { isChromiumBased } from '../utils/commons';
+import usePrevious, { isChromiumBased } from '../utils/commons';
 
 export interface useEmbedShareResult {
   /**
@@ -27,13 +27,19 @@ export interface useEmbedShareResult {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
-export const useEmbedShare = (): useEmbedShareResult => {
+/**
+ * @param resetConfig pass resetConfig where you were mounting the iframe, it will help to clear configuration when stop screen share occurs
+ * @returns useEmbedShareResult
+ */
+export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const handleScreenShareError = useCallback(() => {
     throw new Error('unable to start screen share');
   }, []);
   const inProgress = useRef(false);
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
+  // store previous state of screensharing, it will help to reset the config after screensharing stop.
+  const previouslySharing = usePrevious(amIScreenSharing);
 
   const stopShare = useCallback(async () => {
     if (amIScreenSharing) {
@@ -68,13 +74,14 @@ export const useEmbedShare = (): useEmbedShareResult => {
   );
 
   useEffect(() => {
-    return () => {
-      // close screenshare when this component is being unmounted
-      if (amIScreenSharing) {
-        stopShare(); // stop
+    if (previouslySharing && !amIScreenSharing) {
+      resetConfig?.();
+      if (iframeRef.current) {
+        iframeRef.current.src = '';
+        iframeRef.current = null;
       }
-    };
-  }, [amIScreenSharing, stopShare]);
+    }
+  }, [amIScreenSharing, previouslySharing, resetConfig]);
 
   return {
     startEmbedShare: startShare,
