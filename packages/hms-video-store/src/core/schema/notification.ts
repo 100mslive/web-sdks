@@ -1,4 +1,3 @@
-import { HMSPoll } from '@100mslive/hms-video';
 import { HMSDeviceChangeEvent } from './device-change';
 import { HMSException } from './error';
 import { HMSMessage } from './message';
@@ -72,11 +71,6 @@ export interface HMSReconnectionNotification extends BaseNotification {
   data: null;
 }
 
-export interface HMSPollNotification extends BaseNotification {
-  type: HMSNotificationTypes.POLL_STARTED | HMSNotificationTypes.POLL_STOPPED | HMSNotificationTypes.POLL_VOTES_UPDATED;
-  data: HMSPoll;
-}
-
 export type HMSNotification =
   | HMSPeerNotification
   | HMSPeerListNotification
@@ -119,11 +113,6 @@ export enum HMSNotificationTypes {
   PLAYLIST_TRACK_ENDED = 'PLAYLIST_TRACK_ENDED',
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
-  POLL_CREATED = 'POLL_CREATED',
-  POLL_STARTED = 'POLL_STARTED',
-  POLL_STOPPED = 'POLL_STOPPED',
-  POLL_VOTES_UPDATED = 'POLL_VOTES_UPDATED',
-  POLL_LIST = 'POLL_LIST',
 }
 
 export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
@@ -151,11 +140,6 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST]: HMSChangeMultiTrackStateRequestNotification;
   [HMSNotificationTypes.RECONNECTED]: HMSReconnectionNotification;
   [HMSNotificationTypes.RECONNECTING]: HMSReconnectionNotification;
-  [HMSNotificationTypes.POLL_STARTED]: HMSPollNotification;
-  [HMSNotificationTypes.POLL_STOPPED]: HMSPollNotification;
-  [HMSNotificationTypes.POLL_VOTES_UPDATED]: HMSPollNotification;
-  [HMSNotificationTypes.POLL_LIST]: HMSPollNotification;
-  [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
 }[T];
 
 type MappedNotifications<Type extends HMSNotificationTypes[]> = {

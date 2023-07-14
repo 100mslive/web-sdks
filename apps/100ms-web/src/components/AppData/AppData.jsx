@@ -37,7 +37,6 @@ import {
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
-  WIDGET_STATE,
 } from "../../common/constants";
 
 export const getAppDetails = appDetails => {
@@ -80,10 +79,6 @@ const initialAppData = {
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
-  [APP_DATA.widgetState]: {
-    [WIDGET_STATE.pollInView]: "",
-    [WIDGET_STATE.view]: "",
-  },
 };
 
 export const AppData = React.memo(

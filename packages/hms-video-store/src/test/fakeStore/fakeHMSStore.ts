@@ -289,7 +289,6 @@ export const makeFakeStore = (): HMSStore => {
     },
     errors: [],
     sessionStore: {},
-    polls: {},
   };
 
   localPeer = fakeStore.peers['1'];

@@ -6,7 +6,6 @@ import {
   selectLocalPeerID,
   selectPeers,
   selectPeersMap,
-  selectPollsMap,
   selectTracksMap,
 } from './selectors';
 import {
@@ -35,7 +34,6 @@ const selectPeerID = (_store: HMSStore, peerID: HMSPeerID | undefined) => peerID
 const selectTrackID = (_store: HMSStore, trackID: HMSTrackID | undefined) => trackID;
 const selectRoleName = (_store: HMSStore, roleName: HMSRoleName | undefined) => roleName;
 const selectAppDataKey = (_store: HMSStore, key: string | undefined) => key;
-const selectPollID = (_store: HMSStore, pollID: string | undefined) => pollID;
 
 const selectPeerByIDBare = createSelector([selectPeersMap, selectPeerID], (storePeers, peerID) =>
   peerID ? storePeers[peerID] : null,
@@ -87,10 +85,6 @@ const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTr
   }
   return null;
 });
-
-export const selectPollByIDBare = createSelector([selectPollsMap, selectPollID], (storePolls, pollID) =>
-  pollID ? storePolls[pollID] : null,
-);
 
 /**
  * Select the {@link HMSPeer} object given a peer ID.
@@ -514,5 +508,3 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
   });
 
 export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);
-
-export const selectPollByID = byIDCurry(selectPollByIDBare);

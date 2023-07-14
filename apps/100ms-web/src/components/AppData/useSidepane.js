@@ -5,8 +5,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
-import { useWidgetState } from "./useUISettings";
-import { APP_DATA, WIDGET_STATE, WIDGET_VIEWS } from "../../common/constants";
+import { APP_DATA } from "../../common/constants";
 
 /**
  * Gives a boolean value if the sidepaneType matches current sidepane value in store
@@ -44,27 +43,6 @@ export const useSidepaneToggle = sidepaneType => {
   return toggleSidepane;
 };
 
-export const useWidgetToggle = () => {
-  const { widgetView, setWidgetState } = useWidgetState();
-
-  const toggleWidget = useCallback(
-    id => {
-      id = typeof id === "string" ? id : undefined;
-      setWidgetState({
-        [WIDGET_STATE.pollInView]: id,
-        [WIDGET_STATE.view]: id
-          ? WIDGET_VIEWS.VOTE
-          : widgetView
-          ? null
-          : WIDGET_VIEWS.LANDING,
-      });
-    },
-    [widgetView, setWidgetState]
-  );
-
-  return toggleWidget;
-};
-
 /**
  * reset's the sidepane value
  */
@@ -72,10 +50,6 @@ export const useSidepaneReset = () => {
   const hmsActions = useHMSActions();
   const resetSidepane = useCallback(() => {
     hmsActions.setAppData(APP_DATA.sidePane, "");
-    hmsActions.setAppData(APP_DATA.widgetState, {
-      [WIDGET_STATE.pollInView]: "",
-      [WIDGET_STATE.view]: "",
-    });
   }, [hmsActions]);
   return resetSidepane;
 };

@@ -6,7 +6,7 @@ import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSPoll, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
+import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
 
 export interface HMSGenericTypes {
   sessionStore: Record<string, any>;
@@ -43,7 +43,6 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   };
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
   sessionStore: T['sessionStore'];
-  polls: Record<string, HMSPoll>;
 }
 
 export interface HMSStatsStore {
@@ -125,7 +124,6 @@ export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T
     errors: [],
     sessionStore: {},
     templateAppData: {},
-    polls: {},
   };
 };
 

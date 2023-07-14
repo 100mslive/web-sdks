@@ -23,24 +23,6 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   MultiTrackUpdateRequestParams,
-  PollInfoGetParams,
-  PollInfoGetResponse,
-  PollInfoSetParams,
-  PollInfoSetResponse,
-  PollListParams,
-  PollListResponse,
-  PollQuestionsGetParams,
-  PollQuestionsGetResponse,
-  PollQuestionsSetParams,
-  PollQuestionsSetResponse,
-  PollResponseSetParams,
-  PollResponseSetResponse,
-  PollResponsesGetParams,
-  PollResponsesGetResponse,
-  PollStartParams,
-  PollStartResponse,
-  PollStopParams,
-  PollStopResponse,
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
@@ -391,60 +373,6 @@ export default class JsonRpcSignal implements ISignal {
       );
     }
     return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
-  }
-
-  setPollInfo(params: PollInfoSetParams) {
-    this.valiateConnection();
-    return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { version: '1.0', ...params });
-  }
-
-  getPollInfo(params: PollInfoGetParams) {
-    this.valiateConnection();
-    return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { version: '1.0', ...params });
-  }
-
-  setPollQuestions(params: PollQuestionsSetParams) {
-    this.valiateConnection();
-    return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { version: '1.0', ...params });
-  }
-
-  startPoll(params: PollStartParams) {
-    this.valiateConnection();
-    return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { version: '1.0', ...params });
-  }
-
-  stopPoll(params: PollStopParams) {
-    this.valiateConnection();
-    return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { version: '1.0', ...params });
-  }
-
-  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
-    this.valiateConnection();
-    return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { version: '1.0', ...params });
-  }
-
-  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
-    this.valiateConnection();
-    return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { version: '1.0', ...params });
-  }
-
-  getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
-    this.valiateConnection();
-    return this.call<PollResponsesGetResponse>(HMSSignalMethod.POLL_RESPONSES, { version: '1.0', ...params });
-  }
-
-  getPollsList(params: PollListParams): Promise<PollListResponse> {
-    this.valiateConnection();
-    return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { version: '1.0', ...params });
-  }
-
-  private valiateConnection() {
-    if (!this.isConnected) {
-      throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
-        HMSAction.RECONNECT_SIGNAL,
-        'Failed to send message due to network disconnection',
-      );
-    }
   }
 
   private onMessageHandler(event: MessageEvent) {

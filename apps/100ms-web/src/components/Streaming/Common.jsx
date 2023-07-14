@@ -55,47 +55,36 @@ export const StreamCard = ({
   );
 };
 
-export const ContentHeader = ({ onBack, onClose, title = "", content }) => {
+export const ContentHeader = ({ onBack, title, content }) => {
   return (
     <Flex css={{ w: "100%", py: "$8", px: "$10", cursor: "pointer" }}>
-      {onBack ? (
-        <Text
-          css={{
-            p: "$2",
-            bg: "$surfaceLight",
-            r: "$round",
-            alignSelf: "center",
-          }}
-          onClick={onBack}
-          data-testid="go_back"
-        >
-          <ChevronLeftIcon width={16} height={16} />
-        </Text>
-      ) : null}
+      <Text
+        css={{ p: "$2", bg: "$surfaceLight", r: "$round", alignSelf: "center" }}
+        onClick={onBack}
+        data-testid="go_back"
+      >
+        <ChevronLeftIcon width={16} height={16} />
+      </Text>
       <Box css={{ flex: "1 1 0", mx: "$8" }}>
-        {title ? (
-          <Text
-            variant="tiny"
-            css={{
-              textTransform: "uppercase",
-              fontWeight: "$semiBold",
-              color: "$textMedEmp",
-            }}
-          >
-            {title}
-          </Text>
-        ) : null}
+        <Text
+          variant="tiny"
+          css={{
+            textTransform: "uppercase",
+            fontWeight: "$semiBold",
+            color: "$textMedEmp",
+          }}
+        >
+          {title}
+        </Text>
         <Text variant="h6">{content}</Text>
       </Box>
-      {onClose ? (
-        <IconButton
-          onClick={onClose}
-          css={{ alignSelf: "flex-start" }}
-          data-testid="close_stream_section"
-        >
-          <CrossIcon width={16} height={16} />
-        </IconButton>
-      ) : null}
+      <IconButton
+        onClick={onBack}
+        css={{ alignSelf: "flex-start" }}
+        data-testid="close_stream_section"
+      >
+        <CrossIcon width={16} height={16} />
+      </IconButton>
     </Flex>
   );
 };
@@ -115,8 +104,6 @@ export const Container = ({ children, rounded = false }) => {
         display: "flex",
         flexDirection: "column",
         borderRadius: rounded ? "$2" : "0",
-        overflowY: "auto",
-        overflowX: "hidden",
       }}
     >
       {children}

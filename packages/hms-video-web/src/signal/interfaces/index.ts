@@ -7,4 +7,3 @@
 export * from './track';
 export * from './superpowers';
 export * from './responses';
-export * from './polls';

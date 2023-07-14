@@ -39,8 +39,4 @@ export type {
   TokenRequest,
   TokenRequestOptions,
   RID,
-  HMSPoll,
-  HMSPollCreateParams,
-  HMSPollQuestionCreateParams,
-  HMSPollQuestionAnswer,
 } from './hmsSDKStore/sdkTypes';

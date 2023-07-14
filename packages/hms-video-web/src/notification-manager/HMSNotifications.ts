@@ -1,9 +1,8 @@
 import { VideoTrackLayerUpdate } from '../connection/channel-messages';
-import { HMSPollQuestionType } from '../interfaces';
 import { HMSRole } from '../interfaces/role';
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
-import { PollInfoParams, Track } from '../signal/interfaces';
+import { Track } from '../signal/interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -244,28 +243,5 @@ export interface MetadataChangeNotification {
     data: any;
     key: string;
     updated_at?: number;
-  }[];
-}
-
-export interface PollStartNotification {
-  polls: PollInfoParams[];
-}
-
-export type PollStopNotification = PollStartNotification;
-
-export interface PollStatsNotification {
-  polls: {
-    poll_id: string;
-    max_user: number;
-    total_responses: number;
-    user_count: number;
-    questions?: {
-      question: number;
-      type: HMSPollQuestionType;
-      options?: number[];
-      correct?: number;
-      skipped?: number;
-      total?: number;
-    }[];
   }[];
 }

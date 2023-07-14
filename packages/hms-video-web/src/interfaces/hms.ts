@@ -1,4 +1,3 @@
-import { HMSInteractivityCenter } from './session-store/interactivity-center';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
@@ -32,7 +31,6 @@ export interface HMSInterface {
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
   getSessionStore(): HMSSessionStore;
-  getInteractivityCenter(): HMSInteractivityCenter;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
   refreshDevices(): Promise<void>;

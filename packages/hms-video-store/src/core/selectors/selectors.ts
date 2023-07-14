@@ -425,7 +425,3 @@ export const selectRoomStartTime = createSelector(selectRoom, room => room.start
 export const selectTemplateAppData = (store: HMSStore) => store.templateAppData;
 /** @deprecated - use `selectSessionStore` instead */
 export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;
-export const selectPollsMap = (store: HMSStore) => store.polls;
-export const selectPolls = (store: HMSStore) => {
-  return Object.values(store.polls);
-};
