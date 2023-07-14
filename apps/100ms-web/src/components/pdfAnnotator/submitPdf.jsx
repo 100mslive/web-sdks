@@ -1,18 +1,39 @@
+import { useCallback } from "react";
 import { Button, Flex } from "@100mslive/react-ui";
 import {
   useResetPDFConfig,
   useSetAppDataByKey,
 } from "../AppData/useUISettings";
+import { isValidURL } from "../../common/utils";
 import { APP_DATA } from "../../common/constants";
 
 export const SubmitPDF = ({
   pdfFile,
   pdfURL,
+  isValidateProgress,
+  setIsPDFUrlValid,
+  setIsValidateProgress,
   onOpenChange,
   hideSecondaryCTA = false,
   setPDFFile = () => {},
 }) => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  const isValidPDF = useCallback(
+    pdfURL => {
+      setIsValidateProgress(true);
+      const isValid = isValidURL(pdfURL);
+      if (isValid) {
+        setIsPDFUrlValid(true);
+        setIsValidateProgress(false);
+        setPDFConfig(pdfURL);
+        onOpenChange(false);
+      } else {
+        setIsPDFUrlValid(false);
+        setIsValidateProgress(false);
+      }
+    },
+    [onOpenChange, setIsPDFUrlValid, setIsValidateProgress, setPDFConfig]
+  );
   const resetConfig = useResetPDFConfig();
   return (
     <Flex
@@ -45,11 +66,11 @@ export const SubmitPDF = ({
             setPDFConfig(pdfFile);
             onOpenChange(false);
           } else if (pdfURL) {
-            setPDFConfig(pdfURL);
-            onOpenChange(false);
+            isValidPDF(pdfURL);
           }
         }}
         disabled={!pdfFile && !pdfURL}
+        loading={isValidateProgress}
         data-testid="share_pdf_btn"
         css={{
           w: hideSecondaryCTA ? "100%" : "50%",
