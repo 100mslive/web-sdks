@@ -1,61 +1,19 @@
-import { useCallback } from "react";
 import { Button, Flex } from "@100mslive/react-ui";
-import { useSetAppDataByKey } from "../AppData/useUISettings";
+import {
+  useResetPDFConfig,
+  useSetAppDataByKey,
+} from "../AppData/useUISettings";
 import { APP_DATA } from "../../common/constants";
 
 export const SubmitPDF = ({
   pdfFile,
   pdfURL,
-  isValidateProgress,
-  setIsPDFUrlValid,
-  setIsValidateProgress,
   onOpenChange,
   hideSecondaryCTA = false,
   setPDFFile = () => {},
 }) => {
   const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-
-  const isValidPDF = useCallback(
-    pdfURL => {
-      const extension = pdfURL.split(".").pop().toLowerCase();
-      setIsValidateProgress(true);
-      if (extension === "pdf") {
-        setIsPDFUrlValid(true);
-        setIsValidateProgress(false);
-        setPDFConfig({ isPDFBeingShared: true, file: pdfFile, url: pdfURL });
-        onOpenChange(false);
-      }
-
-      fetch(pdfURL, { method: "HEAD" })
-        .then(response => response.headers.get("content-type"))
-        .then(contentType => {
-          if (contentType === "application/pdf") {
-            setIsPDFUrlValid(true);
-            setIsValidateProgress(false);
-            setPDFConfig({
-              isPDFBeingShared: true,
-              file: pdfFile,
-              url: pdfURL,
-            });
-            onOpenChange(false);
-          } else {
-            setIsPDFUrlValid(false);
-            setIsValidateProgress(false);
-          }
-        })
-        .catch(error => {
-          setIsPDFUrlValid(false);
-          setIsValidateProgress(false);
-        });
-    },
-    [
-      onOpenChange,
-      pdfFile,
-      setIsPDFUrlValid,
-      setIsValidateProgress,
-      setPDFConfig,
-    ]
-  );
+  const resetConfig = useResetPDFConfig();
   return (
     <Flex
       direction="row"
@@ -70,7 +28,10 @@ export const SubmitPDF = ({
           variant="standard"
           outlined
           type="submit"
-          onClick={() => setPDFFile(null)}
+          onClick={() => {
+            resetConfig();
+            setPDFFile(null);
+          }}
           css={{ w: "50%" }}
         >
           Go Back
@@ -79,20 +40,16 @@ export const SubmitPDF = ({
       <Button
         variant="primary"
         type="submit"
-        onClick={() => {
+        onClick={async () => {
           if (pdfFile) {
-            setPDFConfig({
-              isPDFBeingShared: true,
-              file: pdfFile,
-              url: pdfURL,
-            });
+            setPDFConfig(pdfFile);
             onOpenChange(false);
           } else if (pdfURL) {
-            isValidPDF(pdfURL);
+            setPDFConfig(pdfURL);
+            onOpenChange(false);
           }
         }}
         disabled={!pdfFile && !pdfURL}
-        loading={isValidateProgress}
         data-testid="share_pdf_btn"
         css={{
           w: hideSecondaryCTA ? "100%" : "50%",

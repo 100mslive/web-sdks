@@ -5,15 +5,7 @@ import { PDFHeader } from "./pdfHeader";
 import { PDFInfo } from "./pdfInfo";
 import { SubmitPDF } from "./submitPdf";
 
-export const UploadedFile = ({
-  pdfFile,
-  pdfURL,
-  isValidateProgress,
-  setPDFFile,
-  setIsPDFUrlValid,
-  setIsValidateProgress,
-  onOpenChange,
-}) => {
+export const UploadedFile = ({ pdfFile, pdfURL, setPDFFile, onOpenChange }) => {
   const [fileName, ext] = pdfFile.name.split(".");
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
@@ -75,11 +67,8 @@ export const UploadedFile = ({
             <SubmitPDF
               pdfFile={pdfFile}
               pdfURL={pdfURL}
-              isValidateProgress={isValidateProgress}
-              setIsPDFUrlValid={setIsPDFUrlValid}
-              setIsValidateProgress={setIsValidateProgress}
-              onOpenChange={onOpenChange}
               setPDFFile={setPDFFile}
+              onOpenChange={onOpenChange}
             />
           </Flex>
         </Dialog.Content>
