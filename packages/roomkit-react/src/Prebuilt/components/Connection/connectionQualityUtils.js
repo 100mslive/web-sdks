@@ -29,11 +29,11 @@ export const getColor = (position, connectionScore, defaultColor, theme) => {
     return defaultColor;
   }
   if (connectionScore >= 4) {
-    return theme.color.alert_success || '#37F28D';
+    return theme.color.alert_success;
   } else if (connectionScore >= 3) {
-    return theme.color.alert_warning || '#FAC919';
+    return theme.color.alert_warning;
   } else if (connectionScore >= 1) {
-    return theme.color.alert_default || '#ED4C5A';
+    return theme.color.alert_default;
   }
   return defaultColor;
 };
