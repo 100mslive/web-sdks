@@ -391,7 +391,7 @@ export default class HMSTransport implements ITransport {
       throw ex;
     }
 
-    HMSLogger.i(TAG, '✅ join: successful');
+    HMSLogger.d(TAG, '✅ join: successful');
     this.state = TransportState.Joined;
     this.observer.onStateChange(this.state);
   }
@@ -454,7 +454,7 @@ export default class HMSTransport implements ITransport {
     try {
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
-      this.webrtcInternals?.cleanUp();
+      this.webrtcInternals?.cleanup();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (notifyServer) {
@@ -872,7 +872,16 @@ export default class HMSTransport implements ITransport {
     await this.publishConnection.setLocalDescription(offer);
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const answer = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+      offer,
+    );
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -886,7 +895,15 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const response = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+    );
     return !!response;
   }
 
@@ -992,6 +1009,7 @@ export default class HMSTransport implements ITransport {
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
+      this.observer.onConnected();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
@@ -1206,6 +1224,10 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
+  }
+
+  getSubscribeConnection() {
+    return this.subscribeConnection;
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {

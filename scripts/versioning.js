@@ -20,7 +20,6 @@ const lernaCommands = [
   'lerna add @100mslive/react-sdk --scope=100ms_edtech_template --exact || echo "No changes"',
   'lerna add @100mslive/react-icons --scope=100ms_edtech_template --exact || echo "No changes"',
   'lerna add @100mslive/hms-virtual-background --scope=100ms_edtech_template --exact || echo "No changes"',
-  'lerna add @100mslive/hms-noise-suppression --scope=100ms_edtech_template --exact || echo "No changes"',
   // Update deps in custom app
   'lerna add @100mslive/react-icons --scope=100ms-custom-app --exact || echo "No changes"',
   'lerna add @100mslive/react-ui --scope=100ms-custom-app --exact || echo "No changes"',

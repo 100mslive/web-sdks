@@ -347,8 +347,8 @@ class Store implements IStore {
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];
         const resolution = {
-          width: width / value.scaleResolutionDownBy,
-          height: height / value.scaleResolutionDownBy,
+          width: Math.floor(width / value.scaleResolutionDownBy),
+          height: Math.floor(height / value.scaleResolutionDownBy),
         };
         return {
           layer,
@@ -362,7 +362,7 @@ class Store implements IStore {
     return this.errorListener;
   }
 
-  cleanUp() {
+  cleanup() {
     const tracks = this.getTracks();
     for (const track of tracks) {
       track.cleanup();
