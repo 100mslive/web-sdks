@@ -49,6 +49,7 @@
     "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream --ignore 100ms_edtech_template",
+    "publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes --no-verify-access",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
