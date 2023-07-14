@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Dialog, Flex, Input, Text } from "@100mslive/react-ui";
 import { DialogInputFile } from "../../primitives/DialogContent";
 import Tabs from "../Tabs";
+import { PdfErrorView } from "./pdfErrorView";
 import { PDFHeader } from "./pdfHeader";
 import { PDFInfo } from "./pdfInfo";
 import { SubmitPDF } from "./submitPdf";
@@ -9,6 +10,8 @@ import { UploadedFile } from "./uploadedFile";
 import { PDF_SHARING_OPTIONS } from "../../common/constants";
 
 export function PDFFileOptions({ onOpenChange }) {
+  const [isPDFUrlValid, setIsPDFUrlValid] = useState(true);
+  const [isValidateProgress, setIsValidateProgress] = useState(false);
   const [pdfFile, setPDFFile] = useState(null);
   const [pdfURL, setPDFURL] = useState("");
   const [activeTab, setActiveTab] = useState(
@@ -64,12 +67,20 @@ export function PDFFileOptions({ onOpenChange }) {
                 <Input
                   css={{ w: "100%", mb: "$10" }}
                   value={pdfURL}
+                  onFocus={() => {
+                    setIsPDFUrlValid(true);
+                    setIsValidateProgress(false);
+                  }}
                   onChange={e => {
                     setPDFURL(e.target.value);
                   }}
                   placeholder="Enter a valid PDF link to share"
                   type="text"
+                  error={!isPDFUrlValid}
                 />
+                {!isPDFUrlValid && (
+                  <PdfErrorView isPDFUrlValid={isPDFUrlValid} />
+                )}
                 <PDFInfo />
               </>
             ) : null}
@@ -77,6 +88,9 @@ export function PDFFileOptions({ onOpenChange }) {
             <SubmitPDF
               pdfFile={pdfFile}
               pdfURL={pdfURL}
+              isValidateProgress={isValidateProgress}
+              setIsPDFUrlValid={setIsPDFUrlValid}
+              setIsValidateProgress={setIsValidateProgress}
               onOpenChange={onOpenChange}
               hideSecondaryCTA
             />
@@ -88,7 +102,10 @@ export function PDFFileOptions({ onOpenChange }) {
     <UploadedFile
       pdfFile={pdfFile}
       pdfURL={pdfURL}
+      isValidateProgress={isValidateProgress}
       setPDFFile={setPDFFile}
+      setIsPDFUrlValid={setIsPDFUrlValid}
+      setIsValidateProgress={setIsValidateProgress}
       onOpenChange={onOpenChange}
     />
   );
