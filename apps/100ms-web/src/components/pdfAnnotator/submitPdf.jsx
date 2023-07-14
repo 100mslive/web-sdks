@@ -21,7 +21,8 @@ export const SubmitPDF = ({
   const isValidPDF = useCallback(
     pdfURL => {
       setIsValidateProgress(true);
-      if (isValidURL(pdfURL)) {
+      const isValid = isValidURL(pdfURL);
+      if (isValid) {
         setIsPDFUrlValid(true);
         setIsValidateProgress(false);
         setPDFConfig(pdfURL);
