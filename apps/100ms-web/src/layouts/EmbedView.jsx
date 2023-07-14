@@ -48,7 +48,7 @@ export const EmbedView = () => {
 export const EmbedScreenShareView = forwardRef((props, ref) => {
   const peers = useHMSStore(selectPeers);
 
-  const mediaQueryLg = cssConfig.media.xl;
+  const mediaQueryLg = cssConfig.media.lg;
   const showSidebarInBottom = useMedia(mediaQueryLg);
   const localPeerID = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
