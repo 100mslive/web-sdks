@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.7-alpha.9",
+  "version": "0.8.9",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -58,8 +58,8 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.8.7-alpha.9",
-    "@100mslive/react-sdk": "0.8.7-alpha.9",
+    "@100mslive/react-icons": "0.8.9",
+    "@100mslive/react-sdk": "0.8.9",
     "@radix-ui/react-accordion": "1.0.0",
     "@radix-ui/react-checkbox": "1.0.0",
     "@radix-ui/react-collapsible": "^1.0.1",
@@ -67,6 +67,7 @@
     "@radix-ui/react-dropdown-menu": "1.0.0",
     "@radix-ui/react-label": "1.0.0",
     "@radix-ui/react-popover": "1.0.0",
+    "@radix-ui/react-progress": "1.0.0",
     "@radix-ui/react-radio-group": "1.0.0",
     "@radix-ui/react-select": "1.0.0",
     "@radix-ui/react-slider": "1.0.0",
@@ -74,7 +75,6 @@
     "@radix-ui/react-tabs": "1.0.0",
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.0",
-    "@radix-ui/react-progress":"1.0.0",
     "@stitches/react": "^1.2.8",
     "lodash.merge": "^4.6.2",
     "qrcode.react": "^3.1.0",
