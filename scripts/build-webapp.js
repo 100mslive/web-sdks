@@ -26,7 +26,7 @@ async function main() {
     const commonOptions = {
       entryPoints: [source],
       assetNames: '[name]',
-      minify: true,
+      minify: false, // causing export issues in apps
       bundle: true,
       target: 'es6',
       external,
