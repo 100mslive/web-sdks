@@ -262,7 +262,6 @@ const App = () => {
                 metadata: settings.metadataFields.metadata,
                 recordingUrl: settings.recording_url,
               }}
-              getDetails={fetchData}
             />
           </Box>
         </Suspense>
