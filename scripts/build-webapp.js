@@ -14,11 +14,7 @@ async function main() {
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
   const source = './src/index.ts';
-  const external = [
-    '*.stories.tsx',
-    ...Object.keys(pkg.dependencies || {}),
-    ...Object.keys(pkg.peerDependencies || {}),
-  ];
+  const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'file', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
   const plugins = [
@@ -36,24 +32,37 @@ async function main() {
       external,
       treeShaking: true,
       sourcemap: true,
+      metafile: true,
       loader,
       define,
       plugins,
     };
 
-    esbuild.build({
-      outfile: 'dist/index.cjs.js',
-      format: 'cjs',
-      ...commonOptions,
-    });
+    esbuild
+      .build({
+        outfile: 'dist/index.cjs.js',
+        format: 'cjs',
+        ...commonOptions,
+      })
+      .then(({ metafile }) => {
+        console.log('cjs build successful');
+        console.log('creating build dependency file');
+        fs.writeFileSync('dist/meta.cjs.json', JSON.stringify(metafile, null, 2), 'utf-8');
+      });
 
-    esbuild.build({
-      entryPoints: [source],
-      outdir: 'dist/',
-      format: 'esm',
-      splitting: true,
-      ...commonOptions,
-    });
+    esbuild
+      .build({
+        entryPoints: [source],
+        outdir: 'dist/',
+        format: 'esm',
+        splitting: true,
+        ...commonOptions,
+      })
+      .then(({ metafile }) => {
+        console.log('esbuild successful');
+        console.log('creating build dependency file');
+        fs.writeFileSync('dist/meta.esbuild.json', JSON.stringify(metafile, null, 2), 'utf-8');
+      });
   } catch (e) {
     console.log(`× ${pkg.name}: Build failed due to an error.`);
     console.log(e);

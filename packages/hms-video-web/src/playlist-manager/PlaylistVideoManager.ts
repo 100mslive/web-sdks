@@ -100,6 +100,9 @@ export class PlaylistVideoManager extends TypedEventEmitter<{ ended: null; progr
   }
 
   getElement() {
+    if (!this.videoElement) {
+      this.videoElement = this.getVideoElement();
+    }
     return this.videoElement;
   }
 

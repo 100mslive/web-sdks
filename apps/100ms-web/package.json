@@ -10,7 +10,6 @@
   ],
   "dependencies": {
     "@100mslive/hls-player": "0.1.7-alpha.8",
-    "@100mslive/hms-noise-suppression": "0.9.7-alpha.8",
     "@100mslive/hms-virtual-background": "1.11.7-alpha.8",
     "@100mslive/react-icons": "0.8.7-alpha.8",
     "@100mslive/react-sdk": "0.8.7-alpha.8",
@@ -46,7 +45,7 @@
     "esbuild": "node ../../scripts/build-webapp",
     "dev": "node ../../scripts/dev-webapp",
     "format": "prettier -w src",
-    "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
+    "lint": "eslint -c ./.eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
     "lint:fix": "yarn lint --fix"
   },
   "browserslist": {

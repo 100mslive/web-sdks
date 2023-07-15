@@ -8,6 +8,6 @@
     "sourceMap": false,
     "emitDeclarationOnly": true
   },
-  "include": ["src/**/*", "types", "**/*.mdx"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.stories.tsx", "src/store/**", "**/*.mdx"]
 }
