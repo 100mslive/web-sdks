@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
 import {
   selectIsLocalVideoEnabled,
   selectLocalPeer,
@@ -27,10 +27,11 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
-import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackground';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { UI_SETTINGS } from '../../common/constants';
+
+const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
@@ -171,7 +172,9 @@ const PreviewControls = () => {
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle compact />
-        <VirtualBackground />
+        <Suspense fallback="">
+          <VirtualBackground />
+        </Suspense>
       </Flex>
       <PreviewSettings />
     </Flex>

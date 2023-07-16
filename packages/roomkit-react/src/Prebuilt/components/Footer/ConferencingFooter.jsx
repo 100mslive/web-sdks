@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, Suspense, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSPlaylistType, selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { MusicIcon } from '@100mslive/react-icons';
@@ -14,8 +14,6 @@ import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ScreenShareHintModal } from '../ScreenshareHintModal';
 import { ChatToggle } from './ChatToggle';
-import { NoiseSuppression } from '../../plugins/NoiseSuppression';
-import { VirtualBackground } from '../../plugins/VirtualBackground/VirtualBackground';
 import { ToggleWhiteboard } from '../../plugins/whiteboard';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { isScreenshareSupported } from '../../common/utils';
@@ -23,6 +21,7 @@ import { FeatureFlags } from '../../services/FeatureFlags';
 import { FEATURE_LIST } from '../../common/constants';
 
 const TranscriptionButton = React.lazy(() => import('../../plugins/transcription'));
+const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 const ScreenshareAudio = () => {
   const {
@@ -69,8 +68,9 @@ export const ConferencingFooter = () => {
         <Playlist type={HMSPlaylistType.audio} />
         <Playlist type={HMSPlaylistType.video} />
         {FeatureFlags.enableWhiteboard ? <ToggleWhiteboard /> : null}
-        <VirtualBackground />
-        <NoiseSuppression />
+        <Suspense fallback="">
+          <VirtualBackground />
+        </Suspense>
         {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
         <Flex
           align="center"

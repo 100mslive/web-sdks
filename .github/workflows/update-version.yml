@@ -13,6 +13,7 @@ jobs:
       hms-video-store: ${{ steps.filter.outputs.hms-video-store }}
       react-sdk: ${{ steps.filter.outputs.react-sdk }}
       react-ui: ${{ steps.filter.outputs.react-ui }}
+      roomkit-react: ${{ steps.filter.outputs.roomkit-react }}
       react-icons: ${{ steps.filter.outputs.react-icons }}
     steps:
       - uses: actions/checkout@v2
@@ -28,6 +29,8 @@ jobs:
               - 'packages/react-sdk/src/**'
             react-ui:
               - 'packages/react-ui/src/**'
+            roomkit-react:
+              - 'packages/roomkit-react/src/**'
             react-icons:
               - 'packages/react-icons/src/**'
             hls-stats:
