@@ -85,3 +85,5 @@ export const VirtualBackground = () => {
     </Tooltip>
   );
 };
+
+export default VirtualBackground;
