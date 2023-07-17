@@ -10,7 +10,7 @@ import {
 import { HorizontalDivider } from '../../Divider';
 import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
