@@ -59,7 +59,6 @@ export const HMSPrebuilt = React.forwardRef(
         metadata = '',
         recordingUrl = '',
       } = {},
-      getDetails,
       roomId = '',
       role = '',
       roomCode = '',
@@ -147,7 +146,7 @@ export const HMSPrebuilt = React.forwardRef(
                   size: '100%',
                 }}
               >
-                <AppRoutes getDetails={getDetails} authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
+                <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
               </Box>
             </HMSRoomProvider>
           </HMSThemeProvider>
@@ -159,11 +158,8 @@ export const HMSPrebuilt = React.forwardRef(
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
-const Redirector = ({ getDetails, showPreview }) => {
+const Redirector = ({ showPreview }) => {
   const { roomId, role } = useParams();
-  useEffect(() => {
-    getDetails();
-  }, [roomId]); //eslint-disable-line
 
   if (!roomId && !role) {
     return <Navigate to="/" />;
@@ -178,7 +174,7 @@ const Redirector = ({ getDetails, showPreview }) => {
   return <Navigate to={`${getRoutePrefix()}/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
 };
 
-const RouteList = ({ getDetails }) => {
+const RouteList = () => {
   const { showPreview, showLeave } = useHMSPrebuiltContext();
 
   return (
@@ -227,8 +223,8 @@ const RouteList = ({ getDetails }) => {
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
-      <Route path="/:roomId/:role" element={<Redirector getDetails={getDetails} showPreview={showPreview} />} />
-      <Route path="/:roomId/" element={<Redirector getDetails={getDetails} showPreview={showPreview} />} />
+      <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
+      <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
       <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
     </Routes>
   );
@@ -262,7 +258,7 @@ const Router = ({ children }) => {
   );
 };
 
-function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
+function AppRoutes({ authTokenByRoomCodeEndpoint }) {
   return (
     <Router>
       <ToastContainer />
@@ -275,8 +271,8 @@ function AppRoutes({ getDetails, authTokenByRoomCodeEndpoint }) {
       <BeamSpeakerLabelsLogging />
       <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
       <Routes>
-        <Route path="/*" element={<RouteList getDetails={getDetails} />} />
-        <Route path="/streaming/*" element={<RouteList getDetails={getDetails} />} />
+        <Route path="/*" element={<RouteList />} />
+        <Route path="/streaming/*" element={<RouteList />} />
       </Routes>
     </Router>
   );
