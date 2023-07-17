@@ -103,7 +103,7 @@ const VolumeControl = () => {
   const sliderVolume = active ? volume : audioTrackVolume;
 
   return (
-    <Flex align="center" css={{ color: '$white' }}>
+    <Flex align="center" css={{ color: '#FFF' }}>
       <SpeakerIcon />
       <Slider
         css={{ mx: '$4', w: '$20' }}

@@ -56,7 +56,7 @@ const TileType = ({ type, active, value, change }) => {
       css={{
         height: '$20',
         aspectRatio: `${multiplier}/${divider}`,
-        border: `1px solid ${active ? '$brandDefault' : '$surface_light'}`,
+        border: `1px solid ${active ? '$primary_default' : '$surface_light'}`,
         m: '$2',
         cursor: 'pointer',
       }}

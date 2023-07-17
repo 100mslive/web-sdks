@@ -17,7 +17,7 @@ const Root = styled(BaseSlider.Root, {
 });
 
 const Track = styled(BaseSlider.Track, {
-  backgroundColor: '$background_dim',
+  backgroundColor: '$surface_bright',
   position: 'relative',
   flexGrow: 1,
   borderRadius: '$round',

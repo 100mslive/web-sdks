@@ -9,7 +9,7 @@ const IconButton = styled(BaseIconButton, {
     active: {
       false: {
         border: '1px solid transparent',
-        color: '$white',
+        color: '#FFF',
       },
     },
   },

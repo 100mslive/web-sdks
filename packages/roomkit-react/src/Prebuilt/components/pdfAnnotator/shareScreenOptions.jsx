@@ -175,7 +175,7 @@ export function ShareScreenOptions() {
                     variant="xs"
                     css={{
                       fontWeight: '$semiBold',
-                      c: '$white',
+                      c: '#FFF',
                       pr: '$4',
                     }}
                   >

@@ -7,7 +7,7 @@ const StyledRoot = styled(Root, {
   w: '100%',
   h: '$4',
   borderRadius: '$round',
-  backgroundColor: '$secondaryDark',
+  backgroundColor: '$secondary_dim',
   overflow: 'hidden',
 });
 

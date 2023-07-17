@@ -78,7 +78,10 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                     </Dropdown.Content>
                   </Dropdown.Portal>
                 </Dropdown.Root>
-                <Text variant="sm" css={{ color: '$on_surface_medium', my: '$10' }}>
+                <Text
+                  variant="sm"
+                  css={{ color: '$on_surface_medium', my: '$10' }}
+                >
                   Select a role with relevant permissions that you want to
                   share, to join the room.
                 </Text>
@@ -103,7 +106,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                   css={{
                     flex: '1 1 0',
                     my: '$10',
-                    bg: '$white',
+                    bg: '#FFF',
                     r: '$1',
                     px: '$8',
                   }}

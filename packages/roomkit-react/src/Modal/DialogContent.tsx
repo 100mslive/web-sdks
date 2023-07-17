@@ -32,7 +32,7 @@ export const StyledDialogContent = styled(DialogPrimitive.Content, {
   position: 'fixed',
   top: '50%',
   left: '50%',
-  border: '$space$px solid $primary_default',
+  border: '$space$px solid $border_bright',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   transform: 'translate(-50%, -50%)',
   zIndex: 999,

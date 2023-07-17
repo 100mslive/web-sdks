@@ -167,7 +167,7 @@ export const LeaveRoom = () => {
 };
 
 const LeaveIconButton = styled(IconButton, {
-  color: '$white',
+  color: '#FFF',
   h: '$14',
   px: '$8',
   r: '$1',

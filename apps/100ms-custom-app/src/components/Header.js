@@ -93,10 +93,10 @@ export default function Header({
                     togModal(!modal);
                     AppAnalytics.track('invite.clicked');
                   }}
-                  css={{ px: '$8', mr: '$4', color: '$white' }}
+                  css={{ px: '$8', mr: '$4', color: '#FFF' }}
                 >
                   <InviteIcon />
-                  <Text as="span" css={{ ml: '$2', color: '$white' }}>
+                  <Text as="span" css={{ ml: '$2', color: '#FFF' }}>
                     Invite
                   </Text>
                 </Button>
@@ -134,7 +134,7 @@ export default function Header({
             justify="center"
             css={{ bg: randomColor, w: '$14', h: '$14', r: '$round' }}
           >
-            <Text css={{ color: '$white' }}>{getInitialsFromEmail()}</Text>
+            <Text css={{ color: '#FFF' }}>{getInitialsFromEmail()}</Text>
           </Flex>
         </Flex>
       </Flex>
