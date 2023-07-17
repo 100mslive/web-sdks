@@ -30,9 +30,9 @@ const ItemRoot = React.memo(({ title, children }) => (
 ));
 
 const TextArea = styled('textarea', {
-  bg: '$bgSecondary',
+  bg: '$surface_light',
   p: '$4 $8',
-  color: '$textPrimary',
+  color: '$on_primary_high',
   resize: 'none',
 });
 
@@ -56,7 +56,7 @@ const TileType = ({ type, active, value, change }) => {
       css={{
         height: '$20',
         aspectRatio: `${multiplier}/${divider}`,
-        border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
+        border: `1px solid ${active ? '$brandDefault' : '$surface_light'}`,
         m: '$2',
         cursor: 'pointer',
       }}
@@ -77,7 +77,7 @@ const ThemeType = ({ title, active, onClick }) => {
         m: '$2',
         p: '$2 $8',
         r: '$1',
-        bg: active ? '$menuBg' : '',
+        bg: active ? '$surface_default' : '',
         cursor: 'pointer',
       }}
       onClick={onClick}
@@ -96,9 +96,9 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           htmlFor="logoInput"
           variant="standard"
           css={{
-            bg: '$bgSecondary',
+            bg: '$surface_light',
             cursor: 'pointer',
-            color: '$textPrimary',
+            color: '$on_primary_high',
             display: 'flex',
           }}
         >
@@ -115,7 +115,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
         />
       </ItemRoot>
       <ItemRoot title="Appearance">
-        <Flex align="center" css={{ bg: '$bgSecondary', r: '$1' }}>
+        <Flex align="center" css={{ bg: '$surface_light', r: '$1' }}>
           <ThemeType
             title="Dark"
             active={settings.theme === 'dark'}
@@ -138,7 +138,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           htmlFor="brandColorPicker"
           align="center"
           css={{
-            bg: '$bgSecondary',
+            bg: '$surface_light',
             p: '$4',
             r: '$1',
             cursor: 'pointer',

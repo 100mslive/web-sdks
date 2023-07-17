@@ -71,8 +71,8 @@ export default function Header({
         justify="between"
         css={{
           p: '$6 $4',
-          bg: '$mainBg',
-          borderBottom: '1px solid $borderLight',
+          bg: '$background_dim',
+          borderBottom: '1px solid $border_bright',
         }}
       >
         <LogoImg

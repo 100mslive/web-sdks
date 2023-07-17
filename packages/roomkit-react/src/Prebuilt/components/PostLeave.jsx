@@ -23,7 +23,7 @@ const PostLeave = () => {
         justify="center"
         direction="column"
         align="center"
-        css={{ bg: '$mainBg', flex: '1 1 0', position: 'relative' }}
+        css={{ bg: '$background_dim', flex: '1 1 0', position: 'relative' }}
       >
         <Text variant="h2" css={{ fontWeight: '$semiBold' }}>
           👋
