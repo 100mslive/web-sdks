@@ -2,14 +2,14 @@ import React from 'react';
 
 export declare const HMSPrebuilt: React.FC<{
   roomCode: string;
-  themeConfig: {
+  themeConfig?: {
     aspectRatio: string;
     theme: string;
     color: string;
     logo: string;
     font: string;
   };
-  options: {
+  options?: {
     endPoints?: {
       tokenByRoomIdRole?: string;
       tokenByRoomCode?: string;

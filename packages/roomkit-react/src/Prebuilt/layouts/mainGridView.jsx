@@ -8,7 +8,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { GridCenterView, GridSidePaneView } from '../components/gridView';
-import { Flex } from '../../';
+import { Flex } from '../../Layout';
 import { NonPublisherView } from './NonPublisherView';
 import { useAppLayout } from '../components/AppData/useAppLayout';
 import { useUISettings } from '../components/AppData/useUISettings';

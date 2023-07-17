@@ -60,8 +60,9 @@
     "reactsdk": "cd packages/react-sdk && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
     "reactui": "cd packages/react-ui && yarn start",
-    "storybook": "cd packages/react-ui && yarn storybook",
-    "build-storybook": "cd packages/react-ui && build-storybook"
+    "storybook": "cd packages/roomkit-react && yarn storybook",
+    "build-storybook": "cd packages/roomkit-react && build-storybook",
+    "babelrc": "cd packages/roomkit-react && npx storybook@latest babelrc"
   },
   "resolutions": {
     "loader-utils": "^2.0.4"

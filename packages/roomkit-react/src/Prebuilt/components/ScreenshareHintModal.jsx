@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
-import { Button, Dialog } from '../../';
+import { Button } from '../../Button';
+import { Dialog } from '../../Modal';
 import { DialogContent, DialogRow } from '../primitives/DialogContent';
 
 export const ScreenShareHintModal = ({ onClose }) => {

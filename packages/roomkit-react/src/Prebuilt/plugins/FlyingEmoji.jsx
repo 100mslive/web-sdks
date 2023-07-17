@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerID, selectPeerNameByID, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { Box, config as cssConfig, Flex, keyframes, Text } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
+import { config as cssConfig, keyframes } from '../../Theme';
 
 let emojiCount = 1;
 

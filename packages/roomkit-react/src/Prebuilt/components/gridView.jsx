@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { useMedia } from 'react-use';
-import { Box, config as cssConfig, Flex } from '../../';
+import { Box, Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 import { FirstPersonDisplay } from './FirstPersonDisplay';
 import { Image } from './Image';
 import VideoList from './VideoList';

@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, Flex, Text, useTheme } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
+import { useTheme } from '../../Theme';
 import { CREATE_ROOM_DOC_URL } from '../common/constants';
 
 function ErrorPage({ error }) {
