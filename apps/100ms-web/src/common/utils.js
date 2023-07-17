@@ -87,6 +87,11 @@ export const metadataPayloadParser = payload => {
   }
 };
 
+export const isValidURL = url => {
+  const urlPattern = new RegExp(/^(ftp|http|https):\/\/[^ "]+$/);
+  return !!urlPattern.test(url);
+};
+
 export const compareArrays = (a, b) => {
   if (a.length !== b.length) return false;
   else {
@@ -98,4 +103,8 @@ export const compareArrays = (a, b) => {
     }
     return true;
   }
+};
+
+export const isValidTextInput = (text, minLength = 2, maxLength = 100) => {
+  return text && text.length >= minLength && text.length <= maxLength;
 };
