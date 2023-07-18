@@ -50,8 +50,6 @@ const getAspectRatio = ({ width, height }) => {
 export const HMSPrebuilt = React.forwardRef(
   (
     {
-      roomId = '',
-      role = '',
       roomCode = '',
       logo: { url: logoUrl = '' } = {},
       options: {
@@ -105,8 +103,8 @@ export const HMSPrebuilt = React.forwardRef(
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
           value={{
-            roomId,
-            role,
+            roomId: '',
+            role: '',
             roomCode,
             showPreview: true,
             showLeave: true,

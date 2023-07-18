@@ -7,13 +7,11 @@ export default {
   component: HMSPrebuilt,
   argTypes: {
     roomCode: { control: { type: 'text' }, defaultValue: 'tsj-obqh-lwx' },
-    roomId: { control: { type: 'text' }, defaultValue: '' },
-    role: { control: { type: 'text' }, defaultValue: '' },
   },
 } as Meta<typeof HMSPrebuilt>;
 
-const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '' }) => {
-  return <HMSPrebuilt roomCode={roomCode} />;
+const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', logo }) => {
+  return <HMSPrebuilt roomCode={roomCode} logo={logo} />;
 };
 
 export const Example = PrebuiltRoomCodeStory.bind({});
