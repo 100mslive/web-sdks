@@ -9,7 +9,11 @@ export const ScreenShareHintModal = ({ onClose }) => {
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <DialogContent title="AudioOnly Screenshare">
-        <img src="/share-audio.png" alt="AudioOnly Screenshare instructions" />
+        <img
+          src="https://images.app.100ms.live/share-audio.png"
+          alt="AudioOnly Screenshare instructions"
+          width="100%"
+        />
         <DialogRow justify="end">
           <Button
             variant="primary"

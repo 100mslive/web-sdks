@@ -25,7 +25,6 @@ import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
 
-const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
 const isSSR = typeof window === 'undefined';
 
 let appName;
@@ -51,27 +50,24 @@ const getAspectRatio = ({ width, height }) => {
 export const HMSPrebuilt = React.forwardRef(
   (
     {
-      themeConfig: {
-        aspectRatio = '1-1',
-        font = 'Roboto',
-        color = '#2F80FF',
-        theme = 'dark',
-        logo = '',
-        metadata = '',
-        recordingUrl = '',
-      } = {},
       roomId = '',
       role = '',
       roomCode = '',
+      logo: { url: logoUrl = '' } = {},
       options: {
         userName = '',
         userId = '',
-        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = defaultTokenEndpoint } = {},
+        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = '' } = {},
       } = {},
       onLeave,
     },
     ref,
   ) => {
+    const aspectRatio = '1-1';
+    const color = '#2F80FF';
+    const theme = 'dark';
+    const metadata = '';
+    const recordingUrl = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
 
     const [hyderated, setHyderated] = React.useState(false);
@@ -87,6 +83,14 @@ export const HMSPrebuilt = React.forwardRef(
         hmsNotifications,
       };
     }, [ref]);
+
+    // leave room when component unmounts
+    useEffect(
+      () => () => {
+        return hmsActions.leave();
+      },
+      [],
+    );
 
     const endPoints = {
       tokenByRoomCode,
@@ -123,7 +127,7 @@ export const HMSPrebuilt = React.forwardRef(
                 brandDisabled: shadeColor(color, 10),
               },
               fonts: {
-                sans: [font, 'Inter', 'sans-serif'],
+                sans: ['Roboto', 'Inter', 'sans-serif'],
               },
             }}
           >
@@ -137,7 +141,7 @@ export const HMSPrebuilt = React.forwardRef(
               <AppData
                 appDetails={metadata}
                 recordingUrl={recordingUrl}
-                logo={logo}
+                logo={logoUrl}
                 tokenEndpoint={endPoints.tokenByRoomIdRole}
               />
               <Init />
