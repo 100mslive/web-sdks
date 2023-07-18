@@ -174,6 +174,7 @@ export { default as PeopleIcon } from './PeopleIcon';
 export { default as PeopleRemoveIcon } from './PeopleRemoveIcon';
 export { default as PersonContactIcon } from './PersonContactIcon';
 export { default as PersonIcon } from './PersonIcon';
+export { default as PersonRectangleIcon } from './PersonRectangleIcon';
 export { default as PhoneIcon } from './PhoneIcon';
 export { default as PhotoIcon } from './PhotoIcon';
 export { default as PinIcon } from './PinIcon';
