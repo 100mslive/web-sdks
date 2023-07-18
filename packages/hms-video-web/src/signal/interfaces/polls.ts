@@ -156,7 +156,4 @@ export interface PollResult {
 
 export type PollResultParams = PollID;
 
-export interface PollResultResponse {
-  poll_id: string;
-  result: PollResult;
-}
+export type PollResultResponse = PollResult & PollID;
