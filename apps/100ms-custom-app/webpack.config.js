@@ -150,6 +150,10 @@ module.exports = {
       template: path.resolve(__dirname, './public/index.html'),
       base: '/',
     }),
+    // will not be needed in case of prebuilt component. Needed only for 100ms-web app
+    new webpack.ProvidePlugin({
+      React: 'react',
+    }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
