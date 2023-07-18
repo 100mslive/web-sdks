@@ -19,6 +19,7 @@ const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
 const HMSEdtechTemplate = React.lazy(() =>
+  // eslint-disable-next-line import/no-unresolved
   import('100ms_edtech_template').then(module => ({
     default: module.EdtechComponent,
   }))
