@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Flex, Text } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
 import PlaceholderBg from '../images/first_person.png';
 
 export const FirstPersonDisplay = React.memo(() => {

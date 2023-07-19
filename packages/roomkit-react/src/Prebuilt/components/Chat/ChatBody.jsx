@@ -14,7 +14,12 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, IconButton, styled, Text, Tooltip } from '../../../';
+import { Dropdown } from '../../../Dropdown';
+import { IconButton } from '../../../IconButton';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
+import { styled } from '../../../Theme';
+import { Tooltip } from '../../../Tooltip';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {

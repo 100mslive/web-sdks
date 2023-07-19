@@ -1,7 +1,8 @@
 import React from 'react';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, HandIcon } from '@100mslive/react-icons';
-import { Flex, Tooltip } from '../../';
+import { Flex } from '../../Layout';
+import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { useMyMetadata } from './hooks/useMetadata';

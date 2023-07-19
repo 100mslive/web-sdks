@@ -9,7 +9,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
-import { Loading, Tooltip } from '../../../';
+import { Loading } from '../../../Loading';
+import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
 import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
 import { getRandomVirtualBackground } from './vbutils';

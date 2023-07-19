@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flex, Loading } from '../../';
+import { Flex } from '../../Layout';
+import { Loading } from '../../Loading';
 
 const FullPageProgress = () => (
   <Flex justify="center" align="center" css={{ size: '100%' }}>

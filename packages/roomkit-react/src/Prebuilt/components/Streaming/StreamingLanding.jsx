@@ -1,7 +1,9 @@
 import React, { Fragment, useState } from 'react';
 import { selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ColoredHandIcon, CrossIcon, GoLiveIcon } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Text } from '../../../';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
+import IconButton from '../../IconButton';
 import { StreamCard } from './Common';
 import { HLSStreaming } from './HLSStreaming';
 import { RTMPIcon } from './RTMPIcon';

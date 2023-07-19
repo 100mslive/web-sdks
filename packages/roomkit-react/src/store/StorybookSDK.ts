@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
+import { HMSFrameworkInfo } from '@100mslive/hms-video';
 import {
   HMSActions,
   HMSAudioTrackSettings,
@@ -54,6 +55,8 @@ export class StoryBookSDK implements Partial<HMSActions> {
   setEnabledTrack(_trackId: string, _enabled: boolean): Promise<void> {
     throw new Error('Method not implemented.');
   }
+
+  setFrameworkInfo(frameworkInfo: HMSFrameworkInfo): void {}
 
   setMessageRead(readStatus: boolean, messageId: string): void {
     this.store.setState(store => {

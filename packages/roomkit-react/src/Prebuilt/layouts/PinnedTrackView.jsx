@@ -3,7 +3,8 @@ import { useMeasure } from 'react-use';
 import { selectPeers, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { GridSidePaneView } from '../components/gridView';
 import VideoTile from '../components/VideoTile';
-import { Flex, useTheme } from '../../';
+import { Flex } from '../../Layout';
+import { useTheme } from '../../Theme';
 import { usePinnedTrack } from '../components/AppData/useUISettings';
 
 const PinnedPeerView = () => {
