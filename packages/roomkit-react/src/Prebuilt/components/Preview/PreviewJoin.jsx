@@ -94,7 +94,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
-      <Flex css={{ my: '$8' }}>
+      <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
         {isHLSRunning || isRTMPRunning ? (
           <Chip
             content="LIVE"
