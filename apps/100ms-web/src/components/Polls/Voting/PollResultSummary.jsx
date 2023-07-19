@@ -80,14 +80,8 @@ export const PollResultSummary = ({
   if (isQuiz && isAdmin) {
     StatsComponents = (
       <>
-        <PollStat
-          label="Peers who responded with correct answers"
-          value={totalCorrectAnswers}
-        />
-        <PollStat
-          label="Peers who responded with wrong answers"
-          value={totalIncorrectAnswers}
-        />
+        <PollStat label="No. of correct answers" value={totalCorrectAnswers} />
+        <PollStat label="No. of wrong answerss" value={totalIncorrectAnswers} />
         <PollStat label="Peers who didn't answer" value={noAnswers} />
         <PollStat
           label="Participation Percentage"
