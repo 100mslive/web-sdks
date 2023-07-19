@@ -23,6 +23,7 @@ import {
 } from '@100mslive/react-icons';
 import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
+import MetaActions from '../MetaActions';
 import { RoleChangeModal } from '../RoleChangeModal';
 import SettingsModal from '../Settings/SettingsModal';
 import StartRecording from '../Settings/StartRecording';
@@ -110,6 +111,7 @@ export const MoreSettings = () => {
             <>
               <Dropdown.Item onClick={() => updateState(MODALS.START_RECORDING, true)}>
                 <RecordIcon />
+                {/* TODO: refactor similar text to a label component */}
                 <Text variant="sm" css={{ ml: '$4' }}>
                   {isBrowserRecordingOn ? 'Stop' : 'Start'} Recording
                 </Text>
@@ -117,6 +119,7 @@ export const MoreSettings = () => {
               <Dropdown.ItemSeparator />
             </>
           ) : null}
+          <MetaActions isMobile />
           {isChangeNameEnabled && (
             <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">
               <PencilIcon />

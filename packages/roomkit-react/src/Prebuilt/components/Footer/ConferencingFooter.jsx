@@ -81,7 +81,6 @@ export const ConferencingFooter = () => {
           }}
         >
           {isMobile && <EmojiReaction />}
-          <MetaActions isMobile />
         </Flex>
       </AppFooter.Left>
       <AppFooter.Center>
@@ -96,7 +95,7 @@ export const ConferencingFooter = () => {
       </AppFooter.Center>
       <AppFooter.Right>
         {!isMobile && <EmojiReaction />}
-        <MetaActions />
+        {!isMobile && <MetaActions />}
         <ChatToggle />
       </AppFooter.Right>
     </AppFooter.Root>

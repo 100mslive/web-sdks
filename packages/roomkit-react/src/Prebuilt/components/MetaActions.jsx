@@ -1,7 +1,9 @@
 import React from 'react';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, HandIcon } from '@100mslive/react-icons';
+import { Dropdown } from '../../Dropdown';
 import { Flex } from '../../Layout';
+import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
@@ -16,6 +18,29 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
 
   if (!isConnected || (!isHandRaiseEnabled && !isBRBEnabled)) {
     return null;
+  }
+
+  if (isMobile) {
+    return (
+      <>
+        {isHandRaiseEnabled && (
+          <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn_mobile">
+            <HandIcon />
+            <Text variant="sm" css={{ ml: '$4' }}>
+              {`${!isHandRaised ? 'Raise' : 'Unraise'} hand`}
+            </Text>
+          </Dropdown.Item>
+        )}
+        {isBRBEnabled && (
+          <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn_mobile">
+            <BrbIcon />
+            <Text variant="sm" css={{ ml: '$4' }}>
+              {`${isBRBOn ? `I'm back` : `I'll be right back`}`}
+            </Text>
+          </Dropdown.Item>
+        )}
+      </>
+    );
   }
 
   return (
