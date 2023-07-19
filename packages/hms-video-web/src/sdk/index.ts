@@ -477,8 +477,7 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
-      const polls = await this.interactivityCenter.getPolls();
-      this.listener.onPollsUpdate(HMSPollsUpdate.POLL_LIST, polls);
+      await this.fetchInitialPolls();
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
     } catch (error) {
@@ -1242,6 +1241,13 @@ export class HMSSdk implements HMSInterface {
       this.playlistManager.stop(HMSPlaylistType.audio);
     } else if (track.source === 'videoplaylist') {
       this.playlistManager.stop(HMSPlaylistType.video);
+    }
+  }
+
+  private async fetchInitialPolls() {
+    if (this.localPeer?.role?.permissions.pollRead) {
+      const polls = await this.interactivityCenter.getPolls();
+      this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_LIST, polls);
     }
   }
 }
