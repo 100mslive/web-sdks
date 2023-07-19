@@ -22,7 +22,7 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
       />
       <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
         {/* TODO: Go Live should also start the stream */}
-        {showStreamingUI ? `${(<RadioIcon />)} Go Live` : `Join Room ${(<ArrowRightIcon />)}`}
+        {showStreamingUI ? `${(<RadioIcon />)} Go Live` : `Join Now ${(<ArrowRightIcon />)}`}
       </Button>
     </Form>
   );
