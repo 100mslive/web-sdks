@@ -7,6 +7,7 @@ import {
   useHMSStore,
   useParticipants,
   usePreviewJoin,
+  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { SettingsIcon } from '@100mslive/react-icons';
 import {
@@ -42,6 +43,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
@@ -92,13 +94,14 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
-      {/* TODO: Show only when livestreaming, roomstate permission is given */}
-      <Flex>
-        <Chip
-          content="LIVE"
-          backgroundColor="$alert_error_default"
-          icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
-        />
+      <Flex css={{ my: '$8' }}>
+        {isHLSRunning || isRTMPRunning ? (
+          <Chip
+            content="LIVE"
+            backgroundColor="$alert_error_default"
+            icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+          />
+        ) : null}
         <Chip content={getParticipantChipContent(peerCount, participants)} hideIfNoContent />
       </Flex>
       <Flex
