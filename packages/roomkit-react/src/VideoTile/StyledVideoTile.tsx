@@ -61,13 +61,13 @@ const AttributeBox = styled('div', {
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  top: '$2',
-  right: '$2',
+  top: '$4',
+  right: '$4',
   color: '$white',
   bg: '$error',
-  borderRadius: '$round',
-  width: '$13',
-  height: '$13',
+  borderRadius: '$3',
+  width: '$14',
+  height: '$14',
   mb: '5px',
   ...flexCenter,
   variants: {
