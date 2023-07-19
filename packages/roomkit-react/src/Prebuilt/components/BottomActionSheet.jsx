@@ -46,7 +46,7 @@ export const BottomSheet = ({
                 h: sheetHeight,
                 minHeight: '50vh',
                 overflowY: 'auto',
-                backgroundColor: '$surfaceDefault',
+                backgroundColor: '$surface_default',
                 transition: 'all 0.2s linear',
                 ...containerCSS,
               }}
@@ -58,22 +58,22 @@ export const BottomSheet = ({
                   setSheetHeight(updatedSheetHeight);
                 }}
                 css={{
-                  borderBottom: '1px solid $borderLight',
+                  borderBottom: '1px solid $border_bright',
                   px: '$8',
                   pb: '$4',
                   mb: '$4',
                   w: '100%',
                 }}
               >
-                <Text variant="h6" css={{ color: '$textHighEmp' }}>
+                <Text variant="h6" css={{ color: '$on_surface_high' }}>
                   {title}
                 </Text>
                 <Popover.Close aria-label="Close">
                   <Box
                     ref={closeRef}
                     css={{
-                      color: '$textHighEmp',
-                      bg: '$surfaceLight',
+                      color: '$on_surface_high',
+                      bg: '$surface_bright',
                       p: '$2',
                       borderRadius: '$round',
                     }}
