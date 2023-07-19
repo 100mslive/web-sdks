@@ -2,6 +2,7 @@ import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
+import { globalStylesCss } from './globalStyles';
 import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
@@ -29,11 +30,7 @@ export const {
   config,
 } = HmsStitches;
 
-export const globalStyles = globalCss({
-  '*': {
-    fontFamily: '$sans',
-  },
-});
+export const globalStyles = globalCss(globalStylesCss);
 
 export type ThemeType = 'light' | 'dark';
 export type Theme = typeof HmsStitches.theme;

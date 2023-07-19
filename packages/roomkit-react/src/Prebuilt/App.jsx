@@ -14,7 +14,7 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { Box } from '../Layout';
-import { HMSThemeProvider } from '../Theme';
+import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
@@ -95,6 +95,8 @@ export const HMSPrebuilt = React.forwardRef(
       init: initEndpoint,
       tokenByRoomIdRole,
     };
+
+    globalStyles();
 
     if (!hyderated) {
       return null;
