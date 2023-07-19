@@ -1,7 +1,8 @@
 import React from 'react';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { GoLiveIcon } from '@100mslive/react-icons';
-import { Button, Tooltip } from '../../';
+import { Button } from '../../Button';
+import { Tooltip } from '../../Tooltip';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './AppData/useSidepane';
 import { useIsHLSStartedFromUI, useIsRTMPStartedFromUI } from './AppData/useUISettings';
 import { SIDE_PANE_OPTIONS } from './../common/constants';

@@ -7,7 +7,10 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { ClosedCaptionIcon } from '@100mslive/react-icons';
-import { Box, IconButton, Text, Tooltip } from '../../../';
+import { Box } from '../../../Layout';
+import { Text } from '../../../Text';
+import { Tooltip } from '../../../Tooltip';
+import IconButton from '../../IconButton';
 import { Transcriber } from './Transcriber';
 import { SESSION_STORE_KEY } from '../../common/constants';
 

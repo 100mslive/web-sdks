@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
-import { Accordion } from './';
+import { Accordion } from '.';
 
 export default {
   title: 'UI Components/Accordion',
