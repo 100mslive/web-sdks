@@ -15,7 +15,7 @@ import {
   styled,
   Text,
 } from "@100mslive/react-ui";
-import { compareArrays } from "../../../common/utils";
+import { checkCorrectAnswer } from "../../../common/utils";
 import { MultipleChoiceOptions } from "../common/MultipleChoiceOptions";
 import { SingleChoiceOptions } from "../common/SingleChoiceOptions";
 import { QUESTION_TYPE } from "../../../common/constants";
@@ -55,17 +55,7 @@ export const QuestionCard = ({
   const isLive = pollState === "started";
   const canRespond = isLive && !localPeerResponse;
 
-  const isCorrectAnswer = useMemo(() => {
-    if (type === QUESTION_TYPE.SINGLE_CHOICE) {
-      return answer?.option === localPeerResponse?.option;
-    } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
-      return (
-        answer?.options &&
-        localPeerResponse?.options &&
-        compareArrays(answer?.options, localPeerResponse?.options)
-      );
-    }
-  }, [answer, localPeerResponse, type]);
+  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
 
   const prev = index !== 1;
   const next = index !== totalQuestions && (skippable || localPeerResponse);
