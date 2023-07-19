@@ -14,7 +14,7 @@ export const BottomSheet = ({
 }) => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetHeight, setSheetHeight] = useState('50vh');
-  const closeRef = useRef < HTMLDivElement > null;
+  const closeRef = useRef(null);
 
   // Close the sheet if height goes under 40vh
   useEffect(() => {
