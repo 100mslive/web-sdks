@@ -5,12 +5,14 @@ import {
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
+  useParticipants,
   usePreviewJoin,
 } from '@100mslive/react-sdk';
 import { SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Flex,
+  Box,
   flexCenter,
   Loading,
   styled,
@@ -30,6 +32,8 @@ import PreviewName from './PreviewName';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { UI_SETTINGS } from '../../common/constants';
+import Chip from '../Chip';
+import { getParticipantChipContent } from '../../common/utils';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -43,6 +47,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
+  const { participants, isConnected, peerCount } = useParticipants();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -87,6 +92,15 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
+      {/* TODO: Show only when livestreaming, roomstate permission is given */}
+      <Flex>
+        <Chip
+          content="LIVE"
+          backgroundColor="$alert_error_default"
+          icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+        />
+        <Chip content={getParticipantChipContent(peerCount, participants)} hideIfNoContent />
+      </Flex>
       <Flex
         align="center"
         justify="center"
