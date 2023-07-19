@@ -19,6 +19,8 @@ import {
   PollResponseSetResponse,
   PollResponsesGetParams,
   PollResponsesGetResponse,
+  PollResultParams,
+  PollResultResponse,
   PollStartParams,
   PollStartResponse,
   PollStopParams,
@@ -119,4 +121,6 @@ export interface ISignal extends IAnalyticsTransportProvider {
   getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse>;
 
   getPollsList(params: PollListParams): Promise<PollListResponse>;
+
+  getPollResult(params: PollResultParams): Promise<PollResultResponse>;
 }
