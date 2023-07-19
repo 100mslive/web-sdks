@@ -82,7 +82,7 @@ export const BottomSheet = ({
                   </Box>
                 </Popover.Close>
               </Flex>
-              <Box css={{ px: '$8' }}>{children}</Box>
+              <Box css={{ px: '$8', maxHeight: '100%', overflowY: 'auto' }}>{children}</Box>
             </Box>
           </Popover.Content>
         </Popover.Portal>
