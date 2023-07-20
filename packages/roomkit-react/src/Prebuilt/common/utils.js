@@ -86,7 +86,7 @@ export const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
     return 'You are the first to join';
   }
-  const formatter = Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
-  const formattedNum = formatter(peerCount);
-  return `${formattedNum} other${formattedNum === 1 ? '' : 's'} in the session`;
+  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  const formattedNum = formatter.format(peerCount);
+  return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
 };

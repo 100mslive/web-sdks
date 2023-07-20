@@ -47,7 +47,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
-  const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
+  const { isLocalAudioEnabled, isLocalVideoEnabled, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -88,36 +88,42 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
   return (
-    <Container>
-      <Logo />
-      <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14' }}>
-        Get Started
-      </Text>
-      <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
-        Setup your audio and video before joining
-      </Text>
-      <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
-        {isHLSRunning || isRTMPRunning ? (
-          <Chip
-            content="LIVE"
-            backgroundColor="$alert_error_default"
-            icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
-          />
-        ) : null}
-        <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
+    <Container css={{ h: '100%', '@md': { justifyContent: 'space-between' } }}>
+      <Flex direction="column" justify="center">
+        <Logo />
+        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14' }}>
+          Get Started
+        </Text>
+        <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
+          Setup your audio and video before joining
+        </Text>
+        <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
+          {isHLSRunning || isRTMPRunning ? (
+            <Chip
+              content="LIVE"
+              backgroundColor="$alert_error_default"
+              icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+            />
+          ) : null}
+          <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
+        </Flex>
       </Flex>
-      <Flex
-        align="center"
-        justify="center"
-        css={{
-          '@sm': { width: '100%' },
-          flexDirection: 'column',
-        }}
-      >
-        <PreviewTile name={name} error={previewError} />
+      {toggleVideo ? (
+        <Flex
+          align="center"
+          justify="center"
+          css={{
+            '@sm': { width: '100%' },
+            flexDirection: 'column',
+          }}
+        >
+          <PreviewTile name={name} error={previewError} />
+        </Flex>
+      ) : null}
+      <Box>
         <PreviewControls enableJoin={enableJoin} savePreferenceAndJoin={savePreferenceAndJoin} />
         <PreviewName name={name} onChange={setName} enableJoin={enableJoin} onJoin={savePreferenceAndJoin} />
-      </Flex>
+      </Box>
     </Container>
   );
 };
