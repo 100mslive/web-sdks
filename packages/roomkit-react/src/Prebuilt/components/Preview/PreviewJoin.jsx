@@ -12,8 +12,8 @@ import {
 import { SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
-  Flex,
   Box,
+  Flex,
   flexCenter,
   Loading,
   styled,
@@ -27,14 +27,14 @@ import {
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
+import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { UI_SETTINGS } from '../../common/constants';
-import Chip from '../Chip';
 import { getParticipantChipContent } from '../../common/utils';
+import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -49,7 +49,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
-  const { participants, isConnected, peerCount } = useParticipants();
+  const { participants, peerCount } = useParticipants();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -102,7 +102,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
             icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
           />
         ) : null}
-        <Chip content={getParticipantChipContent(peerCount, participants)} hideIfNoContent />
+        <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
       </Flex>
       <Flex
         align="center"
