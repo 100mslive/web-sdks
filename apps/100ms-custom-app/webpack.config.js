@@ -21,7 +21,9 @@ module.exports = {
     publicPath: '/',
     clean: true,
     devtoolModuleFilenameTemplate: info => {
-      return path.relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath).replace(/\\/g, '/');
+      return path
+        .relative(path.resolve(__dirname, 'src'), info.absoluteResourcePath)
+        .replace(/\\/g, '/');
     },
   },
   devtool: isProduction ? 'source-map' : 'cheap-module-source-map',
@@ -32,6 +34,7 @@ module.exports = {
       path: false,
       fs: false,
       events: false,
+      crypto: false,
     },
   },
   ignoreWarnings: [/Failed to parse source map/], // some libraries do not provide proper source maps which throws this warning
@@ -115,7 +118,9 @@ module.exports = {
           manifest[file.name] = file.path;
           return manifest;
         }, seed);
-        const entrypointFiles = entrypoints.main.filter(fileName => !fileName.endsWith('.map'));
+        const entrypointFiles = entrypoints.main.filter(
+          fileName => !fileName.endsWith('.map')
+        );
 
         return {
           files: manifestFiles,
@@ -145,6 +150,7 @@ module.exports = {
       template: path.resolve(__dirname, './public/index.html'),
       base: '/',
     }),
+    // will not be needed in case of prebuilt component. Needed only for 100ms-web app
     new webpack.ProvidePlugin({
       React: 'react',
     }),
@@ -158,6 +164,6 @@ module.exports = {
     open: true,
     compress: true,
     hot: true,
-    port: 3000,
+    port: 3001,
   },
 };

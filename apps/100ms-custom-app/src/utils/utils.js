@@ -1,5 +1,5 @@
-import cookies from 'js-cookies';
 import axios from 'axios';
+import cookies from 'js-cookies';
 
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
@@ -10,7 +10,8 @@ export const getRoomCodeFromUrl = () => {
 export const getAuthInfo = () => {
   let info = { token: undefined, userEmail: undefined };
   try {
-    const cookieName = process.env.REACT_APP_ENV === 'qa' ? 'authUser-qa' : 'authUser';
+    const cookieName =
+      process.env.REACT_APP_ENV === 'qa' ? 'authUser-qa' : 'authUser';
     const authUser = JSON.parse(cookies.getItem(cookieName));
     info.token = authUser?.token;
     info.userEmail = authUser?.email;
