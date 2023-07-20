@@ -82,19 +82,10 @@ export const metadataPayloadParser = payload => {
   }
 };
 
-export const getParticipantChipContent = (peerCount = 0, participants = []) => {
-  switch (peerCount) {
-    case 0:
-      return 'You are the first to join';
-
-    case 1:
-      return `${participants[0].name} is in this session`;
-    case 2:
-      return `${participants[0].name} & ${participants[1].name} are in this session`;
-    default: {
-      if (participants.length > 2) {
-        return `${participants[0].name}, ${participants[1].name} & ${peerCount - 2} other${peerCount > 3 ? 's' : ''}`;
-      }
-    }
+export const getParticipantChipContent = (peerCount = 0) => {
+  if (peerCount === 0) {
+    return 'You are the first to join';
   }
+  const formatter = Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  return formatter(peerCount);
 };
