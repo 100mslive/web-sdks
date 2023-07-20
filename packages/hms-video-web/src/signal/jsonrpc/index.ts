@@ -37,6 +37,8 @@ import {
   PollResponseSetResponse,
   PollResponsesGetParams,
   PollResponsesGetResponse,
+  PollResultParams,
+  PollResultResponse,
   PollStartParams,
   PollStartResponse,
   PollStopParams,
@@ -436,6 +438,11 @@ export default class JsonRpcSignal implements ISignal {
   getPollsList(params: PollListParams): Promise<PollListResponse> {
     this.valiateConnection();
     return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { version: '1.0', ...params });
+  }
+
+  getPollResult(params: PollResultParams): Promise<PollResultResponse> {
+    this.valiateConnection();
+    return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { version: '1.0', ...params });
   }
 
   private valiateConnection() {
