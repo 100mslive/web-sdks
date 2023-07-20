@@ -13,8 +13,8 @@ const BottomActionSheet = ({
   sideOffset = -50,
   defaultHeight = 50,
 }) => {
-  const [sheetOpen, setSheetOpen] = useState(false);
   const MINIMUM_HEIGHT = 20; // vh
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetHeight, setSheetHeight] = useState(`${Math.min(Math.max(MINIMUM_HEIGHT, defaultHeight), 100)}vh`);
   const closeRef = useRef(null);
 
