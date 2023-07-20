@@ -60,7 +60,6 @@
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
-    "reactui": "cd packages/react-ui && yarn start",
     "storybook": "cd packages/roomkit-react && yarn storybook",
     "build-storybook": "cd packages/roomkit-react && yarn build-storybook"
   },
@@ -102,11 +101,11 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.cjs.js",
+      "path": "packages/roomkit-react/dist/index.cjs.js",
       "limit": "20 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.js",
+      "path": "packages/roomkit-react/dist/index.js",
       "limit": "20 KB"
     },
     {
