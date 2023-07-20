@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { Button, Input, styled } from '../../../';
 import { isStreamingKit } from '../../common/utils';
 
@@ -6,6 +7,7 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
   const formSubmit = e => {
     e.preventDefault();
   };
+  const showStreamingUI = isStreamingKit();
   return (
     <Form onSubmit={formSubmit}>
       <Input
@@ -18,8 +20,9 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
         autoFocus
         autoComplete="name"
       />
-      <Button type="submit" disabled={!name || !enableJoin} onClick={onJoin}>
-        {isStreamingKit() ? 'Join Studio' : 'Join Room'}
+      <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
+        {/* TODO: Go Live should also start the stream */}
+        {showStreamingUI ? `${(<RadioIcon />)} Go Live` : `Join Now ${(<ArrowRightIcon />)}`}
       </Button>
     </Form>
   );

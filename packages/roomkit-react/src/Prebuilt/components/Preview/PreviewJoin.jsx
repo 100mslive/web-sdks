@@ -25,6 +25,7 @@ import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import TileConnection from '../Connection/TileConnection';
+import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
@@ -81,7 +82,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   }, [authToken, skipPreview]);
   return (
     <Container>
-      <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
+      <Logo />
+      <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14' }}>
         Get Started
       </Text>
       <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
