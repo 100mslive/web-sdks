@@ -92,7 +92,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
 
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
-        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', '@md': { mt: '$8' } }}>
+        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
           Get Started
         </Text>
         <Text css={{ c: '$textMedEmp', my: '$4', textAlign: 'center' }} variant="body1">
@@ -152,7 +152,6 @@ const PreviewTile = ({ name, error }) => {
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
-  const isHeadless = useIsHeadless();
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
 
   const {

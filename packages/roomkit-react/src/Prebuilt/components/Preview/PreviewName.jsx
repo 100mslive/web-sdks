@@ -27,12 +27,12 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin, cannotPublishVideo })
         {/* TODO: Go Live should also start the stream */}
         {showStreamingUI ? (
           <>
-            <RadioIcon />
+            <RadioIcon height={18} width={18} />
             Go Live
           </>
         ) : (
           <>
-            Join Now <ArrowRightIcon />
+            Join Now <ArrowRightIcon height={18} width={18} />
           </>
         )}
       </Button>
