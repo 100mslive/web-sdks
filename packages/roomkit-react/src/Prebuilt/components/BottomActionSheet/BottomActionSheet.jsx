@@ -3,7 +3,7 @@ import { CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex, Popover, Text } from '../../..';
 import { getUpdatedHeight } from '../../common/utils';
 
-export const BottomActionSheet = ({
+const BottomActionSheet = ({
   title = '',
   children = <></>,
   triggerContent,
@@ -18,7 +18,7 @@ export const BottomActionSheet = ({
   const [sheetHeight, setSheetHeight] = useState(`${Math.min(Math.max(MINIMUM_HEIGHT, defaultHeight), 100)}vh`);
   const closeRef = useRef(null);
 
-  // Close the sheet if height goes under 40vh
+  // Close the sheet if height goes under MINIMUM_HEIGHT
   useEffect(() => {
     if (closeRef?.current && parseFloat(sheetHeight.slice(0, -2)) <= MINIMUM_HEIGHT) {
       setSheetOpen(false);
@@ -92,3 +92,5 @@ export const BottomActionSheet = ({
     </>
   );
 };
+
+export default BottomActionSheet;
