@@ -1,48 +1,57 @@
 import { VerticalMenuIcon } from '@100mslive/react-icons';
-import { Dropdown } from '../../Dropdown';
-import { Box, Flex } from '../../Layout';
-import { styled } from '../../Theme';
-import { Tooltip } from '../../Tooltip';
-import IconButton from '../IconButton';
+import { Dropdown } from '../../../Dropdown';
+import { Box, Flex } from '../../../Layout';
+import { styled } from '../../../Theme';
+import { Tooltip } from '../../../Tooltip';
+import IconButton from '../../IconButton';
 
 const IconSection = styled(IconButton, {
-  h: '$14',
-  px: '$8',
+  w: 'unset',
+  h: 'unset',
+  p: '$4',
   r: '$1',
   borderTopRightRadius: 0,
   borderBottomRightRadius: 0,
   '@md': {
-    px: '$4',
     mx: 0,
     borderTopRightRadius: '$1',
     borderBottomRightRadius: '$1',
   },
 });
 
-const OptionsSection = styled(IconSection, {
-  display: 'block',
+const OptionsSection = styled(IconButton, {
+  w: 'unset',
+  h: 'unset',
+  p: '$4',
+  r: '$1',
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
-  borderTopRightRadius: '$1',
-  borderBottomRightRadius: '$1',
   borderLeftWidth: 0,
-  w: '$4',
   '@md': {
     display: 'none',
   },
 });
 
-export const IconButtonWithOptions = ({ tooltipMessage, icon, options = [], buttonProps }) => {
+export const IconButtonWithOptions = ({
+  tooltipMessage,
+  icon,
+  options = [],
+  backgroundColor = '$surfaceDefault',
+  // enabledColor = '$transparent',
+  // disabledColor = '$surfaceDefault',
+  // hoveredColor = '$surfaceLight',
+  buttonProps,
+}) => {
   return (
     <Flex>
-      <IconSection {...buttonProps}>
+      <IconSection css={{ backgroundColor }} {...buttonProps}>
         <Tooltip title={tooltipMessage}>
           <Box>{icon}</Box>
         </Tooltip>
       </IconSection>
       <Dropdown.Root>
         <Dropdown.Trigger asChild>
-          <OptionsSection>
+          <OptionsSection css={{ backgroundColor }}>
             <Tooltip title="View Options">
               <Box>
                 <VerticalMenuIcon />
@@ -52,8 +61,9 @@ export const IconButtonWithOptions = ({ tooltipMessage, icon, options = [], butt
         </Dropdown.Trigger>
         <Dropdown.Content
           sideOffset={5}
+          align="center"
           css={{
-            w: '$96',
+            w: '$48',
             maxHeight: '$96',
             p: 0,
           }}
@@ -64,12 +74,10 @@ export const IconButtonWithOptions = ({ tooltipMessage, icon, options = [], butt
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                px: '$10',
-                pt: '$10',
-                pb: '$6',
+                p: '$8',
+                borderTop: '1px solid $borderLight',
                 '&:hover': {
-                  bg: '$transparent',
-                  cursor: 'default',
+                  cursor: 'pointer',
                 },
               }}
             >
