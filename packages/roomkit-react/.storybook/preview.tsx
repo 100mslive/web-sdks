@@ -6,6 +6,7 @@ import { themes } from '@storybook/theming';
 import { setUpFakeStore, storyBookSDK, storyBookStore } from '../src/store/SetupFakeStore';
 import { HMSThemeProvider, ThemeTypes } from '../src/Theme';
 import { DecoratorFn } from '@storybook/react';
+import './global.css';
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

@@ -14,7 +14,8 @@ import { ScreenshareDisplay } from '../components/ScreenshareDisplay';
 import ScreenshareTile from '../components/ScreenshareTile';
 import VideoList from '../components/VideoList';
 import VideoTile from '../components/VideoTile';
-import { Box, config as cssConfig, Flex } from '../../';
+import { Box, Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 
 const ScreenShareView = () => {
   // for smaller screen we will show sidebar in bottom

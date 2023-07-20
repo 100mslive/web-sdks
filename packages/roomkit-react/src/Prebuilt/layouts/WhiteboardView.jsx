@@ -1,7 +1,8 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { selectPeers, selectRoomID, useHMSStore } from '@100mslive/react-sdk';
-import { Box, config as cssConfig, Flex } from '../../';
+import { Box, Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 import { SidePane } from './screenShareView';
 import { Whiteboard } from '../plugins/whiteboard';
 

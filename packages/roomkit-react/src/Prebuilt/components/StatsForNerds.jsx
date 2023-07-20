@@ -7,7 +7,13 @@ import {
   useHMSStatsStore,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { Box, Dialog, Dropdown, Flex, HorizontalDivider, Label, Switch, Text } from '../../';
+import { HorizontalDivider } from '../../Divider';
+import { Dropdown } from '../../Dropdown';
+import { Label } from '../../Label';
+import { Box, Flex } from '../../Layout';
+import { Dialog } from '../../Modal';
+import { Switch } from '../../Switch';
+import { Text } from '../../Text';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';

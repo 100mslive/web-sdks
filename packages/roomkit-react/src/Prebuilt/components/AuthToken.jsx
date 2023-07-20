@@ -3,7 +3,7 @@ import { matchPath, useLocation } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { v4 as uuid } from 'uuid';
 import { useHMSActions } from '@100mslive/react-sdk';
-import { styled } from '../../';
+import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ErrorDialog } from '../primitives/DialogContent';
 import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
@@ -40,7 +40,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    if (!tokenEndpoint || (!urlRoomId && !roomCode && !urlRoomCode)) {
+    if (!tokenEndpoint && !urlRoomId && !roomCode && !urlRoomCode) {
       return;
     }
     const code = !userRole && (roomCode || urlRoomCode);

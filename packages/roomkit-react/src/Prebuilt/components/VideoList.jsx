@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { selectLocalPeerID, useHMSStore, useVideoList } from '@100mslive/react-sdk';
-import { StyledVideoList, useTheme } from '../../';
+import { useTheme } from '../../Theme';
+import { StyledVideoList } from '../../VideoList';
 import { Pagination } from './Pagination';
 import ScreenshareTile from './ScreenshareTile';
 import VideoTile from './VideoTile';

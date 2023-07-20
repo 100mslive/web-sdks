@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
 import { logMessage } from 'zipyai';
 import { CopyIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, Text, ThemeContext, Tooltip } from '../../';
+import { Button } from '../../Button';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
+import { ThemeContext } from '../../Theme';
+import { Tooltip } from '../../Tooltip';
 import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {

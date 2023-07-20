@@ -9,7 +9,9 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-import { StyledVideoTile, Video, VideoTileStats } from '../../';
+import { VideoTileStats } from '../../Stats';
+import { Video } from '../../Video';
+import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import TileMenu from './TileMenu';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
