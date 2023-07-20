@@ -9,7 +9,7 @@ import {
   usePreviewJoin,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { SettingsIcon } from '@100mslive/react-icons';
+import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Box,
@@ -19,7 +19,6 @@ import {
   styled,
   StyledVideoTile,
   Text,
-  textEllipsis,
   useBorderAudioLevel,
   useTheme,
   Video,
@@ -32,7 +31,7 @@ import TileConnection from '../Connection/TileConnection';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+import { useAuthToken, useIsHeadless, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { getParticipantChipContent } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
@@ -89,12 +88,14 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   }, [authToken, skipPreview]);
   return (
     <Container css={{ h: '100%', '@md': { justifyContent: 'space-between' } }}>
-      <Flex direction="column" justify="center">
+      {toggleVideo ? null : <Box />}
+
+      <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
-        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14' }}>
+        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', '@md': { mt: '$8' } }}>
           Get Started
         </Text>
-        <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
+        <Text css={{ c: '$textMedEmp', my: '$4', textAlign: 'center' }} variant="body1">
           Setup your audio and video before joining
         </Text>
         <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
@@ -108,6 +109,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
         </Flex>
       </Flex>
+
       {toggleVideo ? (
         <Flex
           align="center"
@@ -120,9 +122,16 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-      <Box>
+
+      <Box css={{ w: '100%', maxWidth: '360px' }}>
         <PreviewControls enableJoin={enableJoin} savePreferenceAndJoin={savePreferenceAndJoin} />
-        <PreviewName name={name} onChange={setName} enableJoin={enableJoin} onJoin={savePreferenceAndJoin} />
+        <PreviewName
+          name={name}
+          onChange={setName}
+          enableJoin={enableJoin}
+          onJoin={savePreferenceAndJoin}
+          cannotPublishVideo={!toggleVideo}
+        />
       </Box>
     </Container>
   );
@@ -138,14 +147,18 @@ const Container = styled('div', {
 const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
+  const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
+  const isHeadless = useIsHeadless();
+  const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
 
   const {
     aspectRatio: { width, height },
   } = useTheme();
+
   return (
     <StyledVideoTile.Container
       css={{
@@ -165,6 +178,7 @@ const PreviewTile = ({ name, error }) => {
       {localPeer ? (
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
+
           <Video
             mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
@@ -173,14 +187,16 @@ const PreviewTile = ({ name, error }) => {
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={name} data-testid="preview_avatar_tile" />
-              <Text css={{ ...textEllipsis('75%') }} variant="body2">
-                {name}
-              </Text>
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
       ) : !error ? (
         <Loading size={100} />
+      ) : null}
+      {showMuteIcon ? (
+        <StyledVideoTile.AudioIndicator size="medium">
+          <MicOffIcon />
+        </StyledVideoTile.AudioIndicator>
       ) : null}
     </StyledVideoTile.Container>
   );

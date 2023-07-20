@@ -3,17 +3,20 @@ import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { Button, Input, styled } from '../../../';
 import { isStreamingKit } from '../../common/utils';
 
-const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
+const PreviewName = ({ name, onChange, onJoin, enableJoin, cannotPublishVideo }) => {
   const formSubmit = e => {
     e.preventDefault();
   };
   const showStreamingUI = isStreamingKit();
   return (
-    <Form onSubmit={formSubmit}>
+    <Form
+      css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}
+      onSubmit={formSubmit}
+    >
       <Input
         required
         id="name"
-        css={{ w: '100%' }}
+        css={{ w: '100%', boxSizing: 'border-box' }}
         value={name}
         onChange={e => onChange(e.target.value)}
         placeholder="Enter your name"

@@ -65,7 +65,7 @@ const AudioIndicator = styled('div', {
   right: '$4',
   color: '$white',
   bg: '$error',
-  borderRadius: '$3',
+  borderRadius: '$2',
   width: '$14',
   height: '$14',
   mb: '5px',
