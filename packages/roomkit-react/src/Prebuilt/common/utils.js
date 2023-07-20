@@ -81,3 +81,11 @@ export const metadataPayloadParser = payload => {
     return { payload };
   }
 };
+
+export const getParticipantChipContent = (peerCount = 0) => {
+  if (peerCount === 0) {
+    return 'You are the first to join';
+  }
+  const formatter = Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  return formatter(peerCount);
+};

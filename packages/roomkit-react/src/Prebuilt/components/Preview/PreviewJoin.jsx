@@ -5,11 +5,14 @@ import {
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
+  useParticipants,
   usePreviewJoin,
+  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
+  Box,
   Flex,
   flexCenter,
   Loading,
@@ -24,12 +27,14 @@ import {
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
+import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { getParticipantChipContent } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
@@ -39,11 +44,13 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
+  const { peerCount } = useParticipants();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -89,6 +96,16 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
+      <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
+        {isHLSRunning || isRTMPRunning ? (
+          <Chip
+            content="LIVE"
+            backgroundColor="$alert_error_default"
+            icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+          />
+        ) : null}
+        <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
+      </Flex>
       <Flex
         align="center"
         justify="center"
