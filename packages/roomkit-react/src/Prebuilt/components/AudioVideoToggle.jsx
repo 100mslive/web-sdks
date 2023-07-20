@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import {
-  selectIsConnectedToRoom,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
   useAVToggle,
@@ -18,7 +17,6 @@ export const AudioVideoToggle = () => {
   const actions = useHMSActions();
   const videoTracKId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTracKId));
-  const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
 
   return (
     <Fragment>
@@ -44,7 +42,7 @@ export const AudioVideoToggle = () => {
           </IconButton>
         </Tooltip>
       ) : null}
-      {localVideoTrack?.facingMode && isConnectedToRoom ? (
+      {localVideoTrack?.facingMode ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
