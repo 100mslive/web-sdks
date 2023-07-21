@@ -1,6 +1,7 @@
 // @ts-check
 import React, { useState } from "react";
 import {
+  selectLocalPeerRoleName,
   selectPermissions,
   selectPolls,
   useHMSActions,
@@ -79,7 +80,9 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
 const AddMenu = () => {
   const actions = useHMSActions();
   const [title, setTitle] = useState("");
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const [anonymous, setAnonymous] = useState(false);
+  const [hideVoteCount, setHideVoteCount] = useState(false);
   const [error, setError] = useState();
   const { setWidgetState } = useWidgetState();
   const [interactionType, setInteractionType] = useState(INTERACTION_TYPE.POLL);
@@ -123,7 +126,10 @@ const AddMenu = () => {
           onChange={event => setTitle(event.target.value)}
         />
         <Flex align="center" css={{ mt: "$10" }}>
-          <Switch css={{ mr: "$6" }} />
+          <Switch
+            onCheckedChange={value => setHideVoteCount(value)}
+            css={{ mr: "$6" }}
+          />
           <Text variant="body2" css={{ c: "$textMedEmp" }}>
             Hide Vote Count
           </Text>
@@ -155,6 +161,10 @@ const AddMenu = () => {
                 id,
                 title,
                 anonymous,
+                rolesThatCanViewResponses:
+                  hideVoteCount && localPeerRoleName
+                    ? [localPeerRoleName]
+                    : undefined,
                 type: interactionType.toLowerCase(),
                 // duration: showTimerDropDown ? timer : undefined,
               })
