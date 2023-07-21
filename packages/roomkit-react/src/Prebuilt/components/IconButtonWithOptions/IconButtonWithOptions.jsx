@@ -11,6 +11,7 @@ const IconSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopRightRadius: 0,
+  borderColor: '$borderDefault',
   borderBottomRightRadius: 0,
   '@md': {
     mx: 0,
@@ -25,6 +26,7 @@ const OptionsSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopLeftRadius: 0,
+  borderColor: '$borderDefault',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
   '@md': {
@@ -32,28 +34,20 @@ const OptionsSection = styled(IconButton, {
   },
 });
 
-export const IconButtonWithOptions = ({
-  tooltipMessage,
-  icon,
-  options = [],
-  backgroundColor = '$surfaceDefault',
-  // enabledColor = '$transparent',
-  // disabledColor = '$surfaceDefault',
-  // hoveredColor = '$surfaceLight',
-  buttonProps,
-}) => {
+export const IconButtonWithOptions = ({ tooltipMessage, icon, options = [], active, onClick = () => {}, key = '' }) => {
+  const bgCss = { backgroundColor: active ? '$transparent' : '$secondaryDark' };
   return (
     <Flex>
-      <IconSection css={{ backgroundColor }} {...buttonProps}>
+      <IconSection css={bgCss} onClick={onClick}>
         <Tooltip title={tooltipMessage}>
-          <Box>{icon}</Box>
+          <Box css={{ color: '$textHighEmp' }}>{icon}</Box>
         </Tooltip>
       </IconSection>
       <Dropdown.Root>
         <Dropdown.Trigger asChild>
-          <OptionsSection css={{ backgroundColor }}>
+          <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
-              <Box>
+              <Box css={{ color: '$textHighEmp' }}>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>
@@ -75,7 +69,7 @@ export const IconButtonWithOptions = ({
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 p: '$8',
-                borderTop: '1px solid $borderLight',
+                borderTop: '1px solid $borderDefault',
                 '&:hover': {
                   cursor: 'pointer',
                 },

@@ -12,12 +12,14 @@ export default {
     tooltipMessage: { control: 'text' },
     icon: { control: 'object' },
     options: { control: 'object' },
-    buttonProps: { control: 'object' },
+    active: { control: 'boolean' },
+    onClick: { control: 'function' },
+    key: { control: 'string' },
   },
 } as Meta;
 
 const Template = args => (
-  <Box css={{ ml: '$20' }}>
+  <Box css={{ ml: '$20', bg: '$backgroundDark', p: '$8' }}>
     <IconButtonWithOptions {...args} />
   </Box>
 );
@@ -30,5 +32,9 @@ Default.args = {
     { title: 'Option 1', content: <Text>Some content</Text> },
     { title: 'Option 2', content: <Text>Some more content</Text> },
   ],
-  buttonProps: {},
+  active: true,
+  onClick: () => {
+    return;
+  },
+  key: '',
 };
