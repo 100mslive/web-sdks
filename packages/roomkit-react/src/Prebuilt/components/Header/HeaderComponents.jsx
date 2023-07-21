@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Flex, styled, Text, textEllipsis, useTheme } from '../../../';
+import { config as cssConfig, Flex, styled, Text, textEllipsis } from '../../../';
 import { useLogo } from '../AppData/useUISettings';
 import { isStreamingKit } from '../../common/utils';
 
@@ -30,7 +30,6 @@ const LogoImg = styled('img', {
 });
 
 export const Logo = () => {
-  const { themeType } = useTheme();
   const logo = useLogo();
   const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -38,14 +37,5 @@ export const Logo = () => {
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return (
-    <LogoImg
-      src={
-        logo || (themeType === 'dark' ? require('../../images/logo-light.svg') : require('../../images/logo-dark.svg'))
-      }
-      alt="Brand Logo"
-      width={132}
-      height={40}
-    />
-  );
+  return logo ? <LogoImg src={logo} alt="Brand Logo" width={132} height={40} /> : null;
 };

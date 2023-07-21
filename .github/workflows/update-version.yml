@@ -38,7 +38,7 @@ jobs:
   size:
     runs-on: ubuntu-latest
     needs: changes
-    if: needs.changes.outputs.hms-video-web == 'true' || needs.changes.outputs.hms-video-store == 'true'
+    if: needs.changes.outputs.hms-video-web == 'true' || needs.changes.outputs.hms-video-store == 'true' || needs.changes.outputs.roomkit-react == 'true'
     steps:
       - uses: actions/checkout@v1
       - name: Check packages size

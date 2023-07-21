@@ -5,7 +5,6 @@ import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import ErrorPage from './components/ErrorPage';
 import FullPageProgress from './components/FullPageProgress';
 import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
@@ -228,7 +227,6 @@ const RouteList = () => {
       )}
       <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
-      <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
     </Routes>
   );
 };
