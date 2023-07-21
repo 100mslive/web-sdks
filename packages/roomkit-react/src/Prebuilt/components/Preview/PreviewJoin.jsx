@@ -5,7 +5,6 @@ import {
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
-<<<<<<< HEAD
   useParticipants,
   usePreviewJoin,
   useRecordingStreaming,
@@ -14,23 +13,12 @@ import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Box,
-=======
-  usePreviewJoin,
-} from '@100mslive/react-sdk';
-import { SettingsIcon } from '@100mslive/react-icons';
-import {
-  Avatar,
->>>>>>> main
   Flex,
   flexCenter,
   Loading,
   styled,
   StyledVideoTile,
   Text,
-<<<<<<< HEAD
-=======
-  textEllipsis,
->>>>>>> main
   useBorderAudioLevel,
   useTheme,
   Video,
@@ -38,7 +26,6 @@ import {
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
-<<<<<<< HEAD
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import { Logo } from '../Header/HeaderComponents';
@@ -47,13 +34,6 @@ import PreviewName from './PreviewName';
 import { useAuthToken, useIsHeadless, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { getParticipantChipContent } from '../../common/utils';
-=======
-import TileConnection from '../Connection/TileConnection';
-import SettingsModal from '../Settings/SettingsModal';
-import PreviewName from './PreviewName';
-import { useAuthToken, useUISettings } from '../AppData/useUISettings';
-import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
->>>>>>> main
 import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
@@ -63,7 +43,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
-<<<<<<< HEAD
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
@@ -71,13 +50,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
-=======
-  const authToken = useAuthToken();
-  const [name, setName] = useState(initialName || previewPreference.name);
-  const { isLocalAudioEnabled, isLocalVideoEnabled } = useAVToggle();
-  const [previewError, setPreviewError] = useState(false);
-  const { endPoints } = useHMSPrebuiltContext();
->>>>>>> main
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
@@ -115,7 +87,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
   return (
-<<<<<<< HEAD
     <Container css={{ h: '100%', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
 
@@ -167,27 +138,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           cannotPublishAudio={!toggleAudio}
         />
       </Box>
-=======
-    <Container>
-      <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
-        Get Started
-      </Text>
-      <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
-        Setup your audio and video before joining
-      </Text>
-      <Flex
-        align="center"
-        justify="center"
-        css={{
-          '@sm': { width: '100%' },
-          flexDirection: 'column',
-        }}
-      >
-        <PreviewTile name={name} error={previewError} />
-        <PreviewControls enableJoin={enableJoin} savePreferenceAndJoin={savePreferenceAndJoin} />
-        <PreviewName name={name} onChange={setName} enableJoin={enableJoin} onJoin={savePreferenceAndJoin} />
-      </Flex>
->>>>>>> main
     </Container>
   );
 };
@@ -202,26 +152,16 @@ const Container = styled('div', {
 const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
-<<<<<<< HEAD
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
-=======
->>>>>>> main
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
-<<<<<<< HEAD
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-=======
->>>>>>> main
 
   const {
     aspectRatio: { width, height },
   } = useTheme();
-<<<<<<< HEAD
-
-=======
->>>>>>> main
   return (
     <StyledVideoTile.Container
       css={{
@@ -241,10 +181,6 @@ const PreviewTile = ({ name, error }) => {
       {localPeer ? (
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
-<<<<<<< HEAD
-
-=======
->>>>>>> main
           <Video
             mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}
@@ -253,35 +189,22 @@ const PreviewTile = ({ name, error }) => {
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={name} data-testid="preview_avatar_tile" />
-<<<<<<< HEAD
-=======
-              <Text css={{ ...textEllipsis('75%') }} variant="body2">
-                {name}
-              </Text>
->>>>>>> main
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
       ) : !error ? (
         <Loading size={100} />
       ) : null}
-<<<<<<< HEAD
       {showMuteIcon ? (
         <StyledVideoTile.AudioIndicator size="medium">
           <MicOffIcon />
         </StyledVideoTile.AudioIndicator>
       ) : null}
-=======
->>>>>>> main
     </StyledVideoTile.Container>
   );
 };
 
-<<<<<<< HEAD
 const PreviewControls = ({ hideSettings }) => {
-=======
-const PreviewControls = () => {
->>>>>>> main
   return (
     <Flex
       justify="between"
@@ -296,20 +219,12 @@ const PreviewControls = () => {
           <VirtualBackground />
         </Suspense>
       </Flex>
-<<<<<<< HEAD
       {!hideSettings ? <PreviewSettings /> : null}
-=======
-      <PreviewSettings />
->>>>>>> main
     </Flex>
   );
 };
 
-<<<<<<< HEAD
 export const PreviewSettings = React.memo(() => {
-=======
-const PreviewSettings = React.memo(() => {
->>>>>>> main
   const [open, setOpen] = useState(false);
   return (
     <Fragment>

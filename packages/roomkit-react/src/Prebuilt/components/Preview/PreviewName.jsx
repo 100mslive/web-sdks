@@ -90,18 +90,12 @@ const Form = styled('form', {
   width: '100%',
   display: 'flex',
   alignItems: 'center',
-<<<<<<< HEAD
   gap: '$8',
   mt: '$10',
   mb: '$10',
   '@md': {
     gap: '$4',
   },
-=======
-  gap: '$4',
-  mt: '$10',
-  mb: '$10',
->>>>>>> main
 });
 
 export default PreviewName;
