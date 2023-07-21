@@ -46,7 +46,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
-  const { isLocalAudioEnabled, isLocalVideoEnabled, toggleVideo } = useAVToggle();
+  const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -102,8 +102,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           {isHLSRunning || isRTMPRunning ? (
             <Chip
               content="LIVE"
-              backgroundColor="$alert_error_default"
-              icon={<Box css={{ h: '$lg', w: '$lg', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+              backgroundColor="$error"
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$textHighEmp', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
@@ -124,13 +124,18 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       ) : null}
 
       <Box css={{ w: '100%', maxWidth: '360px' }}>
-        <PreviewControls enableJoin={enableJoin} savePreferenceAndJoin={savePreferenceAndJoin} />
+        <PreviewControls
+          enableJoin={enableJoin}
+          savePreferenceAndJoin={savePreferenceAndJoin}
+          hideSettings={!toggleVideo && !toggleAudio}
+        />
         <PreviewName
           name={name}
           onChange={setName}
           enableJoin={enableJoin}
           onJoin={savePreferenceAndJoin}
           cannotPublishVideo={!toggleVideo}
+          cannotPublishAudio={!toggleAudio}
         />
       </Box>
     </Container>
@@ -201,7 +206,7 @@ const PreviewTile = ({ name, error }) => {
   );
 };
 
-const PreviewControls = () => {
+const PreviewControls = ({ hideSettings }) => {
   return (
     <Flex
       justify="between"
@@ -216,12 +221,12 @@ const PreviewControls = () => {
           <VirtualBackground />
         </Suspense>
       </Flex>
-      <PreviewSettings />
+      {!hideSettings ? <PreviewSettings /> : null}
     </Flex>
   );
 };
 
-const PreviewSettings = React.memo(() => {
+export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
   return (
     <Fragment>
