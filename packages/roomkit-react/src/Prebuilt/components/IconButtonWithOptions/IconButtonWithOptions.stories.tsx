@@ -1,9 +1,9 @@
 import React from 'react';
 import { Meta } from '@storybook/react';
-import { IconButtonWithOptions } from './IconButtonWithOptions';
 import { MicIcon } from '@100mslive/react-icons';
-import { Text } from '../../../Text';
 import { Box } from '../../../Layout';
+import { Text } from '../../../Text';
+import { IconButtonWithOptions } from './IconButtonWithOptions';
 
 export default {
   title: 'Components/IconButtonWithOptions',

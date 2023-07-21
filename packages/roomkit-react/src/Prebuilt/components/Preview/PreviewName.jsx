@@ -1,10 +1,9 @@
 import React from 'react';
-import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
-import { Button, Flex, Input, styled } from '../../../';
-import { isStreamingKit } from '../../common/utils';
-import { PreviewSettings } from './PreviewJoin';
-import { config as cssConfig } from '../../../';
 import { useMedia } from 'react-use';
+import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
+import { Button, config as cssConfig, Flex, Input, styled } from '../../../';
+import { PreviewSettings } from './PreviewJoin';
+import { isStreamingKit } from '../../common/utils';
 
 const PreviewName = ({
   name,

@@ -45,7 +45,7 @@ export const IconButtonWithOptions = ({
   const bgCss = { backgroundColor: active ? '$transparent' : '$secondaryDark' };
   return (
     <Flex>
-      <IconSection css={bgCss} onClick={onClick}>
+      <IconSection css={bgCss} onClick={onClick} key={key}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Box css={{ color: '$textHighEmp' }}>{icon}</Box>
         </Tooltip>
@@ -64,7 +64,7 @@ export const IconButtonWithOptions = ({
           sideOffset={5}
           align="center"
           css={{
-            w: '$48',
+            w: '$64',
             maxHeight: '$96',
             p: 0,
           }}
@@ -75,6 +75,7 @@ export const IconButtonWithOptions = ({
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
+                backgroundColor: option.active ? '$primaryDefault' : '',
                 p: '$8',
                 borderTop: '1px solid $borderDefault',
                 '&:hover': {
