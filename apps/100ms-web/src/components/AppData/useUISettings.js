@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   selectAppData,
   selectAppDataByPath,
@@ -222,7 +222,7 @@ export const useShowWhiteboard = () => {
   const isWhiteboardFeatureEnabled = useIsFeatureEnabled(
     FEATURE_LIST.WHITEBOARD
   );
-  const showWhiteboard = useCallback(() => {
+  const showWhiteboard = useMemo(() => {
     return !(
       !whiteboardEnabled ||
       hlsViewerRole === localPeerRole ||
@@ -235,7 +235,7 @@ export const useShowWhiteboard = () => {
     whiteboardEnabled,
   ]);
   return {
-    showWhiteboard: showWhiteboard(),
+    showWhiteboard: showWhiteboard,
   };
 };
 export const useShowAudioShare = () => {
@@ -244,7 +244,7 @@ export const useShowAudioShare = () => {
     FEATURE_LIST.AUDIO_ONLY_SCREENSHARE
   );
 
-  const showAudioShare = useCallback(() => {
+  const showAudioShare = useMemo(() => {
     return !(
       !isAudioShareFeatureEnabled ||
       !isAllowedToPublish.screen ||
@@ -253,7 +253,7 @@ export const useShowAudioShare = () => {
   }, [isAllowedToPublish.screen, isAudioShareFeatureEnabled]);
 
   return {
-    showAudioShare: showAudioShare(),
+    showAudioShare: showAudioShare,
   };
 };
 export const useShowPolls = () => {
@@ -262,13 +262,13 @@ export const useShowPolls = () => {
     poll => poll.state === "started" || poll.state === "stopped"
   );
 
-  const showPolls = useCallback(() => {
+  const showPolls = useMemo(() => {
     return (
       permissions?.pollWrite || (permissions?.pollRead && polls?.length > 0)
     );
   }, [permissions?.pollRead, permissions?.pollWrite, polls?.length]);
 
   return {
-    showPolls: showPolls(),
+    showPolls: showPolls,
   };
 };
