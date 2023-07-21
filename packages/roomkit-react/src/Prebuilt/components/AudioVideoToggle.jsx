@@ -58,9 +58,6 @@ export const AudioVideoToggle = () => {
     title: audioInput.label,
   }));
 
-  console.log('vid', formattedVideoInputList);
-  console.log('audi', formattedAudioInputList);
-
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
   const videoTracKId = useHMSStore(selectLocalVideoTrackID);
