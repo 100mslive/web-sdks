@@ -10,6 +10,7 @@ import { CameraFlipIcon, MicOffIcon, MicOnIcon, VideoOffIcon, VideoOnIcon } from
 import { ToastManager } from './Toast/ToastManager';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
+import { IconButtonWithOptions } from './IconButtonWithOptions/IconButtonWithOptions';
 import { isMacOS } from '../common/constants';
 
 export const AudioVideoToggle = () => {
@@ -21,26 +22,31 @@ export const AudioVideoToggle = () => {
   return (
     <Fragment>
       {toggleAudio ? (
-        <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
-          <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
-            {!isLocalAudioEnabled ? (
-              <MicOffIcon data-testid="audio_off_btn" />
-            ) : (
-              <MicOnIcon data-testid="audio_on_btn" />
-            )}
-          </IconButton>
-        </Tooltip>
+        <IconButtonWithOptions
+          tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
+          icon={
+            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
+          }
+          active={isLocalAudioEnabled}
+          onClick={toggleAudio}
+          key="toggleAudio"
+        />
       ) : null}
+
       {toggleVideo ? (
-        <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
-          <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
-            {!isLocalVideoEnabled ? (
+        <IconButtonWithOptions
+          tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
+          icon={
+            !isLocalVideoEnabled ? (
               <VideoOffIcon data-testid="video_off_btn" />
             ) : (
               <VideoOnIcon data-testid="video_on_btn" />
-            )}
-          </IconButton>
-        </Tooltip>
+            )
+          }
+          key="toggleVideo"
+          active={isLocalVideoEnabled}
+          onClick={toggleVideo}
+        />
       ) : null}
       {localVideoTrack?.facingMode ? (
         <Tooltip title="Switch Camera" key="switchCamera">
