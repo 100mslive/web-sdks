@@ -75,7 +75,7 @@ export const IconButtonWithOptions = ({
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                backgroundColor: option.active ? '$primaryDefault' : '',
+                backgroundColor: option.active ? '$primaryDefault' : '$surfaceDark',
                 p: '$8',
                 borderTop: '1px solid $borderDefault',
                 '&:hover': {

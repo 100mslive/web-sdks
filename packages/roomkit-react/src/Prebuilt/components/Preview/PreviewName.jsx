@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useMedia } from 'react-use';
+import { selectAppData, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../../';
 import { PreviewSettings } from './PreviewJoin';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { isStreamingKit } from '../../common/utils';
+import { APP_DATA } from '../../common/constants';
 
 const PreviewName = ({
   name,
@@ -19,6 +22,25 @@ const PreviewName = ({
   const showStreamingUI = isStreamingKit();
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
+  const hmsActions = useHMSActions();
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const startHLS = useCallback(async () => {
+    try {
+      if (isHLSStarted) {
+        return;
+      }
+      setHLSStarted(true);
+      await hmsActions.startHLSStreaming({});
+    } catch (error) {
+      if (error.message.includes('invalid input')) {
+        await startHLS();
+        return;
+      }
+      setHLSStarted(false);
+    }
+  }, [hmsActions, isHLSStarted, setHLSStarted, recordingUrl]);
   return (
     <Form
       css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}
@@ -37,9 +59,19 @@ const PreviewName = ({
         />
         {cannotPublishAudio && cannotPublishVideo && !isMobile ? <PreviewSettings /> : null}
       </Flex>
-      <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
-        {/* TODO: Go Live should also start the stream */}
-        {showStreamingUI ? (
+      <Button
+        type="submit"
+        icon
+        disabled={!name || !enableJoin}
+        onClick={() => {
+          if (showStreamingUI) {
+            startHLS();
+            window.sessionStorage.setItem('userStartedStream', 'true');
+          }
+          onJoin();
+        }}
+      >
+        {showStreamingUI && !(isHLSRunning || isRTMPRunning) ? (
           <>
             <RadioIcon height={18} width={18} />
             Go Live
