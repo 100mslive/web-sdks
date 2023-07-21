@@ -104,7 +104,6 @@ export function CreateQuestions() {
             Add another question
           </Text>
         </Flex>
-
         <Flex css={{ w: "100%" }} justify="end">
           <Button disabled={!isValidPoll} onClick={launchPoll}>
             Launch {interaction.type}
