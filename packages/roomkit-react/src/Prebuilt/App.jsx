@@ -105,7 +105,7 @@ export const HMSPrebuilt = React.forwardRef(
           value={{
             roomId: '',
             role: '',
-            roomCode, // vyg-rdsj-iua for viewer
+            roomCode,
             showPreview: true,
             showLeave: true,
             onLeave,

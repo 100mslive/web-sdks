@@ -2,6 +2,7 @@
 import React, { useCallback, useMemo, useState } from "react";
 import {
   selectLocalPeerID,
+  selectPermissions,
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
@@ -15,7 +16,7 @@ import {
   styled,
   Text,
 } from "@100mslive/roomkit-react";
-import { compareArrays } from "../../../common/utils";
+import { checkCorrectAnswer } from "../../../common/utils";
 import { MultipleChoiceOptions } from "../common/MultipleChoiceOptions";
 import { SingleChoiceOptions } from "../common/SingleChoiceOptions";
 import { QUESTION_TYPE } from "../../../common/constants";
@@ -34,9 +35,10 @@ const TextArea = styled("textarea", {
 export const QuestionCard = ({
   pollID,
   isQuiz,
+  pollState,
   index,
   totalQuestions,
-  totalResponses,
+  result,
   type,
   text,
   options = [],
@@ -48,21 +50,14 @@ export const QuestionCard = ({
 }) => {
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
+  const permissions = useHMSStore(selectPermissions);
   const localPeerResponse = responses?.find(
     response => response.peer?.peerid === localPeerID
   );
+  const isLive = pollState === "started";
+  const canRespond = isLive && permissions?.pollRead && !localPeerResponse;
 
-  const isCorrectAnswer = useMemo(() => {
-    if (type === QUESTION_TYPE.SINGLE_CHOICE) {
-      return answer?.option === localPeerResponse?.option;
-    } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
-      return (
-        answer?.options &&
-        localPeerResponse?.options &&
-        compareArrays(answer?.options, localPeerResponse?.options)
-      );
-    }
-  }, [answer, localPeerResponse, type]);
+  const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
 
   const prev = index !== 1;
   const next = index !== totalQuestions && (skippable || localPeerResponse);
@@ -193,7 +188,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
-          disabled={!!localPeerResponse}
+          disabled={!canRespond}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
           css={{
@@ -208,7 +203,7 @@ export const QuestionCard = ({
 
       {type === QUESTION_TYPE.LONG_ANSWER ? (
         <TextArea
-          disabled={!!localPeerResponse}
+          disabled={!canRespond}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
         />
@@ -218,11 +213,12 @@ export const QuestionCard = ({
         <SingleChoiceOptions
           questionIndex={index}
           isQuiz={isQuiz}
+          canRespond={canRespond}
           response={localPeerResponse}
           correctOptionIndex={answer?.option}
           options={options}
           setAnswer={setSingleOptionAnswer}
-          totalResponses={totalResponses}
+          totalResponses={result?.totalResponses}
         />
       ) : null}
 
@@ -230,28 +226,31 @@ export const QuestionCard = ({
         <MultipleChoiceOptions
           questionIndex={index}
           isQuiz={isQuiz}
+          canRespond={canRespond}
           response={localPeerResponse}
           correctOptionIndexes={answer?.options}
           options={options}
           selectedOptions={multipleOptionAnswer}
           setSelectedOptions={setMultipleOptionAnswer}
-          totalResponses={totalResponses}
+          totalResponses={result?.totalResponses}
         />
       ) : null}
 
-      <QuestionCardFooter
-        isValidVote={isValidVote}
-        skippable={skippable}
-        onSkip={handleSkip}
-        onVote={handleVote}
-        response={localPeerResponse}
-        stringAnswerExpected={stringAnswerExpected}
-      />
+      {isLive && (
+        <QuestionActions
+          isValidVote={isValidVote}
+          skippable={skippable}
+          onSkip={handleSkip}
+          onVote={handleVote}
+          response={localPeerResponse}
+          stringAnswerExpected={stringAnswerExpected}
+        />
+      )}
     </Box>
   );
 };
 
-const QuestionCardFooter = ({
+const QuestionActions = ({
   isValidVote,
   skippable,
   response,

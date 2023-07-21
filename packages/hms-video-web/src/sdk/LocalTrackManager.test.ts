@@ -51,6 +51,8 @@ const policyParams: PolicyParams = {
         hlsStreaming: false,
         rtmpStreaming: false,
         browserRecording: false,
+        pollRead: false,
+        pollWrite: false,
       },
       publishParams: {
         allowed: ['audio', 'video', 'screen'],
