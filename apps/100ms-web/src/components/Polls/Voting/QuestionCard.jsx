@@ -60,7 +60,6 @@ export const QuestionCard = ({
     (!rolesThatCanViewResponses ||
       rolesThatCanViewResponses.length === 0 ||
       rolesThatCanViewResponses.includes(localPeerRoleName || ""));
-  console.log(showVoteCount, rolesThatCanViewResponses);
 
   const isLive = pollState === "started";
   const canRespond = isLive && !localPeerResponse;
