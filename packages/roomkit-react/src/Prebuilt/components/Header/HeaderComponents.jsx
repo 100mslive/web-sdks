@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Flex, styled, Text, textEllipsis, useTheme } from '../../../';
+import { config as cssConfig, Flex, styled, Text, textEllipsis } from '../../../';
 import { useLogo } from '../AppData/useUISettings';
 import { isStreamingKit } from '../../common/utils';
 
