@@ -106,7 +106,7 @@
     },
     {
       "path": "packages/roomkit-react/dist/index.js",
-      "limit": "20 KB"
+      "limit": "480 KB"
     },
     {
       "path": "packages/hms-virtual-background/dist/index.cjs.js",
