@@ -1,11 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useMedia } from 'react-use';
-import { selectAppData, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../../';
 import { PreviewSettings } from './PreviewJoin';
-import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { APP_DATA } from '../../common/constants';
 
 const PreviewName = ({
   name,
@@ -19,28 +17,10 @@ const PreviewName = ({
     e.preventDefault();
   };
   // Value to be part of layout API
-  const showStreamingUI = true;
+  const showStreamingUI = false;
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
-  const hmsActions = useHMSActions();
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
-  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-  const startHLS = useCallback(async () => {
-    try {
-      if (isHLSStarted) {
-        return;
-      }
-      setHLSStarted(true);
-      await hmsActions.startHLSStreaming({});
-    } catch (error) {
-      if (error.message.includes('invalid input')) {
-        await startHLS();
-        return;
-      }
-      setHLSStarted(false);
-    }
-  }, [hmsActions, isHLSStarted, setHLSStarted, recordingUrl]);
 
   return (
     <Form
@@ -66,11 +46,6 @@ const PreviewName = ({
         disabled={!name || !enableJoin}
         onClick={() => {
           onJoin();
-          if (showStreamingUI && !(cannotPublishAudio || cannotPublishVideo)) {
-            // Better way to do this?
-            setTimeout(() => startHLS(), 300);
-            window.sessionStorage.setItem('userStartedStream', 'true');
-          }
         }}
       >
         {/* Conditions to show go live: The first broadcaster joins a streaming kit */}

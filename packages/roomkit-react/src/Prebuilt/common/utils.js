@@ -89,7 +89,7 @@ export const getParticipantChipContent = (peerCount = 0) => {
   const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
   const formattedNum = formatter.format(peerCount);
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
-}
+};
 
 // For bottom action sheet, returns updated height based on drag
 export const getUpdatedHeight = (e, MINIMUM_HEIGHT) => {

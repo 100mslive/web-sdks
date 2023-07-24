@@ -33,7 +33,7 @@ import TileConnection from '../Connection/TileConnection';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewName from './PreviewName';
-import { useAuthToken, useIsHeadless, useUISettings } from '../AppData/useUISettings';
+import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { getParticipantChipContent } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
@@ -70,6 +70,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     },
     asRole,
   });
+
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
@@ -79,6 +80,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     join();
     onJoin && onJoin();
   }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
+
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {

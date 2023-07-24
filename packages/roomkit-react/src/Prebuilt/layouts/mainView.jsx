@@ -1,13 +1,15 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectPeerScreenSharing,
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
+  selectPermissions,
   selectTemplateAppData,
   useHMSActions,
   useHMSStore,
+  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
@@ -25,11 +27,12 @@ import {
   useIsHeadless,
   usePDFAnnotator,
   usePinnedTrack,
+  useSetAppDataByKey,
   useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -52,7 +55,27 @@ export const ConferenceMainView = () => {
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
-  const pdfAnntatorActive = usePDFAnnotator();
+  const pdfAnnotatorActive = usePDFAnnotator();
+  const { isHLSRunning } = useRecordingStreaming();
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const permissions = useHMSStore(selectPermissions);
+
+  const startHLS = useCallback(async () => {
+    try {
+      if (isHLSStarted) {
+        return;
+      }
+      setHLSStarted(true);
+      await hmsActions.startHLSStreaming({});
+    } catch (error) {
+      if (error.message.includes('invalid input')) {
+        await startHLS();
+        return;
+      }
+      setHLSStarted(false);
+    }
+  }, [hmsActions, isHLSStarted, setHLSStarted]);
+
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -67,6 +90,12 @@ export const ConferenceMainView = () => {
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
+
+    // Is a streaming kit and broadcaster joins - to get the former from layout api. Currently also starts the stream in webrtc
+    if (permissions?.hlsStreaming && !isHLSRunning) {
+      // startHLS();
+      window.sessionStorage.setItem('userStartedStream', 'true');
+    }
   }, [isConnected, hmsActions]);
 
   if (!localPeerRole) {
@@ -79,7 +108,7 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (pdfAnntatorActive) {
+  } else if (pdfAnnotatorActive) {
     ViewComponent = PDFView;
   } else if (urlToIframe) {
     ViewComponent = EmbedView;
