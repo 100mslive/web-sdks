@@ -29,6 +29,9 @@ const OptionsSection = styled(IconButton, {
   borderColor: '$borderDefault',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
+  '&:not([disabled]):focus-visible': {
+    boxShadow: 'none',
+  },
   '@md': {
     display: 'none',
   },
@@ -67,6 +70,7 @@ export const IconButtonWithOptions = ({
             w: '$64',
             maxHeight: '$96',
             p: 0,
+            border: 'none',
           }}
         >
           {options.map(option => (

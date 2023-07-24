@@ -128,7 +128,6 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
           css={{
             position: 'relative',
             flex: '1 1 0',
-            w: '100%',
             minWidth: 0,
             '@md': {
               mb: children ? '$8' : 0,
