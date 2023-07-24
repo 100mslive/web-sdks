@@ -66,7 +66,6 @@ const StyledButton = styled('button', {
   cursor: 'pointer',
   fontFamily: '$sans',
   lineHeight: 'inherit',
-  fontSize: '100%',
   textTransform: 'none',
   position: 'relative',
   outline: 'none',
