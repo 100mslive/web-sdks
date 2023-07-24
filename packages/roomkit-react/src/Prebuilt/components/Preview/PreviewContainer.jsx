@@ -9,10 +9,12 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
   const skipPreview = useSkipPreview();
+  const roomState = useHMSStore(selectRoomState);
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   const initialName = useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? 'Beam' : '');
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url

@@ -60,8 +60,8 @@ export const AudioVideoToggle = () => {
 
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
-  const videoTracKId = useHMSStore(selectLocalVideoTrackID);
-  const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTracKId));
+  const videoTrackId = useHMSStore(selectLocalVideoTrackID);
+  const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
 
   return (
     <Fragment>
@@ -94,6 +94,7 @@ export const AudioVideoToggle = () => {
           onClick={toggleVideo}
         />
       ) : null}
+
       {localVideoTrack?.facingMode ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton

@@ -1,7 +1,9 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
 import {
+  HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
+  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
@@ -47,6 +49,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
+  const roomState = useHMSStore(selectRoomState);
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -86,10 +89,10 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
-  return (
+
+  return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
-
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
         <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
@@ -139,6 +142,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         />
       </Box>
     </Container>
+  ) : (
+    <Loading size={100} />
   );
 };
 
