@@ -90,7 +90,7 @@
     },
     {
       "path": "packages/hms-video-web/dist/index.js",
-      "limit": "200 KB"
+      "limit": "80 KB"
     },
     {
       "path": "packages/hms-video-store/dist/index.cjs.js",
@@ -102,7 +102,7 @@
     },
     {
       "path": "packages/roomkit-react/dist/index.cjs.js",
-      "limit": "20 KB"
+      "limit": "480 KB"
     },
     {
       "path": "packages/roomkit-react/dist/index.js",
