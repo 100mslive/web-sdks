@@ -20,7 +20,7 @@ export const ConferencingHeader = ({ isPreview }) => {
         }}
       >
         <StreamActions />
-        <ParticipantCount />
+        {!isPreview ? <ParticipantCount /> : null}
       </Flex>
     </Flex>
   );

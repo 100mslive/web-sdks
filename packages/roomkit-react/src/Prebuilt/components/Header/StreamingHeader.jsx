@@ -47,7 +47,7 @@ export const StreamingHeader = ({ isPreview }) => {
             <StreamActions />
           </Flex>
         )}
-        <ParticipantCount />
+        {!isPreview ? <ParticipantCount /> : null}
       </Flex>
     </Flex>
   );
