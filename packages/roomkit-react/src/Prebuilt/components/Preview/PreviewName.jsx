@@ -19,7 +19,8 @@ const PreviewName = ({
   const formSubmit = e => {
     e.preventDefault();
   };
-  const showStreamingUI = isStreamingKit();
+  // Value to be part of layout API
+  const showStreamingUI = false;
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const hmsActions = useHMSActions();
@@ -41,6 +42,7 @@ const PreviewName = ({
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted, recordingUrl]);
+
   return (
     <Form
       css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}
@@ -71,7 +73,8 @@ const PreviewName = ({
           onJoin();
         }}
       >
-        {showStreamingUI && !(isHLSRunning || isRTMPRunning) ? (
+        {/* Conditions to show go live: The first broadcaster joins a streaming kit */}
+        {showStreamingUI && !(isHLSRunning || isRTMPRunning) && !(cannotPublishAudio || cannotPublishVideo) ? (
           <>
             <RadioIcon height={18} width={18} />
             Go Live
