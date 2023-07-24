@@ -49,6 +49,7 @@
     "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
     "build": "lerna run build --stream",
+    "lerna:publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes --no-verify-access",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
@@ -59,7 +60,6 @@
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
-    "reactui": "cd packages/react-ui && yarn start",
     "storybook": "cd packages/roomkit-react && yarn storybook",
     "build-storybook": "cd packages/roomkit-react && yarn build-storybook"
   },
@@ -90,7 +90,7 @@
     },
     {
       "path": "packages/hms-video-web/dist/index.js",
-      "limit": "200 KB"
+      "limit": "80 KB"
     },
     {
       "path": "packages/hms-video-store/dist/index.cjs.js",
@@ -101,11 +101,11 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.cjs.js",
-      "limit": "20 KB"
+      "path": "packages/roomkit-react/dist/index.cjs.js",
+      "limit": "480 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.js",
+      "path": "packages/roomkit-react/dist/index.js",
       "limit": "20 KB"
     },
     {

@@ -17,17 +17,19 @@ export const StandardView = ({ poll }) => {
         <QuestionCard
           pollID={poll.id}
           isQuiz={poll.type === "quiz"}
+          pollState={poll.state}
           key={`${question.text}-${index}`}
           index={question.index}
           text={question.text}
           type={question.type}
-          totalResponses={question.totalResponses}
+          result={question.result}
           totalQuestions={poll.questions?.length || 0}
           options={question.options}
           skippable={question.skippable}
           responses={question.responses}
           answer={question.answer}
           setCurrentIndex={() => {}}
+          rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
         />
       ))}
     </>

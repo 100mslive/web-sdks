@@ -1,5 +1,6 @@
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
+import { PollResult } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
@@ -44,7 +45,7 @@ export class PollsManager {
         mode: pollParams.mode as HMSPoll['mode'],
         visibility: pollParams.visibility,
         rolesThatCanVote: pollParams.vote || [],
-        rolesThaCanViewResponses: pollParams.responses || [],
+        rolesThatCanViewResponses: pollParams.responses || [],
         state: pollParams.state,
         stoppedBy: pollParams.stopped_by,
         startedAt: convertDateNumToDate(pollParams.started_at),
@@ -60,17 +61,21 @@ export class PollsManager {
     this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STARTED, polls);
   }
 
-  private handlePollStop(notification: PollStopNotification) {
+  private async handlePollStop(notification: PollStopNotification) {
     const stoppedPolls: HMSPoll[] = [];
-    notification.polls.forEach(poll => {
+
+    for (const poll of notification.polls) {
       const savedPoll = this.store.getPoll(poll.poll_id);
       if (savedPoll) {
         savedPoll.state = 'stopped';
         savedPoll.stoppedAt = convertDateNumToDate(poll.stopped_at);
         savedPoll.stoppedBy = poll.stopped_by;
+
+        const pollResult = await this.transport.getPollResult({ poll_id: poll.poll_id });
+        this.updatePollResult(savedPoll, pollResult);
         stoppedPolls.push(savedPoll);
       }
-    });
+    }
 
     if (stoppedPolls.length > 0) {
       this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STOPPED, stoppedPolls);
@@ -84,23 +89,8 @@ export class PollsManager {
       if (!savedPoll) {
         return;
       }
-      savedPoll.totalUsers = updatedPoll.user_count;
-      savedPoll.totalResponses = updatedPoll.total_responses;
-      updatedPoll.questions?.forEach(updatedQuestion => {
-        const savedQuestion = savedPoll.questions?.find(question => question.index === updatedQuestion.question);
-        if (!savedQuestion) {
-          return;
-        }
 
-        savedQuestion.totalResponses = updatedQuestion.total;
-
-        updatedQuestion.options?.forEach((updatedVoteCount, index) => {
-          const savedOption = savedQuestion.options?.[index];
-          if (savedOption && savedOption.voteCount !== updatedVoteCount) {
-            savedOption.voteCount = updatedVoteCount;
-          }
-        });
-      });
+      this.updatePollResult(savedPoll, updatedPoll);
 
       const serverResponseParams = await this.transport.getPollResponses({
         poll_id: updatedPoll.poll_id,
@@ -142,5 +132,30 @@ export class PollsManager {
     if (updatedPolls.length > 0) {
       this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_STATS_UPDATED, updatedPolls);
     }
+  }
+
+  private updatePollResult(savedPoll: HMSPoll, pollResult: PollResult) {
+    savedPoll.result = { ...savedPoll.result };
+    savedPoll.result.totalUsers = pollResult.user_count;
+    savedPoll.result.maxUsers = pollResult.max_user;
+    savedPoll.result.totalResponses = pollResult.total_response;
+
+    pollResult.questions?.forEach(updatedQuestion => {
+      const savedQuestion = savedPoll.questions?.find(question => question.index === updatedQuestion.question);
+      if (!savedQuestion) {
+        return;
+      }
+      savedQuestion.result = { ...savedQuestion.result };
+      savedQuestion.result.correctResponses = updatedQuestion.correct;
+      savedQuestion.result.skippedCount = updatedQuestion.skipped;
+      savedQuestion.result.totalResponses = updatedQuestion.total;
+
+      updatedQuestion.options?.forEach((updatedVoteCount, index) => {
+        const savedOption = savedQuestion.options?.[index];
+        if (savedOption && savedOption.voteCount !== updatedVoteCount) {
+          savedOption.voteCount = updatedVoteCount;
+        }
+      });
+    });
   }
 }

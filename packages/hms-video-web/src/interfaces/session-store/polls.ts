@@ -22,9 +22,8 @@ export interface HMSPoll {
   stoppedAt?: Date;
   questions?: HMSPollQuestion[];
   rolesThatCanVote?: HMSRoleName[];
-  rolesThaCanViewResponses?: HMSRoleName[];
-  totalUsers?: number;
-  totalResponses?: number;
+  rolesThatCanViewResponses?: HMSRoleName[];
+  result?: HMSPollResult;
 }
 
 export interface HMSPollCreateParams
@@ -39,7 +38,7 @@ export interface HMSPollCreateParams
     | 'locked'
     | 'mode'
     | 'rolesThatCanVote'
-    | 'rolesThaCanViewResponses'
+    | 'rolesThatCanViewResponses'
   > {
   questions?: HMSPollQuestionCreateParams[];
 }
@@ -55,10 +54,10 @@ export interface HMSPollQuestion {
   negative?: boolean;
   answerMinLen?: number;
   answerMaxLen?: number;
-  totalResponses?: number;
   options?: HMSPollQuestionOption[];
   answer?: HMSPollQuestionAnswer;
   responses?: HMSPollQuestionResponse[];
+  result?: HMSPollQuestionResult;
 }
 
 export interface HMSPollQuestionCreateParams extends Pick<HMSPollQuestion, 'text' | 'skippable' | 'type' | 'answer'> {
@@ -117,4 +116,22 @@ interface HMSPollResponsePeerInfo {
   peerid?: string;
   userid?: string;
   username?: string;
+}
+
+export interface HMSPollResult {
+  /**
+   * The number of unique users who responded to the poll
+   */
+  totalUsers?: number;
+  /**
+   * The maximum number of users in the room during the poll.
+   */
+  maxUsers?: number;
+  totalResponses?: number;
+}
+
+export interface HMSPollQuestionResult {
+  correctResponses?: number;
+  skippedCount?: number;
+  totalResponses?: number;
 }
