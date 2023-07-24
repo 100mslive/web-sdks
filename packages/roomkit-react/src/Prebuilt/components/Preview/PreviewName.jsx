@@ -5,7 +5,6 @@ import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../../';
 import { PreviewSettings } from './PreviewJoin';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { isStreamingKit } from '../../common/utils';
 import { APP_DATA } from '../../common/constants';
 
 const PreviewName = ({
@@ -20,7 +19,7 @@ const PreviewName = ({
     e.preventDefault();
   };
   // Value to be part of layout API
-  const showStreamingUI = false;
+  const showStreamingUI = true;
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const hmsActions = useHMSActions();
@@ -66,11 +65,12 @@ const PreviewName = ({
         icon
         disabled={!name || !enableJoin}
         onClick={() => {
-          if (showStreamingUI) {
-            startHLS();
+          onJoin();
+          if (showStreamingUI && !(cannotPublishAudio || cannotPublishVideo)) {
+            // Better way to do this?
+            setTimeout(() => startHLS(), 300);
             window.sessionStorage.setItem('userStartedStream', 'true');
           }
-          onJoin();
         }}
       >
         {/* Conditions to show go live: The first broadcaster joins a streaming kit */}
