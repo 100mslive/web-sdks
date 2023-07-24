@@ -32,6 +32,46 @@ export const {
 export const globalStyles = globalCss({
   '*': {
     fontFamily: '$sans',
+    boxSizing: 'border-box',
+    borderWidth: 0,
+    borderStyle: 'solid',
+  },
+  html: {
+    height: '100%',
+  },
+  body: {
+    height: '100%',
+    margin: 0,
+  },
+  '#root': {
+    height: '100%',
+    overscrollBehaviorY: 'none',
+  },
+  '::-webkit-scrollbar-track': {
+    WebkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+    boxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+    backgroundColor: 'transparent',
+  },
+  '::-webkit-scrollbar': {
+    width: '6px',
+    height: '6px',
+    backgroundColor: 'transparent',
+  },
+  '::-webkit-scrollbar-thumb': {
+    backgroundColor: '#657080',
+    borderRadius: '5px',
+  },
+  /**
+   * needed for safari. Safari
+   * adds background color on its own
+   * on hls-viewer on fullscreen
+   */
+  '#hls-viewer-dark:fullscreen': {
+    backgroundColor: 'black !important',
+  },
+
+  '#hls-viewer-light:fullscreen': {
+    backgroundColor: 'white !important',
   },
 });
 

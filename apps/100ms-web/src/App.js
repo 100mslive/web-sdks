@@ -29,8 +29,6 @@ import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
 import { getRoutePrefix, shadeColor } from "./common/utils";
 import { FeatureFlags } from "./services/FeatureFlags";
-import "./base.css";
-import "./index.css";
 
 const Conference = React.lazy(() => import("./components/conference"));
 const PreviewScreen = React.lazy(() => import("./components/PreviewScreen"));
@@ -116,6 +114,10 @@ export function EdtechComponent({
             css={{
               bg: "$mainBg",
               w: "100%",
+              lineHeight: "1.5",
+              "-webkit-text-size-adjust": "100%",
+              "moz-tab-size": "4",
+              tabSize: "4",
               ...(headerPresent === "true"
                 ? { flex: "1 1 0", minHeight: 0 }
                 : { h: "100%" }),

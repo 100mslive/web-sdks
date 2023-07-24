@@ -146,6 +146,10 @@ export const HMSPrebuilt = React.forwardRef(
                 css={{
                   bg: '$mainBg',
                   size: '100%',
+                  lineHeight: '1.5',
+                  '-webkit-text-size-adjust': '100%',
+                  'moz-tab-size': '4',
+                  tabSize: '4',
                 }}
               >
                 <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />

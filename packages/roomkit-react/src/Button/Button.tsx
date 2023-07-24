@@ -65,6 +65,9 @@ const StyledButton = styled('button', {
   ...flexCenter,
   cursor: 'pointer',
   fontFamily: '$sans',
+  lineHeight: 'inherit',
+  fontSize: '100%',
+  textTransform: 'none',
   position: 'relative',
   outline: 'none',
   border: 'none',
@@ -74,6 +77,7 @@ const StyledButton = styled('button', {
   fontWeight: '500',
   whiteSpace: 'nowrap',
   p: '$4 $8',
+  '-webkit-appearance': 'button',
   '&:focus': {
     outline: 'none',
   },

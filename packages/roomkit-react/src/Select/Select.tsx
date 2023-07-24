@@ -18,6 +18,8 @@ const SelectRoot = styled('select', {
   h: '$16',
   fontSize: '$md',
   fontWeight: '500',
+  lineHeight: 'inherit',
+  textTransform: 'none',
   appearance: 'none',
   color: '$textAccentHigh',
   padding: '5px',

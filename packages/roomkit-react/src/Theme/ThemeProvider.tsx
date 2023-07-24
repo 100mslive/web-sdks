@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import type { Theme } from './stitches.config';
-import { createTheme, theme } from './stitches.config';
+import { createTheme, globalStyles, theme } from './stitches.config';
 import useSSR from './useSSR';
 
 const defaultAspectRatio = {
@@ -91,6 +91,8 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
       setCurrentTheme(themeType);
     }
   }, [themeType]);
+
+  globalStyles();
 
   return (
     <ThemeContext.Provider
