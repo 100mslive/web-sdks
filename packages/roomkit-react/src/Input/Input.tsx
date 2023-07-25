@@ -6,12 +6,12 @@ import { styled } from '../Theme';
 
 export const Input = styled('input', {
   fontFamily: '$sans',
+  lineHeight: 'inherit',
   backgroundColor: '$surfaceLight',
   borderRadius: '8px',
   outline: 'none',
   border: '1px solid $borderLight',
   padding: '0.5rem 0.75rem',
-  minHeight: '30px',
   color: '$textPrimary',
   fontSize: '$md',
   '&:focus': {

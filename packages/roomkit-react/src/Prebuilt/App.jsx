@@ -13,7 +13,7 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { Box } from '../Layout';
-import { HMSThemeProvider } from '../Theme';
+import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
@@ -23,18 +23,6 @@ import { getRoutePrefix, shadeColor } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
-
-const isSSR = typeof window === 'undefined';
-
-let appName;
-if (!isSSR) {
-  if (window.location.host.includes('localhost')) {
-    appName = 'localhost';
-  } else {
-    appName = window.location.host.split('.')[0];
-  }
-  document.title = `${appName}'s ${document.title}`;
-}
 
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
@@ -98,6 +86,9 @@ export const HMSPrebuilt = React.forwardRef(
     if (!hyderated) {
       return null;
     }
+
+    globalStyles();
+
     return (
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
@@ -146,6 +137,8 @@ export const HMSPrebuilt = React.forwardRef(
                 css={{
                   bg: '$mainBg',
                   size: '100%',
+                  lineHeight: '1.5',
+                  '-webkit-text-size-adjust': '100%',
                 }}
               >
                 <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
