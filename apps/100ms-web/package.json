@@ -9,7 +9,7 @@
     "src"
   ],
   "dependencies": {
-    "@100mslive/roomkit-react": "0.0.1",
+    "@100mslive/roomkit-react": "0.1.0",
     "@100mslive/hls-player": "0.1.10-alpha.0",
     "@100mslive/hms-virtual-background": "1.11.10-alpha.0",
     "@100mslive/react-icons": "0.8.10-alpha.0",
