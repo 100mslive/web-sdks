@@ -4,7 +4,6 @@ import { CopyIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { ThemeContext } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { ErrorWithSupportLink } from './AuthToken';
 
@@ -36,26 +35,13 @@ export class ErrorBoundary extends Component {
           justify="center"
           css={{
             size: '100%',
+            height: '100vh',
+            width: '100%',
             color: '$textPrimary',
-            backgroundColor: '$bgPrimary',
+            backgroundColor: 'black',
           }}
         >
-          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
-            <ThemeContext.Consumer>
-              {value => {
-                const { themeType } = value;
-                return (
-                  <img
-                    src={
-                      themeType === 'dark'
-                        ? require('../images/error-bg-dark.svg')
-                        : require('../images/error-bg-light.svg')
-                    }
-                    alt="error background"
-                  />
-                );
-              }}
-            </ThemeContext.Consumer>
+          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3', height: '100%', width: '100%' }}>
             <Flex
               direction="column"
               css={{
@@ -65,17 +51,19 @@ export class ErrorBoundary extends Component {
                 left: 0,
               }}
             >
-              <div style={{ margin: '1.5rem' }}>
-                <Text>{`Something went wrong. ERROR: ${this.state.error}`}</Text>
+              <div style={{ margin: '1.5rem', width: '100%' }}>
+                <Text>Something went wrong</Text>
+                <Text>Message: ${this.state.error}</Text>
+                <br />
                 {ErrorWithSupportLink(`Please reload to see if it works.`)}
               </div>
-              <Flex justify="center">
+              <Flex>
                 <Tooltip title="Reload page">
                   <Button
                     onClick={() => {
                       window.location.reload();
                     }}
-                    css={{ mx: '$4' }}
+                    css={{ mx: '$8' }}
                     data-testid="join_again_btn"
                   >
                     Reload
@@ -93,7 +81,7 @@ export class ErrorBoundary extends Component {
                       );
                       this.setState({ isErrorCopied: true });
                     }}
-                    css={{ mx: '$4' }}
+                    css={{ mx: '$8' }}
                     data-testid="join_again_btn"
                   >
                     <CopyIcon /> {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}

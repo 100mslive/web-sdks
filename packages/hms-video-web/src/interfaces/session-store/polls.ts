@@ -22,7 +22,7 @@ export interface HMSPoll {
   stoppedAt?: Date;
   questions?: HMSPollQuestion[];
   rolesThatCanVote?: HMSRoleName[];
-  rolesThaCanViewResponses?: HMSRoleName[];
+  rolesThatCanViewResponses?: HMSRoleName[];
   result?: HMSPollResult;
 }
 
@@ -38,7 +38,7 @@ export interface HMSPollCreateParams
     | 'locked'
     | 'mode'
     | 'rolesThatCanVote'
-    | 'rolesThaCanViewResponses'
+    | 'rolesThatCanViewResponses'
   > {
   questions?: HMSPollQuestionCreateParams[];
 }

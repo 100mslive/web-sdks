@@ -114,27 +114,30 @@ export const QuestionForm = ({
               setOptions={setOptions}
             />
           )}
-          <Flex
-            css={{
-              c: "$textMedEmp",
-              cursor: "pointer",
-              "&:hover": { c: "$textHighEmp" },
-            }}
-            onClick={() =>
-              setOptions([...options, { text: "", isCorrectAnswer: false }])
-            }
-          >
-            <AddCircleIcon />
-            <Text
-              variant="body1"
+          {options?.length < 20 && (
+            <Flex
               css={{
-                ml: "$9",
-                c: "inherit",
+                c: "$textMedEmp",
+                cursor: "pointer",
+                "&:hover": { c: "$textHighEmp" },
               }}
+              onClick={() =>
+                setOptions([...options, { text: "", isCorrectAnswer: false }])
+              }
             >
-              Add Option
-            </Text>
-          </Flex>
+              <AddCircleIcon />
+
+              <Text
+                variant="body1"
+                css={{
+                  ml: "$9",
+                  c: "inherit",
+                }}
+              >
+                Add Option
+              </Text>
+            </Flex>
+          )}
           {isQuiz ? (
             <Flex css={{ mt: "$md" }}>
               <Switch
@@ -166,7 +169,6 @@ export const QuestionForm = ({
               type,
               options,
               isQuiz,
-              skippable,
             })
           }
           onClick={() => {
@@ -218,13 +220,7 @@ export const QuestionForm = ({
   );
 };
 
-export const isValidQuestion = ({
-  text,
-  type,
-  options,
-  isQuiz = false,
-  skippable = true,
-}) => {
+export const isValidQuestion = ({ text, type, options, isQuiz = false }) => {
   if (!isValidTextInput(text) || !type) {
     return false;
   }
@@ -238,10 +234,9 @@ export const isValidQuestion = ({
   const everyOptionHasText = options.every(
     option => option && isValidTextInput(option.text, 1)
   );
-  const isCorrectAnswerRequired = isQuiz && !skippable;
   const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
 
-  if (!isCorrectAnswerRequired) {
+  if (!isQuiz) {
     return everyOptionHasText;
   }
 

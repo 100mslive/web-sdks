@@ -158,7 +158,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
           )}
           <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
             <Box css={{ width: '50%' }}>
-              <Dialog.Close css={{ width: '100%' }} asChild>
+              <Dialog.Close css={{ width: '100%', p: '$4 $8' }} asChild>
                 <Button variant="standard" outlined css={{ width: '100%' }} data-testid="cancel_button">
                   Cancel
                 </Button>

@@ -45,7 +45,7 @@ export class PollsManager {
         mode: pollParams.mode as HMSPoll['mode'],
         visibility: pollParams.visibility,
         rolesThatCanVote: pollParams.vote || [],
-        rolesThaCanViewResponses: pollParams.responses || [],
+        rolesThatCanViewResponses: pollParams.responses || [],
         state: pollParams.state,
         stoppedBy: pollParams.stopped_by,
         startedAt: convertDateNumToDate(pollParams.started_at),
