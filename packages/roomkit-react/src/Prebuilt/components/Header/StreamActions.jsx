@@ -1,9 +1,11 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
+  HMSRoomState,
   selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
+  selectRoomState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -208,12 +210,13 @@ export const StreamActions = () => {
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
   const { isStreamingOn } = useRecordingStreaming();
+  const roomState = useHMSStore(selectRoomState);
 
   return (
     <Flex align="center" css={{ gap: '$4' }}>
       <AdditionalRoomState />
       <Flex align="center" css={{ gap: '$4', '@md': { display: 'none' } }}>
-        <LiveStatus />
+        {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
         <RecordingStatus />
       </Flex>
       {isConnected && !isMobile ? <StartRecording /> : null}

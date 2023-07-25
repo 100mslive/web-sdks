@@ -187,7 +187,7 @@ const RouteList = () => {
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryLight" />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -195,7 +195,7 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryLight" />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -206,7 +206,7 @@ const RouteList = () => {
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loaderColor="$primaryLight" loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -214,7 +214,7 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loaderColor="$primaryLight" loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -226,6 +226,7 @@ const RouteList = () => {
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
+
       <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
       <Route path="*" element={<ErrorPage error="Invalid URL!" />} />

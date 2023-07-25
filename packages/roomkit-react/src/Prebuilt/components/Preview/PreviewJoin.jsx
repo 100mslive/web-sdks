@@ -33,7 +33,7 @@ import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
-import PreviewName from './PreviewName';
+import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { getParticipantChipContent } from '../../common/utils';
@@ -137,7 +137,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           savePreferenceAndJoin={savePreferenceAndJoin}
           hideSettings={!toggleVideo && !toggleAudio}
         />
-        <PreviewName
+        <PreviewForm
           name={name}
           onChange={setName}
           enableJoin={enableJoin}

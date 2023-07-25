@@ -16,7 +16,7 @@ import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
-import { useAuthToken, useIsHeadless } from './AppData/useUISettings';
+import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
@@ -38,6 +38,7 @@ const Conference = () => {
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
+  const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
@@ -105,7 +106,11 @@ const Conference = () => {
   }, [isHeadless, hmsActions]);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress />;
+    return <FullPageProgress loadingText="Joining..." loaderColor="$primaryLight" />;
+  }
+
+  if (isHLSStarted) {
+    return <FullPageProgress loadingText="Starting the stream..." loaderColor="$primaryLight" />;
   }
 
   return (

@@ -42,7 +42,9 @@ export const IconButtonWithOptions = ({
   icon,
   options = [],
   active,
-  onClick = () => {},
+  onClick = () => {
+    return;
+  },
   key = '',
 }) => {
   const bgCss = { backgroundColor: active ? '$transparent' : '$secondaryDark' };

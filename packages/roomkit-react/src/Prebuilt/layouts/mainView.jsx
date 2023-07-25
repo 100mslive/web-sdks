@@ -93,7 +93,7 @@ export const ConferenceMainView = () => {
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
 
-    // Is a streaming kit and broadcaster joins - to get the former from layout api. Currently also starts the stream in webrtc
+    // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
       startHLS();
       window.sessionStorage.setItem('userStartedStream', 'true');

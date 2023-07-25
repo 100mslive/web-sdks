@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
-import { Dialog, Text, Flex, Button } from '../../../';
+import { Button, Dialog, Flex, Text } from '../../../';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);

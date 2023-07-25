@@ -3,10 +3,10 @@ import { useMedia } from 'react-use';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
 import { sampleLayout } from '../../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
-import { Button, config as cssConfig, Flex, Input, styled } from '../../../';
+import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { PreviewSettings } from './PreviewJoin';
 
-const PreviewName = ({
+const PreviewForm = ({
   name,
   onChange,
   onJoin,
@@ -22,7 +22,7 @@ const PreviewName = ({
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
   const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
-  const showStreamingUI = joinForm.join_btn_type === 1 && !isHLSRunning && !(cannotPublishAudio || cannotPublishVideo);
+  const showGoLive = joinForm.join_btn_type === 1 && !isHLSRunning;
 
   return (
     <Form
@@ -51,9 +51,9 @@ const PreviewName = ({
         }}
       >
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
-        {showStreamingUI ? <RadioIcon height={18} width={18} /> : null}
-        {showStreamingUI ? joinForm.join_btn_label : 'Join Now'}
-        {!showStreamingUI ? <ArrowRightIcon height={18} width={18} /> : null}
+        {showGoLive ? <RadioIcon height={18} width={18} /> : null}
+        {showGoLive ? joinForm.join_btn_label : 'Join Now'}
+        {!showGoLive ? <ArrowRightIcon height={18} width={18} /> : null}
       </Button>
     </Form>
   );
@@ -71,4 +71,4 @@ const Form = styled('form', {
   },
 });
 
-export default PreviewName;
+export default PreviewForm;
