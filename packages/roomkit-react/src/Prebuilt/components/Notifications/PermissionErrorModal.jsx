@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
-import { Dialog, Text } from '../../../';
+import { Dialog, Text, Flex, Button } from '../../../';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
+
   useEffect(() => {
     if (
       !notification ||
@@ -30,18 +31,12 @@ export function PermissionErrorModal() {
     }
     setIsSystemError(notification.data.code === 3011);
   }, [notification]);
+
   return deviceType ? (
-    <Dialog.Root
-      open
-      onOpenChange={value => {
-        if (!value) {
-          setDeviceType('');
-        }
-      }}
-    >
+    <Dialog.Root open={!!deviceType}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(480px, 90%)' }}>
+        <Dialog.Content css={{ w: 'min(380px, 90%)' }}>
           <Dialog.Title
             css={{
               display: 'flex',
@@ -51,15 +46,19 @@ export function PermissionErrorModal() {
               pb: '$8',
             }}
           >
-            <Text css={{ fontWeight: '$semiBold' }}>{deviceType} permissions are blocked</Text>
-            <Dialog.DefaultClose data-testid="dialoge_cross_icon" css={{ alignSelf: 'start' }} />
+            <Text variant="h6">{deviceType} permissions are blocked</Text>
           </Dialog.Title>
-          <Text variant="md" css={{ py: '$10' }}>
+          <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$textMedEmp' }}>
             Access to {deviceType} is required.&nbsp;
             {isSystemError
               ? `Enable permissions for ${deviceType} from sytem settings`
               : `Enable permissions for ${deviceType} from address bar or browser settings`}
           </Text>
+          <Flex justify="end" css={{ w: '100%' }}>
+            <Button outlined variant="standard" onClick={() => setDeviceType('')}>
+              Dismiss
+            </Button>
+          </Flex>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

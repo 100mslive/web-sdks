@@ -12,6 +12,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
+import { sampleLayout } from '../../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
 import {
   Avatar,
   Box,
@@ -81,6 +82,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     onJoin && onJoin();
   }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
 
+  const { preview_header: previewHeader } = sampleLayout.screens.preview.live_streaming.elements;
+
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -98,10 +101,10 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
         <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
-          Get Started
+          {previewHeader.title}
         </Text>
         <Text css={{ c: '$textMedEmp', my: '$4', textAlign: 'center' }} variant="body1">
-          Setup your audio and video before joining
+          {previewHeader.sub_title}
         </Text>
         <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
           {isHLSRunning || isRTMPRunning ? (

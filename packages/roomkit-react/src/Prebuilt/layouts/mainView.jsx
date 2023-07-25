@@ -12,6 +12,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
+import { sampleLayout } from '../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
@@ -59,6 +60,7 @@ export const ConferenceMainView = () => {
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
+  const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
 
   const startHLS = useCallback(async () => {
     try {
@@ -92,8 +94,8 @@ export const ConferenceMainView = () => {
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
 
     // Is a streaming kit and broadcaster joins - to get the former from layout api. Currently also starts the stream in webrtc
-    if (permissions?.hlsStreaming && !isHLSRunning) {
-      // startHLS();
+    if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
+      startHLS();
       window.sessionStorage.setItem('userStartedStream', 'true');
     }
   }, [isConnected, hmsActions]);
