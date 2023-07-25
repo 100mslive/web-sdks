@@ -24,18 +24,6 @@ import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
 
-const isSSR = typeof window === 'undefined';
-
-let appName;
-if (!isSSR) {
-  if (window.location.host.includes('localhost')) {
-    appName = 'localhost';
-  } else {
-    appName = window.location.host.split('.')[0];
-  }
-  document.title = `${appName}'s ${document.title}`;
-}
-
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
   const host = process.env.REACT_APP_HOST_NAME;
