@@ -13,7 +13,7 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { Box } from '../Layout';
-import { HMSThemeProvider } from '../Theme';
+import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
@@ -98,6 +98,9 @@ export const HMSPrebuilt = React.forwardRef(
     if (!hyderated) {
       return null;
     }
+
+    globalStyles();
+
     return (
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
@@ -148,8 +151,6 @@ export const HMSPrebuilt = React.forwardRef(
                   size: '100%',
                   lineHeight: '1.5',
                   '-webkit-text-size-adjust': '100%',
-                  'moz-tab-size': '4',
-                  tabSize: '4',
                 }}
               >
                 <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />

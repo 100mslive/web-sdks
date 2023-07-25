@@ -12,7 +12,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, HMSThemeProvider } from "@100mslive/roomkit-react";
+import { Box, globalStyles, HMSThemeProvider } from "@100mslive/roomkit-react";
 import { AppData } from "./components/AppData/AppData.jsx";
 import { BeamSpeakerLabelsLogging } from "./components/AudioLevel/BeamSpeakerLabelsLogging";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -77,6 +77,8 @@ export function EdtechComponent({
     .split("-")
     .map(el => parseInt(el));
 
+  globalStyles();
+
   return (
     <ErrorBoundary>
       <HMSThemeProvider
@@ -116,8 +118,6 @@ export function EdtechComponent({
               w: "100%",
               lineHeight: "1.5",
               "-webkit-text-size-adjust": "100%",
-              "moz-tab-size": "4",
-              tabSize: "4",
               ...(headerPresent === "true"
                 ? { flex: "1 1 0", minHeight: 0 }
                 : { h: "100%" }),
