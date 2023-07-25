@@ -37,5 +37,5 @@ export const Logo = () => {
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return logo ? <LogoImg src={logo} alt="Brand Logo" width={132} height={40} /> : null;
+  return logo ? <LogoImg src={logo} alt="Brand Logo" width={40} height={40} /> : null;
 };

@@ -6,9 +6,6 @@ import { isStreamingKit } from '../../common/utils';
 
 export const Header = () => {
   const roomState = useHMSStore(selectRoomState);
-  return isStreamingKit() ? (
-    <StreamingHeader isPreview={roomState === HMSRoomState.Preview} />
-  ) : (
-    <ConferencingHeader isPreview={roomState === HMSRoomState.Preview} />
-  );
+  const isPreview = roomState === HMSRoomState.Preview;
+  return isStreamingKit() ? <StreamingHeader isPreview={isPreview} /> : <ConferencingHeader isPreview={isPreview} />;
 };
