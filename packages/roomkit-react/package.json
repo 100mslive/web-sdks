@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -36,6 +36,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.22.5",
+    "@babel/preset-react": "^7.22.5",
+    "@babel/preset-typescript": "^7.22.5",
     "@rollup/plugin-commonjs": "^21.0.3",
     "@rollup/plugin-image": "^3.0.2",
     "@rollup/plugin-json": "^6.0.0",
@@ -46,6 +49,7 @@
     "@storybook/addon-essentials": "^7.0.27",
     "@storybook/addon-interactions": "^7.0.27",
     "@storybook/addon-links": "^7.0.27",
+    "@storybook/cli": "^7.0.27",
     "@storybook/react": "^7.0.27",
     "@storybook/react-webpack5": "^7.0.27",
     "@storybook/testing-library": "^0.2.0",
@@ -59,18 +63,16 @@
     "rollup-plugin-esbuild": "^5.0.0",
     "rollup-plugin-import-css": "^3.3.1",
     "rollup-plugin-terser": "^7.0.2",
-    "storybook-dark-mode": "^3.0.0",
-    "@storybook/cli": "^7.0.27",
-    "@babel/preset-env": "^7.22.5",
-    "@babel/preset-typescript": "^7.22.5",
-    "@babel/preset-react": "^7.22.5"
+    "storybook-dark-mode": "^3.0.0"
   },
   "peerDependencies": {
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/react-icons": "0.8.10-alpha.0",
-    "@100mslive/react-sdk": "0.8.10-alpha.0",
+    "@100mslive/hls-player": "0.1.10",
+    "@100mslive/hms-virtual-background": "1.11.10",
+    "@100mslive/react-icons": "0.8.10",
+    "@100mslive/react-sdk": "0.8.10",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@radix-ui/react-accordion": "1.0.0",
