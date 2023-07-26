@@ -6,7 +6,7 @@ export const VolumeControl = ({ hlsPlayer }) => {
   const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);
 
   return (
-    <Flex align="center" css={{ color: "$white" }}>
+    <Flex align="center" css={{ color: "#FFF" }}>
       <SpeakerIcon
         style={{ cursor: "pointer" }}
         onClick={() => {

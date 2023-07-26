@@ -72,7 +72,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
               css={{
                 mt: "$4",
                 mb: "$8",
-                c: "$textMedEmp",
+                c: "$on_surface_medium",
                 display: "flex",
                 flexWrap: "wrap",
                 columnGap: "4px",
@@ -116,8 +116,8 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                   data-testid="open_role_selection_dropdown"
                   asChild
                   css={{
-                    border: "1px solid $borderLight",
-                    bg: "$surfaceLight",
+                    border: "1px solid $border_bright",
+                    bg: "$surface_bright",
                     r: "$1",
                     p: "$6 $9",
                   }}

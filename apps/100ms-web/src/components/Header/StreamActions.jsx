@@ -39,7 +39,15 @@ export const LiveStatus = () => {
   }
   return (
     <Flex align="center">
-      <Box css={{ w: "$4", h: "$4", r: "$round", bg: "$error", mr: "$2" }} />
+      <Box
+        css={{
+          w: "$4",
+          h: "$4",
+          r: "$round",
+          bg: "$alert_error_default",
+          mr: "$2",
+        }}
+      />
       <Text>
         Live
         <Text as="span" css={{ "@md": { display: "none" } }}>
@@ -82,7 +90,7 @@ export const RecordingStatus = () => {
     >
       <Box
         css={{
-          color: "$error",
+          color: "$alert_error_default",
         }}
       >
         <RecordIcon width={24} height={24} />
@@ -154,7 +162,7 @@ const StartRecording = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content align="end" sideOffset={8} css={{ w: "$64" }}>
-            <Text variant="body" css={{ color: "$textMedEmp" }}>
+            <Text variant="body" css={{ color: "$on_surface_medium" }}>
               Are you sure you want to end the recording?
             </Text>
             <Button

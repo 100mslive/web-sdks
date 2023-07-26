@@ -54,8 +54,8 @@ const ToastRoot = styled(ToastPrimitives.Root, {
     variant: {
       standard: getToastVariant('$secondary_default'),
       warning: getToastVariant('$warning'),
-      alert_error_default: getToastVariant('$alert_error_default'),
-      success: getToastVariant('$success'),
+      error: getToastVariant('$alert_error_default'),
+      success: getToastVariant('$alert_success'),
     },
   },
   defaultVariants: {

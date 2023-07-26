@@ -44,7 +44,7 @@ const Item = ({ title, description, step, selected, children, onClick }) => {
       </Flex>
       {selected && (
         <Fragment>
-          <Text css={{ color: '$menuBg', my: '$8' }}>{description}</Text>
+          <Text css={{ color: '$surface_default', my: '$8' }}>{description}</Text>
           <Box css={{ mb: '$8' }}>{children}</Box>
         </Fragment>
       )}

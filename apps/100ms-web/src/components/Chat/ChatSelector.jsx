@@ -34,7 +34,7 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
       onClick={onClick}
     >
       <Text variant="sm">{value}</Text>
-      <Flex align="center" css={{ ml: "auto", color: "$textPrimary" }}>
+      <Flex align="center" css={{ ml: "auto", color: "$on_surface_high" }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
             <Box css={{ mr: active ? "$3" : 0 }}>

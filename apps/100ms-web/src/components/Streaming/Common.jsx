@@ -29,7 +29,7 @@ export const StreamCard = ({
         p: "$10",
         r: "$1",
         cursor: "pointer",
-        bg: "$surfaceLight",
+        bg: "$surface_bright",
         mb: "$10",
         mt: "$8",
         ...css,
@@ -44,7 +44,7 @@ export const StreamCard = ({
         <Text variant="h6" css={{ mb: "$4" }}>
           {title}
         </Text>
-        <Text variant="sm" css={{ color: "$textMedEmp" }}>
+        <Text variant="sm" css={{ color: "$on_surface_medium" }}>
           {subtitle}
         </Text>
       </Box>
@@ -62,7 +62,7 @@ export const ContentHeader = ({ onBack, onClose, title = "", content }) => {
         <Text
           css={{
             p: "$2",
-            bg: "$surfaceLight",
+            bg: "$surface_bright",
             r: "$round",
             alignSelf: "center",
           }}
@@ -79,7 +79,7 @@ export const ContentHeader = ({ onBack, onClose, title = "", content }) => {
             css={{
               textTransform: "uppercase",
               fontWeight: "$semiBold",
-              color: "$textMedEmp",
+              color: "$on_surface_medium",
             }}
           >
             {title}
@@ -109,7 +109,7 @@ export const Container = ({ children, rounded = false }) => {
         position: "absolute",
         top: 0,
         left: 0,
-        bg: "$surfaceDefault",
+        bg: "$surface_default",
         transform: "translateX(10%)",
         animation: `${slideLeftAndFade("10%")} 100ms ease-out forwards`,
         display: "flex",
@@ -138,7 +138,7 @@ export const ContentBody = ({
           {title}
         </Text>
       </Text>
-      <Text variant="sm" css={{ color: "$textMedEmp" }}>
+      <Text variant="sm" css={{ color: "$on_surface_medium" }}>
         {children}
       </Text>
     </Box>
@@ -150,9 +150,9 @@ export const RecordStream = ({ record, setRecord, testId }) => {
   return permissions?.browserRecording ? (
     <Flex
       align="center"
-      css={{ bg: "$surfaceLight", m: "$8 $10", p: "$8", r: "$0" }}
+      css={{ bg: "$surface_bright", m: "$8 $10", p: "$8", r: "$0" }}
     >
-      <Text css={{ color: "$error" }}>
+      <Text css={{ color: "$alert_error_default" }}>
         <RecordIcon />
       </Text>
       <Text variant="sm" css={{ flex: "1 1 0", mx: "$8" }}>
@@ -172,7 +172,7 @@ export const ErrorText = ({ error }) => {
     return null;
   }
   return (
-    <Text variant="sm" css={{ mb: "$8", color: "$error" }}>
+    <Text variant="sm" css={{ mb: "$8", color: "$alert_error_default" }}>
       {error}
     </Text>
   );
