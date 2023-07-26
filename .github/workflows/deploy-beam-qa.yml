@@ -1,11 +1,6 @@
 name: Deploy Beam QA
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: 'Target branch name for beam qa'
-        required: true
-        default: 'beam-main'
   push:
     branches:
       - beam-main
