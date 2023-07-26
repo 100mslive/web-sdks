@@ -13,7 +13,7 @@ import { DialogContent } from './DialogContent';
 const Step = ({ value, opacity }) => (
   <Text
     css={{
-      bg: '$backround_dim',
+      bg: '$background_dim',
       size: '$12',
       r: '$round',
       mr: '$8',
