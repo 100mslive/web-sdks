@@ -4,31 +4,32 @@ import usePrevious, { isChromiumBased } from '../utils/commons';
 
 export interface useEmbedShareResult {
   /**
-   * used to start screen share
-   * It throws error in given below scenarios:
-   * 1. When url is not passed.
-   * 2. Reference to a iframe or element is not at attached.
-   * 3. Unable to start screen share
+   * Embed and start sharing a URL.
+   *
+   * It will throw an error in the following scenarios:
+   * - When the URL has not been passed
+   * - When the reference has not been attached to an iframe
+   * - When screen share cannot be started
    */
   startEmbedShare: (value: string) => Promise<void>;
 
   /**
-   * stop your screen share.
+   * Stop sharing the embed.
    */
   stopEmbedShare: () => Promise<void>;
   /**
-   * am I sharing embed view in a room
+   * Flag to check if an embed is currently being shared.
    */
   isEmbedShareInProgress: boolean;
 
   /**
-   * reference of iframe where embed url will be launched
+   * Reference to attach to the iframe that is responsible for rendering the URL passed.
    */
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 /**
- * @param resetConfig pass resetConfig where you were mounting the iframe, it will help to clear configuration when stop screen share occurs
+ * @param resetConfig Callback that implements cleanup after Embed sharing stops. It is an optional parameter.
  * @returns useEmbedShareResult
  */
 export const useEmbedShare = (resetConfig?: () => void): useEmbedShareResult => {
