@@ -58,6 +58,7 @@ import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notifica
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { PlaylistManager } from '../playlist-manager';
 import { SessionStore } from '../session-store';
+import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -101,6 +102,7 @@ export class HMSSdk implements HMSInterface {
   private networkTestManager!: NetworkTestManager;
   private wakeLockManager!: WakeLockManager;
   private sessionStore!: SessionStore;
+  private interactivityCenter!: InteractivityCenter;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
 
@@ -123,6 +125,7 @@ export class HMSSdk implements HMSInterface {
        */
       this.notificationManager?.setListener(this.listener);
       this.audioSinkManager.setListener(this.listener);
+      this.interactivityCenter.setListener(this.listener);
       return;
     }
 
@@ -132,7 +135,6 @@ export class HMSSdk implements HMSInterface {
     this.wakeLockManager = new WakeLockManager();
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.playlistManager = new PlaylistManager(this, this.eventBus);
-
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.deviceManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
@@ -156,6 +158,7 @@ export class HMSSdk implements HMSInterface {
     );
 
     this.sessionStore = new SessionStore(this.transport);
+    this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
 
     /**
      * Note: Subscribe to events here right after creating stores and managers
@@ -208,6 +211,10 @@ export class HMSSdk implements HMSInterface {
 
   getTemplateAppData() {
     return this.store.getTemplateAppData();
+  }
+
+  getInteractivityCenter() {
+    return this.interactivityCenter;
   }
 
   private handleAutoplayError = (error: HMSException) => {

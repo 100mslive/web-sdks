@@ -32,4 +32,7 @@ export enum HMSNotificationMethod {
   HLS_START = 'on-hls-start',
   HLS_STOP = 'on-hls-stop',
   METADATA_CHANGE = 'on-metadata-change',
+  POLL_START = 'on-poll-start',
+  POLL_STOP = 'on-poll-stop',
+  POLL_STATS = 'on-poll-stats',
 }
