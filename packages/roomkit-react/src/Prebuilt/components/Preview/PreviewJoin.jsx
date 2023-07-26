@@ -18,7 +18,6 @@ import {
   Box,
   Flex,
   flexCenter,
-  Loading,
   styled,
   StyledVideoTile,
   Text,

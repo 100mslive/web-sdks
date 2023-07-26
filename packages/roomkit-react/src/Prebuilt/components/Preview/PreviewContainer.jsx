@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import { Box, Flex, Loading } from '../../../';
+import { Box, Flex } from '../../../';
 import SidePane from '../../layouts/SidePane';
 import FullPageProgress from '../FullPageProgress';
 import { Header } from '../Header';
