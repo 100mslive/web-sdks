@@ -23,7 +23,9 @@ export function CreateQuestions() {
   const interaction = useHMSStore(selectPollByID(id));
 
   const isValidPoll = useMemo(
-    () => questions.every(question => isValidQuestion(question)),
+    () =>
+      questions.length > 0 &&
+      questions.every(question => isValidQuestion(question)),
     [questions]
   );
 
@@ -102,7 +104,6 @@ export function CreateQuestions() {
             Add another question
           </Text>
         </Flex>
-
         <Flex css={{ w: "100%" }} justify="end">
           <Button disabled={!isValidPoll} onClick={launchPoll}>
             Launch {interaction.type}

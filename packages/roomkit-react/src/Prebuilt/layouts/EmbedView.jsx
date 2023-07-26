@@ -9,7 +9,8 @@ import {
   useHMSStore,
   useScreenShare,
 } from '@100mslive/react-sdk';
-import { Box, config as cssConfig, Flex } from '../../';
+import { Box, Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 import { SidePane } from './screenShareView';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';

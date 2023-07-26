@@ -11,7 +11,11 @@ import {
 } from '@100mslive/react-sdk';
 import { BrbIcon, HandRaiseFilledIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
-import { Avatar, StyledVideoTile, useBorderAudioLevel, Video, VideoTileStats } from '../../';
+import { useBorderAudioLevel } from '../../AudioLevel';
+import { Avatar } from '../../Avatar';
+import { VideoTileStats } from '../../Stats';
+import { Video } from '../../Video';
+import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import TileMenu from './TileMenu';
 import { useAppConfig } from './AppData/useAppConfig';

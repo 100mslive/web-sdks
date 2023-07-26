@@ -39,7 +39,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                     ref={ref}
                     css={{
                       border: '1px solid $border_bright',
-                      bg: '$surface_light',
+                      bg: '$surface_bright',
                       r: '$1',
                       p: '$6 $9',
                       mt: '$4',
@@ -65,7 +65,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                             css={{
                               bg:
                                 selectedRole === role
-                                  ? '$primaryDark'
+                                  ? '$primary_dim'
                                   : undefined,
                               px: '$9',
                             }}
@@ -166,7 +166,7 @@ const RightContainer = ({ children }) => {
         w: '45%',
         h: '100%',
         border: '1px solid $border_bright',
-        bg: '$surface_light',
+        bg: '$surface_bright',
         r: '$1',
         textAlign: 'center',
       }}

@@ -18,7 +18,6 @@ import logoLight from './assets/images/logo-on-white.png';
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
-
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;

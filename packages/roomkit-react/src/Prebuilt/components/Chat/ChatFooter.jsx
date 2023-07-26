@@ -15,6 +15,10 @@ const TextArea = styled('textarea', {
   resize: 'none',
   lineHeight: '1rem',
   position: 'relative',
+  fontFamily: '$sans',
+  fontSize: '100%',
+  margin: 0,
+  padding: 0,
   top: '$3',
   '&:focus': {
     boxShadow: 'none',

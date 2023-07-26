@@ -68,8 +68,8 @@ export const Playlist = ({ type }) => {
             maxHeight: 'unset',
             width: '$60',
             p: '$0',
-            bg: '$surface_light',
-            border: '1px solid $surface_default',
+            bg: '$surface_bright',
+            border: '1px solid $border_default',
           }}
         >
           <Flex

@@ -1,9 +1,17 @@
 import React, { forwardRef, useRef, useState } from 'react';
 import { selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Box, Button, Checkbox, Dialog, Dropdown, Flex, Label, Text, textEllipsis, Tooltip } from '../../';
+import { Button } from '../../Button';
+import { Checkbox } from '../../Checkbox';
+import { Dropdown } from '../../Dropdown';
+import { Label } from '../../Label';
+import { Box, Flex } from '../../Layout';
+import { Dialog } from '../../Modal';
+import { Text } from '../../Text';
+import { Tooltip } from '../../Tooltip';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
+import { textEllipsis } from '../../utils';
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
   <Text
@@ -150,7 +158,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
           )}
           <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
             <Box css={{ width: '50%' }}>
-              <Dialog.Close css={{ width: '100%' }} asChild>
+              <Dialog.Close css={{ width: '100%', p: '$4 $8' }} asChild>
                 <Button variant="standard" outlined css={{ width: '100%' }} data-testid="cancel_button">
                   Cancel
                 </Button>

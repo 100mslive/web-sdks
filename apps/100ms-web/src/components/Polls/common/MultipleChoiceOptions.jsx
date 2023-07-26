@@ -1,25 +1,21 @@
 // @ts-check
 import React, { useCallback } from "react";
 import { CheckIcon } from "@100mslive/react-icons";
-import {
-  Checkbox,
-  Flex,
-  Input,
-  Label,
-  Progress,
-  Text,
-} from "@100mslive/roomkit-react";
+import { Checkbox, Flex, Input, Label, Text } from "@100mslive/roomkit-react";
 import { VoteCount } from "./VoteCount";
+import { VoteProgress } from "./VoteProgress";
 
 export const MultipleChoiceOptions = ({
   questionIndex,
   isQuiz,
   options,
   correctOptionIndexes,
+  canRespond,
   response,
   totalResponses,
   selectedOptions,
   setSelectedOptions,
+  showVoteCount,
 }) => {
   const handleCheckedChange = (checked, index) => {
     const newSelected = new Set(selectedOptions);
@@ -34,7 +30,6 @@ export const MultipleChoiceOptions = ({
   return (
     <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
       {options.map(option => {
-        const progressValue = (100 * option.voteCount) / totalResponses;
         const isCorrectAnswer =
           isQuiz && correctOptionIndexes?.includes(option.index);
 
@@ -46,13 +41,13 @@ export const MultipleChoiceOptions = ({
           >
             <Checkbox.Root
               id={`${questionIndex}-${option.index}`}
-              disabled={!!response}
+              disabled={!canRespond}
               checked={response?.options?.includes(option.index)}
               onCheckedChange={checked =>
                 handleCheckedChange(checked, option.index)
               }
               css={{
-                cursor: response ? "not-allowed" : "pointer",
+                cursor: canRespond ? "pointer" : "not-allowed",
               }}
             >
               <Checkbox.Indicator>
@@ -61,13 +56,13 @@ export const MultipleChoiceOptions = ({
             </Checkbox.Root>
 
             <Flex direction="column" css={{ flexGrow: "1" }}>
-              <Flex css={{ w: "100%", mb: response ? "$4" : "0" }}>
+              <Flex css={{ w: "100%" }}>
                 <Text css={{ display: "flex", flexGrow: "1" }}>
                   <Label htmlFor={`${questionIndex}-${option.index}`}>
                     {option.text}
                   </Label>
                 </Text>
-                {response && (
+                {showVoteCount && (
                   <VoteCount
                     isQuiz={isQuiz}
                     isCorrectAnswer={isCorrectAnswer}
@@ -75,15 +70,9 @@ export const MultipleChoiceOptions = ({
                   />
                 )}
               </Flex>
-              {response ? (
-                <Progress.Root value={progressValue}>
-                  <Progress.Content
-                    style={{
-                      transform: `translateX(-${100 - progressValue}%)`,
-                    }}
-                  />
-                </Progress.Root>
-              ) : null}
+              {showVoteCount && (
+                <VoteProgress option={option} totalResponses={totalResponses} />
+              )}
             </Flex>
           </Flex>
         );

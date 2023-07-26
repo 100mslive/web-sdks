@@ -68,7 +68,7 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
         id="video-rest"
         css={{
           width: `${100 - bufferProgress}%`,
-          background: '$surface_lighter',
+          background: '$surface_brighter',
           height: '0.3rem',
         }}
       />

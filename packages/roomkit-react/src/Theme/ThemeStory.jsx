@@ -22,7 +22,7 @@ const ThemeStory = () => {
         title="theme.color.surface"
         subtitle="Surface Variants"
         colors={{
-          surface_dimer: '#06080A',
+          surface_dimmer: '#06080A',
           surface_dim: '#080B0F',
           surface_default: '#0B0F15',
           surface_bright: '#12161C',

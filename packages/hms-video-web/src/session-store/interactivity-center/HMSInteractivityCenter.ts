@@ -26,7 +26,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       ...pollParams,
       poll_id: pollParams.id,
       vote: pollParams.rolesThatCanVote,
-      responses: pollParams.rolesThaCanViewResponses,
+      responses: pollParams.rolesThatCanViewResponses,
     });
 
     if (!pollParams.id) {
@@ -49,7 +49,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       mode: pollParams.mode,
       visibility: pollParams.visibility,
       rolesThatCanVote: pollParams.rolesThatCanVote || [],
-      rolesThaCanViewResponses: pollParams.rolesThaCanViewResponses || [],
+      rolesThatCanViewResponses: pollParams.rolesThatCanViewResponses || [],
       state: 'created',
       createdBy: this.store.getLocalPeer()?.peerId,
       questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
@@ -129,7 +129,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         mode: pollParams.mode as HMSPoll['mode'],
         visibility: pollParams.visibility,
         rolesThatCanVote: pollParams.vote || [],
-        rolesThaCanViewResponses: pollParams.responses || [],
+        rolesThatCanViewResponses: pollParams.responses || [],
         state: pollParams.state,
         stoppedBy: pollParams.stopped_by,
         startedAt: convertDateNumToDate(pollParams.started_at),

@@ -14,7 +14,7 @@ const TabButton = styled('button', {
   variants: {
     active: {
       true: {
-        bg: '$surface_light',
+        bg: '$surface_bright',
       },
     },
   },

@@ -79,7 +79,7 @@ export const Flex = styled('div', {
 
 const RemoveMenuItem = styled(StyledItemButton, {
   color: '$alert_error_default',
-  borderTop: '1px solid $border_light',
+  borderTop: '1px solid $border_bright',
 });
 
 interface MenuTileType {

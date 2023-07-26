@@ -1,5 +1,7 @@
 import React from 'react';
-import { Flex, Label, Switch } from '../../../';
+import { Label } from '../../../Label';
+import { Flex } from '../../../Layout';
+import { Switch } from '../../../Switch';
 
 const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) => {
   return (

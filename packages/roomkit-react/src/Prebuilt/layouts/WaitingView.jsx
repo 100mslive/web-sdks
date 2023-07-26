@@ -1,6 +1,7 @@
 import React from 'react';
 import { ColoredTimeIcon } from '@100mslive/react-icons';
-import { Box, Flex, Text } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
 
 export const WaitingView = React.memo(() => {
   return (

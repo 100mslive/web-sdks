@@ -1,7 +1,9 @@
 import React from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { CrossIcon, ShareScreenIcon } from '@100mslive/react-icons';
-import { Button, Flex, Text } from '../../';
+import { Button } from '../../Button';
+import { Flex } from '../../Layout';
+import { Text } from '../../Text';
 
 export const ScreenshareDisplay = () => {
   const hmsActions = useHMSActions();
@@ -19,8 +21,8 @@ export const ScreenshareDisplay = () => {
         h: '100%',
         r: '$3',
         m: '0 auto',
-        color: '$on_primary_high',
-        bg: '$surface_default',
+        color: '$textPrimary',
+        bg: '$surfaceDefault',
         textAlign: 'center',
       }}
     >

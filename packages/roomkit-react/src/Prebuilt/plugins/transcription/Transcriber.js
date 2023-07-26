@@ -61,7 +61,7 @@ export class Transcriber {
 
   async listen(retryCount = 0) {
     if (retryCount > 5) {
-      console.alert_error_default('transcription', 'Max retry count reached!!', retryCount);
+      console.error('transcription', 'Max retry count reached!!', retryCount);
       this.cleanup();
       return;
     }
@@ -136,7 +136,7 @@ export class Transcriber {
       this.unsubscribes.push(unsub);
       this.getAndObserveStream(); // call it once to start observing initially
     } catch (err) {
-      console.alert_error_default('transcription - observing local peer track', err);
+      console.error('transcription - observing local peer track', err);
     }
   }
 
@@ -160,7 +160,7 @@ export class Transcriber {
       }
       this.recordRTCInstance = null;
     } catch (err) {
-      console.alert_error_default('transcription - in destroying earlier instance', err);
+      console.error('transcription - in destroying earlier instance', err);
     }
     const stream = new MediaStream([mediaTrack]);
     await this.observeStream(stream);
@@ -197,7 +197,7 @@ export class Transcriber {
         this.audioSocket.close();
         this.audioSocket = null;
       } catch (err) {
-        console.alert_error_default("transcription cleanup - couldn't close socket", err);
+        console.error("transcription cleanup - couldn't close socket", err);
       }
     }
     if (this.recordRTCInstance) {
@@ -205,7 +205,7 @@ export class Transcriber {
         this.recordRTCInstance.destroy();
         this.recordRTCInstance = null;
       } catch (err) {
-        console.alert_error_default("transcription cleanup - couldn't stop recording", err);
+        console.error("transcription cleanup - couldn't stop recording", err);
       }
     }
     for (const unsub of this.unsubscribes) {

@@ -1,3 +1,5 @@
+import { useEffect, useRef } from 'react';
+import { parsedUserAgent } from '@100mslive/hms-video-store';
 import HMSLogger from './logger';
 import { hooksErrHandler } from '../hooks/types';
 
@@ -12,3 +14,21 @@ export const logErrorHandler: hooksErrHandler = (err: Error, method?: string) =>
 export const throwErrorHandler: hooksErrHandler = (err: Error) => {
   throw err;
 };
+
+export default function usePrevious<T>(state: T): T | undefined {
+  const ref = useRef<T>();
+
+  useEffect(() => {
+    ref.current = state;
+  });
+
+  return ref.current;
+}
+
+const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];
+
+export const isChromiumBased = chromiumBasedBrowsers.some(
+  (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
+);
+
+export const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';

@@ -10,7 +10,10 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, IconButton, Text } from '../../../';
+import { Button } from '../../../Button';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
+import IconButton from '../../IconButton';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatHeader } from './ChatHeader';

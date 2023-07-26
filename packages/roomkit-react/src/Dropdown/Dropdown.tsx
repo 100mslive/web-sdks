@@ -76,6 +76,7 @@ const DropdownContent = styled(Content, {
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,
+  fontFamily: '$sans',
 });
 
 const DropdownLabel = styled(Label, {

@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { logMessage } from 'zipyai';
 import { CopyIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, Text, ThemeContext, Tooltip } from '../../';
+import { Button } from '../../Button';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
+import { Tooltip } from '../../Tooltip';
 import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {
@@ -32,16 +35,13 @@ export class ErrorBoundary extends Component {
           justify="center"
           css={{
             size: '100%',
+            height: '100vh',
+            width: '100%',
             color: '$on_primary_high',
             backgroundColor: '$background_default',
           }}
         >
-          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3' }}>
-            <ThemeContext.Consumer>
-              {() => {
-                return <img src={require('../images/error-bg-dark.svg')} alt="error background" />;
-              }}
-            </ThemeContext.Consumer>
+          <Box css={{ position: 'relative', overflow: 'hidden', r: '$3', height: '100%', width: '100%' }}>
             <Flex
               direction="column"
               css={{
@@ -51,17 +51,19 @@ export class ErrorBoundary extends Component {
                 left: 0,
               }}
             >
-              <div style={{ margin: '1.5rem' }}>
-                <Text>{`Something went wrong. ERROR: ${this.state.error}`}</Text>
+              <div style={{ margin: '1.5rem', width: '100%' }}>
+                <Text>Something went wrong</Text>
+                <Text>Message: ${this.state.error}</Text>
+                <br />
                 {ErrorWithSupportLink(`Please reload to see if it works.`)}
               </div>
-              <Flex justify="center">
+              <Flex>
                 <Tooltip title="Reload page">
                   <Button
                     onClick={() => {
                       window.location.reload();
                     }}
-                    css={{ mx: '$4' }}
+                    css={{ mx: '$8' }}
                     data-testid="join_again_btn"
                   >
                     Reload
@@ -79,7 +81,7 @@ export class ErrorBoundary extends Component {
                       );
                       this.setState({ isErrorCopied: true });
                     }}
-                    css={{ mx: '$4' }}
+                    css={{ mx: '$8' }}
                     data-testid="join_again_btn"
                   >
                     <CopyIcon /> {this.state.isErrorCopied ? 'Copied' : 'Copy Details'}

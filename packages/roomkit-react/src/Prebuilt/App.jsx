@@ -5,7 +5,6 @@ import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import ErrorPage from './components/ErrorPage';
 import FullPageProgress from './components/FullPageProgress';
 import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
@@ -13,7 +12,8 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { Box, HMSThemeProvider } from '../';
+import { Box } from '../Layout';
+import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
@@ -23,19 +23,6 @@ import { getRoutePrefix, shadeColor } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
-
-const defaultTokenEndpoint = process.env.REACT_APP_TOKEN_GENERATION_ENDPOINT;
-const isSSR = typeof window === 'undefined';
-
-let appName;
-if (!isSSR) {
-  if (window.location.host.includes('localhost')) {
-    appName = 'localhost';
-  } else {
-    appName = window.location.host.split('.')[0];
-  }
-  document.title = `${appName}'s ${document.title}`;
-}
 
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
@@ -50,27 +37,22 @@ const getAspectRatio = ({ width, height }) => {
 export const HMSPrebuilt = React.forwardRef(
   (
     {
-      themeConfig: {
-        aspectRatio = '1-1',
-        font = 'Roboto',
-        color = '#2572ed',
-        theme = 'dark',
-        logo = '',
-        metadata = '',
-        recordingUrl = '',
-      } = {},
-      roomId = '',
-      role = '',
       roomCode = '',
+      logo: { url: logoUrl = '' } = {},
       options: {
         userName = '',
         userId = '',
-        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = defaultTokenEndpoint } = {},
+        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = '' } = {},
       } = {},
       onLeave,
     },
     ref,
   ) => {
+    const aspectRatio = '1-1';
+    const color = '#2F80FF';
+    const theme = 'dark';
+    const metadata = '';
+    const recordingUrl = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
 
     const [hyderated, setHyderated] = React.useState(false);
@@ -87,6 +69,14 @@ export const HMSPrebuilt = React.forwardRef(
       };
     }, [ref]);
 
+    // leave room when component unmounts
+    useEffect(
+      () => () => {
+        return hmsActions.leave();
+      },
+      [],
+    );
+
     const endPoints = {
       tokenByRoomCode,
       init: initEndpoint,
@@ -96,12 +86,15 @@ export const HMSPrebuilt = React.forwardRef(
     if (!hyderated) {
       return null;
     }
+
+    globalStyles();
+
     return (
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
           value={{
-            roomId,
-            role,
+            roomId: '',
+            role: '',
             roomCode,
             showPreview: true,
             showLeave: true,
@@ -122,7 +115,7 @@ export const HMSPrebuilt = React.forwardRef(
                 brandDisabled: shadeColor(color, 10),
               },
               fonts: {
-                sans: [font, 'Inter', 'sans-serif'],
+                sans: ['Roboto', 'Inter', 'sans-serif'],
               },
             }}
           >
@@ -136,7 +129,7 @@ export const HMSPrebuilt = React.forwardRef(
               <AppData
                 appDetails={metadata}
                 recordingUrl={recordingUrl}
-                logo={logo}
+                logo={logoUrl}
                 tokenEndpoint={endPoints.tokenByRoomIdRole}
               />
               <Init />
@@ -144,6 +137,8 @@ export const HMSPrebuilt = React.forwardRef(
                 css={{
                   bg: '$background_darker',
                   size: '100%',
+                  lineHeight: '1.5',
+                  '-webkit-text-size-adjust': '100%',
                 }}
               >
                 <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
@@ -225,7 +220,6 @@ const RouteList = () => {
       )}
       <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
-      <Route path="*" element={<ErrorPage error="Invalid URL!" />} />
     </Routes>
   );
 };

@@ -2,12 +2,15 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
-import { Box, Button, Flex, Text, textEllipsis } from '../../';
+import { Button } from '../../Button';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { Header } from './Header';
 import { useNavigation } from './hooks/useNavigation';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { getRoutePrefix } from '../common/utils';
+import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
   const navigate = useNavigation();

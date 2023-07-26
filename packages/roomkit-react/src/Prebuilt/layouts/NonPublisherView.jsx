@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShieldAlertIcon } from '@100mslive/react-icons';
-import { Box, Flex, Text } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
 
 export const NonPublisherView = React.memo(({ message }) => {
   return (

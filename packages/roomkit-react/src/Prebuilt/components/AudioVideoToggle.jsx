@@ -9,7 +9,7 @@ import {
 } from '@100mslive/react-sdk';
 import { CameraFlipIcon, MicOffIcon, MicOnIcon, VideoOffIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
-import { Tooltip } from '../../';
+import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { isMacOS } from '../common/constants';
 

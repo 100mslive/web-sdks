@@ -131,9 +131,9 @@ export const APP_DATA = {
   rtmpStarted: "rtmpStarted",
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
+  pdfConfig: "pdfConfig",
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
-  pdfConfig: "pdfConfig",
   widgetState: "widgetState",
 };
 
@@ -225,6 +225,11 @@ export const SESSION_STORE_KEY = {
   TRANSCRIPTION_STATE: "transcriptionState",
   PINNED_MESSAGE: "pinnedMessage",
   SPOTLIGHT: "spotlight",
+};
+
+export const INTERACTION_TYPE = {
+  POLL: "Poll",
+  QUIZ: "Quiz",
 };
 
 export const QUESTION_TYPE_TITLE = {

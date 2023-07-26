@@ -1,23 +1,19 @@
 // @ts-check
 import React, { useCallback } from "react";
-import {
-  Flex,
-  Input,
-  Label,
-  Progress,
-  RadioGroup,
-  Text,
-} from "@100mslive/roomkit-react";
+import { Flex, Input, Label, RadioGroup, Text } from "@100mslive/roomkit-react";
 import { VoteCount } from "./VoteCount";
+import { VoteProgress } from "./VoteProgress";
 
 export const SingleChoiceOptions = ({
   questionIndex,
   isQuiz,
   options,
   response,
+  canRespond,
   correctOptionIndex,
   setAnswer,
   totalResponses,
+  showVoteCount,
 }) => {
   return (
     <RadioGroup.Root
@@ -26,7 +22,6 @@ export const SingleChoiceOptions = ({
     >
       <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
         {options.map(option => {
-          const progressValue = (100 * option.voteCount) / totalResponses;
           const isCorrectAnswer = isQuiz && option.index === correctOptionIndex;
 
           return (
@@ -45,13 +40,13 @@ export const SingleChoiceOptions = ({
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  cursor: response ? "not-allowed" : "pointer",
+                  cursor: canRespond ? "pointer" : "not-allowed",
                   '&[data-state="checked"]': {
                     borderColor: "$primaryLight",
                     borderWidth: "2px",
                   },
                 }}
-                disabled={!!response}
+                disabled={!canRespond}
                 value={option.index}
                 id={`${questionIndex}-${option.index}`}
               >
@@ -66,13 +61,13 @@ export const SingleChoiceOptions = ({
               </RadioGroup.Item>
 
               <Flex direction="column" css={{ flexGrow: "1" }}>
-                <Flex css={{ w: "100%", mb: response ? "$4" : "0" }}>
+                <Flex css={{ w: "100%" }}>
                   <Text css={{ display: "flex", flexGrow: "1" }}>
                     <Label htmlFor={`${questionIndex}-${option.index}`}>
                       {option.text}
                     </Label>
                   </Text>
-                  {response && (
+                  {showVoteCount && (
                     <VoteCount
                       isQuiz={isQuiz}
                       isCorrectAnswer={isCorrectAnswer}
@@ -80,16 +75,12 @@ export const SingleChoiceOptions = ({
                     />
                   )}
                 </Flex>
-
-                {response ? (
-                  <Progress.Root value={progressValue}>
-                    <Progress.Content
-                      style={{
-                        transform: `translateX(-${100 - progressValue}%)`,
-                      }}
-                    />
-                  </Progress.Root>
-                ) : null}
+                {showVoteCount && (
+                  <VoteProgress
+                    option={option}
+                    totalResponses={totalResponses}
+                  />
+                )}
               </Flex>
             </Flex>
           );

@@ -24,7 +24,10 @@ import {
   VideoOnIcon,
 } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
-import { Box, Flex, Slider, StyledMenuTile, Text } from '../../';
+import { Box, Flex } from '../../Layout';
+import { Slider } from '../../Slider';
+import { Text } from '../../Text';
+import { StyledMenuTile } from '../../TileMenu';
 import { useSetAppDataByKey } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useDropdownSelection } from './hooks/useDropdownSelection';

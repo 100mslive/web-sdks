@@ -1,19 +1,16 @@
 import React, { useRef } from 'react';
 import { CheckIcon, CloudUploadIcon, CrossIcon } from '@100mslive/react-icons';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  Flex,
-  HorizontalDivider,
-  IconButton,
-  Input,
-  Label,
-  Select,
-  Switch,
-  Text,
-} from '../../';
+import { Button } from '../../Button';
+import { Checkbox } from '../../Checkbox';
+import { HorizontalDivider } from '../../Divider';
+import { IconButton } from '../../IconButton';
+import { Input } from '../../Input';
+import { Label } from '../../Label';
+import { Box, Flex } from '../../Layout';
+import { Dialog } from '../../Modal';
+import { Select } from '../../Select';
+import { Switch } from '../../Switch';
+import { Text } from '../../Text';
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   return (

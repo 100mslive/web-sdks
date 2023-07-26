@@ -10,7 +10,12 @@ import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
-import { Box, Flex, IconButton, Loading, Text, Tooltip, useTheme } from '../../';
+import { IconButton } from '../../IconButton';
+import { Box, Flex } from '../../Layout';
+import { Loading } from '../../Loading';
+import { Text } from '../../Text';
+import { useTheme } from '../../Theme';
+import { Tooltip } from '../../Tooltip';
 import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;
@@ -91,7 +96,7 @@ const HLSView = () => {
       }
     };
     const handleError = data => {
-      console.error('[HLSView] alert_error_default in hls', `${data}`);
+      console.error('[HLSView] error in hls', `${data}`);
     };
     const handleNoLongerLive = ({ isLive }) => {
       setIsVideoLive(isLive);

@@ -26,7 +26,7 @@ const TooltipBox = styled(BaseTooltip.Content, {
     outlined: {
       true: {
         backgroundColor: '$background_dim',
-        border: 'solid $space$px $border_light',
+        border: 'solid $space$px $border_bright',
       },
     },
   },

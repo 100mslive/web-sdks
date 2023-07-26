@@ -30,7 +30,7 @@ const Item = ({ title, description, step, selected, children, onClick }) => {
   return (
     <Box
       css={{
-        bg: '$surface_light',
+        bg: '$surface_bright',
         p: '$8',
         my: '$8',
         opacity,

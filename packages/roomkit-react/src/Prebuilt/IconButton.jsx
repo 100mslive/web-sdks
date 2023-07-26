@@ -1,4 +1,5 @@
-import { IconButton as BaseIconButton, styled } from '../';
+import { IconButton as BaseIconButton } from '../IconButton';
+import { styled } from '../Theme';
 
 const IconButton = styled(BaseIconButton, {
   width: '$14',
