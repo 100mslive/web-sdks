@@ -22,16 +22,18 @@ import {
   HMSVideoTrack as SDKHMSVideoTrack,
   SessionStoreUpdate,
 } from '@100mslive/hms-video';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
   isEntityUpdated,
   mergeNewPeersInDraft,
+  mergeNewPollsInDraft,
   mergeNewTracksInDraft,
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
+import { HMSInteractivityCenter, IHMSInteractivityCenter } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -117,6 +119,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  interactivityCenter: IHMSInteractivityCenter;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
@@ -125,7 +128,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications = notificationManager;
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
-
+    this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -743,6 +746,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
+      onPollsUpdate: this.onPollsUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -822,6 +826,27 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
     this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
+  }
+
+  private onPollsUpdate(actionType: sdkTypes.HMSPollsUpdate, polls: sdkTypes.HMSPoll[]) {
+    const actionName = POLL_NOTIFICATION_TYPES[actionType];
+    this.setState(draftStore => {
+      const pollsObject = polls.reduce((acc, poll) => {
+        acc[poll.id] = {
+          ...poll,
+          questions: poll.questions?.map(question => ({
+            ...question,
+            answer: question.answer ? { ...question.answer } : undefined,
+            options: question.options?.map(option => ({ ...option })),
+            responses: question.responses?.map(response => ({ ...response })),
+          })),
+        };
+        return acc;
+      }, {} as { [key: string]: sdkTypes.HMSPoll });
+      mergeNewPollsInDraft(draftStore.polls, pollsObject);
+    }, actionName);
+
+    polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {

@@ -1,18 +1,45 @@
 import React, { Fragment, useState } from 'react';
-import { Box, Button, Dialog, Flex, Text, flexCenter } from '@100mslive/react-ui';
-import { DialogContent } from './DialogContent';
 import { DownloadIcon } from '@100mslive/react-icons';
+import {
+  Box,
+  Button,
+  Dialog,
+  Flex,
+  flexCenter,
+  Text,
+} from '@100mslive/roomkit-react';
+import { DialogContent } from './DialogContent';
 
 const Step = ({ value, opacity }) => (
-  <Text css={{ bg: '$mainBg', size: '$12', r: '$round', mr: '$8', ...flexCenter, opacity }}>{value}</Text>
+  <Text
+    css={{
+      bg: '$mainBg',
+      size: '$12',
+      r: '$round',
+      mr: '$8',
+      ...flexCenter,
+      opacity,
+    }}
+  >
+    {value}
+  </Text>
 );
 
 const Item = ({ title, description, step, selected, children, onClick }) => {
   const opacity = selected ? 1 : 0.75;
   return (
-    <Box css={{ bg: '$bgSecondary', p: '$8', my: '$8', opacity, cursor: 'pointer' }} onClick={onClick}>
+    <Box
+      css={{
+        bg: '$bgSecondary',
+        p: '$8',
+        my: '$8',
+        opacity,
+        cursor: 'pointer',
+      }}
+      onClick={onClick}
+    >
       <Flex align="center">
-        <Step value={step} opacity={opacity}></Step>
+        <Step value={step} opacity={opacity} />
         <Text>{title}</Text>
       </Flex>
       {selected && (
