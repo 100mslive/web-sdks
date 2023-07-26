@@ -16,6 +16,8 @@ import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { isMacOS } from '../common/constants';
 
+const optionsCSS = { fontWeight: '$semiBold', color: '$textHighEmp', w: '100%', p: '$8' };
+
 export const AudioVideoToggle = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
@@ -31,7 +33,7 @@ export const AudioVideoToggle = () => {
             deviceId: videoInput.deviceId,
           })
         }
-        css={{ fontWeight: '$semiBold', color: '$textHighEmp' }}
+        css={optionsCSS}
       >
         {videoInput.label}
       </Text>
@@ -50,7 +52,7 @@ export const AudioVideoToggle = () => {
             deviceId: audioInput.deviceId,
           })
         }
-        css={{ fontWeight: '$semiBold', color: '$textHighEmp' }}
+        css={optionsCSS}
       >
         {audioInput.label}
       </Text>

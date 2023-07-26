@@ -75,18 +75,18 @@ export const IconButtonWithOptions = ({
             border: 'none',
           }}
         >
-          {options.map(option => (
+          {options.map((option, index) => (
             <Dropdown.Item
               key={option.title}
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                backgroundColor: option.active ? '$primaryDefault' : '$surfaceDark',
-                p: '$8',
-                borderTop: '1px solid $borderDefault',
+                backgroundColor: option.active ? '$primaryDark' : '$surfaceDark',
+                borderTop: index === 0 ? 'none' : '1px solid $borderDefault',
                 '&:hover': {
                   cursor: 'pointer',
                 },
+                p: '0',
               }}
             >
               {option.content}

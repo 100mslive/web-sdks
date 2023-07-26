@@ -179,7 +179,7 @@ const RouteList = () => {
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryLight" />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryDefault" />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -187,7 +187,7 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryLight" />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." loaderColor="$primaryDefault" />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -198,7 +198,7 @@ const RouteList = () => {
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress loaderColor="$primaryLight" loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress loaderColor="$primaryDefault" loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -206,7 +206,7 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress loaderColor="$primaryLight" loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress loaderColor="$primaryDefault" loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
