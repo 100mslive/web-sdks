@@ -106,11 +106,11 @@ const Conference = () => {
   }, [isHeadless, hmsActions]);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress loadingText="Joining..." loaderColor="$primaryDefault" />;
+    return <FullPageProgress loadingText="Joining..." />;
   }
 
   if (isHLSStarted) {
-    return <FullPageProgress loadingText="Starting the stream..." loaderColor="$primaryDefault" />;
+    return <FullPageProgress loadingText="Starting the stream..." />;
   }
 
   return (

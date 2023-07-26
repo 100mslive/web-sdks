@@ -31,6 +31,7 @@ import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
+import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
 import PreviewForm from './PreviewForm';
@@ -148,7 +149,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       </Box>
     </Container>
   ) : (
-    <Loading size={100} />
+    <FullPageProgress />
   );
 };
 
@@ -203,7 +204,7 @@ const PreviewTile = ({ name, error }) => {
           ) : null}
         </>
       ) : !error ? (
-        <Loading size={100} />
+        <FullPageProgress />
       ) : null}
       {showMuteIcon ? (
         <StyledVideoTile.AudioIndicator size="medium">
