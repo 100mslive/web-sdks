@@ -27,7 +27,12 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: "$8", color: "$on_surface_medium", bg: "$surface_bright", r: "$1" }}
+      css={{
+        p: "$8",
+        color: "$on_surface_medium",
+        bg: "$surface_bright",
+        r: "$1",
+      }}
       align="center"
       justify="between"
     >

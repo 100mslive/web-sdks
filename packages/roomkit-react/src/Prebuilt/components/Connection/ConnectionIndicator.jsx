@@ -10,7 +10,7 @@ const Wrapper = styled('span', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: '$background_darker',
+  backgroundColor: '$background_dim',
   borderRadius: '$round',
   variants: {
     isTile: {

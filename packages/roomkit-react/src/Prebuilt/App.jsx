@@ -135,7 +135,7 @@ export const HMSPrebuilt = React.forwardRef(
               <Init />
               <Box
                 css={{
-                  bg: '$background_darker',
+                  bg: '$background_dim',
                   size: '100%',
                   lineHeight: '1.5',
                   '-webkit-text-size-adjust': '100%',
