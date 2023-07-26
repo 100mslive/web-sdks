@@ -122,7 +122,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
                         css={{
                           px: "$9",
                           bg: isSelected ? selectionBg : undefined,
-                          c: isSelected ? "$white" : "$textHighEmp",
+                          c: isSelected ? "#FFF" : "$on_surface_high",
                         }}
                       >
                         {option.label}
@@ -270,12 +270,12 @@ const TrackStats = ({ trackID, layer, local }) => {
 };
 
 const StatsRow = React.memo(({ label, value }) => (
-  <Box css={{ bg: "$surfaceLight", w: "calc(50% - $6)", p: "$8", r: "$3" }}>
+  <Box css={{ bg: "$surface_bright", w: "calc(50% - $6)", p: "$8", r: "$3" }}>
     <Text
       variant="overline"
       css={{
         fontWeight: "$semiBold",
-        color: "$textMedEmp",
+        color: "$on_surface_medium",
         textTransform: "uppercase",
       }}
     >
@@ -283,7 +283,7 @@ const StatsRow = React.memo(({ label, value }) => (
     </Text>
     <Text
       variant="sub1"
-      css={{ fontWeight: "$semiBold", color: "$textHighEmp" }}
+      css={{ fontWeight: "$semiBold", color: "$on_surface_high" }}
     >
       {value || "-"}
     </Text>

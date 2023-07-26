@@ -149,7 +149,7 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: "$surfaceDefault",
+        bg: "$surface_default",
         aspectRatio: width / height,
         width: "unset",
         height: "min(360px, 60vh)",

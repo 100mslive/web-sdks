@@ -110,7 +110,7 @@ export const EmojiReaction = () => {
         <Dropdown.Content
           sideOffset={5}
           align="center"
-          css={{ p: "$8", bg: "$surfaceDefault" }}
+          css={{ p: "$8", bg: "$surface_default" }}
         >
           {emojiReactionList.map((emojiLine, index) => (
             <Flex key={index} justify="between" css={{ mb: "$8" }}>
@@ -133,7 +133,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: "$textMedEmp",
+                color: "$on_surface_medium",
               }}
             >
               Reactions will be timed for Live Streaming viewers.{" "}
@@ -142,7 +142,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: "$primaryLight",
+                color: "$primary_bright",
                 fontWeight: "$semiBold",
               }}
             >
@@ -170,7 +170,7 @@ const EmojiContainer = styled("span", {
   p: "$4",
   "&:hover": {
     p: "7px",
-    bg: "$surfaceLighter",
+    bg: "$surface_brighter",
     borderRadius: "$1",
   },
 });

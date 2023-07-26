@@ -24,7 +24,6 @@ import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import { ToastContainer } from "./components/Toast/ToastContainer";
 import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
-import { baseTheme } from "./themeColors";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
@@ -92,9 +91,6 @@ export function EdtechComponent({
             brandDark: shadeColor(color, -30),
             brandLight: shadeColor(color, 30),
             brandDisabled: shadeColor(color, 10),
-            ...(theme === "dark"
-              ? baseTheme.dark.colors
-              : baseTheme.light.colors),
           },
           fonts: {
             sans: [font, "Inter", "sans-serif"],

@@ -22,7 +22,7 @@ export const SpeakerTag = () => {
     <Flex
       align="center"
       justify="center"
-      css={{ flex: "1 1 0", color: "$textHighEmp", "@md": { display: "none" } }}
+      css={{ flex: "1 1 0", color: "$on_surface_high", "@md": { display: "none" } }}
     >
       <VolumeOneIcon />
       <Text
