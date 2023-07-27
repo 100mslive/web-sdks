@@ -52,7 +52,9 @@ export const IconButtonWithOptions = ({
     <Flex>
       <IconSection css={bgCss} onClick={onClick} key={key}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
-          <Box css={{ color: '$textHighEmp' }}>{icon}</Box>
+          <Flex align="center" justify="center" css={{ color: '$textHighEmp' }}>
+            {icon}
+          </Flex>
         </Tooltip>
       </IconSection>
       <Dropdown.Root>

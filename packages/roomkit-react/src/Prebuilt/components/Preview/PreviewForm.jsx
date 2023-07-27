@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
-import { ArrowRightIcon, RadioIcon } from '@100mslive/react-icons';
+import { RadioIcon } from '@100mslive/react-icons';
 import { sampleLayout } from '../../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { PreviewSettings } from './PreviewJoin';
@@ -53,7 +53,6 @@ const PreviewForm = ({
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
         {showGoLive ? <RadioIcon height={18} width={18} /> : null}
         {showGoLive ? joinForm.join_btn_label : 'Join Now'}
-        {!showGoLive ? <ArrowRightIcon height={18} width={18} /> : null}
       </Button>
     </Form>
   );

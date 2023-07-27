@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
@@ -17,7 +17,7 @@ import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
-import { useSidepaneState, useSidepaneToggle } from '../AppData/useSidepane';
+import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -74,16 +74,6 @@ export const RecordingStatus = () => {
 
 const EndStream = () => {
   const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-  const sidePane = useSidepaneState();
-  useEffect(() => {
-    if (window && !sidePane) {
-      const userStartedStream = window.sessionStorage.getItem('userStartedStream');
-      if (userStartedStream === 'true') {
-        toggleStreaming();
-        window.sessionStorage.setItem('userStartedStream', '');
-      }
-    }
-  }, [sidePane, toggleStreaming]);
 
   return (
     <Button data-testid="end_stream" variant="danger" icon onClick={toggleStreaming}>

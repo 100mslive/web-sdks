@@ -96,7 +96,6 @@ export const ConferenceMainView = () => {
     // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
       startHLS();
-      window.sessionStorage.setItem('userStartedStream', 'true');
     }
   }, [isConnected, hmsActions]);
 
