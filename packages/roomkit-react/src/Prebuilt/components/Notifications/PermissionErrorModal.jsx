@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSNotificationTypes, useAVToggle, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, Dialog, Flex, Text } from '../../../';
-import { config as cssConfig } from '../../../../dist';
+import { config as cssConfig } from '../../../';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
