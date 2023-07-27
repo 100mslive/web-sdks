@@ -4,6 +4,7 @@ import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
+  selectHLSState,
   selectIsConnectedToRoom,
   selectRoomState,
   useHMSActions,
@@ -20,6 +21,7 @@ import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUI
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
+import { HLSFailureModal } from './Notifications/HLSFailureModal';
 
 const Conference = () => {
   const navigate = useNavigation();
@@ -162,6 +164,7 @@ const Conference = () => {
         </Box>
       )}
       <RoleChangeRequestModal />
+      <HLSFailureModal />
     </Flex>
   );
 };

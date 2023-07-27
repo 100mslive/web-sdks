@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, Dialog, Flex, Text } from '../../../';
+import { config as cssConfig } from '../../../../dist';
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
+  const isMobile = useMedia(cssConfig.media.md);
 
   useEffect(() => {
     if (
@@ -54,10 +57,19 @@ export function PermissionErrorModal() {
               ? `Enable permissions for ${deviceType} from sytem settings`
               : `Enable permissions for ${deviceType} from address bar or browser settings`}
           </Text>
-          <Flex justify="end" css={{ w: '100%' }}>
+          <Flex justify="end" css={{ w: '100%', gap: '$8' }}>
             <Button outlined variant="standard" onClick={() => setDeviceType('')}>
               Dismiss
             </Button>
+            {isMobile ? (
+              <Button
+                onClick={() => {
+                  setDeviceType('');
+                }}
+              >
+                Retry
+              </Button>
+            ) : null}
           </Flex>
         </Dialog.Content>
       </Dialog.Portal>
