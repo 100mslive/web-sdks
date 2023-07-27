@@ -6,7 +6,7 @@ import { Text } from '../../Text';
 const FullPageProgress = ({ loaderColor = '$primaryDefault', loadingText = '' }) => (
   <Flex direction="column" justify="center" align="center" css={{ size: '100%', color: loaderColor }}>
     <Loading color="currentColor" size={100} />
-    {loadingText ? <Text>{loadingText}</Text> : null}
+    {loadingText ? <Text css={{ mt: '$10', color: '$textHighEmp' }}>{loadingText}</Text> : null}
   </Flex>
 );
 
