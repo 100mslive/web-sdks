@@ -26,7 +26,7 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store"
+    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store && npx prettier --write './docs/**/*'"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.3",
