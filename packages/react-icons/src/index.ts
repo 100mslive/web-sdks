@@ -193,6 +193,7 @@ export { default as QrCodeIcon } from './QrCodeIcon';
 export { default as QuestionIcon } from './QuestionIcon';
 export { default as QuestionMarkIcon } from './QuestionMarkIcon';
 export { default as QuizIcon } from './QuizIcon';
+export { default as RtmpIcon } from './RtmpIcon';
 export { default as RadioIcon } from './RadioIcon';
 export { default as ReactIcon } from './ReactIcon';
 export { default as RecordIcon } from './RecordIcon';
