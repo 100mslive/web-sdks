@@ -79,7 +79,7 @@ export const AmbientMusic = () => {
   }
 
   return (
-    <Tooltip title={playing ? `Disable Ambient Music` : `Play Ambient Music`} key="ambient-music">
+    <Tooltip title={`${playing ? `Disable Ambient Music` : `Play Ambient Music`}`} key="ambient-music">
       <IconButton css={{ mx: '$4' }} onClick={toggleAmbientMusic} active={!playing}>
         <MusicIcon />
       </IconButton>

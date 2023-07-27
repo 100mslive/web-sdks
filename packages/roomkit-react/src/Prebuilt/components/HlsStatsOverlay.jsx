@@ -44,7 +44,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
-      <HlsStatsRow label="Dropped frames">{hlsStatsState?.droppedFrames}</HlsStatsRow>
+      <HlsStatsRow label="Dropped frames">{`${hlsStatsState?.droppedFrames}`}</HlsStatsRow>
     </Flex>
   );
 }

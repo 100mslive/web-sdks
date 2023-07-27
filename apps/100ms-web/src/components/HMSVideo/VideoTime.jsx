@@ -27,8 +27,6 @@ export const VideoTime = ({ hlsPlayer }) => {
       variant={{
         "@sm": "xs",
       }}
-    >
-      {videoTime}
-    </Text>
+    >{`${videoTime}`}</Text>
   ) : null;
 };
