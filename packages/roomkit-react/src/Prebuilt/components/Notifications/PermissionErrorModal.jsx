@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { HMSNotificationTypes, useAVToggle, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { config as cssConfig } from '../../../../dist';
 
@@ -9,6 +9,7 @@ export function PermissionErrorModal() {
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const { toggleVideo, toggleAudio } = useAVToggle();
 
   useEffect(() => {
     if (
@@ -64,6 +65,13 @@ export function PermissionErrorModal() {
             {isMobile ? (
               <Button
                 onClick={() => {
+                  console.log(toggleAudio, toggleVideo);
+                  if (deviceType.includes('Camera') && toggleVideo) {
+                    toggleVideo();
+                  }
+                  if (deviceType.includes('Microphone') && toggleAudio) {
+                    toggleAudio();
+                  }
                   setDeviceType('');
                 }}
               >
