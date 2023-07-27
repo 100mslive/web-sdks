@@ -88,7 +88,7 @@ const selectScreenVideoTrackByIDBare = createSelector([selectTracksMap, selectTr
   return null;
 });
 
-export const selectPollByIDBare = createSelector([selectPollsMap, selectPollID], (storePolls, pollID) =>
+const selectPollByIDBare = createSelector([selectPollsMap, selectPollID], (storePolls, pollID) =>
   pollID ? storePolls[pollID] : null,
 );
 
