@@ -1,12 +1,11 @@
 import React, { Fragment, useState } from 'react';
 import { selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ColoredHandIcon, CrossIcon, GoLiveIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, CrossIcon, GoLiveIcon, RTMPIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import IconButton from '../../IconButton';
 import { StreamCard } from './Common';
 import { HLSStreaming } from './HLSStreaming';
-import { RTMPIcon } from './RTMPIcon';
 import { RTMPStreaming } from './RTMPStreaming';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';

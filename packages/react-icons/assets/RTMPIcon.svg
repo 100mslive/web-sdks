@@ -1,6 +1,4 @@
-export const RTMPIcon = props => {
-  return (
-    <svg width="49" height="50" viewBox="0 0 49 50" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+<svg width="49" height="50" viewBox="0 0 49 50" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="1.368" y="22.63" width="21.148" height="21.148" rx="10.574" fill="#fff" />
       <rect x="1.368" y="22.63" width="21.148" height="21.148" rx="10.574" fill="url(#a)" />
       <rect x="1.368" y="22.63" width="21.148" height="21.148" rx="10.574" stroke="#1B1F26" />
@@ -20,5 +18,3 @@ export const RTMPIcon = props => {
         </pattern>
       </defs>
     </svg>
-  );
-};
