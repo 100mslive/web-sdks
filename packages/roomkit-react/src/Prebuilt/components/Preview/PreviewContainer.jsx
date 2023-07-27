@@ -10,6 +10,7 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
@@ -18,6 +19,9 @@ const PreviewContainer = () => {
   const initialName = useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? 'Beam' : '');
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const authToken = useAuthToken();
+
+  const roomState = useHMSStore(selectRoomState);
+  const isPreview = roomState === HMSRoomState.Preview;
 
   const onJoin = () => {
     let meetingURL = `/meeting/${urlRoomId}`;
@@ -28,9 +32,11 @@ const PreviewContainer = () => {
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <Box css={{ h: '$18', '@md': { h: '$17', flexShrink: 0 } }} data-testid="header">
-        <Header />
-      </Box>
+      {isPreview ? null : (
+        <Box css={{ h: '$18', '@md': { h: '$17', flexShrink: 0 } }} data-testid="header">
+          <Header />
+        </Box>
+      )}
       <Flex
         css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primaryDefault' }}
         justify="center"

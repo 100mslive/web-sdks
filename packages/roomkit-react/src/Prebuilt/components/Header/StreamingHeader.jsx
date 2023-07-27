@@ -8,7 +8,7 @@ import { SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
-export const StreamingHeader = ({ isPreview }) => {
+export const StreamingHeader = () => {
   const isMobile = useMedia(cssConfig.media.md);
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
@@ -22,11 +22,11 @@ export const StreamingHeader = ({ isPreview }) => {
         {isMobile ? (
           <Flex align="center" gap={2}>
             <LeaveRoom />
-            {!isPreview ? <LiveStatus /> : null}
+            <LiveStatus />
             <RecordingStatus />
           </Flex>
         ) : null}
-        {!isPreview ? <SpeakerTag /> : null}
+        <SpeakerTag />
       </Flex>
 
       <Flex
@@ -47,7 +47,7 @@ export const StreamingHeader = ({ isPreview }) => {
             <StreamActions />
           </Flex>
         )}
-        {!isPreview ? <ParticipantCount /> : null}
+        <ParticipantCount />
       </Flex>
     </Flex>
   );

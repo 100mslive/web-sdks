@@ -96,7 +96,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   }, [authToken, skipPreview]);
 
   return roomState === HMSRoomState.Preview ? (
-    <Container css={{ h: '100%', '@md': { justifyContent: 'space-between' } }}>
+    <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />

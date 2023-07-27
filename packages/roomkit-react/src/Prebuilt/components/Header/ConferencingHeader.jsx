@@ -4,11 +4,11 @@ import { SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { StreamActions } from './StreamActions';
 
-export const ConferencingHeader = ({ isPreview }) => {
+export const ConferencingHeader = () => {
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
-        {!isPreview ? <SpeakerTag /> : null}
+        <SpeakerTag />
       </Flex>
 
       <Flex
@@ -20,7 +20,7 @@ export const ConferencingHeader = ({ isPreview }) => {
         }}
       >
         <StreamActions />
-        {!isPreview ? <ParticipantCount /> : null}
+        <ParticipantCount />
       </Flex>
     </Flex>
   );
