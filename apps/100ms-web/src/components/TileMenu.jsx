@@ -102,7 +102,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         }
       >
         <PinIcon />
-        <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile for myself</span>
+        <span>{isTilePinned ? "Unpin" : "Pin"} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
   );
@@ -206,7 +206,7 @@ const TileMenu = ({
                 }
               >
                 {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
-                <span>{`${isVideoEnabled ? "Mute" : "Request Unmute"}`}</span>
+                <span>{isVideoEnabled ? "Mute" : "Request Unmute"}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {toggleAudio ? (
@@ -219,7 +219,7 @@ const TileMenu = ({
                 }
               >
                 {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
-                <span>{`${isAudioEnabled ? "Mute" : "Request Unmute"}`}</span>
+                <span>{isAudioEnabled ? "Mute" : "Request Unmute"}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {audioTrackID ? (

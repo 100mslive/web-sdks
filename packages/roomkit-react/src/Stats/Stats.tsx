@@ -120,7 +120,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 
-          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
+          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={downlinkScore} />
 
           <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
 
