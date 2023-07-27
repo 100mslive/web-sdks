@@ -23,6 +23,10 @@ const HMSEdtechTemplate = React.lazy(() =>
   import('100ms_edtech_template').then(module => ({ default: module.EdtechComponent })),
 );
 let hostname = window.location.hostname;
+// check for app beam domain
+if (hostname?.includes('app-beam')) {
+  hostname = hostname.replace('app-beam', 'app');
+}
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;
 } else if (hostname.endsWith('dev-app.100ms.live')) {
