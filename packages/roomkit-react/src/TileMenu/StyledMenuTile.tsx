@@ -42,6 +42,7 @@ const styledItem = {
   alignItems: 'center',
   padding: '$4 $6',
   width: '100%',
+  backgroundColor: '$menuBg',
 };
 
 const StyledItemButton = styled('button', {
@@ -50,6 +51,7 @@ const StyledItemButton = styled('button', {
   '&:hover': {
     backgroundColor: '$background_dim',
   },
+  cursor: 'pointer',
   // TODO: default focus applied cause issues with this style
   '&:focus': {
     outline: 'none',
