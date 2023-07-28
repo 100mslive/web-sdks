@@ -6,7 +6,7 @@ export const baseConfig = {
     colors: {
       primary_default: '#2572ED',
       primary_bright: '#538DFF',
-      primary_dim: '002D6D',
+      primary_dim: '#002D6D',
       primary_disabled: '#004299',
       on_primary_high: '#FFFFFF',
       on_primary_medium: '#CCDAFF',
