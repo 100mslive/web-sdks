@@ -255,7 +255,8 @@ const App = () => {
               color: settings.brand_color,
               theme: settings.theme,
               logo:
-                settings.logo_url
+                settings.logo_url ||
+                (settings.theme === 'dark' ? logoDark : logoLight),
               headerPresent: String(!!getAuthInfo().userEmail),
               metadata: settings.metadataFields.metadata,
               recordingUrl: settings.recording_url,
