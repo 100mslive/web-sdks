@@ -31,7 +31,7 @@ Navigate to playwright directory before running below commands.
 ## Install packages
 
 ```
-yarn install
+yarn install 
 ```
 
 ## Run for say qa-in
