@@ -1,7 +1,7 @@
 import { Indicator, Root } from '@radix-ui/react-progress';
 import { styled } from '../Theme';
 
-const StyledIndicator = styled(Indicator, { h: '$4', backgroundColor: '$primary_default' });
+const StyledIndicator = styled(Indicator, { h: '$4', backgroundColor: '$primaryDefault' });
 
 const StyledRoot = styled(Root, {
   w: '100%',

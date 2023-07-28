@@ -28,7 +28,7 @@ const Wrapper = styled('div', {
   position: 'absolute',
   bottom: '$2',
   left: '$2',
-  backgroundColor: '$background_dim',
+  backgroundColor: '$backgroundDark',
   borderRadius: '$1',
   maxWidth: '85%',
   zIndex: 1,
