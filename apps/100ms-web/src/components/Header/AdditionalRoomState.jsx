@@ -89,7 +89,7 @@ export const AdditionalRoomState = () => {
         <Flex
           align="center"
           css={{
-            color: "$textPrimary",
+            color: "$textHighEmp",
             borderRadius: "$1",
             border: "1px solid $textDisabled",
             padding: "$4",
@@ -99,35 +99,35 @@ export const AdditionalRoomState = () => {
         >
           {!isAudioshareInactive && (
             <Tooltip title="Screenshare Audio">
-              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+              <Flex align="center" css={{ color: "$textHighEmp", mx: "$2" }}>
                 <MusicIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
           {shouldShowScreenShareState && (
             <Tooltip title="Screenshare">
-              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+              <Flex align="center" css={{ color: "$textHighEmp", mx: "$2" }}>
                 <ShareScreenIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
           {shouldShowVideoState && (
             <Tooltip title="video playlist">
-              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+              <Flex align="center" css={{ color: "$textHighEmp", mx: "$2" }}>
                 <VideoPlayerIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
           {!isPlaylistInactive && (
             <Tooltip title="Playlist Music">
-              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+              <Flex align="center" css={{ color: "$textHighEmp", mx: "$2" }}>
                 <AudioPlayerIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
           {whiteboardOwner && (
             <Tooltip title="Whiteboard">
-              <Flex align="center" css={{ color: "$textPrimary", mx: "$2" }}>
+              <Flex align="center" css={{ color: "$textHighEmp", mx: "$2" }}>
                 <PencilDrawIcon width={24} height={24} />
               </Flex>
             </Tooltip>
@@ -139,7 +139,7 @@ export const AdditionalRoomState = () => {
       </Dropdown.Trigger>
       <Dropdown.Content sideOffset={5} align="end" css={{ w: "$60" }}>
         {!isPlaylistInactive && (
-          <Dropdown.Item css={{ color: "$textPrimary" }}>
+          <Dropdown.Item css={{ color: "$textHighEmp" }}>
             <AudioPlayerIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               Playlist is playing
@@ -172,7 +172,7 @@ export const AdditionalRoomState = () => {
           </Dropdown.Item>
         )}
         {!isAudioshareInactive && (
-          <Dropdown.Item css={{ color: "$textPrimary" }}>
+          <Dropdown.Item css={{ color: "$textHighEmp" }}>
             <MusicIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               Music is playing
@@ -190,7 +190,7 @@ export const AdditionalRoomState = () => {
           </Dropdown.Item>
         )}
         {shouldShowScreenShareState && (
-          <Dropdown.Item css={{ color: "$textPrimary" }}>
+          <Dropdown.Item css={{ color: "$textHighEmp" }}>
             <ShareScreenIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               {`Shared by: ${
@@ -202,7 +202,7 @@ export const AdditionalRoomState = () => {
           </Dropdown.Item>
         )}
         {shouldShowVideoState && (
-          <Dropdown.Item css={{ color: "$textPrimary" }}>
+          <Dropdown.Item css={{ color: "$textHighEmp" }}>
             <VideoPlayerIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               {`Shared by: ${
@@ -214,7 +214,7 @@ export const AdditionalRoomState = () => {
           </Dropdown.Item>
         )}
         {whiteboardOwner && (
-          <Dropdown.Item css={{ color: "$textPrimary" }}>
+          <Dropdown.Item css={{ color: "$textHighEmp" }}>
             <PencilDrawIcon width={24} height={24} />
             <Text variant="sm" css={{ ml: "$2", flex: "1 1 0" }}>
               Whiteboard Owner - {whiteboardOwner.name}

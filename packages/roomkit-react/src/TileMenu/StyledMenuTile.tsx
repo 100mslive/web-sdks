@@ -14,7 +14,8 @@ const StyledTrigger = styled(Popover.Trigger, {
   height: '$13',
   color: '$on_surface_high',
   borderRadius: '$round',
-  backgroundColor: '$surface_dim',
+  backgroundColor: '$surface_bright',
+  cursor: 'pointer',
   border: 'none',
   ...flexCenter,
   '&:not([disabled]):focus': {
@@ -25,7 +26,7 @@ const StyledTrigger = styled(Popover.Trigger, {
 
 const StyledContent = styled(Popover.Content, {
   fontFamily: '$sans',
-  backgroundColor: '$background_dim',
+  backgroundColor: '$surface_bright',
   padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
@@ -49,7 +50,7 @@ const StyledItemButton = styled('button', {
   ...styledItem,
   height: '$14',
   '&:hover': {
-    backgroundColor: '$background_dim',
+    backgroundColor: '$surface_brighter',
   },
   cursor: 'pointer',
   // TODO: default focus applied cause issues with this style

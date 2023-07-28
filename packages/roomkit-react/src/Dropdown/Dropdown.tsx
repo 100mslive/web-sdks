@@ -52,12 +52,13 @@ const DropdownItem = styled(Item, {
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
+  backgroundColor: '$surface_default',
   '&:hover': {
     cursor: 'pointer',
-    bg: '$surface_brighter',
+    bg: '$surface_bright',
   },
   '&:focus-visible': {
-    bg: '$surface_brighter',
+    bg: '$surface_bright',
   },
 });
 

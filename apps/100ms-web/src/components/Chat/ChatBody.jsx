@@ -254,7 +254,7 @@ const ChatMessage = React.memo(
                 variant="sm"
                 css={{
                   ml: "$4",
-                  color: "$textSecondary",
+                  color: "$textMedEmp",
                   flexShrink: 0,
                 }}
               >

@@ -164,7 +164,7 @@ export const BulkRoleChangeModal = ({ onOpenChange }) => {
             onClick={changeBulkRole}
             disabled={!(selectedRole && selectedBulkRole.length > 0)}
           >
-            {isSubmiting && <Loading css={{ color: "$textSecondary" }} />}
+            {isSubmiting && <Loading css={{ color: "$textMedEmp" }} />}
             Apply
           </Button>
         </DialogRow>

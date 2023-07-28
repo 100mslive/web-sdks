@@ -133,7 +133,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: "$textSecondary",
+                color: "$textMedEmp",
               }}
             >
               Reactions will be timed for Live Streaming viewers.{" "}
@@ -150,8 +150,9 @@ export const EmojiReaction = () => {
                 href={HLS_TIMED_METADATA_DOC_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ color: "inherit", textDecoration: "none" }}
               >
-                {"Learn more ->"}
+                Learn more
               </a>
             </Text>
           </div>

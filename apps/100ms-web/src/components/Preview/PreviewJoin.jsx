@@ -99,7 +99,7 @@ const PreviewJoin = ({
         Get Started
       </Text>
       <Text
-        css={{ c: "$textSecondary", my: "$6", textAlign: "center" }}
+        css={{ c: "$textMedEmp", my: "$6", textAlign: "center" }}
         variant="body1"
       >
         Setup your audio and video before joining

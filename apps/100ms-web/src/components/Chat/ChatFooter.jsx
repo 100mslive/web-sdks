@@ -18,7 +18,7 @@ const TextArea = styled("textarea", {
   width: "100%",
   fontFamily: "$sans",
   bg: "transparent",
-  color: "$textPrimary",
+  color: "$textHighEmp",
   resize: "none",
   lineHeight: "1rem",
   position: "relative",
@@ -127,6 +127,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         placeholder="Write something here"
         ref={inputRef}
         autoFocus
+        css={{ fontSize: "1rem" }}
         onKeyPress={async event => {
           if (event.key === "Enter") {
             if (!event.shiftKey) {

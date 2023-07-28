@@ -113,8 +113,13 @@ export const EmojiReaction = () => {
                 fontWeight: '$semiBold',
               }}
             >
-              <a href={HLS_TIMED_METADATA_DOC_URL} target="_blank" rel="noopener noreferrer">
-                {'Learn more ->'}
+              <a
+                href={HLS_TIMED_METADATA_DOC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                Learn more.
               </a>
             </Text>
           </div>
