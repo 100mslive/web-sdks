@@ -7,7 +7,7 @@ export const Votes = ({ voters }) => {
 
   return (
     <Flex align="center" css={{ gap: "$4" }}>
-      <Text variant="sm" css={{ color: "$on_surface_medium" }}>
+      <Text variant="sm" css={{ color: "$textMedEmp" }}>
         {voters.length}&nbsp;
         {voters.length && voters.length !== 1 ? "votes" : "votes"}
       </Text>
@@ -16,7 +16,7 @@ export const Votes = ({ voters }) => {
         align="start"
         disabled={hiddenVotersCount === 0}
         boxCss={{
-          backgroundColor: "$surface_brighter",
+          backgroundColor: "$surfaceLighter",
           borderRadius: "$1",
           p: "$4 $6",
           top: "$2",
@@ -45,7 +45,7 @@ export const Votes = ({ voters }) => {
           {hiddenVotersCount ? (
             <Box
               css={{
-                backgroundColor: "$secondary_default",
+                backgroundColor: "$secondaryDefault",
                 borderRadius: "$round",
                 position: "relative",
                 left: "-$2",
@@ -56,7 +56,7 @@ export const Votes = ({ voters }) => {
                 variant="caption"
                 css={{
                   fontWeight: "$semiBold",
-                  color: "$on_surface_high",
+                  color: "$textHighEmp",
                   fontSize: "$tiny",
                 }}
               >

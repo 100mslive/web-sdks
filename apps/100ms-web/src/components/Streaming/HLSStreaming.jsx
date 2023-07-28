@@ -70,19 +70,19 @@ const Card = ({ title, icon, link, content, isHLSRunning, order = 0 }) => {
     <Box
       key={title}
       css={{
-        backgroundColor: "$surface_bright",
+        backgroundColor: "$surfaceLight",
         padding: "$10",
         order,
         borderRadius: "$2",
       }}
     >
-      <Flex align="center" gap="2" css={{ color: "$primary_bright" }}>
+      <Flex align="center" gap="2" css={{ color: "$primaryLight" }}>
         {icon}
         <Text variant="h6" css={{ fontWeight: "$semiBold" }}>
           {title}
         </Text>
       </Flex>
-      <Text variant="sm" css={{ color: "$on_surface_medium", mt: "$6" }}>
+      <Text variant="sm" css={{ color: "$textMedEmp", mt: "$6" }}>
         {content}
       </Text>
       <Button
@@ -208,7 +208,7 @@ const StartHLS = () => {
         <Text>
           <InfoIcon width={16} height={16} />
         </Text>
-        <Text variant="tiny" color="$on_surface_medium" css={{ mx: "$8" }}>
+        <Text variant="tiny" color="$textMedEmp" css={{ mx: "$8" }}>
           You cannot start recording once the stream starts, you will have to
           stop the stream to enable recording.
         </Text>

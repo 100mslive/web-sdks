@@ -282,9 +282,7 @@ const HLSView = () => {
                             css={{
                               height: "$4",
                               width: "$4",
-                              background: isVideoLive
-                                ? "$alert_error_default"
-                                : "#FFF",
+                              background: isVideoLive ? "$error" : "$white",
                               r: "$1",
                             }}
                           />

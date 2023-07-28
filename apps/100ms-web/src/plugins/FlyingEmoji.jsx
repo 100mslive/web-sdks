@@ -121,7 +121,7 @@ export function FlyingEmoji() {
               css={{
                 width: "fit-content",
                 padding: "$2 $4",
-                background: "$surface_bright",
+                background: "$surfaceLight",
                 borderRadius: "$1",
               }}
             >
@@ -129,7 +129,7 @@ export function FlyingEmoji() {
                 css={{
                   fontSize: "$space$6",
                   lineHeight: "$xs",
-                  color: "$on_surface_high",
+                  color: "$textHighEmp",
                 }}
               >
                 {emoji.senderName}

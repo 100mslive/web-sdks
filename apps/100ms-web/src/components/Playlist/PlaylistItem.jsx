@@ -28,10 +28,10 @@ export const PlaylistItem = React.memo(
           p: "$8",
           "&:hover": {
             cursor: "pointer",
-            bg: "$surface_default",
+            bg: "$menuBg",
           },
           "&:focus-visible": {
-            bg: "$surface_default",
+            bg: "$menuBg",
           },
         }}
         onClick={onClick}
@@ -43,7 +43,7 @@ export const PlaylistItem = React.memo(
         >
           <Text
             variant="md"
-            css={{ color: selected ? "$primary_default" : "$on_surface_high" }}
+            css={{ color: selected ? "$brandDefault" : "$textPrimary" }}
           >
             {name}
           </Text>

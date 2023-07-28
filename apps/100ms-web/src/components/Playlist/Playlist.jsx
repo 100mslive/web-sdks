@@ -95,15 +95,15 @@ export const Playlist = ({ type }) => {
             width: "$60",
             p: "$0",
             bg: "$bgSecondary",
-            border: "1px solid $surface_default",
+            border: "1px solid $menuBg",
           }}
         >
           <Flex
             align="center"
             css={{
               p: "$4 $8",
-              borderBottom: "1px solid $border_bright",
-              bg: "$surface_default",
+              borderBottom: "1px solid $borderLight",
+              bg: "$menuBg",
             }}
           >
             <Text variant="md" css={{ flex: "1 1 0" }}>

@@ -32,7 +32,7 @@ export const StreamingLanding = () => {
           css={{
             alignSelf: "center",
             p: "$4",
-            bg: "$surface_bright",
+            bg: "$surfaceLight",
             r: "$round",
           }}
         >
@@ -50,7 +50,7 @@ export const StreamingLanding = () => {
           <CrossIcon />
         </IconButton>
       </Flex>
-      <Text variant="tiny" color="$on_surface_medium">
+      <Text variant="tiny" color="$textMedEmp">
         Start Streaming
       </Text>
       {permissions?.hlsStreaming && (

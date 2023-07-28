@@ -7,7 +7,7 @@ const Tabs = ({ options, activeTab, setActiveTab }) => {
       css={{
         w: "100%",
         p: "$2",
-        backgroundColor: "$surface_default",
+        backgroundColor: "$surfaceDark",
         borderRadius: "$2",
       }}
     >
@@ -21,16 +21,14 @@ const Tabs = ({ options, activeTab, setActiveTab }) => {
               p: "$4 $8",
               borderRadius: "$1",
               w: "100%",
-              backgroundColor: isActive
-                ? "$surface_bright"
-                : "$surface_default",
+              backgroundColor: isActive ? "$surfaceLight" : "$surfaceDark",
               cursor: "pointer",
             }}
           >
             <Text
               variant="sm"
               css={{
-                color: isActive ? "$on_surface_high" : "$on_surface_low",
+                color: isActive ? "$textHighEmp" : "$textDisabled",
                 textAlign: "center",
                 fontWeight: "$semiBold",
               }}

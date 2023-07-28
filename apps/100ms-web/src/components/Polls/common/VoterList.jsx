@@ -19,7 +19,7 @@ export const VoterList = ({ voters }) => {
       />
       <Text
         variant="xs"
-        css={{ color: "$on_surface_medium", fontWeight: "$semiBold" }}
+        css={{ color: "$textMedEmp", fontWeight: "$semiBold" }}
       >
         {voter}
       </Text>

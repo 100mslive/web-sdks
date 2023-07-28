@@ -1,3 +1,6 @@
+import { useTheme } from "@100mslive/roomkit-react";
+
 export const useDropdownSelection = () => {
-  return '$primary_dim';
+  const { themeType } = useTheme();
+  return themeType === "dark" ? "$primaryDark" : "$grayLight";
 };

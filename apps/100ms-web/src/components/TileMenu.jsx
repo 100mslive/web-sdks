@@ -295,7 +295,7 @@ const SimulcastLayers = ({ trackId }) => {
   return (
     <Fragment>
       <StyledMenuTile.ItemButton
-        css={{ color: "$on_surface_medium", cursor: "default" }}
+        css={{ color: "$textMedEmp", cursor: "default" }}
       >
         Select maximum resolution
       </StyledMenuTile.ItemButton>
@@ -327,14 +327,14 @@ const SimulcastLayers = ({ trackId }) => {
             >
               {layer.layer}
             </Text>
-            <Text as="span" variant="xs" css={{ color: "$on_surface_medium" }}>
+            <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
               {layer.resolution.width}x{layer.resolution.height}
             </Text>
           </StyledMenuTile.ItemButton>
         );
       })}
       <StyledMenuTile.ItemButton>
-        <Text as="span" variant="xs" css={{ color: "$on_surface_medium" }}>
+        <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
           Currently streaming:
           <Text
             as="span"
@@ -342,7 +342,7 @@ const SimulcastLayers = ({ trackId }) => {
             css={{
               fontWeight: "$semiBold",
               textTransform: "capitalize",
-              color: "$on_surface_medium",
+              color: "$textMedEmp",
               ml: "$2",
             }}
           >

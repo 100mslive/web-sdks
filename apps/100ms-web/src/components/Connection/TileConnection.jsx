@@ -8,7 +8,7 @@ const TileConnection = ({ name, peerId, hideLabel, width }) => {
       {!hideLabel ? (
         <Text
           css={{
-            c: "$on_surface_high",
+            c: "$textHighEmp",
             ...textEllipsis(width - 60),
           }}
           variant="xs"
@@ -28,7 +28,7 @@ const Wrapper = styled("div", {
   position: "absolute",
   bottom: "$2",
   left: "$2",
-  backgroundColor: "$background_dim",
+  backgroundColor: "$backgroundDark",
   borderRadius: "$1",
   maxWidth: "85%",
   zIndex: 1,

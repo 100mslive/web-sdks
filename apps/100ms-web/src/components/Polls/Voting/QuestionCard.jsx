@@ -22,11 +22,11 @@ import { SingleChoiceOptions } from "../common/SingleChoiceOptions";
 import { QUESTION_TYPE } from "../../../common/constants";
 
 const TextArea = styled("textarea", {
-  backgroundColor: "$surface_brighter",
-  border: "1px solid $border_bright",
+  backgroundColor: "$surfaceLighter",
+  border: "1px solid $borderLight",
   borderRadius: "$1",
   mb: "$md",
-  color: "$on_surface_high",
+  color: "$textHighEmp",
   resize: "none",
   p: "$2",
   w: "100%",
@@ -137,22 +137,20 @@ export const QuestionCard = ({
   return (
     <Box
       css={{
-        backgroundColor: "$surface_bright",
+        backgroundColor: "$surfaceLight",
         borderRadius: "$1",
         p: "$md",
         mt: "$md",
         border:
           isQuiz && localPeerResponse && !localPeerResponse.skipped
-            ? `1px solid ${
-                isCorrectAnswer ? "$alert_success" : "$alert_error_default"
-              }`
+            ? `1px solid ${isCorrectAnswer ? "$success" : "$error"}`
             : "none",
       }}
     >
       <Flex align="center" justify="between">
         <Text
           variant="caption"
-          css={{ color: "$on_surface_low", fontWeight: "$semiBold" }}
+          css={{ color: "$textDisabled", fontWeight: "$semiBold" }}
         >
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
@@ -164,9 +162,9 @@ export const QuestionCard = ({
               onClick={movePrev}
               css={
                 prev
-                  ? { color: "$on_surface_high", cursor: "pointer" }
+                  ? { color: "$textHighEmp", cursor: "pointer" }
                   : {
-                      color: "$on_surface_low",
+                      color: "$textDisabled",
                       cursor: "not-allowed",
                     }
               }
@@ -178,9 +176,9 @@ export const QuestionCard = ({
               onClick={moveNext}
               css={
                 next
-                  ? { color: "$on_surface_high", cursor: "pointer" }
+                  ? { color: "$textHighEmp", cursor: "pointer" }
                   : {
-                      color: "$on_surface_low",
+                      color: "$textDisabled",
                       cursor: "not-allowed",
                     }
               }
@@ -192,7 +190,7 @@ export const QuestionCard = ({
       </Flex>
 
       <Box css={{ my: "$md" }}>
-        <Text css={{ color: "$on_surface_high" }}>{text}</Text>
+        <Text css={{ color: "$textHighEmp" }}>{text}</Text>
       </Box>
 
       {type === QUESTION_TYPE.SHORT_ANSWER ? (
@@ -202,9 +200,9 @@ export const QuestionCard = ({
           onChange={e => setTextAnswer(e.target.value)}
           css={{
             w: "100%",
-            backgroundColor: "$surface_brighter",
+            backgroundColor: "$surfaceLighter",
             mb: "$md",
-            border: "1px solid $border_default",
+            border: "1px solid $borderDefault",
             cursor: localPeerResponse ? "not-allowed" : "text",
           }}
         />
@@ -282,7 +280,7 @@ const QuestionActions = ({
       ) : null}
 
       {response ? (
-        <Text css={{ fontWeight: "$semiBold", color: "$on_surface_medium" }}>
+        <Text css={{ fontWeight: "$semiBold", color: "$textMedEmp" }}>
           {response.skipped
             ? "Skipped"
             : stringAnswerExpected

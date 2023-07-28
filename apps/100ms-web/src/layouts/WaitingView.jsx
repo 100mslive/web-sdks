@@ -11,7 +11,7 @@ export const WaitingView = React.memo(() => {
         maxWidth: "96%",
         h: "100%",
         m: "auto",
-        background: "$surface_default",
+        background: "$surfaceDefault",
         borderRadius: "$3",
       }}
       data-testid="waiting_view"
@@ -41,7 +41,7 @@ export const WaitingView = React.memo(() => {
             Please wait
           </Text>
           <Text
-            color="$on_surface_medium"
+            color="$textMedEmp"
             css={{ mt: "$4", "@md": { fontSize: "$sm" } }}
           >
             Sit back and relax till others let you join.

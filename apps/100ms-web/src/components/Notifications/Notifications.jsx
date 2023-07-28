@@ -172,9 +172,9 @@ export function Notifications() {
                 onClick={() => toggleWidget(notification.data.id)}
                 variant="standard"
                 css={{
-                  backgroundColor: "$surface_bright",
+                  backgroundColor: "$surfaceLight",
                   fontWeight: "$semiBold",
-                  color: "$on_surface_high",
+                  color: "$textHighEmp",
                   p: "$xs $md",
                 }}
               >

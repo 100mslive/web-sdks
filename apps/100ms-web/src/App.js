@@ -115,7 +115,7 @@ export function EdtechComponent({
           <Init />
           <Box
             css={{
-              bg: "$background_default",
+              bg: "$mainBg",
               w: "100%",
               lineHeight: "1.5",
               "-webkit-text-size-adjust": "100%",

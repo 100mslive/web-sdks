@@ -18,7 +18,7 @@ const TextArea = styled("textarea", {
   width: "100%",
   fontFamily: "$sans",
   bg: "transparent",
-  color: "$on_surface_high",
+  color: "$textPrimary",
   resize: "none",
   lineHeight: "1rem",
   position: "relative",
@@ -113,7 +113,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        bg: "$surface_bright",
+        bg: "$surfaceLight",
         minHeight: "$16",
         maxHeight: "$24",
         position: "relative",

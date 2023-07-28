@@ -19,11 +19,11 @@ export const PDFHeader = ({ onOpenChange, title = "", subtitle = "" }) => {
           <Flex
             onClick={() => onOpenChange(false)}
             css={{
-              color: "$on_surface_high",
+              color: "$textHighEmp",
               cursor: "pointer",
               p: "$2",
               borderRadius: "$round",
-              "&:hover": { backgroundColor: "$surface_brighter" },
+              "&:hover": { backgroundColor: "$surfaceLighter" },
             }}
           >
             <CrossIcon />
@@ -34,7 +34,7 @@ export const PDFHeader = ({ onOpenChange, title = "", subtitle = "" }) => {
         <Text
           variant="sm"
           css={{
-            c: "$on_surface_medium",
+            c: "$textMedEmp",
           }}
         >
           {subtitle}

@@ -12,10 +12,10 @@ export const PDFInfo = () => {
     <DialogRow
       css={{
         p: "$8",
-        bg: "$surface_bright",
+        bg: "$surfaceLight",
         r: "$1",
         outline: "none",
-        border: "1px solid $border_bright",
+        border: "1px solid $borderLight",
         mt: "$0",
       }}
     >
@@ -27,7 +27,7 @@ export const PDFInfo = () => {
           minWidth: "20px",
         }}
       />
-      <Text variant="caption" css={{ color: "$on_surface_medium" }}>
+      <Text variant="caption" css={{ color: "$textMedEmp" }}>
         On the next screen, ensure you select{" "}
         <span style={{ fontWeight: "600" }}>“This Tab”</span> and click on{" "}
         <span style={{ fontWeight: "600" }}>“Share” </span>

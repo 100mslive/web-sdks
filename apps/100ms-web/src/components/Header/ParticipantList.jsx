@@ -297,7 +297,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
               }}
             >
               <RemoveUserIcon />
-              <Text css={{ ml: "$4", color: "$alert_error_default" }}>
+              <Text css={{ ml: "$4", color: "$error" }}>
                 Remove Participant
               </Text>
             </Dropdown.Item>
@@ -356,7 +356,7 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
           left: "$4",
           top: "$2",
           transform: "translateY(50%)",
-          color: "$on_surface_medium",
+          color: "$textMedEmp",
         }}
       >
         <SearchIcon />

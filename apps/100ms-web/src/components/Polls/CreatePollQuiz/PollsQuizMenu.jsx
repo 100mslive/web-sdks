@@ -45,8 +45,8 @@ export const PollsQuizMenu = () => {
 
 function InteractionSelectionCard({ title, icon, active, onClick }) {
   const activeBorderStyle = active
-    ? "$space$px solid $primary_default"
-    : "$space$px solid $border_bright";
+    ? "$space$px solid $borderAccent"
+    : "$space$px solid $borderLight";
   return (
     <Flex
       onClick={onClick}
@@ -63,8 +63,8 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
         css={{
           border: activeBorderStyle,
           p: "$4",
-          bg: "$surface_bright",
-          c: "$on_surface_high",
+          bg: "$surfaceLight",
+          c: "$textHighEmp",
           r: "$0",
         }}
       >
@@ -111,7 +111,7 @@ const AddMenu = () => {
 
   return (
     <>
-      <Text variant="caption" css={{ c: "$on_surface_medium", mb: "$md" }}>
+      <Text variant="caption" css={{ c: "$textMedEmp", mb: "$md" }}>
         Select the type you want to continue with
       </Text>
       <Flex css={{ w: "100%", gap: "$10", mb: "$md" }}>
@@ -143,7 +143,7 @@ const AddMenu = () => {
             onCheckedChange={value => setHideVoteCount(value)}
             css={{ mr: "$6" }}
           />
-          <Text variant="body2" css={{ c: "$on_surface_medium" }}>
+          <Text variant="body2" css={{ c: "$textMedEmp" }}>
             Hide Vote Count
           </Text>
         </Flex>
@@ -152,7 +152,7 @@ const AddMenu = () => {
             onCheckedChange={value => setAnonymous(value)}
             css={{ mr: "$6" }}
           />
-          <Text variant="body2" css={{ c: "$on_surface_medium" }}>
+          <Text variant="body2" css={{ c: "$textMedEmp" }}>
             Make Results Anonymous
           </Text>
         </Flex>
@@ -200,13 +200,13 @@ const PrevMenu = () => {
   return polls?.length ? (
     <Flex
       css={{
-        borderTop: "$space$px solid $border_bright",
+        borderTop: "$space$px solid $borderLight",
         mt: "$10",
         pt: "$10",
       }}
     >
       <Flex direction="column" css={{ w: "100%" }}>
-        <Text variant="h6" css={{ c: "$on_surface_high" }}>
+        <Text variant="h6" css={{ c: "$textHighEmp" }}>
           Previous Polls/Quiz
         </Text>
         <Flex direction="column" css={{ gap: "$10", mt: "$8" }}>
@@ -238,12 +238,12 @@ const InteractionCard = ({ id, title, isLive, isTimed }) => {
   return (
     <Flex
       direction="column"
-      css={{ backgroundColor: "$surface_bright", borderRadius: "$1", p: "$8" }}
+      css={{ backgroundColor: "$surfaceLight", borderRadius: "$1", p: "$8" }}
     >
       <Flex css={{ w: "100%", justifyContent: "space-between", mb: "$sm" }}>
         <Text
           variant="sub1"
-          css={{ c: "$on_surface_high", fontWeight: "$semiBold" }}
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold" }}
         >
           {title}
         </Text>

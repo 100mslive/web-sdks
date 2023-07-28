@@ -7,7 +7,7 @@ import { QUESTION_TYPE_TITLE } from "../../../common/constants";
 export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
   return (
     <>
-      <Text variant="overline" css={{ c: "$on_surface_low" }}>
+      <Text variant="overline" css={{ c: "$textDisabled" }}>
         Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
       </Text>
       <Text variant="body2" css={{ mt: "$4", mb: "$md" }}>
@@ -15,11 +15,11 @@ export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
       </Text>
       {question.options.map(option => (
         <Flex css={{ alignItems: "center" }}>
-          <Text variant="body2" css={{ my: "$xs", c: "$on_surface_medium" }}>
+          <Text variant="body2" css={{ my: "$xs", c: "$textMedEmp" }}>
             {option.text}
           </Text>
           {option.isCorrectAnswer && (
-            <Box css={{ color: "$alert_success", mx: "$xs" }}>
+            <Box css={{ color: "$success", mx: "$xs" }}>
               <CheckCircleIcon />
             </Box>
           )}

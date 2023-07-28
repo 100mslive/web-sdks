@@ -56,18 +56,18 @@ const MessageTypeContainer = ({ left, right }) => {
         ml: "auto",
         mr: "$4",
         p: "$2 $4",
-        border: "1px solid $on_surface_low",
+        border: "1px solid $textDisabled",
         r: "$0",
       }}
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: "$on_surface_medium" }}>
+        <SenderName variant="tiny" as="span" css={{ color: "$textMedEmp" }}>
           {left}
         </SenderName>
       )}
       {left && right && (
         <Box
-          css={{ borderLeft: "1px solid $on_surface_low", mx: "$4", h: "$8" }}
+          css={{ borderLeft: "1px solid $textDisabled", mx: "$4", h: "$8" }}
         />
       )}
       {right && (
@@ -219,7 +219,7 @@ const ChatMessage = React.memo(
           align="center"
           css={{
             flexWrap: "wrap",
-            bg: messageType ? "$surface_bright" : undefined,
+            bg: messageType ? "$surfaceLight" : undefined,
             r: messageType ? "$1" : undefined,
             px: messageType ? "$4" : "$2",
             py: messageType ? "$4" : 0,
@@ -230,7 +230,7 @@ const ChatMessage = React.memo(
         >
           <Text
             css={{
-              color: "$on_surface_high",
+              color: "$textHighEmp",
               fontWeight: "$semiBold",
               display: "inline-flex",
               alignItems: "center",
@@ -254,7 +254,7 @@ const ChatMessage = React.memo(
                 variant="sm"
                 css={{
                   ml: "$4",
-                  color: "$on_surface_medium",
+                  color: "$textSecondary",
                   flexShrink: 0,
                 }}
               >

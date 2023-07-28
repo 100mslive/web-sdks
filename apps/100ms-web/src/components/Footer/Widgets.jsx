@@ -71,10 +71,10 @@ const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
     >
       <Flex
         css={{
-          border: "$space$px solid $border_bright",
+          border: "$space$px solid $borderLight",
           r: "$1",
           p: "$4",
-          c: "$on_surface_high",
+          c: "$textHighEmp",
         }}
       >
         {Icon}
@@ -82,7 +82,7 @@ const WidgetOptions = ({ title, onClick, subtitle, Icon }) => {
       <Flex direction="column" css={{ ml: "$md" }}>
         <Text
           variant="sub2"
-          css={{ c: "$on_surface_high", fontWeight: "$semiBold", mb: "$4" }}
+          css={{ c: "$textHighEmp", fontWeight: "$semiBold", mb: "$4" }}
         >
           {title}
         </Text>

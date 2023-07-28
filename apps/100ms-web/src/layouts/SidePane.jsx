@@ -16,7 +16,7 @@ const SidePane = ({ css = {} }) => {
     w: "$100",
     h: "100%",
     p: "$10",
-    bg: "$surface_default",
+    bg: "$surfaceDefault",
     r: "$1",
     top: 0,
     zIndex: 10,

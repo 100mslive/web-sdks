@@ -37,7 +37,7 @@ export const ParticipantFilter = ({
         asChild
         data-testid="participant_list_filter"
         css={{
-          border: "1px solid $on_surface_low",
+          border: "1px solid $textDisabled",
           r: "$0",
           p: "$2 $4",
         }}
@@ -47,7 +47,7 @@ export const ParticipantFilter = ({
           <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || "Everyone"}
           </Text>
-          <Box css={{ ml: "$2", color: "$on_surface_low" }}>
+          <Box css={{ ml: "$2", color: "$textDisabled" }}>
             {open ? (
               <ChevronUpIcon width={14} height={14} />
             ) : (

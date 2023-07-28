@@ -109,9 +109,9 @@ export function ShareScreenOptions() {
                   p: "$6",
                   display: "flex",
                   justifyContent: "center",
-                  border: "1px solid $border_bright",
+                  border: "1px solid $grayDefault",
                   r: "$2",
-                  bg: "$surface_brighter",
+                  bg: "$surfaceLighter",
                   pb: "0",
                 }}
               >
@@ -129,7 +129,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: "$on_surface_low",
+                    c: "$textDisabled",
                     textAlign: "center",
                   }}
                 >
@@ -153,9 +153,9 @@ export function ShareScreenOptions() {
                   p: "$6",
                   display: "flex",
                   justifyContent: "center",
-                  border: "$border_bright 1px solid",
+                  border: "$grayDefault 1px solid",
                   r: "$2",
-                  bg: "$surface_bright",
+                  bg: "$surfaceLight",
                   pb: "0",
                 }}
               >
@@ -175,7 +175,7 @@ export function ShareScreenOptions() {
                     left: "54%",
                     padding: "$2 $4",
                     r: "$2",
-                    bg: "$primary_bright",
+                    bg: "$primaryLight",
                     zIndex: "2",
                   }}
                 >
@@ -195,7 +195,7 @@ export function ShareScreenOptions() {
                     variant="xs"
                     css={{
                       fontWeight: "$semiBold",
-                      c: "#FFF",
+                      c: "$white",
                       pr: "$4",
                     }}
                   >
@@ -208,7 +208,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: "$on_surface_low",
+                    c: "$textDisabled",
                     textAlign: "center",
                   }}
                 >

@@ -99,7 +99,7 @@ const PreviewJoin = ({
         Get Started
       </Text>
       <Text
-        css={{ c: "$on_surface_medium", my: "$6", textAlign: "center" }}
+        css={{ c: "$textSecondary", my: "$6", textAlign: "center" }}
         variant="body1"
       >
         Setup your audio and video before joining
@@ -149,7 +149,7 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: "$surface_default",
+        bg: "$surfaceDefault",
         aspectRatio: width / height,
         width: "unset",
         height: "min(360px, 60vh)",
