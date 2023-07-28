@@ -28,10 +28,10 @@ export const baseTheme = {
     grayDark: "#303740",
     secondaryGray: "#242A33",
     grayDisabled: "#DCE4EF",
-    menuBg: "$grayDark",
+    menuBg: "#303740",
     textHighEmp: "#FFFFFF",
     textMedEmp: "#CCDAFF",
-    textDisabled: "#84AAFF",
+    textDisabled: "rgba(255, 255, 255, 0.48)",
 
     // text variants when bg is accent (blue)
     // same for both themes
