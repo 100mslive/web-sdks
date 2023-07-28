@@ -49,12 +49,18 @@ export const ChangeSelfRole = ({ onClick }) => {
       <Dropdown.SubMenuContent
         sideOffset={8}
         alignOffset={-5}
-        css={{ "@md": { w: "$64" } }}
+        css={{
+          backgroundColor: "$surfaceDefault",
+          "@md": { w: "$64" },
+        }}
       >
         {availableSelfChangeRoles.map((role, i) => (
           <Dropdown.Item
             key={role}
-            css={{ justifyContent: "space-between" }}
+            css={{
+              justifyContent: "space-between",
+              "&:hover": { backgroundColor: "$surfaceLight" },
+            }}
             onClick={async () => {
               try {
                 await hmsActions.changeRole(localPeerId, role, true);

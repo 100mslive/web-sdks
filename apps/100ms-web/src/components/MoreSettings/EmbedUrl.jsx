@@ -20,6 +20,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
   }
   return (
     <Dropdown.Item
+    css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
       onClick={() => {
         if (!amIScreenSharing) {
           setShowOpenUrl(true);

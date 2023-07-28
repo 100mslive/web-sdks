@@ -43,6 +43,7 @@ const DropdownTriggerItem = styled(SubTrigger, {
   },
   '&:focus-visible': {
     bg: '$surface_brighter',
+    outline: 'none',
   },
 });
 
@@ -64,7 +65,7 @@ const DropdownItem = styled(Item, {
 
 const DropdownItemSeparator = styled(Separator, {
   h: 1,
-  backgroundColor: '$border_default',
+  backgroundColor: '$border_bright',
   m: '$4 $8',
 });
 
@@ -73,7 +74,7 @@ const DropdownContent = styled(Content, {
   maxHeight: '$64',
   r: '$1',
   py: '$4',
-  backgroundColor: '$surface_bright',
+  backgroundColor: '$surface_default',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,

@@ -39,6 +39,7 @@ export function ShareScreenOptions() {
     });
   };
   const { toggleScreenShare } = useScreenShare();
+
   return (
     <Fragment>
       <Dropdown.Root
@@ -74,7 +75,7 @@ export function ShareScreenOptions() {
               pt: "$10",
               pb: "$6",
               "&:hover": {
-                bg: "$transparent",
+                bg: "$surfaceDefault",
                 cursor: "default",
               },
             }}
@@ -90,7 +91,7 @@ export function ShareScreenOptions() {
               px: "$10",
               py: "$6",
               "&:hover": {
-                bg: "$transparent",
+                bg: "$surfaceDefault",
                 cursor: "default",
               },
             }}
@@ -184,7 +185,7 @@ export function ShareScreenOptions() {
                       w: "$10",
                       h: "$8",
                       "&:hover": {
-                        bg: "$transparent !important",
+                        bg: "$surfaceDefault !important",
                         border: "none",
                       },
                     }}
@@ -223,7 +224,7 @@ export function ShareScreenOptions() {
               pb: "$10",
               pt: "$6",
               "&:hover": {
-                bg: "$transparent",
+                bg: "$surfaceDefault",
                 cursor: "default",
               },
             }}

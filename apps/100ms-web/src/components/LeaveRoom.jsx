@@ -117,7 +117,11 @@ export const LeaveRoom = () => {
             </Dropdown.Trigger>
             <Dropdown.Content css={{ p: 0 }} alignOffset={-50} sideOffset={10}>
               <Dropdown.Item
-                css={{ w: "100%", bg: "rgba(178, 71, 81, 0.1)" }}
+                css={{
+                  w: "100%",
+                  bg: "rgba(178, 71, 81, 0.1)",
+                  "&:hover": { backgroundColor: "$surfaceLight" },
+                }}
                 onClick={() => {
                   setShowEndRoomModal(true);
                 }}
@@ -138,7 +142,10 @@ export const LeaveRoom = () => {
                 </Flex>
               </Dropdown.Item>
               <Dropdown.Item
-                css={{ bg: "$surfaceDefault" }}
+                css={{
+                  bg: "$surfaceDefault",
+                  "&:hover": { backgroundColor: "$surfaceLight" },
+                }}
                 onClick={leaveRoom}
                 data-testid="just_leave_btn"
               >

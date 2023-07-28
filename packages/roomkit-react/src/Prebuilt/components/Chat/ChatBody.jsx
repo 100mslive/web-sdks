@@ -132,14 +132,16 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <Box>
-              <HorizontalMenuIcon />
-            </Box>
+            <HorizontalMenuIcon />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content sideOffset={5} align="end" css={{ width: '$48' }}>
+        <Dropdown.Content
+          sideOffset={5}
+          align="end"
+          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0' }}
+        >
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
             <Text variant="sm" css={{ ml: '$4' }}>

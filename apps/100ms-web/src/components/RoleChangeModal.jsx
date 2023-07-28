@@ -60,7 +60,12 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ width: "min(400px,80%)", p: "$10" }}>
+        <Dialog.Content
+          css={{
+            width: "min(400px,80%)",
+            p: "$10",
+          }}
+        >
           <Dialog.Title css={{ p: 0 }} asChild>
             <Text as="h6" variant="h6">
               Change Role
@@ -146,7 +151,16 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                           onSelect={() => setRole(role)}
                           css={{
                             px: "$9",
-                            bg: role === selectedRole ? selectionBg : undefined,
+                            bg:
+                              role === selectedRole
+                                ? selectionBg
+                                : "$surfaceLight",
+                            "&:hover": {
+                              backgroundColor:
+                                role !== selectedRole
+                                  ? "$surfaceLighter"
+                                  : "$primaryDefault",
+                            },
                           }}
                         >
                           {role}

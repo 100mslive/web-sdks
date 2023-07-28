@@ -30,7 +30,11 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
     <Dropdown.Item
       data-testid="chat_members"
-      css={{ align: "center", px: "$10" }}
+      css={{
+        align: "center",
+        px: "$10",
+        "&:hover": { backgroundColor: "$surfaceLighter" },
+      }}
       onClick={onClick}
     >
       <Text variant="sm">{value}</Text>
