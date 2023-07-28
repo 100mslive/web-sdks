@@ -150,6 +150,9 @@ module.exports = {
       template: path.resolve(__dirname, './public/index.html'),
       base: '/',
     }),
+    new webpack.ProvidePlugin({
+      React: 'react',
+    }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(process.env),
     }),
