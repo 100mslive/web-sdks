@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import merge from 'lodash.merge';
 import { logError } from 'zipyai';
-import { Box, Flex, HMSPrebuilt, Loading } from '@100mslive/roomkit-react';
+import { Flex, Loading } from '@100mslive/roomkit-react';
 import {
   apiBasePath,
   getAuthInfo,
@@ -18,6 +18,12 @@ import logoLight from './assets/images/logo-on-white.png';
 const Header = React.lazy(() => import('./components/Header'));
 const RoomSettings = React.lazy(() => import('./components/RoomSettings'));
 const ErrorModal = React.lazy(() => import('./components/ErrorModal'));
+const HMSEdtechTemplate = React.lazy(() =>
+  // eslint-disable-next-line import/no-unresolved
+  import('100ms_edtech_template').then(module => ({
+    default: module.EdtechComponent,
+  }))
+);
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname = process.env.REACT_APP_HOST_NAME || hostname;
@@ -241,28 +247,22 @@ const App = () => {
             </Flex>
           }
         >
-          <Box css={{ flex: '1 1 0', minHeight: 0 }}>
-            <HMSPrebuilt
-              options={{
-                endPoints: {
-                  tokenByRoomIdRole: `${apiBasePath + hostname}/`,
-                  tokenByRoomCode: getAuthTokenByRoomCodeEndpoint(),
-                  init: `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`,
-                },
-              }}
-              themeConfig={{
-                aspectRatio: settings.tile_shape,
-                font: settings.font,
-                color: settings.brand_color,
-                theme: settings.theme,
-                logo:
-                  settings.logo_url ||
-                  (settings.theme === 'dark' ? logoDark : logoLight),
-                metadata: settings.metadataFields.metadata,
-                recordingUrl: settings.recording_url,
-              }}
-            />
-          </Box>
+          <HMSEdtechTemplate
+            tokenEndpoint={`${apiBasePath + hostname}/`}
+            themeConfig={{
+              aspectRatio: settings.tile_shape,
+              font: settings.font,
+              color: settings.brand_color,
+              theme: settings.theme,
+              logo:
+                settings.logo_url
+              headerPresent: String(!!getAuthInfo().userEmail),
+              metadata: settings.metadataFields.metadata,
+              recordingUrl: settings.recording_url,
+            }}
+            authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
+            getDetails={fetchData}
+          />
         </Suspense>
       )}
       {showSettingsModal && (
