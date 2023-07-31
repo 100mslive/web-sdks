@@ -1,8 +1,8 @@
 import React from 'react';
-import { Box, Flex, Text } from '../../';
+import { Box, Flex, Text } from '../..';
 import { CREATE_ROOM_DOC_URL } from '../common/constants';
 
-function ErrorPage({ error }) {
+function ErrorScreen({ error }) {
   const isSSR = typeof window === 'undefined';
   return (
     <Flex
@@ -47,6 +47,6 @@ function ErrorPage({ error }) {
   );
 }
 
-ErrorPage.displayName = 'ErrorPage';
+ErrorScreen.displayName = 'ErrorScreen';
 
-export default ErrorPage;
+export default ErrorScreen;
