@@ -1,5 +1,3 @@
-import { QUERY_PARAM_SKIP_PREVIEW } from './constants';
-
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);

@@ -1,4 +1,4 @@
-import { QUERY_PARAM_SKIP_PREVIEW, QUESTION_TYPE } from "./constants";
+import { QUESTION_TYPE } from "./constants";
 
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
