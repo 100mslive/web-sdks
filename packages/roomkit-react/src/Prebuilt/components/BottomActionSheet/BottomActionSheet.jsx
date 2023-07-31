@@ -12,8 +12,14 @@ const BottomActionSheet = ({
   // A negative offset allows it to start from the bottom of the screen.
   sideOffset = -50,
   defaultHeight = 50,
+  disabled = false,
+  onBackClick = null,
 }) => {
-  const MINIMUM_HEIGHT = 20; // vh
+  if (disabled) {
+    return;
+  }
+
+  const MINIMUM_HEIGHT = 40; // vh
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetHeight, setSheetHeight] = useState(`${Math.min(Math.max(MINIMUM_HEIGHT, defaultHeight), 100)}vh`);
   const closeRef = useRef(null);
