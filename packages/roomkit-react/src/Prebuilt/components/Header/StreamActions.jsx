@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
-  selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
