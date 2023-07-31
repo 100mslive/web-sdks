@@ -61,7 +61,7 @@ export const ChatHeader = React.memo(
               w: "$64",
               overflow: "hidden",
               maxHeight: "unset",
-              backgroundColor: "$surfaceDefault",
+              backgroundColor: "$surface_default",
             }}
             align="start"
             sideOffset={8}

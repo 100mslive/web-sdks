@@ -13,7 +13,7 @@ export const Input = styled('input', {
   border: '1px solid $border_bright',
   padding: '0.5rem 0.75rem',
   minHeight: '30px',
-  color: '$on_primary_high',
+  color: '$on_surface_high',
   fontSize: '$md',
   '&:focus': {
     boxShadow: '0 0 0 1px $colors$primary_default',

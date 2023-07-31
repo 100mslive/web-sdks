@@ -64,7 +64,7 @@ export const ParticipantFilter = ({
           maxHeight: "$96",
           boxShadow: "$md",
           w: "$48",
-          backgroundColor: "$surfaceDefault",
+          backgroundColor: "$surface_default",
         }}
       >
         <Item
@@ -80,7 +80,9 @@ export const ParticipantFilter = ({
           icon={<HandRaiseIcon />}
           value={{ metadata: { isHandRaised: true }, role: "" }}
         />
-        <Dropdown.ItemSeparator css={{ backgroundColor: "$surfaceLighter" }} />
+        <Dropdown.ItemSeparator
+          css={{ backgroundColor: "$surface_brighter" }}
+        />
         {roles
           .filter(role => !isInternalRole(role))
           .map(role => (
@@ -100,7 +102,7 @@ export const ParticipantFilter = ({
 const Item = ({ selected, title, onSelection, value, icon }) => {
   return (
     <Dropdown.Item
-      css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+      css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
       onClick={e => {
         e.preventDefault();
         onSelection(value);

@@ -33,7 +33,7 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
       css={{
         align: "center",
         px: "$10",
-        "&:hover": { backgroundColor: "$surfaceLighter" },
+        "&:hover": { backgroundColor: "$surface_brighter" },
       }}
       onClick={onClick}
     >

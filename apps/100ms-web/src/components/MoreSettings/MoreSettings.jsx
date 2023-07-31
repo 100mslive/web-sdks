@@ -113,7 +113,7 @@ export const MoreSettings = () => {
           sideOffset={5}
           align="center"
           css={{
-            backgroundColor: "$surfaceDefault",
+            backgroundColor: "$surface_default",
             maxHeight: "$96",
             "@md": { w: "$64" },
             "div[role='separator']:first-child": {
@@ -124,7 +124,7 @@ export const MoreSettings = () => {
           {isMobile && permissions?.browserRecording ? (
             <>
               <Dropdown.Item
-                css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+                css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
                 onClick={() => updateState(MODALS.START_RECORDING, true)}
               >
                 <RecordIcon />
@@ -136,7 +136,7 @@ export const MoreSettings = () => {
           ) : null}
           {isChangeNameEnabled && (
             <Dropdown.Item
-              css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               data-testid="change_name_btn"
             >
@@ -151,7 +151,7 @@ export const MoreSettings = () => {
           />
           {permissions?.changeRole && (
             <Dropdown.Item
-              css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
               onClick={() => updateState(MODALS.BULK_ROLE_CHANGE, true)}
               data-testid="bulk_role_change_btn"
             >
@@ -169,7 +169,7 @@ export const MoreSettings = () => {
           )}
           {permissions.mute && (
             <Dropdown.Item
-              css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+              css={{ "&:hover": { backgroundColor: "$surfaceight" } }}
               onClick={() => updateState(MODALS.MUTE_ALL, true)}
               data-testid="mute_all_btn"
             >
@@ -180,7 +180,7 @@ export const MoreSettings = () => {
             </Dropdown.Item>
           )}
           <Dropdown.Item
-            css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+            css={{ "&:hover": { backgroundColor: "$surfaceight" } }}
             onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)}
             data-testid="device_settings_btn"
           >
@@ -194,7 +194,7 @@ export const MoreSettings = () => {
             (localPeerRole === "hls-viewer" ? (
               Hls.isSupported() ? (
                 <Dropdown.Item
-                  css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+                  css={{ "&:hover": { backgroundColor: "$surfaceight" } }}
                   onClick={() =>
                     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)
                   }
@@ -225,7 +225,7 @@ export const MoreSettings = () => {
               ) : null
             ) : (
               <Dropdown.Item
-                css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+                css={{ "&:hover": { backgroundColor: "$surfaceight" } }}
                 onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)}
                 data-testid="stats_for_nreds_btn"
               >

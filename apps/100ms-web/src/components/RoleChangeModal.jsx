@@ -154,12 +154,12 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                             bg:
                               role === selectedRole
                                 ? selectionBg
-                                : "$surfaceLight",
+                                : "$surface_bright",
                             "&:hover": {
                               backgroundColor:
                                 role !== selectedRole
-                                  ? "$surfaceLighter"
-                                  : "$primaryDefault",
+                                  ? "$surface_brighter"
+                                  : "$primary_default",
                             },
                           }}
                         >

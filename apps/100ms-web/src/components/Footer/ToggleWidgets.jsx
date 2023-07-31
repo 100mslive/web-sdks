@@ -5,8 +5,8 @@ import {
   InteractionOpenIcon,
 } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/roomkit-react";
-import IconButton from "../../IconButton";
 import { useWidgetToggle } from "../AppData/useSidepane";
+import IconButton from "../../IconButton";
 import {
   useShowAudioShare,
   useShowPolls,
@@ -32,8 +32,16 @@ export const ToggleWidgets = () => {
         zIndex: "100",
       }}
     >
-      <IconButton data-testid="get_widgets" onClick={() => toggle()} icon>
-        {widgetView ? <InteractionOpenIcon /> : <InteractionClosedIcon />}
+      <IconButton
+        data-testid="get_widgets"
+        onClick={() => toggle()}
+        css={{ color: "$on_surface_high" }}
+      >
+        {widgetView ? (
+          <InteractionOpenIcon style={{ color: "inherit" }} />
+        ) : (
+          <InteractionClosedIcon style={{ color: "inherit" }} />
+        )}
       </IconButton>
     </Tooltip>
   );

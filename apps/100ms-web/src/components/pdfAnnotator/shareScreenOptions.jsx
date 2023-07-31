@@ -75,7 +75,7 @@ export function ShareScreenOptions() {
               pt: "$10",
               pb: "$6",
               "&:hover": {
-                bg: "$surfaceDefault",
+                bg: "$surface_default",
                 cursor: "default",
               },
             }}
@@ -91,7 +91,7 @@ export function ShareScreenOptions() {
               px: "$10",
               py: "$6",
               "&:hover": {
-                bg: "$surfaceDefault",
+                bg: "$surface_default",
                 cursor: "default",
               },
             }}
@@ -185,7 +185,7 @@ export function ShareScreenOptions() {
                       w: "$10",
                       h: "$8",
                       "&:hover": {
-                        bg: "$surfaceDefault !important",
+                        bg: "$surface_default !important",
                         border: "none",
                       },
                     }}
@@ -224,7 +224,7 @@ export function ShareScreenOptions() {
               pb: "$10",
               pt: "$6",
               "&:hover": {
-                bg: "$surfaceDefault",
+                bg: "$surface_default",
                 cursor: "default",
               },
             }}
