@@ -38,10 +38,6 @@ import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { getParticipantChipContent } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../';
-import BottomActionSheet from '../BottomActionSheet/BottomActionSheet';
-import { settingsList } from '../Settings/common';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -241,39 +237,13 @@ const PreviewControls = ({ hideSettings }) => {
 // Bottom action sheet goes here, if isMobile
 export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
-  const [activeTabName, setActiveTabName] = useState('Settings');
-  const isMobile = useMedia(cssConfig.media.md);
-  const [showSetting, setShowSetting] = useState(() =>
-    settingsList.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {}),
-  );
+
   return (
     <Fragment>
-      <IconButton
-        data-testid="preview_setting_btn"
-        onClick={() => {
-          if (!isMobile) {
-            setOpen(value => !value);
-          }
-        }}
-      >
-        {isMobile ? (
-          <BottomActionSheet triggerContent={<SettingsIcon />}>
-            {settingsList
-              .filter(({ tabName }) => showSetting[tabName])
-              .map(({ icon: Icon, tabName, title }) => {
-                return (
-                  <Flex align="center" key={tabName} css={{ gap: '$8', w: '100%' }}>
-                    <Icon />
-                    {title}
-                  </Flex>
-                );
-              })}
-          </BottomActionSheet>
-        ) : (
-          <SettingsIcon />
-        )}
+      <IconButton data-testid="preview_setting_btn" onClick={() => setOpen(value => !value)}>
+        <SettingsIcon />
       </IconButton>
-      {open && <SettingsModal open={open && !isMobile} onOpenChange={setOpen} />}
+      {open && <SettingsModal open={open} onOpenChange={setOpen} />}
     </Fragment>
   );
 });

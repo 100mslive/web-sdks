@@ -5,11 +5,10 @@ import { Text } from '../../../Text';
 import { Flex } from '../../../Layout';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
-import { useHMSActions } from '@100mslive/react-sdk';
+import { selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 
 export function HLSFailureModal() {
-  //   const { hlsError = null } = useHMSStore(selectHLSState).error;
-  const hlsError = true;
+  const { hlsError } = useHMSStore(selectHLSState).error || false;
   const [openModal, setOpenModal] = useState(!!hlsError);
   const hmsActions = useHMSActions();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
