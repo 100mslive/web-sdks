@@ -26,7 +26,6 @@ import {
 } from "./Common";
 import { useSetAppDataByKey } from "../AppData/useUISettings";
 import { useFilteredRoles } from "../../common/hooks";
-import { getDefaultMeetingUrl } from "../../common/utils";
 import { APP_DATA } from "../../common/constants";
 
 const getCardData = (roleName, roomId) => {

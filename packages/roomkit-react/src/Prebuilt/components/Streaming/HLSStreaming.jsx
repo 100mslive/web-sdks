@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { selectAppData, selectRoomID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+import { selectRoomID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import {
   EndStreamIcon,
   EyeOpenIcon,
@@ -14,7 +14,6 @@ import { Box, Button, Flex, Loading, Text } from '../../../';
 import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useFilteredRoles } from '../../common/hooks';
-import { getDefaultMeetingUrl } from '../../common/utils';
 import { APP_DATA } from '../../common/constants';
 
 const getCardData = (roleName, roomId) => {

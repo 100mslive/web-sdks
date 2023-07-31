@@ -60,13 +60,6 @@ export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== "undefined";
 };
 
-export const getDefaultMeetingUrl = () => {
-  return (
-    window.location.href.replace("meeting", "preview") +
-    `?${QUERY_PARAM_SKIP_PREVIEW}=true`
-  );
-};
-
 export const getRoutePrefix = () => {
   return window.location.pathname.startsWith("/streaming") ? "/streaming" : "";
 };
