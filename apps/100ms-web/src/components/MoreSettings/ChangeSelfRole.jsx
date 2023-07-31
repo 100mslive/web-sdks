@@ -50,7 +50,7 @@ export const ChangeSelfRole = ({ onClick }) => {
         sideOffset={8}
         alignOffset={-5}
         css={{
-          backgroundColor: "$surfaceDefault",
+          backgroundColor: "$surface_default",
           "@md": { w: "$64" },
         }}
       >
@@ -59,7 +59,7 @@ export const ChangeSelfRole = ({ onClick }) => {
             key={role}
             css={{
               justifyContent: "space-between",
-              "&:hover": { backgroundColor: "$surfaceLight" },
+              "&:hover": { backgroundColor: "$surface_bright" },
             }}
             onClick={async () => {
               try {

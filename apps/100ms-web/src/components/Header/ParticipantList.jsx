@@ -273,7 +273,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
         css={{ p: "$2", r: "$0" }}
         tabIndex={0}
       >
-        <Flex css={{ color: "$textHighEmp" }}>
+        <Flex css={{ color: "$on_surface_high" }}>
           <VerticalMenuIcon />
         </Flex>
       </Dropdown.Trigger>
@@ -283,13 +283,13 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
           sideOffset={8}
           css={{
             w: "$64",
-            backgroundColor: "$surfaceDefault",
+            backgroundColor: "$surface_default",
           }}
         >
           {canChangeRole && (
             <Dropdown.Item
               onClick={() => onRoleChange(peerId)}
-              css={{ "&:hover": { backgroundColor: "$surfaceLight" } }}
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
             >
               <ChangeRoleIcon />
               <Text css={{ ml: "$4" }}>Change Role</Text>

@@ -120,7 +120,7 @@ export const LeaveRoom = () => {
                 css={{
                   w: "100%",
                   bg: "rgba(178, 71, 81, 0.1)",
-                  "&:hover": { backgroundColor: "$surfaceLight" },
+                  "&:hover": { backgroundColor: "$surface_bright" },
                 }}
                 onClick={() => {
                   setShowEndRoomModal(true);
