@@ -122,7 +122,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
                         css={{
                           px: "$9",
                           bg: isSelected ? selectionBg : undefined,
-                          c: isSelected ? "$white" : "$textPrimary",
+                          c: isSelected ? "$white" : "$textHighEmp",
                         }}
                       >
                         {option.label}

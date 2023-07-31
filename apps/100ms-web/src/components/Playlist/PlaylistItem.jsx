@@ -43,7 +43,7 @@ export const PlaylistItem = React.memo(
         >
           <Text
             variant="md"
-            css={{ color: selected ? "$brandDefault" : "$textPrimary" }}
+            css={{ color: selected ? "$brandDefault" : "$textHighEmp" }}
           >
             {name}
           </Text>

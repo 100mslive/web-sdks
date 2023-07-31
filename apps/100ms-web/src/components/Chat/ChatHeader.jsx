@@ -25,7 +25,7 @@ export const ChatHeader = React.memo(
         onClick={onToggle}
         align="center"
         css={{
-          color: "$textPrimary",
+          color: "$textHighEmp",
           h: "$16",
           mb: "$2",
         }}

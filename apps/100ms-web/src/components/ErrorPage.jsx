@@ -10,8 +10,8 @@ function ErrorPage({ error }) {
       justify="center"
       css={{
         size: "100%",
-        color: "$textPrimary",
-        backgroundColor: "$bgPrimary",
+        color: "$textHighEmp",
+        backgroundColor: "$backgroundDefault",
       }}
     >
       <Box css={{ position: "relative", overflow: "hidden", r: "$3" }}>

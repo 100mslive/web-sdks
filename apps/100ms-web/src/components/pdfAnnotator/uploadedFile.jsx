@@ -41,7 +41,7 @@ export const UploadedFile = ({
                 border: "1px solid $borderLight",
                 p: "$4 $6",
                 minHeight: "$11",
-                c: "$textPrimary",
+                c: "$textHighEmp",
                 fs: "$md",
                 w: "100%",
                 "&:focus": {

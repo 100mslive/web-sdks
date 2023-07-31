@@ -92,7 +92,9 @@ export function EdtechComponent({
             brandDark: shadeColor(color, -30),
             brandLight: shadeColor(color, 30),
             brandDisabled: shadeColor(color, 10),
-            ...baseTheme.colors,
+            ...(theme === "dark"
+              ? baseTheme.dark.colors
+              : baseTheme.light.colors),
           },
           fonts: {
             sans: [font, "Inter", "sans-serif"],
