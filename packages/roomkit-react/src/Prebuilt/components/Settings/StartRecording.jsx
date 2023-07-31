@@ -1,11 +1,5 @@
 import React, { useState } from 'react';
-import {
-  selectAppData,
-  selectPermissions,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectPermissions, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
@@ -16,7 +10,6 @@ import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
@@ -99,7 +92,6 @@ const StartRecording = ({ open, onOpenChange }) => {
             try {
               setRecordingState(true);
               await hmsActions.startRTMPOrRecording({
-                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: true,
               });

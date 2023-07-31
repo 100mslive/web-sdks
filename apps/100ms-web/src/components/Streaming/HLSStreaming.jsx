@@ -152,7 +152,6 @@ const StartHLS = () => {
   const [record, setRecord] = useState(false);
   const [error, setError] = useState(false);
   const hmsActions = useHMSActions();
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(
     async variants => {
@@ -167,17 +166,11 @@ const StartHLS = () => {
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {
-        if (error.message.includes("invalid input")) {
-          await startHLS([
-            { meetingURL: recordingUrl || getDefaultMeetingUrl() },
-          ]);
-          return;
-        }
         setHLSStarted(false);
         setError(error.message);
       }
     },
-    [hmsActions, record, isHLSStarted, setHLSStarted, recordingUrl]
+    [hmsActions, record, isHLSStarted, setHLSStarted]
   );
 
   return (

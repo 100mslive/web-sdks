@@ -19,7 +19,6 @@ import {
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
 
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(
@@ -109,7 +108,6 @@ const StartRecording = ({ open, onOpenChange }) => {
             try {
               setRecordingState(true);
               await hmsActions.startRTMPOrRecording({
-                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: true,
               });
