@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useEffect, useState } from "react";
 import {
-  selectAppData,
   selectRoomID,
   useHMSActions,
   useHMSStore,
