@@ -120,7 +120,7 @@ export function VideoTileStats({ videoTrackID, audioTrackID, peerID, isLocal = f
             value={formatBytes(audioTrackStats?.bitrate, 'b/s')}
           />
 
-          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={`${downlinkScore}`} />
+          <StatsRow show={isNotNullish(downlinkScore)} label="Downlink" value={downlinkScore} />
 
           <StatsRow show={isNotNullish(videoTrackStats?.codec)} label="Codec(V)" value={videoTrackStats?.codec} />
 
@@ -174,7 +174,17 @@ const TrackPacketsLostRow = ({
   );
 };
 
-const RawStatsRow = ({ label = '', value = '', tooltip = '', show = true }) => {
+const RawStatsRow = ({
+  label = '',
+  value = '',
+  tooltip = '',
+  show = true,
+}: {
+  label: string;
+  value?: string | number;
+  show?: boolean;
+  tooltip?: string;
+}) => {
   const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
 
   return (

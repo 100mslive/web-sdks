@@ -1,3 +1,3 @@
 export const useDropdownSelection = () => {
-  return '$primary_dim';
+  return "$primary_dim";
 };
