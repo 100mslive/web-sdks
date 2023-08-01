@@ -34,16 +34,16 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           justify="between"
           align="center"
           css={{
-            bg: '$menuBg',
+            bg: '$surface_default',
             p: '$2 $2 $2 $6',
             borderTopLeftRadius: '$1',
             borderTopRightRadius: '$1',
           }}
         >
-          <Text css={{ color: '$textPrimary' }}>{active.name}</Text>
+          <Text css={{ color: '$on_primary_high' }}>{active.name}</Text>
           <IconButton
             css={{
-              color: '$white',
+              color: '$on_primary_high',
             }}
             onClick={() => {
               hmsActions.videoPlaylist.stop();
@@ -80,7 +80,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           <IconButton
             onClick={() => toggle()}
             css={{
-              color: '$white',
+              color: '$on_primary_high',
               height: 'max-content',
               alignSelf: 'center',
               cursor: 'pointer',

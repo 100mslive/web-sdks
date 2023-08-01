@@ -11,7 +11,7 @@ const IconSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopRightRadius: 0,
-  borderColor: '$borderDefault',
+  borderColor: '$border_default',
   borderBottomRightRadius: 0,
   '@md': {
     mx: 0,
@@ -26,7 +26,7 @@ const OptionsSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopLeftRadius: 0,
-  borderColor: '$borderDefault',
+  borderColor: '$border_default',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
   '&:not([disabled]):focus-visible': {
@@ -47,12 +47,12 @@ export const IconButtonWithOptions = ({
   },
   key = '',
 }) => {
-  const bgCss = { backgroundColor: active ? '$transparent' : '$secondaryDark' };
+  const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
   return (
     <Flex>
       <IconSection css={bgCss} onClick={onClick} key={key}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
-          <Flex align="center" justify="center" css={{ color: '$textHighEmp' }}>
+          <Flex align="center" justify="center" css={{ color: '$on_surface_high' }}>
             {icon}
           </Flex>
         </Tooltip>
@@ -61,7 +61,7 @@ export const IconButtonWithOptions = ({
         <Dropdown.Trigger asChild>
           <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
-              <Box css={{ color: '$textHighEmp' }}>
+              <Box css={{ color: '$on_surface_high' }}>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>
@@ -83,8 +83,8 @@ export const IconButtonWithOptions = ({
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                backgroundColor: option.active ? '$primaryDark' : '$surfaceDark',
-                borderTop: index === 0 ? 'none' : '1px solid $borderDefault',
+                backgroundColor: option.active ? '$primary_dim' : '$surface_dim',
+                borderTop: index === 0 ? 'none' : '1px solid $border_default',
                 '&:hover': {
                   cursor: 'pointer',
                 },

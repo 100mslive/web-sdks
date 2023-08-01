@@ -89,9 +89,9 @@ export function ShareScreenOptions() {
                   p: '$6',
                   display: 'flex',
                   justifyContent: 'center',
-                  border: '1px solid $grayDefault',
+                  border: '1px solid $border_bright',
                   r: '$2',
-                  bg: '$surfaceLighter',
+                  bg: '$surface_brighter',
                   pb: '0',
                 }}
               >
@@ -109,7 +109,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$textDisabled',
+                    c: '$on_surface_low',
                     textAlign: 'center',
                   }}
                 >
@@ -133,9 +133,9 @@ export function ShareScreenOptions() {
                   p: '$6',
                   display: 'flex',
                   justifyContent: 'center',
-                  border: '$grayDefault 1px solid',
+                  border: '$border_bright 1px solid',
                   r: '$2',
-                  bg: '$surfaceLight',
+                  bg: '$surface_bright',
                   pb: '0',
                 }}
               >
@@ -155,7 +155,7 @@ export function ShareScreenOptions() {
                     left: '54%',
                     padding: '$2 $4',
                     r: '$2',
-                    bg: '$primaryLight',
+                    bg: '$primary_bright',
                     zIndex: '2',
                   }}
                 >
@@ -175,7 +175,7 @@ export function ShareScreenOptions() {
                     variant="xs"
                     css={{
                       fontWeight: '$semiBold',
-                      c: '$white',
+                      c: '$on_primary_high',
                       pr: '$4',
                     }}
                   >
@@ -188,7 +188,7 @@ export function ShareScreenOptions() {
                 <Text
                   variant="caption"
                   css={{
-                    c: '$textDisabled',
+                    c: '$on_surface_low',
                     textAlign: 'center',
                   }}
                 >

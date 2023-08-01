@@ -37,14 +37,14 @@ const StyledTrigger = styled(BaseAccordion.Trigger, {
   justifyContent: 'space-between',
   fontSize: '$md',
   lineHeight: '$md',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
 });
 
 const StyledContent = styled(BaseAccordion.Content, {
   display: 'contents',
   fontSize: '$md',
   fontFamily: '$sans',
-  color: '$textMedEmp',
+  color: '$on_surface_medium',
   '&[data-state="open"]': {
     animation: `${slideDown('--radix-accordion-content-height')} 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards`,
   },
@@ -54,7 +54,7 @@ const StyledContent = styled(BaseAccordion.Content, {
 });
 
 const StyledChevron = styled(ChevronUpIcon, {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   transition: 'transform 300ms cubic-bezier(0.87, 0, 0.13, 1)',
   '[data-state=closed] &': { transform: 'rotate(180deg)' },
 });

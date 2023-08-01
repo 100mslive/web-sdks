@@ -103,7 +103,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
           {previewHeader.title}
         </Text>
-        <Text css={{ c: '$textMedEmp', my: '$4', textAlign: 'center' }} variant="body1">
+        <Text css={{ c: '$on_surface_medium', my: '$4', textAlign: 'center' }} variant="body1">
           {previewHeader.sub_title}
         </Text>
         <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
@@ -111,7 +111,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
             <Chip
               content="LIVE"
               backgroundColor="$error"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$textHighEmp', borderRadius: '$round' }} />}
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: 'on_surface_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
@@ -175,7 +175,7 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: '$surfaceDefault',
+        bg: '$surface_default',
         aspectRatio: width / height,
         width: 'unset',
         height: 'min(360px, 60vh)',

@@ -68,16 +68,16 @@ export const Playlist = ({ type }) => {
             maxHeight: 'unset',
             width: '$60',
             p: '$0',
-            bg: '$bgSecondary',
-            border: '1px solid $menuBg',
+            bg: '$surface_bright',
+            border: '1px solid $border_default',
           }}
         >
           <Flex
             align="center"
             css={{
               p: '$4 $8',
-              borderBottom: '1px solid $borderLight',
-              bg: '$menuBg',
+              borderBottom: '1px solid $border_bright',
+              bg: '$surface_default',
             }}
           >
             <Text variant="md" css={{ flex: '1 1 0' }}>

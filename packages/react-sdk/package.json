@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.10-alpha.0",
+  "version": "0.8.10",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -26,7 +26,7 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store"
+    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store && npx prettier --write './docs/**/*'"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.3",
@@ -43,7 +43,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.10.10-alpha.0",
+    "@100mslive/hms-video-store": "0.10.10",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }

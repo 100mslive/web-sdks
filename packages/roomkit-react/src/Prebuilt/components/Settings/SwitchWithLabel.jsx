@@ -2,7 +2,6 @@ import React from 'react';
 import { Label } from '../../../Label';
 import { Flex } from '../../../Layout';
 import { Switch } from '../../../Switch';
-// import { Flex, Label, Switch } from '../../../';
 
 const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) => {
   return (
@@ -12,7 +11,7 @@ const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) =
         my: '$2',
         py: '$8',
         w: '100%',
-        borderBottom: '1px solid $borderDefault',
+        borderBottom: '1px solid $border_default',
         display: hide ? 'none' : 'flex',
       }}
     >
@@ -21,7 +20,7 @@ const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) =
         css={{
           fontSize: '$md',
           fontWeight: '$semiBold',
-          color: checked ? '$textHighEmp' : '$textDisabled',
+          color: checked ? '$on_surface_high' : '$on_surface_low',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',

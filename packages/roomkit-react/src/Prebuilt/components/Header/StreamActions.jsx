@@ -2,7 +2,6 @@ import React, { Fragment, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
-  selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
   selectRoomState,
@@ -28,7 +27,7 @@ export const LiveStatus = () => {
   }
   return (
     <Flex align="center">
-      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$error', mr: '$2' }} />
+      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
       <Text>
         Live
         <Text as="span" css={{ '@md': { display: 'none' } }}>
@@ -63,7 +62,7 @@ export const RecordingStatus = () => {
     >
       <Box
         css={{
-          color: '$error',
+          color: '$alert_error_default',
         }}
       >
         <RecordIcon width={24} height={24} />
@@ -85,7 +84,6 @@ const EndStream = () => {
 
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   const [open, setOpen] = useState(false);
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
@@ -107,7 +105,7 @@ const StartRecording = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content align="end" sideOffset={8} css={{ w: '$64' }}>
-            <Text variant="body" css={{ color: '$textMedEmp' }}>
+            <Text variant="body" css={{ color: '$on_surface_medium' }}>
               Are you sure you want to end the recording?
             </Text>
             <Button
@@ -167,7 +165,6 @@ const StartRecording = () => {
             try {
               setRecordingState(true);
               await hmsActions.startRTMPOrRecording({
-                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: true,
               });

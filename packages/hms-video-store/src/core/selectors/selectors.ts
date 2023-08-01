@@ -126,11 +126,24 @@ export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRo
 });
 
 /**
+ * @internal
+ * Select a boolean flag denoting whether to hide local peer.
+ * When this is true, `selectPeers` skips local peer.
+ */
+export const selectHideLocalPeer = (store: HMSStore): boolean => store.hideLocalPeer;
+
+/**
  * Select an array of peers(remote peers and your local peer) present in the room.
  */
-export const selectPeers = createSelector([selectRoom, selectPeersMap], (room, storePeers) => {
-  return room.peers.map(peerID => storePeers[peerID]);
-});
+export const selectPeers = createSelector(
+  [selectRoom, selectPeersMap, selectHideLocalPeer],
+  (room, storePeers, hideLocalPeer) => {
+    if (hideLocalPeer) {
+      return room.peers.filter(peerID => room.localPeer !== peerID).map(peerID => storePeers[peerID]);
+    }
+    return room.peers.map(peerID => storePeers[peerID]);
+  },
+);
 
 /**
  * Select an array of tracks(remote peer tracks and your local tracks) present in the room.

@@ -12,20 +12,21 @@ const StyledTrigger = styled(Popover.Trigger, {
   zIndex: 10,
   width: '$13',
   height: '$13',
-  color: '$textPrimary',
+  color: '$on_surface_high',
   borderRadius: '$round',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_bright',
+  cursor: 'pointer',
   border: 'none',
   ...flexCenter,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandLight',
+    boxShadow: '0 0 0 3px $colors$primary_bright',
   },
 });
 
 const StyledContent = styled(Popover.Content, {
   fontFamily: '$sans',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_bright',
   padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
@@ -37,19 +38,21 @@ const StyledContent = styled(Popover.Content, {
 
 const styledItem = {
   fontSize: '$sm',
-  color: '$textPrimary',
+  color: '$on_surface_high',
   display: 'flex',
   alignItems: 'center',
   padding: '$4 $6',
   width: '100%',
+  backgroundColor: '$menuBg',
 };
 
 const StyledItemButton = styled('button', {
   ...styledItem,
   height: '$14',
   '&:hover': {
-    backgroundColor: '$menuBg',
+    backgroundColor: '$surface_brighter',
   },
+  cursor: 'pointer',
   // TODO: default focus applied cause issues with this style
   '&:focus': {
     outline: 'none',
@@ -78,8 +81,8 @@ export const Flex = styled('div', {
 });
 
 const RemoveMenuItem = styled(StyledItemButton, {
-  color: '$error',
-  borderTop: '1px solid $borderLight',
+  color: '$alert_error_default',
+  borderTop: '1px solid $border_bright',
 });
 
 interface MenuTileType {

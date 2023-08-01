@@ -1,7 +1,7 @@
 import { styled } from '../Theme';
 
 export const Root = styled('div', {
-  backgroundColor: '$statsBg',
+  backgroundColor: 'rgba(0,0,0,0.75)',
   position: 'absolute',
   top: '$3',
   left: '$3',
@@ -26,12 +26,12 @@ export const Row = styled('tr', {
 });
 
 export const Label = styled('td', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   fontWeight: '$regular',
 });
 
 export const Value = styled('td', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
 });
 
 export const Gap = styled('tr', {

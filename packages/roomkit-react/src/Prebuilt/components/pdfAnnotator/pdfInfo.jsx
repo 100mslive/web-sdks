@@ -9,10 +9,10 @@ export const PDFInfo = () => {
       css={{
         px: '$8',
         py: '$3',
-        bg: '$surfaceLight',
+        bg: '$surface_bright',
         r: '$1',
         outline: 'none',
-        border: '1px solid $borderLight',
+        border: '1px solid $border_bright',
         minHeight: '$11',
       }}
     >

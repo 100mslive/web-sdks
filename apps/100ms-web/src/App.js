@@ -23,7 +23,7 @@ import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
+import { palette } from "./theme.js";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
 import { RemoteStopScreenshare } from "./plugins/RemoteStopScreenshare";
@@ -43,7 +43,8 @@ if (window.location.host.includes("localhost")) {
   appName = window.location.host.split(".")[0];
 }
 
-document.title = `${appName}'s ${document.title}`;
+document.title =
+  process.env.REACT_APP_TITLE || `${appName}'s ${document.title}`;
 
 // TODO: remove now that there are options to change to portrait
 const getAspectRatio = ({ width, height }) => {
@@ -67,7 +68,6 @@ export function EdtechComponent({
     logo = "",
     headerPresent = "false",
     metadata = "",
-    recordingUrl = "",
   },
   policyConfig = envPolicyConfig,
   getDetails = () => {},
@@ -76,7 +76,6 @@ export function EdtechComponent({
   const { 0: width, 1: height } = aspectRatio
     .split("-")
     .map(el => parseInt(el));
-
   globalStyles();
 
   return (
@@ -86,27 +85,21 @@ export function EdtechComponent({
         aspectRatio={getAspectRatio({ width, height })}
         theme={{
           colors: {
-            brandDefault: color,
-            brandDark: shadeColor(color, -30),
-            brandLight: shadeColor(color, 30),
-            brandDisabled: shadeColor(color, 10),
+            ...palette[theme],
+            primary_default: color,
+            primary_dark: shadeColor(color, -30),
+            primary_bright: shadeColor(color, 30),
+            primary_disabled: shadeColor(color, 10),
           },
           fonts: {
             sans: [font, "Inter", "sans-serif"],
           },
         }}
       >
-        <HMSRoomProvider
-          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-          actions={hmsActions}
-          store={hmsStore}
-          notifications={hmsNotifications}
-          stats={hmsStats}
-        >
+        <HMSRoomProvider isHMSStatsOn={FeatureFlags.enableStatsForNerds}>
           <AppData
             appDetails={metadata}
             policyConfig={policyConfig}
-            recordingUrl={recordingUrl}
             logo={logo}
             tokenEndpoint={tokenEndpoint}
           />
@@ -114,7 +107,7 @@ export function EdtechComponent({
           <Init />
           <Box
             css={{
-              bg: "$mainBg",
+              bg: "$background_dim",
               w: "100%",
               lineHeight: "1.5",
               "-webkit-text-size-adjust": "100%",

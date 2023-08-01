@@ -13,7 +13,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
         marginLeft: '$8',
         padding: '$8 $8 $10',
         zIndex: 10,
-        backgroundColor: 'rgba(55,59,66, 0.84)',
+        backgroundColor: '$surface_brighter',
         borderRadius: '$1',
       }}
       direction="column"
@@ -44,7 +44,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       <HlsStatsRow label="distance from live">
         {getDurationFromSeconds(hlsStatsState.distanceFromLive / 1000)}
       </HlsStatsRow>
-      <HlsStatsRow label="Dropped frames">{`${hlsStatsState?.droppedFrames}`}</HlsStatsRow>
+      <HlsStatsRow label="Dropped frames">{hlsStatsState?.droppedFrames}</HlsStatsRow>
     </Flex>
   );
 }

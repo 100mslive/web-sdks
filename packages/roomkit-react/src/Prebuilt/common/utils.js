@@ -1,5 +1,3 @@
-import { QUERY_PARAM_SKIP_PREVIEW } from './constants';
-
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
@@ -56,10 +54,6 @@ export const metadataProps = function (peer) {
 
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
-};
-
-export const getDefaultMeetingUrl = () => {
-  return `${window.location.href.replace('meeting', 'preview')}?${QUERY_PARAM_SKIP_PREVIEW}=true`;
 };
 
 export const getRoutePrefix = () => {

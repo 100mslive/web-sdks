@@ -1,6 +1,12 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { HMSRoomProvider, selectIsConnectedToRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSReactiveStore,
+  HMSRoomProvider,
+  selectIsConnectedToRoom,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
@@ -15,7 +21,6 @@ import { ToastContainer } from './components/Toast/ToastContainer';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
@@ -52,27 +57,38 @@ export const HMSPrebuilt = React.forwardRef(
     const color = '#2F80FF';
     const theme = 'dark';
     const metadata = '';
-    const recordingUrl = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
+    const reactiveStore = useRef();
 
     const [hyderated, setHyderated] = React.useState(false);
-    useEffect(() => setHyderated(true), []);
     useEffect(() => {
-      if (!ref) {
-        return;
-      }
-      ref.current = {
+      setHyderated(true);
+      const hms = new HMSReactiveStore();
+      const hmsStore = hms.getStore();
+      const hmsActions = hms.getActions();
+      const hmsNotifications = hms.getNotifications();
+      const hmsStats = hms.getStats();
+
+      reactiveStore.current = {
         hmsActions,
         hmsStats,
         hmsStore,
         hmsNotifications,
       };
+    }, []);
+
+    useEffect(() => {
+      if (!ref || !reactiveStore.current) {
+        return;
+      }
+
+      ref.current = { ...reactiveStore.current };
     }, [ref]);
 
     // leave room when component unmounts
     useEffect(
       () => () => {
-        return hmsActions.leave();
+        return reactiveStore.current.hmsActions.leave();
       },
       [],
     );
@@ -121,21 +137,16 @@ export const HMSPrebuilt = React.forwardRef(
           >
             <HMSRoomProvider
               isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-              actions={hmsActions}
-              store={hmsStore}
-              notifications={hmsNotifications}
-              stats={hmsStats}
+              actions={reactiveStore.current.hmsActions}
+              store={reactiveStore.current.hmsStore}
+              notifications={reactiveStore.current.hmsNotifications}
+              stats={reactiveStore.current.hmsStats}
             >
-              <AppData
-                appDetails={metadata}
-                recordingUrl={recordingUrl}
-                logo={logoUrl}
-                tokenEndpoint={endPoints.tokenByRoomIdRole}
-              />
+              <AppData appDetails={metadata} logo={logoUrl} tokenEndpoint={endPoints.tokenByRoomIdRole} />
               <Init />
               <Box
                 css={{
-                  bg: '$mainBg',
+                  bg: '$background_dim',
                   size: '100%',
                   lineHeight: '1.5',
                   '-webkit-text-size-adjust': '100%',

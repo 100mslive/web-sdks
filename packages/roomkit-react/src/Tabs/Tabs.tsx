@@ -18,11 +18,11 @@ const StyledTrigger = styled(TabsPrimitive.Trigger, {
   alignItems: 'center',
   fontSize: '$sm',
   lineHeight: '$sm',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
   userSelect: 'none',
   cursor: 'pointer',
   '&[data-state="active"]': {
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
     r: '$1',
   },
 });

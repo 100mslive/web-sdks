@@ -38,8 +38,8 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                     asChild
                     ref={ref}
                     css={{
-                      border: '1px solid $borderLight',
-                      bg: '$surfaceLight',
+                      border: '1px solid $border_bright',
+                      bg: '$surface_bright',
                       r: '$1',
                       p: '$6 $9',
                       mt: '$4',
@@ -65,7 +65,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                             css={{
                               bg:
                                 selectedRole === role
-                                  ? '$primaryDark'
+                                  ? '$primary_dim'
                                   : undefined,
                               px: '$9',
                             }}
@@ -78,7 +78,10 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                     </Dropdown.Content>
                   </Dropdown.Portal>
                 </Dropdown.Root>
-                <Text variant="sm" css={{ color: '$textMedEmp', my: '$10' }}>
+                <Text
+                  variant="sm"
+                  css={{ color: '$on_surface_medium', my: '$10' }}
+                >
                   Select a role with relevant permissions that you want to
                   share, to join the room.
                 </Text>
@@ -103,7 +106,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                   css={{
                     flex: '1 1 0',
                     my: '$10',
-                    bg: '$white',
+                    bg: '$on_primary_high',
                     r: '$1',
                     px: '$8',
                   }}
@@ -130,7 +133,7 @@ const SubHeading = ({ children, css = {} }) => {
   return (
     <Text
       variant="tiny"
-      css={{ color: '$textMedEmp', textTransform: 'uppercase', ...css }}
+      css={{ color: '$on_surface_medium', textTransform: 'uppercase', ...css }}
     >
       {children}
     </Text>
@@ -162,8 +165,8 @@ const RightContainer = ({ children }) => {
         p: '$10 $14',
         w: '45%',
         h: '100%',
-        border: '1px solid $borderLight',
-        bg: '$surfaceLight',
+        border: '1px solid $border_bright',
+        bg: '$surface_bright',
         r: '$1',
         textAlign: 'center',
       }}
