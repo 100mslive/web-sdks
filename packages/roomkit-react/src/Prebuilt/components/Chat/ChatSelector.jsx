@@ -14,14 +14,14 @@ import { ParticipantSearch } from '../Header/ParticipantList';
 import { useFilteredRoles } from '../../common/hooks';
 
 const ChatDotIcon = () => {
-  return <Box css={{ size: '$6', bg: '$brandDefault', mx: '$2', r: '$round' }} />;
+  return <Box css={{ size: '$6', bg: '$primary_default', mx: '$2', r: '$round' }} />;
 };
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
     <Dropdown.Item data-testid="chat_members" css={{ align: 'center', px: '$10' }} onClick={onClick}>
       <Text variant="sm">{value}</Text>
-      <Flex align="center" css={{ ml: 'auto', color: '$textPrimary' }}>
+      <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
             <Box css={{ mr: active ? '$3' : 0 }}>

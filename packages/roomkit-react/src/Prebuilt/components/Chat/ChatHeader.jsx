@@ -13,7 +13,7 @@ export const ChatHeader = React.memo(({ selection, selectorOpen, onToggle, onSel
       onClick={onToggle}
       align="center"
       css={{
-        color: '$textPrimary',
+        color: '$on_primary_high',
         h: '$16',
         mb: '$2',
       }}
@@ -24,7 +24,7 @@ export const ChatHeader = React.memo(({ selection, selectorOpen, onToggle, onSel
           asChild
           data-testid="participant_list_filter"
           css={{
-            border: '1px solid $textDisabled',
+            border: '1px solid $on_surface_low',
             r: '$0',
             p: '$2 $4',
             ml: '$8',
@@ -35,7 +35,7 @@ export const ChatHeader = React.memo(({ selection, selectorOpen, onToggle, onSel
             <Text variant="sm" css={{ ...textEllipsis(80) }}>
               {selection}
             </Text>
-            <Box css={{ ml: '$2', color: '$textDisabled' }}>
+            <Box css={{ ml: '$2', color: '$on_surface_low' }}>
               {open ? <ChevronUpIcon width={14} height={14} /> : <ChevronDownIcon width={14} height={14} />}
             </Box>
           </Flex>

@@ -20,7 +20,7 @@ export const PDFHeader = () => {
         <Text
           variant="sm"
           css={{
-            c: '$textMedEmp',
+            c: '$on_surface_medium',
           }}
         >
           Choose PDF you want to annotate and share

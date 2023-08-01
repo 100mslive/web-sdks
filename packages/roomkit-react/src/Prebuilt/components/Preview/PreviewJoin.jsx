@@ -84,7 +84,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center' }}>
         Get Started
       </Text>
-      <Text css={{ c: '$textMedEmp', my: '$6', textAlign: 'center' }} variant="body1">
+      <Text css={{ c: '$on_surface_medium', my: '$6', textAlign: 'center' }} variant="body1">
         Setup your audio and video before joining
       </Text>
       <Flex
@@ -124,7 +124,7 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: '$surfaceDefault',
+        bg: '$surface_default',
         aspectRatio: width / height,
         width: 'unset',
         height: 'min(360px, 60vh)',

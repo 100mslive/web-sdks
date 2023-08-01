@@ -15,7 +15,7 @@ export const makeFakeMessage = (msg: string, sender: string): HMSMessage => {
 };
 
 export const fakeMessages = [
-  makeFakeMessage('Hello from 100m', 'Yash'),
+  makeFakeMessage('Hello from 100ms', 'Yash'),
   makeFakeMessage('This is a chat example', 'admin'),
   makeFakeMessage('via the sendBroadcast action', 'Yash'),
   makeFakeMessage('Our twitter handle @100mslive', '100ms'),

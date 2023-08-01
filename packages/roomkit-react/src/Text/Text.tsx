@@ -129,12 +129,12 @@ export const Text = styled('p', {
   fontFamily: '$sans',
   fontWeight: '$regular',
   margin: 0,
-  color: '$textPrimary',
+  color: '$on_surface_high',
   variants: {
     variant: textVariants,
     color: {
       white: {
-        color: '$white',
+        color: '$on_surface_high',
       },
     },
     inline: {

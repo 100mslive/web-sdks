@@ -10,7 +10,7 @@ const getAvatarShape = (radii: string) => ({
 
 export const StyledAvatar = styled('div', {
   ...flexCenter,
-  color: '$white',
+  color: '$colors$on_primary_high',
   fontFamily: '$sans',
   aspectRatio: 1,
   fontWeight: 600,

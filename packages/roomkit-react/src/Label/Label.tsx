@@ -4,5 +4,5 @@ import { styled } from '../Theme';
 export const Label = styled(LabelPrimitive.Root, {
   fontFamily: '$sans',
   fontSize: '$md',
-  color: '$textPrimary',
+  color: '$on_primary_high',
 });

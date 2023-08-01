@@ -9,7 +9,11 @@ import { isStreamingKit } from '../../common/utils';
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
   return dominantSpeaker && dominantSpeaker.name ? (
-    <Flex align="center" justify="center" css={{ flex: '1 1 0', color: '$textPrimary', '@md': { display: 'none' } }}>
+    <Flex
+      align="center"
+      justify="center"
+      css={{ flex: '1 1 0', color: '$on_primary_high', '@md': { display: 'none' } }}
+    >
       <VolumeOneIcon />
       <Text variant="md" css={{ ...textEllipsis(200), ml: '$2' }} title={dominantSpeaker.name}>
         {dominantSpeaker.name}

@@ -76,7 +76,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
         <PinIcon />
-        <span>{`${isTilePinned ? 'Unpin' : 'Pin'}`} Tile for myself</span>
+        <span>{isTilePinned ? 'Unpin' : 'Pin'} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
   );
@@ -142,7 +142,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
                 data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
               >
                 {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
-                <span>{`${isVideoEnabled ? 'Mute' : 'Request Unmute'}`}</span>
+                <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {toggleAudio ? (
@@ -151,7 +151,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
                 data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
               >
                 {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
-                <span>{`${isAudioEnabled ? 'Mute' : 'Request Unmute'}`}</span>
+                <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {audioTrackID ? (
@@ -211,7 +211,7 @@ const SimulcastLayers = ({ trackId }) => {
   const currentLayer = track.layerDefinitions.find(layer => layer.layer === track.layer);
   return (
     <Fragment>
-      <StyledMenuTile.ItemButton css={{ color: '$textMedEmp', cursor: 'default' }}>
+      <StyledMenuTile.ItemButton css={{ color: '$on_surface_medium', cursor: 'default' }}>
         Select maximum resolution
       </StyledMenuTile.ItemButton>
       {track.layerDefinitions.map(layer => {
@@ -239,14 +239,14 @@ const SimulcastLayers = ({ trackId }) => {
             >
               {layer.layer}
             </Text>
-            <Text as="span" variant="xs" css={{ color: '$textMedEmp' }}>
+            <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
               {layer.resolution.width}x{layer.resolution.height}
             </Text>
           </StyledMenuTile.ItemButton>
         );
       })}
       <StyledMenuTile.ItemButton>
-        <Text as="span" variant="xs" css={{ color: '$textMedEmp' }}>
+        <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
           Currently streaming:
           <Text
             as="span"
@@ -254,7 +254,7 @@ const SimulcastLayers = ({ trackId }) => {
             css={{
               fontWeight: '$semiBold',
               textTransform: 'capitalize',
-              color: '$textMedEmp',
+              color: '$on_surface_medium',
               ml: '$2',
             }}
           >

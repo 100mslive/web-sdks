@@ -26,7 +26,7 @@ const VerticalDividerComponent: ComponentStory<typeof VerticalDivider> = ({ spac
           Add Stuff
         </Text>
       </Button>
-      <VerticalDivider space={space} css={{ bg: '$textPrimary', ...css }} />
+      <VerticalDivider space={space} css={{ bg: '$on_primary_high', ...css }} />
       <Button icon variant="danger">
         <AddIcon />
         <Text as="span" variant="button" css={{ c: 'white' }}>

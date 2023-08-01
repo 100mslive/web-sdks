@@ -99,6 +99,7 @@ export const MoreSettings = () => {
           sideOffset={5}
           align="center"
           css={{
+            py: '$0',
             maxHeight: '$96',
             '@md': { w: '$64' },
             "div[role='separator']:first-child": {

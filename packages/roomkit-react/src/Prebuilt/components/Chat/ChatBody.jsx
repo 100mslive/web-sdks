@@ -46,16 +46,16 @@ const MessageTypeContainer = ({ left, right }) => {
         ml: 'auto',
         mr: '$4',
         p: '$2 $4',
-        border: '1px solid $textDisabled',
+        border: '1px solid $on_surface_low',
         r: '$0',
       }}
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: '$textMedEmp' }}>
+        <SenderName variant="tiny" as="span" css={{ color: '$on_surface_medium' }}>
           {left}
         </SenderName>
       )}
-      {left && right && <Box css={{ borderLeft: '1px solid $textDisabled', mx: '$4', h: '$8' }} />}
+      {left && right && <Box css={{ borderLeft: '1px solid $on_surface_low', mx: '$4', h: '$8' }} />}
       {right && (
         <SenderName as="span" variant="tiny">
           {right}
@@ -87,7 +87,7 @@ const URL_REGEX =
   /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
 
 const Link = styled('a', {
-  color: '$brandDefault',
+  color: '$primary_default',
   wordBreak: 'break-word',
   '&:hover': {
     textDecoration: 'underline',
@@ -132,14 +132,16 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <Box>
-              <HorizontalMenuIcon />
-            </Box>
+            <HorizontalMenuIcon />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content sideOffset={5} align="end" css={{ width: '$48' }}>
+        <Dropdown.Content
+          sideOffset={5}
+          align="end"
+          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0' }}
+        >
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
@@ -192,7 +194,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         align="center"
         css={{
           flexWrap: 'wrap',
-          bg: messageType ? '$surfaceLight' : undefined,
+          bg: messageType ? '$surface_bright' : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -203,7 +205,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       >
         <Text
           css={{
-            color: '$textHighEmp',
+            color: '$on_surface_high',
             fontWeight: '$semiBold',
             display: 'inline-flex',
             alignItems: 'center',
@@ -225,7 +227,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
               variant="sm"
               css={{
                 ml: '$4',
-                color: '$textSecondary',
+                color: '$on_primary_medium',
                 flexShrink: 0,
               }}
             >

@@ -2,7 +2,6 @@ import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
-import { darkTheme, lightTheme } from './themes';
 
 const HmsStitches = createStitches({
   prefix: 'hms-ui',
@@ -10,7 +9,6 @@ const HmsStitches = createStitches({
     ...baseConfig.theme,
     colors: {
       ...baseConfig.theme.colors,
-      ...darkTheme.colors,
     },
   },
   media: defaultMedia,
@@ -71,7 +69,7 @@ export const globalStyles = globalCss({
   },
 });
 
-export type ThemeType = 'light' | 'dark';
+export type ThemeType = 'default';
 export type Theme = typeof HmsStitches.theme;
 
 /**
@@ -91,10 +89,7 @@ export const createTheme = ({
   if (!themeType) {
     throw new Error('Theme type is required');
   }
-  return createThemeBase(
-    className || `${themeType}-theme`,
-    merge(baseConfig.theme, themeType === 'dark' ? darkTheme : lightTheme, theme || {}),
-  );
+  return createThemeBase(className || `${themeType}-theme`, merge(baseConfig.theme, theme || {}));
 };
 
 export type CSS = Stitches.CSS<typeof HmsStitches>;

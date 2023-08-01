@@ -13,12 +13,12 @@ const Root = styled('div', {
 });
 
 const Chevron = styled('button', {
-  color: '$textPrimary',
+  color: '$on_surface_high',
   '&:focus': {
     outline: 'none',
   },
   '&[disabled]': {
-    color: '$grayDefault',
+    color: '$on_surface_low',
     cursor: 'not-allowed',
   },
   display: 'flex',
@@ -40,14 +40,14 @@ const Dot = styled('button', {
   borderRadius: '9999px',
   width: '0.5rem',
   height: '0.5rem',
-  backgroundColor: '$textDisabled',
+  backgroundColor: '$on_surface_low',
   padding: '0px',
   border: 'none',
   cursor: 'pointer',
   variants: {
     active: {
       true: {
-        backgroundColor: '$textPrimary',
+        backgroundColor: '$on_surface_high',
       },
     },
   },

@@ -219,7 +219,7 @@ const App = () => {
   return (
     <Flex
       direction="column"
-      css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}
+      css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
     >
       {error && (
         <Suspense fallback={null}>

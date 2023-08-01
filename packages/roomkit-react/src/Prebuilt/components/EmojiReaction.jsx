@@ -85,7 +85,7 @@ export const EmojiReaction = () => {
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
-        <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surfaceDefault' }}>
+        <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surface_default' }}>
           {emojiReactionList.map((emojiLine, index) => (
             <Flex key={index} justify="between" css={{ mb: '$8' }}>
               {emojiLine.map(emoji => (
@@ -100,7 +100,7 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: '$textSecondary',
+                color: '$on_primary_medium',
               }}
             >
               Reactions will be timed for Live Streaming viewers.{' '}
@@ -109,12 +109,17 @@ export const EmojiReaction = () => {
               variant="sm"
               inline={true}
               css={{
-                color: '$primaryLight',
+                color: '$primary_bright',
                 fontWeight: '$semiBold',
               }}
             >
-              <a href={HLS_TIMED_METADATA_DOC_URL} target="_blank" rel="noopener noreferrer">
-                {'Learn more ->'}
+              <a
+                href={HLS_TIMED_METADATA_DOC_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'none' }}
+              >
+                Learn more.
               </a>
             </Text>
           </div>
@@ -132,7 +137,7 @@ const EmojiContainer = styled('span', {
   p: '$4',
   '&:hover': {
     p: '7px',
-    bg: '$surfaceLighter',
+    bg: '$surface_brighter',
     borderRadius: '$1',
   },
 });
