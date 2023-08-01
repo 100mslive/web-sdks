@@ -8,7 +8,7 @@ import { ColoredHandIcon, CrossIcon, GoLiveIcon } from "@100mslive/react-icons";
 import { Box, Flex, IconButton, Text } from "@100mslive/roomkit-react";
 import { StreamCard } from "./Common";
 import { HLSStreaming } from "./HLSStreaming";
-import { RTMPIcon } from "../../images/rtmp.png";
+import RTMPIcon from "../../images/rtmp.png";
 import { RTMPStreaming } from "./RTMPStreaming";
 import { useSidepaneToggle } from "../AppData/useSidepane";
 import { SIDE_PANE_OPTIONS } from "../../common/constants";
