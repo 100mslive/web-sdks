@@ -1,31 +1,23 @@
 import React from 'react';
-import { selectAppData } from '@100mslive/react-sdk';
 import { ChatIcon, ConnectivityIcon, HandIcon, PersonIcon, PoorConnectivityIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
-import { hmsActions, hmsStore } from '../../hms';
-import { APP_DATA, SIDE_PANE_OPTIONS } from '../../common/constants';
-
-const isChatOpen = () => {
-  return hmsStore.getState(selectAppData(APP_DATA.sidePane)) === SIDE_PANE_OPTIONS.CHAT;
-};
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 const ChatAction = React.forwardRef((_, ref) => {
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+
+  if (isChatOpen) {
+    return null;
+  }
+
   return (
-    <Button
-      outlined
-      as="div"
-      variant="standard"
-      css={{ w: 'max-content' }}
-      onClick={() => {
-        hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.CHAT);
-      }}
-      ref={ref}
-    >
+    <Button outlined as="div" variant="standard" css={{ w: 'max-content' }} onClick={toggleChat} ref={ref}>
       Open Chat
     </Button>
   );
 });
-
 export const ToastConfig = {
   PEER_LIST: {
     single: function (notification) {
@@ -98,14 +90,14 @@ export const ToastConfig = {
       return {
         title: `New message from ${notification.data?.senderName}`,
         icon: <ChatIcon />,
-        action: isChatOpen() ? null : <ChatAction />,
+        action: <ChatAction />,
       };
     },
     multiple: notifications => {
       return {
         title: `${notifications.length} new messages`,
         icon: <ChatIcon />,
-        action: isChatOpen() ? null : <ChatAction />,
+        action: <ChatAction />,
       };
     },
   },
