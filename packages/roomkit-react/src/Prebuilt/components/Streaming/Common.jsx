@@ -3,7 +3,7 @@ import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, ChevronRightIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Flex, IconButton, slideLeftAndFade, Switch, Text } from '../../../';
 
-export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick, testId }) => {
+export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onClick, testId }) => {
   return (
     <Flex
       css={{
@@ -20,7 +20,7 @@ export const StreamCard = ({ title, subtitle, Icon, css = {}, onClick, testId })
       onClick={onClick}
     >
       <Text css={{ alignSelf: 'center', p: '$4' }}>
-        <Icon width={40} height={40} />
+        {imgSrc ? <img src={imgSrc} height={40} width={40} /> : <Icon width={40} height={40} />}
       </Text>
       <Box css={{ flex: '1 1 0', mx: '$8' }}>
         <Text variant="h6" css={{ mb: '$4' }}>

@@ -6,7 +6,7 @@ import { Text } from '../../../Text';
 import IconButton from '../../IconButton';
 import { StreamCard } from './Common';
 import { HLSStreaming } from './HLSStreaming';
-import { RTMPIcon } from './RTMPIcon';
+import RTMPIcon from '../../images/rtmp.png';
 import { RTMPStreaming } from './RTMPStreaming';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
@@ -66,7 +66,7 @@ export const StreamingLanding = () => {
           onClick={() => {
             setShowRTMP(true);
           }}
-          Icon={RTMPIcon}
+          imgSrc={RTMPIcon}
         />
       )}
       {showHLS && <HLSStreaming onBack={() => setShowHLS(false)} />}
