@@ -13,7 +13,7 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger, {
   lineHeight: '$px',
   gap: '$8',
   backgroundColor: '$secondary_default',
-  color: '#FFFFFF',
+  color: '$on_primary_high',
   fontSize: '$8',
   cursor: 'pointer',
   r: '$1',
@@ -45,12 +45,12 @@ const StyledItem = styled(SelectPrimitive.Item, {
 const StyledLabel = styled(SelectPrimitive.Label, {
   p: '$4 $8',
   lineHeight: '$10',
-  color: '#FFFFFF',
+  color: '$on_primary_high',
 });
 
 const StyledSeparator = styled(SelectPrimitive.Separator, {
   height: '$px',
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '$on_primary_high',
   margin: '$4',
   opacity: 0.4,
 });
@@ -62,7 +62,7 @@ const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#FFFFFF',
+  color: '$on_primary_high',
 });
 
 const scrollButtonStyles = {
@@ -71,7 +71,7 @@ const scrollButtonStyles = {
   justifyContent: 'center',
   p: '$4',
   backgroundColor: '$surface_bright',
-  color: '#FFFFFF',
+  color: '$on_primary_high',
   cursor: 'default',
 };
 

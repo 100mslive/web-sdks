@@ -43,7 +43,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           <Text css={{ color: '$on_primary_high' }}>{active.name}</Text>
           <IconButton
             css={{
-              color: '#FFF',
+              color: '$on_primary_high',
             }}
             onClick={() => {
               hmsActions.videoPlaylist.stop();
@@ -80,7 +80,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
           <IconButton
             onClick={() => toggle()}
             css={{
-              color: '#FFF',
+              color: '$on_primary_high',
               height: 'max-content',
               alignSelf: 'center',
               cursor: 'pointer',

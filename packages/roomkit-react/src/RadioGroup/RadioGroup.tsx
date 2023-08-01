@@ -7,7 +7,7 @@ const RadioGroupRoot = styled(RadioGroupPrimitive.Root, {
 });
 
 const RadioGroupItem = styled(RadioGroupPrimitive.Item, {
-  bg: '#FFFFFF',
+  bg: '$on_primary_high',
   width: '$8',
   height: '$8',
   border: '1px solid $primary_default',

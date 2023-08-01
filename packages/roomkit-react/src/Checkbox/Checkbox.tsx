@@ -4,7 +4,7 @@ import { styled } from '../Theme';
 const CheckboxRoot = styled(CheckboxPrimitive.Root, {
   all: 'unset',
   border: '1px solid $primary_default',
-  backgroundColor: '#FFFFFF',
+  backgroundColor: '$on_primary_high',
   width: '$8',
   height: '$8',
   borderRadius: '$0',
@@ -24,7 +24,7 @@ const CheckboxRoot = styled(CheckboxPrimitive.Root, {
 });
 
 const CheckboxIndicator = styled(CheckboxPrimitive.Indicator, {
-  color: '#FFFFFF',
+  color: '$on_primary_high',
 });
 
 export const Checkbox = {

@@ -106,7 +106,7 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                   css={{
                     flex: '1 1 0',
                     my: '$10',
-                    bg: '#FFF',
+                    bg: '$on_primary_high',
                     r: '$1',
                     px: '$8',
                   }}
