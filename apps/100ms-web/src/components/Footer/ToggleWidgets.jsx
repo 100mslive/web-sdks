@@ -5,8 +5,8 @@ import {
   InteractionOpenIcon,
 } from "@100mslive/react-icons";
 import { Tooltip } from "@100mslive/roomkit-react";
-import { useWidgetToggle } from "../AppData/useSidepane";
 import IconButton from "../../IconButton";
+import { useWidgetToggle } from "../AppData/useSidepane";
 import {
   useShowAudioShare,
   useShowPolls,

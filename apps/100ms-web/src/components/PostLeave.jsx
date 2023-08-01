@@ -41,7 +41,11 @@ const PostLeave = () => {
         </Text>
         <Text
           variant="h4"
-          css={{ color: "$on_surface_high", fontWeight: "$semiBold", mt: "$12" }}
+          css={{
+            color: "$on_surface_high",
+            fontWeight: "$semiBold",
+            mt: "$12",
+          }}
         >
           You left the {getRoutePrefix() ? "stream" : "room"}
         </Text>

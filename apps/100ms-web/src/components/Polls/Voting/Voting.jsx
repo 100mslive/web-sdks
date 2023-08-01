@@ -62,7 +62,9 @@ export const Voting = ({ id, toggleVoting }) => {
       <Flex direction="column" css={{ p: "$8 $10" }}>
         <Flex align="center">
           <Box css={{ flex: "auto" }}>
-            <Text css={{ color: "$on_surface_medium", fontWeight: "$semiBold" }}>
+            <Text
+              css={{ color: "$on_surface_medium", fontWeight: "$semiBold" }}
+            >
               {pollCreatorName || "Participant"} started a {poll.type}
             </Text>
           </Box>

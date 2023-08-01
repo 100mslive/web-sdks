@@ -61,7 +61,11 @@ const MessageTypeContainer = ({ left, right }) => {
       }}
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: "$on_surface_medium" }}>
+        <SenderName
+          variant="tiny"
+          as="span"
+          css={{ color: "$on_surface_medium" }}
+        >
           {left}
         </SenderName>
       )}
