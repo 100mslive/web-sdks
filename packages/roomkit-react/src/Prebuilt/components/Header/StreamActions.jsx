@@ -1,7 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
-  selectAppData,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
@@ -93,7 +92,6 @@ const EndStream = () => {
 
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   const [open, setOpen] = useState(false);
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
@@ -175,7 +173,6 @@ const StartRecording = () => {
             try {
               setRecordingState(true);
               await hmsActions.startRTMPOrRecording({
-                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: true,
               });

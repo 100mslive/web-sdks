@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { selectAppData, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+import { useHMSActions, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AddCircleIcon, EndStreamIcon, GoLiveIcon, PencilIcon, SettingsIcon, TrashIcon } from '@100mslive/react-icons';
 import { Accordion, Box, Button, Flex, Input, Label, Loading, Text } from '../../../';
 import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
@@ -37,7 +37,6 @@ const StartRTMP = () => {
         ],
   );
   const hmsActions = useHMSActions();
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [error, setError] = useState(false);
   const [record, setRecord] = useState(false);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
@@ -131,7 +130,6 @@ const StartRTMP = () => {
               const urls = hasRTMPURL ? rtmpStreams.map(value => `${value.rtmpURL}/${value.streamKey}`) : [];
               await hmsActions.startRTMPOrRecording({
                 rtmpURLs: urls,
-                meetingURL: recordingUrl,
                 resolution: getResolution(resolution),
                 record: record,
               });

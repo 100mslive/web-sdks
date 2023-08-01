@@ -52,7 +52,6 @@ export const HMSPrebuilt = React.forwardRef(
     const color = '#2F80FF';
     const theme = 'dark';
     const metadata = '';
-    const recordingUrl = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
 
     const [hyderated, setHyderated] = React.useState(false);
@@ -126,12 +125,7 @@ export const HMSPrebuilt = React.forwardRef(
               notifications={hmsNotifications}
               stats={hmsStats}
             >
-              <AppData
-                appDetails={metadata}
-                recordingUrl={recordingUrl}
-                logo={logoUrl}
-                tokenEndpoint={endPoints.tokenByRoomIdRole}
-              />
+              <AppData appDetails={metadata} logo={logoUrl} tokenEndpoint={endPoints.tokenByRoomIdRole} />
               <Init />
               <Box
                 css={{

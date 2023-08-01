@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { selectAppData, selectRoomID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+import { selectRoomID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import {
   EndStreamIcon,
   EyeOpenIcon,
@@ -14,7 +14,6 @@ import { Box, Button, Flex, Loading, Text } from '../../../';
 import { Container, ContentBody, ContentHeader, ErrorText, RecordStream } from './Common';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useFilteredRoles } from '../../common/hooks';
-import { getDefaultMeetingUrl } from '../../common/utils';
 import { APP_DATA } from '../../common/constants';
 
 const getCardData = (roleName, roomId) => {
@@ -128,7 +127,6 @@ const StartHLS = () => {
   const [record, setRecord] = useState(false);
   const [error, setError] = useState(false);
   const hmsActions = useHMSActions();
-  const recordingUrl = useHMSStore(selectAppData(APP_DATA.recordingUrl));
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(
     async variants => {
@@ -143,15 +141,11 @@ const StartHLS = () => {
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {
-        if (error.message.includes('invalid input')) {
-          await startHLS([{ meetingURL: recordingUrl || getDefaultMeetingUrl() }]);
-          return;
-        }
         setHLSStarted(false);
         setError(error.message);
       }
     },
-    [hmsActions, record, isHLSStarted, setHLSStarted, recordingUrl],
+    [hmsActions, record, isHLSStarted, setHLSStarted],
   );
 
   return (
