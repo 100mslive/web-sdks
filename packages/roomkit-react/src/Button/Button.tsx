@@ -150,7 +150,7 @@ const StyledButton = styled('button', {
         '$alert_error_default',
         '$alert_error_bright',
         '$alert_error_dim',
-        '$alert_error_brighter',
+        '$alert_error_dim',
         '$on_surface_high',
         '$on_surface_low',
       ),
@@ -184,7 +184,7 @@ export const Button = React.forwardRef<
       <>
         {loading && (
           <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute', left: '0' }}>
-            <Loading color="currentColor" />
+            <Loading />
           </Flex>
         )}
         <Flex

@@ -1,16 +1,14 @@
 import React from 'react';
-import { Flex, VerticalDivider } from '../../../';
-import { Logo, SpeakerTag } from './HeaderComponents';
+import { Flex } from '../../../';
+import { SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { StreamActions } from './StreamActions';
 
-export const ConferencingHeader = ({ isPreview }) => {
+export const ConferencingHeader = () => {
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
-        <Logo />
-        <VerticalDivider css={{ ml: '$8' }} />
-        {!isPreview ? <SpeakerTag /> : null}
+        <SpeakerTag />
       </Flex>
 
       <Flex

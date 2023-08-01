@@ -72,6 +72,7 @@ const Settings = ({ setHide }) => {
           />
         </Fragment>
       ) : null}
+
       {audioInput?.length ? (
         <DeviceSelector
           title={shouldShowAudioOutput ? 'Microphone' : 'Audio'}
@@ -86,6 +87,7 @@ const Settings = ({ setHide }) => {
           }
         />
       ) : null}
+
       {audioOutputFiltered?.length && shouldShowAudioOutput ? (
         <DeviceSelector
           title="Speaker"
@@ -128,7 +130,6 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
           css={{
             position: 'relative',
             flex: '1 1 0',
-            w: '100%',
             minWidth: 0,
             '@md': {
               mb: children ? '$8' : 0,

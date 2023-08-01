@@ -1,34 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
+import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Dialog, Flex, IconButton, Tabs, Text } from '../../../';
-import DeviceSettings from './DeviceSettings';
-import { LayoutSettings } from './LayoutSettings';
-import { NotificationSettings } from './NotificationSettings';
 import { useHLSViewerRole } from '../AppData/useUISettings';
-import { settingContent } from './common.js';
-
-const settings = [
-  {
-    tabName: 'devices',
-    title: 'Device Settings',
-    icon: SettingsIcon,
-    content: DeviceSettings,
-  },
-  {
-    tabName: 'notifications',
-    title: 'Notifications',
-    icon: NotificationsIcon,
-    content: NotificationSettings,
-  },
-  {
-    tabName: 'layout',
-    title: 'Layout',
-    icon: GridFourIcon,
-    content: LayoutSettings,
-  },
-];
+import { settingContent, settingsList } from './common.js';
 
 const SettingsModal = ({ open, onOpenChange, children }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -39,7 +15,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
   const isHlsViewer = hlsViewerRole === localPeerRole;
 
   const [showSetting, setShowSetting] = useState(() =>
-    settings.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {}),
+    settingsList.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {}),
   );
 
   const hideSettingByTabName = useCallback(
@@ -98,7 +74,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
             >
               <Text variant="h5">Settings </Text>
               <Flex direction="column" css={{ mx: isMobile ? '-$8' : 0, overflowY: 'auto', pt: '$10' }}>
-                {settings
+                {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ icon: Icon, tabName, title }) => {
                     return (
@@ -129,7 +105,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                     : {}),
                 }}
               >
-                {settings
+                {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ content: Content, title, tabName }) => {
                     return (

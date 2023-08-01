@@ -34,12 +34,12 @@ const LogoImg = styled('img', {
 });
 
 export const Logo = () => {
-  const logo = useLogo();
+  const logo = useLogo() || require('../../images/Logo.svg');
   const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   // Hide logo for now as there is not enough space
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return logo ? <LogoImg src={logo} alt="Brand Logo" width={132} height={40} /> : null;
+  return logo ? <LogoImg src={logo} alt="Brand Logo" width={40} height={40} /> : null;
 };

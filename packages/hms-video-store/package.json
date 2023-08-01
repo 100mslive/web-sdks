@@ -45,7 +45,8 @@
     "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
-    "zustand": "3.5.7"
+    "zustand": "3.5.7",
+    "@100mslive/types-prebuilt": "0.3.0"
   },
   "devDependencies": {
     "ts-node": "^10.4.0",

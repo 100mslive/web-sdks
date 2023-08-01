@@ -125,10 +125,10 @@ export const HMSPrebuilt = React.forwardRef(
             aspectRatio={getAspectRatio({ width, height })}
             theme={{
               colors: {
-                brandDefault: color,
-                brandDark: shadeColor(color, -30),
-                brandLight: shadeColor(color, 30),
-                brandDisabled: shadeColor(color, 10),
+                primary_default: color,
+                primary_dim: shadeColor(color, -30),
+                primary_bright: shadeColor(color, 30),
+                primary_disabled: shadeColor(color, 10),
               },
               fonts: {
                 sans: ['Roboto', 'Inter', 'sans-serif'],
@@ -190,7 +190,7 @@ const RouteList = () => {
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -198,7 +198,7 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -209,7 +209,7 @@ const RouteList = () => {
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -217,7 +217,7 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -229,6 +229,7 @@ const RouteList = () => {
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
+
       <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
     </Routes>
