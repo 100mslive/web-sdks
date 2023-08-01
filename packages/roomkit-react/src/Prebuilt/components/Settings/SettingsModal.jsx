@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
+import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Dialog, Flex, IconButton, Tabs, Text } from '../../../';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { settingContent, settingsList } from './common.js';

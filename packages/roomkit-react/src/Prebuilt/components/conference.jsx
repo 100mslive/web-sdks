@@ -4,7 +4,6 @@ import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
-  selectHLSState,
   selectIsConnectedToRoom,
   selectRoomState,
   useHMSActions,
