@@ -23,7 +23,6 @@ import { KeyboardHandler } from "./components/Input/KeyboardInputManager";
 import { Notifications } from "./components/Notifications";
 import PostLeave from "./components/PostLeave";
 import { ToastContainer } from "./components/Toast/ToastContainer";
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from "./hms.js";
 import { palette } from "./theme.js";
 import { Confetti } from "./plugins/confetti";
 import { FlyingEmoji } from "./plugins/FlyingEmoji.jsx";
@@ -69,7 +68,6 @@ export function EdtechComponent({
     logo = "",
     headerPresent = "false",
     metadata = "",
-    recordingUrl = "",
   },
   policyConfig = envPolicyConfig,
   getDetails = () => {},
@@ -98,17 +96,10 @@ export function EdtechComponent({
           },
         }}
       >
-        <HMSRoomProvider
-          isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-          actions={hmsActions}
-          store={hmsStore}
-          notifications={hmsNotifications}
-          stats={hmsStats}
-        >
+        <HMSRoomProvider isHMSStatsOn={FeatureFlags.enableStatsForNerds}>
           <AppData
             appDetails={metadata}
             policyConfig={policyConfig}
-            recordingUrl={recordingUrl}
             logo={logo}
             tokenEndpoint={tokenEndpoint}
           />
