@@ -174,7 +174,17 @@ const TrackPacketsLostRow = ({
   );
 };
 
-const RawStatsRow = ({ label = '', value = '', tooltip = '', show = true }) => {
+const RawStatsRow = ({
+  label = '',
+  value = '',
+  tooltip = '',
+  show = true,
+}: {
+  label: string;
+  value?: string | number;
+  show?: boolean;
+  tooltip?: string;
+}) => {
   const statsLabel = <Stats.Label css={{ fontWeight: !value ? '$semiBold' : '$regular' }}>{label}</Stats.Label>;
 
   return (
