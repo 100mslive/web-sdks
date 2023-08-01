@@ -16,7 +16,7 @@ import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { isMacOS } from '../common/constants';
 
-const optionsCSS = { fontWeight: '$semiBold', color: '$textHighEmp', w: '100%', p: '$8' };
+const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%', p: '$8' };
 
 export const AudioVideoToggle = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();

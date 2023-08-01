@@ -1,11 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
+import { selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
+import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
-import { Flex } from '../../../Layout';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
-import { selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 
 export function HLSFailureModal() {
   const { hlsError } = useHMSStore(selectHLSState).error || false;
@@ -45,7 +45,7 @@ export function HLSFailureModal() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              borderBottom: '1px solid $borderDefault',
+              borderBottom: '1px solid $border_default',
               mt: '$4',
             }}
           >
@@ -53,7 +53,7 @@ export function HLSFailureModal() {
               Failed to Go Live
             </Text>
           </Dialog.Title>
-          <Text variant="sm" css={{ mb: '$10', color: '$textMedEmp' }}>
+          <Text variant="sm" css={{ mb: '$10', color: '$on_surface_medium' }}>
             Something went wrong and your live broadcast failed. Please try again.
           </Text>
           <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>

@@ -50,7 +50,7 @@ export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   const { initials } = getAvatarBg(name);
   let { color } = getAvatarBg(name);
   if (!name) {
-    color = '$primaryDefault';
+    color = '#7E47EB';
   }
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>

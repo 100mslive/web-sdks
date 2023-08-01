@@ -48,7 +48,7 @@ export function PermissionErrorModal() {
           >
             <Text variant="h6">{deviceType} permissions are blocked</Text>
           </Dialog.Title>
-          <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$textMedEmp' }}>
+          <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
             Access to {deviceType} is required.&nbsp;
             {isSystemError
               ? `Enable permissions for ${deviceType} from sytem settings`

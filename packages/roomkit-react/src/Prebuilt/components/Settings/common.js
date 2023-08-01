@@ -1,8 +1,8 @@
-import { SettingsIcon, NotificationsIcon, GridFourIcon } from '@100mslive/react-icons';
+import { GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
+import { css } from '../../..';
 import DeviceSettings from '../Settings/DeviceSettings';
 import { LayoutSettings } from '../Settings/LayoutSettings';
 import { NotificationSettings } from '../Settings/NotificationSettings';
-import { css } from '../../..';
 
 export const settingOverflow = css({
   flex: '1 1 0',

@@ -1,14 +1,14 @@
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
 
-const Chip = ({ icon = <></>, content = '', backgroundColor = '$surfaceDefault', hideIfNoContent = false }) => {
+const Chip = ({ icon = <></>, content = '', backgroundColor = '$surface_default', hideIfNoContent = false }) => {
   if (hideIfNoContent && !content) {
     return;
   }
   return (
     <Flex align="center" css={{ backgroundColor, p: '$4 $6', borderRadius: '$4' }}>
       {icon}
-      <Text variant="sm" css={{ fontWeight: '$semiBold', color: '$textHighEmp', ml: '$2' }}>
+      <Text variant="sm" css={{ fontWeight: '$semiBold', color: '$on_surface_high', ml: '$2' }}>
         {content}
       </Text>
     </Flex>

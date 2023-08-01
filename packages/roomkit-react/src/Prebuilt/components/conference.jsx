@@ -10,6 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
@@ -21,7 +22,6 @@ import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUI
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
-import { HLSFailureModal } from './Notifications/HLSFailureModal';
 
 const Conference = () => {
   const navigate = useNavigation();

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../';
 import SidePane from '../../layouts/SidePane';
 import FullPageProgress from '../FullPageProgress';
@@ -10,7 +11,6 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
-import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
@@ -38,7 +38,7 @@ const PreviewContainer = () => {
         </Box>
       )}
       <Flex
-        css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primaryDefault' }}
+        css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primary_default' }}
         justify="center"
         align="center"
       >
