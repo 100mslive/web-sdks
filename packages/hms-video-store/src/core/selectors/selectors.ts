@@ -20,6 +20,7 @@ import {
   HMSStore,
   HMSVideoTrack,
 } from '../schema';
+import { HMSLogger } from '../../common/ui-logger';
 
 /**
  * Select the current {@link HMSRoom} object to which you are connected.
@@ -139,6 +140,7 @@ export const selectPeers = createSelector(
   [selectRoom, selectPeersMap, selectHideLocalPeer],
   (room, storePeers, hideLocalPeer) => {
     if (hideLocalPeer) {
+      HMSLogger.d("hiding local peer: ", room.localPeer)
       return room.peers.filter(peerID => room.localPeer !== peerID).map(peerID => storePeers[peerID]);
     }
     return room.peers.map(peerID => storePeers[peerID]);
