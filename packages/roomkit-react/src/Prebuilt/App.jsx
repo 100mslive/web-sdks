@@ -68,9 +68,9 @@ export const HMSPrebuilt = React.forwardRef(
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
     const reactiveStore = useRef();
 
-    const [hyderated, setHyderated] = React.useState(false);
+    const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
-      setHyderated(true);
+      setHydrated(true);
       const hms = new HMSReactiveStore();
       const hmsStore = hms.getStore();
       const hmsActions = hms.getActions();
@@ -114,7 +114,7 @@ export const HMSPrebuilt = React.forwardRef(
       typography,
     };
 
-    if (!hyderated) {
+    if (!hydrated) {
       return null;
     }
 
