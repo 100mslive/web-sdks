@@ -13,6 +13,7 @@ import {
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';
@@ -33,7 +34,6 @@ import {
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -62,7 +62,7 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const roomLayout = useRoomLayout();
-  const { join_form: joinForm = {} } = roomLayout.screens?.preview?.live_streaming?.elements;
+  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.live_streaming?.elements || {};
 
   const startHLS = useCallback(async () => {
     try {

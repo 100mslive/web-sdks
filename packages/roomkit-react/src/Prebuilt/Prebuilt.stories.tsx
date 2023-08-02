@@ -20,7 +20,7 @@ Example.args = {
   roomCode: 'tsj-obqh-lwx',
   options: {
     endpoints: {
-      roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui'
-    }
-  }
+      roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
+    },
+  },
 };

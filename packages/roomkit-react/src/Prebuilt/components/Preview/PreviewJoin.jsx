@@ -26,6 +26,7 @@ import {
 } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
@@ -36,7 +37,6 @@ import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { UI_SETTINGS } from '../../common/constants';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 

@@ -3,8 +3,8 @@ import { useMedia } from 'react-use';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
-import { PreviewSettings } from './PreviewJoin';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
+import { PreviewSettings } from './PreviewJoin';
 
 const PreviewForm = ({
   name,
@@ -22,7 +22,7 @@ const PreviewForm = ({
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
   const layout = useRoomLayout();
-  const { join_form: joinForm = {} } = layout?.screens?.preview?.live_streaming?.elements ||{};
+  const { join_form: joinForm = {} } = layout?.screens?.preview?.live_streaming?.elements || {};
   const showGoLive = joinForm.join_btn_type === 1 && !isHLSRunning;
 
   return (

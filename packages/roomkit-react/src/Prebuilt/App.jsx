@@ -50,11 +50,11 @@ export const HMSPrebuilt = React.forwardRef(
       options: {
         userName = '',
         userId = '',
-        endpoints: { 
-          init: initEndpoint = '', 
-          tokenByRoomCode: tokenByRoomCodeEndpoint  = '', 
-          tokenByRoomIdRole: tokenByRoomIdRoleEndpoint = '', 
-          roomLayout: roomLayoutEndpoint = '' 
+        endpoints: {
+          init: initEndpoint = '',
+          tokenByRoomCode: tokenByRoomCodeEndpoint = '',
+          tokenByRoomIdRole: tokenByRoomIdRoleEndpoint = '',
+          roomLayout: roomLayoutEndpoint = '',
         } = {},
       } = {},
       onLeave,
@@ -105,14 +105,14 @@ export const HMSPrebuilt = React.forwardRef(
       tokenByRoomCode: tokenByRoomCodeEndpoint,
       init: initEndpoint,
       tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
-      roomLayout: roomLayoutEndpoint
+      roomLayout: roomLayoutEndpoint,
     };
 
     const overrideLayout = {
       logo,
       themes,
-      typography
-    }
+      typography,
+    };
 
     if (!hyderated) {
       return null;
@@ -166,7 +166,7 @@ export const HMSPrebuilt = React.forwardRef(
                     '-webkit-text-size-adjust': '100%',
                   }}
                 >
-                  <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}/>
+                  <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
                 </Box>
               </HMSThemeProvider>
             </RoomLayoutProvider>
@@ -279,7 +279,7 @@ const Router = ({ children }) => {
   );
 };
 
-function AppRoutes({authTokenByRoomCodeEndpoint}) {
+function AppRoutes({ authTokenByRoomCodeEndpoint }) {
   return (
     <Router>
       <ToastContainer />

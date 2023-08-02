@@ -3,8 +3,8 @@ import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Flex, styled, Text, textEllipsis } from '../../../';
-import { isStreamingKit } from '../../common/utils';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
+import { isStreamingKit } from '../../common/utils';
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -34,7 +34,7 @@ const LogoImg = styled('img', {
 });
 
 export const Logo = () => {
-  const roomLayout = useRoomLayout()
+  const roomLayout = useRoomLayout();
   const logo = roomLayout?.logo?.url;
   const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
