@@ -1,7 +1,9 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
 import {
+  HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
+  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
@@ -75,6 +77,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     },
     asRole,
   });
+  const roomState = useHMSStore(selectRoomState);
 
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -99,7 +102,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
-  return (
+  return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
@@ -115,7 +118,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
             <Chip
               content="LIVE"
               backgroundColor="$alert_error_default"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: 'on_surface_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
@@ -151,6 +154,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         />
       </Box>
     </Container>
+  ) : (
+    <FullPageProgress />
   );
 };
 
