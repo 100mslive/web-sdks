@@ -1,16 +1,23 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSRoomState,
+  selectPermissions,
+  selectRoomState,
+  useHMSActions,
+  useHMSStore,
+  useRecordingStreaming,
+} from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../';
 import SidePane from '../../layouts/SidePane';
 import FullPageProgress from '../FullPageProgress';
 import { Header } from '../Header';
 import PreviewJoin from './PreviewJoin';
-import { useAuthToken } from '../AppData/useUISettings';
+import { useAuthToken, useSetAppDataByKey } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
-import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
+import { APP_DATA, QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE, sampleLayout } from '../../common/constants';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
@@ -22,6 +29,26 @@ const PreviewContainer = () => {
 
   const roomState = useHMSStore(selectRoomState);
   const isPreview = roomState === HMSRoomState.Preview;
+  const hmsActions = useHMSActions();
+  const permissions = useHMSStore(selectPermissions);
+  const { isHLSRunning } = useRecordingStreaming();
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
+  const startHLS = useCallback(async () => {
+    try {
+      if (isHLSStarted) {
+        return;
+      }
+      setHLSStarted(true);
+      await hmsActions.startHLSStreaming({});
+    } catch (error) {
+      if (error.message.includes('invalid input')) {
+        await startHLS();
+        return;
+      }
+      setHLSStarted(false);
+    }
+  }, [hmsActions, isHLSStarted, setHLSStarted]);
 
   const onJoin = () => {
     let meetingURL = `/meeting/${urlRoomId}`;
@@ -29,6 +56,10 @@ const PreviewContainer = () => {
       meetingURL += `/${userRole}`;
     }
     navigate(meetingURL);
+    if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
+      startHLS();
+      console.log('called');
+    }
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>

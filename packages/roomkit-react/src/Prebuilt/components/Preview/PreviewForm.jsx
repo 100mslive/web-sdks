@@ -2,9 +2,9 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
-import { sampleLayout } from '../../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { PreviewSettings } from './PreviewJoin';
+import { sampleLayout } from '../../common/constants';
 
 const PreviewForm = ({
   name,
