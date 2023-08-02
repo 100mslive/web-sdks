@@ -39,13 +39,16 @@ const PreviewContainer = () => {
       if (isHLSStarted) {
         return;
       }
+      console.log("didn't return startHLS");
       setHLSStarted(true);
       await hmsActions.startHLSStreaming({});
     } catch (error) {
+      console.log('caught error startHLS', error);
       if (error.message.includes('invalid input')) {
         await startHLS();
         return;
       }
+      console.log('setting to false startHLS');
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted]);
@@ -55,11 +58,10 @@ const PreviewContainer = () => {
     if (userRole) {
       meetingURL += `/${userRole}`;
     }
-    navigate(meetingURL);
     if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
       startHLS();
-      console.log('called');
     }
+    navigate(meetingURL);
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>
