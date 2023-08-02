@@ -18,7 +18,7 @@ import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSGenericTypes, HMSStore } from '../schema';
 import { IHMSNotifications } from '../schema/notification';
-import { HMSStats, selectRoomState } from '../';
+import { HMSStats } from '../';
 
 declare global {
   interface Window {
@@ -56,8 +56,6 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
       this.sdk = new HMSSdk();
       this.actions = new HMSSDKActions(this.store, this.sdk, this.notifications);
     }
-
-    this.setupStats();
 
     // @ts-ignore
     this.actions.setFrameworkInfo({ type: 'js', sdkVersion: require('../../../package.json').version });
@@ -133,29 +131,6 @@ export class HMSReactiveStore<T extends HMSGenericTypes = { sessionStore: Record
     }
     return this.stats;
   };
-
-  private setupStats() {
-    const initCallback = () => {
-      if (!this.sdk) {
-        return;
-      }
-      const unsub = this.sdk.getWebrtcInternals()?.onStatsChange(() => {
-        this.getStats();
-        unsub?.();
-      });
-    };
-
-    if (this.store.getState(selectRoomState) === 'Connected') {
-      initCallback();
-    } else {
-      const unsub = this.store.subscribe(roomState => {
-        if (roomState === 'Connected') {
-          initCallback();
-          unsub();
-        }
-      }, selectRoomState);
-    }
-  }
 
   /**
    * @internal
