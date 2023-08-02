@@ -1,9 +1,7 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
 import {
-  HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
-  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useHMSStore,
@@ -57,7 +55,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
-  const roomState = useHMSStore(selectRoomState);
   const [previewError, setPreviewError] = useState(false);
   const { endPoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -102,7 +99,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
-  return roomState === HMSRoomState.Preview ? (
+  return (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
@@ -117,8 +114,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           {isHLSRunning || isRTMPRunning ? (
             <Chip
               content="LIVE"
-              backgroundColor="$error"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: 'on_surface_high', borderRadius: '$round' }} />}
+              backgroundColor="$alert_error_default"
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
@@ -154,8 +151,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         />
       </Box>
     </Container>
-  ) : (
-    <FullPageProgress />
   );
 };
 

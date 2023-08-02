@@ -1,13 +1,15 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useCallback, useEffect } from 'react';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectPeerScreenSharing,
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
+  selectPermissions,
   selectTemplateAppData,
   useHMSActions,
   useHMSStore,
+  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
@@ -25,11 +27,12 @@ import {
   useIsHeadless,
   usePDFAnnotator,
   usePinnedTrack,
+  useSetAppDataByKey,
   useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { APP_DATA, sampleLayout, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -54,6 +57,27 @@ export const ConferenceMainView = () => {
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
 
+  const { isHLSRunning } = useRecordingStreaming();
+  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const permissions = useHMSStore(selectPermissions);
+  const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
+
+  const startHLS = useCallback(async () => {
+    try {
+      if (isHLSStarted) {
+        return;
+      }
+      setHLSStarted(true);
+      await hmsActions.startHLSStreaming({});
+    } catch (error) {
+      if (error.message.includes('invalid input')) {
+        await startHLS();
+        return;
+      }
+      setHLSStarted(false);
+    }
+  }, [hmsActions, isHLSStarted, setHLSStarted]);
+
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -67,8 +91,13 @@ export const ConferenceMainView = () => {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
 
+    // Is a streaming kit and broadcaster joins
+    if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
+      startHLS();
+    }
+
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-  }, [isConnected, hmsActions]);
+  }, [isConnected, hmsActions, permissions, isHLSRunning, joinForm]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
