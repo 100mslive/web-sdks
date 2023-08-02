@@ -12,7 +12,6 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
-import { sampleLayout } from '../../../../hms-video-store/src/test/fakeStore/fakeLayoutStore';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
@@ -33,7 +32,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { APP_DATA, sampleLayout, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -57,6 +56,7 @@ export const ConferenceMainView = () => {
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
+
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
@@ -91,13 +91,13 @@ export const ConferenceMainView = () => {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
 
-    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-
     // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
       startHLS();
     }
-  }, [isConnected, hmsActions]);
+
+    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
+  }, [isConnected, hmsActions, permissions, isHLSRunning, joinForm]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI

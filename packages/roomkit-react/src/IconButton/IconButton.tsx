@@ -38,7 +38,7 @@ export const IconButton = styled('button', {
       },
       true: {
         '&:not([disabled]):hover': {
-          backgroundColor: '$on_surface_medium',
+          backgroundColor: '$on_surface_low',
         },
       },
     },

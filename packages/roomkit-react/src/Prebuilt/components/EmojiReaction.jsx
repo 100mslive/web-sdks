@@ -13,7 +13,7 @@ import {
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../Dropdown';
-import { Box, Flex } from '../../Layout';
+import { Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { styled } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
@@ -79,9 +79,7 @@ export const EmojiReaction = () => {
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
           <IconButton>
             <Tooltip title="Emoji reaction">
-              <Box>
-                <EmojiIcon />
-              </Box>
+              <EmojiIcon />
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>
