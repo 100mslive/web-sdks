@@ -17,7 +17,6 @@ const PreviewForm = ({
   const formSubmit = e => {
     e.preventDefault();
   };
-
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();

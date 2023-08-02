@@ -111,7 +111,7 @@ const Conference = () => {
   }
 
   if (isHLSStarted) {
-    return <FullPageProgress loadingText="Starting the stream..." />;
+    return <FullPageProgress loadingText="Starting live stream..." />;
   }
 
   return (
