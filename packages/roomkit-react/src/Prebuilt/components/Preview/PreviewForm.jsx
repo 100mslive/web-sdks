@@ -4,7 +4,7 @@ import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { PreviewSettings } from './PreviewJoin';
-import { sampleLayout } from '../../common/constants';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 const PreviewForm = ({
   name,
@@ -21,7 +21,8 @@ const PreviewForm = ({
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
-  const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
+  const layout = useRoomLayout();
+  const { join_form: joinForm = {} } = layout?.screens?.preview?.live_streaming?.elements ||{};
   const showGoLive = joinForm.join_btn_type === 1 && !isHLSRunning;
 
   return (

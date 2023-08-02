@@ -9,6 +9,7 @@
   ],
   "plugins": ["prettier", "simple-import-sort"],
   "rules": {
+    "@typescript-eslint/ban-ts-comment": "allow",
     "no-unused-vars": [
       "error",
       {

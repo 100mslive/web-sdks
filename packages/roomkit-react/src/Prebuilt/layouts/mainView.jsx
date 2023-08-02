@@ -32,7 +32,8 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { APP_DATA, sampleLayout, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
@@ -60,7 +61,8 @@ export const ConferenceMainView = () => {
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
-  const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
+  const roomLayout = useRoomLayout();
+  const { join_form: joinForm = {} } = roomLayout.screens?.preview?.live_streaming?.elements;
 
   const startHLS = useCallback(async () => {
     try {
