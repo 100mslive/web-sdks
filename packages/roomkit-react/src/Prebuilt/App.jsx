@@ -62,7 +62,6 @@ export const HMSPrebuilt = React.forwardRef(
     ref,
   ) => {
     const aspectRatio = '1-1';
-    const color = '#2F80FF';
     const theme = 'dark';
     const metadata = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
