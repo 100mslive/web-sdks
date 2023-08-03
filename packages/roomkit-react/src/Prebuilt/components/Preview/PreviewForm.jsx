@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
-import { useRecordingStreaming } from '@100mslive/react-sdk';
+import { selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { PreviewSettings } from './PreviewJoin';
@@ -22,7 +22,11 @@ const PreviewForm = ({
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
   const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
-  const showGoLive = joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning;
+  const permissions = useHMSStore(selectPermissions);
+  const showGoLive =
+    joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE &&
+    !isHLSRunning &&
+    permissions?.hlsStreaming;
 
   return (
     <Form
