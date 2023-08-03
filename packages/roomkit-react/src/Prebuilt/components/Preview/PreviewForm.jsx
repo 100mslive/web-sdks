@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
-import { useRecordingStreaming } from '@100mslive/react-sdk';
+import { selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -21,9 +21,13 @@ const PreviewForm = ({
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
+  const permissions = useHMSStore(selectPermissions);
   const layout = useRoomLayout();
   const { join_form: joinForm = {} } = layout?.screens?.preview?.live_streaming?.elements || {};
-  const showGoLive = joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning;
+  const showGoLive =
+    joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE &&
+    !isHLSRunning &&
+    permissions?.hlsStreaming;
 
   return (
     <Form
@@ -43,17 +47,10 @@ const PreviewForm = ({
         />
         {cannotPublishAudio && cannotPublishVideo && !isMobile ? <PreviewSettings /> : null}
       </Flex>
-      <Button
-        type="submit"
-        icon
-        disabled={!name || !enableJoin}
-        onClick={() => {
-          onJoin();
-        }}
-      >
+      <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
         {showGoLive ? <RadioIcon height={18} width={18} /> : null}
-        {showGoLive ? joinForm.join_btn_label : 'Join Now'}
+        {showGoLive ? joinForm.go_live_btn_label : joinForm.join_btn_label}
       </Button>
     </Form>
   );
