@@ -25,7 +25,7 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
-import { getRoutePrefix, shadeColor } from './common/utils';
+import { getRoutePrefix } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
