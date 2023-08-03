@@ -9,10 +9,10 @@
   dependencies:
     protoc-gen-js "^3.21.2"
 
-"@100mslive/types-prebuilt@0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.4.0.tgz#2c8ba2284f6e5cdc4235bac84d7e27ef3682e4d3"
-  integrity sha512-TKV1B3/euWLePLOWgR/Tf+tZ2CVt4R4TR2QsiMD0eLwsR511d4da1a5igeCn1vNu/kkEsTh43mNaBUUBzM2FPQ==
+"@100mslive/types-prebuilt@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.5.0.tgz#8b375a7315cde138d2dcd29b701b2696ec7ac7e1"
+  integrity sha512-/46xZwKtp9pHninYVJJlzNRp8BzlVQmdN/FPM+uEvpJS0QlaXt7Nf7VKTRe3r3yP4ZVKwpxisAB07V0+Lb1z5A==
   dependencies:
     protoc-gen-js "^3.21.2"
 
