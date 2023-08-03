@@ -249,7 +249,7 @@ export const PreviewSettings = React.memo(() => {
 
   return (
     <Fragment>
-      <IconButton data-testid="preview_setting_btn" onClick={() => setOpen(value => !value)}>
+      <IconButton data-testid="preview_setting_btn" css={{ flexShrink: 0 }} onClick={() => setOpen(value => !value)}>
         <SettingsIcon />
       </IconButton>
       {open && <SettingsModal open={open} onOpenChange={setOpen} />}
