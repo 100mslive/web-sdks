@@ -26,8 +26,8 @@ export const SpeakerTag = () => {
 
 const LogoImg = styled('img', {
   maxHeight: '$14',
-  p: '$2',
   w: 'auto',
+  objectFit: 'contain',
   '@md': {
     maxHeight: '$12',
   },
@@ -42,5 +42,5 @@ export const Logo = () => {
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return logo ? <LogoImg src={logo} alt="Brand Logo" width={40} height={40} /> : null;
+  return logo ? <LogoImg src={logo} alt="Brand Logo" /> : null;
 };
