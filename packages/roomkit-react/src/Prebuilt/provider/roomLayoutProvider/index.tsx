@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Layout } from '@100mslive/types-prebuilt/types/layouts';
+import type { Layout } from '@100mslive/types-prebuilt';
 import merge from 'lodash.merge';
 // @ts-ignore: fix types
 import { useAuthToken } from '../../components/AppData/useUISettings';
