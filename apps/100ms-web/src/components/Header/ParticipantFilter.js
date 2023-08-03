@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { Box, Dropdown, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -6,7 +7,6 @@ import {
   HandRaiseIcon,
   PeopleIcon,
 } from "@100mslive/react-icons";
-import { Box, Dropdown, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import { isInternalRole } from "../../common/utils";
 
 export const ParticipantFilter = ({

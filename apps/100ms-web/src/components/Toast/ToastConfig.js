@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@100mslive/react-ui";
 import { selectAppData } from "@100mslive/react-sdk";
 import {
   ChatIcon,
@@ -7,7 +8,6 @@ import {
   PersonIcon,
   PoorConnectivityIcon,
 } from "@100mslive/react-icons";
-import { Button } from "@100mslive/react-ui";
 import { hmsActions, hmsStore } from "../../hms";
 import { APP_DATA, SIDE_PANE_OPTIONS } from "../../common/constants";
 
