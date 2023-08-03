@@ -81,8 +81,12 @@ export function PermissionErrorModal() {
             {!isMobile
               ? `Access to ${deviceType} is required. ${
                   isSystemError
-                    ? `Enable permissions for ${deviceType} from sytem settings`
-                    : `Enable permissions for ${deviceType} from address bar or browser settings.`
+                    ? `Enable permissions for ${deviceType}${
+                        deviceType === 'screen' ? 'share' : ''
+                      } from sytem settings`
+                    : `Enable permissions for ${deviceType}${
+                        deviceType === 'screen' ? 'share' : ''
+                      } from address bar or browser settings.`
                 }`
               : null}
           </Text>
