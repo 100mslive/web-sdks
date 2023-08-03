@@ -2,17 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.3.0.tgz#5fcade475cae46d514737a1a2e8a96a6ca20af70"
-  integrity sha512-weVJxYX4mNKne3T3B9zP/9BSRx0wD52SUs0uNWwvpAWXx0j7bR/aDASU+I8dLESRRYKd2MpF39X4TrcdyR+U9w==
-  dependencies:
-    protoc-gen-js "^3.21.2"
-
-"@100mslive/types-prebuilt@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.5.0.tgz#8b375a7315cde138d2dcd29b701b2696ec7ac7e1"
-  integrity sha512-/46xZwKtp9pHninYVJJlzNRp8BzlVQmdN/FPM+uEvpJS0QlaXt7Nf7VKTRe3r3yP4ZVKwpxisAB07V0+Lb1z5A==
+"@100mslive/types-prebuilt@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.6.0.tgz#9649c4aea4bcc0a89bd589c3076a17b8b2cfd92a"
+  integrity sha512-dK34akiAwYKW73Ey5NpW2M3q8e6UFlwO7Bncy3kxgQzFhSy3WgswGbn11xjZ/cWwn/Onn7iAlf9Q6LZaCaVSXA==
   dependencies:
     protoc-gen-js "^3.21.2"
 

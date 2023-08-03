@@ -26,6 +26,7 @@ import {
 } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
@@ -35,7 +36,7 @@ import SettingsModal from '../Settings/SettingsModal';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { sampleLayout, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -88,8 +89,9 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     join();
     onJoin && onJoin();
   }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
+  const roomLayout = useRoomLayout();
 
-  const { preview_header: previewHeader } = sampleLayout.screens.preview.live_streaming.elements;
+  const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.live_streaming?.elements || {};
 
   useEffect(() => {
     if (authToken) {
