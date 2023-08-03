@@ -56,6 +56,8 @@ export function PermissionErrorModal() {
             }}
           >
             {isMobile && isIOS ? <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={iosPermissions} /> : null}
+
+            {/* Images for android */}
             {isMobile && isAndroid ? (
               showAndroidPrompt ? (
                 <img src={androidPermissions} style={{ maxWidth: '100%', maxHeight: '100%' }} />
@@ -68,28 +70,34 @@ export function PermissionErrorModal() {
               {showAndroidPrompt ? `Allow access to your ${deviceType}` : `We can't access your ${deviceType}`}
             </Text>
           </Dialog.Title>
+
           <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
+            {/* IOS prompt text */}
             {isMobile && isIOS
               ? 'Enable permissions by reloading this page and clicking “Allow” on the pop-up, or change settings from the address bar.'
               : null}
-            {isMobile && isAndroid
-              ? showAndroidPrompt
-                ? 'In order for others to see and hear you, your browser will request camera and microphone access.'
-                : 'To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.'
+
+            {/* Initial prompt for android devices */}
+            {isMobile && isAndroid && showAndroidPrompt
+              ? 'In order for others to see and hear you, your browser will request camera and microphone access.'
               : null}
 
-            {!isMobile
-              ? `Access to ${deviceType} is required. ${
-                  isSystemError
-                    ? `Enable permissions for ${deviceType}${
-                        deviceType === 'screen' ? 'share' : ''
-                      } from sytem settings`
-                    : `Enable permissions for ${deviceType}${
-                        deviceType === 'screen' ? 'share' : ''
-                      } from address bar or browser settings.`
-                }`
+            {/* Successive prompts for android devices */}
+            {isMobile && isAndroid && !showAndroidPrompt
+              ? 'To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.'
               : null}
+
+            {/* Prompt for desktops */}
+            {!isMobile ? `Access to ${deviceType} is required. ` : null}
+
+            {isSystemError && !isMobile
+              ? `Enable permissions for ${deviceType}${deviceType === 'screen' ? 'share' : ''} from sytem settings`
+              : `Enable permissions for ${deviceType}${
+                  deviceType === 'screen' ? 'share' : ''
+                } from address bar or browser settings.`}
           </Text>
+
+          {/* CTA section */}
           {isMobile && isIOS ? (
             <>
               <Button onClick={() => window.location.reload()} css={{ w: '100%', mb: '$6' }}>
