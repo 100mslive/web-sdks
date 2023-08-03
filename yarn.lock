@@ -9,6 +9,13 @@
   dependencies:
     protoc-gen-js "^3.21.2"
 
+"@100mslive/types-prebuilt@0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.5.0.tgz#8b375a7315cde138d2dcd29b701b2696ec7ac7e1"
+  integrity sha512-/46xZwKtp9pHninYVJJlzNRp8BzlVQmdN/FPM+uEvpJS0QlaXt7Nf7VKTRe3r3yP4ZVKwpxisAB07V0+Lb1z5A==
+  dependencies:
+    protoc-gen-js "^3.21.2"
+
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
