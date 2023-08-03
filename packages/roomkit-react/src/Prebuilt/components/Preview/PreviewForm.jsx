@@ -50,7 +50,7 @@ const PreviewForm = ({
       <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
         {showGoLive ? <RadioIcon height={18} width={18} /> : null}
-        {showGoLive ? joinForm.go_live_btn_label : joinForm.join_btn_label}
+        {(showGoLive ? joinForm.go_live_btn_label : joinForm.join_btn_label) || 'Join Now'}
       </Button>
     </Form>
   );

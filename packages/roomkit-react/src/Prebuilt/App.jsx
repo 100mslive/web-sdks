@@ -18,14 +18,14 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutProvider } from './provider/roomLayoutProvider/index.tsx';
+import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider/index.tsx';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
-import { getRoutePrefix, shadeColor } from './common/utils';
+import { getRoutePrefix } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
@@ -57,13 +57,12 @@ export const HMSPrebuilt = React.forwardRef(
           roomLayout: roomLayoutEndpoint = '',
         } = {},
       } = {},
+      screens,
       onLeave,
     },
     ref,
   ) => {
     const aspectRatio = '1-1';
-    const color = '#2F80FF';
-    const theme = 'dark';
     const metadata = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
     const reactiveStore = useRef();
@@ -112,6 +111,7 @@ export const HMSPrebuilt = React.forwardRef(
       logo,
       themes,
       typography,
+      screens,
     };
 
     if (!hydrated) {
@@ -141,34 +141,42 @@ export const HMSPrebuilt = React.forwardRef(
             stats={reactiveStore.current.hmsStats}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
-              <HMSThemeProvider
-                themeType={theme}
-                aspectRatio={getAspectRatio({ width, height })}
-                theme={{
-                  colors: {
-                    primary_default: color,
-                    primary_dim: shadeColor(color, -30),
-                    primary_bright: shadeColor(color, 30),
-                    primary_disabled: shadeColor(color, 10),
-                  },
-                  fonts: {
-                    sans: ['Roboto', 'Inter', 'sans-serif'],
-                  },
+              <RoomLayoutContext.Consumer>
+                {layout => {
+                  const theme = layout.themes?.[0] || {};
+                  const { typography } = layout;
+                  let fontFamily = ['sans-serif'];
+                  if (typography?.font_family) {
+                    fontFamily = [`${typography?.font_family}`, ...fontFamily];
+                  }
+
+                  return (
+                    <HMSThemeProvider
+                      themeType={theme.name}
+                      aspectRatio={getAspectRatio({ width, height })}
+                      theme={{
+                        colors: theme.palette,
+                        fonts: {
+                          sans: fontFamily,
+                        },
+                      }}
+                    >
+                      <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
+                      <Init />
+                      <Box
+                        css={{
+                          bg: '$background_dim',
+                          size: '100%',
+                          lineHeight: '1.5',
+                          '-webkit-text-size-adjust': '100%',
+                        }}
+                      >
+                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                      </Box>
+                    </HMSThemeProvider>
+                  );
                 }}
-              >
-                <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
-                <Init />
-                <Box
-                  css={{
-                    bg: '$background_dim',
-                    size: '100%',
-                    lineHeight: '1.5',
-                    '-webkit-text-size-adjust': '100%',
-                  }}
-                >
-                  <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
-                </Box>
-              </HMSThemeProvider>
+              </RoomLayoutContext.Consumer>
             </RoomLayoutProvider>
           </HMSRoomProvider>
         </HMSPrebuiltContext.Provider>
