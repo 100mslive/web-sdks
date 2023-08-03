@@ -77,10 +77,6 @@ export const useAuthToken = () => {
   return useHMSStore(selectAppData(APP_DATA.authToken));
 };
 
-export const useLogo = () => {
-  return useHMSStore(selectAppData(APP_DATA.logo));
-};
-
 export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };

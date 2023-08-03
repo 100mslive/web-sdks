@@ -18,6 +18,7 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { RoomLayoutProvider } from './provider/roomLayoutProvider/index.tsx';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
@@ -43,11 +44,18 @@ export const HMSPrebuilt = React.forwardRef(
   (
     {
       roomCode = '',
-      logo: { url: logoUrl = '' } = {},
+      logo,
+      typography,
+      themes,
       options: {
         userName = '',
         userId = '',
-        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = '' } = {},
+        endpoints: {
+          init: initEndpoint = '',
+          tokenByRoomCode: tokenByRoomCodeEndpoint = '',
+          tokenByRoomIdRole: tokenByRoomIdRoleEndpoint = '',
+          roomLayout: roomLayoutEndpoint = '',
+        } = {},
       } = {},
       onLeave,
     },
@@ -60,9 +68,9 @@ export const HMSPrebuilt = React.forwardRef(
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
     const reactiveStore = useRef();
 
-    const [hyderated, setHyderated] = React.useState(false);
+    const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
-      setHyderated(true);
+      setHydrated(true);
       const hms = new HMSReactiveStore();
       const hmsStore = hms.getStore();
       const hmsActions = hms.getActions();
@@ -93,13 +101,20 @@ export const HMSPrebuilt = React.forwardRef(
       [],
     );
 
-    const endPoints = {
-      tokenByRoomCode,
+    const endpoints = {
+      tokenByRoomCode: tokenByRoomCodeEndpoint,
       init: initEndpoint,
-      tokenByRoomIdRole,
+      tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
+      roomLayout: roomLayoutEndpoint,
     };
 
-    if (!hyderated) {
+    const overrideLayout = {
+      logo,
+      themes,
+      typography,
+    };
+
+    if (!hydrated) {
       return null;
     }
 
@@ -109,53 +124,53 @@ export const HMSPrebuilt = React.forwardRef(
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
           value={{
-            roomId: '',
-            role: '',
             roomCode,
             showPreview: true,
             showLeave: true,
             onLeave,
             userName,
             userId,
-            endPoints,
+            endpoints,
           }}
         >
-          <HMSThemeProvider
-            themeType={theme}
-            aspectRatio={getAspectRatio({ width, height })}
-            theme={{
-              colors: {
-                primary_default: color,
-                primary_dim: shadeColor(color, -30),
-                primary_bright: shadeColor(color, 30),
-                primary_disabled: shadeColor(color, 10),
-              },
-              fonts: {
-                sans: ['Roboto', 'Inter', 'sans-serif'],
-              },
-            }}
+          <HMSRoomProvider
+            isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+            actions={reactiveStore.current.hmsActions}
+            store={reactiveStore.current.hmsStore}
+            notifications={reactiveStore.current.hmsNotifications}
+            stats={reactiveStore.current.hmsStats}
           >
-            <HMSRoomProvider
-              isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-              actions={reactiveStore.current.hmsActions}
-              store={reactiveStore.current.hmsStore}
-              notifications={reactiveStore.current.hmsNotifications}
-              stats={reactiveStore.current.hmsStats}
-            >
-              <AppData appDetails={metadata} logo={logoUrl} tokenEndpoint={endPoints.tokenByRoomIdRole} />
-              <Init />
-              <Box
-                css={{
-                  bg: '$background_dim',
-                  size: '100%',
-                  lineHeight: '1.5',
-                  '-webkit-text-size-adjust': '100%',
+            <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
+              <HMSThemeProvider
+                themeType={theme}
+                aspectRatio={getAspectRatio({ width, height })}
+                theme={{
+                  colors: {
+                    primary_default: color,
+                    primary_dim: shadeColor(color, -30),
+                    primary_bright: shadeColor(color, 30),
+                    primary_disabled: shadeColor(color, 10),
+                  },
+                  fonts: {
+                    sans: ['Roboto', 'Inter', 'sans-serif'],
+                  },
                 }}
               >
-                <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
-              </Box>
-            </HMSRoomProvider>
-          </HMSThemeProvider>
+                <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
+                <Init />
+                <Box
+                  css={{
+                    bg: '$background_dim',
+                    size: '100%',
+                    lineHeight: '1.5',
+                    '-webkit-text-size-adjust': '100%',
+                  }}
+                >
+                  <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                </Box>
+              </HMSThemeProvider>
+            </RoomLayoutProvider>
+          </HMSRoomProvider>
         </HMSPrebuiltContext.Provider>
       </ErrorBoundary>
     );

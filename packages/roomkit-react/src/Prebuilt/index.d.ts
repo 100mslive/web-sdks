@@ -6,10 +6,11 @@ export declare const HMSPrebuilt: React.FC<{
     url: string;
   };
   options?: {
-    endPoints?: {
+    endpoints?: {
       tokenByRoomIdRole?: string;
       tokenByRoomCode?: string;
       init?: string;
+      roomLayout?: string;
     };
   };
 }>;
