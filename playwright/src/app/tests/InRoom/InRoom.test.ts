@@ -59,7 +59,7 @@ test(`Verify network on tile and peerlist`, async ({ context }) => {
 test(`Verify emoji container text and is clickable`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.assertVisible(page.footer.emoji_btn);
-  await page.click(page.footer.emoji_btn)
+  await page.click(page.footer.emoji_btn);
   await page.assertVisible(page.footer.emoji_container);
 
   //verify emoji container text
@@ -113,8 +113,8 @@ test.skip(`Verify valid embed url and stop embed`, async ({ page: nativePage }) 
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url)
-  await page.click(page.footer.embed_cta)
-  await page.assertNotVisible(page.center.first_person_img)
+  await page.click(page.footer.embed_share_cta);
+  await page.assertNotVisible(page.center.first_person_img);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta, page.footer.stop_embed_cta);
   await page.endRoom();
   await page.close();
@@ -134,11 +134,11 @@ test.skip(`Verify invalid embed url`, async ({ page: nativePage }) => {
 });
 
 //Disabled it on 24th July as this feature(Just embed) doesn't exist anymore
-test(`Update embed url`, async ({ page: nativePage }) => {
+test.skip(`Update embed url`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url);
-  await page.click(page.footer.embed_cta);
+  await page.click(page.footer.embed_share_cta);
   await page.assertNotVisible(page.center.first_person_img);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.invalid_embed_url);
