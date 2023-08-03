@@ -93,6 +93,11 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
 
   useEffect(() => {
     hmsActions.initAppData(initialAppData);
+    hmsActions.setFrameworkInfo({
+      type: 'react-web-prebuilt',
+      isPrebuilt: true,
+      version: React.version,
+    });
   }, [hmsActions]);
 
   useEffect(() => {
