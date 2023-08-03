@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { GetResponse, Layout } from '@100mslive/types-prebuilt';
+import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
 
 // TODO: remove this usage
 const fetchWithRetry = async (url = '', options = {}) => {
