@@ -145,12 +145,6 @@ export const HMSPrebuilt = React.forwardRef(
                 themeType={theme}
                 aspectRatio={getAspectRatio({ width, height })}
                 theme={{
-                  colors: {
-                    primary_default: color,
-                    primary_dim: shadeColor(color, -30),
-                    primary_bright: shadeColor(color, 30),
-                    primary_disabled: shadeColor(color, 10),
-                  },
                   fonts: {
                     sans: ['Roboto', 'Inter', 'sans-serif'],
                   },

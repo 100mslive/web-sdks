@@ -109,13 +109,13 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
-        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
+        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', '@md': { mt: '$8' } }}>
           {previewHeader.title}
         </Text>
-        <Text css={{ c: '$on_surface_medium', my: '$4', textAlign: 'center' }} variant="body1">
+        <Text css={{ c: '$on_surface_medium', my: '0', textAlign: 'center' }} variant="body1">
           {previewHeader.sub_title}
         </Text>
-        <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
+        <Flex justify="center" css={{ my: '$14', gap: '$4', '@md': { my: '$8' } }}>
           {isHLSRunning || isRTMPRunning ? (
             <Chip
               content="LIVE"
@@ -188,7 +188,6 @@ const PreviewTile = ({ name, error }) => {
         aspectRatio: width / height,
         width: 'unset',
         height: 'min(360px, 60vh)',
-        mt: '$12',
         '@sm': {
           height: 'unset',
           width: 'min(360px, 100%)',
