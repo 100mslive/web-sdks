@@ -59,8 +59,6 @@ export function Notifications() {
               inlineAction: true,
               action: (
                 <Button
-                  as="div"
-                  variant="primary"
                   onClick={() => {
                     ToastManager.removeToast(toastId);
                     window.location.reload();

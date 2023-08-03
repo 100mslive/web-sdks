@@ -1,4 +1,5 @@
 import React, { Suspense, useCallback, useEffect } from 'react';
+import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -92,7 +93,11 @@ export const ConferenceMainView = () => {
     }
 
     // Is a streaming kit and broadcaster joins
-    if (permissions?.hlsStreaming && !isHLSRunning && joinForm.join_btn_type === 1) {
+    if (
+      permissions?.hlsStreaming &&
+      !isHLSRunning &&
+      joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
+    ) {
       startHLS();
     }
 

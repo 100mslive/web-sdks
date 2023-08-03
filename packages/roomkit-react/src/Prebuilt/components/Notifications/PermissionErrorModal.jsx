@@ -21,7 +21,7 @@ export function PermissionErrorModal() {
     const hasVideo = errorMessage.includes('video');
     const hasScreen = errorMessage.includes('screen');
     if (hasAudio && hasVideo) {
-      setDeviceType('Camera and Microphone');
+      setDeviceType('Camera and microphone');
     } else if (hasAudio) {
       setDeviceType('Microphone');
     } else if (hasVideo) {
@@ -36,14 +36,13 @@ export function PermissionErrorModal() {
     <Dialog.Root open={!!deviceType}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(380px, 90%)' }}>
+        <Dialog.Content css={{ w: 'min(380px, 90%)', p: '$8' }}>
           <Dialog.Title
             css={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               borderBottom: '1px solid $border_default',
-              pb: '$8',
             }}
           >
             <Text variant="h6">{deviceType} permissions are blocked</Text>
@@ -52,7 +51,7 @@ export function PermissionErrorModal() {
             Access to {deviceType} is required.&nbsp;
             {isSystemError
               ? `Enable permissions for ${deviceType} from sytem settings`
-              : `Enable permissions for ${deviceType} from address bar or browser settings`}
+              : `Enable permissions for ${deviceType} from address bar or browser settings.`}
           </Text>
           <Flex justify="end" css={{ w: '100%' }}>
             <Button outlined variant="standard" onClick={() => setDeviceType('')}>

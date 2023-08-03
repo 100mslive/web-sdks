@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
 import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
@@ -17,12 +18,11 @@ const PreviewForm = ({
   const formSubmit = e => {
     e.preventDefault();
   };
-
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
   const { isHLSRunning } = useRecordingStreaming();
   const { join_form: joinForm } = sampleLayout.screens.preview.live_streaming.elements;
-  const showGoLive = joinForm.join_btn_type === 1 && !isHLSRunning;
+  const showGoLive = joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning;
 
   return (
     <Form

@@ -210,9 +210,6 @@ const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
             size: '100%',
             padding: 0,
           }}
-          containerCSS={{
-            bg: '$surface_default',
-          }}
           width={width}
           height={height}
         />
