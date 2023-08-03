@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
-import androidPermissions from '../../../assets/android-permission-0.png';
-import androidPermissionAlert from '../../../assets/android-permission-alert.png';
-import iosPermissions from '../../../assets/ios-permission-0.png';
+import androidPermissions from '../../../assets/android-perm-0.png';
+import androidPermissionAlert from '../../../assets/android-perm-1.png';
+import iosPermissions from '../../../assets/ios-perm-0.png';
 import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorModal() {
@@ -78,12 +78,12 @@ export function PermissionErrorModal() {
               : null}
 
             {/* Initial prompt for android devices */}
-            {isMobile && isAndroid && showAndroidPrompt
+            {isMobile && showAndroidPrompt && isAndroid
               ? 'In order for others to see and hear you, your browser will request camera and microphone access.'
               : null}
 
             {/* Successive prompts for android devices */}
-            {isMobile && isAndroid && !showAndroidPrompt
+            {isMobile && !showAndroidPrompt && isAndroid
               ? 'To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.'
               : null}
 
@@ -92,9 +92,12 @@ export function PermissionErrorModal() {
 
             {isSystemError && !isMobile
               ? `Enable permissions for ${deviceType}${deviceType === 'screen' ? 'share' : ''} from sytem settings`
-              : `Enable permissions for ${deviceType}${
+              : null}
+            {!isSystemError && !isMobile
+              ? `Enable permissions for ${deviceType}${
                   deviceType === 'screen' ? 'share' : ''
-                } from address bar or browser settings.`}
+                } from address bar or browser settings.`
+              : null}
           </Text>
 
           {/* CTA section */}
