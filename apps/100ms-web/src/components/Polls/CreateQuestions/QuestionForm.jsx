@@ -57,6 +57,7 @@ export const QuestionForm = ({
         <DialogDropdownTrigger
           ref={ref}
           title={QUESTION_TYPE_TITLE[type]}
+          css={{ borderColor: "$border_default" }}
           open={open}
         />
         <Dropdown.Portal>
