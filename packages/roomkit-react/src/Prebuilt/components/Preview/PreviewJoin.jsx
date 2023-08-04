@@ -28,7 +28,6 @@ import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { AudioVideoToggle } from '../AudioVideoToggle';
-import { BottomActionSheet } from '../BottomActionSheet';
 import Chip from '../Chip';
 import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
@@ -248,21 +247,14 @@ const PreviewControls = ({ hideSettings }) => {
 // Bottom action sheet goes here, if isMobile
 export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('Settings');
 
   return (
-    <BottomActionSheet
-      title={title}
-      triggerContent={
-        <IconButton data-testid="preview_setting_btn" css={{ flexShrink: 0 }}>
-          <SettingsIcon />
-        </IconButton>
-      }
-      setSheetOpen={setOpen}
-      sheetOpen={open}
-    >
-      <SettingsModal open={open} onOpenChange={setOpen} />
-    </BottomActionSheet>
+    <Fragment>
+      <IconButton data-testid="preview_setting_btn" css={{ flexShrink: 0 }} onClick={() => setOpen(value => !value)}>
+        <SettingsIcon />
+      </IconButton>
+      {open && <SettingsModal open={open} onOpenChange={setOpen} />}
+    </Fragment>
   );
 });
 
