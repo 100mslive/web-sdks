@@ -91,7 +91,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
   const roomLayout = useRoomLayout();
 
-  const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.live_streaming?.elements || {};
+  const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
 
   useEffect(() => {
     if (authToken) {
