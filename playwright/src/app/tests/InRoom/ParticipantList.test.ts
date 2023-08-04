@@ -26,7 +26,7 @@ test(`Verify Number & Name in Participant list`, async ({ page: nativePage }) =>
   await page.close();
 });
 
-test(`Verify Number of multiple participants @mytest`, async ({ context }, testInfo) => {
+test(`Verify Number of multiple participants`, async ({ context }, testInfo) => {
   if (testInfo.retry) {
     const page = await PageWrapper.openPages(context, 1);
     await page[0].endRoom();

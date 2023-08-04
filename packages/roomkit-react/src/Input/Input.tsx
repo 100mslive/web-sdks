@@ -7,7 +7,7 @@ import { styled } from '../Theme';
 export const Input = styled('input', {
   fontFamily: '$sans',
   lineHeight: 'inherit',
-  backgroundColor: '$surface_bright',
+  backgroundColor: '$surface_default',
   borderRadius: '8px',
   outline: 'none',
   border: '1px solid $border_bright',

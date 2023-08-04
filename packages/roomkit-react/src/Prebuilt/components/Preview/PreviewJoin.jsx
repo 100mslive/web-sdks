@@ -54,7 +54,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
-  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
@@ -109,18 +109,19 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
-        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$10', '@md': { mt: '$8' } }}>
+        <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', '@md': { mt: '$8' } }}>
           {previewHeader.title}
         </Text>
-        <Text css={{ c: '$on_surface_medium', my: '$4', textAlign: 'center' }} variant="body1">
+        <Text css={{ c: '$on_surface_medium', my: '0', textAlign: 'center' }} variant="body1">
           {previewHeader.sub_title}
         </Text>
         <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
-          {isHLSRunning || isRTMPRunning ? (
+          {isStreamingOn ? (
             <Chip
               content="LIVE"
               backgroundColor="$alert_error_default"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+              textColor="#FFF"
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
@@ -188,7 +189,6 @@ const PreviewTile = ({ name, error }) => {
         aspectRatio: width / height,
         width: 'unset',
         height: 'min(360px, 60vh)',
-        mt: '$12',
         '@sm': {
           height: 'unset',
           width: 'min(360px, 100%)',
@@ -224,6 +224,7 @@ const PreviewTile = ({ name, error }) => {
 };
 
 const PreviewControls = ({ hideSettings }) => {
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   return (
     <Flex
       justify="between"
@@ -234,9 +235,7 @@ const PreviewControls = ({ hideSettings }) => {
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle compact />
-        <Suspense fallback="">
-          <VirtualBackground />
-        </Suspense>
+        <Suspense fallback="">{isVideoOn ? <VirtualBackground /> : null}</Suspense>
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

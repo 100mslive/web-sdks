@@ -54,7 +54,7 @@ export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
   }
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
-      {initials || <PersonIcon height={24} width={24} />}
+      {initials || <PersonIcon height={40} width={40} />}
     </StyledAvatar>
   );
 };
