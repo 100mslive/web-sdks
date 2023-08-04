@@ -27,7 +27,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
     <Sheet.Trigger asChild>
       <Button variant="standard">Open Sheet</Button>
     </Sheet.Trigger>
-    <Sheet.Content>
+    <Sheet.Content css={{ padding: '16px' }}>
       <Sheet.Title>
         <Flex direction="row" justify="between" css={{ w: '100%' }}>
           <Flex justify="start" align="center" gap="3">

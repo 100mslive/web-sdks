@@ -3,8 +3,13 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { CSS, keyframes, styled, VariantProps } from '@stitches/react';
 import { Dialog } from '../Modal';
 
-const SheetRoot = DialogPrimitive.Root;
-const SheetTrigger = DialogPrimitive.Trigger;
+const SheetRoot = styled(DialogPrimitive.Root, {
+  minHeight: '300px',
+  maxWidth: 'fit-content',
+});
+const SheetTrigger = styled(DialogPrimitive.Trigger, {
+  appearance: 'none !important', // Needed for safari it shows white overlay
+});
 
 const fadeIn = keyframes({
   from: { opacity: '0' },
