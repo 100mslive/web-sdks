@@ -120,7 +120,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
             <Chip
               content="LIVE"
               backgroundColor="$alert_error_default"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+              textColor="#FFF"
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
