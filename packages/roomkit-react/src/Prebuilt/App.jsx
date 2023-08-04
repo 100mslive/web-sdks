@@ -25,7 +25,7 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
-import { getRoutePrefix, shadeColor } from './common/utils';
+import { getRoutePrefix } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
@@ -62,7 +62,6 @@ export const HMSPrebuilt = React.forwardRef(
     ref,
   ) => {
     const aspectRatio = '1-1';
-    const color = '#2F80FF';
     const theme = 'dark';
     const metadata = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
@@ -145,12 +144,6 @@ export const HMSPrebuilt = React.forwardRef(
                 themeType={theme}
                 aspectRatio={getAspectRatio({ width, height })}
                 theme={{
-                  colors: {
-                    primary_default: color,
-                    primary_dim: shadeColor(color, -30),
-                    primary_bright: shadeColor(color, 30),
-                    primary_disabled: shadeColor(color, 10),
-                  },
                   fonts: {
                     sans: ['Roboto', 'Inter', 'sans-serif'],
                   },
