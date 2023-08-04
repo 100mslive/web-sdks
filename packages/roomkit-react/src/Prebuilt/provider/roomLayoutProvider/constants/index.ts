@@ -1,9 +1,14 @@
 import type { Layout } from '@100mslive/types-prebuilt';
+
+// @ts-ignore
 export const defaultLayout: Layout = {
   id: '',
   role_id: '',
   template_id: '',
   app_id: '',
+  typography: {
+    font_family: 'Inter',
+  },
   screens: {
     preview: {
       live_streaming: {
