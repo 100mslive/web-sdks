@@ -54,7 +54,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
-  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
@@ -115,12 +115,13 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         <Text css={{ c: '$on_surface_medium', my: '0', textAlign: 'center' }} variant="body1">
           {previewHeader.sub_title}
         </Text>
-        <Flex justify="center" css={{ my: '$14', gap: '$4', '@md': { my: '$8' } }}>
-          {isHLSRunning || isRTMPRunning ? (
+        <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
+          {isStreamingOn ? (
             <Chip
               content="LIVE"
               backgroundColor="$alert_error_default"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_surface_high', borderRadius: '$round' }} />}
+              textColor="#FFF"
+              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
             />
           ) : null}
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
