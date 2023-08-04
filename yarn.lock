@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.6.0.tgz#9649c4aea4bcc0a89bd589c3076a17b8b2cfd92a"
-  integrity sha512-dK34akiAwYKW73Ey5NpW2M3q8e6UFlwO7Bncy3kxgQzFhSy3WgswGbn11xjZ/cWwn/Onn7iAlf9Q6LZaCaVSXA==
+"@100mslive/types-prebuilt@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.7.0.tgz#1942f92ab71cd6f0472c1006d8eb0ba350fa88d1"
+  integrity sha512-+THSqHVL6EBI4jDAKwQRA1fHUNK8HxZGa5gzOYvzd31ZJ+M07ldYBS/Lfo5LqAt5xEsRxd/tNKGrkrLXQL+org==
   dependencies:
     protoc-gen-js "^3.21.2"
 

@@ -15,7 +15,6 @@ export const defaultLayout: Layout = {
           join_form: {
             join_btn_type: 0,
             join_btn_label: 'Join Now',
-            // @ts-ignore
             go_live_btn_label: 'Go Live',
           },
         },
