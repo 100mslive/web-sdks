@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
+import { defaultLayout } from '../constants';
 
 // TODO: remove this usage
 const fetchWithRetry = async (url = '', options = {}) => {
@@ -37,8 +38,11 @@ export const useFetchRoomLayout = ({
       if (isFetchInProgress.current || !authToken) {
         return;
       }
+      if (!endpoint) {
+        setLayout(defaultLayout);
+      }
       isFetchInProgress.current = true;
-      const resp = await fetchWithRetry(endpoint || 'https://api.100ms.live/v2/layouts/ui', {
+      const resp = await fetchWithRetry(endpoint, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },

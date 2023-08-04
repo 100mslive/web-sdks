@@ -11,8 +11,8 @@ export default {
   },
 } as Meta<typeof HMSPrebuilt>;
 
-const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', logo, options }) => {
-  return <HMSPrebuilt roomCode={roomCode} logo={logo} options={options} />;
+const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', logo, themes, typography, options }) => {
+  return <HMSPrebuilt roomCode={roomCode} logo={logo} options={options} themes={themes} typography={typography} />;
 };
 
 export const Example = PrebuiltRoomCodeStory.bind({});

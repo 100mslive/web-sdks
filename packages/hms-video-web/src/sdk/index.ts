@@ -921,7 +921,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
-    this.frameworkInfo = frameworkInfo;
+    this.frameworkInfo = { ...this.frameworkInfo, ...frameworkInfo };
   }
 
   async attachVideo(track: HMSVideoTrack, videoElement: HTMLVideoElement) {
