@@ -23,7 +23,7 @@ const PreviewForm = ({
   const { isHLSRunning } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
   const layout = useRoomLayout();
-  const { join_form: joinForm = {} } = layout?.screens?.preview?.live_streaming?.elements || {};
+  const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
   const showGoLive =
     joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE &&
     !isHLSRunning &&
@@ -48,7 +48,7 @@ const PreviewForm = ({
         {cannotPublishAudio && cannotPublishVideo && !isMobile ? <PreviewSettings /> : null}
       </Flex>
 
-      {joinForm.join_btn_type ? (
+      {Object.keys(joinForm).length > 0 ? (
         <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
           {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
           {showGoLive ? <RadioIcon height={18} width={18} /> : null}

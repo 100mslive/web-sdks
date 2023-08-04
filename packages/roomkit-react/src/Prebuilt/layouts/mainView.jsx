@@ -63,7 +63,7 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const roomLayout = useRoomLayout();
-  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.live_streaming?.elements || {};
+  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.default?.elements || {};
 
   const startHLS = useCallback(async () => {
     try {
