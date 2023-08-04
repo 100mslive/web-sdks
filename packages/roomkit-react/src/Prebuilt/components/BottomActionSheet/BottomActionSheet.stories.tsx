@@ -4,7 +4,7 @@ import { Button } from '../../../Button';
 import { Box } from '../../../Layout';
 import { Text } from '../../../Text';
 import { CSS } from '../../../Theme';
-import BottomActionSheet from './BottomActionSheet';
+import { BottomActionSheet } from './BottomActionSheet';
 
 // WIP
 
