@@ -120,7 +120,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
             <Chip
               content="LIVE"
               backgroundColor="$alert_error_default"
-              textColor="$on_primary_high"
+              textColor="#FFF"
               icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
             />
           ) : null}
