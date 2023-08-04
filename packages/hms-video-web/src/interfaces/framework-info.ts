@@ -12,4 +12,8 @@ export interface HMSFrameworkInfo {
    * version of the SDK being used i.e., version of hms-video-store or react-sdk
    */
   sdkVersion: string;
+  /**
+   * true when any Prebuilt Kit on any framework is used
+   */
+  isPrebuilt?: boolean;
 }
