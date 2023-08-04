@@ -2,7 +2,7 @@
  * Used in the user agent sent to INIT, BIZ and in offline cached events.
  */
 export interface HMSFrameworkInfo {
-  type: 'js' | 'react-web' | 'react-web-prebuilt';
+  type: 'js' | 'react-web';
   /**
    * version of the framework being used, i.e., version of react
    * optional since there's no framework version required for JS SDK usage
