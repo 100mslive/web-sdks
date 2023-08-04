@@ -83,7 +83,7 @@ export const IconButtonWithOptions = ({
               css={{
                 flexDirection: 'column',
                 alignItems: 'flex-start',
-                backgroundColor: option.active ? '$primary_dim' : '$surface_dim',
+                backgroundColor: option.active ? '$surface_bright' : '$surface_dim',
                 borderTop: index === 0 ? 'none' : '1px solid $border_default',
                 '&:hover': {
                   cursor: 'pointer',

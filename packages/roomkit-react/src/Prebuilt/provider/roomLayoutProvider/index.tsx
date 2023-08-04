@@ -6,7 +6,6 @@ import { useAuthToken } from '../../components/AppData/useUISettings';
 import { useFetchRoomLayout } from './hooks/useFetchRoomLayout';
 
 export type RoomLayoutProviderProps = {
-  roomCode: string;
   roomLayoutEndpoint?: string;
   overrideLayout?: Layout;
 };
