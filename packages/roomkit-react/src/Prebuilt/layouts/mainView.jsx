@@ -104,7 +104,7 @@ export const ConferenceMainView = () => {
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-  }, [isConnected, hmsActions, permissions, isHLSRunning, joinForm]);
+  }, [isConnected, hmsActions, permissions, joinForm]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
