@@ -12415,7 +12415,7 @@ lazy-universal-dotenv@^4.0.0:
     dotenv "^16.0.0"
     dotenv-expand "^10.0.0"
 
-lerna@^5.6.2:
+lerna@5.6.2:
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/lerna/-/lerna-5.6.2.tgz#cdcdfe4e8bf07eccb4ecff1c216def9c67e62af2"
   integrity sha512-Y0yMPslvnBnTZi7Nrs/gDyYZYauNf61xWNCehISHIORxZmmpoluNkcWTfcyb47is5uJQCv5QJX5xKKubbs+a6w==
