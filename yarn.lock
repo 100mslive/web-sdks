@@ -2,6 +2,120 @@
 # yarn lockfile v1
 
 
+"@100mslive/hls-player@0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-player/-/hls-player-0.1.10.tgz#4b10acedde2e7b3c035135dd4cf9aaa19020ebe0"
+  integrity sha512-E/93YsdLdd20LD6RSJGWjumSLajBYwaxPosA5m8VTOEcdtrPiCUsZyHZNjrLOCOanten9Tnn5teFvSsbQXafFw==
+  dependencies:
+    "@100mslive/hls-stats" "0.2.10"
+    eventemitter2 "^6.4.7"
+    hls.js "^1.3.0"
+
+"@100mslive/hls-stats@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-stats/-/hls-stats-0.2.10.tgz#a6481cd310a89315dc86359efaa3e8f1d6ba5a15"
+  integrity sha512-Hf4KWdNxzsCbB+BcNE4Ns24OOzNlcM1qCn1a9HWaqIlgVwSwYjKSFd7jel87X8W8t1ykXEoO9R66pcPX3zlEcQ==
+
+"@100mslive/hms-video-store@0.10.10":
+  version "0.10.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.10.10.tgz#5cb84d4d644d74ddcfd2466403f95b0bc8568e8e"
+  integrity sha512-HiV0swF/f9fvPYe69vfIeHbpA9kHQeP/oi3YXm1ma2FGhCRwtWgznpiSQUEyDcmOr/SRrBh338NE0DKHVx/htQ==
+  dependencies:
+    "@100mslive/hms-video" "0.9.10"
+    eventemitter2 "^6.4.7"
+    immer "^9.0.6"
+    reselect "4.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-video@0.9.10":
+  version "0.9.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.9.10.tgz#37f2b09009af850c074e4b81532915791976c07d"
+  integrity sha512-KiP/bXrJyElbMZ5PnuX6qgsZHL5uvtxa6SmenPGaiFb8CD2fM1BaoDtoVJldP05u7sDO2Opiuac+b2zrPzDVUQ==
+  dependencies:
+    eventemitter2 "^6.4.7"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-virtual-background@1.11.10":
+  version "1.11.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.11.10.tgz#be3ad793aabc44428919adc53acb9e07fb5d4354"
+  integrity sha512-tF5myZxUbLYw+GYj66rpJQbwCssu0qg1vU7dFzY4dTTT+55rhwNomCdP6hxqayHZf5iprTWmxi2pGQ61fxsjrg==
+  dependencies:
+    "@mediapipe/selfie_segmentation" "^0.1.1632777926"
+    "@tensorflow-models/body-segmentation" "^1.0.1"
+    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
+    "@tensorflow/tfjs-converter" "^3.19.0"
+    "@tensorflow/tfjs-core" "^3.19.0"
+    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
+    "@webassemblyjs/wasm-gen" "1.11.1"
+    gifuct-js "^2.1.2"
+    wasm-check "^2.0.2"
+
+"@100mslive/react-icons@0.8.10":
+  version "0.8.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.8.10.tgz#b8bd70ed88fd060e7d694174985ea83be3fabb23"
+  integrity sha512-YD1tFIH+hlFaS10zoyG2c8zgN5CVkZh4KekYEGyMr7pQsEMevJDYhLhiWv3vUkZCnvwmnta5ZueenjeJ83ujGA==
+
+"@100mslive/react-sdk@0.8.10":
+  version "0.8.10"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.8.10.tgz#fdf42398b3884b17a0ca73915bbce5509daa11b1"
+  integrity sha512-XxwdwE2t11fNrN/3A0rDcXsqX/tvbydTZ41sL9mSR1BWjBHNJ+buHrgReJL9aG30eFS3pEg3CXXRg0Mqgbt5Ew==
+  dependencies:
+    "@100mslive/hms-video-store" "0.10.10"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
+
+"@100mslive/roomkit-react@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@100mslive/roomkit-react/-/roomkit-react-0.1.1.tgz#2ac0bf69567a7db0b0c7101d47ce75670eba5e0f"
+  integrity sha512-eaJmrkZlZIPyWfSv8rMVHQAStr3z7cVs5AdFvJ/KHzyMFgejVKUmTF8Z+ab7r+LWcppqvBh8EfOZlreHdcziuw==
+  dependencies:
+    "@100mslive/hls-player" "0.1.10"
+    "@100mslive/hms-virtual-background" "1.11.10"
+    "@100mslive/react-icons" "0.8.10"
+    "@100mslive/react-sdk" "0.8.10"
+    "@emoji-mart/data" "^1.0.6"
+    "@emoji-mart/react" "^1.0.1"
+    "@radix-ui/react-accordion" "1.0.0"
+    "@radix-ui/react-checkbox" "1.0.0"
+    "@radix-ui/react-collapsible" "1.0.0"
+    "@radix-ui/react-dialog" "1.0.0"
+    "@radix-ui/react-dropdown-menu" "1.0.0"
+    "@radix-ui/react-label" "1.0.0"
+    "@radix-ui/react-popover" "1.0.0"
+    "@radix-ui/react-progress" "1.0.0"
+    "@radix-ui/react-radio-group" "1.0.0"
+    "@radix-ui/react-select" "1.0.0"
+    "@radix-ui/react-slider" "1.0.0"
+    "@radix-ui/react-switch" "1.0.0"
+    "@radix-ui/react-tabs" "1.0.0"
+    "@radix-ui/react-toast" "1.0.0"
+    "@radix-ui/react-tooltip" "1.0.0"
+    "@stitches/react" "^1.2.8"
+    "@tldraw/tldraw" "^1.18.4"
+    emoji-mart "^5.2.2"
+    eventemitter2 "^6.4.7"
+    hls.js "^1.3.0"
+    js-confetti "^0.10.2"
+    lodash.merge "^4.6.2"
+    mobx "^6.3.12"
+    pusher-js "^7.0.3"
+    qrcode.react "^3.1.0"
+    react-draggable "^4.4.5"
+    react-intersection-observer "^9.4.3"
+    react-router-dom "^6.3.0"
+    react-use "^17.4.0"
+    react-virtualized-auto-sizer "^1.0.7"
+    react-window "^1.8.7"
+    recordrtc "^5.6.2"
+    screenfull "^5.1.0"
+    uuid "^8.3.2"
+    web-vitals "^1.0.1"
+    worker-timers "^7.0.40"
+    zipyai "^1.3.24"
+
 "@100mslive/types-prebuilt@0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.8.0.tgz#21ca6241332cbc43d131f688525b162c9d0945cc"
