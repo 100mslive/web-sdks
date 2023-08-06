@@ -2,6 +2,7 @@ import React from 'react';
 import { ComponentMeta, ComponentStory } from '@storybook/react';
 import { CrossIcon, InfoIcon } from '@100mslive/react-icons';
 import { Button } from '../Button';
+import { HorizontalDivider } from '../Divider';
 import { Fieldset } from '../Fieldset';
 import { Input } from '../Input';
 import { Label } from '../Label';
@@ -34,11 +35,12 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
             <InfoIcon />
             <Text variant="h5">Sheet Heading</Text>
           </Flex>
-          <Sheet.Close>
+          <Sheet.Close css={{ color: 'white' }}>
             <CrossIcon />
           </Sheet.Close>
         </Flex>
       </Sheet.Title>
+      <HorizontalDivider />
       <Text variant="body1" css={{ c: '$on_surface_medium' }}>
         Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
         dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -46,11 +48,11 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
       </Text>
       <Fieldset>
         <Label htmlFor="name">Name</Label>
-        <Input id="name" defaultValue="Hardik" css={{ w: '50%' }} />
+        <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
       </Fieldset>
       <Fieldset>
         <Label htmlFor="username">Username</Label>
-        <Input id="username" defaultValue="@hdz666" css={{ w: '50%' }} />
+        <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
       </Fieldset>
     </Sheet.Content>
   </Sheet.Root>

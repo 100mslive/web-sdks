@@ -63,7 +63,7 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
           value={selection}
           activationMode={isMobile ? 'manual' : 'automatic'}
           onValueChange={setSelection}
-          css={{ size: '100%', position: 'relative' }}
+          css={{ size: '100%', position: 'relative', borderTopLeftRadius: '$4', borderTopRightRadius: '$4' }}
         >
           <Tabs.List
             css={{
@@ -71,8 +71,6 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
               flexDirection: 'column',
               bg: '$background_default',
               p: '$14 $10',
-              borderTopLeftRadius: '$4',
-              borderTopRightRadius: '$4',
             }}
           >
             <Text variant="h5">Settings </Text>

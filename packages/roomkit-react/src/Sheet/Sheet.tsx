@@ -49,7 +49,8 @@ const slideOut = keyframes({
 const StyledContent = styled(DialogPrimitive.Content, {
   color: '$hms-ui$colors$on_surface_medium',
   backgroundColor: '$hms-ui$colors$surface_default',
-  borderRadius: '8px',
+  borderTopLeftRadius: '16px',
+  borderTopRightRadius: '16px',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   position: 'fixed',
   zIndex: 999,
