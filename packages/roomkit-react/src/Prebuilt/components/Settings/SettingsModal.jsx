@@ -4,6 +4,7 @@ import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
+import { Dialog } from '../../../Modal';
 import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
@@ -11,7 +12,7 @@ import { config as cssConfig } from '../../../Theme';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { settingContent, settingsList } from './common.js';
 
-const SettingsModal = ({ open, onOpenChange, children }) => {
+const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
 
@@ -47,13 +48,94 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
       setSelection(firstNotHiddenTabName);
     }
   }, [isMobile, showSetting]);
-  console.log('here sheet open ', open);
-  return (
+  return isMobile ? (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
-      <Sheet.Portal>
-        <Sheet.Overlay />
-        <Sheet.Content
+      <Sheet.Content
+        css={{
+          w: 'min(800px, 90%)',
+          height: 'min(362px, 50%)',
+          p: 0,
+          r: '$4',
+        }}
+      >
+        <Tabs.Root
+          value={selection}
+          activationMode={isMobile ? 'manual' : 'automatic'}
+          onValueChange={setSelection}
+          css={{ size: '100%', position: 'relative' }}
+        >
+          <Tabs.List
+            css={{
+              w: isMobile ? '100%' : '18.625rem',
+              flexDirection: 'column',
+              bg: '$background_default',
+              p: '$14 $10',
+              borderTopLeftRadius: '$4',
+              borderTopRightRadius: '$4',
+            }}
+          >
+            <Text variant="h5">Settings </Text>
+            <Flex direction="column" css={{ mx: isMobile ? '-$8' : 0, overflowY: 'auto', pt: '$10' }}>
+              {settingsList
+                .filter(({ tabName }) => showSetting[tabName])
+                .map(({ icon: Icon, tabName, title }) => {
+                  return (
+                    <Tabs.Trigger key={tabName} value={tabName} css={{ gap: '$8' }}>
+                      <Icon />
+                      {title}
+                    </Tabs.Trigger>
+                  );
+                })}
+            </Flex>
+          </Tabs.List>
+          {selection && (
+            <Flex
+              direction="column"
+              css={{
+                flex: '1 1 0',
+                minWidth: 0,
+                mr: '$4',
+                ...(isMobile
+                  ? {
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      bg: '$surface_default',
+                      width: '100%',
+                      height: '100%',
+                    }
+                  : {}),
+              }}
+            >
+              {settingsList
+                .filter(({ tabName }) => showSetting[tabName])
+                .map(({ content: Content, title, tabName }) => {
+                  return (
+                    <Tabs.Content key={tabName} value={tabName} className={settingContent()}>
+                      <SettingsContentHeader onBack={resetSelection} isMobile={isMobile}>
+                        {title}
+                      </SettingsContentHeader>
+                      <Content setHide={hideSettingByTabName(tabName)} />
+                    </Tabs.Content>
+                  );
+                })}
+            </Flex>
+          )}
+        </Tabs.Root>
+        <Sheet.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
+          <IconButton as="div" data-testid="dialog_cross_icon">
+            <CrossIcon />
+          </IconButton>
+        </Sheet.Close>
+      </Sheet.Content>
+    </Sheet.Root>
+  ) : (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content
           css={{
             w: 'min(800px, 90%)',
             height: 'min(656px, 90%)',
@@ -125,14 +207,14 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               </Flex>
             )}
           </Tabs.Root>
-          <Sheet.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
+          <Dialog.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
             <IconButton as="div" data-testid="dialog_cross_icon">
               <CrossIcon />
             </IconButton>
-          </Sheet.Close>
-        </Sheet.Content>
-      </Sheet.Portal>
-    </Sheet.Root>
+          </Dialog.Close>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 
