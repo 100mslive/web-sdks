@@ -6,7 +6,7 @@ export const HMSPrebuiltContext = React.createContext({
   roomCode: '',
   userName: '',
   userId: '',
-  endPoints: {},
+  endpoints: {},
   onLeave: undefined,
 });
 
