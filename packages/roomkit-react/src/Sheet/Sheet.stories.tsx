@@ -28,7 +28,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
     <Sheet.Trigger asChild>
       <Button variant="standard">Open Sheet</Button>
     </Sheet.Trigger>
-    <Sheet.Content css={{ padding: '16px' }}>
+    <Sheet.Content>
       <Sheet.Title>
         <Flex direction="row" justify="between" css={{ w: '100%' }}>
           <Flex justify="start" align="center" gap="3">
@@ -40,7 +40,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
           </Sheet.Close>
         </Flex>
       </Sheet.Title>
-      <HorizontalDivider />
+      <HorizontalDivider css={{ my: '$8' }} />
       <Text variant="body1" css={{ c: '$on_surface_medium' }}>
         Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
         dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
