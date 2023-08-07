@@ -183,8 +183,12 @@ export const Button = React.forwardRef<
     <StyledButton {...buttonProps} ref={ref}>
       <>
         {loading && (
-          <Flex align="center" justify="center" css={{ w: '100%', position: 'absolute', left: '0' }}>
-            <Loading />
+          <Flex
+            align="center"
+            justify="center"
+            css={{ w: '100%', position: 'absolute', left: '0', color: '$on_primary_low' }}
+          >
+            <Loading color="currentColor" />
           </Flex>
         )}
         <Flex

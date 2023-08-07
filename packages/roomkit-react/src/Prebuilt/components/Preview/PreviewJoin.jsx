@@ -112,7 +112,10 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         <Text variant="h4" css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', '@md': { mt: '$8' } }}>
           {previewHeader.title}
         </Text>
-        <Text css={{ c: '$on_surface_medium', my: '0', textAlign: 'center' }} variant="body1">
+        <Text
+          css={{ c: '$on_surface_medium', my: '0', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
+          variant="body1"
+        >
           {previewHeader.sub_title}
         </Text>
         <Flex justify="center" css={{ my: '$8', gap: '$4' }}>
