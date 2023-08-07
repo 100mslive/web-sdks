@@ -4,7 +4,7 @@ import { CSS, keyframes, styled, VariantProps } from '@stitches/react';
 import { Dialog } from '../Modal';
 
 const SheetRoot = styled(DialogPrimitive.Root, {
-  minHeight: '300px',
+  minHeight: '240px',
   maxWidth: 'fit-content',
 });
 const SheetTrigger = styled(DialogPrimitive.Trigger, {
@@ -53,6 +53,7 @@ const StyledContent = styled(DialogPrimitive.Content, {
   borderTopRightRadius: '16px',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   position: 'fixed',
+  padding: '24px',
   zIndex: 999,
   top: 0,
   right: 0,
@@ -123,7 +124,9 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof StyledContent>, Sh
   ),
 );
 const SheetClose = Dialog.Close;
-const SheetTitle = Dialog.Title;
+const SheetTitle = styled(DialogPrimitive.Title, {
+  margin: 0,
+});
 const SheetDescription = Dialog.Description;
 const SheetDefaultCloseIcon = Dialog.DefaultClose;
 
