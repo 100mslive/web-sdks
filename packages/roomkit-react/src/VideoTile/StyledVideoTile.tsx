@@ -18,7 +18,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$surface_default',
+  background: '$background_default',
   variants: {
     transparentBg: {
       true: {
