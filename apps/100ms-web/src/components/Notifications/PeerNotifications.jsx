@@ -6,6 +6,7 @@ import {
 import { ToastBatcher } from "../Toast/ToastBatcher";
 import { useSubscribedNotifications } from "../AppData/useUISettings";
 import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
+import { isInternalRole } from "../../common/utils";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
@@ -22,7 +23,11 @@ export const PeerNotifications = () => {
     SUBSCRIBED_NOTIFICATIONS.PEER_LEFT
   );
   useEffect(() => {
-    if (!notification) {
+    if (
+      !notification ||
+      (notification?.data?.roleName &&
+        isInternalRole(notification.data.roleName))
+    ) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
