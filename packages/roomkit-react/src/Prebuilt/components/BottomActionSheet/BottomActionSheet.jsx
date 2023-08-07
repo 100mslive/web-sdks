@@ -18,14 +18,12 @@ export const BottomActionSheet = ({
   const MINIMUM_HEIGHT = 40; // vh
   const [sheetHeight, setSheetHeight] = useState(`${Math.min(Math.max(MINIMUM_HEIGHT, defaultHeight), 100)}vh`);
   const closeRef = useRef(null);
-  console.log('here ', sheetOpen);
 
   // Close the sheet if height goes under MINIMUM_HEIGHT
   useEffect(() => {
     if (closeRef?.current && parseFloat(sheetHeight.slice(0, -2)) <= MINIMUM_HEIGHT) {
       setSheetOpen(false);
-      // Delay for showing the opacity animation, can be removed if not needed
-      setTimeout(() => closeRef.current?.click(), 200);
+      closeRef.current?.click();
     }
   }, [setSheetOpen, sheetHeight]);
 
@@ -34,7 +32,22 @@ export const BottomActionSheet = ({
       <Dialog.Trigger asChild>{triggerContent}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content sideOffset={sideOffset} style={{ zIndex: '2' }}>
+        <Dialog.Content
+          sideOffset={sideOffset}
+          css={{
+            position: 'fixed',
+            bottom: '0',
+            top: 'unset',
+            transform: 'translate(-50%)',
+            transition: '0',
+            '&[data-state="open"]': {
+              animation: 'none',
+            },
+            '&[data-state="closed"]': {
+              animation: 'none',
+            },
+          }}
+        >
           <Box
             css={{
               w: '100vw',
@@ -44,7 +57,7 @@ export const BottomActionSheet = ({
               minHeight: '50vh',
               overflowY: 'auto',
               backgroundColor: '$surface_default',
-              transition: 'all 0.2s linear',
+              transition: 'none',
               ...containerCSS,
             }}
           >
@@ -84,131 +97,5 @@ export const BottomActionSheet = ({
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-    /*
-    <Dialog.Root
-      open={sheetOpen}
-      onOpenChange={open => {
-        if (!open) {
-          setSheetHeight('0');
-        }
-        setSheetOpen(open);
-      }}
-    >
-      <Dialog.Trigger asChild>{triggerContent}</Dialog.Trigger>
-      <Dialog.Portal>
-        <Dialog.Content sideOffset={sideOffset} style={{ zIndex: '2' }}>
-          <Box
-            css={{
-              w: '100vw',
-              py: '$8',
-              opacity: sheetOpen ? '1' : '0.5',
-              h: sheetHeight,
-              minHeight: '50vh',
-              overflowY: 'auto',
-              backgroundColor: '$surface_default',
-              transition: 'all 0.2s linear',
-              ...containerCSS,
-            }}
-          >
-            <Flex
-              justify="between"
-              onTouchMove={e => {
-                const updatedSheetHeight = getUpdatedHeight(e, MINIMUM_HEIGHT);
-                setSheetHeight(updatedSheetHeight);
-              }}
-              css={{
-                borderBottom: '1px solid $border_bright',
-                px: '$8',
-                pb: '$4',
-                mb: '$4',
-                w: '100%',
-              }}
-            >
-              <Text variant="h6" css={{ color: '$on_surface_high' }}>
-                {title}
-              </Text>
-              <Dialog.Close aria-label="Close">
-                <Box
-                  ref={closeRef}
-                  css={{
-                    color: '$on_surface_high',
-                    bg: '$surface_bright',
-                    p: '$2',
-                    borderRadius: '$round',
-                  }}
-                >
-                  <CrossIcon />
-                </Box>
-              </Dialog.Close>
-            </Flex>
-            <Box css={{ px: '$8', maxHeight: '100%', overflowY: 'auto' }}>{children}</Box>
-          </Box>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-    */
-    /*
-    <Popover.Root
-      open={sheetOpen}
-      onOpenChange={open => {
-        if (!open) {
-          setSheetHeight('0');
-        }
-        setSheetOpen(open);
-      }}
-    >
-      <Popover.Trigger asChild>{triggerContent}</Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content sideOffset={sideOffset} style={{ zIndex: '2' }}>
-          <Box
-            css={{
-              w: '100vw',
-              py: '$8',
-              opacity: sheetOpen ? '1' : '0.5',
-              h: sheetHeight,
-              minHeight: '50vh',
-              overflowY: 'auto',
-              backgroundColor: '$surface_default',
-              transition: 'all 0.2s linear',
-              ...containerCSS,
-            }}
-          >
-            <Flex
-              justify="between"
-              onTouchMove={e => {
-                const updatedSheetHeight = getUpdatedHeight(e, MINIMUM_HEIGHT);
-                setSheetHeight(updatedSheetHeight);
-              }}
-              css={{
-                borderBottom: '1px solid $border_bright',
-                px: '$8',
-                pb: '$4',
-                mb: '$4',
-                w: '100%',
-              }}
-            >
-              <Text variant="h6" css={{ color: '$on_surface_high' }}>
-                {title}
-              </Text>
-              <Popover.Close aria-label="Close">
-                <Box
-                  ref={closeRef}
-                  css={{
-                    color: '$on_surface_high',
-                    bg: '$surface_bright',
-                    p: '$2',
-                    borderRadius: '$round',
-                  }}
-                >
-                  <CrossIcon />
-                </Box>
-              </Popover.Close>
-            </Flex>
-            <Box css={{ px: '$8', maxHeight: '100%', overflowY: 'auto' }}>{children}</Box>
-          </Box>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-    */
   );
 };
