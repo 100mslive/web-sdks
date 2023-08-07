@@ -38,6 +38,8 @@ export const BottomActionSheet = ({
             position: 'fixed',
             bottom: '0',
             top: 'unset',
+            p: '0',
+            w: '100%',
             transform: 'translate(-50%)',
             transition: '0',
             '&[data-state="open"]': {
@@ -50,9 +52,8 @@ export const BottomActionSheet = ({
         >
           <Box
             css={{
-              w: '100vw',
-              py: '$8',
-              opacity: sheetOpen ? '1' : '0.5',
+              py: '$10',
+              opacity: '1',
               h: sheetHeight,
               minHeight: '50vh',
               overflowY: 'auto',
@@ -72,7 +73,7 @@ export const BottomActionSheet = ({
                 px: '$8',
                 pb: '$4',
                 mb: '$4',
-                w: '100%',
+                maxWidth: '100%',
               }}
             >
               <Text variant="h6" css={{ color: '$on_surface_high' }}>
