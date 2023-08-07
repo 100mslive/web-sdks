@@ -17,7 +17,7 @@ const SidePane = ({ css = {} }) => {
     h: "100%",
     p: "$10",
     bg: "$surface_default",
-    radius: "$1",
+    r: "$1",
     top: 0,
     zIndex: 10,
     boxShadow: "$md",
