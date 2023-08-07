@@ -1,11 +1,13 @@
 import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { CSS, keyframes, styled, VariantProps } from '@stitches/react';
+import { CSS, keyframes, VariantProps } from '@stitches/react';
 import { Dialog } from '../Modal';
+import { styled } from '../Theme';
 
 const SheetRoot = styled(DialogPrimitive.Root, {
   minHeight: '240px',
-  maxWidth: 'fit-content',
+  maxWidth: '100%',
+  maxHeight: 'fit-content',
 });
 const SheetTrigger = styled(DialogPrimitive.Trigger, {
   appearance: 'none !important', // Needed for safari it shows white overlay
@@ -47,8 +49,8 @@ const slideOut = keyframes({
 });
 
 const StyledContent = styled(DialogPrimitive.Content, {
-  color: '$hms-ui$colors$on_surface_medium',
-  backgroundColor: '$hms-ui$colors$surface_default',
+  color: '$on_surface_medium',
+  backgroundColor: '$surface_default',
   borderTopLeftRadius: '16px',
   borderTopRightRadius: '16px',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
@@ -59,7 +61,6 @@ const StyledContent = styled(DialogPrimitive.Content, {
   right: 0,
   left: 0,
   bottom: 0,
-  width: 250,
 
   // Among other things, prevents text alignment inconsistencies when dialog can't be centered in the viewport evenly.
   // Affects animated and non-animated dialogs alike.
@@ -82,8 +83,6 @@ const StyledContent = styled(DialogPrimitive.Content, {
     side: {
       top: {
         $$transformValue: 'translate3d(0,-100%,0)',
-        width: '100%',
-        height: 300,
         bottom: 'auto',
       },
       right: {
@@ -92,8 +91,6 @@ const StyledContent = styled(DialogPrimitive.Content, {
       },
       bottom: {
         $$transformValue: 'translate3d(0,100%,0)',
-        width: '100%',
-        height: 300,
         bottom: 0,
         top: 'auto',
       },

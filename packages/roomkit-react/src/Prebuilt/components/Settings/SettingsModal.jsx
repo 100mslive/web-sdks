@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import { HorizontalDivider } from '../../../Divider';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
@@ -48,17 +49,30 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
       setSelection(firstNotHiddenTabName);
     }
   }, [isMobile, showSetting]);
+  console.log('show setting ', selection, settingsList);
+
   return isMobile ? (
     <Sheet.Root open={open} onOpenChange={onOpenChange}>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
-      <Sheet.Content
-        css={{
-          w: 'min(800px, 90%)',
-          height: 'min(362px, 50%)',
-          p: 0,
-          r: '$4',
-        }}
-      >
+      <Sheet.Content>
+        <Sheet.Title>
+          {!selection ? (
+            <Flex direction="row" justify="between" css={{ width: '100%' }}>
+              <Flex justify="start" align="center" gap="3">
+                <Text variant="h5">Settings</Text>
+              </Flex>
+            </Flex>
+          ) : (
+            <Text variant="h6" css={{ mb: '$12', display: 'flex', alignItems: 'center' }}>
+              <Box as="span" css={{ mr: '$4', r: '$round', p: '$2' }} onClick={resetSelection}>
+                <ChevronLeftIcon />
+              </Box>
+              {selection}
+            </Text>
+          )}
+        </Sheet.Title>
+        <HorizontalDivider css={{ my: '$8' }} />
+
         <Tabs.Root
           value={selection}
           activationMode={isMobile ? 'manual' : 'automatic'}
@@ -67,58 +81,52 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
         >
           <Tabs.List
             css={{
-              w: isMobile ? '100%' : '18.625rem',
               flexDirection: 'column',
-              bg: '$background_default',
-              p: '$14 $10',
             }}
           >
-            <Text variant="h5">Settings </Text>
-            <Flex direction="column" css={{ mx: isMobile ? '-$8' : 0, overflowY: 'auto', pt: '$10' }}>
-              {settingsList
-                .filter(({ tabName }) => showSetting[tabName])
-                .map(({ icon: Icon, tabName, title }) => {
-                  return (
-                    <Tabs.Trigger key={tabName} value={tabName} css={{ gap: '$8' }}>
-                      <Icon />
-                      {title}
-                    </Tabs.Trigger>
-                  );
-                })}
-            </Flex>
+            {/* <Flex justify="start" align="center" gap="3">
+              <InfoIcon />
+              <Text variant="h5">Sheet Heading</Text>
+            </Flex> */}
+            {settingsList
+              .filter(({ tabName }) => showSetting[tabName])
+              .map(({ icon: Icon, tabName, title }) => {
+                return (
+                  <Tabs.Trigger key={tabName} value={tabName} css={{ gap: '$8' }}>
+                    <Icon />
+                    {title}
+                  </Tabs.Trigger>
+                );
+              })}
           </Tabs.List>
           {selection && (
-            <Flex
-              direction="column"
-              css={{
-                flex: '1 1 0',
-                minWidth: 0,
-                mr: '$4',
-                ...(isMobile
-                  ? {
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      bg: '$surface_default',
-                      width: '100%',
-                      height: '100%',
-                    }
-                  : {}),
-              }}
-            >
+            <>
               {settingsList
                 .filter(({ tabName }) => showSetting[tabName])
                 .map(({ content: Content, title, tabName }) => {
                   return (
-                    <Tabs.Content key={tabName} value={tabName} className={settingContent()}>
-                      <SettingsContentHeader onBack={resetSelection} isMobile={isMobile}>
-                        {title}
-                      </SettingsContentHeader>
+                    <Tabs.Content
+                      key={tabName}
+                      value={tabName}
+                      className={settingContent()}
+                      css={{
+                        minWidth: 0,
+                        mr: '$4',
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    >
+                      {/* <SettingsContentHeader onBack={resetSelection} isMobile={isMobile}>
+                        {selection}
+                      </SettingsContentHeader> */}
                       <Content setHide={hideSettingByTabName(tabName)} />
                     </Tabs.Content>
                   );
                 })}
-            </Flex>
+            </>
           )}
         </Tabs.Root>
         <Sheet.Close css={{ position: 'absolute', right: '$10', top: '$10' }}>
