@@ -12,6 +12,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
@@ -100,7 +101,7 @@ export const ConferenceMainView = () => {
       !isHLSRunning &&
       joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
     ) {
-      startHLS();
+      // startHLS();
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
@@ -133,6 +134,8 @@ export const ConferenceMainView = () => {
   } else {
     ViewComponent = MainGridView;
   }
+
+  ViewComponent = EqualProminence;
 
   return (
     <Suspense fallback={<FullPageProgress />}>
