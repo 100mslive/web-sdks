@@ -5,8 +5,8 @@ import {
 } from "@100mslive/react-sdk";
 import { ToastBatcher } from "../Toast/ToastBatcher";
 import { useSubscribedNotifications } from "../AppData/useUISettings";
-import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
 import { isInternalRole } from "../../common/utils";
+import { SUBSCRIBED_NOTIFICATIONS } from "../../common/constants";
 
 const notificationTypes = [
   HMSNotificationTypes.PEER_LIST,
