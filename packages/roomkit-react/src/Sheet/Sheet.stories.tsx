@@ -6,7 +6,7 @@ import { HorizontalDivider } from '../Divider';
 import { Fieldset } from '../Fieldset';
 import { Input } from '../Input';
 import { Label } from '../Label';
-import { Flex } from '../Layout';
+import { Box, Flex } from '../Layout';
 import { Text } from '../Text';
 import { Sheet } from './Sheet';
 import SheetDocs from './Sheet.mdx';
@@ -29,7 +29,7 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
       <Button variant="standard">Open Sheet</Button>
     </Sheet.Trigger>
     <Sheet.Content>
-      <Sheet.Title>
+      <Sheet.Title css={{ p: '$10' }}>
         <Flex direction="row" justify="between" css={{ w: '100%' }}>
           <Flex justify="start" align="center" gap="3">
             <InfoIcon />
@@ -40,20 +40,61 @@ const Template: ComponentStory<typeof Sheet.Root> = () => (
           </Sheet.Close>
         </Flex>
       </Sheet.Title>
-      <HorizontalDivider css={{ my: '$8' }} />
-      <Text variant="body1" css={{ c: '$on_surface_medium' }}>
-        Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-        dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
-        labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
-      </Text>
-      <Fieldset>
-        <Label htmlFor="name">Name</Label>
-        <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
-      </Fieldset>
-      <Fieldset>
-        <Label htmlFor="username">Username</Label>
-        <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
-      </Fieldset>
+      <HorizontalDivider />
+      <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
+        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+          Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
+        </Text>
+        <Fieldset>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
+        </Fieldset>
+        <Fieldset>
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
+        </Fieldset>
+        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+          Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
+        </Text>
+        <Fieldset>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
+        </Fieldset>
+        <Fieldset>
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
+        </Fieldset>
+        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+          Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
+        </Text>
+        <Fieldset>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
+        </Fieldset>
+        <Fieldset>
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
+        </Fieldset>
+        <Text variant="body1" css={{ c: '$on_surface_medium' }}>
+          Body 2: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+          dolore magna aliqua. Ut enim ad minim veniam,im venitetur adipiscing elit, sed do eiusmod tempor incididunt ut
+          labore et dolore magna aliqua. Ut enim ad minim veniam,im veni
+        </Text>
+        <Fieldset>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" defaultValue="Amar" css={{ w: '50%' }} />
+        </Fieldset>
+        <Fieldset>
+          <Label htmlFor="username">Username</Label>
+          <Input id="username" defaultValue="@amar1995" css={{ w: '50%' }} />
+        </Fieldset>
+      </Box>
     </Sheet.Content>
   </Sheet.Root>
 );

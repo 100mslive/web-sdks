@@ -7,7 +7,6 @@ import { styled } from '../Theme';
 const SheetRoot = styled(DialogPrimitive.Root, {
   minHeight: '240px',
   maxWidth: '100%',
-  maxHeight: 'fit-content',
 });
 const SheetTrigger = styled(DialogPrimitive.Trigger, {
   appearance: 'none !important', // Needed for safari it shows white overlay
@@ -51,16 +50,16 @@ const slideOut = keyframes({
 const StyledContent = styled(DialogPrimitive.Content, {
   color: '$on_surface_medium',
   backgroundColor: '$surface_default',
-  borderTopLeftRadius: '16px',
-  borderTopRightRadius: '16px',
+  borderTopLeftRadius: '$3',
+  borderTopRightRadius: '$3',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   position: 'fixed',
-  padding: '24px',
   zIndex: 999,
   top: 0,
   right: 0,
   left: 0,
   bottom: 0,
+  maxHeight: '96%',
 
   // Among other things, prevents text alignment inconsistencies when dialog can't be centered in the viewport evenly.
   // Affects animated and non-animated dialogs alike.
