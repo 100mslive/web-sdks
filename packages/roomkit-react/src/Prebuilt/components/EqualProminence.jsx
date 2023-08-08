@@ -18,6 +18,13 @@ export function EqualProminence() {
   const [ref, { width, height }] = useMeasure();
 
   useEffect(() => {
+    // currentPageIndex should not exceed pages length
+    if (page >= pagesWithTiles.length) {
+      setPage(0);
+    }
+  }, [pagesWithTiles.length, page]);
+
+  useEffect(() => {
     if (width === 0 || height === 0) {
       return;
     }
@@ -94,6 +101,7 @@ export function EqualProminence() {
           alignItems: 'center',
           justifyContent: 'center',
           flexFlow: 'row wrap',
+          minHeight: 0,
         }}
       >
         {pagesWithTiles[page]?.map(tile => {
