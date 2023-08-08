@@ -117,7 +117,7 @@ export function EqualProminence() {
           );
         })}
       </div>
-      {pagesWithTiles.length > 1 && <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} />}
+      {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
     </Flex>
   );
 }
