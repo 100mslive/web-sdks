@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSNotificationTypes, useHMSNotifications, useRemoteAVToggle } from '@100mslive/react-sdk';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
-import androidPermissions from '../../../assets/android-perm-0.png';
 import androidPermissionAlert from '../../../assets/android-perm-1.png';
 import iosPermissions from '../../../assets/ios-perm-0.png';
 import { isAndroid, isIOS } from '../../common/constants';
