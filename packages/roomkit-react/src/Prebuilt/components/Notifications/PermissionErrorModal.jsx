@@ -1,24 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { HMSNotificationTypes, useHMSNotifications, useRemoteAVToggle } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
 import androidPermissions from '../../../assets/android-perm-0.png';
 import androidPermissionAlert from '../../../assets/android-perm-1.png';
 import iosPermissions from '../../../assets/ios-perm-0.png';
 import { isAndroid, isIOS } from '../../common/constants';
 
+// Do not show android prompt if the user has already given permissions
+// getUserMedia call
+
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [deviceType, setDeviceType] = useState('');
   const [isSystemError, setIsSystemError] = useState(false);
-  const [showAndroidPrompt, setShowAndroidPrompt] = useState(true);
   const isMobile = useMedia(cssConfig.media.md);
-
-  useEffect(() => {
-    if (showAndroidPrompt && isAndroid && isMobile) {
-      setDeviceType('camera and microphone');
-    }
-  }, []);
 
   useEffect(() => {
     if (
@@ -59,16 +55,10 @@ export function PermissionErrorModal() {
 
             {/* Images for android */}
             {isMobile && isAndroid ? (
-              showAndroidPrompt ? (
-                <img src={androidPermissions} style={{ maxWidth: '100%', maxHeight: '100%' }} />
-              ) : (
-                <img src={androidPermissionAlert} style={{ maxWidth: '100%', maxHeight: '100%' }} />
-              )
+              <img src={androidPermissionAlert} style={{ maxWidth: '100%', maxHeight: '100%' }} />
             ) : null}
 
-            <Text variant="h6">
-              {showAndroidPrompt ? `Allow access to your ${deviceType}` : `We can't access your ${deviceType}`}
-            </Text>
+            <Text variant="h6">We can't access your {deviceType}</Text>
           </Dialog.Title>
 
           <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
@@ -77,13 +67,8 @@ export function PermissionErrorModal() {
               ? 'Enable permissions by reloading this page and clicking “Allow” on the pop-up, or change settings from the address bar.'
               : null}
 
-            {/* Initial prompt for android devices */}
-            {isMobile && showAndroidPrompt && isAndroid
-              ? 'In order for others to see and hear you, your browser will request camera and microphone access.'
-              : null}
-
-            {/* Successive prompts for android devices */}
-            {isMobile && !showAndroidPrompt && isAndroid
+            {/* Prompt for android devices */}
+            {isMobile && isAndroid
               ? 'To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.'
               : null}
 
@@ -113,26 +98,14 @@ export function PermissionErrorModal() {
           ) : null}
 
           {isMobile && isAndroid ? (
-            showAndroidPrompt ? (
-              <Button
-                css={{ w: '100%' }}
-                onClick={() => {
-                  setDeviceType('');
-                  setShowAndroidPrompt(false);
-                }}
-              >
-                Continue
+            <>
+              <Button onClick={() => setDeviceType('')} css={{ w: '100%', mb: '$6' }}>
+                I've allowed access
               </Button>
-            ) : (
-              <>
-                <Button onClick={() => setDeviceType('')} css={{ w: '100%', mb: '$6' }}>
-                  I've allowed access
-                </Button>
-                <Button outlined variant="standard" onClick={() => setDeviceType('')} css={{ w: '100%' }}>
-                  Continue anyway
-                </Button>
-              </>
-            )
+              <Button outlined variant="standard" onClick={() => setDeviceType('')} css={{ w: '100%' }}>
+                Continue anyway
+              </Button>
+            </>
           ) : null}
 
           {!isMobile ? (
