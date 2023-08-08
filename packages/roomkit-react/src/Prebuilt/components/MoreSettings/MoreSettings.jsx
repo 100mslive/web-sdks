@@ -52,7 +52,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MoreSettings = () => {
+export const MoreSettings = ({showStreamingUI = false}) => {
   const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);

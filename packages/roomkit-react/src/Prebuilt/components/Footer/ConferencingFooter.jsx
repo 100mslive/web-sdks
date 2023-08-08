@@ -9,12 +9,15 @@ import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { FeatureFlags } from '../../services/FeatureFlags';
+import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 
 const TranscriptionButton = React.lazy(() => import('../../plugins/transcription'));
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 export const ConferencingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+
   return (
     <AppFooter.Root>
       {isMobile ? (
@@ -29,9 +32,11 @@ export const ConferencingFooter = () => {
       ) : (
         <>
           <AppFooter.Left>
-            <Suspense fallback="">
-              <VirtualBackground />
-            </Suspense>
+            {isVideoOn ? (
+              <Suspense fallback="">
+                <VirtualBackground />
+              </Suspense>
+            ) : null}
             {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
           </AppFooter.Left>
           <AppFooter.Center>
