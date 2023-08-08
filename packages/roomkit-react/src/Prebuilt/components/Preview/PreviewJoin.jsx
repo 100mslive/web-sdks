@@ -1,5 +1,4 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -16,7 +15,6 @@ import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Box,
-  config as cssConfig,
   Flex,
   flexCenter,
   styled,
@@ -35,11 +33,10 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
-import { AndroidPermissionModal } from './AndroidPermissionModal';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { isAndroid, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -82,7 +79,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
-  const isMobile = useMedia(cssConfig.media.md);
 
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -102,7 +98,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
       if (skipPreview) {
         savePreferenceAndJoin();
       } else {
-        if (!isAndroid) preview();
+        preview();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +106,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
 
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
-      {isAndroid && isMobile ? <AndroidPermissionModal preview={preview} /> : null}
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
