@@ -151,7 +151,7 @@ export const HMSPrebuilt = React.forwardRef(
 
                   return (
                     <HMSThemeProvider
-                      themeType={theme.name}
+                      themeType={`${theme.name}-${Date.now()}`}
                       aspectRatio={getAspectRatio({ width, height })}
                       theme={{
                         colors: theme.palette,
