@@ -151,6 +151,9 @@ export const HMSPrebuilt = React.forwardRef(
 
                   return (
                     <HMSThemeProvider
+                      // issue is with stichtes caching the theme using the theme name / class
+                      // no updates to the themes are fired if the name is same.
+                      // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}
                       aspectRatio={getAspectRatio({ width, height })}
                       theme={{
