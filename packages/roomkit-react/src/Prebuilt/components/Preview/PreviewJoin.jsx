@@ -1,5 +1,4 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -16,7 +15,6 @@ import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Box,
-  config as cssConfig,
   Flex,
   flexCenter,
   styled,
@@ -82,7 +80,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
-  const isMobile = useMedia(cssConfig.media.md);
 
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -108,9 +105,16 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
+  if (roomState === HMSRoomState.Connecting) {
+    return <FullPageProgress />;
+  }
+
+  if (isAndroid && roomState !== HMSRoomState.Preview) {
+    return <AndroidPermissionModal preview={preview} />;
+  }
+
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
-      {isAndroid && isMobile ? <AndroidPermissionModal preview={preview} /> : null}
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
