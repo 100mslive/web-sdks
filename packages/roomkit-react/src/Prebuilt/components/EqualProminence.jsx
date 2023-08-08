@@ -27,7 +27,7 @@ export function EqualProminence() {
     const pages = Math.ceil(peersWithTiles.length / maxPerPage);
     let pagesList = [];
     let index = 0;
-    for (let i = 0; i < pages; i++) {
+    for (let pageNo = 0; pageNo < pages; pageNo++) {
       let maxCols = Math.ceil(Math.sqrt(maxPerPage));
       let maxRows = Math.ceil(maxPerPage / maxCols);
       // eslint-disable-next-line no-loop-func
@@ -36,7 +36,9 @@ export function EqualProminence() {
         let rowElements = [];
 
         for (let j = 0; j < numCols; j++) {
-          rowElements.push(peersWithTiles[index++]);
+          if (index < peersWithTiles.length) {
+            rowElements.push(peersWithTiles[index++]);
+          }
         }
 
         return rowElements;
