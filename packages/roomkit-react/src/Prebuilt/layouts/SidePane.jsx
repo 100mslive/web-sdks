@@ -22,23 +22,20 @@ const SidePane = ({ css = {} }) => {
   return (
     <Box
       css={{
-        position: 'absolute',
         w: '$100',
         h: '100%',
         p: '$10',
         bg: '$surface_default',
         r: '$1',
-        top: 0,
-        right: '$10',
-        zIndex: 10,
-        boxShadow: '$md',
         ...css,
         '@lg': {
           w: '100%',
           right: 0,
           position: 'fixed',
+          top: 72,
           bottom: 0,
-          height: 'unset',
+          r: 0,
+          zIndex: 10,
           ...(css['@lg'] || {}),
         },
       }}
