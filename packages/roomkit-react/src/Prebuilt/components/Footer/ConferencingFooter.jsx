@@ -10,6 +10,7 @@ import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
+import { PIP } from '../PIP';
 
 const TranscriptionButton = React.lazy(() => import('../../plugins/transcription'));
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));

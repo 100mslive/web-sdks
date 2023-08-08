@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, ExitIcon, HangUpIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
 import { Dropdown } from '../../Dropdown';
@@ -12,17 +12,14 @@ import { Text } from '../../Text';
 import { styled } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { DialogCheckbox, DialogContent, DialogRow } from '../primitives/DialogContent';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useNavigation } from './hooks/useNavigation';
-import { isStreamingKit } from '../common/utils';
 
-export const LeaveRoom = () => {
+export const LeaveRoom = ({ showStreamingUI = false }) => {
   const navigate = useNavigation();
   const params = useParams();
   const [open, setOpen] = useState(false);
   const [showEndRoomModal, setShowEndRoomModal] = useState(false);
-  const [lockRoom, setLockRoom] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
@@ -51,7 +48,6 @@ export const LeaveRoom = () => {
     redirectToLeavePage();
   };
 
-  const isStreamKit = isStreamingKit();
   if (!permissions || !isConnected) {
     return null;
   }
@@ -72,7 +68,7 @@ export const LeaveRoom = () => {
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              {!isStreamKit ? (
+              {!showStreamingUI ? (
                 <Box>
                   <HangUpIcon key="hangUp" />
                 </Box>
@@ -101,7 +97,23 @@ export const LeaveRoom = () => {
                 <VerticalMenuIcon />
               </MenuTriggerButton>
             </Dropdown.Trigger>
-            <Dropdown.Content css={{ p: 0 }} alignOffset={-50} sideOffset={10}>
+            <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
+                <Flex gap={4}>
+                  <Box>
+                    <ExitIcon />
+                  </Box>
+                  <Flex direction="column" align="start">
+                    <Text variant="lg" css={{ color: '$on_surface_high' }}>
+                      Leave {showStreamingUI ? 'Studio' : 'Session'}
+                    </Text>
+                    <Text css={{ c: '$on_surface_low', mt: '$2' }}>
+                      Others will continue after you leave. You can join the {showStreamingUI ? 'studio ' : 'room '}
+                      again.
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Dropdown.Item>
               <Dropdown.Item
                 css={{ w: '100%', bg: 'rgba(178, 71, 81, 0.1)' }}
                 onClick={() => {
@@ -111,27 +123,14 @@ export const LeaveRoom = () => {
               >
                 <Flex gap={4}>
                   <Box css={{ color: '$alert_error_default' }}>
-                    <AlertTriangleIcon />
+                    <StopIcon />
                   </Box>
                   <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ c: '$alert_error_default' }}>
-                      End Room for All
+                    <Text variant="lg" css={{ c: '$alert_error_brighter' }}>
+                      End Session
                     </Text>
-                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
-                      Warning: You can’t undo this action
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Dropdown.Item>
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
-                <Flex gap={4}>
-                  <Box>
-                    <ExitIcon />
-                  </Box>
-                  <Flex direction="column" align="start">
-                    <Text variant="lg">Leave {isStreamKit ? 'Studio' : 'Room'}</Text>
-                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
-                      You can always rejoin later
+                    <Text css={{ c: '$alert_error_bright', mt: '$2' }}>
+                      The session will end for everyone. You can't undo this action.
                     </Text>
                   </Flex>
                 </Flex>
@@ -143,7 +142,7 @@ export const LeaveRoom = () => {
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
             <Box>
-              {isStreamKit ? (
+              {showStreamingUI ? (
                 <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
                   <ExitIcon />
                 </Box>
@@ -155,23 +154,34 @@ export const LeaveRoom = () => {
         </LeaveIconButton>
       )}
 
-      <Dialog.Root
-        open={showEndRoomModal}
-        onOpenChange={value => {
-          if (!value) {
-            setLockRoom(false);
-          }
-          setShowEndRoomModal(value);
-        }}
-      >
-        <DialogContent title="End Room" Icon={HangUpIcon}>
-          <DialogCheckbox id="lockRoom" title="Disable future joins" value={lockRoom} onChange={setLockRoom} />
-          <DialogRow justify="end">
-            <Button variant="danger" onClick={endRoom} data-testid="lock_end_room">
-              End Room
-            </Button>
-          </DialogRow>
-        </DialogContent>
+      <Dialog.Root open={showEndRoomModal}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8' }}>
+            <Dialog.Title
+              css={{
+                borderBottom: '1px solid $border_default',
+                color: '$alert_error_default',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
+              End Session
+            </Dialog.Title>
+            <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
+              The session will end for everyone and all the activities will stop. You can't undo this action.
+            </Text>
+            <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
+              <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setShowEndRoomModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="danger" css={{ w: '100%' }} onClick={endRoom} id="lockRoom" data-testid="lock_end_room">
+                End Session
+              </Button>
+            </Flex>
+          </Dialog.Content>
+        </Dialog.Portal>
       </Dialog.Root>
     </Fragment>
   );

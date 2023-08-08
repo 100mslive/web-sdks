@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import { useMedia } from 'react-use';
 import Hls from 'hls.js';
 import {
   selectAppData,
@@ -9,19 +8,19 @@ import {
   selectPermissions,
   useHMSActions,
   useHMSStore,
-  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import {
-  ChangeRoleIcon,
+  BrbIcon,
   CheckIcon,
   DragHandleIcon,
+  HandIcon,
   InfoIcon,
   MicOffIcon,
   PencilIcon,
-  RecordIcon,
+  PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../../';
+import { Box, Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { RoleChangeModal } from '../RoleChangeModal';
 import SettingsModal from '../Settings/SettingsModal';
@@ -37,6 +36,8 @@ import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
+import { useMyMetadata } from '../hooks/useMetadata';
+import { PIP } from '../PIP';
 
 const isMobileOS = isAndroid || isIOS;
 
@@ -52,19 +53,22 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MoreSettings = ({showStreamingUI = false}) => {
+export const MoreSettings = ({ showStreamingUI = false }) => {
   const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const isMobile = useMedia(cssConfig.media.md);
-  const { isBrowserRecordingOn } = useRecordingStreaming();
   const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
   const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
+  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
+  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
+  const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
+  const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
@@ -100,24 +104,59 @@ export const MoreSettings = ({showStreamingUI = false}) => {
           align="end"
           css={{
             py: '$0',
-            maxHeight: '$96',
+            maxHeight: 'unset',
             '@md': { w: '$64' },
             "div[role='separator']:first-child": {
               display: 'none',
             },
           }}
         >
-          {isMobile && permissions?.browserRecording ? (
-            <>
-              <Dropdown.Item onClick={() => updateState(MODALS.START_RECORDING, true)}>
-                <RecordIcon />
-                <Text variant="sm" css={{ ml: '$4' }}>
-                  {isBrowserRecordingOn ? 'Stop' : 'Start'} Recording
-                </Text>
-              </Dropdown.Item>
-              <Dropdown.ItemSeparator />
-            </>
+          {isHandRaiseEnabled && !showStreamingUI ? (
+            <Dropdown.Item
+              onClick={toggleHandRaise}
+              data-testid={isMobileOS ? 'raise_hand_btn_mobile' : 'raise_hand_btn'}
+            >
+              <HandIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                Raise Hand
+              </Text>
+              <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
+                {isHandRaised ? <CheckIcon /> : null}
+              </Flex>
+            </Dropdown.Item>
           ) : null}
+
+          {isBRBEnabled && !showStreamingUI ? (
+            <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
+              <BrbIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                Be Right Back
+              </Text>
+              <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
+                {isBRBOn ? <CheckIcon /> : null}
+              </Flex>
+            </Dropdown.Item>
+          ) : null}
+
+          {(isBRBEnabled || isHandRaiseEnabled) && !showStreamingUI ? (
+            <Dropdown.ItemSeparator css={{ mx: '0' }} />
+          ) : null}
+
+          {isPIPEnabled ? (
+            <Dropdown.Item>
+              <PIP
+                content={
+                  <Flex css={{ w: '100%' }}>
+                    <PipIcon />
+                    <Text variant="sm" css={{ ml: '$4' }}>
+                      Picture in picture mode
+                    </Text>
+                  </Flex>
+                }
+              />
+            </Dropdown.Item>
+          ) : null}
+
           {isChangeNameEnabled && (
             <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">
               <PencilIcon />
@@ -131,6 +170,7 @@ export const MoreSettings = ({showStreamingUI = false}) => {
           {isAllowedToPublish.screen && isEmbedEnabled && (
             <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
           )}
+
           {permissions.mute && (
             <Dropdown.Item onClick={() => updateState(MODALS.MUTE_ALL, true)} data-testid="mute_all_btn">
               <MicOffIcon />
@@ -140,12 +180,14 @@ export const MoreSettings = ({showStreamingUI = false}) => {
             </Dropdown.Item>
           )}
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
+
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
               Settings
             </Text>
           </Dropdown.Item>
+
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
             (localPeerRole === 'hls-viewer' ? (

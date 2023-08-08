@@ -9,7 +9,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../../';
+import { Tooltip, Flex } from '../../../';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
@@ -20,7 +20,7 @@ import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
  * shows a button which when clicked shows some videos in PIP, clicking
  * again turns it off.
  */
-const PIPComponent = ({ peers, showLocalPeer }) => {
+const PIPComponent = ({ peers, showLocalPeer, content = null }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const [isPipOn, setIsPipOn] = useState(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
@@ -48,11 +48,17 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
   }
   return (
     <>
-      <Tooltip title={`${isPipOn ? 'Deactivate' : 'Activate'} picture in picture view`}>
-        <IconButton active={!isPipOn} key="pip" onClick={() => onPipToggle()} data-testid="pip_btn">
-          <PipIcon />
-        </IconButton>
-      </Tooltip>
+      {content ? (
+        <Flex css={{ w: '100%' }} onClick={() => onPipToggle()} data-testid="pip_btn">
+          {content}
+        </Flex>
+      ) : (
+        <Tooltip title={`${isPipOn ? 'Deactivate' : 'Activate'} picture in picture view`}>
+          <IconButton active={!isPipOn} key="pip" onClick={() => onPipToggle()} data-testid="pip_btn">
+            <PipIcon />
+          </IconButton>
+        </Tooltip>
+      )}
       {isPipOn && <ActivatedPIP showLocalPeer={showLocalPeer} peers={peers} />}
     </>
   );
