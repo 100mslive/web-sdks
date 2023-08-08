@@ -1,4 +1,5 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -15,6 +16,7 @@ import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import {
   Avatar,
   Box,
+  config as cssConfig,
   Flex,
   flexCenter,
   styled,
@@ -33,11 +35,11 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
+import { AndroidPermissionModal } from './AndroidPermissionModal';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { isAndroid, UI_SETTINGS } from '../../common/constants';
-import { AndroidPermissionModal } from './AndroidPermissionModal';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -80,6 +82,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
+  const isMobile = useMedia(cssConfig.media.md);
 
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
@@ -98,7 +101,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     if (authToken) {
       if (skipPreview) {
         savePreferenceAndJoin();
-      } else if (isAndroid) {
+      } else if (isAndroid && isMobile) {
         <AndroidPermissionModal preview={preview} />;
       } else {
         preview();

@@ -6,9 +6,6 @@ import androidPermissionAlert from '../../../assets/android-perm-1.png';
 import iosPermissions from '../../../assets/ios-perm-0.png';
 import { isAndroid, isIOS } from '../../common/constants';
 
-// Do not show android prompt if the user has already given permissions
-// getUserMedia call
-
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [deviceType, setDeviceType] = useState('');

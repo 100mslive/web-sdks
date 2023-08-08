@@ -4,6 +4,7 @@ import { useSearchParam } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../';
 import SidePane from '../../layouts/SidePane';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
 import { Header } from '../Header';
 import PreviewJoin from './PreviewJoin';
@@ -11,7 +12,6 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
