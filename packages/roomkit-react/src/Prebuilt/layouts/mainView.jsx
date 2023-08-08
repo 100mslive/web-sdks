@@ -18,7 +18,6 @@ import { Flex } from '../../Layout';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
-import { MainGridView } from './mainGridView';
 import { PDFView } from './PDFView';
 import ScreenShareView from './screenShareView';
 import SidePane from './SidePane';
@@ -105,7 +104,7 @@ export const ConferenceMainView = () => {
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-  }, [isConnected, hmsActions, permissions, joinForm]);
+  }, [isConnected, hmsActions, permissions, joinForm, isHLSRunning]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
@@ -132,10 +131,8 @@ export const ConferenceMainView = () => {
   } else if (uiViewMode === UI_MODE_ACTIVE_SPEAKER || (isHeadless && headlessUIMode === UI_MODE_ACTIVE_SPEAKER)) {
     ViewComponent = ActiveSpeakerView;
   } else {
-    ViewComponent = MainGridView;
+    ViewComponent = EqualProminence;
   }
-
-  ViewComponent = EqualProminence;
 
   return (
     <Suspense fallback={<FullPageProgress />}>
