@@ -89,7 +89,8 @@ export const createTheme = ({
   if (!themeType) {
     throw new Error('Theme type is required');
   }
-  return createThemeBase(className || `${themeType}-theme`, merge(baseConfig.theme, theme || {}));
+  const mergedTheme = merge(baseConfig.theme, theme || {});
+  return createThemeBase(className || `${themeType}-theme`, mergedTheme);
 };
 
 export type CSS = Stitches.CSS<typeof HmsStitches>;
