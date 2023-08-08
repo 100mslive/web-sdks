@@ -101,10 +101,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     if (authToken) {
       if (skipPreview) {
         savePreferenceAndJoin();
-      } else if (isAndroid && isMobile) {
-        <AndroidPermissionModal preview={preview} />;
       } else {
-        preview();
+        if (!isAndroid) preview();
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,6 +110,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
 
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
+      {isAndroid && isMobile ? <AndroidPermissionModal preview={preview} /> : null}
       {toggleVideo ? null : <Box />}
       <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
         <Logo />
@@ -136,7 +135,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
         </Flex>
       </Flex>
-
       {toggleVideo ? (
         <Flex
           align="center"
@@ -149,7 +147,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-
       <Box css={{ w: '100%', maxWidth: '360px' }}>
         <PreviewControls
           enableJoin={enableJoin}

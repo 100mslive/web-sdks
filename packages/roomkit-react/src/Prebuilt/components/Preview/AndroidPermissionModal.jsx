@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Dialog, Text } from '../../../';
-import androidPermissionAlert from '../../../assets/android-perm-1.png';
+import androidPermissionAlert from '../../../assets/android-perm-0.png';
 
 export function AndroidPermissionModal({ preview }) {
   const [deviceType, setDeviceType] = useState('camera and microphone');
@@ -21,7 +21,7 @@ export function AndroidPermissionModal({ preview }) {
           </Dialog.Title>
 
           <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
-            To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.
+            To allow other users to see and hear you, click the blocked camera icon in your browser's address bar.
           </Text>
 
           <Button

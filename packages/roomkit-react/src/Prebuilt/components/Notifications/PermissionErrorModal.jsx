@@ -60,12 +60,12 @@ export function PermissionErrorModal() {
           <Text variant="sm" css={{ pt: '$4', pb: '$10', color: '$on_surface_medium' }}>
             {/* IOS prompt text */}
             {isMobile && isIOS
-              ? 'Enable permissions by reloading this page and clicking “Allow” on the pop-up, or change settings from the address bar.'
+              ? 'Enable permissions by reloading this page and clicking "Allow" on the pop-up, or change settings from the address bar.'
               : null}
 
             {/* Prompt for android devices */}
             {isMobile && isAndroid
-              ? 'To allow other users to see and hear you, click the blocked camera icon in your browser’s address bar.'
+              ? `To allow other users to see and hear you, click the blocked camera icon in your browser's address bar.`
               : null}
 
             {/* Prompt for desktops */}
