@@ -14,12 +14,12 @@ import {
 import {
   ChangeRoleIcon,
   CheckIcon,
+  DragHandleIcon,
   InfoIcon,
   MicOffIcon,
   PencilIcon,
   RecordIcon,
   SettingsIcon,
-  DragHandleIcon,
 } from '@100mslive/react-icons';
 import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../../';
 import IconButton from '../../IconButton';

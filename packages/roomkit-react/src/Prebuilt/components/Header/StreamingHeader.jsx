@@ -2,10 +2,10 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { config as cssConfig, Flex } from '../../../';
 import { EmojiReaction } from '../EmojiReaction';
+import { ParticipantCount } from '../Footer/ParticipantList';
 import { LeaveRoom } from '../LeaveRoom';
 import MetaActions from '../MetaActions';
 import { SpeakerTag } from './HeaderComponents';
-import { ParticipantCount } from './ParticipantList';
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
 export const StreamingHeader = () => {

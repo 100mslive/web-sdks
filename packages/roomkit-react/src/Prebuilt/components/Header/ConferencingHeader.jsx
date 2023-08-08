@@ -1,7 +1,6 @@
 import React from 'react';
 import { Flex } from '../../../';
 import { SpeakerTag } from './HeaderComponents';
-import { ParticipantCount } from './ParticipantList';
 import { StreamActions } from './StreamActions';
 
 export const ConferencingHeader = () => {
@@ -20,7 +19,6 @@ export const ConferencingHeader = () => {
         }}
       >
         <StreamActions />
-        <ParticipantCount />
       </Flex>
     </Flex>
   );

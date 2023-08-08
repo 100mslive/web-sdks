@@ -1,61 +1,17 @@
-import React, { Fragment, Suspense, useState } from 'react';
+import React, { Suspense } from 'react';
 import { useMedia } from 'react-use';
-import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
-import { MusicIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
-import IconButton from '../../IconButton';
+import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
-// import { LeaveRoom } from '../LeaveRoom';
-import MetaActions from '../MetaActions';
+import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-// import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
-import { ScreenShareHintModal } from '../ScreenshareHintModal';
 import { ChatToggle } from './ChatToggle';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { isScreenshareSupported } from '../../common/utils';
+import { ParticipantCount } from './ParticipantList';
 import { FeatureFlags } from '../../services/FeatureFlags';
-import { FEATURE_LIST } from '../../common/constants';
 
 const TranscriptionButton = React.lazy(() => import('../../plugins/transcription'));
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
-
-const ScreenshareAudio = () => {
-  const {
-    amIScreenSharing,
-    screenShareVideoTrackId: video,
-    screenShareAudioTrackId: audio,
-    toggleScreenShare,
-  } = useScreenShare();
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const isAudioScreenshare = amIScreenSharing && !video && !!audio;
-  const [showModal, setShowModal] = useState(false);
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.AUDIO_ONLY_SCREENSHARE);
-  if (!isFeatureEnabled || !isAllowedToPublish.screen || !isScreenshareSupported()) {
-    return null;
-  }
-  return (
-    <Fragment>
-      <Tooltip title={`${!isAudioScreenshare ? 'Start' : 'Stop'} audio sharing`} key="shareAudio">
-        <IconButton
-          active={!isAudioScreenshare}
-          onClick={() => {
-            if (amIScreenSharing) {
-              toggleScreenShare();
-            } else {
-              setShowModal(true);
-            }
-          }}
-          data-testid="screenshare_audio"
-        >
-          <MusicIcon />
-        </IconButton>
-      </Tooltip>
-      {showModal && <ScreenShareHintModal onClose={() => setShowModal(false)} />}
-    </Fragment>
-  );
-};
 
 export const ConferencingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
@@ -86,6 +42,7 @@ export const ConferencingFooter = () => {
           </AppFooter.Center>
           <AppFooter.Right>
             <ChatToggle />
+            <ParticipantCount />
             <MoreSettings />
           </AppFooter.Right>
         </>
