@@ -97,7 +97,7 @@ export const MoreSettings = () => {
 
         <Dropdown.Content
           sideOffset={5}
-          align="center"
+          align="end"
           css={{
             py: '$0',
             maxHeight: '$96',
@@ -127,17 +127,6 @@ export const MoreSettings = () => {
             </Dropdown.Item>
           )}
           <ChangeSelfRole onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)} />
-          {permissions?.changeRole && (
-            <Dropdown.Item
-              onClick={() => updateState(MODALS.BULK_ROLE_CHANGE, true)}
-              data-testid="bulk_role_change_btn"
-            >
-              <ChangeRoleIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Bulk Role Change
-              </Text>
-            </Dropdown.Item>
-          )}
           <FullScreenItem />
           {isAllowedToPublish.screen && isEmbedEnabled && (
             <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
@@ -150,7 +139,7 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
-          <Dropdown.ItemSeparator />
+          <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">
             <SettingsIcon />
             <Text variant="sm" css={{ ml: '$4' }}>

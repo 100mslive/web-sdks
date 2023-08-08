@@ -180,7 +180,7 @@ export const LeaveRoom = () => {
 const LeaveIconButton = styled(IconButton, {
   color: '$on_primary_high',
   h: '$14',
-  px: '$8',
+  px: '$6',
   r: '$1',
   bg: '$alert_error_default',
   '&:not([disabled]):hover': {

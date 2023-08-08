@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ViewIcon } from '@100mslive/react-icons';
+import { LinkIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Text } from '../../../';
 import { DialogContent, DialogInput, DialogRow } from '../../primitives/DialogContent';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
@@ -17,7 +17,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
       }}
       data-testid="embed_url_btn"
     >
-      <ViewIcon />
+      <LinkIcon />
       <Text variant="sm" css={{ ml: '$4' }}>
         Embed URL
       </Text>
@@ -34,7 +34,7 @@ export function EmbedUrlModal({ onOpenChange }) {
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <DialogContent title="Embed URL" Icon={ViewIcon}>
+      <DialogContent title="Embed URL" Icon={LinkIcon} iconCSS={{ mt: '$2' }}>
         <DialogInput title="URL" value={url} onChange={setUrl} placeholder="https://www.tldraw.com/" type="url" />
         <DialogRow>
           <Text>
