@@ -2,14 +2,14 @@ import React, { Fragment, Suspense, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { MusicIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Flex, Footer as AppFooter, Tooltip } from '../../../';
+import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
-import { LeaveRoom } from '../LeaveRoom';
+// import { LeaveRoom } from '../LeaveRoom';
 import MetaActions from '../MetaActions';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-import { PIP } from '../PIP';
+// import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ScreenShareHintModal } from '../ScreenshareHintModal';
 import { ChatToggle } from './ChatToggle';
@@ -61,41 +61,35 @@ export const ConferencingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
   return (
     <AppFooter.Root>
-      <AppFooter.Left>
-        <ScreenshareAudio />
-        <Suspense fallback="">
-          <VirtualBackground />
-        </Suspense>
-        {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
-        <Flex
-          align="center"
-          css={{
-            display: 'none',
-            '@md': {
-              display: 'flex',
-              gap: '$8',
-            },
-          }}
-        >
-          {isMobile && <EmojiReaction />}
-          <MetaActions isMobile />
-        </Flex>
-      </AppFooter.Left>
-      <AppFooter.Center>
-        <AudioVideoToggle />
-        <ScreenshareToggle />
-        <PIP />
-        <MoreSettings />
-        <Flex align="center" css={{ display: 'none', '@md': { display: 'flex' } }}>
-          <ChatToggle />
-        </Flex>
-        <LeaveRoom />
-      </AppFooter.Center>
-      <AppFooter.Right>
-        {!isMobile && <EmojiReaction />}
-        <MetaActions />
-        <ChatToggle />
-      </AppFooter.Right>
+      {isMobile ? (
+        <>
+          <AppFooter.Center>
+            <LeaveRoom />
+            <AudioVideoToggle hideOptions />
+            <ChatToggle />
+            <MoreSettings />
+          </AppFooter.Center>
+        </>
+      ) : (
+        <>
+          <AppFooter.Left>
+            <Suspense fallback="">
+              <VirtualBackground />
+            </Suspense>
+            {FeatureFlags.enableTranscription ? <TranscriptionButton /> : null}
+          </AppFooter.Left>
+          <AppFooter.Center>
+            <AudioVideoToggle hideOptions />
+            <ScreenshareToggle />
+            <EmojiReaction />
+            <LeaveRoom />
+          </AppFooter.Center>
+          <AppFooter.Right>
+            <ChatToggle />
+            <MoreSettings />
+          </AppFooter.Right>
+        </>
+      )}
     </AppFooter.Root>
   );
 };

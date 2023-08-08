@@ -28,7 +28,7 @@ export const StreamingFooter = () => {
           },
         }}
       >
-        <AudioVideoToggle />
+        <AudioVideoToggle hideOptions />
       </AppFooter.Left>
       <AppFooter.Center
         css={{

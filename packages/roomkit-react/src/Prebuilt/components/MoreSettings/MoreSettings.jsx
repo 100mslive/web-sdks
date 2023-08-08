@@ -19,7 +19,7 @@ import {
   PencilIcon,
   RecordIcon,
   SettingsIcon,
-  VerticalMenuIcon,
+  DragHandleIcon,
 } from '@100mslive/react-icons';
 import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
@@ -89,7 +89,7 @@ export const MoreSettings = () => {
           <IconButton>
             <Tooltip title="More options">
               <Box>
-                <VerticalMenuIcon />
+                <DragHandleIcon />
               </Box>
             </Tooltip>
           </IconButton>

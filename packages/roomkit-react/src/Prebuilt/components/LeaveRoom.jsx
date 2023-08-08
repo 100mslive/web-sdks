@@ -64,7 +64,11 @@ export const LeaveRoom = () => {
             variant="danger"
             key="LeaveRoom"
             data-testid="leave_room_btn"
-            css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
+            css={{
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              '@md': { borderTopRightRadius: '$1', borderBottomRightRadius: '$1' },
+            }}
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
@@ -197,6 +201,6 @@ const MenuTriggerButton = styled(LeaveIconButton, {
   borderBottomLeftRadius: 0,
   px: '$3',
   '@md': {
-    px: '$2',
+    display: 'none',
   },
 });
