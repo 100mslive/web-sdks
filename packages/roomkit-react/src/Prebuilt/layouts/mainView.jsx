@@ -1,5 +1,4 @@
 import React, { Suspense, useCallback, useEffect } from 'react';
-import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -14,7 +13,6 @@ import {
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';
@@ -34,6 +32,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
+import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
@@ -58,12 +57,10 @@ export const ConferenceMainView = () => {
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
-
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
-  const roomLayout = useRoomLayout();
-  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+  const showStreamingUI = useShowStreamingUI();
 
   const startHLS = useCallback(async () => {
     try {
@@ -95,16 +92,12 @@ export const ConferenceMainView = () => {
     }
 
     // Is a streaming kit and broadcaster joins
-    if (
-      permissions?.hlsStreaming &&
-      !isHLSRunning &&
-      joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
-    ) {
-      startHLS();
+    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
+      // startHLS();
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-  }, [isConnected, hmsActions, permissions, joinForm]);
+  }, [isConnected, hmsActions, permissions]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI

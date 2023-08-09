@@ -22,12 +22,12 @@ export const ScreenshareDisplay = () => {
         r: '$3',
         m: '0 auto',
         color: '$on_surface_high',
-        bg: '$surface_default',
+        bg: '$background_default',
         textAlign: 'center',
       }}
     >
       <ShareScreenIcon width={48} height={48} />
-      <Text variant="h5" css={{ m: '$8 0' }}>
+      <Text variant="h5" css={{ m: '$8 0', color: '$on_surface_high' }}>
         You are sharing your screen
       </Text>
       <Button
