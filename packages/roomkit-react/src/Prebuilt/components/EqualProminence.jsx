@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
-import { getPeersWithTiles, selectPeers, selectTracksMap, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  getPeersWithTiles,
+  selectRemotePeers,
+  selectTracksMap,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
@@ -12,11 +18,12 @@ import { UI_SETTINGS } from '../common/constants';
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
 export function EqualProminence() {
-  const peers = useHMSStore(selectPeers);
+  const peers = useHMSStore(selectRemotePeers);
   const vanillaStore = useHMSVanillaStore();
   const isMobile = useMedia(cssConfig.media.md);
 
-  const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
+  let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
+  maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
   const [pagesWithTiles, setPagesWithTiles] = useState([]);
   const [page, setPage] = useState(0);
   const [ref, { width, height }] = useMeasure();
@@ -34,17 +41,18 @@ export function EqualProminence() {
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
     const peersWithTiles = getPeersWithTiles(peers, tracksMap, () => false);
-    const maxTiles = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-    const noOfPages = Math.ceil(peersWithTiles.length / maxTiles);
+    const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
     let pagesList = [];
+    // split into pages
     for (let i = 0; i < noOfPages; i++) {
-      const count = Math.min(remaining, maxTiles);
+      const count = Math.min(remaining, maxTileCount);
       pagesList.push(peersWithTiles.slice(sliceStart, sliceStart + count));
       remaining = remaining - count;
       sliceStart += count;
     }
+    // calculate dimesions for each page
     for (const page of pagesList) {
       const noOfTilesInPage = page.length;
       let maxCols =
