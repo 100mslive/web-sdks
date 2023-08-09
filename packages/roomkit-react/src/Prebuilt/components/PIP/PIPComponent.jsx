@@ -9,7 +9,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
-import { Tooltip, Flex } from '../../../';
+import { Flex, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';

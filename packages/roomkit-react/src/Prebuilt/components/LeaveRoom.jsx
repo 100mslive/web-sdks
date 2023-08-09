@@ -44,7 +44,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
   };
 
   const endRoom = () => {
-    hmsActions.endRoom(lockRoom, 'End Room');
+    hmsActions.endRoom(false, 'End Room');
     redirectToLeavePage();
   };
 
@@ -157,7 +157,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
       <Dialog.Root open={showEndRoomModal}>
         <Dialog.Portal>
           <Dialog.Overlay />
-          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8' }}>
+          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <Dialog.Title
               css={{
                 borderBottom: '1px solid $border_default',

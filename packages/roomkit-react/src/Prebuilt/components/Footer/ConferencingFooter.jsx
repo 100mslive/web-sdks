@@ -1,16 +1,16 @@
 import React, { Suspense } from 'react';
 import { useMedia } from 'react-use';
+import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
+// import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { FeatureFlags } from '../../services/FeatureFlags';
-import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
-import { PIP } from '../PIP';
 
 const TranscriptionButton = React.lazy(() => import('../../plugins/transcription'));
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
