@@ -1,8 +1,9 @@
 import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { CSS, keyframes, VariantProps } from '@stitches/react';
+import { CSS, VariantProps } from '@stitches/react';
 import { Dialog } from '../Modal';
 import { styled } from '../Theme';
+import { sheetFadeIn, sheetFadeOut, sheetSlideIn, sheetSlideOut } from '../utils';
 
 const SheetRoot = styled(DialogPrimitive.Root, {
   minHeight: '240px',
@@ -12,16 +13,6 @@ const SheetTrigger = styled(DialogPrimitive.Trigger, {
   appearance: 'none !important', // Needed for safari it shows white overlay
 });
 
-const fadeIn = keyframes({
-  from: { opacity: '0' },
-  to: { opacity: '1' },
-});
-
-const fadeOut = keyframes({
-  from: { opacity: '1' },
-  to: { opacity: '0' },
-});
-
 const StyledOverlay = styled(Dialog.Overlay, {
   top: 0,
   right: 0,
@@ -29,22 +20,12 @@ const StyledOverlay = styled(Dialog.Overlay, {
   left: 0,
 
   '&[data-state="open"]': {
-    animation: `${fadeIn} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+    animation: `${sheetFadeIn} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
   },
 
   '&[data-state="closed"]': {
-    animation: `${fadeOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+    animation: `${sheetFadeOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
   },
-});
-
-const slideIn = keyframes({
-  from: { transform: '$$transformValue' },
-  to: { transform: 'translate3d(0,0,0)' },
-});
-
-const slideOut = keyframes({
-  from: { transform: 'translate3d(0,0,0)' },
-  to: { transform: '$$transformValue' },
 });
 
 const StyledContent = styled(DialogPrimitive.Content, {
@@ -70,11 +51,11 @@ const StyledContent = styled(DialogPrimitive.Content, {
   },
   '@allowMotion': {
     '&[data-state="open"]': {
-      animation: `${slideIn} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+      animation: `${sheetSlideIn} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
     },
 
     '&[data-state="closed"]': {
-      animation: `${slideOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+      animation: `${sheetSlideOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
     },
   },
 
