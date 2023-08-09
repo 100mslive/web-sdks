@@ -13,7 +13,6 @@ import {
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';
@@ -33,7 +32,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { showStreamingUI } from '../common/utils';
+import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
@@ -58,10 +57,10 @@ export const ConferenceMainView = () => {
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
-  const layout = useRoomLayout();
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
+  const showStreamingUI = useShowStreamingUI();
 
   const startHLS = useCallback(async () => {
     try {
@@ -93,7 +92,7 @@ export const ConferenceMainView = () => {
     }
 
     // Is a streaming kit and broadcaster joins
-    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI(layout)) {
+    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
       // startHLS();
     }
 

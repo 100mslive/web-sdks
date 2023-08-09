@@ -5,7 +5,7 @@ import { RadioIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { PreviewSettings } from './PreviewJoin';
-import { showStreamingUI } from '../../common/utils';
+import { useShowStreamingUI } from '../../common/hooks';
 
 const PreviewForm = ({
   name,
@@ -24,7 +24,8 @@ const PreviewForm = ({
   const permissions = useHMSStore(selectPermissions);
   const layout = useRoomLayout();
   const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
-  const showGoLive = showStreamingUI(layout) && !isHLSRunning && permissions?.hlsStreaming;
+  const showStreamingUI = useShowStreamingUI();
+  const showGoLive = showStreamingUI && !isHLSRunning && permissions?.hlsStreaming;
 
   return (
     <Form

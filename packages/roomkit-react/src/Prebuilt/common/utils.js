@@ -91,8 +91,3 @@ export const getFormattedCount = num => {
   const formattedNum = formatter.format(num);
   return formattedNum;
 };
-
-export const showStreamingUI = layout => {
-  const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
-  return joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE;
-};
