@@ -154,19 +154,15 @@ export function InsetView() {
 export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
-  const roleMap = useHMSStore(selectRolesMap);
   const localPeer = useHMSStore(selectLocalPeer);
-  const aspectRatio = getAspectRatio({
-    roleMap,
-    roleName: localPeer.roleName,
-    isMobile,
-  });
+  const aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   let height = 180;
   let width = height * aspectRatio;
   if (isLandscape && width > 240) {
     width = 240;
     height = width / aspectRatio;
   }
+
   const nodeRef = useRef(null);
 
   useEffect(() => {
