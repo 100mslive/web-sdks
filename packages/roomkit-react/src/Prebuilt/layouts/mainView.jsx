@@ -7,7 +7,6 @@ import {
   selectPeerSharingAudio,
   selectPeerSharingVideoPlaylist,
   selectPermissions,
-  selectTemplateAppData,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -17,16 +16,13 @@ import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
-import { InsetView } from './InsetView';
 import { PDFView } from './PDFView';
 import ScreenShareView from './screenShareView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { useWhiteboardMetadata } from '../plugins/whiteboard';
-import { useAppConfig } from '../components/AppData/useAppConfig';
 import {
   useHLSViewerRole,
-  useIsHeadless,
   usePDFAnnotator,
   usePinnedTrack,
   useSetAppDataByKey,
@@ -34,11 +30,10 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
+import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
-const ActiveSpeakerView = React.lazy(() => import('./ActiveSpeakerView'));
 const PinnedTrackView = React.lazy(() => import('./PinnedTrackView'));
 
 export const ConferenceMainView = () => {
@@ -49,11 +44,8 @@ export const ConferenceMainView = () => {
   const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
   const hmsActions = useHMSActions();
-  const isHeadless = useIsHeadless();
-  const headlessUIMode = useAppConfig('headlessConfig', 'uiMode');
-  const { uiViewMode, isAudioOnly } = useUISettings();
+  const { isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
@@ -122,14 +114,10 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     // ViewComponent = WhiteboardView;
-  } else if (uiMode === 'inset') {
-    ViewComponent = InsetView;
   } else if (((peerSharing && peerSharing.id !== peerSharingAudio?.id) || peerSharingPlaylist) && !isAudioOnly) {
     ViewComponent = ScreenShareView;
   } else if (pinnedTrack) {
     ViewComponent = PinnedTrackView;
-  } else if (uiViewMode === UI_MODE_ACTIVE_SPEAKER || (isHeadless && headlessUIMode === UI_MODE_ACTIVE_SPEAKER)) {
-    ViewComponent = ActiveSpeakerView;
   } else {
     ViewComponent = EqualProminence;
   }
