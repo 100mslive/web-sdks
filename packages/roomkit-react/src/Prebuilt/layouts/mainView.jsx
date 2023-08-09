@@ -13,6 +13,7 @@ import {
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { InsetView } from './InsetView';
 import { MainGridView } from './mainGridView';
@@ -34,7 +35,6 @@ import {
 } from '../components/AppData/useUISettings';
 import { showStreamingUI } from '../common/utils';
 import { APP_DATA, SESSION_STORE_KEY, UI_MODE_ACTIVE_SPEAKER } from '../common/constants';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));

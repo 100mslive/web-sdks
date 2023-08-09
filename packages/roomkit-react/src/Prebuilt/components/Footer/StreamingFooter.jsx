@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { Footer as AppFooter, config as cssConfig } from '../../../';
+import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
@@ -39,7 +39,10 @@ export const StreamingFooter = () => {
         }}
       >
         {isMobile ? (
-          <ChatToggle />
+          <>
+            <ChatToggle />
+            <MoreSettings />
+          </>
         ) : (
           <>
             <ScreenshareToggle />
