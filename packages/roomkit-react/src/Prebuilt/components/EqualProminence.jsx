@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { getPeersWithTiles, selectPeers, selectTracksMap, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
+import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
@@ -65,6 +66,9 @@ export function EqualProminence() {
             }
           }
         }
+
+        // tileHeight is not calculated as it could be exceeding the max possible height
+        // find the max possible width instead
         if (tileHeight === 0) {
           tileHeight = maxRowHeight;
           const calcWidths = aspectRatios.map(aR => tileHeight * aR);
@@ -118,6 +122,7 @@ export function EqualProminence() {
         })}
       </div>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
+      <InsetTile />
     </Flex>
   );
 }

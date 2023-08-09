@@ -152,7 +152,10 @@ export function InsetView() {
   );
 }
 
-const InsetTile = ({ isMobile, roleMap, isLandscape }) => {
+export const InsetTile = () => {
+  const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.ls);
+  const roleMap = useHMSStore(selectRolesMap);
   const localPeer = useHMSStore(selectLocalPeer);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const aspectRatio = getAspectRatio({
