@@ -1,8 +1,10 @@
 import React from 'react';
 import { ConferencingFooter } from './Footer/ConferencingFooter';
 import { StreamingFooter } from './Footer/StreamingFooter';
-import { isStreamingKit } from '../common/utils';
+import { showStreamingUI } from '../common/utils';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 
 export const Footer = () => {
-  return isStreamingKit() ? <StreamingFooter /> : <ConferencingFooter />;
+  const layout = useRoomLayout();
+  return showStreamingUI(layout) ? <StreamingFooter /> : <ConferencingFooter />;
 };

@@ -1,3 +1,5 @@
+import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
+
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
@@ -88,4 +90,9 @@ export const getFormattedCount = num => {
   const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
   const formattedNum = formatter.format(num);
   return formattedNum;
+};
+
+export const showStreamingUI = layout => {
+  const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
+  return joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE;
 };

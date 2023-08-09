@@ -1,16 +1,16 @@
 import React from 'react';
-import { Box, Flex, Footer as AppFooter } from '../../../';
+import { useMedia } from 'react-use';
+import { Footer as AppFooter, config as cssConfig } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
-import { StreamActions } from '../Header/StreamActions';
 import { LeaveRoom } from '../LeaveRoom';
-import MetaActions from '../MetaActions';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
+import { ParticipantCount } from './ParticipantList';
 
 export const StreamingFooter = () => {
+  const isMobile = useMedia(cssConfig.media.md);
   return (
     <AppFooter.Root
       css={{
@@ -28,6 +28,7 @@ export const StreamingFooter = () => {
           },
         }}
       >
+        {isMobile ? <LeaveRoom /> : null}
         <AudioVideoToggle hideOptions />
       </AppFooter.Left>
       <AppFooter.Center
@@ -37,34 +38,20 @@ export const StreamingFooter = () => {
           },
         }}
       >
-        <ScreenshareToggle css={{ '@sm': { display: 'none' } }} />
-        <Box css={{ '@md': { display: 'none' } }}>
-          <PIP />
-        </Box>
-        <Box
-          css={{
-            display: 'none',
-            '@md': {
-              display: 'flex',
-              alignItems: 'center',
-              mx: '$4',
-            },
-          }}
-        >
-          <StreamActions />
-        </Box>
-        <MoreSettings />
-        <Box css={{ '@md': { display: 'none' } }}>
-          <LeaveRoom />
-        </Box>
-        <Flex align="center" css={{ display: 'none', '@md': { display: 'flex' } }}>
+        {isMobile ? (
           <ChatToggle />
-        </Flex>
+        ) : (
+          <>
+            <ScreenshareToggle />
+            <EmojiReaction />
+            <LeaveRoom />
+          </>
+        )}
       </AppFooter.Center>
       <AppFooter.Right>
-        <EmojiReaction />
-        <MetaActions />
         <ChatToggle />
+        <ParticipantCount />
+        <MoreSettings />
       </AppFooter.Right>
     </AppFooter.Root>
   );
