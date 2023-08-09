@@ -133,7 +133,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
         </Flex>
       </Flex>
-
       {toggleVideo ? (
         <Flex
           align="center"
@@ -146,7 +145,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-
       <Box css={{ w: '100%', maxWidth: '360px' }}>
         <PreviewControls
           enableJoin={enableJoin}

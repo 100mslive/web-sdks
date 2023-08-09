@@ -17,6 +17,9 @@ async function main() {
     target: 'esnext',
     tsconfig: 'tsconfig.json',
     external,
+    loader: {
+      '.png': 'binary',
+    },
     plugins: [
       {
         name: 'on-rebuild-plugin',
