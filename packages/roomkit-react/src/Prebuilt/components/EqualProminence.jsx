@@ -49,6 +49,7 @@ export function EqualProminence() {
           : Math.ceil(Math.sqrt(noOfTilesInPage));
       let maxRows = Math.ceil(noOfTilesInPage / maxCols);
       let index = 0;
+      // convert the current page to a matrix(grid)
       const matrix = new Array(maxRows).fill(null).map((_, i) => {
         const numCols = Math.min(maxCols, noOfTilesInPage - i * maxCols);
         let rowElements = [];
@@ -62,6 +63,7 @@ export function EqualProminence() {
 
       const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
+      // calculate height and width of each tile in a row
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * 8) / row.length;
         let tileHeight = 0;
