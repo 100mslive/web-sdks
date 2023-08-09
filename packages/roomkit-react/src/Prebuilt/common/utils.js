@@ -1,5 +1,3 @@
-import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
-
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
