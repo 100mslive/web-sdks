@@ -160,7 +160,6 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <Dialog.Title
               css={{
-                borderBottom: '1px solid $border_default',
                 color: '$alert_error_default',
                 display: 'flex',
                 alignItems: 'center',

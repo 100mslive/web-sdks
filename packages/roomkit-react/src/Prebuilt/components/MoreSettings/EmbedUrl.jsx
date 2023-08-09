@@ -58,7 +58,7 @@ export function EmbedUrlModal({ onOpenChange }) {
             type="url"
           />
           <Flex justify="between" css={{ w: '100%', gap: '$8', mt: '$8' }}>
-            <Button outlined variant="standard" css={{ w: '100%' }}>
+            <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
             <Button

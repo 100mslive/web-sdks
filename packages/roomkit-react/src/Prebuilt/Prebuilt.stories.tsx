@@ -6,7 +6,7 @@ export default {
   title: 'UI Components/Prebuilt',
   component: HMSPrebuilt,
   argTypes: {
-    roomCode: { control: { type: 'text' }, defaultValue: 'dhv-uwro-gzs' },
+    roomCode: { control: { type: 'text' }, defaultValue: 'cuf-wywo-trf' },
     logo: { control: { type: 'object' }, defaultValue: undefined },
   },
 } as Meta<typeof HMSPrebuilt>;
@@ -17,7 +17,7 @@ const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', log
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 Example.args = {
-  roomCode: 'dhv-uwro-gzs',
+  roomCode: 'cuf-wywo-trf',
   options: {
     endpoints: {
       roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
