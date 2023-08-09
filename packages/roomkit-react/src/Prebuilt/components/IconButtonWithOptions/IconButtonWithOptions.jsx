@@ -48,11 +48,12 @@ export const IconButtonWithOptions = ({
   key = '',
 }) => {
   const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
+  const iconCss = { color: active ? '$on_surface_high' : '$on_primary_high' };
   return (
     <Flex>
       <IconSection css={bgCss} onClick={onClick} key={key}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
-          <Flex align="center" justify="center" css={{ color: '$on_surface_high' }}>
+          <Flex align="center" justify="center" css={iconCss}>
             {icon}
           </Flex>
         </Tooltip>
@@ -61,7 +62,7 @@ export const IconButtonWithOptions = ({
         <Dropdown.Trigger asChild>
           <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
-              <Box css={{ color: '$on_surface_high' }}>
+              <Box css={iconCss}>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>

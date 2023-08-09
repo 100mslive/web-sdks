@@ -18,7 +18,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$surface_default',
+  background: '$background_default',
   variants: {
     transparentBg: {
       true: {
@@ -64,8 +64,8 @@ const AudioIndicator = styled('div', {
   top: '$4',
   right: '$4',
   color: '$on_primary_high',
-  bg: '$alert_error_default',
-  borderRadius: '$2',
+  bg: '$secondary_dim',
+  borderRadius: '$round',
   width: '$14',
   height: '$14',
   mb: '5px',

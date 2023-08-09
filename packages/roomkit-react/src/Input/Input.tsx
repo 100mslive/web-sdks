@@ -10,7 +10,7 @@ export const Input = styled('input', {
   backgroundColor: '$surface_default',
   borderRadius: '8px',
   outline: 'none',
-  border: '1px solid $border_bright',
+  border: '1px solid $border_default',
   padding: '0.5rem 0.75rem',
   minHeight: '30px',
   color: '$on_surface_high',

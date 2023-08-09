@@ -22,7 +22,6 @@ import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProv
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
-import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 import { getRoutePrefix } from './common/utils';
@@ -152,7 +151,10 @@ export const HMSPrebuilt = React.forwardRef(
 
                   return (
                     <HMSThemeProvider
-                      themeType={theme.name}
+                      // issue is with stichtes caching the theme using the theme name / class
+                      // no updates to the themes are fired if the name is same.
+                      // TODO: cache the theme and do deep check to trigger name change in the theme
+                      themeType={`${theme.name}-${Date.now()}`}
                       aspectRatio={getAspectRatio({ width, height })}
                       theme={{
                         colors: theme.palette,
@@ -293,7 +295,6 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }) {
       <ToastContainer />
       <Notifications />
       <BackSwipe />
-      <Confetti />
       <FlyingEmoji />
       <RemoteStopScreenshare />
       <KeyboardHandler />
