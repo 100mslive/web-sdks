@@ -98,13 +98,13 @@ export function EqualProminence() {
   }, [width, height, maxTileCount, vanillaStore, peers, page]);
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
+    <Flex direction="column" css={{ size: '100%', position: 'relative' }}>
       <div
         ref={ref}
         style={{
           flex: '1 1 0',
-          padding: 8,
-          gap: 8,
+          padding: '$4',
+          gap: '$4',
           display: 'flex',
           placeContent: 'center',
           alignItems: 'center',

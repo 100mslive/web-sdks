@@ -1,13 +1,12 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectAppData, selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { useRolePreference } from '../components/hooks/useFeatures';
-import { APP_DATA } from '../common/constants';
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];
@@ -157,7 +156,6 @@ export const InsetTile = () => {
   const isLandscape = useMedia(cssConfig.media.ls);
   const roleMap = useHMSStore(selectRolesMap);
   const localPeer = useHMSStore(selectLocalPeer);
-  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const aspectRatio = getAspectRatio({
     roleMap,
     roleName: localPeer.roleName,
@@ -198,8 +196,7 @@ export const InsetTile = () => {
         css={{
           position: 'absolute',
           bottom: 0,
-          right: sidepane ? '$100' : '$10',
-          mr: sidepane ? '$14' : 0,
+          right: '$4',
           boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
           aspectRatio: aspectRatio,
