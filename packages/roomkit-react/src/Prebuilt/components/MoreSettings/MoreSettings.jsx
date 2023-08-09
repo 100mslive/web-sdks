@@ -22,6 +22,7 @@ import {
 } from '@100mslive/react-icons';
 import { Box, Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
+import { PIP } from '../PIP';
 import { RoleChangeModal } from '../RoleChangeModal';
 import SettingsModal from '../Settings/SettingsModal';
 import StartRecording from '../Settings/StartRecording';
@@ -34,10 +35,9 @@ import { FullScreenItem } from './FullScreenItem';
 import { MuteAllModal } from './MuteAllModal';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { useMyMetadata } from '../hooks/useMetadata';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
-import { useMyMetadata } from '../hooks/useMetadata';
-import { PIP } from '../PIP';
 
 const isMobileOS = isAndroid || isIOS;
 

@@ -44,6 +44,7 @@ export function ShareScreenOptions() {
             w: '$96',
             maxHeight: '$96',
             p: 0,
+            bg: '$surface_dim',
           }}
         >
           <Dropdown.Item
