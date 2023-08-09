@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
-import { useMeasure } from 'react-use';
+import { useMeasure, useMedia } from 'react-use';
 import { getPeersWithTiles, selectPeers, selectTracksMap, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
-const aspectRatios = [1 / 1, 4 / 3, 16 / 9];
+const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
 export function EqualProminence() {
   const peers = useHMSStore(selectPeers);
   const vanillaStore = useHMSVanillaStore();
+  const isMobile = useMedia(cssConfig.media.md);
+
   const maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   const [pagesWithTiles, setPagesWithTiles] = useState([]);
   const [page, setPage] = useState(0);
@@ -31,12 +34,13 @@ export function EqualProminence() {
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
     const peersWithTiles = getPeersWithTiles(peers, tracksMap, () => false);
-    const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
+    const maxTiles = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
+    const noOfPages = Math.ceil(peersWithTiles.length / maxTiles);
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
     let pagesList = [];
     for (let i = 0; i < noOfPages; i++) {
-      const count = Math.min(remaining, maxTileCount);
+      const count = Math.min(remaining, maxTiles);
       pagesList.push(peersWithTiles.slice(sliceStart, sliceStart + count));
       remaining = remaining - count;
       sliceStart += count;
@@ -47,6 +51,9 @@ export function EqualProminence() {
         noOfTilesInPage > 2 && noOfTilesInPage < 9
           ? Math.ceil(noOfTilesInPage / 2)
           : Math.ceil(Math.sqrt(noOfTilesInPage));
+      if (isMobile) {
+        maxCols = noOfTilesInPage < 4 ? 1 : Math.min(maxCols, 2);
+      }
       let maxRows = Math.ceil(noOfTilesInPage / maxCols);
       let index = 0;
       // convert the current page to a matrix(grid)
@@ -63,6 +70,7 @@ export function EqualProminence() {
 
       const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
+      const aspectRatios = isMobile && noOfTilesInPage > 3 ? aspectRatioConfig.mobile : aspectRatioConfig.default;
       // calculate height and width of each tile in a row
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * 8) / row.length;
@@ -97,7 +105,7 @@ export function EqualProminence() {
       }
     }
     setPagesWithTiles(pagesList);
-  }, [width, height, maxTileCount, vanillaStore, peers, page]);
+  }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile]);
 
   return (
     <Flex direction="column" css={{ size: '100%', position: 'relative' }}>
