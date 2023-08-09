@@ -42,12 +42,15 @@ export function EqualProminence() {
       sliceStart += count;
     }
     for (const page of pagesList) {
-      const maxPerPage = page.length;
-      let maxCols = Math.ceil(Math.sqrt(page.length));
-      let maxRows = Math.ceil(maxPerPage / maxCols);
+      const noOfTilesInPage = page.length;
+      let maxCols =
+        noOfTilesInPage > 2 && noOfTilesInPage < 9
+          ? Math.ceil(noOfTilesInPage / 2)
+          : Math.ceil(Math.sqrt(noOfTilesInPage));
+      let maxRows = Math.ceil(noOfTilesInPage / maxCols);
       let index = 0;
       const matrix = new Array(maxRows).fill(null).map((_, i) => {
-        const numCols = Math.min(maxCols, maxPerPage - i * maxCols);
+        const numCols = Math.min(maxCols, noOfTilesInPage - i * maxCols);
         let rowElements = [];
         for (let j = 0; j < numCols; j++) {
           if (index < page.length) {
