@@ -123,7 +123,7 @@ export const baseConfig = {
       72: '18rem',
       80: '20rem',
       96: '24rem',
-      100: '27rem',
+      100: '25rem',
     },
     borderWidths: {
       light: '1px',

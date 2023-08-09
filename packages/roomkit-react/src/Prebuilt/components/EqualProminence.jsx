@@ -7,7 +7,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
@@ -116,13 +116,12 @@ export function EqualProminence() {
   }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile]);
 
   return (
-    <Flex direction="column" css={{ size: '100%', position: 'relative' }}>
-      <div
+    <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative' }}>
+      <Box
         ref={ref}
-        style={{
+        css={{
           flex: '1 1 0',
-          padding: '$4',
-          gap: 8,
+          gap: '$4',
           display: 'flex',
           placeContent: 'center',
           alignItems: 'center',
@@ -143,7 +142,7 @@ export function EqualProminence() {
             />
           );
         })}
-      </div>
+      </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
       <InsetTile />
     </Flex>
