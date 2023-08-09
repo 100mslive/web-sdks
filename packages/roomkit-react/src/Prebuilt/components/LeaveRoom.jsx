@@ -1,29 +1,35 @@
 import React, { Fragment, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useMedia } from 'react-use';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
-import { Button } from '../../Button';
 import { Dropdown } from '../../Dropdown';
 import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
+import { Sheet } from '../../Sheet';
 import { Text } from '../../Text';
-import { styled } from '../../Theme';
+import { config as cssConfig, styled } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { useHMSPrebuiltContext } from '../AppContext';
+import { EndSessionContent } from './EndSessionContent';
+import { LeaveCard } from './LeaveCard';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useNavigation } from './hooks/useNavigation';
+import { useShowStreamingUI } from '../common/hooks';
 
-export const LeaveRoom = ({ showStreamingUI = false }) => {
+export const LeaveRoom = ({}) => {
   const navigate = useNavigation();
   const params = useParams();
   const [open, setOpen] = useState(false);
-  const [showEndRoomModal, setShowEndRoomModal] = useState(false);
+  const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const { showLeave, onLeave } = useHMSPrebuiltContext();
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
   useDropdownList({ open, name: 'LeaveRoom' });
 
   const redirectToLeavePage = () => {
@@ -50,6 +56,88 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
 
   if (!permissions || !isConnected) {
     return null;
+  }
+
+  if (isMobile) {
+    return (
+      <Fragment>
+        {permissions.endRoom ? (
+          <Sheet.Root open={open} onOpenChange={setOpen}>
+            <Sheet.Trigger asChild>
+              <LeaveIconButton
+                variant="danger"
+                key="LeaveRoom"
+                data-testid="leave_room_btn"
+                css={{
+                  borderTopRightRadius: '$1',
+                  borderBottomRightRadius: '$1',
+                }}
+              >
+                <Tooltip title="Leave Room">
+                  {!showStreamingUI ? (
+                    <Box>
+                      <HangUpIcon key="hangUp" />
+                    </Box>
+                  ) : (
+                    <Flex gap={2}>
+                      <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
+                        <ExitIcon key="hangUp" />
+                      </Box>
+                      <Text css={{ '@md': { display: 'none' }, color: 'inherit' }} variant="button">
+                        Leave Studio
+                      </Text>
+                    </Flex>
+                  )}
+                </Tooltip>
+              </LeaveIconButton>
+            </Sheet.Trigger>
+            <Sheet.Content>
+              <LeaveCard
+                title="Leave"
+                subtitle="Others will continue after you leave. You can join the session again."
+                bg="$surface_default"
+                titleColor="$on_surface_high"
+                subtitleColor="$on_surface_low"
+                icon={<ExitIcon height={24} width={24} />}
+                onClick={leaveRoom}
+                css={{ pt: 0, mt: '$10' }}
+              />
+              <LeaveCard
+                title="End Session"
+                subtitle="The session will end for everyone. You can’t undo this action."
+                bg="$alert_error_dim"
+                titleColor="$alert_error_brighter"
+                subtitleColor="$alert_error_bright"
+                icon={<StopIcon height={24} width={24} />}
+                onClick={() => {
+                  setOpen(false);
+                  setShowEndRoomAlert(true);
+                }}
+              />
+            </Sheet.Content>
+          </Sheet.Root>
+        ) : (
+          <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+            <Tooltip title="Leave Room">
+              <Box>
+                {showStreamingUI ? (
+                  <Box css={{ transform: 'rotate(180deg)' }}>
+                    <ExitIcon />
+                  </Box>
+                ) : (
+                  <HangUpIcon key="hangUp" />
+                )}
+              </Box>
+            </Tooltip>
+          </LeaveIconButton>
+        )}
+        <Sheet.Root open={showEndRoomAlert} onOpenChange={setShowEndRoomAlert}>
+          <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+            <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} />
+          </Sheet.Content>
+        </Sheet.Root>
+      </Fragment>
+    );
   }
 
   return (
@@ -99,41 +187,31 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
             </Dropdown.Trigger>
             <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
-                <Flex gap={4}>
-                  <Box>
-                    <ExitIcon />
-                  </Box>
-                  <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ color: '$on_surface_high' }}>
-                      Leave {showStreamingUI ? 'Studio' : 'Session'}
-                    </Text>
-                    <Text css={{ c: '$on_surface_low', mt: '$2' }}>
-                      Others will continue after you leave. You can join the {showStreamingUI ? 'studio ' : 'room '}
-                      again.
-                    </Text>
-                  </Flex>
-                </Flex>
+                <LeaveCard
+                  title="Leave"
+                  subtitle="Others will continue after you leave. You can join the session again."
+                  bg=""
+                  titleColor="$on_surface_high"
+                  subtitleColor="$on_surface_low"
+                  icon={<ExitIcon height={24} width={24} />}
+                  onClick={leaveRoom}
+                  css={{ p: 0 }}
+                />
               </Dropdown.Item>
-              <Dropdown.Item
-                css={{ w: '100%', bg: 'rgba(178, 71, 81, 0.1)' }}
-                onClick={() => {
-                  setShowEndRoomModal(true);
-                }}
-                data-testid="end_room_btn"
-              >
-                <Flex gap={4}>
-                  <Box css={{ color: '$alert_error_default' }}>
-                    <StopIcon />
-                  </Box>
-                  <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ c: '$alert_error_brighter' }}>
-                      End Session
-                    </Text>
-                    <Text css={{ c: '$alert_error_bright', mt: '$2' }}>
-                      The session will end for everyone. You can't undo this action.
-                    </Text>
-                  </Flex>
-                </Flex>
+              <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
+                <LeaveCard
+                  title="End Session"
+                  subtitle="The session will end for everyone. You can't undo this action."
+                  bg=""
+                  titleColor="$alert_error_brighter"
+                  subtitleColor="$alert_error_bright"
+                  icon={<StopIcon height={24} width={24} />}
+                  onClick={() => {
+                    setOpen(false);
+                    setShowEndRoomAlert(true);
+                  }}
+                  css={{ p: 0 }}
+                />
               </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
@@ -154,31 +232,11 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
         </LeaveIconButton>
       )}
 
-      <Dialog.Root open={showEndRoomModal}>
+      <Dialog.Root open={showEndRoomAlert}>
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
-            <Dialog.Title
-              css={{
-                color: '$alert_error_default',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
-              End Session
-            </Dialog.Title>
-            <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-              The session will end for everyone and all the activities will stop. You can't undo this action.
-            </Text>
-            <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
-              <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setShowEndRoomModal(false)}>
-                Cancel
-              </Button>
-              <Button variant="danger" css={{ w: '100%' }} onClick={endRoom} id="lockRoom" data-testid="lock_end_room">
-                End Session
-              </Button>
-            </Flex>
+            <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} isModal />
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
