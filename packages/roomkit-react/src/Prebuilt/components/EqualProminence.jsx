@@ -104,7 +104,7 @@ export function EqualProminence() {
         style={{
           flex: '1 1 0',
           padding: '$4',
-          gap: '$4',
+          gap: 8,
           display: 'flex',
           placeContent: 'center',
           alignItems: 'center',
