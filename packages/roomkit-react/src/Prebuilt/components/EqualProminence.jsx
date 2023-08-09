@@ -31,30 +31,34 @@ export function EqualProminence() {
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
     const peersWithTiles = getPeersWithTiles(peers, tracksMap, () => false);
-    const maxPerPage = Math.min(peersWithTiles.length, maxTileCount);
-    const pages = Math.ceil(peersWithTiles.length / maxPerPage);
+    const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
+    let remaining = peersWithTiles.length;
+    let sliceStart = 0;
     let pagesList = [];
-    let index = 0;
-    for (let pageNo = 0; pageNo < pages; pageNo++) {
-      let maxCols = Math.ceil(Math.sqrt(maxPerPage));
+    for (let i = 0; i < noOfPages; i++) {
+      const count = Math.min(remaining, maxTileCount);
+      pagesList.push(peersWithTiles.slice(sliceStart, sliceStart + count));
+      remaining = remaining - count;
+      sliceStart += count;
+    }
+    for (const page of pagesList) {
+      const maxPerPage = page.length;
+      let maxCols = Math.ceil(Math.sqrt(page.length));
       let maxRows = Math.ceil(maxPerPage / maxCols);
-      // eslint-disable-next-line no-loop-func
+      let index = 0;
       const matrix = new Array(maxRows).fill(null).map((_, i) => {
         const numCols = Math.min(maxCols, maxPerPage - i * maxCols);
         let rowElements = [];
-
         for (let j = 0; j < numCols; j++) {
-          if (index < peersWithTiles.length) {
-            rowElements.push(peersWithTiles[index++]);
+          if (index < page.length) {
+            rowElements.push(page[index++]);
           }
         }
-
         return rowElements;
       });
 
       const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
-      const pageList = [];
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * 8) / row.length;
         let tileHeight = 0;
@@ -84,10 +88,8 @@ export function EqualProminence() {
         for (let i = 0; i < row.length; i++) {
           row[i].width = tileWidth;
           row[i].height = tileHeight;
-          pageList.push(row[i]);
         }
       }
-      pagesList.push(pageList);
     }
     setPagesWithTiles(pagesList);
   }, [width, height, maxTileCount, vanillaStore, peers, page]);
