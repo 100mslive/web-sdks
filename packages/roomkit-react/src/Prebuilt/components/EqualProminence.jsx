@@ -127,8 +127,9 @@ export function EqualProminence() {
           flex: '1 1 0',
           gap: '$4',
           minHeight: 0,
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gridTemplateRows: `repeat(${pagesWithTiles[page]?.length}, 1fr)`,
         }}
       >
         {pagesWithTiles[page]?.map(grid => {
