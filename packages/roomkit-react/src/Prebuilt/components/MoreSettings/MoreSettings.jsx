@@ -172,7 +172,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
           </Sheet.Content>
         </Sheet.Root>
         {openModals.has(MODALS.MUTE_ALL) && (
-          <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />
+          <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile={isMobile} />
         )}
         {openModals.has(MODALS.CHANGE_NAME) && (
           <ChangeNameModal

@@ -14,8 +14,9 @@ import { Tooltip } from '../../Tooltip';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useNavigation } from './hooks/useNavigation';
+import { useShowStreamingUI } from '../common/hooks';
 
-export const LeaveRoom = ({ showStreamingUI = false }) => {
+export const LeaveRoom = () => {
   const navigate = useNavigation();
   const params = useParams();
   const [open, setOpen] = useState(false);
@@ -24,6 +25,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const { showLeave, onLeave } = useHMSPrebuiltContext();
+  const showStreamingUI = useShowStreamingUI();
   useDropdownList({ open, name: 'LeaveRoom' });
 
   const redirectToLeavePage = () => {
@@ -68,20 +70,9 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              {!showStreamingUI ? (
-                <Box>
-                  <HangUpIcon key="hangUp" />
-                </Box>
-              ) : (
-                <Flex gap={2}>
-                  <Box>
-                    <ExitIcon key="hangUp" />
-                  </Box>
-                  <Text css={{ '@md': { display: 'none' }, color: 'inherit' }} variant="button">
-                    Leave Studio
-                  </Text>
-                </Flex>
-              )}
+              <Box>
+                <HangUpIcon key="hangUp" />
+              </Box>
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -108,7 +99,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
                       Leave {showStreamingUI ? 'Studio' : 'Session'}
                     </Text>
                     <Text css={{ c: '$on_surface_low', mt: '$2' }}>
-                      Others will continue after you leave. You can join the {showStreamingUI ? 'studio ' : 'room '}
+                      Others will continue after you leave. You can join the {showStreamingUI ? 'stream ' : 'session '}
                       again.
                     </Text>
                   </Flex>
@@ -127,10 +118,10 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
                   </Box>
                   <Flex direction="column" align="start">
                     <Text variant="lg" css={{ c: '$alert_error_brighter' }}>
-                      End Session
+                      End {showStreamingUI ? 'Stream' : 'Session'}
                     </Text>
                     <Text css={{ c: '$alert_error_bright', mt: '$2' }}>
-                      The session will end for everyone. You can't undo this action.
+                      The {showStreamingUI ? 'stream ' : 'session'} will end for everyone. You can't undo this action.
                     </Text>
                   </Flex>
                 </Flex>
@@ -141,15 +132,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>
-              {showStreamingUI ? (
-                <Box>
-                  <ExitIcon />
-                </Box>
-              ) : (
-                <HangUpIcon key="hangUp" />
-              )}
-            </Box>
+            <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
           </Tooltip>
         </LeaveIconButton>
       )}
@@ -166,17 +149,18 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
               }}
             >
               <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
-              End Session
+              End {showStreamingUI ? 'Stream' : 'Session'}
             </Dialog.Title>
             <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-              The session will end for everyone and all the activities will stop. You can't undo this action.
+              The {showStreamingUI ? 'stream ' : 'session '} will end for everyone and all the activities will stop. You
+              can't undo this action.
             </Text>
             <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
               <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setShowEndRoomModal(false)}>
                 Cancel
               </Button>
               <Button variant="danger" css={{ w: '100%' }} onClick={endRoom} id="lockRoom" data-testid="lock_end_room">
-                End Session
+                End {showStreamingUI ? 'Stream' : 'Session'}
               </Button>
             </Flex>
           </Dialog.Content>
