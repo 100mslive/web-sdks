@@ -1,8 +1,7 @@
 import React, { Suspense, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectIsLocalVideoEnabled, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, CrossIcon, DragHandleIcon, HandIcon, MicOffIcon, PencilIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Tooltip } from '../../../../';
+import { Box, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
 import { ActionTile } from '.././ActionTile';
@@ -49,7 +48,6 @@ export const MwebOptions = () => {
       return copy;
     });
   };
-  const isMobile = useMedia(cssConfig.media.md);
 
   return (
     <>
@@ -135,7 +133,7 @@ export const MwebOptions = () => {
         </Sheet.Content>
       </Sheet.Root>
       {openModals.has(MODALS.MUTE_ALL) && (
-        <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile={isMobile} />
+        <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}
       {openModals.has(MODALS.CHANGE_NAME) && (
         <ChangeNameModal
