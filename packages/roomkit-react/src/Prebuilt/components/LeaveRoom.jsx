@@ -9,7 +9,6 @@ import { IconButton } from '../../IconButton';
 import { config as cssConfig, styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { useNavigation } from './hooks/useNavigation';
-import { useShowStreamingUI } from '../common/hooks';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
