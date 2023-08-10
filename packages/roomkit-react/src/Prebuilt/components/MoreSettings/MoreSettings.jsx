@@ -36,6 +36,7 @@ import { MuteAllModal } from './MuteAllModal';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
+import { useShowStreamingUI } from '../../common/hooks';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
 
@@ -53,7 +54,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MoreSettings = ({ showStreamingUI = false }) => {
+export const MoreSettings = ({}) => {
   const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -68,6 +69,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const showStreamingUI = useShowStreamingUI();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
