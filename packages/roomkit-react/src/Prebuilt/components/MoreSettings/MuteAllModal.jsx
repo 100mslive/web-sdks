@@ -2,10 +2,10 @@ import React, { useCallback, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
 import { Dialog } from '../../../';
-import { DialogContent } from '../../primitives/DialogContent';
-import { useFilteredRoles } from '../../common/hooks';
-import { MuteAllContent } from './MuteAllContent';
 import { Sheet } from '../../../Sheet';
+import { DialogContent } from '../../primitives/DialogContent';
+import { MuteAllContent } from './MuteAllContent';
+import { useFilteredRoles } from '../../common/hooks';
 
 const trackSourceOptions = [
   { label: 'All Track Sources', value: '' },
@@ -50,7 +50,7 @@ export const MuteAllModal = ({ onOpenChange, isMobile = false }) => {
     setSource,
     trackSourceOptions,
     trackTypeOptions,
-    isMobile
+    isMobile,
   };
 
   if (isMobile) {

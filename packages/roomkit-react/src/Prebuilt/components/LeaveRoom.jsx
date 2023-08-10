@@ -9,7 +9,6 @@ import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Sheet } from '../../Sheet';
-import { Text } from '../../Text';
 import { config as cssConfig, styled } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { useHMSPrebuiltContext } from '../AppContext';

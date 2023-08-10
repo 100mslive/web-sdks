@@ -1,10 +1,9 @@
 import { Button } from '../../../Button';
-import { DialogRow } from '../../primitives/DialogContent';
-import { DialogSelect } from '../../primitives/DialogContent';
-import { Text } from '../../../Text';
-import { RadioGroup } from '../../../RadioGroup';
-import { Flex } from '../../../Layout';
 import { Label } from '../../../Label';
+import { Flex } from '../../../Layout';
+import { RadioGroup } from '../../../RadioGroup';
+import { Text } from '../../../Text';
+import { DialogRow, DialogSelect } from '../../primitives/DialogContent';
 
 export const MuteAllContent = props => {
   const roles = props.roles || [];
