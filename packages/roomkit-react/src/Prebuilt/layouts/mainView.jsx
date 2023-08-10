@@ -92,11 +92,12 @@ export const ConferenceMainView = () => {
       !isHLSRunning &&
       joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
     ) {
-      // startHLS();
+      startHLS();
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
-  }, [isConnected, hmsActions, permissions, joinForm, isHLSRunning]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, hmsActions, permissions, joinForm]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
