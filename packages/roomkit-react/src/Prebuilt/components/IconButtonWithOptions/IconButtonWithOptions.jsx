@@ -1,3 +1,4 @@
+import React from 'react';
 import { VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
