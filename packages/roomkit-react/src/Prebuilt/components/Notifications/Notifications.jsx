@@ -59,8 +59,6 @@ export function Notifications() {
               inlineAction: true,
               action: (
                 <Button
-                  as="div"
-                  variant="primary"
                   onClick={() => {
                     ToastManager.removeToast(toastId);
                     window.location.reload();
@@ -81,7 +79,7 @@ export function Notifications() {
           }, 2000);
           return;
         }
-        // Autoplay error or user denied screen share(cancelled browser pop-up)
+        // Autoplay error or user denied screen share (cancelled browser pop-up)
         if (notification.data?.code === 3008 || notification.data?.code === 3001 || notification.data?.code === 3011) {
           return;
         }

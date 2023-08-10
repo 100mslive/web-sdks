@@ -1,5 +1,6 @@
 import React from 'react';
 import { VariantProps } from '@stitches/react';
+import { PersonIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 import { getAvatarBg } from './getAvatarBg';
 import { flexCenter } from '../utils/styles';
@@ -10,7 +11,7 @@ const getAvatarShape = (radii: string) => ({
 
 export const StyledAvatar = styled('div', {
   ...flexCenter,
-  color: '$white',
+  color: '$colors$on_primary_high',
   fontFamily: '$sans',
   aspectRatio: 1,
   fontWeight: 600,
@@ -46,10 +47,14 @@ type Props = VariantProps<typeof StyledAvatar> &
   };
 
 export const Avatar: React.FC<Props> = ({ name, css, ...props }) => {
-  const { initials, color } = getAvatarBg(name);
+  const { initials } = getAvatarBg(name);
+  let { color } = getAvatarBg(name);
+  if (!name) {
+    color = '#7E47EB';
+  }
   return (
     <StyledAvatar css={{ bg: color, ...css }} {...props}>
-      {initials}
+      {initials || <PersonIcon height={40} width={40} />}
     </StyledAvatar>
   );
 };

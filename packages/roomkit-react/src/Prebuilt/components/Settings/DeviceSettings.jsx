@@ -72,6 +72,7 @@ const Settings = ({ setHide }) => {
           />
         </Fragment>
       ) : null}
+
       {audioInput?.length ? (
         <DeviceSelector
           title={shouldShowAudioOutput ? 'Microphone' : 'Audio'}
@@ -86,6 +87,7 @@ const Settings = ({ setHide }) => {
           }
         />
       ) : null}
+
       {audioOutputFiltered?.length && shouldShowAudioOutput ? (
         <DeviceSelector
           title="Speaker"
@@ -128,8 +130,8 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
           css={{
             position: 'relative',
             flex: '1 1 0',
-            w: '100%',
             minWidth: 0,
+            maxWidth: '100%',
             '@md': {
               mb: children ? '$8' : 0,
             },
@@ -138,14 +140,6 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
           <Dropdown.Root open={open} onOpenChange={setOpen}>
             <DialogDropdownTrigger
               ref={ref}
-              css={{
-                ...(children
-                  ? {
-                      flex: '1 1 0',
-                      minWidth: 0,
-                    }
-                  : {}),
-              }}
               icon={icon}
               title={devices.find(({ deviceId }) => deviceId === selection)?.label || 'Select device from list'}
               open={open}

@@ -13,7 +13,7 @@ import { DialogContent } from './DialogContent';
 const Step = ({ value, opacity }) => (
   <Text
     css={{
-      bg: '$mainBg',
+      bg: '$background_dim',
       size: '$12',
       r: '$round',
       mr: '$8',
@@ -30,7 +30,7 @@ const Item = ({ title, description, step, selected, children, onClick }) => {
   return (
     <Box
       css={{
-        bg: '$bgSecondary',
+        bg: '$surface_bright',
         p: '$8',
         my: '$8',
         opacity,
@@ -44,7 +44,9 @@ const Item = ({ title, description, step, selected, children, onClick }) => {
       </Flex>
       {selected && (
         <Fragment>
-          <Text css={{ color: '$textSecondary', my: '$8' }}>{description}</Text>
+          <Text css={{ color: '$on_surface_high', my: '$8' }}>
+            {description}
+          </Text>
           <Box css={{ mb: '$8' }}>{children}</Box>
         </Fragment>
       )}

@@ -102,7 +102,7 @@
     },
     {
       "path": "packages/roomkit-react/dist/index.cjs.js",
-      "limit": "500 KB"
+      "limit": "400 KB"
     },
     {
       "path": "packages/roomkit-react/dist/index.js",

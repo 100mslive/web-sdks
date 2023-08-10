@@ -43,7 +43,7 @@ export const ChangeSelfRole = ({ onClick }) => {
         </Text>
         <ArrowRightIcon />
       </Dropdown.TriggerItem>
-      <Dropdown.SubMenuContent sideOffset={8} alignOffset={-5} css={{ '@md': { w: '$64' } }}>
+      <Dropdown.SubMenuContent sideOffset={8} alignOffset={-5} css={{ py: '$0', '@md': { w: '$64' } }}>
         {availableSelfChangeRoles.map(role => (
           <Dropdown.Item
             key={role}

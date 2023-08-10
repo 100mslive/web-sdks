@@ -1,6 +1,12 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { HMSRoomProvider, selectIsConnectedToRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSReactiveStore,
+  HMSRoomProvider,
+  selectIsConnectedToRoom,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { AppData } from './components/AppData/AppData';
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
 import AuthToken from './components/AuthToken';
@@ -12,14 +18,13 @@ import { Notifications } from './components/Notifications';
 import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider/index.tsx';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
-import { hmsActions, hmsNotifications, hmsStats, hmsStore } from './hms.js';
-import { Confetti } from './plugins/confetti';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
-import { getRoutePrefix, shadeColor } from './common/utils';
+import { getRoutePrefix } from './common/utils';
 import { FeatureFlags } from './services/FeatureFlags';
 
 const Conference = React.lazy(() => import('./components/conference'));
@@ -38,52 +43,77 @@ export const HMSPrebuilt = React.forwardRef(
   (
     {
       roomCode = '',
-      logo: { url: logoUrl = '' } = {},
+      logo,
+      typography,
+      themes,
       options: {
         userName = '',
         userId = '',
-        endPoints: { init: initEndpoint = '', tokenByRoomCode = '', tokenByRoomIdRole = '' } = {},
+        endpoints: {
+          init: initEndpoint = '',
+          tokenByRoomCode: tokenByRoomCodeEndpoint = '',
+          tokenByRoomIdRole: tokenByRoomIdRoleEndpoint = '',
+          roomLayout: roomLayoutEndpoint = '',
+        } = {},
       } = {},
+      screens,
       onLeave,
     },
     ref,
   ) => {
     const aspectRatio = '1-1';
-    const color = '#2F80FF';
-    const theme = 'dark';
     const metadata = '';
-    const recordingUrl = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
+    const reactiveStore = useRef();
 
-    const [hyderated, setHyderated] = React.useState(false);
-    useEffect(() => setHyderated(true), []);
+    const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
-      if (!ref) {
-        return;
-      }
-      ref.current = {
+      setHydrated(true);
+      const hms = new HMSReactiveStore();
+      const hmsStore = hms.getStore();
+      const hmsActions = hms.getActions();
+      const hmsNotifications = hms.getNotifications();
+      const hmsStats = hms.getStats();
+
+      reactiveStore.current = {
         hmsActions,
         hmsStats,
         hmsStore,
         hmsNotifications,
       };
+    }, []);
+
+    useEffect(() => {
+      if (!ref || !reactiveStore.current) {
+        return;
+      }
+
+      ref.current = { ...reactiveStore.current };
     }, [ref]);
 
     // leave room when component unmounts
     useEffect(
       () => () => {
-        return hmsActions.leave();
+        return reactiveStore.current.hmsActions.leave();
       },
       [],
     );
 
-    const endPoints = {
-      tokenByRoomCode,
+    const endpoints = {
+      tokenByRoomCode: tokenByRoomCodeEndpoint,
       init: initEndpoint,
-      tokenByRoomIdRole,
+      tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
+      roomLayout: roomLayoutEndpoint,
     };
 
-    if (!hyderated) {
+    const overrideLayout = {
+      logo,
+      themes,
+      typography,
+      screens,
+    };
+
+    if (!hydrated) {
       return null;
     }
 
@@ -93,58 +123,64 @@ export const HMSPrebuilt = React.forwardRef(
       <ErrorBoundary>
         <HMSPrebuiltContext.Provider
           value={{
-            roomId: '',
-            role: '',
             roomCode,
             showPreview: true,
             showLeave: true,
             onLeave,
             userName,
             userId,
-            endPoints,
+            endpoints,
           }}
         >
-          <HMSThemeProvider
-            themeType={theme}
-            aspectRatio={getAspectRatio({ width, height })}
-            theme={{
-              colors: {
-                brandDefault: color,
-                brandDark: shadeColor(color, -30),
-                brandLight: shadeColor(color, 30),
-                brandDisabled: shadeColor(color, 10),
-              },
-              fonts: {
-                sans: ['Roboto', 'Inter', 'sans-serif'],
-              },
-            }}
+          <HMSRoomProvider
+            isHMSStatsOn={FeatureFlags.enableStatsForNerds}
+            actions={reactiveStore.current.hmsActions}
+            store={reactiveStore.current.hmsStore}
+            notifications={reactiveStore.current.hmsNotifications}
+            stats={reactiveStore.current.hmsStats}
           >
-            <HMSRoomProvider
-              isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-              actions={hmsActions}
-              store={hmsStore}
-              notifications={hmsNotifications}
-              stats={hmsStats}
-            >
-              <AppData
-                appDetails={metadata}
-                recordingUrl={recordingUrl}
-                logo={logoUrl}
-                tokenEndpoint={endPoints.tokenByRoomIdRole}
-              />
-              <Init />
-              <Box
-                css={{
-                  bg: '$mainBg',
-                  size: '100%',
-                  lineHeight: '1.5',
-                  '-webkit-text-size-adjust': '100%',
+            <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
+              <RoomLayoutContext.Consumer>
+                {layout => {
+                  const theme = layout.themes?.[0] || {};
+                  const { typography } = layout;
+                  let fontFamily = ['sans-serif'];
+                  if (typography?.font_family) {
+                    fontFamily = [`${typography?.font_family}`, ...fontFamily];
+                  }
+
+                  return (
+                    <HMSThemeProvider
+                      // issue is with stichtes caching the theme using the theme name / class
+                      // no updates to the themes are fired if the name is same.
+                      // TODO: cache the theme and do deep check to trigger name change in the theme
+                      themeType={`${theme.name}-${Date.now()}`}
+                      aspectRatio={getAspectRatio({ width, height })}
+                      theme={{
+                        colors: theme.palette,
+                        fonts: {
+                          sans: fontFamily,
+                        },
+                      }}
+                    >
+                      <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
+                      <Init />
+                      <Box
+                        css={{
+                          bg: '$background_dim',
+                          size: '100%',
+                          lineHeight: '1.5',
+                          '-webkit-text-size-adjust': '100%',
+                        }}
+                      >
+                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                      </Box>
+                    </HMSThemeProvider>
+                  );
                 }}
-              >
-                <AppRoutes authTokenByRoomCodeEndpoint={endPoints.tokenByRoomCode} />
-              </Box>
-            </HMSRoomProvider>
-          </HMSThemeProvider>
+              </RoomLayoutContext.Consumer>
+            </RoomLayoutProvider>
+          </HMSRoomProvider>
         </HMSPrebuiltContext.Provider>
       </ErrorBoundary>
     );
@@ -179,7 +215,7 @@ const RouteList = () => {
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -187,7 +223,7 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress />}>
+              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -198,7 +234,7 @@ const RouteList = () => {
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -206,7 +242,7 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress />}>
+            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -218,6 +254,7 @@ const RouteList = () => {
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
+
       <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
     </Routes>
@@ -258,7 +295,6 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }) {
       <ToastContainer />
       <Notifications />
       <BackSwipe />
-      <Confetti />
       <FlyingEmoji />
       <RemoteStopScreenshare />
       <KeyboardHandler />

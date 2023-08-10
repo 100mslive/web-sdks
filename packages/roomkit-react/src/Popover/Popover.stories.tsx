@@ -35,11 +35,11 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
             aspectRatio: 1,
             r: '$round',
             p: '$2 $2',
-            bg: '$bgPrimary',
-            '&:hover': { bg: '$bgSecondary !important' },
+            bg: '$background_default',
+            '&:hover': { bg: '$background_dim !important' },
           }}
         >
-          <Box css={{ w: '$10', h: '$10', c: '$textPrimary' }}>
+          <Box css={{ w: '$10', h: '$10', c: '$on_primary_high' }}>
             <VerticalMenuIcon />
           </Box>
         </Button>
@@ -47,10 +47,10 @@ const Template: ComponentStory<typeof Popover.Root> = () => (
       <Popover.Content align="center" side="bottom" sideOffset={10}>
         <Flex css={{ flexDirection: 'column', gap: 10 }} justify="center" align="center">
           <Flex direction="row" justify="between" css={{ width: '100%' }}>
-            <Text as="div" variant="caption" css={{ color: '$textMedEmp' }}>
+            <Text as="div" variant="caption" css={{ color: '$on_surface_medium' }}>
               Dimensions
             </Text>
-            <Box css={{ color: '$textMedEmp' }}>
+            <Box css={{ color: '$on_surface_medium' }}>
               <CrossIcon width="0.75rem" height="0.75rem" />
             </Box>
           </Flex>

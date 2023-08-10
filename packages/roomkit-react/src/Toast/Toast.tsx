@@ -38,13 +38,13 @@ const getToastVariant = (base: string) => {
 
 const ToastRoot = styled(ToastPrimitives.Root, {
   r: '$3',
-  bg: '$surfaceDefault',
+  bg: '$surface_default',
   p: '$10',
   display: 'flex',
   flexDirection: 'column',
   position: 'relative',
   fontFamily: '$sans',
-  border: 'solid $space$px $borderLight',
+  border: 'solid $space$px $border_bright',
   overflow: 'hidden',
   ...toastAnimation,
   '@sm': {
@@ -52,10 +52,10 @@ const ToastRoot = styled(ToastPrimitives.Root, {
   },
   variants: {
     variant: {
-      standard: getToastVariant('$secondaryDefault'),
-      warning: getToastVariant('$warning'),
-      error: getToastVariant('$error'),
-      success: getToastVariant('$success'),
+      standard: getToastVariant('$secondary_default'),
+      warning: getToastVariant('$alert_warning'),
+      error: getToastVariant('$alert_error_default'),
+      success: getToastVariant('$alert_success'),
     },
   },
   defaultVariants: {
@@ -65,18 +65,19 @@ const ToastRoot = styled(ToastPrimitives.Root, {
 
 const ToastTitle = styled(ToastPrimitives.Title, {
   fontSize: '$md',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
   fontWeight: '$semiBold',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
 });
 const ToastDescription = styled(ToastPrimitives.Description, {
-  color: '$textMedEmp',
+  color: '$on_surface_medium',
 });
 const ToastClose = styled(ToastPrimitives.Close, {});
 const ToastAction = styled(ToastPrimitives.Action, {
   cursor: 'pointer',
+  background: 'none',
 });
 const ToastViewport = styled(ToastPrimitives.Viewport, {
   position: 'fixed',
@@ -142,7 +143,7 @@ const HMSToast: React.FC<HMSToastProps> = ({
         </ToastTitle>
         {description ? (
           <ToastDescription>
-            <Text variant="body1" css={{ fontWeight: '$regular', c: '$textMedEmp' }}>
+            <Text variant="body1" css={{ fontWeight: '$regular', c: '$on_surface_medium' }}>
               {description}
             </Text>
           </ToastDescription>

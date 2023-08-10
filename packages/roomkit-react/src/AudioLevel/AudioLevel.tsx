@@ -9,7 +9,7 @@ import { useTheme } from '../Theme';
  */
 export function useBorderAudioLevel(audioTrackId?: HMSTrackID) {
   const { theme } = useTheme();
-  const color = theme.colors.brandDefault.value;
+  const color = theme.colors.primary_default.value;
   const getStyle = useCallback(
     (level: number) => {
       const style: Record<string, string> = {

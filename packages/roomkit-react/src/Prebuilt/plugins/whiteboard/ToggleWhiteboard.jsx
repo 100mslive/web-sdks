@@ -25,9 +25,7 @@ export const ToggleWhiteboard = () => {
 
   return (
     <Tooltip
-      title={`${
-        whiteboardActive ? (amIWhiteboardOwner ? `Stop whiteboard` : `Can't stop whiteboard`) : 'Start whiteboard'
-      }`}
+      title={whiteboardActive ? (amIWhiteboardOwner ? `Stop whiteboard` : `Can't stop whiteboard`) : 'Start whiteboard'}
       key="whiteboard"
     >
       <IconButton

@@ -7,14 +7,24 @@ export default {
   component: HMSPrebuilt,
   argTypes: {
     roomCode: { control: { type: 'text' }, defaultValue: 'tsj-obqh-lwx' },
+    logo: { control: { type: 'object' }, defaultValue: undefined },
+    typography: { control: { type: 'object' }, defaultValue: 'Roboto' },
   },
 } as Meta<typeof HMSPrebuilt>;
 
-const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', logo }) => {
-  return <HMSPrebuilt roomCode={roomCode} logo={logo} />;
+const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', logo, themes, typography, options }) => {
+  return <HMSPrebuilt roomCode={roomCode} logo={logo} options={options} themes={themes} typography={typography} />;
 };
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 Example.args = {
   roomCode: 'tsj-obqh-lwx',
+  options: {
+    endpoints: {
+      roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
+    },
+  },
+  typography: {
+    font_family: 'Roboto',
+  },
 };

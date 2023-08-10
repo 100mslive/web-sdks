@@ -19,7 +19,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
         asChild
         data-testid="participant_list_filter"
         css={{
-          border: '1px solid $textDisabled',
+          border: '1px solid $on_surface_low',
           r: '$0',
           p: '$2 $4',
         }}
@@ -29,7 +29,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
           <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || 'Everyone'}
           </Text>
-          <Box css={{ ml: '$2', color: '$textDisabled' }}>
+          <Box css={{ ml: '$2', color: '$on_surface_low' }}>
             {open ? <ChevronUpIcon width={14} height={14} /> : <ChevronDownIcon width={14} height={14} />}
           </Box>
         </Flex>

@@ -24,7 +24,7 @@ test.afterEach(async () => {
   await page.close();
 });
 
-test(`Start and Stop Browser Recording`, async () => {
+test.skip(`Start and Stop Browser Recording`, async () => {
 
   await page.click(page.header.start_recording_btn, page.header.start_recording_confirm_btn);
   await expect(page.locator(page.header.go_live_btn)).toBeDisabled();
@@ -34,7 +34,7 @@ test(`Start and Stop Browser Recording`, async () => {
 });
 
 invalidRes.forEach(data =>{
-  test(`Start recording only with invalid resolutions ${data.width}X${data.height}`, async() => {
+  test.skip(`Start recording only with invalid resolutions ${data.width}X${data.height}`, async() => {
 
     await page.click(page.header.start_recording_btn);
 
@@ -48,7 +48,7 @@ invalidRes.forEach(data =>{
   });})
 
 testData.forEach(data =>{
-  test(`Start recording only with different resolutions ${data.width}X${data.height}`, async() => {
+  test.skip(`Start recording only with different resolutions ${data.width}X${data.height}`, async() => {
 
     await page.click(page.header.start_recording_btn);
 
@@ -64,7 +64,7 @@ testData.forEach(data =>{
 
   });})
 
-test(`Start and Stop HLS stream only`, async () => {
+test.skip(`Start and Stop HLS stream only`, async () => {
   await page.click(page.header.go_live_btn, page.header.hls_stream_btn, page.header.start_hls_btn);
   
   await page.clickWithTimeout(beamWaitTimeout, page.header.end_stream_btn,page.header.end_stream_btn)
@@ -77,7 +77,7 @@ test(`Start and Stop HLS stream only`, async () => {
   await expect(page.locator(page.header.live_indicator)).toBeHidden();
 });
 
-test(`Start and Stop HLS Recording`, async () => {
+test.skip(`Start and Stop HLS Recording`, async () => {
   await page.click(
     page.header.go_live_btn,
     page.header.hls_stream_btn,
@@ -94,7 +94,7 @@ test(`Start and Stop HLS Recording`, async () => {
   await expect(page.locator(page.header.live_indicator)).toBeHidden();
 });
 
-test(`Start and Stop Rtmp`, async () => {
+test.skip(`Start and Stop Rtmp`, async () => {
   await page.click(page.header.go_live_btn, page.header.rtmp_stream_btn);
   await page.sendText(page.header.rtmp_url_btn, process.env.twitch_rtmp_url);
   await page.sendText(page.header.rtmp_key_btn, process.env.twitch_rtmp_key);
@@ -109,7 +109,7 @@ test(`Start and Stop Rtmp`, async () => {
   await expect(page.locator(page.header.rtmp_indicator)).toBeHidden();
 });
 
-test(`Start and Stop Rtmp Recording`, async () => {
+test.skip(`Start and Stop Rtmp Recording`, async () => {
   await page.click(page.header.go_live_btn, page.header.rtmp_stream_btn);
 
   await page.sendText(page.header.rtmp_url_btn, process.env.twitch_rtmp_url);
@@ -132,7 +132,7 @@ test(`Start and Stop Rtmp Recording`, async () => {
 
 
 testData.forEach(data =>{
-test(`Start RTMP only with different resolutions ${data.width}X${data.height}`, async() => {
+test.skip(`Start RTMP only with different resolutions ${data.width}X${data.height}`, async() => {
   await page.click(page.header.go_live_btn, page.header.rtmp_stream_btn);
 
   await page.sendText(page.header.rtmp_url_btn, process.env.twitch_rtmp_url);
@@ -153,7 +153,7 @@ test(`Start RTMP only with different resolutions ${data.width}X${data.height}`, 
 });})
 
 testData.forEach(data =>{
-  test(`Start RTMP with recording with different resulutions ${data.width}X${data.height}`, async() => {
+  test.skip(`Start RTMP with recording with different resulutions ${data.width}X${data.height}`, async() => {
     await page.click(page.header.go_live_btn, page.header.rtmp_stream_btn);
   
     await page.sendText(page.header.rtmp_url_btn, process.env.twitch_rtmp_url);

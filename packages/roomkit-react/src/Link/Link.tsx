@@ -12,15 +12,15 @@ const LinkComponent = styled('a', {
   variants: {
     color: {
       highEmp: {
-        color: '$textHighEmp',
+        color: '$on_surface_high',
         '&:hover': {
-          color: '$textMedEmp',
+          color: '$on_surface_medium',
         },
       },
       primary: {
-        color: '$primaryLight',
+        color: '$primary_default',
         '&:hover': {
-          color: '$primaryDefault',
+          color: '$primary_bright',
         },
       },
     },

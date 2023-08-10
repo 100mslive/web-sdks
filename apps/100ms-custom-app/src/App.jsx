@@ -219,7 +219,7 @@ const App = () => {
   return (
     <Flex
       direction="column"
-      css={{ size: '100%', overflowY: 'hidden', bg: '$mainBg' }}
+      css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
     >
       {error && (
         <Suspense fallback={null}>
@@ -259,7 +259,6 @@ const App = () => {
                 (settings.theme === 'dark' ? logoDark : logoLight),
               headerPresent: String(!!getAuthInfo().userEmail),
               metadata: settings.metadataFields.metadata,
-              recordingUrl: settings.recording_url,
             }}
             authTokenByRoomCodeEndpoint={getAuthTokenByRoomCodeEndpoint()}
             getDetails={fetchData}

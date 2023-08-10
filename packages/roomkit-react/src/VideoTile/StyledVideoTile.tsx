@@ -18,7 +18,7 @@ const Container = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  background: '$tileBg',
+  background: '$background_default',
   variants: {
     transparentBg: {
       true: {
@@ -40,7 +40,7 @@ const Overlay = styled('div', {
 });
 
 const Info = styled('div', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   position: 'absolute',
   bottom: '5px',
   left: '50%',
@@ -56,18 +56,18 @@ const Info = styled('div', {
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  color: '$textPrimary',
+  color: '$on_primary_high',
 });
 
 const AudioIndicator = styled('div', {
   position: 'absolute',
-  top: '$2',
-  right: '$2',
-  color: '$white',
-  bg: '$error',
+  top: '$4',
+  right: '$4',
+  color: '$on_primary_high',
+  bg: '$secondary_dim',
   borderRadius: '$round',
-  width: '$13',
-  height: '$13',
+  width: '$14',
+  height: '$14',
   mb: '5px',
   ...flexCenter,
   variants: {
@@ -94,9 +94,9 @@ const AudioIndicator = styled('div', {
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
-  color: '$textHighEmp',
+  color: '$on_surface_high',
   borderRadius: '$round',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_default',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -106,7 +106,7 @@ const FullScreenButton = styled('button', {
   zIndex: 5,
   '&:not([disabled]):focus': {
     outline: 'none',
-    boxShadow: '0 0 0 3px $colors$brandLight',
+    boxShadow: '0 0 0 3px $colors$primary_bright',
   },
 });
 

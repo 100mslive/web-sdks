@@ -71,6 +71,7 @@ export const VirtualBackground = () => {
 
   return (
     <Tooltip
+      boxCss={{ zIndex: '100' }}
       title={isVBLoading ? 'Adding virtual background' : `Turn ${!isVBPresent ? 'on' : 'off'} virtual background`}
     >
       <IconButton

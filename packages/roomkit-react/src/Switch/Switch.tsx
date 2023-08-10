@@ -6,14 +6,14 @@ const SwitchRoot = styled(BaseSwitch.Root, {
   all: 'unset',
   width: '30px',
   height: '14px',
-  border: 'solid $space$px $secondaryDefault',
+  border: 'solid $space$px $secondary_default',
   borderRadius: '$3',
   p: '$2',
   position: 'relative',
   cursor: 'pointer',
   '&[data-state="checked"]': {
-    backgroundColor: '$primaryDefault',
-    border: 'solid $space$px $primaryDefault',
+    backgroundColor: '$primary_default',
+    border: 'solid $space$px $primary_default',
   },
   '&:focus': {
     outline: 'none',
@@ -30,14 +30,14 @@ const SwitchThumb = styled(BaseSwitch.Thumb, {
   position: 'absolute',
   width: '$md',
   height: '$md',
-  backgroundColor: '$secondaryDefault',
+  backgroundColor: '$secondary_default',
   borderRadius: '$round',
   transition: 'right 500ms ease-in',
   left: '$2',
   '&[data-state="checked"]': {
     left: 'unset',
     right: '$2',
-    backgroundColor: '$textAccentHigh',
+    backgroundColor: '$on_primary_high',
   },
 });
 

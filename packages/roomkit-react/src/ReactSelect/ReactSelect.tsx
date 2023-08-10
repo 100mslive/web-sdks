@@ -12,8 +12,8 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger, {
   padding: '$8',
   lineHeight: '$px',
   gap: '$8',
-  backgroundColor: '$secondaryDefault',
-  color: '$white',
+  backgroundColor: '$secondary_default',
+  color: '$on_primary_high',
   fontSize: '$8',
   cursor: 'pointer',
   r: '$1',
@@ -21,7 +21,7 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger, {
 
 const StyledContent = styled(SelectPrimitive.Content, {
   overflow: 'hidden',
-  backgroundColor: '$surfaceLight',
+  backgroundColor: '$surface_bright',
   r: '$1',
   h: '$80',
 });
@@ -45,12 +45,12 @@ const StyledItem = styled(SelectPrimitive.Item, {
 const StyledLabel = styled(SelectPrimitive.Label, {
   p: '$4 $8',
   lineHeight: '$10',
-  color: '$white',
+  color: '$on_primary_high',
 });
 
 const StyledSeparator = styled(SelectPrimitive.Separator, {
   height: '$px',
-  backgroundColor: '$white',
+  backgroundColor: '$on_primary_high',
   margin: '$4',
   opacity: 0.4,
 });
@@ -62,7 +62,7 @@ const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator, {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '$white',
+  color: '$on_primary_high',
 });
 
 const scrollButtonStyles = {
@@ -70,8 +70,8 @@ const scrollButtonStyles = {
   alignItems: 'center',
   justifyContent: 'center',
   p: '$4',
-  backgroundColor: '$surfaceLight',
-  color: '$white',
+  backgroundColor: '$surface_bright',
+  color: '$on_primary_high',
   cursor: 'default',
 };
 

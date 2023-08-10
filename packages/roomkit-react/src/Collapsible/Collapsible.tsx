@@ -11,7 +11,7 @@ const CollapsibleTrigger = styled(Trigger, {
     outline: 'none',
   },
   '&:focus-visible': {
-    boxShadow: '0 0 0 3px $colors$primaryDefault',
+    boxShadow: '0 0 0 3px $colors$primary_default',
   },
 });
 

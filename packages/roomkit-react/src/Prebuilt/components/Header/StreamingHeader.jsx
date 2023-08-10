@@ -4,11 +4,11 @@ import { config as cssConfig, Flex } from '../../../';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import MetaActions from '../MetaActions';
-import { Logo, SpeakerTag } from './HeaderComponents';
+import { SpeakerTag } from './HeaderComponents';
 import { ParticipantCount } from './ParticipantList';
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
-export const StreamingHeader = ({ isPreview }) => {
+export const StreamingHeader = () => {
   const isMobile = useMedia(cssConfig.media.md);
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
@@ -19,15 +19,14 @@ export const StreamingHeader = ({ isPreview }) => {
           left: '$10',
         }}
       >
-        <Logo />
-        {isMobile && (
+        {isMobile ? (
           <Flex align="center" gap={2}>
             <LeaveRoom />
             <LiveStatus />
             <RecordingStatus />
           </Flex>
-        )}
-        {!isPreview ? <SpeakerTag /> : null}
+        ) : null}
+        <SpeakerTag />
       </Flex>
 
       <Flex

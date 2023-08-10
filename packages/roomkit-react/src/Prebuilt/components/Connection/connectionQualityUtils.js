@@ -23,17 +23,17 @@ export const getTooltipText = connectionScore => {
  * @param connectionScore -> 0 to 5, 0 means disconnected
  * @param defaultColor -> color for components not taking the connection color
  */
-export const getColor = (position, connectionScore, defaultColor) => {
+export const getColor = (position, connectionScore, defaultColor, theme) => {
   const shouldBeColored = position <= connectionScore;
   if (!shouldBeColored) {
     return defaultColor;
   }
   if (connectionScore >= 4) {
-    return '#37F28D';
+    return theme.colors.alert_success;
   } else if (connectionScore >= 3) {
-    return '#FAC919';
+    return theme.colors.alert_warning;
   } else if (connectionScore >= 1) {
-    return '#ED4C5A';
+    return theme.colors.alert_default;
   }
   return defaultColor;
 };

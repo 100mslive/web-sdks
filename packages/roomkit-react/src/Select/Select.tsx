@@ -3,13 +3,13 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { styled } from '../Theme';
 
 const Root = styled('div', {
-  color: '$textPrimary',
+  color: '$on_primary_high',
   display: 'inline-flex',
   position: 'relative',
   outline: 'none',
   overflow: 'hidden',
   borderRadius: '$1',
-  backgroundColor: '$menuBg',
+  backgroundColor: '$surface_default',
   maxWidth: '100%',
 });
 
@@ -21,15 +21,15 @@ const SelectRoot = styled('select', {
   lineHeight: 'inherit',
   textTransform: 'none',
   appearance: 'none',
-  color: '$textAccentHigh',
+  color: '$on_secondary_high',
   padding: '5px',
   paddingLeft: '12px',
   paddingRight: '30px',
   border: 'none',
   borderRadius: '8px',
-  backgroundColor: '$secondaryDefault',
+  backgroundColor: '$secondary_default',
   '&:not([disabled]):focus-visible': {
-    boxShadow: '0 0 0 3px $colors$brandDefault',
+    boxShadow: '0 0 0 3px $colors$primary_default',
   },
   '&[disabled]': {
     opacity: 0.5,
@@ -38,7 +38,7 @@ const SelectRoot = styled('select', {
 });
 
 const Arrow = styled('span', {
-  color: '$textAccentMedium',
+  color: '$on_secondary_high',
   width: '30px',
   height: '100%',
   position: 'absolute',

@@ -1,8 +1,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import { Box, Flex, Loading } from '../../../';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import { Box, Flex } from '../../../';
 import SidePane from '../../layouts/SidePane';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
+import FullPageProgress from '../FullPageProgress';
 import { Header } from '../Header';
 import PreviewJoin from './PreviewJoin';
 import { useAuthToken } from '../AppData/useUISettings';
@@ -17,6 +20,11 @@ const PreviewContainer = () => {
   const initialName = useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? 'Beam' : '');
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const authToken = useAuthToken();
+  const roomLayout = useRoomLayout();
+  const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+
+  const roomState = useHMSStore(selectRoomState);
+  const isPreview = roomState === HMSRoomState.Preview;
 
   const onJoin = () => {
     let meetingURL = `/meeting/${urlRoomId}`;
@@ -27,14 +35,20 @@ const PreviewContainer = () => {
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <Box css={{ h: '$18', '@md': { h: '$17', flexShrink: 0 } }} data-testid="header">
-        <Header />
-      </Box>
-      <Flex css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto' }} justify="center" align="center">
-        {authToken ? (
+      {isPreview ? null : (
+        <Box css={{ h: '$18', '@md': { h: '$17', flexShrink: 0 } }} data-testid="header">
+          <Header />
+        </Box>
+      )}
+      <Flex
+        css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primary_default' }}
+        justify="center"
+        align="center"
+      >
+        {authToken && Object.keys(previewHeader).length > 0 ? (
           <PreviewJoin initialName={initialName} skipPreview={skipPreview} asRole={previewAsRole} onJoin={onJoin} />
         ) : (
-          <Loading size={100} />
+          <FullPageProgress />
         )}
         <SidePane
           css={{

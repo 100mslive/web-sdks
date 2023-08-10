@@ -74,7 +74,7 @@ const initialAppData = {
   [APP_DATA.authToken]: '',
 };
 
-export const AppData = React.memo(({ appDetails, logo, recordingUrl, tokenEndpoint }) => {
+export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const sidePane = useSidepaneState();
@@ -93,6 +93,11 @@ export const AppData = React.memo(({ appDetails, logo, recordingUrl, tokenEndpoi
 
   useEffect(() => {
     hmsActions.initAppData(initialAppData);
+    hmsActions.setFrameworkInfo({
+      type: 'react-web',
+      isPrebuilt: true,
+      version: React.version,
+    });
   }, [hmsActions]);
 
   useEffect(() => {
@@ -108,16 +113,14 @@ export const AppData = React.memo(({ appDetails, logo, recordingUrl, tokenEndpoi
 
   useEffect(() => {
     const appData = {
-      [APP_DATA.recordingUrl]: recordingUrl,
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
-      [APP_DATA.logo]: logo,
       [APP_DATA.hlsViewerRole]: getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] || DEFAULT_HLS_VIEWER_ROLE,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     for (const key in appData) {
       hmsActions.setAppData([key], appData[key]);
     }
-  }, [appDetails, logo, recordingUrl, tokenEndpoint, hmsActions]);
+  }, [appDetails, tokenEndpoint, hmsActions]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {

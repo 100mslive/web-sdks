@@ -12,7 +12,7 @@ export const NonPublisherView = React.memo(({ message }) => {
         maxWidth: '96%',
         h: '100%',
         m: 'auto',
-        background: '$surfaceDefault',
+        background: '$surface_default',
         borderRadius: '$3',
       }}
       data-testid="non_publisher_view"
@@ -41,7 +41,7 @@ export const NonPublisherView = React.memo(({ message }) => {
           <Text color="white" variant="h6" css={{ '@md': { fontSize: '$md' } }}>
             {message}
           </Text>
-          <Text color="$textMedEmp" css={{ mt: '$4', '@md': { fontSize: '$sm' } }}>
+          <Text color="$on_surface_medium" css={{ mt: '$4', '@md': { fontSize: '$sm' } }}>
             Please go to dashboard and reconfigure role settings or contact the role admin.
           </Text>
         </Flex>
