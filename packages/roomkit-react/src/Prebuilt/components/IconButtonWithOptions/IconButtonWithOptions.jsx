@@ -45,13 +45,12 @@ export const IconButtonWithOptions = ({
   onClick = () => {
     return;
   },
-  key = '',
 }) => {
   const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
   const iconCss = { color: active ? '$on_surface_high' : '$on_primary_high' };
   return (
     <Flex>
-      <IconSection css={bgCss} onClick={onClick} key={key}>
+      <IconSection css={bgCss} onClick={onClick}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Flex align="center" justify="center" css={iconCss}>
             {icon}
