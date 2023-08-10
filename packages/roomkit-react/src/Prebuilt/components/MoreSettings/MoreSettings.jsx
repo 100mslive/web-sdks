@@ -175,7 +175,10 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
           <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />
         )}
         {openModals.has(MODALS.CHANGE_NAME) && (
-          <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
+          <ChangeNameModal
+            onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
+            openParentSheet={() => setOpenSettingsSheet(true)}
+          />
         )}
       </>
     );
