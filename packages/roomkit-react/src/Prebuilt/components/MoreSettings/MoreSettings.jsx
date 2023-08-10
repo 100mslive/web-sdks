@@ -12,6 +12,7 @@ import {
 import {
   BrbIcon,
   CheckIcon,
+  CrossIcon,
   DragHandleIcon,
   HandIcon,
   InfoIcon,
@@ -37,9 +38,11 @@ import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
 import { FeatureFlags } from '../../services/FeatureFlags';
-import { APP_DATA, FEATURE_LIST, isAndroid, isIOS, isMacOS } from '../../common/constants';
-
-const isMobileOS = isAndroid || isIOS;
+import { APP_DATA, FEATURE_LIST, isMacOS } from '../../common/constants';
+import { useMedia } from 'react-use';
+import { config as cssConfig } from '../../../';
+import { Sheet } from '../../../Sheet';
+import { ActionTile } from './ActionTile';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -68,6 +71,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -82,6 +86,97 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
       return copy;
     });
   };
+  const isMobile = useMedia(cssConfig.media.md);
+
+  if (isMobile) {
+    return (
+      <>
+        <Sheet.Root open={openSettingsSheet} onOpenChange={setOpenSettingsSheet}>
+          <Sheet.Trigger asChild data-testid="more_settings_btn">
+            <IconButton>
+              <Tooltip title="More options">
+                <Box>
+                  <DragHandleIcon />
+                </Box>
+              </Tooltip>
+            </IconButton>
+          </Sheet.Trigger>
+          <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
+            <Sheet.Title
+              css={{
+                display: 'flex',
+                color: '$on_surface_high',
+                w: '100%',
+                justifyContent: 'space-between',
+                fontSize: '$md',
+                mt: '$8',
+                px: '$10',
+                pb: '$8',
+                borderBottom: '1px solid $border_default',
+                mb: '$8',
+              }}
+            >
+              Options
+              <Sheet.Close>
+                <Box css={{ color: '$on_surface_high' }}>
+                  <CrossIcon />
+                </Box>
+              </Sheet.Close>
+            </Sheet.Title>
+            <Box
+              css={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr 1fr',
+                gridTemplateRows: 'auto',
+                gridColumnGap: '$6',
+                gridRowGap: '$8',
+                px: '$9',
+              }}
+            >
+              {isHandRaiseEnabled ? (
+                <ActionTile
+                  title="Raise Hand"
+                  icon={<HandIcon />}
+                  onClick={toggleHandRaise}
+                  active={isHandRaised}
+                  setOpenSettingsSheet={setOpenSettingsSheet}
+                />
+              ) : null}
+              {isBRBEnabled ? (
+                <ActionTile
+                  title="Be Right Back"
+                  icon={<BrbIcon />}
+                  onClick={toggleBRB}
+                  active={isBRBOn}
+                  setOpenSettingsSheet={setOpenSettingsSheet}
+                />
+              ) : null}
+              {permissions.mute ? (
+                <ActionTile
+                  title="Mute All"
+                  icon={<MicOffIcon />}
+                  onClick={() => updateState(MODALS.MUTE_ALL, true)}
+                  setOpenSettingsSheet={setOpenSettingsSheet}
+                />
+              ) : null}
+              <ActionTile
+                title="Change Name"
+                icon={<PencilIcon />}
+                onClick={() => updateState(MODALS.CHANGE_NAME, true)}
+                setOpenSettingsSheet={setOpenSettingsSheet}
+              />
+            </Box>
+          </Sheet.Content>
+        </Sheet.Root>
+        {openModals.has(MODALS.MUTE_ALL) && (
+          <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />
+        )}
+        {openModals.has(MODALS.CHANGE_NAME) && (
+          <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
+        )}
+      </>
+    );
+  }
 
   return (
     <Fragment>
@@ -112,10 +207,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
           }}
         >
           {isHandRaiseEnabled && !showStreamingUI ? (
-            <Dropdown.Item
-              onClick={toggleHandRaise}
-              data-testid={isMobileOS ? 'raise_hand_btn_mobile' : 'raise_hand_btn'}
-            >
+            <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
                 Raise Hand
@@ -209,11 +301,10 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                     <Text variant="sm" css={{ ml: '$4' }}>
                       Show HLS Stats
                     </Text>
-                    {!isMobileOS ? (
-                      <Text variant="sm" css={{ ml: '$4' }}>
-                        {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
-                      </Text>
-                    ) : null}
+
+                    <Text variant="sm" css={{ ml: '$4' }}>
+                      {`${isMacOS ? '⌘' : 'ctrl'} + ]`}
+                    </Text>
                   </Flex>
                 </Dropdown.Item>
               ) : null
@@ -237,6 +328,9 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
       {openModals.has(MODALS.CHANGE_NAME) && (
         <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
       )}
+      {openModals.has(MODALS.START_RECORDING) && (
+        <StartRecording open onOpenChange={value => updateState(MODALS.START_RECORDING, value)} />
+      )}
       {openModals.has(MODALS.DEVICE_SETTINGS) && (
         <SettingsModal open onOpenChange={value => updateState(MODALS.DEVICE_SETTINGS, value)} />
       )}
@@ -245,9 +339,6 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
       )}
       {openModals.has(MODALS.SELF_ROLE_CHANGE) && (
         <RoleChangeModal peerId={localPeerId} onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)} />
-      )}
-      {openModals.has(MODALS.START_RECORDING) && (
-        <StartRecording open onOpenChange={value => updateState(MODALS.START_RECORDING, value)} />
       )}
       {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
