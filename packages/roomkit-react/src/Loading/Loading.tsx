@@ -15,7 +15,7 @@ type LoadingProps = Props & React.SVGProps<SVGSVGElement>;
 
 export const Loading = ({ size = 24, color = 'white', ...props }: LoadingProps) => (
   <svg width={size} height={size} viewBox="0 0 50 50" fill={color} xmlns="http://www.w3.org/2000/svg" {...props}>
-    <circle cx="25" cy="25" r="20" stroke="#0074D9" stroke-width="4" stroke-dasharray="70 30" fill="none">
+    <circle cx="25" cy="25" r="20" stroke={color} strokeWidth="4" strokeDasharray="70 30" fill="none">
       <animateTransform
         attributeName="transform"
         attributeType="XML"

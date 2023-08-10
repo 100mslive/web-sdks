@@ -8,6 +8,7 @@ export default {
   argTypes: {
     roomCode: { control: { type: 'text' }, defaultValue: 'tsj-obqh-lwx' },
     logo: { control: { type: 'object' }, defaultValue: undefined },
+    typography: { control: { type: 'object' }, defaultValue: 'Roboto' },
   },
 } as Meta<typeof HMSPrebuilt>;
 
@@ -22,5 +23,8 @@ Example.args = {
     endpoints: {
       roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
     },
+  },
+  typography: {
+    font_family: 'Roboto',
   },
 };
