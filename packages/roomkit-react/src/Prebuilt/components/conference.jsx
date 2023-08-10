@@ -137,6 +137,7 @@ const Conference = () => {
           w: '100%',
           flex: '1 1 0',
           minHeight: 0,
+          px: '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
         id="conferencing"
