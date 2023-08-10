@@ -37,7 +37,7 @@ export const MwebLeaveRoom = ({ LeaveIconButton, endRoom, leaveRoom }) => {
               }}
             >
               <Tooltip title="Leave Room">
-                {!showStreamingUI ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}
+                <Box>{!showStreamingUI ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
