@@ -157,6 +157,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                   icon={<MicOffIcon />}
                   onClick={() => updateState(MODALS.MUTE_ALL, true)}
                   setOpenSettingsSheet={setOpenSettingsSheet}
+                  disabled
                 />
               ) : null}
               <ActionTile
