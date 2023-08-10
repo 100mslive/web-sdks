@@ -139,7 +139,6 @@ export function EqualProminence() {
                 display: 'grid',
                 gridTemplateColumns: `repeat(${grid.length}, 1fr)`,
                 gap: '$4',
-                flex: '1 1 0',
                 minHeight: 0,
               }}
             >
