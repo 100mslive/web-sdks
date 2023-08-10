@@ -1,4 +1,4 @@
-import { Box, Flex } from '../../../Layout';
+import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
 export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenSettingsSheet: setSheet }) => {

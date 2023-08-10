@@ -7,7 +7,7 @@ const Root = styled(Flex, {
   py: '$4',
   position: 'relative',
   height: '100%',
-  '@md': { flexWrap: 'wrap', gap: '$4' },
+  '@md': { flexWrap: 'wrap', gap: '$10' },
 });
 
 const Left = styled(Flex, {
@@ -19,6 +19,7 @@ const Left = styled(Flex, {
     position: 'unset',
     justifyContent: 'center',
     w: '100%',
+    gap: '$10',
   },
 });
 
@@ -27,6 +28,9 @@ const Center = styled(Flex, {
   justifyContent: 'center',
   alignItems: 'center',
   gap: '$8',
+  '@md': {
+    gap: '$10',
+  },
 });
 
 const Right = styled(Flex, {
@@ -36,6 +40,7 @@ const Right = styled(Flex, {
   gap: '$8',
   '@md': {
     display: 'none',
+    gap: '$10',
   },
 });
 

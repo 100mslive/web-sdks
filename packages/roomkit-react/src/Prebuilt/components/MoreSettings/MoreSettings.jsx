@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { useMedia } from 'react-use';
 import Hls from 'hls.js';
 import {
   selectAppData,
@@ -21,13 +22,15 @@ import {
   PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Box, Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../';
+import { Box, Checkbox, config as cssConfig, Dropdown, Flex, Text, Tooltip } from '../../../';
+import { Sheet } from '../../../Sheet';
 import IconButton from '../../IconButton';
 import { PIP } from '../PIP';
 import { RoleChangeModal } from '../RoleChangeModal';
 import SettingsModal from '../Settings/SettingsModal';
 import StartRecording from '../Settings/StartRecording';
 import { StatsForNerds } from '../StatsForNerds';
+import { ActionTile } from './ActionTile';
 import { BulkRoleChangeModal } from './BulkRoleChangeModal';
 import { ChangeNameModal } from './ChangeNameModal';
 import { ChangeSelfRole } from './ChangeSelfRole';
@@ -39,10 +42,8 @@ import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
 import { FeatureFlags } from '../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../common/constants';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../';
-import { Sheet } from '../../../Sheet';
-import { ActionTile } from './ActionTile';
+
+const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -114,6 +115,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                 pb: '$8',
                 borderBottom: '1px solid $border_default',
                 mb: '$8',
+                alignItems: 'center',
               }}
             >
               Options
@@ -157,7 +159,6 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                   icon={<MicOffIcon />}
                   onClick={() => updateState(MODALS.MUTE_ALL, true)}
                   setOpenSettingsSheet={setOpenSettingsSheet}
-                  disabled
                 />
               ) : null}
               <ActionTile
@@ -166,6 +167,7 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                 onClick={() => updateState(MODALS.CHANGE_NAME, true)}
                 setOpenSettingsSheet={setOpenSettingsSheet}
               />
+              <VirtualBackground asActionTile />
             </Box>
           </Sheet.Content>
         </Sheet.Root>

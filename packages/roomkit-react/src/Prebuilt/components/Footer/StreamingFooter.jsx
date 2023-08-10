@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { config as cssConfig, Footer as AppFooter } from '../../../';
+import { config as cssConfig, Flex, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';

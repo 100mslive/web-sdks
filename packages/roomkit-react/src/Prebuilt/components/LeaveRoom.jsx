@@ -74,7 +74,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
                 </Box>
               ) : (
                 <Flex gap={2}>
-                  <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
+                  <Box>
                     <ExitIcon key="hangUp" />
                   </Box>
                   <Text css={{ '@md': { display: 'none' }, color: 'inherit' }} variant="button">
@@ -143,7 +143,7 @@ export const LeaveRoom = ({ showStreamingUI = false }) => {
           <Tooltip title="Leave Room">
             <Box>
               {showStreamingUI ? (
-                <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
+                <Box>
                   <ExitIcon />
                 </Box>
               ) : (
