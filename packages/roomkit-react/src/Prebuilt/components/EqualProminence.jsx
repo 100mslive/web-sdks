@@ -15,7 +15,7 @@ import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
-const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
+// const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
 export function EqualProminence() {
   const peers = useHMSStore(selectRemotePeers);
@@ -45,6 +45,7 @@ export function EqualProminence() {
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
     let pagesList = [];
+    const grid = [];
     // split into pages
     for (let i = 0; i < noOfPages; i++) {
       const count = Math.min(remaining, maxTileCount);
@@ -76,7 +77,7 @@ export function EqualProminence() {
         return rowElements;
       });
 
-      const maxHeight = height - (maxRows - 1) * 8;
+      /* const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios = isMobile && noOfTilesInPage > 3 ? aspectRatioConfig.mobile : aspectRatioConfig.default;
       // calculate height and width of each tile in a row
@@ -110,10 +111,13 @@ export function EqualProminence() {
           row[i].width = tileWidth;
           row[i].height = tileHeight;
         }
-      }
+      } */
+      grid.push(matrix);
     }
-    setPagesWithTiles(pagesList);
+    setPagesWithTiles(grid);
   }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile]);
+
+  console.log(pagesWithTiles[page]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative' }}>
@@ -122,24 +126,27 @@ export function EqualProminence() {
         css={{
           flex: '1 1 0',
           gap: '$4',
-          display: 'flex',
-          placeContent: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexFlow: 'row wrap',
           minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        {pagesWithTiles[page]?.map(tile => {
+        {pagesWithTiles[page]?.map(grid => {
           return (
-            <VideoTile
-              key={tile.track?.id || tile.peer?.id}
-              width={tile.width}
-              height={tile.height}
-              peerId={tile.peer?.id}
-              trackId={tile.track?.id}
-              rootCSS={{ padding: 0 }}
-            />
+            <Box
+              css={{ display: 'grid', gridTemplateColumns: `repeat(${grid.length}, 1fr)`, gap: '$4', flex: '1 1 0' }}
+            >
+              {grid.map(tile => (
+                <VideoTile
+                  key={tile.track?.id || tile.peer?.id}
+                  width={tile.width}
+                  height={tile.height}
+                  peerId={tile.peer?.id}
+                  trackId={tile.track?.id}
+                  rootCSS={{ padding: 0 }}
+                />
+              ))}
+            </Box>
           );
         })}
       </Box>
