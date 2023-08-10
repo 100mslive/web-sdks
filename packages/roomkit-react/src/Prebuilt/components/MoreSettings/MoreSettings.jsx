@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, Suspense, useState } from 'react';
 import { useMedia } from 'react-use';
 import Hls from 'hls.js';
 import {
@@ -167,7 +167,9 @@ export const MoreSettings = ({ showStreamingUI = false }) => {
                 onClick={() => updateState(MODALS.CHANGE_NAME, true)}
                 setOpenSettingsSheet={setOpenSettingsSheet}
               />
-              <VirtualBackground asActionTile />
+              <Suspense fallback="">
+                <VirtualBackground asActionTile />
+              </Suspense>
             </Box>
           </Sheet.Content>
         </Sheet.Root>
