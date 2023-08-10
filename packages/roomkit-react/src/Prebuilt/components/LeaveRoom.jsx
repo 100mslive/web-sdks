@@ -1,14 +1,14 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { useMedia } from 'react-use';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, styled } from '../../Theme';
-import { MwebLeaveRoom } from './MoreSettings/SplitComponents/MwebLeaveRoom';
 import { DesktopLeaveRoom } from './MoreSettings/SplitComponents/DesktopLeaveRoom';
-import { useParams } from 'react-router-dom';
-import { useNavigation } from './hooks/useNavigation';
-import { IconButton } from '../../IconButton';
-import { useHMSPrebuiltContext } from '../AppContext';
+import { MwebLeaveRoom } from './MoreSettings/SplitComponents/MwebLeaveRoom';
 import { ToastManager } from './Toast/ToastManager';
+import { IconButton } from '../../IconButton';
+import { config as cssConfig, styled } from '../../Theme';
+import { useHMSPrebuiltContext } from '../AppContext';
+import { useNavigation } from './hooks/useNavigation';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();

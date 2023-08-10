@@ -10,7 +10,6 @@ import { LeaveCard } from '../../LeaveCard';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useShowStreamingUI } from '../../../common/hooks';
 
-
 export const DesktopLeaveRoom = ({ MenuTriggerButton, LeaveIconButton, leaveRoom, endRoom }) => {
   const [open, setOpen] = useState(false);
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
@@ -34,7 +33,6 @@ export const DesktopLeaveRoom = ({ MenuTriggerButton, LeaveIconButton, leaveRoom
             css={{
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
-              '@md': { borderTopRightRadius: '$1', borderBottomRightRadius: '$1' },
             }}
             onClick={leaveRoom}
           >
