@@ -21,7 +21,7 @@ Example.args = {
   roomCode: 'thirsty-malachite-quail',
   options: {
     endpoints: {
-      roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
+      roomLayout: 'https://api.100ms.live/v2/layouts/ui',
     },
   },
   typography: {
