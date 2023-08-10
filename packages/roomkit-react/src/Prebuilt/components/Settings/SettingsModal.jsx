@@ -90,7 +90,8 @@ const MobileSettingModal = ({
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
       <Sheet.Content
         css={{
-          height: 'max(480px, 80%)',
+          height: 'max(360px, 60%)',
+          bg: '$surface_dim',
         }}
       >
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>

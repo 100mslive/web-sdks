@@ -246,7 +246,6 @@ const PreviewControls = ({ hideSettings }) => {
   );
 };
 
-// Bottom action sheet goes here, if isMobile
 export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
 

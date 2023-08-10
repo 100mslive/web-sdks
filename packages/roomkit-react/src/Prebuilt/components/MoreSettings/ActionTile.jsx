@@ -1,7 +1,7 @@
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
-export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenSettingsSheet: setSheet }) => {
+export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenOptionsSheet: setSheet }) => {
   return (
     <Flex
       direction="column"
