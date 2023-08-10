@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsLocalVideoEnabled, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, CrossIcon, DragHandleIcon, HandIcon, MicOffIcon, PencilIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
@@ -33,7 +33,7 @@ export const MwebOptions = () => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
-
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
@@ -126,9 +126,11 @@ export const MwebOptions = () => {
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               setOpenSettingsSheet={setOpenSettingsSheet}
             />
-            <Suspense fallback="">
-              <VirtualBackground asActionTile />
-            </Suspense>
+            {isVideoOn ? (
+              <Suspense fallback="">
+                <VirtualBackground asActionTile />
+              </Suspense>
+            ) : null}
           </Box>
         </Sheet.Content>
       </Sheet.Root>
