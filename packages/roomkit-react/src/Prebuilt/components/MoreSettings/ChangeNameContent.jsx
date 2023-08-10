@@ -29,7 +29,7 @@ export const ChangeNameContent = ({
           borderBottom: isMobile ? '1px solid $border_default' : '',
           pb: '$6',
           mb: '$8',
-          px: '$8',
+          px: isMobile ? '$8' : '',
         }}
       >
         {isMobile ? <ChevronLeftIcon onClick={onBackClick} style={{ marginRight: '0.5rem' }} /> : null}
@@ -38,7 +38,11 @@ export const ChangeNameContent = ({
           <CrossIcon />
         </Box>
       </Text>
-      <Flex justify="center" align="center" css={{ my: '$8', w: '100%', px: isMobile ? '$4' : '', px: '$8' }}>
+      <Flex
+        justify="center"
+        align="center"
+        css={{ my: '$8', w: '100%', px: isMobile ? '$4' : '', px: isMobile ? '$8' : '' }}
+      >
         <Input
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
