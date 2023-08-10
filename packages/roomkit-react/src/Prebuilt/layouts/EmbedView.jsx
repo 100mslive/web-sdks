@@ -120,7 +120,6 @@ const EmbedComponent = () => {
     <Box
       ref={iframeRef}
       css={{
-        mx: '$8',
         flex: '3 1 0',
         '@lg': {
           flex: '2 1 0',
