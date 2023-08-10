@@ -17,6 +17,7 @@ export const StreamingFooter = () => {
         flexWrap: 'nowrap',
         '@md': {
           justifyContent: 'center',
+          gap: '$10',
         },
       }}
     >
@@ -25,6 +26,7 @@ export const StreamingFooter = () => {
           '@md': {
             w: 'unset',
             p: '0',
+            gap: '$10',
           },
         }}
       >
@@ -35,6 +37,7 @@ export const StreamingFooter = () => {
         css={{
           '@md': {
             w: 'unset',
+            gap: '$10',
           },
         }}
       >
