@@ -135,7 +135,13 @@ export function EqualProminence() {
         {pagesWithTiles[page]?.map(grid => {
           return (
             <Box
-              css={{ display: 'grid', gridTemplateColumns: `repeat(${grid.length}, 1fr)`, gap: '$4', flex: '1 1 0' }}
+              css={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${grid.length}, 1fr)`,
+                gap: '$4',
+                flex: '1 1 0',
+                minHeight: 0,
+              }}
             >
               {grid.map(tile => (
                 <VideoTile
@@ -144,7 +150,7 @@ export function EqualProminence() {
                   height={tile.height}
                   peerId={tile.peer?.id}
                   trackId={tile.track?.id}
-                  rootCSS={{ padding: 0 }}
+                  rootCSS={{ padding: 0, minHeight: 0 }}
                 />
               ))}
             </Box>
