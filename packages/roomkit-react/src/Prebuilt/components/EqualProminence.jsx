@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   getPeersWithTiles,
+  selectLocalPeer,
   selectRemotePeers,
   selectTracksMap,
   useHMSStore,
@@ -19,9 +20,9 @@ const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 /
 
 export function EqualProminence() {
   const peers = useHMSStore(selectRemotePeers);
+  const localPeer = useHMSStore(selectLocalPeer);
   const vanillaStore = useHMSVanillaStore();
   const isMobile = useMedia(cssConfig.media.md);
-
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
   const [pagesWithTiles, setPagesWithTiles] = useState([]);
@@ -40,7 +41,7 @@ export function EqualProminence() {
       return;
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
-    const peersWithTiles = getPeersWithTiles(peers, tracksMap, () => false);
+    const peersWithTiles = getPeersWithTiles(peers.length === 0 ? [localPeer] : peers, tracksMap, () => false);
     const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
@@ -113,7 +114,7 @@ export function EqualProminence() {
       }
     }
     setPagesWithTiles(pagesList);
-  }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile]);
+  }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile, localPeer]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative' }}>
@@ -144,7 +145,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      <InsetTile />
+      {peers.length > 0 && <InsetTile />}
     </Flex>
   );
 }
