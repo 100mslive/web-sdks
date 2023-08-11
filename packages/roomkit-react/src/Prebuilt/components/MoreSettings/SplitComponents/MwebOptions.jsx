@@ -14,7 +14,6 @@ import {
   DragHandleIcon,
   EmojiIcon,
   HandIcon,
-  MicOffIcon,
   PencilIcon,
   RecordIcon,
   SettingsIcon,
@@ -141,14 +140,6 @@ export const MwebOptions = () => {
                 icon={<BrbIcon />}
                 onClick={toggleBRB}
                 active={isBRBOn}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            ) : null}
-            {permissions.mute ? (
-              <ActionTile
-                title="Mute All"
-                icon={<MicOffIcon />}
-                onClick={() => updateState(MODALS.MUTE_ALL, true)}
                 setOpenOptionsSheet={setOpenOptionsSheet}
               />
             ) : null}
