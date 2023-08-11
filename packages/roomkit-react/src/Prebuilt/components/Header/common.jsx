@@ -64,9 +64,9 @@ export const AudioOutputActions = () => {
     <AudioOutputSelectionSheet
       outputDevices={audioOutput}
       outputSelected={selectedDeviceIDs.outputDevices}
-      onChange={deviceId => {
+      onChange={async deviceId => {
         try {
-          updateDevice({
+          await updateDevice({
             deviceId,
             deviceType: DeviceType.audioOutput,
           });
