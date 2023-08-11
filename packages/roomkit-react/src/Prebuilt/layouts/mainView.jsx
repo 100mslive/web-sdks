@@ -1,5 +1,4 @@
 import React, { Suspense, useCallback, useEffect } from 'react';
-import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -14,7 +13,6 @@ import {
 import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
 import { Flex } from '../../Layout';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
 import ScreenShareView from './screenShareView';
@@ -30,6 +28,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
+import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
@@ -50,12 +49,10 @@ export const ConferenceMainView = () => {
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
-
   const { isHLSRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
-  const roomLayout = useRoomLayout();
-  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+  const showStreamingUI = useShowStreamingUI();
 
   const startHLS = useCallback(async () => {
     try {
@@ -77,6 +74,17 @@ export const ConferenceMainView = () => {
     if (!isConnected) {
       return;
     }
+    // Is a streaming kit and broadcaster joins
+    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
+      startHLS();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected]);
+
+  useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
     const audioPlaylist = JSON.parse(process.env.REACT_APP_AUDIO_PLAYLIST || '[]');
     const videoPlaylist = JSON.parse(process.env.REACT_APP_VIDEO_PLAYLIST || '[]');
     if (videoPlaylist.length > 0) {
@@ -86,18 +94,9 @@ export const ConferenceMainView = () => {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
 
-    // Is a streaming kit and broadcaster joins
-    if (
-      permissions?.hlsStreaming &&
-      !isHLSRunning &&
-      joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
-    ) {
-      startHLS();
-    }
-
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, hmsActions, permissions, joinForm]);
+  }, [isConnected, hmsActions]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI

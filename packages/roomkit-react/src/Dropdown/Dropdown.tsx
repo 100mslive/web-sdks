@@ -53,7 +53,7 @@ const DropdownItem = styled(Item, {
   display: 'flex',
   alignItems: 'center',
   outline: 'none',
-  backgroundColor: '$surface_default',
+  backgroundColor: '$surface_dim',
   '&:hover': {
     cursor: 'pointer',
     bg: '$surface_bright',
@@ -74,7 +74,7 @@ const DropdownContent = styled(Content, {
   maxHeight: '$64',
   r: '$1',
   py: '$4',
-  backgroundColor: '$surface_default',
+  backgroundColor: '$surface_dim',
   overflowY: 'auto',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   zIndex: 20,

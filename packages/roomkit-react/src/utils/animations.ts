@@ -34,6 +34,24 @@ export const slideRightAndFade = (start = '-2px') =>
     '100%': { opacity: 1, transform: 'translateX(0)' },
   });
 
+export const sheetSlideIn = keyframes({
+  from: { transform: '$$transformValue' },
+  to: { transform: 'translate3d(0,0,0)' },
+});
+
+export const sheetSlideOut = keyframes({
+  from: { transform: 'translate3d(0,0,0)' },
+  to: { transform: '$$transformValue' },
+});
+export const sheetFadeIn = keyframes({
+  from: { opacity: '0' },
+  to: { opacity: '1' },
+});
+
+export const sheetFadeOut = keyframes({
+  from: { opacity: '1' },
+  to: { opacity: '0' },
+});
 export const slideDownAndFade = (start = '-2px') =>
   keyframes({
     '0%': { opacity: 0, transform: `translateY(${start})` },

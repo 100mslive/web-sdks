@@ -36,6 +36,7 @@ import SettingsModal from '../Settings/SettingsModal';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { getFormattedCount } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
@@ -44,8 +45,7 @@ const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
     return 'You are the first to join';
   }
-  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
-  const formattedNum = formatter.format(peerCount);
+  const formattedNum = getFormattedCount(peerCount);
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
 };
 
@@ -246,7 +246,6 @@ const PreviewControls = ({ hideSettings }) => {
   );
 };
 
-// Bottom action sheet goes here, if isMobile
 export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
 

@@ -21,11 +21,11 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../../';
+import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
+import { ParticipantFilter } from '../Header/ParticipantFilter';
 import { RoleChangeModal } from '../RoleChangeModal';
-import { ParticipantFilter } from './ParticipantFilter';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
@@ -320,8 +320,8 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
       </Box>
       <Input
         type="text"
-        placeholder={placeholder || 'Find what you are looking for'}
-        css={{ w: '100%', pl: '$14' }}
+        placeholder={placeholder || 'Search among participants'}
+        css={{ w: '100%', pl: '$14', bg: '$surface_bright' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();

@@ -1,33 +1,24 @@
-import React, { Fragment, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useMedia } from 'react-use';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, ExitIcon, HangUpIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { DesktopLeaveRoom } from './MoreSettings/SplitComponents/DesktopLeaveRoom';
+import { MwebLeaveRoom } from './MoreSettings/SplitComponents/MwebLeaveRoom';
 import { ToastManager } from './Toast/ToastManager';
-import { Button } from '../../Button';
-import { Dropdown } from '../../Dropdown';
 import { IconButton } from '../../IconButton';
-import { Box, Flex } from '../../Layout';
-import { Dialog } from '../../Modal';
-import { Text } from '../../Text';
-import { styled } from '../../Theme';
-import { Tooltip } from '../../Tooltip';
+import { config as cssConfig, styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { DialogCheckbox, DialogContent, DialogRow } from '../primitives/DialogContent';
-import { useDropdownList } from './hooks/useDropdownList';
 import { useNavigation } from './hooks/useNavigation';
-import { isStreamingKit } from '../common/utils';
 
 export const LeaveRoom = () => {
   const navigate = useNavigation();
   const params = useParams();
-  const [open, setOpen] = useState(false);
-  const [showEndRoomModal, setShowEndRoomModal] = useState(false);
-  const [lockRoom, setLockRoom] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
+  const isMobile = useMedia(cssConfig.media.md);
+
   const hmsActions = useHMSActions();
   const { showLeave, onLeave } = useHMSPrebuiltContext();
-  useDropdownList({ open, name: 'LeaveRoom' });
 
   const redirectToLeavePage = () => {
     if (showLeave) {
@@ -47,129 +38,22 @@ export const LeaveRoom = () => {
   };
 
   const endRoom = () => {
-    hmsActions.endRoom(lockRoom, 'End Room');
+    hmsActions.endRoom(false, 'End Room');
     redirectToLeavePage();
   };
 
-  const isStreamKit = isStreamingKit();
   if (!permissions || !isConnected) {
     return null;
   }
-
-  return (
-    <Fragment>
-      {permissions.endRoom ? (
-        <Flex>
-          <LeaveIconButton
-            variant="danger"
-            key="LeaveRoom"
-            data-testid="leave_room_btn"
-            css={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-            onClick={leaveRoom}
-          >
-            <Tooltip title="Leave Room">
-              {!isStreamKit ? (
-                <Box>
-                  <HangUpIcon key="hangUp" />
-                </Box>
-              ) : (
-                <Flex gap={2}>
-                  <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
-                    <ExitIcon key="hangUp" />
-                  </Box>
-                  <Text css={{ '@md': { display: 'none' }, color: 'inherit' }} variant="button">
-                    Leave Studio
-                  </Text>
-                </Flex>
-              )}
-            </Tooltip>
-          </LeaveIconButton>
-          <Dropdown.Root open={open} onOpenChange={setOpen}>
-            <Dropdown.Trigger
-              asChild
-              css={{
-                '&[data-state="open"]': {
-                  bg: '$alert_error_dim',
-                },
-              }}
-            >
-              <MenuTriggerButton variant="danger" data-testid="leave_end_dropdown_trigger">
-                <VerticalMenuIcon />
-              </MenuTriggerButton>
-            </Dropdown.Trigger>
-            <Dropdown.Content css={{ p: 0 }} alignOffset={-50} sideOffset={10}>
-              <Dropdown.Item
-                css={{ w: '100%', bg: 'rgba(178, 71, 81, 0.1)' }}
-                onClick={() => {
-                  setShowEndRoomModal(true);
-                }}
-                data-testid="end_room_btn"
-              >
-                <Flex gap={4}>
-                  <Box css={{ color: '$alert_error_default' }}>
-                    <AlertTriangleIcon />
-                  </Box>
-                  <Flex direction="column" align="start">
-                    <Text variant="lg" css={{ c: '$alert_error_default' }}>
-                      End Room for All
-                    </Text>
-                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
-                      Warning: You can’t undo this action
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Dropdown.Item>
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
-                <Flex gap={4}>
-                  <Box>
-                    <ExitIcon />
-                  </Box>
-                  <Flex direction="column" align="start">
-                    <Text variant="lg">Leave {isStreamKit ? 'Studio' : 'Room'}</Text>
-                    <Text variant="sm" css={{ c: '$on_surface_medium', mt: '$2' }}>
-                      You can always rejoin later
-                    </Text>
-                  </Flex>
-                </Flex>
-              </Dropdown.Item>
-            </Dropdown.Content>
-          </Dropdown.Root>
-        </Flex>
-      ) : (
-        <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
-          <Tooltip title="Leave Room">
-            <Box>
-              {isStreamKit ? (
-                <Box css={{ '@md': { transform: 'rotate(180deg)' } }}>
-                  <ExitIcon />
-                </Box>
-              ) : (
-                <HangUpIcon key="hangUp" />
-              )}
-            </Box>
-          </Tooltip>
-        </LeaveIconButton>
-      )}
-
-      <Dialog.Root
-        open={showEndRoomModal}
-        onOpenChange={value => {
-          if (!value) {
-            setLockRoom(false);
-          }
-          setShowEndRoomModal(value);
-        }}
-      >
-        <DialogContent title="End Room" Icon={HangUpIcon}>
-          <DialogCheckbox id="lockRoom" title="Disable future joins" value={lockRoom} onChange={setLockRoom} />
-          <DialogRow justify="end">
-            <Button variant="danger" onClick={endRoom} data-testid="lock_end_room">
-              End Room
-            </Button>
-          </DialogRow>
-        </DialogContent>
-      </Dialog.Root>
-    </Fragment>
+  return isMobile ? (
+    <MwebLeaveRoom leaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} endRoom={endRoom} />
+  ) : (
+    <DesktopLeaveRoom
+      leaveIconButton={LeaveIconButton}
+      menuTriggerButton={MenuTriggerButton}
+      leaveRoom={leaveRoom}
+      endRoom={endRoom}
+    />
   );
 };
 
@@ -180,7 +64,7 @@ const LeaveIconButton = styled(IconButton, {
   r: '$1',
   bg: '$alert_error_default',
   '&:not([disabled]):hover': {
-    bg: '$alert_error_default',
+    bg: '$alert_error_bright',
   },
   '&:not([disabled]):active': {
     bg: '$alert_error_default',
