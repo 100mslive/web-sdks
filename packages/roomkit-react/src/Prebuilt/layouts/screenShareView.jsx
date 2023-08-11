@@ -105,6 +105,7 @@ const ScreenShareComponent = ({ amIPresenting, peerPresenting, peerSharingPlayli
     return (
       <Box
         css={{
+          mx: '$8',
           flex: '3 1 0',
           '@xl': {
             flex: '2 1 0',
@@ -122,6 +123,7 @@ const ScreenShareComponent = ({ amIPresenting, peerPresenting, peerSharingPlayli
     <Box
       css={{
         flex: '3 1 0',
+        mx: '$8',
         '@xl': { ml: '$4', maxHeight: '80%', minHeight: 0 },
       }}
     >

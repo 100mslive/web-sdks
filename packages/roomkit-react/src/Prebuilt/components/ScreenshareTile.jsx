@@ -49,7 +49,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0 }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root css={{ width, height }} data-testid="screenshare_tile">
       {peer ? (
         <StyledVideoTile.Container
           transparentBg
