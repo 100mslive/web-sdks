@@ -217,7 +217,7 @@ export const StreamActions = () => {
 
 export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
   return (
-    <Sheet.Root>
+    <Sheet.Root open={true}>
       <Sheet.Content>
         <Sheet.Title css={{ p: '$10' }}>
           <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
@@ -232,7 +232,7 @@ export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
         </Sheet.Title>
         <HorizontalDivider />
         <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
-          <Text variant="caption" css={{ c: '$on_surface_medium' }}>
+          <Text variant="caption" css={{ c: '$on_surface_medium', pb: '$8' }}>
             Are you sure you want to stop recording? You can’t undo this action.
           </Text>
           <Button
