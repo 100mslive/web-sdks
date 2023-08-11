@@ -15,7 +15,6 @@ import {
   DragHandleIcon,
   HandIcon,
   InfoIcon,
-  MicOffIcon,
   PencilIcon,
   PipIcon,
   SettingsIcon,
@@ -52,7 +51,6 @@ const MODALS = {
 };
 
 export const DesktopOptions = ({ showStreamingUI = false }) => {
-  const permissions = useHMSStore(selectPermissions);
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
@@ -164,14 +162,6 @@ export const DesktopOptions = ({ showStreamingUI = false }) => {
             <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
           )}
 
-          {permissions.mute && (
-            <Dropdown.Item onClick={() => updateState(MODALS.MUTE_ALL, true)} data-testid="mute_all_btn">
-              <MicOffIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Mute All
-              </Text>
-            </Dropdown.Item>
-          )}
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
 
           <Dropdown.Item onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)} data-testid="device_settings_btn">

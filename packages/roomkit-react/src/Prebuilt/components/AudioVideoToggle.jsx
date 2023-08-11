@@ -125,7 +125,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         )
       ) : null}
 
-      {localVideoTrack?.facingMode ? (
+      {localVideoTrack?.facingMode && !hideOptions ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
