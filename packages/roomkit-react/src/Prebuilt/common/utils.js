@@ -89,3 +89,12 @@ export const getFormattedCount = num => {
   const formattedNum = formatter.format(num);
   return formattedNum;
 };
+
+export const formatTime = timeInSeconds => {
+  timeInSeconds = Math.floor(timeInSeconds / 1000);
+  const hours = Math.floor(timeInSeconds / 3600);
+  const minutes = Math.floor((timeInSeconds % 3600) / 60);
+  const seconds = timeInSeconds % 60;
+  const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
+  return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
