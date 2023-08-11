@@ -28,7 +28,6 @@ const SidePane = ({ css = {} }) => {
         bg: '$surface_default',
         r: '$1',
         ml: '$8',
-        position: 'relative',
         ...css,
         '@lg': {
           w: '100%',

@@ -140,7 +140,6 @@ export function EqualProminence() {
               peerId={tile.peer?.id}
               trackId={tile.track?.id}
               rootCSS={{ padding: 0 }}
-              objectFit="contain"
             />
           );
         })}
