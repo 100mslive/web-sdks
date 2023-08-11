@@ -85,7 +85,7 @@ export const ConferenceMainView = () => {
 
     // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
-      // startHLS();
+      startHLS();
     }
 
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
