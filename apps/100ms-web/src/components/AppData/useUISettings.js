@@ -125,7 +125,7 @@ export const usePinnedTrack = () => {
   )?.id;
   return useHMSStore(
     selectTrackByID(
-      spotlightVideoTrackId || spotlightAudioTrackId || pinnedTrackId
+      pinnedTrackId || spotlightVideoTrackId || spotlightAudioTrackId
     )
   );
 };

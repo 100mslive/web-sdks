@@ -91,7 +91,7 @@ export const usePinnedTrack = () => {
   const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const spotlightVideoTrackId = useHMSStore(selectVideoTrackByPeerID(spotlightPeerId))?.id;
   const spotlightAudioTrackId = useHMSStore(selectAudioTrackByPeerID(spotlightPeerId))?.id;
-  return useHMSStore(selectTrackByID(spotlightVideoTrackId || spotlightAudioTrackId || pinnedTrackId));
+  return useHMSStore(selectTrackByID(pinnedTrackId || spotlightVideoTrackId || spotlightAudioTrackId));
 };
 
 export const useSubscribedNotifications = notificationKey => {
