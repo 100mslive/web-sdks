@@ -1,7 +1,8 @@
-import React, { Fragment, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
+  selectHLSState,
   selectIsConnectedToRoom,
   selectPermissions,
   selectRoomState,
@@ -9,31 +10,69 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, CrossIcon, RecordIcon, WrenchIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
 import { Sheet } from '../../../Sheet';
-import GoLiveButton from '../GoLiveButton';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
-import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { formatTime } from '../../common/utils';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const hlsState = useHMSStore(selectHLSState);
+  const isMobile = useMedia(cssConfig.media.md);
+  const intervalRef = useRef(null);
+
+  const [liveTime, setLiveTime] = useState(0);
+
+  const startTimer = useCallback(() => {
+    intervalRef.current = setInterval(() => {
+      if (hlsState?.running) {
+        setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
+      }
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    if (hlsState?.running && !isMobile) {
+      startTimer();
+    }
+    if (!hlsState?.running && intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [hlsState.running, isMobile, startTimer]);
+
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
   return (
-    <Flex align="center">
-      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
-      <Text>
-        Live
-        <Text as="span" css={{ '@md': { display: 'none' } }}>
-          &nbsp;with {isHLSRunning ? 'HLS' : 'RTMP'}
+    <Flex align="center" gap="2">
+      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2', '@md': { display: 'none' } }} />
+      {isMobile ? (
+        <Text
+          css={{
+            bg: '$alert_error_default',
+            c: 'on_surface_high',
+            borderRadius: '$0',
+            padding: '$2 $4 $2 $4',
+          }}
+        >
+          Live
         </Text>
+      ) : (
+        <Text>LIVE</Text>
+      )}
+      <Text variant="caption" css={{ '@md': { display: 'none' } }}>
+        {hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}
       </Text>
     </Flex>
   );
@@ -42,6 +81,7 @@ export const LiveStatus = () => {
 export const RecordingStatus = () => {
   const { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn, isRecordingOn } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
+  const isMobile = useMedia(cssConfig.media.md);
 
   if (
     !isRecordingOn ||
@@ -51,8 +91,10 @@ export const RecordingStatus = () => {
       value => !!value,
     )
   ) {
-    return null;
+    // show recording icon in mobile without popover
+    if (!(isMobile && isRecordingOn)) return null;
   }
+
   return (
     <Tooltip
       title={getRecordingText({
@@ -61,25 +103,15 @@ export const RecordingStatus = () => {
         isHLSRecordingOn,
       })}
     >
-      <Box
+      <Flex
         css={{
           color: '$alert_error_default',
+          alignItems: 'center',
         }}
       >
         <RecordIcon width={24} height={24} />
-      </Box>
+      </Flex>
     </Tooltip>
-  );
-};
-
-const EndStream = () => {
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-
-  return (
-    <Button data-testid="end_stream" variant="danger" icon onClick={toggleStreaming}>
-      <WrenchIcon />
-      Manage Stream
-    </Button>
   );
 };
 
@@ -193,24 +225,22 @@ const StartRecording = () => {
   );
 };
 
+/**
+ * @description only start recording button will be shown.
+ */
 export const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
-  const { isStreamingOn } = useRecordingStreaming();
   const roomState = useHMSStore(selectRoomState);
 
   return (
     <Flex align="center" css={{ gap: '$4' }}>
       <AdditionalRoomState />
-      <Flex align="center" css={{ gap: '$4', '@md': { display: 'none' } }}>
-        {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
+      <Flex align="center" css={{ gap: '$4' }}>
         <RecordingStatus />
+        {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
       </Flex>
       {isConnected && !isMobile ? <StartRecording /> : null}
-      {isConnected && (permissions.hlsStreaming || permissions.rtmpStreaming) && (
-        <Fragment>{isStreamingOn ? <EndStream /> : <GoLiveButton />}</Fragment>
-      )}
     </Flex>
   );
 };
