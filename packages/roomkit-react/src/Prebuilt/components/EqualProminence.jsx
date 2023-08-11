@@ -117,7 +117,7 @@ export function EqualProminence() {
   }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile, localPeer]);
 
   return (
-    <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative' }}>
+    <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
       <Box
         ref={ref}
         css={{
