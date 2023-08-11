@@ -5,7 +5,6 @@ import {
   selectIsAllowedToPublish,
   selectLocalPeerID,
   selectLocalPeerRoleName,
-  selectPermissions,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
