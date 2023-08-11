@@ -10,8 +10,9 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { RecordIcon } from '@100mslive/react-icons';
-import { Box, Button, config as cssConfig, Flex, Loading, Popover, Text, Tooltip } from '../../../';
+import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
+import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
+import { Sheet } from '../../../Sheet';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
@@ -34,7 +35,7 @@ export const LiveStatus = () => {
         setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
       }
     }, 1000);
-  }, []);
+  }, [hlsState?.running, hlsState?.variants]);
 
   useEffect(() => {
     if (hlsState?.running && !isMobile) {
@@ -241,5 +242,40 @@ export const StreamActions = () => {
       </Flex>
       {isConnected && !isMobile ? <StartRecording /> : null}
     </Flex>
+  );
+};
+
+export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
+  return (
+    <Sheet.Root open={true}>
+      <Sheet.Content>
+        <Sheet.Title css={{ p: '$10' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
+            <Flex justify="start" align="center" gap="3">
+              <AlertTriangleIcon />
+              <Text variant="h5">Stop Recording</Text>
+            </Flex>
+            <Sheet.Close css={{ color: 'white' }} onClick={onClose}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
+          <Text variant="caption" css={{ c: '$on_surface_medium', pb: '$8' }}>
+            Are you sure you want to stop recording? You can’t undo this action.
+          </Text>
+          <Button
+            variant="danger"
+            css={{ width: '100%' }}
+            type="submit"
+            data-testid="popup_change_btn"
+            onClick={onStopRecording}
+          >
+            Stop
+          </Button>
+        </Box>
+      </Sheet.Content>
+    </Sheet.Root>
   );
 };
