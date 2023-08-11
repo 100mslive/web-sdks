@@ -54,9 +54,9 @@ const SpotlightActions = ({ peerId }) => {
   );
   const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightPeerId = () =>
+  const setSpotlightPeerId = peer =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, peerId)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
       .catch(err => ToastManager.addToast({ title: err.description }));
 
   return (
