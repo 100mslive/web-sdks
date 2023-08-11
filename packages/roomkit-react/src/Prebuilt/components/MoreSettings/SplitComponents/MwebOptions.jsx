@@ -1,18 +1,19 @@
-import React, { Suspense, useState } from 'react';
-import { useMedia } from 'react-use';
+import React, { Suspense, useRef, useState } from 'react';
 import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import {
   BrbIcon,
   CrossIcon,
   DragHandleIcon,
+  EmojiIcon,
   HandIcon,
   MicOffIcon,
   PencilIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Tooltip } from '../../../../';
+import { Box, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
+import { EmojiCard } from '../../Footer/EmojiCard';
 import SettingsModal from '../../Settings/SettingsModal';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
@@ -20,6 +21,7 @@ import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
+import useOnClickOutside from '../../../common/hooks';
 import { FEATURE_LIST } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
@@ -45,6 +47,9 @@ export const MwebOptions = () => {
 
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
+  const [showEmojiCard, setShowEmojiCard] = useState(false);
+
+  const emojiCardRef = useRef(null);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -59,7 +64,8 @@ export const MwebOptions = () => {
       return copy;
     });
   };
-  const isMobile = useMedia(cssConfig.media.md);
+
+  useOnClickOutside(emojiCardRef, () => setShowEmojiCard(false));
 
   return (
     <>
@@ -139,19 +145,47 @@ export const MwebOptions = () => {
             <Suspense fallback="">
               <VirtualBackground asActionTile />
             </Suspense>
+            <ActionTile
+              title="Emoji Reactions"
+              icon={<EmojiIcon />}
+              onClick={() => setShowEmojiCard(true)}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+            />
             <ActionTile title="Settings" icon={<SettingsIcon />} onClick={() => setOpenSettingsSheet(true)} />
           </Box>
         </Sheet.Content>
       </Sheet.Root>
       <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} />
       {openModals.has(MODALS.MUTE_ALL) && (
-        <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile={isMobile} />
+        <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}
       {openModals.has(MODALS.CHANGE_NAME) && (
         <ChangeNameModal
           onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
+      )}
+
+      {showEmojiCard && (
+        <Box
+          ref={emojiCardRef}
+          css={{
+            maxWidth: '100%',
+            w: '100%',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: '$18',
+            bg: '$surface_default',
+            zIndex: '10',
+            p: '$8',
+            pb: 0,
+            r: '$1',
+            mx: '$4',
+          }}
+        >
+          <EmojiCard />
+        </Box>
       )}
     </>
   );
