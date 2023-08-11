@@ -11,7 +11,7 @@ export const ConferencingHeader = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isPreview = roomState === HMSRoomState.Preview;
 
-  if (!isPreview) {
+  if (isPreview) {
     return (
       <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
         <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
