@@ -2,8 +2,10 @@ import { useCallback } from 'react';
 import {
   selectAppData,
   selectAppDataByPath,
+  selectAudioTrackByPeerID,
   selectSessionStore,
   selectTrackByID,
+  selectVideoTrackByPeerID,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -86,8 +88,10 @@ export const usePDFAnnotator = () => {
 };
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));
-  const spotlightTrackId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
-  return useHMSStore(selectTrackByID(pinnedTrackId || spotlightTrackId));
+  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
+  const spotlightVideoTrackId = useHMSStore(selectVideoTrackByPeerID(spotlightPeerId))?.id;
+  const spotlightAudioTrackId = useHMSStore(selectAudioTrackByPeerID(spotlightPeerId))?.id;
+  return useHMSStore(selectTrackByID(pinnedTrackId || spotlightVideoTrackId || spotlightAudioTrackId));
 };
 
 export const useSubscribedNotifications = notificationKey => {

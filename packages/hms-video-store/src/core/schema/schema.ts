@@ -44,6 +44,7 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
   sessionStore: T['sessionStore'];
   polls: Record<string, HMSPoll>;
+  hideLocalPeer: boolean;
 }
 
 export interface HMSStatsStore {
@@ -126,6 +127,7 @@ export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T
     sessionStore: {},
     templateAppData: {},
     polls: {},
+    hideLocalPeer: false,
   };
 };
 

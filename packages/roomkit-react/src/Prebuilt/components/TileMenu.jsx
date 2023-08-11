@@ -37,24 +37,18 @@ import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
-const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
+const SpotlightActions = ({ peerId }) => {
   const hmsActions = useHMSActions();
-  const spotlightTrackId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
-  const isTileSpotlighted = isSameTile({
-    trackId: spotlightTrackId,
-    videoTrackID,
-    audioTrackID,
-  });
+  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
+  const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightTrackId = trackId =>
+  const setSpotlightPeerId = peer =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, trackId)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
       .catch(err => ToastManager.addToast({ title: err.description }));
 
   return (
-    <StyledMenuTile.ItemButton
-      onClick={() => (isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(videoTrackID || audioTrackID))}
-    >
+    <StyledMenuTile.ItemButton onClick={() => (isTileSpotlighted ? setSpotlightPeerId() : setSpotlightPeerId(peerId))}>
       <StarIcon />
       <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
     </StyledMenuTile.ItemButton>
@@ -82,8 +76,6 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
   );
 };
 
-const showSpotlight = process.env.REACT_APP_ENV === 'qa';
-
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
@@ -92,11 +84,12 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers } = useHMSStore(selectPermissions);
+  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
     videoTrackID,
   );
+  const showSpotlight = changeRole;
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
@@ -131,7 +124,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
           showPinAction && (
             <>
               <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-              {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+              {showSpotlight && <SpotlightActions peerId={peerID} />}
             </>
           )
         ) : (
@@ -168,7 +161,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
             {showPinAction && (
               <>
                 <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-                {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+                {showSpotlight && <SpotlightActions peerId={peerID} />}
               </>
             )}
             <SimulcastLayers trackId={videoTrackID} />
