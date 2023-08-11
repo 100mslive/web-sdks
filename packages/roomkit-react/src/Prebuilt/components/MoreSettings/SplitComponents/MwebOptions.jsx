@@ -175,11 +175,29 @@ export const MwebOptions = () => {
                 title={isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}
                 disabled={isHLSRunning}
                 icon={<RecordIcon />}
-                onClick={() => {
+                onClick={async () => {
                   if (isBrowserRecordingOn || isStreamingOn) {
                     setShowRecordingOn(true);
                   } else {
                     // start recording
+                    setOpenOptionsSheet(false);
+                    try {
+                      await hmsActions.startRTMPOrRecording({
+                        record: true,
+                      });
+                    } catch (error) {
+                      if (error.message.includes('stream already running')) {
+                        ToastManager.addToast({
+                          title: 'Recording already running',
+                          variant: 'error',
+                        });
+                      } else {
+                        ToastManager.addToast({
+                          title: error.message,
+                          variant: 'error',
+                        });
+                      }
+                    }
                   }
                 }}
                 setOpenOptionsSheet={setOpenOptionsSheet}
