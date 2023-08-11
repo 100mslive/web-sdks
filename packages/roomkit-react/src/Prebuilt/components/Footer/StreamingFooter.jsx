@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { HandIcon, HandRaiseIcon } from '@100mslive/react-icons';
+import { HandIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Footer as AppFooter } from '../../../';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -59,7 +59,7 @@ export const StreamingFooter = () => {
             <ScreenshareToggle />
             {isHandRaiseEnabled ? (
               <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                {isHandRaised ? <HandRaiseIcon /> : <HandIcon />}
+                <HandIcon />
               </IconButton>
             ) : null}
             <EmojiReaction />
