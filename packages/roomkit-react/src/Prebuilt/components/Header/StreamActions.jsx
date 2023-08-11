@@ -9,8 +9,9 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { RecordIcon, WrenchIcon } from '@100mslive/react-icons';
-import { Box, Button, config as cssConfig, Flex, Loading, Popover, Text, Tooltip } from '../../../';
+import { AlertTriangleIcon, CrossIcon, RecordIcon, WrenchIcon } from '@100mslive/react-icons';
+import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
+import { Sheet } from '../../../Sheet';
 import GoLiveButton from '../GoLiveButton';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
@@ -211,5 +212,40 @@ export const StreamActions = () => {
         <Fragment>{isStreamingOn ? <EndStream /> : <GoLiveButton />}</Fragment>
       )}
     </Flex>
+  );
+};
+
+export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
+  return (
+    <Sheet.Root>
+      <Sheet.Content>
+        <Sheet.Title css={{ p: '$10' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
+            <Flex justify="start" align="center" gap="3">
+              <AlertTriangleIcon />
+              <Text variant="h5">Stop Recording</Text>
+            </Flex>
+            <Sheet.Close css={{ color: 'white' }} onClick={onClose}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
+          <Text variant="caption" css={{ c: '$on_surface_medium' }}>
+            Are you sure you want to stop recording? You can’t undo this action.
+          </Text>
+          <Button
+            variant="danger"
+            css={{ width: '100%' }}
+            type="submit"
+            data-testid="popup_change_btn"
+            onClick={onStopRecording}
+          >
+            Stop
+          </Button>
+        </Box>
+      </Sheet.Content>
+    </Sheet.Root>
   );
 };

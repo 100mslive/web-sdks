@@ -1,6 +1,13 @@
 import React, { Suspense, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
-import { selectIsLocalVideoEnabled, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsConnectedToRoom,
+  selectIsLocalVideoEnabled,
+  selectPermissions,
+  useHMSActions,
+  useHMSStore,
+  useRecordingStreaming,
+} from '@100mslive/react-sdk';
 import {
   BrbIcon,
   CrossIcon,
@@ -9,13 +16,16 @@ import {
   HandIcon,
   MicOffIcon,
   PencilIcon,
+  RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
 import { Box, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
 import { EmojiCard } from '../../Footer/EmojiCard';
+import { StopRecordingInSheet } from '../../Header/StreamActions';
 import SettingsModal from '../../Settings/SettingsModal';
+import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
@@ -39,7 +49,11 @@ const MODALS = {
 };
 
 export const MwebOptions = () => {
+  const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
+  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
+
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
@@ -48,6 +62,7 @@ export const MwebOptions = () => {
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
+  const [showRecordingOn, setShowRecordingOn] = useState(false);
 
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -155,6 +170,21 @@ export const MwebOptions = () => {
               setOpenOptionsSheet={setOpenOptionsSheet}
             />
             <ActionTile title="Settings" icon={<SettingsIcon />} onClick={() => setOpenSettingsSheet(true)} />
+            {isConnected && permissions?.browserRecording && (
+              <ActionTile
+                title={isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}
+                disabled={isHLSRunning}
+                icon={<RecordIcon />}
+                onClick={() => {
+                  if (isBrowserRecordingOn || isStreamingOn) {
+                    setShowRecordingOn(true);
+                  } else {
+                    // start recording
+                  }
+                }}
+                setOpenOptionsSheet={setOpenOptionsSheet}
+              />
+            )}
           </Box>
         </Sheet.Content>
       </Sheet.Root>
@@ -190,6 +220,22 @@ export const MwebOptions = () => {
         >
           <EmojiCard />
         </Box>
+      )}
+      {showRecordingOn && (
+        <StopRecordingInSheet
+          onClose={() => setShowRecordingOn(false)}
+          onStopRecording={async () => {
+            try {
+              await hmsActions.stopRTMPAndRecording();
+              setShowRecordingOn(false);
+            } catch (error) {
+              ToastManager.addToast({
+                title: error.message,
+                variant: 'error',
+              });
+            }
+          }}
+        />
       )}
     </>
   );
