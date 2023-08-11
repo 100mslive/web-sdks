@@ -1,4 +1,5 @@
 import React, { Suspense, useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import {
   BrbIcon,
@@ -21,7 +22,6 @@ import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import useOnClickOutside from '../../../common/hooks';
 import { FEATURE_LIST } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
@@ -65,7 +65,7 @@ export const MwebOptions = () => {
     });
   };
 
-  useOnClickOutside(emojiCardRef, () => setShowEmojiCard(false));
+  useClickAway(emojiCardRef, () => setShowEmojiCard(false));
 
   return (
     <>
