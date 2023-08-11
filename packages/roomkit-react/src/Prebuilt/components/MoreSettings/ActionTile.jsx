@@ -1,7 +1,7 @@
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
-export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenOptionsSheet: setSheet }) => {
+export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenOptionsSheet }) => {
   return (
     <Flex
       direction="column"
@@ -9,7 +9,7 @@ export const ActionTile = ({ icon, title, active, onClick, disabled = false, set
       onClick={() => {
         if (!disabled) {
           onClick();
-          setSheet(false);
+          setOpenOptionsSheet(false);
         }
       }}
       css={{
