@@ -1,9 +1,21 @@
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useRef, useState } from 'react';
+import { useClickAway } from 'react-use';
 import { selectIsLocalVideoEnabled, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CrossIcon, DragHandleIcon, HandIcon, MicOffIcon, PencilIcon } from '@100mslive/react-icons';
+import {
+  BrbIcon,
+  CrossIcon,
+  DragHandleIcon,
+  EmojiIcon,
+  HandIcon,
+  MicOffIcon,
+  PencilIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
 import { Box, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
+import { EmojiCard } from '../../Footer/EmojiCard';
+import SettingsModal from '../../Settings/SettingsModal';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
@@ -32,8 +44,13 @@ export const MwebOptions = () => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+
+  const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
+  const [showEmojiCard, setShowEmojiCard] = useState(false);
+
+  const emojiCardRef = useRef(null);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -49,9 +66,11 @@ export const MwebOptions = () => {
     });
   };
 
+  useClickAway(emojiCardRef, () => setShowEmojiCard(false));
+
   return (
     <>
-      <Sheet.Root open={openSettingsSheet} onOpenChange={setOpenSettingsSheet}>
+      <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Sheet.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
             <Tooltip title="More options">
@@ -98,7 +117,7 @@ export const MwebOptions = () => {
                 icon={<HandIcon />}
                 onClick={toggleHandRaise}
                 active={isHandRaised}
-                setOpenSettingsSheet={setOpenSettingsSheet}
+                setOpenOptionsSheet={setOpenOptionsSheet}
               />
             ) : null}
             {isBRBEnabled ? (
@@ -107,7 +126,7 @@ export const MwebOptions = () => {
                 icon={<BrbIcon />}
                 onClick={toggleBRB}
                 active={isBRBOn}
-                setOpenSettingsSheet={setOpenSettingsSheet}
+                setOpenOptionsSheet={setOpenOptionsSheet}
               />
             ) : null}
             {permissions.mute ? (
@@ -115,31 +134,62 @@ export const MwebOptions = () => {
                 title="Mute All"
                 icon={<MicOffIcon />}
                 onClick={() => updateState(MODALS.MUTE_ALL, true)}
-                setOpenSettingsSheet={setOpenSettingsSheet}
+                setOpenOptionsSheet={setOpenOptionsSheet}
               />
             ) : null}
             <ActionTile
               title="Change Name"
               icon={<PencilIcon />}
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
-              setOpenSettingsSheet={setOpenSettingsSheet}
+              setOpenOptionsSheet={setOpenOptionsSheet}
             />
             {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile />
               </Suspense>
             ) : null}
+            <ActionTile
+              title="Emoji Reactions"
+              icon={<EmojiIcon />}
+              onClick={() => setShowEmojiCard(true)}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+            />
+            <ActionTile title="Settings" icon={<SettingsIcon />} onClick={() => setOpenSettingsSheet(true)} />
           </Box>
         </Sheet.Content>
       </Sheet.Root>
+      <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} />
       {openModals.has(MODALS.MUTE_ALL) && (
         <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}
       {openModals.has(MODALS.CHANGE_NAME) && (
         <ChangeNameModal
           onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
-          openParentSheet={() => setOpenSettingsSheet(true)}
+          openParentSheet={() => setOpenOptionsSheet(true)}
         />
+      )}
+
+      {showEmojiCard && (
+        <Box
+          onClick={() => setShowEmojiCard(false)}
+          ref={emojiCardRef}
+          css={{
+            maxWidth: '100%',
+            w: '100%',
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: '$18',
+            bg: '$surface_default',
+            zIndex: '10',
+            p: '$8',
+            pb: 0,
+            r: '$1',
+            mx: '$4',
+          }}
+        >
+          <EmojiCard />
+        </Box>
       )}
     </>
   );

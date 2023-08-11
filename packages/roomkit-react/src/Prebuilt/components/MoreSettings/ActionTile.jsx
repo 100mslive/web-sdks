@@ -1,7 +1,7 @@
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
-export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenSettingsSheet: setSheet }) => {
+export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenOptionsSheet }) => {
   return (
     <Flex
       direction="column"
@@ -9,7 +9,7 @@ export const ActionTile = ({ icon, title, active, onClick, disabled = false, set
       onClick={() => {
         if (!disabled) {
           onClick();
-          setSheet(false);
+          setOpenOptionsSheet(false);
         }
       }}
       css={{
@@ -18,6 +18,9 @@ export const ActionTile = ({ icon, title, active, onClick, disabled = false, set
         color: disabled ? '$on_surface_low' : '$on_surface_high',
         gap: '$4',
         r: '$1',
+        '&:hover': {
+          bg: '$surface_bright',
+        },
       }}
     >
       {icon}
