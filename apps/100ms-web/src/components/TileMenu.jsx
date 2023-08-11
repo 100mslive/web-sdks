@@ -180,12 +180,7 @@ const TileMenu = ({
                 audioTrackID={audioTrackID}
                 videoTrackID={videoTrackID}
               />
-              {showSpotlight && (
-                <SpotlightActions
-                  audioTrackID={audioTrackID}
-                  videoTrackID={videoTrackID}
-                />
-              )}
+              {showSpotlight && <SpotlightActions peerId={peerID} />}
             </>
           )
         ) : (

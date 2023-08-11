@@ -78,8 +78,6 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
   );
 };
 
-const showSpotlight = process.env.REACT_APP_ENV === 'qa';
-
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
@@ -88,11 +86,12 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers } = useHMSStore(selectPermissions);
+  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
     videoTrackID,
   );
+  const showSpotlight = changeRole;
   const { sendEvent } = useCustomEvent({
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
@@ -127,7 +126,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
           showPinAction && (
             <>
               <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-              {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+              {showSpotlight && <SpotlightActions peerId={peerID} />}
             </>
           )
         ) : (
@@ -164,7 +163,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
             {showPinAction && (
               <>
                 <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-                {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+                {showSpotlight && <SpotlightActions peerId={peerID} />}
               </>
             )}
             <SimulcastLayers trackId={videoTrackID} />
