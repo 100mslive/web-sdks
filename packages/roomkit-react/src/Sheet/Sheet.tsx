@@ -35,7 +35,7 @@ const StyledContent = styled(DialogPrimitive.Content, {
   borderTopRightRadius: '$3',
   boxShadow: '0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23)',
   position: 'fixed',
-  zIndex: 999,
+  zIndex: 1001,
   top: 0,
   right: 0,
   left: 0,
