@@ -18,6 +18,7 @@
         "ignoreRestSiblings": false
       }
     ],
+    "react/react-in-jsx-scope": "error",
     "react/jsx-curly-brace-presence": [
       2,
       {

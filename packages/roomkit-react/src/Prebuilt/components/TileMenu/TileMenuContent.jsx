@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  selectPeerNameByID,
-  selectPermissions,
-  useCustomEvent,
-  useHMSActions,
-  useHMSStore,
-  useRemoteAVToggle,
-} from '@100mslive/react-sdk';
+import { selectPermissions, useCustomEvent, useHMSActions, useHMSStore, useRemoteAVToggle } from '@100mslive/react-sdk';
 import {
   MicOffIcon,
   MicOnIcon,
@@ -36,7 +29,9 @@ export const TileMenuContent = props => {
     showPinAction,
     peerID,
     spacingCSS,
-    closeSheetOnClick = () => {},
+    closeSheetOnClick = () => {
+      return;
+    },
   } = props;
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
@@ -52,7 +47,7 @@ export const TileMenuContent = props => {
     showPinAction && (
       <>
         <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-        {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+        {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
       </>
     )
   ) : (
@@ -97,7 +92,7 @@ export const TileMenuContent = props => {
       {showPinAction && (
         <>
           <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-          {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
+          {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         </>
       )}
       <SimulcastLayers trackId={videoTrackID} />

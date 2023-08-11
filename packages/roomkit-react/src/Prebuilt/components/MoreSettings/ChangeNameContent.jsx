@@ -1,3 +1,4 @@
+import React from 'react';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Input } from '../../../Input';

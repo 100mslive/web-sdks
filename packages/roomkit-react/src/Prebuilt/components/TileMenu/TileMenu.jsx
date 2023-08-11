@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
   selectPeerNameByID,
@@ -12,7 +13,10 @@ import {
   useRemoteAVToggle,
 } from '@100mslive/react-sdk';
 import { CrossIcon, HorizontalMenuIcon, PinIcon, StarIcon } from '@100mslive/react-icons';
+import { Box } from '../../../Layout';
+import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { TileMenuContent } from './TileMenuContent';
@@ -21,34 +25,38 @@ import { useDropdownList } from '../hooks/useDropdownList';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { APP_DATA, FEATURE_LIST, SESSION_STORE_KEY } from '../../common/constants';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../Theme';
-import { Sheet } from '../../../Sheet';
-import { Box } from '../../../Layout';
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
-const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
+const SpotlightActions = ({
+  peerId,
+  onSpotLightClick = () => {
+    return;
+  },
+}) => {
   const hmsActions = useHMSActions();
-  const spotlightTrackId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
-  const isTileSpotlighted = isSameTile({
-    trackId: spotlightTrackId,
-    videoTrackID,
-    audioTrackID,
-  });
+  const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
+  const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightTrackId = trackId =>
+  const setSpotlightPeerId = peer =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, trackId)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
       .catch(err => ToastManager.addToast({ title: err.description }));
 
   return (
     <StyledMenuTile.ItemButton
       css={spacingCSS}
-      onClick={() => (isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(videoTrackID || audioTrackID))}
+      onClick={() => {
+        if (isTileSpotlighted) {
+          setSpotlightPeerId();
+        } else {
+          setSpotlightPeerId(peerId);
+        }
+        onSpotLightClick();
+      }}
     >
       <StarIcon />
       <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
@@ -78,8 +86,6 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
   );
 };
 
-const showSpotlight = process.env.REACT_APP_ENV === 'qa';
-
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
@@ -87,8 +93,9 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
   const [open, setOpen] = useState(false);
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers } = useHMSStore(selectPermissions);
+  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
   const { setVolume, toggleAudio, toggleVideo } = useRemoteAVToggle(audioTrackID, videoTrackID);
+  const showSpotlight = changeRole;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
   const uiMode = useHMSStore(selectTemplateAppData).uiMode;

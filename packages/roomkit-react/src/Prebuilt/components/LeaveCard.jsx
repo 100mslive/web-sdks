@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 
