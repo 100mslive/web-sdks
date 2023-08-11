@@ -2,14 +2,14 @@ import React from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '../../Pagination';
 
-export const Pagination = ({ page, setPage, numPages }) => {
+export const Pagination = ({ page, onPageChange, numPages }) => {
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
   const nextPage = () => {
-    setPage(Math.min(page + 1, numPages - 1));
+    onPageChange(Math.min(page + 1, numPages - 1));
   };
   const prevPage = () => {
-    setPage(Math.max(page - 1, 0));
+    onPageChange(Math.max(page - 1, 0));
   };
   return (
     <StyledPagination.Root>
@@ -18,7 +18,7 @@ export const Pagination = ({ page, setPage, numPages }) => {
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
         {[...Array(numPages)].map((_, i) => (
-          <StyledPagination.Dot key={i} active={page === i} onClick={() => setPage(i)} />
+          <StyledPagination.Dot key={i} active={page === i} onClick={() => onPageChange(i)} />
         ))}
       </StyledPagination.Dots>
       <StyledPagination.Chevron disabled={disableRight} onClick={nextPage}>
