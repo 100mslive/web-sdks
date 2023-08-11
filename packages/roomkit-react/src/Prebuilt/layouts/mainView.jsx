@@ -71,6 +71,9 @@ export const ConferenceMainView = () => {
   }, [hmsActions, isHLSStarted, setHLSStarted]);
 
   useEffect(() => {
+    if (!isConnected) {
+      return;
+    }
     // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
       startHLS();
