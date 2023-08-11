@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
-  selectPeerNameByID,
+  selectPeerByID,
   selectPermissions,
   selectSessionStore,
   selectTemplateAppData,
@@ -13,7 +13,7 @@ import {
   useRemoteAVToggle,
 } from '@100mslive/react-sdk';
 import { CrossIcon, HorizontalMenuIcon, PinIcon, StarIcon } from '@100mslive/react-icons';
-import { Box } from '../../../Layout';
+import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
@@ -107,7 +107,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   const isMobile = useMedia(cssConfig.media.md);
-  const peerName = useHMSStore(selectPeerNameByID(peerID));
+  const peer = useHMSStore(selectPeerByID(peerID));
 
   useDropdownList({ open, name: 'TileMenu' });
 
@@ -142,7 +142,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
       {isMobile ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
-            <Text
+            <Flex
               css={{
                 color: '$on_surface_high',
                 display: 'flex',
@@ -151,16 +151,23 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
                 alignItems: 'center',
                 px: '$10',
                 pb: '$8',
-                fontWeight: '$semiBold',
                 borderBottom: '1px solid $border_default',
               }}
             >
-              {peerName}
-              {isLocal ? ` (You)` : null}
+              <Box>
+                <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                  {peer.name}
+                  {isLocal ? ` (You)` : null}
+                </Text>
+                <Text variant="xs" css={{ color: '$on_surface_low' }}>
+                  {peer?.roleName}
+                </Text>
+              </Box>
+
               <Sheet.Close css={{ color: 'inherit' }}>
                 <CrossIcon />
               </Sheet.Close>
-            </Text>
+            </Flex>
             <Box css={{ px: '$8' }}>
               <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
             </Box>
