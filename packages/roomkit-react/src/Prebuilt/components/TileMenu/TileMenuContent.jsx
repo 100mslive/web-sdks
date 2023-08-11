@@ -36,6 +36,7 @@ export const TileMenuContent = props => {
     showPinAction,
     peerID,
     spacingCSS,
+    closeSheetOnClick = () => {},
   } = props;
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
@@ -59,7 +60,10 @@ export const TileMenuContent = props => {
       {toggleVideo ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
-          onClick={toggleVideo}
+          onClick={() => {
+            toggleVideo();
+            closeSheetOnClick();
+          }}
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
           {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
@@ -69,7 +73,10 @@ export const TileMenuContent = props => {
       {toggleAudio ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
-          onClick={toggleAudio}
+          onClick={() => {
+            toggleAudio();
+            closeSheetOnClick();
+          }}
           data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
           {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
@@ -103,6 +110,7 @@ export const TileMenuContent = props => {
             } catch (error) {
               // TODO: Toast here
             }
+            closeSheetOnClick();
           }}
           data-testid="remove_participant_btn"
         >
@@ -112,7 +120,13 @@ export const TileMenuContent = props => {
       ) : null}
 
       {removeOthers && isScreenshare ? (
-        <StyledMenuTile.RemoveItem onClick={() => sendEvent({})} css={spacingCSS}>
+        <StyledMenuTile.RemoveItem
+          onClick={() => {
+            sendEvent({});
+            closeSheetOnClick();
+          }}
+          css={spacingCSS}
+        >
           <ShareScreenIcon />
           <span>Stop Screenshare</span>
         </StyledMenuTile.RemoveItem>

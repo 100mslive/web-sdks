@@ -155,7 +155,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
               </Sheet.Close>
             </Text>
             <Box css={{ px: '$8' }}>
-              <TileMenuContent {...props} />
+              <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
             </Box>
           </Sheet.Content>
         </Sheet.Root>
