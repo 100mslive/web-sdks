@@ -1,6 +1,6 @@
 import React, { Suspense, useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
-import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsLocalVideoEnabled, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import {
   BrbIcon,
   CrossIcon,
@@ -50,6 +50,7 @@ export const MwebOptions = () => {
   const [showEmojiCard, setShowEmojiCard] = useState(false);
 
   const emojiCardRef = useRef(null);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -142,9 +143,11 @@ export const MwebOptions = () => {
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               setOpenOptionsSheet={setOpenOptionsSheet}
             />
-            <Suspense fallback="">
-              <VirtualBackground asActionTile />
-            </Suspense>
+            {isVideoOn ? (
+              <Suspense fallback="">
+                <VirtualBackground asActionTile />
+              </Suspense>
+            ) : null}
             <ActionTile
               title="Emoji Reactions"
               icon={<EmojiIcon />}

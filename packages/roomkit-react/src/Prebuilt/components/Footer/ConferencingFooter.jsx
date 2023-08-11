@@ -6,7 +6,6 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-// import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
@@ -20,10 +19,10 @@ export const ConferencingFooter = () => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   return (
-    <AppFooter.Root>
+    <AppFooter.Root css={{ '@md': { gap: '$10' } }}>
       {isMobile ? (
         <>
-          <AppFooter.Center>
+          <AppFooter.Center css={{ gap: '$10' }}>
             <LeaveRoom />
             <AudioVideoToggle hideOptions />
             <ChatToggle />
