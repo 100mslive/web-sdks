@@ -47,12 +47,16 @@ export const EmojiCard = () => {
     };
     sendEvent(data, { roleNames: filteredRoles });
     if (isStreamingOn) {
-      await hmsActions.sendHLSTimedMetadata([
-        {
-          payload: JSON.stringify(data),
-          duration: 2,
-        },
-      ]);
+      try {
+        await hmsActions.sendHLSTimedMetadata([
+          {
+            payload: JSON.stringify(data),
+            duration: 2,
+          },
+        ]);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
   return emojiReactionList.map((emojiLine, index) => (
