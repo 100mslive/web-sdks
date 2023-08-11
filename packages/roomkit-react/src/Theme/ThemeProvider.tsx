@@ -72,16 +72,13 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     return updatedTheme;
   }, [userTheme, currentTheme, isBrowser]);
 
-  const toggleTheme = useCallback(
-    (themeToUpdateTo?: ThemeTypes) => {
-      if (themeToUpdateTo) {
-        setCurrentTheme(themeToUpdateTo);
-        return;
-      }
-      setCurrentTheme(ThemeTypes.default);
-    },
-    [currentTheme],
-  );
+  const toggleTheme = useCallback((themeToUpdateTo?: ThemeTypes) => {
+    if (themeToUpdateTo) {
+      setCurrentTheme(themeToUpdateTo);
+      return;
+    }
+    setCurrentTheme(ThemeTypes.default);
+  }, []);
 
   useEffect(() => {
     if (themeType) {
