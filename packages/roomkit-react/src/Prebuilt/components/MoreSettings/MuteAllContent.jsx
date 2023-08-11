@@ -1,3 +1,4 @@
+import React from 'react';
 import { Button } from '../../../Button';
 import { Label } from '../../../Label';
 import { Flex } from '../../../Layout';

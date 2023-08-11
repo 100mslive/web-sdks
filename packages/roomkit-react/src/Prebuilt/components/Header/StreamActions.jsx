@@ -35,7 +35,7 @@ export const LiveStatus = () => {
         setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
       }
     }, 1000);
-  }, []);
+  }, [hlsState?.running, hlsState?.variants]);
 
   useEffect(() => {
     if (hlsState?.running && !isMobile) {

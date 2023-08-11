@@ -1,3 +1,4 @@
+import React from 'react';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
