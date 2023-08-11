@@ -17,7 +17,12 @@ import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
 import { getRandomVirtualBackground } from './vbutils';
 import { FEATURE_LIST } from '../../common/constants';
 
-export const VirtualBackground = ({ asActionTile = false }) => {
+export const VirtualBackground = ({
+  asActionTile = false,
+  onVBClick = () => {
+    return;
+  },
+}) => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
@@ -78,8 +83,9 @@ export const VirtualBackground = ({ asActionTile = false }) => {
         onClick={() => {
           setIsVBOn(!isVBOn);
           !isVBPresent ? addPlugin() : removePlugin();
+          onVBClick();
         }}
-        active={isVBOn}
+        active={isVBPresent}
         disabled={isVBLoading}
         data-testid="virtual_bg_btn"
       />

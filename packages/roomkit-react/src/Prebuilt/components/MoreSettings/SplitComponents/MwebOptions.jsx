@@ -160,7 +160,7 @@ export const MwebOptions = () => {
             />
             {isVideoOn ? (
               <Suspense fallback="">
-                <VirtualBackground asActionTile />
+                <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
             ) : null}
             <ActionTile
@@ -169,7 +169,13 @@ export const MwebOptions = () => {
               onClick={() => setShowEmojiCard(true)}
               setOpenOptionsSheet={setOpenOptionsSheet}
             />
-            <ActionTile title="Settings" icon={<SettingsIcon />} onClick={() => setOpenSettingsSheet(true)} />
+            <ActionTile
+              title="Settings"
+              icon={<SettingsIcon />}
+              onClick={() => setOpenSettingsSheet(true)}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+            />
+
             {isConnected && permissions?.browserRecording && (
               <ActionTile
                 title={isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}
