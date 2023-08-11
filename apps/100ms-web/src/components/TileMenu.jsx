@@ -47,16 +47,12 @@ const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   ((videoTrackID && videoTrackID === trackId) ||
     (audioTrackID && audioTrackID === trackId));
 
-const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
+const SpotlightActions = ({ peerId }) => {
   const hmsActions = useHMSActions();
-  const spotlightTrackId = useHMSStore(
+  const spotlightPeerId = useHMSStore(
     selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)
   );
-  const isTileSpotlighted = isSameTile({
-    trackId: spotlightTrackId,
-    videoTrackID,
-    audioTrackID,
-  });
+  const isTileSpotlighted = spotlightPeerId === peerId;
 
   const setSpotlightTrackId = trackId =>
     hmsActions.sessionStore
@@ -66,9 +62,7 @@ const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
   return (
     <StyledMenuTile.ItemButton
       onClick={() =>
-        isTileSpotlighted
-          ? setSpotlightTrackId()
-          : setSpotlightTrackId(videoTrackID || audioTrackID)
+        isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(peerId)
       }
     >
       <StarIcon />
@@ -244,12 +238,7 @@ const TileMenu = ({
                   audioTrackID={audioTrackID}
                   videoTrackID={videoTrackID}
                 />
-                {showSpotlight && (
-                  <SpotlightActions
-                    audioTrackID={audioTrackID}
-                    videoTrackID={videoTrackID}
-                  />
-                )}
+                {showSpotlight && <SpotlightActions peerId={peerID} />}
               </>
             )}
             <SimulcastLayers trackId={videoTrackID} />
