@@ -18,6 +18,9 @@ export const ActionTile = ({ icon, title, active, onClick, disabled = false, set
         color: disabled ? '$on_surface_low' : '$on_surface_high',
         gap: '$4',
         r: '$1',
+        '&:hover': {
+          bg: '$surface_bright',
+        },
       }}
     >
       {icon}
