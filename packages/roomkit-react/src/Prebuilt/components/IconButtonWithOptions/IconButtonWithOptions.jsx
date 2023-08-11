@@ -5,12 +5,6 @@ import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
 
-const iconButtonWithoutOptionsCSS = {
-  mx: 0,
-  borderTopRightRadius: '$1',
-  borderBottomRightRadius: '$1',
-};
-
 const IconSection = styled(IconButton, {
   w: 'unset',
   h: '$14',
@@ -19,7 +13,11 @@ const IconSection = styled(IconButton, {
   borderTopRightRadius: 0,
   borderColor: '$border_default',
   borderBottomRightRadius: 0,
-  '@md': iconButtonWithoutOptionsCSS,
+  '@md': {
+    mx: 0,
+    borderTopRightRadius: '$1',
+    borderBottomRightRadius: '$1',
+  },
 });
 
 const OptionsSection = styled(IconButton, {
@@ -47,14 +45,12 @@ export const IconButtonWithOptions = ({
   onClick = () => {
     return;
   },
-
-  hideOptions = false,
 }) => {
   const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
   const iconCss = { color: active ? '$on_surface_high' : '$on_primary_high' };
   return (
     <Flex>
-      <IconSection css={{ ...bgCss, ...(hideOptions ? iconButtonWithoutOptionsCSS : {}) }} onClick={onClick}>
+      <IconSection css={bgCss} onClick={onClick}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Flex align="center" justify="center" css={iconCss}>
             {icon}
@@ -63,7 +59,7 @@ export const IconButtonWithOptions = ({
       </IconSection>
       <Dropdown.Root>
         <Dropdown.Trigger asChild>
-          <OptionsSection css={{ ...bgCss, ...(hideOptions ? { display: 'none' } : {}) }}>
+          <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
               <Box css={iconCss}>
                 <VerticalMenuIcon />

@@ -2,8 +2,10 @@ import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
+import { useShowStreamingUI } from '../common/hooks';
 
 export const EndSessionContent = ({ setShowEndRoomAlert, endRoom, isModal = false }) => {
+  const showStreamingUI = useShowStreamingUI();
   return (
     <Box>
       <Flex
@@ -15,7 +17,7 @@ export const EndSessionContent = ({ setShowEndRoomAlert, endRoom, isModal = fals
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
         <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
-          End Session
+          End {showStreamingUI ? 'Stream' : 'Session'}
         </Text>
         {isModal ? null : (
           <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowEndRoomAlert(false)}>
@@ -24,7 +26,8 @@ export const EndSessionContent = ({ setShowEndRoomAlert, endRoom, isModal = fals
         )}
       </Flex>
       <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-        The session will end for everyone and all the activities will stop. You can't undo this action.
+        The {showStreamingUI ? 'stream' : 'session'} will end for everyone and all the activities will stop. You can't
+        undo this action.
       </Text>
       <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
         <Button
@@ -36,7 +39,7 @@ export const EndSessionContent = ({ setShowEndRoomAlert, endRoom, isModal = fals
           Cancel
         </Button>
         <Button variant="danger" css={{ w: '100%' }} onClick={endRoom} id="lockRoom" data-testid="lock_end_room">
-          End Session
+          End {showStreamingUI ? 'Stream' : 'Session'}
         </Button>
       </Flex>
     </Box>
