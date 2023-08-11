@@ -43,5 +43,6 @@ export type { usePDFShareResult } from './hooks/usePDFShare';
 // helpers
 export { throwErrorHandler } from './utils/commons';
 
+export { getVideoTracksFromPeers as getPeersWithTiles } from './utils/layout';
 // reexport everything from store so app can import everything directly from this
 export * from '@100mslive/hms-video-store';
