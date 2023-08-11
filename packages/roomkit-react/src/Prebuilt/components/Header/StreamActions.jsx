@@ -17,6 +17,7 @@ import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { formatTime } from '../../common/utils';
 import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export const LiveStatus = () => {
@@ -33,10 +34,6 @@ export const LiveStatus = () => {
         setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
       }
     }, 1000);
-
-    return () => {
-      clearInterval(intervalRef.current);
-    };
   }, []);
 
   useEffect(() => {
@@ -46,16 +43,13 @@ export const LiveStatus = () => {
     if (!hlsState?.running && intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [hlsState.running, isMobile, startTimer]);
 
-  const formatTime = timeInSeconds => {
-    timeInSeconds = Math.floor(timeInSeconds / 1000);
-    const hours = Math.floor(timeInSeconds / 3600);
-    const minutes = Math.floor((timeInSeconds % 3600) / 60);
-    const seconds = timeInSeconds % 60;
-    const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
-    return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
@@ -108,15 +102,14 @@ export const RecordingStatus = () => {
         isHLSRecordingOn,
       })}
     >
-      <Box
+      <Flex
         css={{
           color: '$alert_error_default',
-          display: 'flex',
           alignItems: 'center',
         }}
       >
         <RecordIcon width={24} height={24} />
-      </Box>
+      </Flex>
     </Tooltip>
   );
 };

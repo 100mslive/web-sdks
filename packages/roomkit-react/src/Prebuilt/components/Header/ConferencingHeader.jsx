@@ -11,17 +11,32 @@ export const ConferencingHeader = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isPreview = roomState === HMSRoomState.Preview;
 
+  if (!isPreview) {
+    return (
+      <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
+        <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
+          <Logo />
+        </Flex>
+        <Flex
+          align="center"
+          css={{
+            position: 'absolute',
+            right: '$10',
+            gap: '$4',
+          }}
+        >
+          <StreamActions />
+        </Flex>
+      </Flex>
+    );
+  }
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
         <Logo />
-        {!isPreview ? (
-          <>
-            <VerticalDivider css={{ ml: '$8' }} /> <SpeakerTag />
-          </>
-        ) : null}
+        <VerticalDivider css={{ ml: '$8' }} />
+        <SpeakerTag />
       </Flex>
-
       <Flex
         align="center"
         css={{
@@ -30,9 +45,13 @@ export const ConferencingHeader = () => {
           gap: '$4',
         }}
       >
-        {!isPreview && <StreamActions />}
-        {!isPreview && isMobile && <CamaraFlipActions />}
-        {!isPreview && isMobile && <AudioOutputActions />}
+        <StreamActions />
+        {isMobile && (
+          <>
+            <CamaraFlipActions />
+            <AudioOutputActions />{' '}
+          </>
+        )}
       </Flex>
     </Flex>
   );
