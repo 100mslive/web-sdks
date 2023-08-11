@@ -1,22 +1,18 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePrevious } from 'react-use';
-import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   HMSRoomState,
   selectAppData,
   selectIsConnectedToRoom,
-  selectPermissions,
   selectRoomState,
   useHMSActions,
   useHMSStore,
-  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
@@ -43,13 +39,7 @@ const Conference = () => {
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
-
-  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-
-  const { isHLSRunning } = useRecordingStreaming();
-  const permissions = useHMSStore(selectPermissions);
-  const roomLayout = useRoomLayout();
-  const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+  const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
@@ -89,34 +79,6 @@ const Conference = () => {
       else navigate(`/preview/${roomId || ''}`);
     }
   }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, showPreview]);
-
-  const startHLS = useCallback(async () => {
-    try {
-      if (isHLSStarted) {
-        return;
-      }
-      setHLSStarted(true);
-      await hmsActions.startHLSStreaming({});
-    } catch (error) {
-      if (error.message.includes('invalid input')) {
-        await startHLS();
-        return;
-      }
-      setHLSStarted(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Is a streaming kit and broadcaster joins
-    if (
-      permissions?.hlsStreaming &&
-      !isHLSRunning &&
-      !isHLSStarted &&
-      joinForm.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE
-    ) {
-      startHLS();
-    }
-  }, []);
 
   useEffect(() => {
     if (authTokenInAppData && !isConnectedToRoom && !showPreview && roomState !== HMSRoomState.Connecting) {
