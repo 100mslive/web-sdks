@@ -1,4 +1,5 @@
 import {
+  DeviceType,
   selectIsLocalVideoEnabled,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
@@ -6,8 +7,12 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CameraFlipIcon, SpeakerIcon } from '@100mslive/react-icons';
-import { Box } from '../../../Layout';
+import { CameraFlipIcon, CheckIcon, CrossIcon, SpeakerIcon } from '@100mslive/react-icons';
+import { HorizontalDivider } from '../../../Divider';
+import { Label } from '../../../Label';
+import { Box, Flex } from '../../../Layout';
+import { Sheet } from '../../../Sheet';
+import { Text } from '../../../Text';
 import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 
@@ -41,8 +46,8 @@ export const CamaraFlipActions = () => {
   );
 };
 
-export const AudioOutputActions = ({ disabled = false }) => {
-  const { allDevices } = useDevices();
+export const AudioOutputActions = () => {
+  const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { audioOutput } = allDevices;
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
@@ -56,22 +61,103 @@ export const AudioOutputActions = ({ disabled = false }) => {
     return null;
   }
   return (
-    <Box>
-      <IconButton
-        disabled={disabled}
-        onClick={async () => {
-          try {
-            // TODO add audio out bottomsheet once integrated with bottomsheet pr
-          } catch (e) {
-            ToastManager.addToast({
-              title: `Error while changin audio output ${e.message || ''}`,
-              variant: 'error',
-            });
-          }
+    <AudioOutputSelectionSheet
+      outputDevices={audioOutput}
+      outputSelected={selectedDeviceIDs.outputDevices}
+      onChange={deviceId => {
+        try {
+          updateDevice({
+            deviceId,
+            deviceType: DeviceType.audioOutput,
+          });
+        } catch (e) {
+          ToastManager.addToast({
+            title: `Error while changing audio output ${e.message || ''}`,
+            variant: 'error',
+          });
+        }
+      }}
+    >
+      <Box>
+        <IconButton>
+          <SpeakerIcon />
+        </IconButton>
+      </Box>
+    </AudioOutputSelectionSheet>
+  );
+};
+
+const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, children }) => {
+  return (
+    <Sheet.Root>
+      <Sheet.Trigger asChild>{children}</Sheet.Trigger>
+      <Sheet.Content>
+        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%' }}>
+            <Text variant="h6" css={{ display: 'flex' }}>
+              Audio Output
+            </Text>
+            <Sheet.Close>
+              <IconButton as="div" data-testid="dialog_cross_icon">
+                <CrossIcon />
+              </IconButton>
+            </Sheet.Close>
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        <Flex
+          direction="column"
+          css={{
+            px: '$8',
+            maxHeight: '80vh',
+            overflowY: 'scroll',
+          }}
+        >
+          {outputDevices.map(audioDevice => {
+            return (
+              <SelectWithLabel
+                label={audioDevice.label}
+                id={audioDevice.deviceId}
+                checked={audioDevice.deviceId === outputSelected}
+                onChange={() => onChange(audioDevice.deviceId)}
+              />
+            );
+          })}
+        </Flex>
+      </Sheet.Content>
+    </Sheet.Root>
+  );
+};
+
+const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
+  return (
+    <Flex
+      align="center"
+      css={{
+        my: '$2',
+        py: '$8',
+        w: '100%',
+        borderBottom: '1px solid $border_default',
+      }}
+      onClick={onChange}
+    >
+      <Label
+        htmlFor={id}
+        css={{
+          fontSize: '$md',
+          fontWeight: '$semiBold',
+          color: checked ? '$on_surface_high' : '$on_surface_low',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '$8',
+          flex: '1 1 0',
         }}
       >
-        <SpeakerIcon />
-      </IconButton>
-    </Box>
+        {icon}
+        {label}
+      </Label>
+      {checked && <CheckIcon width={24} height={24} />}
+    </Flex>
   );
 };
