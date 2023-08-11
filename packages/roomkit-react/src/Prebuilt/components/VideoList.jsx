@@ -62,7 +62,7 @@ const List = ({ maxTileCount, peers, maxColCount, maxRowCount, includeScreenShar
           : null}
       </StyledVideoList.Container>
       {!isHeadless && pagesWithTiles.length > 1 ? (
-        <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />
+        <Pagination page={page} setPage={setPage} numPages={pagesWithTiles.length} />
       ) : null}
     </StyledVideoList.Root>
   );

@@ -21,7 +21,6 @@ const Chevron = styled('button', {
     color: '$on_surface_low',
     cursor: 'not-allowed',
   },
-  backgroundColor: 'transparent',
   display: 'flex',
 });
 
