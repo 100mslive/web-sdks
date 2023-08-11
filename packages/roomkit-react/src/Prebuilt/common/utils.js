@@ -83,3 +83,9 @@ export const getUpdatedHeight = (e, MINIMUM_HEIGHT) => {
   const sheetHeightInVH = Math.max(MINIMUM_HEIGHT, heightToPercentage > 80 ? 100 : heightToPercentage);
   return `${sheetHeightInVH}vh`;
 };
+
+export const getFormattedCount = num => {
+  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  const formattedNum = formatter.format(num);
+  return formattedNum;
+};

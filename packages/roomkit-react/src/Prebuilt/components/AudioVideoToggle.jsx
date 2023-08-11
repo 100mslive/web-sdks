@@ -18,7 +18,7 @@ import { isMacOS } from '../common/constants';
 
 const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%', p: '$8' };
 
-export const AudioVideoToggle = () => {
+export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
 
@@ -77,6 +77,7 @@ export const AudioVideoToggle = () => {
           active={isLocalAudioEnabled}
           onClick={toggleAudio}
           key="toggleAudio"
+          hideOptions={hideOptions}
         />
       ) : null}
 
@@ -94,6 +95,7 @@ export const AudioVideoToggle = () => {
           key="toggleVideo"
           active={isLocalVideoEnabled}
           onClick={toggleVideo}
+          hideOptions={hideOptions}
         />
       ) : null}
 

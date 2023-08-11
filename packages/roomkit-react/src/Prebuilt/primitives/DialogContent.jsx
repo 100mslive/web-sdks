@@ -172,7 +172,7 @@ export const DialogInput = ({ title, value, onChange, placeholder, disabled, typ
     <DialogRow breakSm>
       <Label>{title}</Label>
       <Input
-        css={{ width: '70%', '@sm': { width: '100%' } }}
+        css={{ width: '70%', '@sm': { width: '100%' }, bg: '$surface_bright' }}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}

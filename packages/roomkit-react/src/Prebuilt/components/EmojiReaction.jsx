@@ -14,14 +14,13 @@ import {
 import { EmojiIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../Dropdown';
 import { Flex } from '../../Layout';
-import { Text } from '../../Text';
 import { styled } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { EMOJI_REACTION_TYPE, FEATURE_LIST, HLS_TIMED_METADATA_DOC_URL } from '../common/constants';
+import { EMOJI_REACTION_TYPE, FEATURE_LIST } from '../common/constants';
 
 init({ data });
 
@@ -93,34 +92,6 @@ export const EmojiReaction = () => {
               ))}
             </Flex>
           ))}
-          <div style={{ textAlign: 'center' }}>
-            <Text
-              variant="sm"
-              inline={true}
-              css={{
-                color: '$on_primary_medium',
-              }}
-            >
-              Reactions will be timed for Live Streaming viewers.{' '}
-            </Text>
-            <Text
-              variant="sm"
-              inline={true}
-              css={{
-                color: '$primary_bright',
-                fontWeight: '$semiBold',
-              }}
-            >
-              <a
-                href={HLS_TIMED_METADATA_DOC_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: 'inherit', textDecoration: 'none' }}
-              >
-                Learn more.
-              </a>
-            </Text>
-          </div>
         </Dropdown.Content>
       </Dropdown.Root>
     </Fragment>

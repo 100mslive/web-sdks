@@ -46,7 +46,7 @@ const Conference = () => {
 
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
 
-  const { isHLSRunning, isHLSRecordingOn } = useRecordingStreaming();
+  const { isHLSRunning } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
   const roomLayout = useRoomLayout();
   const { join_form: joinForm = {} } = roomLayout?.screens?.preview?.default?.elements || {};

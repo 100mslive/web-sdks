@@ -1,8 +1,9 @@
 import React from 'react';
 import { ConferencingFooter } from './Footer/ConferencingFooter';
 import { StreamingFooter } from './Footer/StreamingFooter';
-import { isStreamingKit } from '../common/utils';
+import { useShowStreamingUI } from '../common/hooks';
 
 export const Footer = () => {
-  return isStreamingKit() ? <StreamingFooter /> : <ConferencingFooter />;
+  const showStreamingUI = useShowStreamingUI();
+  return showStreamingUI ? <StreamingFooter /> : <ConferencingFooter />;
 };

@@ -2,11 +2,18 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Dialog, Flex, IconButton, Tabs, Text } from '../../../';
+import { HorizontalDivider } from '../../../Divider';
+import { IconButton } from '../../../IconButton';
+import { Box, Flex } from '../../../Layout';
+import { Dialog } from '../../../Modal';
+import { Sheet } from '../../../Sheet';
+import { Tabs } from '../../../Tabs';
+import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { settingContent, settingsList } from './common.js';
 
-const SettingsModal = ({ open, onOpenChange, children }) => {
+const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
 
@@ -43,6 +50,144 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     }
   }, [isMobile, showSetting]);
 
+  return isMobile ? (
+    <MobileSettingModal
+      open={open}
+      onOpenChange={onOpenChange}
+      selection={selection}
+      setSelection={setSelection}
+      showSetting={showSetting}
+      hideSettingByTabName={hideSettingByTabName}
+      resetSelection={resetSelection}
+      children={children}
+    />
+  ) : (
+    <DesktopSettingModal
+      open={open}
+      onOpenChange={onOpenChange}
+      selection={selection}
+      setSelection={setSelection}
+      showSetting={showSetting}
+      hideSettingByTabName={hideSettingByTabName}
+      resetSelection={resetSelection}
+      children={children}
+    />
+  );
+};
+
+const MobileSettingModal = ({
+  open,
+  onOpenChange,
+  selection,
+  setSelection,
+  showSetting,
+  hideSettingByTabName,
+  resetSelection,
+  children = <></>,
+}) => {
+  return (
+    <Sheet.Root open={open} onOpenChange={onOpenChange}>
+      <Sheet.Trigger asChild>{children}</Sheet.Trigger>
+      <Sheet.Content
+        css={{
+          height: 'max(480px, 80%)',
+        }}
+      >
+        <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%' }}>
+            {!selection ? (
+              <Text variant="h6" css={{ display: 'flex' }}>
+                Settings
+              </Text>
+            ) : (
+              <Text variant="h6" css={{ display: 'flex' }}>
+                <Box as="span" css={{ r: '$round', mr: '$2' }} onClick={resetSelection}>
+                  <ChevronLeftIcon />
+                </Box>
+                {selection?.charAt(0).toUpperCase() + selection.slice(1)}
+              </Text>
+            )}
+            <Sheet.Close>
+              <IconButton as="div" data-testid="dialog_cross_icon">
+                <CrossIcon />
+              </IconButton>
+            </Sheet.Close>
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        {!selection ? (
+          <Flex
+            direction="column"
+            css={{
+              px: '$8',
+              maxHeight: '80vh',
+              overflowY: 'scroll',
+            }}
+          >
+            {settingsList
+              .filter(({ tabName }) => showSetting[tabName])
+              .map(({ icon: Icon, tabName, title }) => {
+                return (
+                  <Box
+                    key={tabName}
+                    value={tabName}
+                    onClick={() => {
+                      setSelection(tabName);
+                    }}
+                    as="div"
+                    css={{
+                      all: 'unset',
+                      fontFamily: '$sans',
+                      py: '$10',
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: '$sm',
+                      lineHeight: '$sm',
+                      color: '$on_surface_high',
+                      userSelect: 'none',
+                      gap: '$8',
+                      cursor: 'pointer',
+                      '&:hover': {
+                        bg: '$surface_brighter',
+                        r: '$1',
+                        gap: '$8',
+                        border: 'none',
+                      },
+                      borderBottom: '1px solid $border_default',
+                    }}
+                  >
+                    <Icon />
+                    {title}
+                  </Box>
+                );
+              })}
+          </Flex>
+        ) : (
+          <Box
+            direction="column"
+            css={{ overflowY: 'scroll', px: '$8', py: '$10', maxHeight: '70vh', overflowX: 'hidden' }}
+          >
+            {settingsList
+              .filter(({ tabName }) => showSetting[tabName] && selection === tabName)
+              .map(({ content: Content, title, tabName }) => {
+                return <Content setHide={hideSettingByTabName(tabName)} />;
+              })}
+          </Box>
+        )}
+      </Sheet.Content>
+    </Sheet.Root>
+  );
+};
+const DesktopSettingModal = ({
+  open,
+  onOpenChange,
+  selection,
+  setSelection,
+  showSetting,
+  hideSettingByTabName,
+  resetSelection,
+  children = <></>,
+}) => {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
@@ -58,13 +203,13 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
         >
           <Tabs.Root
             value={selection}
-            activationMode={isMobile ? 'manual' : 'automatic'}
+            activationMode="automatic"
             onValueChange={setSelection}
             css={{ size: '100%', position: 'relative' }}
           >
             <Tabs.List
               css={{
-                w: isMobile ? '100%' : '18.625rem',
+                w: '18.625rem',
                 flexDirection: 'column',
                 bg: '$background_default',
                 p: '$14 $10',
@@ -73,7 +218,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
               }}
             >
               <Text variant="h5">Settings </Text>
-              <Flex direction="column" css={{ mx: isMobile ? '-$8' : 0, overflowY: 'auto', pt: '$10' }}>
+              <Flex direction="column" css={{ mx: 0, overflowY: 'auto', pt: '$10' }}>
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ icon: Icon, tabName, title }) => {
@@ -93,16 +238,6 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   flex: '1 1 0',
                   minWidth: 0,
                   mr: '$4',
-                  ...(isMobile
-                    ? {
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        bg: '$surface_default',
-                        width: '100%',
-                        height: '100%',
-                      }
-                    : {}),
                 }}
               >
                 {settingsList
@@ -110,7 +245,7 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
                   .map(({ content: Content, title, tabName }) => {
                     return (
                       <Tabs.Content key={tabName} value={tabName} className={settingContent()}>
-                        <SettingsContentHeader onBack={resetSelection} isMobile={isMobile}>
+                        <SettingsContentHeader onBack={resetSelection} isMobile={false}>
                           {title}
                         </SettingsContentHeader>
                         <Content setHide={hideSettingByTabName(tabName)} />
@@ -130,7 +265,6 @@ const SettingsModal = ({ open, onOpenChange, children }) => {
     </Dialog.Root>
   );
 };
-
 const SettingsContentHeader = ({ children, isMobile, onBack }) => {
   return (
     <Text variant="h6" css={{ mb: '$12', display: 'flex', alignItems: 'center' }}>
