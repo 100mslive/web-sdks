@@ -159,9 +159,11 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
                   {peer.name}
                   {isLocal ? ` (You)` : null}
                 </Text>
-                <Text variant="xs" css={{ color: '$on_surface_low' }}>
-                  {peer?.roleName}
-                </Text>
+                {peer?.roleName ? (
+                  <Text variant="xs" css={{ color: '$on_surface_low', mt: '$2' }}>
+                    {peer.roleName}
+                  </Text>
+                ) : null}
               </Box>
 
               <Sheet.Close css={{ color: 'inherit' }}>
