@@ -1,41 +1,35 @@
 import React, { Fragment, useState } from 'react';
 import {
   selectLocalPeerID,
+  selectPeerNameByID,
   selectPermissions,
   selectSessionStore,
   selectTemplateAppData,
   selectTrackByID,
   selectVideoTrackByPeerID,
-  useCustomEvent,
   useHMSActions,
   useHMSStore,
   useRemoteAVToggle,
 } from '@100mslive/react-sdk';
-import {
-  HorizontalMenuIcon,
-  MicOffIcon,
-  MicOnIcon,
-  PinIcon,
-  RemoveUserIcon,
-  ShareScreenIcon,
-  SpeakerIcon,
-  StarIcon,
-  VideoOffIcon,
-  VideoOnIcon,
-} from '@100mslive/react-icons';
-import { ToastManager } from './Toast/ToastManager';
-import { Box, Flex } from '../../Layout';
-import { Slider } from '../../Slider';
-import { Text } from '../../Text';
-import { StyledMenuTile } from '../../TileMenu';
-import { useSetAppDataByKey } from './AppData/useUISettings';
-import { useDropdownList } from './hooks/useDropdownList';
-import { useDropdownSelection } from './hooks/useDropdownSelection';
-import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../common/constants';
+import { CrossIcon, HorizontalMenuIcon, PinIcon, StarIcon } from '@100mslive/react-icons';
+import { Text } from '../../../Text';
+import { StyledMenuTile } from '../../../TileMenu';
+import { ToastManager } from '../Toast/ToastManager';
+import { TileMenuContent } from './TileMenuContent';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { useDropdownList } from '../hooks/useDropdownList';
+import { useDropdownSelection } from '../hooks/useDropdownSelection';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { APP_DATA, FEATURE_LIST, SESSION_STORE_KEY } from '../../common/constants';
+import { useMedia } from 'react-use';
+import { config as cssConfig } from '../../../Theme';
+import { Sheet } from '../../../Sheet';
+import { Box } from '../../../Layout';
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
+
+const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
 const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
   const hmsActions = useHMSActions();
@@ -53,6 +47,7 @@ const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
 
   return (
     <StyledMenuTile.ItemButton
+      css={spacingCSS}
       onClick={() => (isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(videoTrackID || audioTrackID))}
     >
       <StarIcon />
@@ -73,6 +68,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
   return (
     <>
       <StyledMenuTile.ItemButton
+        css={spacingCSS}
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
         <PinIcon />
@@ -89,17 +85,10 @@ const showSpotlight = process.env.REACT_APP_ENV === 'qa';
  */
 const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false }) => {
   const [open, setOpen] = useState(false);
-  const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
   const { removeOthers } = useHMSStore(selectPermissions);
-  const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
-    audioTrackID,
-    videoTrackID,
-  );
-  const { sendEvent } = useCustomEvent({
-    type: REMOTE_STOP_SCREENSHARE_TYPE,
-  });
+  const { setVolume, toggleAudio, toggleVideo } = useRemoteAVToggle(audioTrackID, videoTrackID);
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
   const uiMode = useHMSStore(selectTemplateAppData).uiMode;
@@ -110,6 +99,8 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
+  const isMobile = useMedia(cssConfig.media.md);
+  const peerName = useHMSStore(selectPeerNameByID(peerID));
 
   useDropdownList({ open, name: 'TileMenu' });
 
@@ -120,83 +111,59 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
   if (isInset && isLocal) {
     return null;
   }
+  const props = {
+    isLocal,
+    isScreenshare,
+    audioTrackID,
+    videoTrackID,
+    peerID,
+    isPrimaryVideoTrack,
+    showSpotlight,
+    showPinAction,
+    pinActions: PinActions,
+    spotlightActions: SpotlightActions,
+    simulcastLayers: SimulcastLayers,
+    spacingCSS,
+  };
 
   return (
     <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
       <StyledMenuTile.Trigger data-testid="participant_menu_btn" onClick={e => e.stopPropagation()}>
         <HorizontalMenuIcon />
       </StyledMenuTile.Trigger>
-      <StyledMenuTile.Content side="top" align="end">
-        {isLocal ? (
-          showPinAction && (
-            <>
-              <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-              {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
-            </>
-          )
-        ) : (
-          <>
-            {toggleVideo ? (
-              <StyledMenuTile.ItemButton
-                onClick={toggleVideo}
-                data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
-              >
-                {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
-                <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
-              </StyledMenuTile.ItemButton>
-            ) : null}
-            {toggleAudio ? (
-              <StyledMenuTile.ItemButton
-                onClick={toggleAudio}
-                data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
-              >
-                {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
-                <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
-              </StyledMenuTile.ItemButton>
-            ) : null}
-            {audioTrackID ? (
-              <StyledMenuTile.VolumeItem data-testid="participant_volume_slider">
-                <Flex align="center" gap={1}>
-                  <SpeakerIcon />
-                  <Box as="span" css={{ ml: '$4' }}>
-                    Volume ({volume})
-                  </Box>
-                </Flex>
-                <Slider css={{ my: '0.5rem' }} step={5} value={[volume]} onValueChange={e => setVolume(e[0])} />
-              </StyledMenuTile.VolumeItem>
-            ) : null}
-            {showPinAction && (
-              <>
-                <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
-                {showSpotlight && <SpotlightActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
-              </>
-            )}
-            <SimulcastLayers trackId={videoTrackID} />
-            {removeOthers ? (
-              <StyledMenuTile.RemoveItem
-                onClick={async () => {
-                  try {
-                    await actions.removePeer(peerID, '');
-                  } catch (error) {
-                    // TODO: Toast here
-                  }
-                }}
-                data-testid="remove_participant_btn"
-              >
-                <RemoveUserIcon />
-                <span>Remove Participant</span>
-              </StyledMenuTile.RemoveItem>
-            ) : null}
 
-            {removeOthers && isScreenshare ? (
-              <StyledMenuTile.RemoveItem onClick={() => sendEvent({})}>
-                <ShareScreenIcon />
-                <span>Stop Screenshare</span>
-              </StyledMenuTile.RemoveItem>
-            ) : null}
-          </>
-        )}
-      </StyledMenuTile.Content>
+      {isMobile ? (
+        <Sheet.Root open={open} onOpenChange={setOpen}>
+          <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
+            <Text
+              css={{
+                color: '$on_surface_high',
+                display: 'flex',
+                w: '100%',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                px: '$10',
+                pb: '$8',
+                fontWeight: '$semiBold',
+                borderBottom: '1px solid $border_default',
+              }}
+            >
+              {peerName}
+              {isLocal ? ` (You)` : null}
+              <Sheet.Close css={{ color: 'inherit' }}>
+                <CrossIcon />
+              </Sheet.Close>
+            </Text>
+            <Box css={{ px: '$8' }}>
+              <TileMenuContent {...props} />
+            </Box>
+          </Sheet.Content>
+        </Sheet.Root>
+      ) : (
+        <StyledMenuTile.Content side="top" align="end">
+          <TileMenuContent {...props} />
+        </StyledMenuTile.Content>
+      )}
     </StyledMenuTile.Root>
   );
 };

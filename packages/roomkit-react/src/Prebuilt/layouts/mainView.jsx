@@ -71,6 +71,14 @@ export const ConferenceMainView = () => {
   }, [hmsActions, isHLSStarted, setHLSStarted]);
 
   useEffect(() => {
+    // Is a streaming kit and broadcaster joins
+    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
+      startHLS();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (!isConnected) {
       return;
     }
@@ -83,14 +91,9 @@ export const ConferenceMainView = () => {
       hmsActions.audioPlaylist.setList(audioPlaylist);
     }
 
-    // Is a streaming kit and broadcaster joins
-    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
-      startHLS();
-    }
-
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, hmsActions, permissions, showStreamingUI]);
+  }, [isConnected, hmsActions]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
