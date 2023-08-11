@@ -42,15 +42,13 @@ const SpotlightActions = ({ peerId }) => {
   const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightTrackId = trackId =>
+  const setSpotlightPeerId = () =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, trackId)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peerId)
       .catch(err => ToastManager.addToast({ title: err.description }));
 
   return (
-    <StyledMenuTile.ItemButton
-      onClick={() => (isTileSpotlighted ? setSpotlightTrackId() : setSpotlightTrackId(peerId))}
-    >
+    <StyledMenuTile.ItemButton onClick={() => (isTileSpotlighted ? setSpotlightPeerId() : setSpotlightPeerId(peerId))}>
       <StarIcon />
       <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
     </StyledMenuTile.ItemButton>
