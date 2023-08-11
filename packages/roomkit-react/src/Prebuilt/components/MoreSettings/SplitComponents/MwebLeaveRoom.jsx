@@ -9,7 +9,7 @@ import { LeaveCard } from '../../LeaveCard';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useShowStreamingUI } from '../../../common/hooks';
 
-export const MwebLeaveRoom = ({ LeaveIconButton, endRoom, leaveRoom }) => {
+export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leaveRoom }) => {
   const [open, setOpen] = useState(false);
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);

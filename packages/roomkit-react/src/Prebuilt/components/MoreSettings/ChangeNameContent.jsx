@@ -38,11 +38,7 @@ export const ChangeNameContent = ({
           <CrossIcon />
         </Box>
       </Text>
-      <Flex
-        justify="center"
-        align="center"
-        css={{ my: '$8', w: '100%', px: isMobile ? '$4' : '', px: isMobile ? '$8' : '' }}
-      >
+      <Flex justify="center" align="center" css={{ my: '$8', w: '100%', px: isMobile ? '$8' : '' }}>
         <Input
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}

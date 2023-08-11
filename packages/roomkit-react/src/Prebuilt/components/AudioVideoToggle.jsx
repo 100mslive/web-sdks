@@ -68,35 +68,61 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   return (
     <Fragment>
       {toggleAudio ? (
-        <IconButtonWithOptions
-          options={formattedAudioInputList}
-          tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
-          icon={
-            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
-          }
-          active={isLocalAudioEnabled}
-          onClick={toggleAudio}
-          key="toggleAudio"
-          hideOptions={hideOptions}
-        />
+        hideOptions ? (
+          <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
+            <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
+              {!isLocalAudioEnabled ? (
+                <MicOffIcon data-testid="audio_off_btn" />
+              ) : (
+                <MicOnIcon data-testid="audio_on_btn" />
+              )}
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <IconButtonWithOptions
+            options={formattedAudioInputList}
+            tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
+            icon={
+              !isLocalAudioEnabled ? (
+                <MicOffIcon data-testid="audio_off_btn" />
+              ) : (
+                <MicOnIcon data-testid="audio_on_btn" />
+              )
+            }
+            active={isLocalAudioEnabled}
+            onClick={toggleAudio}
+            key="toggleAudio"
+          />
+        )
       ) : null}
 
       {toggleVideo ? (
-        <IconButtonWithOptions
-          options={formattedVideoInputList}
-          tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
-          icon={
-            !isLocalVideoEnabled ? (
-              <VideoOffIcon data-testid="video_off_btn" />
-            ) : (
-              <VideoOnIcon data-testid="video_on_btn" />
-            )
-          }
-          key="toggleVideo"
-          active={isLocalVideoEnabled}
-          onClick={toggleVideo}
-          hideOptions={hideOptions}
-        />
+        hideOptions ? (
+          <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
+            <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
+              {!isLocalVideoEnabled ? (
+                <VideoOffIcon data-testid="video_off_btn" />
+              ) : (
+                <VideoOnIcon data-testid="video_on_btn" />
+              )}
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <IconButtonWithOptions
+            options={formattedVideoInputList}
+            tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
+            icon={
+              !isLocalVideoEnabled ? (
+                <VideoOffIcon data-testid="video_off_btn" />
+              ) : (
+                <VideoOnIcon data-testid="video_on_btn" />
+              )
+            }
+            key="toggleVideo"
+            active={isLocalVideoEnabled}
+            onClick={toggleVideo}
+          />
+        )
       ) : null}
 
       {localVideoTrack?.facingMode ? (

@@ -46,11 +46,11 @@ export const LeaveRoom = () => {
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom LeaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} endRoom={endRoom} />
+    <MwebLeaveRoom leaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} endRoom={endRoom} />
   ) : (
     <DesktopLeaveRoom
-      LeaveIconButton={LeaveIconButton}
-      MenuTriggerButton={MenuTriggerButton}
+      leaveIconButton={LeaveIconButton}
+      menuTriggerButton={MenuTriggerButton}
       leaveRoom={leaveRoom}
       endRoom={endRoom}
     />
