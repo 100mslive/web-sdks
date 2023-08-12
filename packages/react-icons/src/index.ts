@@ -21,6 +21,7 @@ export { default as AudioLevelIcon } from './AudioLevelIcon';
 export { default as AudioPlayerIcon } from './AudioPlayerIcon';
 export { default as AwardIcon } from './AwardIcon';
 export { default as BrbIcon } from './BrbIcon';
+export { default as BrbTileIcon } from './BrbTileIcon';
 export { default as BackDeleteIcon } from './BackDeleteIcon';
 export { default as BackwardIcon } from './BackwardIcon';
 export { default as BagIcon } from './BagIcon';

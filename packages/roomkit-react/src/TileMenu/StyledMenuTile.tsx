@@ -13,7 +13,7 @@ const StyledTrigger = styled(Popover.Trigger, {
   width: '$13',
   height: '$13',
   color: '$on_surface_high',
-  borderRadius: '$round',
+  borderRadius: '$2',
   backgroundColor: '$surface_bright',
   cursor: 'pointer',
   border: 'none',
@@ -26,7 +26,7 @@ const StyledTrigger = styled(Popover.Trigger, {
 
 const StyledContent = styled(Popover.Content, {
   fontFamily: '$sans',
-  backgroundColor: '$surface_bright',
+  backgroundColor: '$surface_dim',
   padding: '$5 0',
   display: 'flex',
   flexDirection: 'column',
