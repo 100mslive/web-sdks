@@ -1,37 +1,81 @@
-import React, { Suspense, useEffect, useRef } from 'react';
+import React, { MutableRefObject, ReactElement, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
+  HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
+// @ts-ignore: No implicit Any
 import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
+// @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
+// @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
+// @ts-ignore: No implicit Any
 import FullPageProgress from './components/FullPageProgress';
+// @ts-ignore: No implicit Any
 import { Init } from './components/init/Init';
+// @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
+// @ts-ignore: No implicit Any
 import { Notifications } from './components/Notifications';
+// @ts-ignore: No implicit Any
 import PostLeave from './components/PostLeave';
+// @ts-ignore: No implicit Any
 import PreviewContainer from './components/Preview/PreviewContainer';
+// @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider/index.tsx';
+import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
+// @ts-ignore: No implicit Any
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
+// @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
+// @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+// @ts-ignore: No implicit Any
 import { getRoutePrefix } from './common/utils';
+// @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 
+// @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
 
+type HMSPrebuiltOptions = {
+  userName?: string;
+  userId?: string;
+  endpoints?: {
+    init?: string;
+    tokenByRoomCode?: string;
+    tokenByRoomIdRole?: string;
+    roomLayout?: string;
+  };
+};
+
+type HMSPrebuiltProps = {
+  roomCode?: string;
+  logo?: Logo;
+  typography?: Typography;
+  themes?: Theme[];
+  options?: HMSPrebuiltOptions;
+  screens?: Screens;
+  onLeave: () => void;
+};
+
+type HMSPrebuiltRefType = MutableRefObject<{
+  hmsActions: HMSActions;
+}>;
+
 // TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }) => {
-  const host = process.env.REACT_APP_HOST_NAME;
+const getAspectRatio = ({ width, height }: { width: string; height: string }) => {
+  const host = process.env.REACT_APP_HOST_NAME || '';
   const portraitDomains = (process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || '').split(',');
   if (portraitDomains.includes(host) && width > height) {
     return { width: height, height: width };
@@ -39,7 +83,7 @@ const getAspectRatio = ({ width, height }) => {
   return { width, height };
 };
 
-export const HMSPrebuilt = React.forwardRef(
+export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
   (
     {
       roomCode = '',
@@ -64,7 +108,7 @@ export const HMSPrebuilt = React.forwardRef(
     const aspectRatio = '1-1';
     const metadata = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
-    const reactiveStore = useRef();
+    const reactiveStore = useRef() as HMSPrebuiltRefType;
 
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
@@ -189,7 +233,7 @@ export const HMSPrebuilt = React.forwardRef(
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
-const Redirector = ({ showPreview }) => {
+const Redirector = ({ showPreview }: { showPreview: boolean }) => {
   const { roomId, role } = useParams();
 
   if (!roomId && !role) {
@@ -278,7 +322,7 @@ const BackSwipe = () => {
   return null;
 };
 
-const Router = ({ children }) => {
+const Router = ({ children }: { children: ReactElement }) => {
   const { roomId, role, roomCode } = useHMSPrebuiltContext();
   return [roomId, role, roomCode].every(value => !value) ? (
     <BrowserRouter>{children}</BrowserRouter>
@@ -289,21 +333,22 @@ const Router = ({ children }) => {
   );
 };
 
-function AppRoutes({ authTokenByRoomCodeEndpoint }) {
+function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
   return (
     <Router>
-      <ToastContainer />
-      <Notifications />
-      <BackSwipe />
-      <FlyingEmoji />
-      <RemoteStopScreenshare />
-      <KeyboardHandler />
-      <BeamSpeakerLabelsLogging />
-      <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
-      <Routes>
-        <Route path="/*" element={<RouteList />} />
-        <Route path="/streaming/*" element={<RouteList />} />
-      </Routes>
+      <>
+        <ToastContainer />
+        <Notifications />
+        <BackSwipe />
+        <FlyingEmoji />
+        <RemoteStopScreenshare />
+        <KeyboardHandler />
+        <BeamSpeakerLabelsLogging />
+        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
+        <Routes>
+          <Route path="/*" element={<RouteList />} />
+        </Routes>
+      </>
     </Router>
   );
 }
