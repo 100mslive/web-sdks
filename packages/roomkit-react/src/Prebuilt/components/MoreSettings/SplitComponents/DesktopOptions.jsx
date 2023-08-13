@@ -15,12 +15,12 @@ import {
   HandIcon,
   InfoIcon,
   PencilIcon,
-  PipIcon,
+  // PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
-import { PIP } from '../../PIP';
+// import { PIP } from '../../PIP';
 import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
@@ -34,6 +34,7 @@ import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
+import { useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
 
@@ -49,7 +50,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const DesktopOptions = ({ showStreamingUI = false }) => {
+export const DesktopOptions = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
@@ -62,7 +63,9 @@ export const DesktopOptions = ({ showStreamingUI = false }) => {
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
-  const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const showStreamingUI = useShowStreamingUI();
+
+  // const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -132,7 +135,7 @@ export const DesktopOptions = ({ showStreamingUI = false }) => {
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
-          {isPIPEnabled ? (
+          {/* {isPIPEnabled ? (
             <Dropdown.Item>
               <PIP
                 content={
@@ -145,7 +148,7 @@ export const DesktopOptions = ({ showStreamingUI = false }) => {
                 }
               />
             </Dropdown.Item>
-          ) : null}
+          ) : null} */}
 
           {isChangeNameEnabled && (
             <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">

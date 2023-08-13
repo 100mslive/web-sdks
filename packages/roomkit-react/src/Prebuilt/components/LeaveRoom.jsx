@@ -60,7 +60,7 @@ export const LeaveRoom = () => {
 const LeaveIconButton = styled(IconButton, {
   color: '$on_primary_high',
   h: '$14',
-  px: '$8',
+  px: '$4',
   r: '$1',
   bg: '$alert_error_default',
   '&:not([disabled]):hover': {
@@ -70,7 +70,6 @@ const LeaveIconButton = styled(IconButton, {
     bg: '$alert_error_default',
   },
   '@md': {
-    px: '$4',
     mx: 0,
   },
 });
@@ -79,8 +78,5 @@ const MenuTriggerButton = styled(LeaveIconButton, {
   borderLeft: '1px solid $alert_error_dim',
   borderTopLeftRadius: 0,
   borderBottomLeftRadius: 0,
-  px: '$3',
-  '@md': {
-    px: '$2',
-  },
+  px: '$2',
 });

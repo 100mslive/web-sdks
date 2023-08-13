@@ -90,7 +90,6 @@ const MobileSettingModal = ({
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
       <Sheet.Content
         css={{
-          height: 'max(360px, 60%)',
           bg: '$surface_dim',
         }}
       >
