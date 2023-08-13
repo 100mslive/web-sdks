@@ -4,7 +4,7 @@ import { selectPeers, selectRoomID, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { SidePane } from './screenShareView';
-import { Whiteboard } from '../plugins/whiteboard';
+// import { Whiteboard } from '../plugins/whiteboard';
 
 const Editor = React.memo(({ roomId }) => {
   return (
@@ -20,9 +20,7 @@ const Editor = React.memo(({ roomId }) => {
         },
       }}
     >
-      <Box css={{ position: 'relative', width: '100%', height: '100%' }}>
-        <Whiteboard roomId={roomId} />
-      </Box>
+      <Box css={{ position: 'relative', width: '100%', height: '100%' }}>{/* <Whiteboard roomId={roomId} /> */}</Box>
     </Box>
   );
 });
