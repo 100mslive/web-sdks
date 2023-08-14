@@ -6,7 +6,6 @@ import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
-  HMSStats,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
@@ -182,7 +181,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             actions={reactiveStore.current?.hmsActions}
             store={reactiveStore.current?.hmsStore}
             notifications={reactiveStore.current?.hmsNotifications}
-            stats={reactiveStore.current?.hmsStats as HMSStats}
+            stats={reactiveStore.current?.hmsStats}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
