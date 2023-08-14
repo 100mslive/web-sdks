@@ -1,17 +1,14 @@
 import React, { Fragment, useState } from 'react';
-import data from '@emoji-mart/data/sets/14/apple.json';
-import { init } from 'emoji-mart';
 import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
 import { Dropdown } from '../../Dropdown';
+import { Box } from '../../Layout';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { FEATURE_LIST } from '../common/constants';
-
-init({ data });
 
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
@@ -28,7 +25,9 @@ export const EmojiReaction = () => {
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
           <IconButton>
             <Tooltip title="Emoji reaction">
-              <EmojiIcon />
+              <Box>
+                <EmojiIcon />
+              </Box>
             </Tooltip>
           </IconButton>
         </Dropdown.Trigger>

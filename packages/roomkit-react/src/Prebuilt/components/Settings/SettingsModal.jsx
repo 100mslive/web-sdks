@@ -170,7 +170,7 @@ const MobileSettingModal = ({
             {settingsList
               .filter(({ tabName }) => showSetting[tabName] && selection === tabName)
               .map(({ content: Content, title, tabName }) => {
-                return <Content setHide={hideSettingByTabName(tabName)} />;
+                return <Content key={title} setHide={hideSettingByTabName(tabName)} />;
               })}
           </Box>
         )}

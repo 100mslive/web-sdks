@@ -62,6 +62,9 @@ export const ConferenceMainView = () => {
       setHLSStarted(true);
       await hmsActions.startHLSStreaming({});
     } catch (error) {
+      if (error.message === 'beam already started') {
+        return;
+      }
       if (error.message.includes('invalid input')) {
         await startHLS();
         return;

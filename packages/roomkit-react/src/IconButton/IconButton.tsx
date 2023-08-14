@@ -17,8 +17,10 @@ export const IconButton = styled('button', {
   '&:not([disabled]):focus': {
     outline: 'none',
   },
-  '&:not([disabled]):hover': {
-    backgroundColor: '$on_surface_low',
+  '@media (hover: hover)': {
+    '&:not([disabled]):hover': {
+      backgroundColor: '$on_surface_low',
+    },
   },
   '&[disabled]': {
     opacity: 0.5,
