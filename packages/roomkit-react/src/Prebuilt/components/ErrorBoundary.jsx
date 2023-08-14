@@ -15,15 +15,10 @@ export class ErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     console.error(`react error boundary - ${error.message}`, error, errorInfo);
     // Catch errors in any components below and re-render with error message
-    this.setState(
-      {
-        error: error?.message,
-        errorInfo: errorInfo,
-      },
-      () => {
-        logMessage(`uiError - ${this.state.error} - ${JSON.stringify(this.state.errorInfo)}`);
-      },
-    );
+    this.setState({
+      error: error?.message,
+      errorInfo: errorInfo,
+    });
   }
 
   render() {
