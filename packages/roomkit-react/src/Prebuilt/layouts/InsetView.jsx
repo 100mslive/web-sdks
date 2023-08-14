@@ -7,7 +7,9 @@ import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
+import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import IconButton from '../IconButton';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRolePreference } from '../components/hooks/useFeatures';
 import { APP_DATA } from '../common/constants';
@@ -155,6 +157,18 @@ export function InsetView() {
   );
 }
 
+const MinimisedTile = ({ setMinimised }) => {
+  return (
+    <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
+      <AudioVideoToggle hideOptions={true} />
+      <Text>You</Text>
+      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
+        <ExpandIcon />
+      </IconButton>
+    </Flex>
+  );
+};
+
 export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
@@ -200,23 +214,16 @@ export const InsetTile = () => {
           right: 0,
           boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
-          ...(minimised
+          ...(!minimised
             ? {
                 aspectRatio: aspectRatio,
                 h: height,
               }
-            : {
-                height: '$13',
-              }),
+            : {}),
         }}
       >
         {minimised ? (
-          <Flex css={{ gap: '$4' }}>
-            <AudioVideoToggle hideOptions />
-            <Box onClick={() => setMinimised(false)}>
-              <ExpandIcon width={20} height={20} />
-            </Box>
-          </Flex>
+          <MinimisedTile setMinimised={setMinimised} />
         ) : (
           <VideoTile
             peerId={localPeer.id}
