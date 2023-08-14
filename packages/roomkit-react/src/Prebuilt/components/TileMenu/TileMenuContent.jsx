@@ -184,6 +184,7 @@ export const TileMenuContent = props => {
     showSpotlight,
     showPinAction,
     peerID,
+    canMinimise,
     closeSheetOnClick = () => {
       return;
     },
@@ -199,11 +200,11 @@ export const TileMenuContent = props => {
   });
 
   return isLocal ? (
-    showPinAction && (
+    (showPinAction || canMinimise) && (
       <>
-        <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
+        {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
-        <MinimiseInset />
+        {canMinimise && <MinimiseInset />}
       </>
     )
   ) : (

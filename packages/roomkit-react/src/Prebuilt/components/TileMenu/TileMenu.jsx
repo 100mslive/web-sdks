@@ -24,7 +24,7 @@ import { FEATURE_LIST } from '../../common/constants';
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
-const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false }) => {
+const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, canMinimise }) => {
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
@@ -64,6 +64,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
     isPrimaryVideoTrack,
     showSpotlight,
     showPinAction,
+    canMinimise,
   };
 
   return (

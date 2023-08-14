@@ -234,6 +234,7 @@ export const InsetTile = () => {
             }}
             width={width}
             height={height}
+            canMinimise
           />
         )}
       </Box>
