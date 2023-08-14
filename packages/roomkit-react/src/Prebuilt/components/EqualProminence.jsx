@@ -132,6 +132,10 @@ export function EqualProminence() {
       tilesPerPage: pagesWithTiles[0]?.length || maxTileCount,
     });
     peersSorter.onUpdate(setSortedPeers);
+
+    return () => {
+      peersSorter.stop();
+    };
   }, [page, vanillaStore, peers, pagesWithTiles, maxTileCount]);
 
   return (
