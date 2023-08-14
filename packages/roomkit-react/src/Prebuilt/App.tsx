@@ -1,10 +1,12 @@
 import React, { MutableRefObject, ReactElement, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
+import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
   HMSActions,
   HMSReactiveStore,
   HMSRoomProvider,
+  HMSStats,
   selectIsConnectedToRoom,
   useHMSActions,
   useHMSStore,
@@ -69,12 +71,15 @@ type HMSPrebuiltProps = {
   onLeave: () => void;
 };
 
-type HMSPrebuiltRefType = MutableRefObject<{
+type HMSPrebuiltRefType = {
   hmsActions: HMSActions;
-}>;
+  hmsStore: HMSStoreWrapper;
+  hmsStats: HMSStatsStoreWrapper;
+  hmsNotifications: IHMSNotifications;
+};
 
 // TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }: { width: string; height: string }) => {
+const getAspectRatio = ({ width, height }: { width: number; height: number }) => {
   const host = process.env.REACT_APP_HOST_NAME || '';
   const portraitDomains = (process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || '').split(',');
   if (portraitDomains.includes(host) && width > height) {
@@ -108,7 +113,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     const aspectRatio = '1-1';
     const metadata = '';
     const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
-    const reactiveStore = useRef() as HMSPrebuiltRefType;
+    const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
@@ -131,14 +136,13 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       if (!ref || !reactiveStore.current) {
         return;
       }
-
-      ref.current = { ...reactiveStore.current };
+      (ref as MutableRefObject<HMSPrebuiltRefType>).current = { ...reactiveStore.current };
     }, [ref]);
 
     // leave room when component unmounts
     useEffect(
       () => () => {
-        return reactiveStore.current.hmsActions.leave();
+        reactiveStore?.current?.hmsActions.leave();
       },
       [],
     );
@@ -150,7 +154,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       roomLayout: roomLayoutEndpoint,
     };
 
-    const overrideLayout = {
+    const overrideLayout: Partial<Layout> = {
       logo,
       themes,
       typography,
@@ -178,16 +182,16 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         >
           <HMSRoomProvider
             isHMSStatsOn={FeatureFlags.enableStatsForNerds}
-            actions={reactiveStore.current.hmsActions}
-            store={reactiveStore.current.hmsStore}
-            notifications={reactiveStore.current.hmsNotifications}
-            stats={reactiveStore.current.hmsStats}
+            actions={reactiveStore.current?.hmsActions}
+            store={reactiveStore.current?.hmsStore}
+            notifications={reactiveStore.current?.hmsNotifications}
+            stats={reactiveStore.current?.hmsStats as HMSStats}
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
                 {layout => {
-                  const theme = layout.themes?.[0] || {};
-                  const { typography } = layout;
+                  const theme: Theme = layout?.themes?.[0] || ({} as Theme);
+                  const { typography } = layout || {};
                   let fontFamily = ['sans-serif'];
                   if (typography?.font_family) {
                     fontFamily = [`${typography?.font_family}`, ...fontFamily];
@@ -201,8 +205,10 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       themeType={`${theme.name}-${Date.now()}`}
                       aspectRatio={getAspectRatio({ width, height })}
                       theme={{
+                        //@ts-ignore: Prebuilt theme to match stiches theme
                         colors: theme.palette,
                         fonts: {
+                          //@ts-ignore: font list to match token types of stiches
                           sans: fontFamily,
                         },
                       }}
