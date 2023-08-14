@@ -14,6 +14,7 @@ import {
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
+  ShrinkIcon,
   SpeakerIcon,
   StarIcon,
   VideoOffIcon,
@@ -83,6 +84,19 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
       >
         <PinIcon />
         <span>{isTilePinned ? 'Unpin' : 'Pin'} Tile for myself</span>
+      </StyledMenuTile.ItemButton>
+    </>
+  );
+};
+
+const MinimiseInset = () => {
+  const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
+
+  return (
+    <>
+      <StyledMenuTile.ItemButton css={spacingCSS} onClick={() => setMinimised(!minimised)}>
+        <ShrinkIcon />
+        <span>{minimised ? 'Show' : 'Minimise'} your video</span>
       </StyledMenuTile.ItemButton>
     </>
   );
@@ -189,6 +203,7 @@ export const TileMenuContent = props => {
       <>
         <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
+        <MinimiseInset />
       </>
     )
   ) : (

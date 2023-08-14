@@ -2,11 +2,15 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import { ExpandIcon } from '@100mslive/react-icons';
+import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRolePreference } from '../components/hooks/useFeatures';
+import { APP_DATA } from '../common/constants';
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];
@@ -155,6 +159,7 @@ export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const localPeer = useHMSStore(selectLocalPeer);
+  const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   let height = 180;
   let width = height * aspectRatio;
@@ -195,20 +200,35 @@ export const InsetTile = () => {
           right: 0,
           boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
-          aspectRatio: aspectRatio,
-          h: height,
+          ...(minimised
+            ? {
+                aspectRatio: aspectRatio,
+                h: height,
+              }
+            : {
+                height: '$13',
+              }),
         }}
       >
-        <VideoTile
-          peerId={localPeer.id}
-          trackid={localPeer.videoTrack}
-          rootCSS={{
-            size: '100%',
-            padding: 0,
-          }}
-          width={width}
-          height={height}
-        />
+        {minimised ? (
+          <Flex css={{ gap: '$4' }}>
+            <AudioVideoToggle hideOptions />
+            <Box onClick={() => setMinimised(false)}>
+              <ExpandIcon width={20} height={20} />
+            </Box>
+          </Flex>
+        ) : (
+          <VideoTile
+            peerId={localPeer.id}
+            trackid={localPeer.videoTrack}
+            rootCSS={{
+              size: '100%',
+              padding: 0,
+            }}
+            width={width}
+            height={height}
+          />
+        )}
       </Box>
     </Draggable>
   );
