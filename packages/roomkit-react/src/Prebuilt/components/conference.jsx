@@ -10,6 +10,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
+import { ActivatedPIP } from './PIP/PIPComponent';
+import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
@@ -106,6 +108,12 @@ const Conference = () => {
     }
   }, [isHeadless, hmsActions]);
 
+  useEffect(() => {
+    return () => {
+      PictureInPicture.stop().catch(error => console.error('stopping pip', error));
+    };
+  }, []);
+
   if (!isConnectedToRoom) {
     return <FullPageProgress loadingText="Joining..." />;
   }
@@ -168,6 +176,7 @@ const Conference = () => {
       )}
       <RoleChangeRequestModal />
       <HLSFailureModal />
+      <ActivatedPIP />
     </Flex>
   );
 };
