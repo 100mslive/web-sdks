@@ -38,7 +38,7 @@ export const LiveStatus = () => {
   }, [hlsState?.running, hlsState?.variants]);
 
   useEffect(() => {
-    if (hlsState?.running && !isMobile) {
+    if (hlsState?.running) {
       startTimer();
     }
     if (!hlsState?.running && intervalRef.current) {
@@ -54,23 +54,6 @@ export const LiveStatus = () => {
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
-  if (isMobile) {
-    return (
-      <Text
-        variant="overline"
-        css={{
-          '@md': {
-            bg: '$alert_error_default',
-            c: 'on_surface_high',
-            borderRadius: '$0',
-            padding: '$1 $2 $1 $2',
-          },
-        }}
-      >
-        LIVE
-      </Text>
-    );
-  }
   return (
     <Flex
       align="center"
@@ -81,24 +64,10 @@ export const LiveStatus = () => {
         borderRadius: '$1',
       }}
     >
-      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2', '@md': { display: 'none' } }} />
+      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
       <Flex align="center" gap="2">
-        <Text
-          variant="button"
-          css={{
-            '@md': {
-              bg: '$alert_error_default',
-              c: 'on_surface_high',
-              borderRadius: '$0',
-              padding: '$2 $4 $2 $4',
-            },
-          }}
-        >
-          LIVE
-        </Text>
-        <Text variant="caption" css={{ '@md': { display: 'none' } }}>
-          {hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}
-        </Text>
+        <Text variant={!isMobile ? 'button' : 'body2'}>LIVE</Text>
+        <Text variant="caption">{hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}</Text>
       </Flex>
     </Flex>
   );

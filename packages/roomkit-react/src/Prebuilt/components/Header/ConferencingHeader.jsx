@@ -37,8 +37,8 @@ export const ConferencingHeader = () => {
         <SpeakerTag />
         {isMobile && (
           <Flex align="center" css={{ gap: '$4' }}>
-            <RecordingStatus />
             <LiveStatus />
+            <RecordingStatus />
           </Flex>
         )}
       </Flex>
