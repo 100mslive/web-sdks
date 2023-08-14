@@ -22,11 +22,11 @@ export const EmojiReaction = () => {
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
-          <IconButton>
-            <Tooltip title="Emoji reaction">
+          <Tooltip title="Emoji reaction">
+            <IconButton>
               <EmojiIcon />
-            </Tooltip>
-          </IconButton>
+            </IconButton>
+          </Tooltip>
         </Dropdown.Trigger>
         <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surface_default' }}>
           <EmojiCard />
