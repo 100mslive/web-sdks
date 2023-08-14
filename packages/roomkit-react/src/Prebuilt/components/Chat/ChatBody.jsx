@@ -21,6 +21,7 @@ import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import emptyChat from '../../../assets/empty-chat.svg';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -359,7 +360,18 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
         align="center"
         justify="center"
       >
-        <Text>There are no messages here</Text>
+        <Box>
+          <img src={emptyChat} alt="Empty Chat" />
+          <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+            Start a conversation
+          </Text>
+          <Text
+            variant="sm"
+            css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
+          >
+            There are no messages here yet. Start a conversation by sending a message.
+          </Text>
+        </Box>
       </Flex>
     );
   }
