@@ -54,26 +54,52 @@ export const LiveStatus = () => {
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
-  return (
-    <Flex align="center" gap="2">
-      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2', '@md': { display: 'none' } }} />
-      {isMobile ? (
-        <Text
-          css={{
+  if (isMobile) {
+    return (
+      <Text
+        variant="overline"
+        css={{
+          '@md': {
             bg: '$alert_error_default',
             c: 'on_surface_high',
             borderRadius: '$0',
-            padding: '$2 $4 $2 $4',
+            padding: '$1 $2 $1 $2',
+          },
+        }}
+      >
+        LIVE
+      </Text>
+    );
+  }
+  return (
+    <Flex
+      align="center"
+      gap="1"
+      css={{
+        border: '1px solid $border_default',
+        padding: '$4 $6 $4 $6',
+        borderRadius: '$1',
+      }}
+    >
+      <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2', '@md': { display: 'none' } }} />
+      <Flex align="center" gap="2">
+        <Text
+          variant="button"
+          css={{
+            '@md': {
+              bg: '$alert_error_default',
+              c: 'on_surface_high',
+              borderRadius: '$0',
+              padding: '$2 $4 $2 $4',
+            },
           }}
         >
-          Live
+          LIVE
         </Text>
-      ) : (
-        <Text>LIVE</Text>
-      )}
-      <Text variant="caption" css={{ '@md': { display: 'none' } }}>
-        {hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}
-      </Text>
+        <Text variant="caption" css={{ '@md': { display: 'none' } }}>
+          {hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}
+        </Text>
+      </Flex>
     </Flex>
   );
 };
@@ -236,10 +262,12 @@ export const StreamActions = () => {
   return (
     <Flex align="center" css={{ gap: '$4' }}>
       <AdditionalRoomState />
-      <Flex align="center" css={{ gap: '$4' }}>
-        <RecordingStatus />
-        {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
-      </Flex>
+      {!isMobile && (
+        <Flex align="center" css={{ gap: '$4' }}>
+          <RecordingStatus />
+          {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
+        </Flex>
+      )}
       {isConnected && !isMobile ? <StartRecording /> : null}
     </Flex>
   );
