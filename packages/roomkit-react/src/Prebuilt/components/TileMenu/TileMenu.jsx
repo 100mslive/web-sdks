@@ -12,11 +12,11 @@ import {
   useHMSStore,
   useRemoteAVToggle,
 } from '@100mslive/react-sdk';
-import { CrossIcon, HorizontalMenuIcon, PinIcon, StarIcon } from '@100mslive/react-icons';
+import { CrossIcon, PinIcon, StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
-import { config as cssConfig } from '../../../Theme';
+import { config as cssConfig, useTheme } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { TileMenuContent } from './TileMenuContent';
@@ -91,6 +91,8 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
  */
 const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false }) => {
   const [open, setOpen] = useState(false);
+  const { theme } = useTheme();
+
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
   const { removeOthers, changeRole } = useHMSStore(selectPermissions);
@@ -135,8 +137,12 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false })
 
   return (
     <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
-      <StyledMenuTile.Trigger data-testid="participant_menu_btn" onClick={e => e.stopPropagation()}>
-        <HorizontalMenuIcon />
+      <StyledMenuTile.Trigger
+        data-testid="participant_menu_btn"
+        css={{ bg: `${theme.colors.background_dim.value}A3` }}
+        onClick={e => e.stopPropagation()}
+      >
+        <VerticalMenuIcon width={20} height={20} />
       </StyledMenuTile.Trigger>
 
       {isMobile ? (

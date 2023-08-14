@@ -50,7 +50,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const DesktopOptions = ({}) => {
+export const DesktopOptions = () => {
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
