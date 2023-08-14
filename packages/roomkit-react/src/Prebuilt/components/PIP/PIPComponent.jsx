@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   selectLocalPeerRoleName,
   selectPeers,
-  selectRemotePeers,
   selectTracksMap,
   useHMSActions,
   useHMSStore,
@@ -13,6 +12,7 @@ import { Flex, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
+import { usePinnedTrack } from '../AppData/useUISettings';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
 
@@ -20,7 +20,7 @@ import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
  * shows a button which when clicked shows some videos in PIP, clicking
  * again turns it off.
  */
-const PIPComponent = ({ peers, showLocalPeer, content = null }) => {
+const PIPComponent = ({ content = null }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const [isPipOn, setIsPipOn] = useState(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
@@ -52,7 +52,6 @@ const PIPComponent = ({ peers, showLocalPeer, content = null }) => {
           </IconButton>
         </Tooltip>
       )}
-      {isPipOn && <ActivatedPIP showLocalPeer={showLocalPeer} peers={peers} />}
     </>
   );
 };
@@ -61,21 +60,27 @@ const PIPComponent = ({ peers, showLocalPeer, content = null }) => {
  * this is a separate component so it can be conditionally rendered and
  * the subscriptions to store are done only if required.
  */
-const ActivatedPIP = ({ showLocalPeer, peers }) => {
+export const ActivatedPIP = () => {
   const tracksMap = useHMSStore(selectTracksMap);
-  const storePeers = useHMSStore(showLocalPeer ? selectPeers : selectRemotePeers);
+  const storePeers = useHMSStore(selectPeers);
+  const pinnedTrack = usePinnedTrack();
 
   useEffect(() => {
-    let pipPeers = storePeers;
-    if (peers) {
-      pipPeers = storePeers.filter(peer => peers.includes(peer.id));
-    }
-    PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
-      console.error('error in updating pip', err);
+    PictureInPicture.listenToStateChange(isPipOn => {
+      if (!isPipOn) {
+        return;
+      }
+      let pipPeers = storePeers;
+      if (pinnedTrack) {
+        pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
+      }
+      PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
+        console.error('error in updating pip', err);
+      });
     });
-  }, [peers, storePeers, tracksMap]);
+  }, [storePeers, tracksMap, pinnedTrack]);
 
-  return null;
+  return <></>;
 };
 
 export default PIPComponent;
