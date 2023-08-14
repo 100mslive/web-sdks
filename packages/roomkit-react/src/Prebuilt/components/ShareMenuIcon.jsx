@@ -21,6 +21,7 @@ export const ShareMenuIcon = styled(ScreenShareButton, {
   borderLeftWidth: 0,
   w: '$4',
   '@md': {
+    w: 'unset',
     px: '$2',
   },
 });

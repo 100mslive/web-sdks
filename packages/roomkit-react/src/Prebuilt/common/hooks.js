@@ -1,6 +1,8 @@
 // @ts-check
 import { useEffect, useRef, useState } from 'react';
+import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import { selectAvailableRoleNames, selectIsConnectedToRoom, selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { isInternalRole } from './utils';
 
 /**
@@ -44,4 +46,10 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 export const useFilteredRoles = () => {
   const roles = useHMSStore(selectAvailableRoleNames).filter(role => !isInternalRole(role));
   return roles;
+};
+
+export const useShowStreamingUI = () => {
+  const layout = useRoomLayout();
+  const { join_form } = layout?.screens?.preview?.default?.elements || {};
+  return join_form?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE;
 };

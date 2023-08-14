@@ -9,15 +9,15 @@ import {
   selectVideoTrackByPeerID,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { BrbIcon, HandRaiseFilledIcon, MicOffIcon } from '@100mslive/react-icons';
+import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
+import TileMenu from './TileMenu/TileMenu';
 import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
-import TileMenu from './TileMenu';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
@@ -145,12 +145,12 @@ const PeerMetadata = ({ peerId }) => {
     <Fragment>
       {isHandRaised ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="raiseHand_icon_onTile">
-          <HandRaiseFilledIcon width={40} height={40} />
+          <HandIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
       {isBRB ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
-          <BrbIcon width={40} height={40} />
+          <BrbTileIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
     </Fragment>

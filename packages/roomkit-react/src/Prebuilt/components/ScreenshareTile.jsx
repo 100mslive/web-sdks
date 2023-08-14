@@ -9,11 +9,11 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
+import TileMenu from './TileMenu/TileMenu';
 import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
-import TileMenu from './TileMenu';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 

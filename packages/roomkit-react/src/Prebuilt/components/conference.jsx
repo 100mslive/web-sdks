@@ -139,6 +139,9 @@ const Conference = () => {
           minHeight: 0,
           px: '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
+          '@lg': {
+            px: 0,
+          },
         }}
         id="conferencing"
         data-testid="conferencing"

@@ -130,7 +130,7 @@ export const selectPeerCount = createSelector([selectIsConnectedToRoom, selectRo
  * Select a boolean flag denoting whether to hide local peer.
  * When this is true, `selectPeers` skips local peer.
  */
-export const selectHideLocalPeer = (store: HMSStore): boolean => store.hideLocalPeer;
+const selectHideLocalPeer = (store: HMSStore): boolean => store.hideLocalPeer;
 
 /**
  * Select an array of peers(remote peers and your local peer) present in the room.

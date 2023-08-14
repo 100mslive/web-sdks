@@ -1,22 +1,31 @@
 import React from 'react';
-import { Box, Flex, Footer as AppFooter } from '../../../';
+import { useMedia } from 'react-use';
+import { HandIcon } from '@100mslive/react-icons';
+import { config as cssConfig, Footer as AppFooter } from '../../../';
+import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
-import { StreamActions } from '../Header/StreamActions';
 import { LeaveRoom } from '../LeaveRoom';
-import MetaActions from '../MetaActions';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-import { PIP } from '../PIP';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
+import { ParticipantCount } from './ParticipantList';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { useMyMetadata } from '../hooks/useMetadata';
+import { FEATURE_LIST } from '../../common/constants';
 
 export const StreamingFooter = () => {
+  const isMobile = useMedia(cssConfig.media.md);
+  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
+  const { isHandRaised, toggleHandRaise } = useMyMetadata();
+
   return (
     <AppFooter.Root
       css={{
         flexWrap: 'nowrap',
         '@md': {
           justifyContent: 'center',
+          gap: '$10',
         },
       }}
     >
@@ -25,46 +34,43 @@ export const StreamingFooter = () => {
           '@md': {
             w: 'unset',
             p: '0',
+            gap: '$10',
           },
         }}
       >
-        <AudioVideoToggle />
+        {isMobile ? <LeaveRoom /> : null}
+        <AudioVideoToggle hideOptions />
       </AppFooter.Left>
       <AppFooter.Center
         css={{
           '@md': {
             w: 'unset',
+            gap: '$10',
           },
         }}
       >
-        <ScreenshareToggle css={{ '@sm': { display: 'none' } }} />
-        <Box css={{ '@md': { display: 'none' } }}>
-          <PIP />
-        </Box>
-        <Box
-          css={{
-            display: 'none',
-            '@md': {
-              display: 'flex',
-              alignItems: 'center',
-              mx: '$4',
-            },
-          }}
-        >
-          <StreamActions />
-        </Box>
-        <MoreSettings />
-        <Box css={{ '@md': { display: 'none' } }}>
-          <LeaveRoom />
-        </Box>
-        <Flex align="center" css={{ display: 'none', '@md': { display: 'flex' } }}>
-          <ChatToggle />
-        </Flex>
+        {isMobile ? (
+          <>
+            <ChatToggle />
+            <MoreSettings />
+          </>
+        ) : (
+          <>
+            <ScreenshareToggle />
+            {isHandRaiseEnabled ? (
+              <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
+                <HandIcon />
+              </IconButton>
+            ) : null}
+            <EmojiReaction />
+            <LeaveRoom />
+          </>
+        )}
       </AppFooter.Center>
       <AppFooter.Right>
-        <EmojiReaction />
-        <MetaActions />
         <ChatToggle />
+        <ParticipantCount />
+        <MoreSettings />
       </AppFooter.Right>
     </AppFooter.Root>
   );

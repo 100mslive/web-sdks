@@ -22,6 +22,7 @@ export function PDFFileOptions({ onOpenChange }) {
             w: 'min(420px,80%)',
             overflow: 'auto',
             p: '$10',
+            bg: '$surface_dim',
           }}
         >
           <Flex direction="column">
@@ -76,7 +77,7 @@ export function PDFFileOptions({ onOpenChange }) {
               onChange={e => {
                 setPDFURL(e.target.value);
               }}
-              placeholder="Add PDF URL"
+              placeholder="Paste PDF URL"
               type="text"
               error={!isPDFUrlValid}
             />

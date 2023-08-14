@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   getPeersWithTiles,
@@ -135,7 +135,7 @@ export function EqualProminence() {
   }, [page, vanillaStore, peers, pagesWithTiles, maxTileCount]);
 
   return (
-    <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative' }}>
+    <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
       <Box
         ref={ref}
         css={{
