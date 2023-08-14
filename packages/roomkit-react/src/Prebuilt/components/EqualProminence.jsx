@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   getPeersWithTiles,
@@ -30,6 +30,8 @@ export function EqualProminence() {
   const [pagesWithTiles, setPagesWithTiles] = useState([]);
   const [page, setPage] = useState(0);
   const [ref, { width, height }] = useMeasure();
+  const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
+  const pageSize = pagesWithTiles[0]?.length;
 
   useEffect(() => {
     // currentPageIndex should not exceed pages length
@@ -126,17 +128,12 @@ export function EqualProminence() {
     if (page !== 0) {
       return;
     }
-    const peersSorter = new PeersSorter(vanillaStore);
     peersSorter.setPeersAndTilesPerPage({
       peers,
-      tilesPerPage: pagesWithTiles[0]?.length || maxTileCount,
+      tilesPerPage: pageSize || maxTileCount,
     });
     peersSorter.onUpdate(setSortedPeers);
-
-    return () => {
-      peersSorter.stop();
-    };
-  }, [page, vanillaStore, peers, pagesWithTiles, maxTileCount]);
+  }, [page, peersSorter, peers, pageSize, maxTileCount]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
