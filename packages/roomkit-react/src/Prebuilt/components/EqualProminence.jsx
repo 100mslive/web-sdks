@@ -30,6 +30,7 @@ export function EqualProminence() {
   const [pagesWithTiles, setPagesWithTiles] = useState([]);
   const [page, setPage] = useState(0);
   const [ref, { width, height }] = useMeasure();
+  const pageSize = pagesWithTiles[0]?.length;
 
   useEffect(() => {
     // currentPageIndex should not exceed pages length
@@ -129,14 +130,14 @@ export function EqualProminence() {
     const peersSorter = new PeersSorter(vanillaStore);
     peersSorter.setPeersAndTilesPerPage({
       peers,
-      tilesPerPage: pagesWithTiles[0]?.length || maxTileCount,
+      tilesPerPage: pageSize || maxTileCount,
     });
     peersSorter.onUpdate(setSortedPeers);
 
     return () => {
       peersSorter.stop();
     };
-  }, [page, vanillaStore, peers, pagesWithTiles, maxTileCount]);
+  }, [page, vanillaStore, peers, pageSize, maxTileCount]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
