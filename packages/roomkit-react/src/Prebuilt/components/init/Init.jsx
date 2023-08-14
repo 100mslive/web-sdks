@@ -1,20 +1,8 @@
 import React, { useEffect } from 'react';
-import {
-  selectLocalPeerID,
-  selectLocalPeerName,
-  selectLocalPeerRoleName,
-  selectSessionId,
-  useHMSStore,
-} from '@100mslive/react-sdk';
 import { useTheme } from '../../../';
-import { setUpZipy } from './initUtils';
 import { FeatureFlagsInit } from '../../services/FeatureFlags';
 
 const Init = () => {
-  const localPeerID = useHMSStore(selectLocalPeerID);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const localPeerName = useHMSStore(selectLocalPeerName);
-  const sessionId = useHMSStore(selectSessionId);
   const { toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -36,21 +24,6 @@ const Init = () => {
       window.removeEventListener('resize', resetHeight);
     };
   }, []);
-
-  useEffect(() => {
-    if (localPeerID && localPeerRole && localPeerName) {
-      const peerData = {
-        localPeer: {
-          id: localPeerID,
-          name: localPeerName,
-          roleName: localPeerRole,
-        },
-        sessionId,
-      };
-      setUpZipy(peerData);
-    }
-    // eslint-disable-next-line
-  }, [localPeerID, localPeerName, localPeerRole, sessionId]);
 
   return <FeatureFlagsInit />;
 };
