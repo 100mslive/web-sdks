@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { logMessage } from 'zipyai';
 import { CopyIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';

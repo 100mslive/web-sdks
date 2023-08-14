@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
-import { logMessage } from 'zipyai';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -50,7 +49,6 @@ export function Notifications() {
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            logMessage('Disconnected');
             // show button action when the error is terminal
             const toastId = ToastManager.addToast({
               title:

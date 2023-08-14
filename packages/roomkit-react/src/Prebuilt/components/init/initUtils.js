@@ -1,26 +1,3 @@
-import { identify } from 'zipyai';
-
-const zipyKey = process.env.REACT_APP_ZIPY_KEY;
-export const setUpZipy = ({ localPeer, roomId, sessionId }) => {
-  if (!zipyKey) {
-    return;
-  }
-
-  let domain;
-  if (typeof window !== 'undefined') {
-    domain = window.location.hostname;
-  }
-
-  identify(localPeer.id, {
-    firstName: localPeer.name,
-    customerName: domain,
-    email: domain,
-    role: localPeer.roleName,
-    sessionId,
-    roomId,
-  });
-};
-
 // interface RoleConfig {
 //   center?: HMSRoleName[];
 //   sidepane?: HMSRoleName[];
