@@ -15,12 +15,12 @@ import {
   HandIcon,
   InfoIcon,
   PencilIcon,
-  // PipIcon,
+  PipIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
-// import { PIP } from '../../PIP';
+import { PIP } from '../../PIP';
 import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
@@ -65,7 +65,7 @@ export const DesktopOptions = () => {
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
 
-  // const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -135,7 +135,7 @@ export const DesktopOptions = () => {
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
-          {/* {isPIPEnabled ? (
+          {isPIPEnabled ? (
             <Dropdown.Item>
               <PIP
                 content={
@@ -148,7 +148,7 @@ export const DesktopOptions = () => {
                 }
               />
             </Dropdown.Item>
-          ) : null} */}
+          ) : null}
 
           {isChangeNameEnabled && (
             <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">

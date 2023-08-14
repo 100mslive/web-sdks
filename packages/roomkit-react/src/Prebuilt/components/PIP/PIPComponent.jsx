@@ -36,13 +36,6 @@ const PIPComponent = ({ peers, showLocalPeer, content = null }) => {
     }
   }, [hmsActions, isPipOn, store]);
 
-  // stop pip on unmount
-  useEffect(() => {
-    return () => {
-      PictureInPicture.stop().catch(err => console.error('error in stopping pip on unmount', err));
-    };
-  }, []);
-
   if (!PictureInPicture.isSupported() || localPeerRole === DEFAULT_HLS_VIEWER_ROLE || !isFeatureEnabled) {
     return null;
   }

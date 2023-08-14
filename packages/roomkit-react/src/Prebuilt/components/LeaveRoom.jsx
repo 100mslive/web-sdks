@@ -4,6 +4,7 @@ import { useMedia } from 'react-use';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { DesktopLeaveRoom } from './MoreSettings/SplitComponents/DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MoreSettings/SplitComponents/MwebLeaveRoom';
+import { PictureInPicture } from './PIP/PIPManager';
 import { ToastManager } from './Toast/ToastManager';
 import { IconButton } from '../../IconButton';
 import { config as cssConfig, styled } from '../../Theme';
@@ -28,6 +29,7 @@ export const LeaveRoom = () => {
         navigate('/leave/' + params.roomId);
       }
     }
+    PictureInPicture.stop().catch(() => console.error('stopping pip'));
     ToastManager.clearAllToast();
     onLeave?.();
   };
