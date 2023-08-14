@@ -22,6 +22,8 @@ import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { EMOJI_REACTION_TYPE, FEATURE_LIST } from '../common/constants';
 
+init({ data });
+
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
