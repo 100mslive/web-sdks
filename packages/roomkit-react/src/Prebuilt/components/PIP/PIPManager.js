@@ -24,8 +24,13 @@ const PIPStates = {
  * tracks which should be shown.
  */
 class PipManager {
+  listeners = new Set();
   constructor() {
     this.reset();
+  }
+
+  listenToStateChange(cb) {
+    this.listeners.add(cb);
   }
 
   /**
@@ -87,6 +92,7 @@ class PipManager {
       console.debug('pip started');
       this.state = PIPStates.started;
       this.onStateChange(true);
+      this.callListeners(true);
     } catch (err) {
       console.error('error in request pip', err);
       this.state = PIPStates.stopped;
@@ -108,6 +114,7 @@ class PipManager {
     // detach all to avoid bandwidth consumption
     await this.detachOldAttachNewTracks(this.tracksToShow, []);
     this.onStateChange(false); // notify parent about this
+    this.callListeners(false);
     this.reset(); // cleanup
     this.state = PIPStates.stopped;
   };
@@ -131,6 +138,12 @@ class PipManager {
   }
 
   // ------- Private function --------------
+  /**
+   * @private {boolean} on - whether pip is on/off
+   */
+  callListeners = on => {
+    this.listeners.forEach(listener => listener?.(on));
+  };
 
   /**
    * @private
