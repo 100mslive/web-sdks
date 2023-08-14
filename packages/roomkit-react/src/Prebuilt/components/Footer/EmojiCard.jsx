@@ -13,6 +13,7 @@ import { Flex } from '../../../Layout';
 import { styled } from '../../../Theme';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { EMOJI_REACTION_TYPE } from '../../common/constants';
+import { ToastManager } from '../Toast/ToastManager';
 
 init({ data });
 
@@ -56,6 +57,7 @@ export const EmojiCard = () => {
         ]);
       } catch (error) {
         console.log(error);
+        ToastManager.addToast({ title: error.message });
       }
     }
   };

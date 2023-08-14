@@ -8,6 +8,7 @@ import IconButton from '../IconButton';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { FEATURE_LIST } from '../common/constants';
+import { Box } from '../../Layout';
 
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
@@ -22,11 +23,13 @@ export const EmojiReaction = () => {
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
-          <Tooltip title="Emoji reaction">
-            <IconButton>
-              <EmojiIcon />
-            </IconButton>
-          </Tooltip>
+          <IconButton>
+            <Tooltip title="Emoji reaction">
+              <Box>
+                <EmojiIcon />
+              </Box>
+            </Tooltip>
+          </IconButton>
         </Dropdown.Trigger>
         <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surface_default' }}>
           <EmojiCard />
