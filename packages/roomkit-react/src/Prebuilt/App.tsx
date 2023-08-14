@@ -50,18 +50,13 @@ import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
 
-type HMSPrebuiltOptions = {
+export type HMSPrebuiltOptions = {
   userName?: string;
   userId?: string;
-  endpoints?: {
-    init?: string;
-    tokenByRoomCode?: string;
-    tokenByRoomIdRole?: string;
-    roomLayout?: string;
-  };
+  endpoints?: object;
 };
 
-type HMSPrebuiltProps = {
+export type HMSPrebuiltProps = {
   roomCode?: string;
   logo?: Logo;
   typography?: Typography;
@@ -71,7 +66,7 @@ type HMSPrebuiltProps = {
   onLeave: () => void;
 };
 
-type HMSPrebuiltRefType = {
+export type HMSPrebuiltRefType = {
   hmsActions: HMSActions;
   hmsStore: HMSStoreWrapper;
   hmsStats: HMSStatsStoreWrapper;
@@ -95,16 +90,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: {
-        userName = '',
-        userId = '',
-        endpoints: {
-          init: initEndpoint = '',
-          tokenByRoomCode: tokenByRoomCodeEndpoint = '',
-          tokenByRoomIdRole: tokenByRoomIdRoleEndpoint = '',
-          roomLayout: roomLayoutEndpoint = '',
-        } = {},
-      } = {},
+      options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
     },
@@ -147,12 +133,18 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       [],
     );
 
-    const endpoints = {
-      tokenByRoomCode: tokenByRoomCodeEndpoint,
-      init: initEndpoint,
-      tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
-      roomLayout: roomLayoutEndpoint,
-    };
+    const endpointsObj = endpoints as
+      | {
+          init: string;
+          tokenByRoomCode: string;
+          tokenByRoomIdRole: string;
+          roomLayout: string;
+        }
+      | undefined;
+    const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
+    const initEndpoint: string = endpointsObj?.init || '';
+    const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
+    const tokenByRoomIdRoleEndpoint: string = endpointsObj?.tokenByRoomIdRole || '';
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -177,7 +169,12 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             onLeave,
             userName,
             userId,
-            endpoints,
+            endpoints: {
+              tokenByRoomCode: tokenByRoomCodeEndpoint,
+              init: initEndpoint,
+              tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
+              roomLayout: roomLayoutEndpoint,
+            },
           }}
         >
           <HMSRoomProvider
