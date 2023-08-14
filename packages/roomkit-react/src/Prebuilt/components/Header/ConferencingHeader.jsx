@@ -1,9 +1,9 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, Flex, VerticalDivider } from '../../../';
+import { config as cssConfig, Flex } from '../../../';
 import { Logo, SpeakerTag } from './HeaderComponents';
-import { StreamActions } from './StreamActions';
+import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 import { AudioOutputActions, CamaraFlipActions } from './common';
 
 export const ConferencingHeader = () => {
@@ -32,10 +32,15 @@ export const ConferencingHeader = () => {
   }
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
-      <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
+      <Flex align="center" gap="2" css={{ position: 'absolute', left: '$10' }}>
         <Logo />
-        <VerticalDivider css={{ ml: '$8' }} />
         <SpeakerTag />
+        {isMobile && (
+          <Flex align="center" css={{ gap: '$4' }}>
+            <LiveStatus />
+            <RecordingStatus />
+          </Flex>
+        )}
       </Flex>
       <Flex
         align="center"
@@ -49,7 +54,7 @@ export const ConferencingHeader = () => {
         {isMobile && (
           <>
             <CamaraFlipActions />
-            <AudioOutputActions />{' '}
+            <AudioOutputActions />
           </>
         )}
       </Flex>
