@@ -14,12 +14,14 @@ import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
+import PeersSorter from '../common/PeersSorter';
 import { UI_SETTINGS } from '../common/constants';
 
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
 export function EqualProminence() {
   const peers = useHMSStore(selectRemotePeers);
+  const [sortedPeers, setSortedPeers] = useState(peers);
   const localPeer = useHMSStore(selectLocalPeer);
   const vanillaStore = useHMSVanillaStore();
   const isMobile = useMedia(cssConfig.media.md);
@@ -41,7 +43,11 @@ export function EqualProminence() {
       return;
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
-    const peersWithTiles = getPeersWithTiles(peers.length === 0 ? [localPeer] : peers, tracksMap, () => false);
+    const peersWithTiles = getPeersWithTiles(
+      sortedPeers.length === 0 ? [localPeer] : sortedPeers,
+      tracksMap,
+      () => false,
+    );
     const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
@@ -114,7 +120,23 @@ export function EqualProminence() {
       }
     }
     setPagesWithTiles(pagesList);
-  }, [width, height, maxTileCount, vanillaStore, peers, page, isMobile, localPeer]);
+  }, [width, height, maxTileCount, vanillaStore, sortedPeers, page, isMobile, localPeer]);
+
+  useEffect(() => {
+    if (page !== 0) {
+      return;
+    }
+    const peersSorter = new PeersSorter(vanillaStore);
+    peersSorter.setPeersAndTilesPerPage({
+      peers,
+      tilesPerPage: pagesWithTiles[0]?.length || maxTileCount,
+    });
+    peersSorter.onUpdate(setSortedPeers);
+
+    return () => {
+      peersSorter.stop();
+    };
+  }, [page, vanillaStore, peers, pagesWithTiles, maxTileCount]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
