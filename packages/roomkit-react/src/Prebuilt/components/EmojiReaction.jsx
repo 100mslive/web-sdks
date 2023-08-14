@@ -3,12 +3,12 @@ import { selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
 import { Dropdown } from '../../Dropdown';
+import { Box } from '../../Layout';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useDropdownList } from './hooks/useDropdownList';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
 import { FEATURE_LIST } from '../common/constants';
-import { Box } from '../../Layout';
 
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);

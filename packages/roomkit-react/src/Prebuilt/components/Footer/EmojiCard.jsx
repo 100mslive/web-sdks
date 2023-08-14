@@ -11,9 +11,9 @@ import {
 } from '@100mslive/react-sdk';
 import { Flex } from '../../../Layout';
 import { styled } from '../../../Theme';
+import { ToastManager } from '../Toast/ToastManager';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { EMOJI_REACTION_TYPE } from '../../common/constants';
-import { ToastManager } from '../Toast/ToastManager';
 
 init({ data });
 
