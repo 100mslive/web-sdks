@@ -21,6 +21,7 @@ import {
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
 import { PIP } from '../../PIP';
+import { PictureInPicture } from '../../PIP/PIPManager';
 import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
@@ -66,6 +67,7 @@ export const DesktopOptions = () => {
   const showStreamingUI = useShowStreamingUI();
 
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const isPipOn = PictureInPicture.isOn();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -142,7 +144,7 @@ export const DesktopOptions = () => {
                   <Flex css={{ w: '100%' }}>
                     <PipIcon />
                     <Text variant="sm" css={{ ml: '$4' }}>
-                      Picture in picture mode
+                      {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
                     </Text>
                   </Flex>
                 }

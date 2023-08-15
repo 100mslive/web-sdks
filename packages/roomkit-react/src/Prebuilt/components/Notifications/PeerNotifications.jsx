@@ -44,3 +44,8 @@ export const PeerNotifications = () => {
 
   return null;
 };
+
+/*
+Listen to peer join
+await hmsActions.sendBroadcastMessage(message);
+*/

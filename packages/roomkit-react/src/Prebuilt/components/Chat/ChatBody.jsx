@@ -21,6 +21,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import { ChatEvent } from './ChatEvent';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -141,7 +142,7 @@ const ChatActions = ({ onPin }) => {
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0' }}
+          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
@@ -165,7 +166,7 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
+const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, isEvent = false, icon = <></> }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const rowRef = useRef(null);
   useEffect(() => {
@@ -189,6 +190,9 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       hmsActions.setMessageRead(true, message.id);
     }
   }, [message.read, hmsActions, inView, message.id]);
+  if (isEvent) {
+    return <ChatEvent content={message} icon={icon} />;
+  }
 
   return (
     <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>
