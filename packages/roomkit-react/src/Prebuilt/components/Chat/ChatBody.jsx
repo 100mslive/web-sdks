@@ -133,7 +133,7 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <HorizontalMenuIcon />
+            <HorizontalMenuIcon style={{ transform: 'rotate(90deg)' }} />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
@@ -161,6 +161,9 @@ const SenderName = styled(Text, {
   whiteSpace: 'nowrap',
   maxWidth: '24ch',
   minWidth: 0,
+  fontSize: '$sm !important',
+  color: '$on_surface_high',
+  fontWeight: '$semiBold',
 });
 
 const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
@@ -225,7 +228,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             )}
             <Text
               as="span"
-              variant="sm"
+              variant="xs"
               css={{
                 ml: '$4',
                 color: '$on_primary_medium',
@@ -361,7 +364,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
         justify="center"
       >
         <Box>
-          <img src={emptyChat} alt="Empty Chat" />
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} />
           <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
             Start a conversation
           </Text>

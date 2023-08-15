@@ -306,22 +306,12 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
     [value, onSearch],
   );
   return (
-    <Box css={{ p: '$4 0', my: '$8', position: 'relative' }}>
-      <Box
-        css={{
-          position: 'absolute',
-          left: '$4',
-          top: '$2',
-          transform: 'translateY(50%)',
-          color: '$on_surface_medium',
-        }}
-      >
-        <SearchIcon />
-      </Box>
+    <Flex align="center" css={{ p: '$2 0', mb: '$2', position: 'relative', color: '$on_surface_medium' }}>
+      <SearchIcon style={{ position: 'absolute', left: '0.5rem' }} />
       <Input
         type="text"
         placeholder={placeholder || 'Search among participants'}
-        css={{ w: '100%', pl: '$14', bg: '$surface_bright' }}
+        css={{ w: '100%', pl: '$14', bg: '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();
@@ -332,6 +322,6 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
         autoComplete="off"
         aria-autocomplete="none"
       />
-    </Box>
+    </Flex>
   );
 };

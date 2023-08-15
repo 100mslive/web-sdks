@@ -28,16 +28,14 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: '$8', color: '$on_surface_medium', bg: '$surface_bright', r: '$1' }}
+      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4' }}
       align="center"
       justify="between"
     >
-      <Box>
-        <PinIcon />
-      </Box>
+      <PinIcon />
+
       <Box
         css={{
-          ml: '$8',
           color: '$on_surface_medium',
           w: '100%',
           maxHeight: '$18',
@@ -49,9 +47,9 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         </Text>
       </Box>
       {permissions.removeOthers && (
-        <IconButton onClick={() => clearPinnedMessage()}>
-          <CrossIcon />
-        </IconButton>
+        <Flex css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}>
+          <CrossIcon onClick={() => clearPinnedMessage()} />
+        </Flex>
       )}
     </Flex>
   ) : null;
@@ -102,6 +100,16 @@ export const Chat = () => {
     <Flex direction="column" css={{ size: '100%' }}>
       <ChatHeader
         selectorOpen={isSelectorOpen}
+        onToggle={() => {
+          setSelectorOpen(value => !value);
+        }}
+      />
+      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+
+      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
+      <ChatFooter
+        role={chatOptions.role}
+        onSend={() => scrollToBottom(1)}
         selection={chatOptions.selection}
         onSelect={({ role, peerId, selection }) => {
           setChatOptions({
@@ -112,16 +120,8 @@ export const Chat = () => {
           setPeerSelector(peerId);
           setRoleSelector(role);
         }}
-        role={chatOptions.role}
         peerId={chatOptions.peerId}
-        onToggle={() => {
-          setSelectorOpen(value => !value);
-        }}
-      />
-      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
-
-      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
-      <ChatFooter role={chatOptions.role} peerId={chatOptions.peerId} onSend={() => scrollToBottom(1)}>
+      >
         {!isSelectorOpen && (
           <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
         )}
@@ -146,13 +146,26 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
       }}
     >
       <Button
+        variant="standard"
         onClick={() => {
           scrollToBottom(unreadCount);
         }}
-        css={{ p: '$2 $4', '& > svg': { ml: '$4' } }}
+        icon
+        css={{
+          p: '$4',
+          pl: '$8',
+          pr: '$6',
+          '& > svg': { ml: '$4' },
+          borderRadius: '$round',
+          position: 'relative',
+          bottom: '$16',
+          fontSize: '$xs',
+          fontWeight: '$semiBold',
+          c: '$on_secondary_high',
+        }}
       >
-        New Messages
-        <ChevronDownIcon width={16} height={16} />
+        New {unreadCount === 1 ? 'message' : 'messages'}
+        <ChevronDownIcon />
       </Button>
     </Flex>
   );
