@@ -14,6 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -21,7 +22,6 @@ import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
-import emptyChat from '../../../assets/empty-chat.svg';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -47,7 +47,7 @@ const MessageTypeContainer = ({ left, right }) => {
         ml: 'auto',
         mr: '$4',
         p: '$2 $4',
-        border: '1px solid $on_surface_low',
+        border: '1px solid $border_bright',
         r: '$0',
       }}
     >
@@ -56,9 +56,9 @@ const MessageTypeContainer = ({ left, right }) => {
           {left}
         </SenderName>
       )}
-      {left && right && <Box css={{ borderLeft: '1px solid $on_surface_low', mx: '$4', h: '$8' }} />}
+      {left && right && <Box css={{ borderLeft: '1px solid $border_bright', mx: '$4', h: '$8' }} />}
       {right && (
-        <SenderName as="span" variant="tiny">
+        <SenderName as="span" variant="tiny" css={{ textTransform: 'uppercase' }}>
           {right}
         </SenderName>
       )}
@@ -161,7 +161,6 @@ const SenderName = styled(Text, {
   whiteSpace: 'nowrap',
   maxWidth: '24ch',
   minWidth: 0,
-  fontSize: '$sm !important',
   color: '$on_surface_high',
   fontWeight: '$semiBold',
 });
@@ -198,7 +197,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         align="center"
         css={{
           flexWrap: 'wrap',
-          bg: messageType ? '$surface_bright' : undefined,
+          bg: messageType ? '$surface_default' : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -220,10 +219,14 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         >
           <Flex align="center">
             {message.senderName === 'You' || !message.senderName ? (
-              <SenderName as="span">{message.senderName || 'Anonymous'}</SenderName>
+              <SenderName as="span" variant="sm">
+                {message.senderName || 'Anonymous'}
+              </SenderName>
             ) : (
               <Tooltip title={message.senderName} side="top" align="start">
-                <SenderName as="span">{message.senderName}</SenderName>
+                <SenderName as="span" variant="sm">
+                  {message.senderName}
+                </SenderName>
               </Tooltip>
             )}
             <Text

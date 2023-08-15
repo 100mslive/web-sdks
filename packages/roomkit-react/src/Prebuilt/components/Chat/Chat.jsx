@@ -13,7 +13,6 @@ import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import IconButton from '../../IconButton';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatHeader } from './ChatHeader';
@@ -28,7 +27,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4' }}
+      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8' }}
       align="center"
       justify="between"
     >

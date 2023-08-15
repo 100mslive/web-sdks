@@ -5,9 +5,9 @@ import { useHMSActions } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, IconButton, Popover, styled, Text, textEllipsis } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
+import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { ChatSelector } from './ChatSelector';
 
 const TextArea = styled('textarea', {
   width: '100%',

@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMeasure } from 'react-use';
 import {
   selectMessagesUnreadCountByPeerID,
@@ -92,7 +92,7 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
 };
 
 const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, searchValue, onSelect }) => {
-  const [ref, { width, height }] = useMeasure();
+  const [ref] = useMeasure();
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
