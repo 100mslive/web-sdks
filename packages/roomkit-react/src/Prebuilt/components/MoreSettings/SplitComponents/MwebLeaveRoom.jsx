@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { selectIsConnectedToRoom, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, HangUpIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../../Layout';
 import { Sheet } from '../../../../Sheet';
@@ -14,8 +14,11 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
+  const { isStreamingOn } = useRecordingStreaming();
 
   const showStreamingUI = useShowStreamingUI();
+
+  const showStream = showStreamingUI && isStreamingOn;
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -37,15 +40,15 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               }}
             >
               <Tooltip title="Leave Room">
-                <Box>{showStreamingUI ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
+                <Box>{showStream ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
           <Sheet.Content>
             <LeaveCard
-              title={showStreamingUI ? 'Leave Stream' : 'Leave Session'}
+              title={showStream ? 'Leave Stream' : 'Leave Session'}
               subtitle={`Others will continue after you leave. You can join the ${
-                showStreamingUI ? 'stream' : 'session'
+                showStream ? 'stream' : 'session'
               } again.`}
               bg="$surface_default"
               titleColor="$on_surface_high"
@@ -55,9 +58,9 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               css={{ pt: 0, mt: '$10' }}
             />
             <LeaveCard
-              title={showStreamingUI ? 'End Stream' : 'End Session'}
+              title={showStream ? 'End Stream' : 'End Session'}
               subtitle={`The will end the ${
-                showStreamingUI ? 'stream' : 'session'
+                showStream ? 'stream' : 'session'
               } for everyone. You can't undo this action.`}
               bg="$alert_error_dim"
               titleColor="$alert_error_brighter"
@@ -73,7 +76,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
       ) : (
         <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
           </Tooltip>
         </LeaveIconButton>
       )}
