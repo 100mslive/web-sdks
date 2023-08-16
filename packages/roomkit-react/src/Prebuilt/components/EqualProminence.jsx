@@ -28,13 +28,6 @@ export function EqualProminence() {
   const pageSize = pagesWithTiles[0]?.length;
 
   useEffect(() => {
-    // currentPageIndex should not exceed pages length
-    if (page >= pagesWithTiles.length) {
-      setPage(0);
-    }
-  }, [pagesWithTiles.length, page]);
-
-  useEffect(() => {
     if (page !== 0) {
       return;
     }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '../../Pagination';
 
@@ -11,6 +11,13 @@ export const Pagination = ({ page, onPageChange, numPages }) => {
   const prevPage = () => {
     onPageChange(Math.max(page - 1, 0));
   };
+
+  useEffect(() => {
+    // currentPageIndex should not exceed pages length
+    if (page >= numPages.length) {
+      onPageChange(0);
+    }
+  }, [numPages, onPageChange, page]);
   return (
     <StyledPagination.Root>
       <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>
