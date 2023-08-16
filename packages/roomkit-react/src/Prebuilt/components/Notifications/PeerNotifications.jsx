@@ -29,7 +29,7 @@ export const PeerNotifications = () => {
         }
         break;
       case HMSNotificationTypes.PEER_JOINED:
-        hmsActions.sendBroadcastMessage(notification.data.name + ' joined the room', 'CHAT_EVENT', { senderName: '' });
+        hmsActions.sendBroadcastMessage(notification.data.name + ' joined the room', 'JOIN_CHAT_EVENT');
         if (!isPeerJoinSubscribed) {
           return;
         }
@@ -44,12 +44,7 @@ export const PeerNotifications = () => {
     }
 
     ToastBatcher.showToast({ notification });
-  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
+  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, hmsActions]);
 
   return null;
 };
-
-/*
-Listen to peer join
-await hmsActions.sendBroadcastMessage(message);
-*/

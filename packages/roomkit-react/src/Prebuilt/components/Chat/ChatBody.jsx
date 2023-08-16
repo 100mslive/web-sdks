@@ -13,7 +13,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { HorizontalMenuIcon, PeopleAddIcon, PinIcon } from '@100mslive/react-icons';
+import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
 import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
@@ -21,7 +21,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-import { ChatEvent } from './ChatEvent';
+import { JoinChatEvent } from './JoinChatEvent';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -166,7 +166,7 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, isEvent = false, icon = <></> }) => {
+const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const rowRef = useRef(null);
   useEffect(() => {
@@ -190,8 +190,8 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       hmsActions.setMessageRead(true, message.id);
     }
   }, [message.read, hmsActions, inView, message.id]);
-  if (message.type === 'CHAT_EVENT') {
-    return <ChatEvent content={message.message} icon={<PeopleAddIcon />} />;
+  if (message.type === 'JOIN_CHAT_EVENT') {
+    return <JoinChatEvent content={message.message} />;
   }
 
   return (
@@ -371,7 +371,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
         justify="center"
       >
         <Box>
-          <img src={emptyChat} alt="Empty Chat" height={132} width={185} />
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} alt="No messages" />
           <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
             Start a conversation
           </Text>

@@ -1,8 +1,9 @@
 import React from 'react';
+import { PeopleAddIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
-export const ChatEvent = ({ icon, content }) => {
+export const JoinChatEvent = ({ content }) => {
   return (
     <Flex
       align="center"
@@ -18,7 +19,7 @@ export const ChatEvent = ({ icon, content }) => {
         mt: '$8',
       }}
     >
-      {icon}
+      <PeopleAddIcon />
       <Text variant="xs" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
         {content}
       </Text>
