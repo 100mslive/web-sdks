@@ -122,4 +122,6 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   );
 };
 
+export { isSameTile } from './TileMenuContent';
+
 export default TileMenu;
