@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
-import { PdfShare, ScreenShare, StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import PDFShareImg from './../../images/pdf-share.png';
+import ScreenShareImg from './../../images/screen-share.png';
 import { Box, Button, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
@@ -96,7 +98,9 @@ export function ShareScreenOptions() {
                   pb: '0',
                 }}
               >
-                <ScreenShare
+                <img
+                  src={ScreenShareImg}
+                  alt="screen-share"
                   width="100%"
                   height="100%"
                   style={{
@@ -140,7 +144,9 @@ export function ShareScreenOptions() {
                   pb: '0',
                 }}
               >
-                <PdfShare
+                <img
+                  src={PDFShareImg}
+                  alt="pdf-share"
                   width="100%"
                   height="100%"
                   style={{
