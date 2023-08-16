@@ -371,7 +371,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
         justify="center"
       >
         <Box>
-          <img src={emptyChat} alt="Empty Chat" height={132} width={185} alt="No messages" />
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} />
           <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
             Start a conversation
           </Text>
