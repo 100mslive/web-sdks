@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useFullscreen, useToggle } from 'react-use';
+import { useFullscreen, useMedia, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -16,7 +16,9 @@ import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
-import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
+import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
+import { config as cssConfig } from '../../Theme';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../components/AppData/useSidepane';
 
 let hlsPlayer;
 
@@ -41,6 +43,18 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
+
+  const isMobile = useMedia(cssConfig.media.md);
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const isParticipantListOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
+
+  // useeffect -> open chat
+  // isFullscreen -> close chat, sidepane
+  // isn't fullscreen -> open chat
+
+  useEffect(() => toggleChat(), []);
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {

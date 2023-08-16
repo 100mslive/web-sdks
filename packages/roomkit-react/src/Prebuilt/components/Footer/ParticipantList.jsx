@@ -13,7 +13,6 @@ import {
 } from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
-  CrossIcon,
   HandRaiseIcon,
   PeopleIcon,
   RemoveUserIcon,
@@ -23,19 +22,24 @@ import {
 } from '@100mslive/react-icons';
 import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
+import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
-import { ParticipantFilter } from '../Header/ParticipantFilter';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
-import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
-  const { participants, isConnected, peerCount, rolesWithParticipants } = useParticipants(filter);
+  const { participants, isConnected, peerCount } = useParticipants(filter);
+  const peersOrderedByRoles = {};
+  participants.forEach(participant => {
+    if (peersOrderedByRoles[participant.roleName] === undefined) {
+      peersOrderedByRoles[participant.roleName] = [];
+    }
+    peersOrderedByRoles[participant.roleName].push(participant);
+  });
   const [selectedPeerId, setSelectedPeerId] = useState(null);
-  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
       if (!filterValue) {
@@ -53,7 +57,7 @@ export const ParticipantList = () => {
     <Fragment>
       <Flex direction="column" css={{ size: '100%' }}>
         <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
-        {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} />}
+        {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
         {participants.length === 0 && (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
             <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
@@ -286,7 +290,7 @@ const ParticipantVolume = ({ peerId }) => {
   );
 };
 
-export const ParticipantSearch = ({ onSearch, placeholder }) => {
+export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false }) => {
   const [value, setValue] = React.useState('');
   useDebounce(
     () => {
@@ -296,12 +300,15 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
     [value, onSearch],
   );
   return (
-    <Flex align="center" css={{ p: '$2 0', mb: '$2', position: 'relative', color: '$on_surface_medium' }}>
+    <Flex
+      align="center"
+      css={{ p: '$2 0', mb: '$2', position: 'relative', color: '$on_surface_medium', mt: inSidePane ? '$4' : '' }}
+    >
       <SearchIcon style={{ position: 'absolute', left: '0.5rem' }} />
       <Input
         type="text"
-        placeholder={placeholder || 'Search among participants'}
-        css={{ w: '100%', pl: '$14', bg: '$surface_dim' }}
+        placeholder={placeholder || 'Search for participants'}
+        css={{ w: '100%', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();

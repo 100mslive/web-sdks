@@ -23,7 +23,6 @@ import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { ToastManager } from '../Toast/ToastManager';
-import { JoinChatEvent } from './JoinChatEvent';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -158,7 +157,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
           {isMobile && showPinAction ? <Dropdown.ItemSeparator css={{ my: 0 }} /> : null}
           {isMobile ? (
             <Dropdown.Item
-              data-testid="pin_message_btn"
+              data-testid="copy_message_btn"
               onClick={() => {
                 try {
                   navigator?.clipboard.writeText(messageContent);
@@ -219,9 +218,6 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       hmsActions.setMessageRead(true, message.id);
     }
   }, [message.read, hmsActions, inView, message.id]);
-  if (message.type === 'JOIN_CHAT_EVENT') {
-    return <JoinChatEvent content={message.message} />;
-  }
 
   return (
     <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>

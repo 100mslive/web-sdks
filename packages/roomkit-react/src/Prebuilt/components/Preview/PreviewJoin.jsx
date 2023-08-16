@@ -64,7 +64,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
-    initEndpoint: endpoints?.init || 'https://qa-init.100ms.live/init',
+    initEndpoint: endpoints?.init,
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,

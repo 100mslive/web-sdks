@@ -29,7 +29,6 @@ export const PeerNotifications = () => {
         }
         break;
       case HMSNotificationTypes.PEER_JOINED:
-        hmsActions.sendBroadcastMessage(notification.data.name + ' joined the room', 'JOIN_CHAT_EVENT');
         if (!isPeerJoinSubscribed) {
           return;
         }
