@@ -12,7 +12,7 @@ export const SecondaryTiles = ({ peers }) => {
   const [page, setPage] = useState(0);
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" css={{ flexShrink: 0 }}>
       <Flex justify="center" align="center" css={{ gap: '$4' }}>
         {pagesWithTiles[page]?.map(tile => {
           return (
