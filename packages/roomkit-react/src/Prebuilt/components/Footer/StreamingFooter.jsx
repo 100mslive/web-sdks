@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
@@ -10,11 +11,10 @@ import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
+import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
 import { FEATURE_LIST } from '../../common/constants';
-import { useHLSViewerRole } from '../AppData/useUISettings';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 
 export const StreamingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
