@@ -10,25 +10,10 @@ export const ConferencingHeader = () => {
   const roomState = useHMSStore(selectRoomState);
   const isMobile = useMedia(cssConfig.media.md);
   const isPreview = roomState === HMSRoomState.Preview;
-
+  console.log('is preview ', isPreview);
+  // no header if there in preview
   if (isPreview) {
-    return (
-      <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
-        <Flex align="center" css={{ position: 'absolute', left: '$10' }}>
-          <Logo />
-        </Flex>
-        <Flex
-          align="center"
-          css={{
-            position: 'absolute',
-            right: '$10',
-            gap: '$4',
-          }}
-        >
-          <StreamActions />
-        </Flex>
-      </Flex>
-    );
+    return <></>;
   }
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
