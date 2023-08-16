@@ -18,12 +18,12 @@ const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', log
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 Example.args = {
-  roomCode: 'wxx-rjvk-sgb',
+  roomCode: process.env.SAMPLE_ROOM_CODE || '',
   options: {
     endpoints: {
-      roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
-      tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
-      init: 'https://qa-init.100ms.live/init',
+      roomLayout: process.env.ROOM_LAYOUT_ENDPOINT || '',
+      tokenByRoomCode: process.env.TOKEN_BY_ROOM_CODE_ENDPOINT || '',
+      init: process.env.INIT_API_ENDPOINT || '',
     },
   },
   typography: {
