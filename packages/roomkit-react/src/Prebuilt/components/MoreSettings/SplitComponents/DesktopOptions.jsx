@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import Hls from 'hls.js';
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -37,6 +36,7 @@ import { useMyMetadata } from '../../hooks/useMetadata';
 import { useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
+import { HMSHLSPlayer } from '@100mslive/hls-player';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -176,7 +176,7 @@ export const DesktopOptions = () => {
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
             (localPeerRole === 'hls-viewer' ? (
-              Hls.isSupported() ? (
+              HMSHLSPlayer.isSupported() ? (
                 <Dropdown.Item
                   onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
                   data-testid="hls_stats"
