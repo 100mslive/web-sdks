@@ -104,8 +104,8 @@ export function ShareScreenOptions() {
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: '$0',
-                    borderTopRightRadius: '$0',
+                    borderTopLeftRadius: '0.5rem', // TODO: create image component to solve for style hardcoding
+                    borderTopRightRadius: '0.5rem',
                   }}
                 />
               </IconButton>
@@ -150,8 +150,8 @@ export function ShareScreenOptions() {
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: '$0',
-                    borderTopRightRadius: '$0',
+                    borderTopLeftRadius: '0.5rem', // TODO: create image component to solve for style hardcoding
+                    borderTopRightRadius: '0.5rem',
                   }}
                 />
                 <Flex
