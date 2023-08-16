@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
+import { HMSHLSPlayer } from "@100mslive/hls-player";
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -50,7 +51,6 @@ import {
   isIOS,
   isMacOS,
 } from "../../common/constants";
-import { HMSHLSPlayer } from "@100mslive/hls-player";
 
 const isMobileOS = isAndroid || isIOS;
 
