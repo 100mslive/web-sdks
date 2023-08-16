@@ -5,10 +5,12 @@ import { StyledPagination } from '../../Pagination';
 export const Pagination = ({ page, onPageChange, numPages }) => {
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
-  const nextPage = () => {
+  const nextPage = e => {
+    e.stopPropagation();
     onPageChange(Math.min(page + 1, numPages - 1));
   };
-  const prevPage = () => {
+  const prevPage = e => {
+    e.stopPropagation();
     onPageChange(Math.max(page - 1, 0));
   };
 
@@ -25,7 +27,14 @@ export const Pagination = ({ page, onPageChange, numPages }) => {
       </StyledPagination.Chevron>
       <StyledPagination.Dots>
         {[...Array(numPages)].map((_, i) => (
-          <StyledPagination.Dot key={i} active={page === i} onClick={() => onPageChange(i)} />
+          <StyledPagination.Dot
+            key={i}
+            active={page === i}
+            onClick={e => {
+              e.stopPropagation();
+              onPageChange(i);
+            }}
+          />
         ))}
       </StyledPagination.Dots>
       <StyledPagination.Chevron disabled={disableRight} onClick={nextPage}>

@@ -1,49 +1,39 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useMedia } from 'react-use';
 import { selectLocalPeer, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
+import { SecondaryTiles } from './SecondaryTiles';
 import VideoTile from './VideoTile';
-import { useUISettings } from './AppData/useUISettings';
 import { useTileLayout } from './hooks/useTileLayout';
 import PeersSorter from '../common/PeersSorter';
-import { UI_SETTINGS } from '../common/constants';
 
 export function RoleProminence() {
   const peers = useHMSStore(selectRemotePeers);
-  const [sortedPeers, setSortedPeers] = useState(peers);
   const localPeer = useHMSStore(selectLocalPeer);
+  const prominentPeers = useMemo(() => peers.filter(peer => peer.roleName !== localPeer.roleName), [peers, localPeer]);
+  const secondaryPeers = peers.filter(peer => peer.roleName === localPeer.roleName);
+  const [sortedPeers, setSortedPeers] = useState(prominentPeers);
   const vanillaStore = useHMSVanillaStore();
-  const isMobile = useMedia(cssConfig.media.md);
-  let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
-  maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
+  const maxTileCount = 4;
   const { ref, pagesWithTiles } = useTileLayout({
     peers: sortedPeers.length === 0 ? [localPeer] : sortedPeers,
-    maxTileCount,
+    maxTileCount: 4,
   });
-  const [page, setPage] = useState(0);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const pageSize = pagesWithTiles[0]?.length;
-
-  useEffect(() => {
-    // currentPageIndex should not exceed pages length
-    if (page >= pagesWithTiles.length) {
-      setPage(0);
-    }
-  }, [pagesWithTiles.length, page]);
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     if (page !== 0) {
       return;
     }
     peersSorter.setPeersAndTilesPerPage({
-      peers,
+      peers: prominentPeers,
       tilesPerPage: pageSize || maxTileCount,
     });
     peersSorter.onUpdate(setSortedPeers);
-  }, [page, peersSorter, peers, pageSize, maxTileCount]);
+  }, [page, peersSorter, prominentPeers, pageSize, maxTileCount]);
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
@@ -75,6 +65,7 @@ export function RoleProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
+      <SecondaryTiles peers={secondaryPeers} />
       {peers.length > 0 && <InsetTile />}
     </Flex>
   );

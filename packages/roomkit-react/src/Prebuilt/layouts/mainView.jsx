@@ -12,6 +12,7 @@ import {
 } from '@100mslive/react-sdk';
 import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
+import { RoleProminence } from '../components/RoleProminence';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
@@ -124,6 +125,7 @@ export const ConferenceMainView = () => {
   } else {
     ViewComponent = EqualProminence;
   }
+  ViewComponent = RoleProminence;
 
   return (
     <Suspense fallback={<FullPageProgress />}>
