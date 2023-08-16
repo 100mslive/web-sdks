@@ -79,7 +79,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
 
       {isMobile ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
-          <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
+          <Sheet.Content css={{ bg: '$surface_dim', pt: '$8', border: '1px solid $border_bright' }}>
             <Flex
               css={{
                 color: '$on_surface_high',
@@ -114,7 +114,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <StyledMenuTile.Content side="top" align="end">
+        <StyledMenuTile.Content side="top" align="end" css={{ border: '1px solid $border_bright' }}>
           <TileMenuContent {...props} />
         </StyledMenuTile.Content>
       )}
