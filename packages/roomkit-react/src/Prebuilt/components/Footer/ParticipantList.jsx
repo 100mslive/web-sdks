@@ -29,6 +29,7 @@ import { RoleChangeModal } from '../RoleChangeModal';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -51,18 +52,7 @@ export const ParticipantList = () => {
   return (
     <Fragment>
       <Flex direction="column" css={{ size: '100%' }}>
-        <Flex align="center" css={{ w: '100%', mb: '$10' }}>
-          <Text css={{ fontWeight: '$semiBold', mr: '$4' }}>Participants</Text>
-          <ParticipantFilter
-            selection={filter}
-            onSelection={setFilter}
-            isConnected={isConnected}
-            roles={rolesWithParticipants}
-          />
-          <IconButton onClick={toggleSidepane} css={{ w: '$11', h: '$11', ml: 'auto' }}>
-            <CrossIcon />
-          </IconButton>
-        </Flex>
+        <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} />}
         {participants.length === 0 && (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>

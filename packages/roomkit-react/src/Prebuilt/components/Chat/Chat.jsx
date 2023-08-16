@@ -15,7 +15,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
-import { ChatHeader } from './ChatHeader';
+import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
@@ -97,12 +97,7 @@ export const Chat = () => {
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <ChatHeader
-        selectorOpen={isSelectorOpen}
-        onToggle={() => {
-          setSelectorOpen(value => !value);
-        }}
-      />
+      <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
       <PinnedMessage clearPinnedMessage={setPinnedMessage} />
 
       <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
