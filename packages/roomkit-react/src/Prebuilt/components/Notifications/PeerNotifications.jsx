@@ -42,7 +42,7 @@ export const PeerNotifications = () => {
     }
 
     ToastBatcher.showToast({ notification });
-  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, hmsActions]);
+  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
 
   return null;
 };
