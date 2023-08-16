@@ -3,8 +3,6 @@ import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectPeerScreenSharing,
-  selectPeerSharingAudio,
-  selectPeerSharingVideoPlaylist,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -12,11 +10,11 @@ import {
 } from '@100mslive/react-sdk';
 import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
-import { RoleProminence } from '../components/RoleProminence';
+import { ScreenshareLayout } from '../components/ScreenshareLayout';
+// import { RoleProminence } from '../components/RoleProminence';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
-import ScreenShareView from './screenShareView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { useWhiteboardMetadata } from '../plugins/whiteboard';
@@ -40,8 +38,6 @@ export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const pinnedTrack = usePinnedTrack();
   const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
-  const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
@@ -118,14 +114,13 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     // ViewComponent = WhiteboardView;
-  } else if (((peerSharing && peerSharing.id !== peerSharingAudio?.id) || peerSharingPlaylist) && !isAudioOnly) {
-    ViewComponent = ScreenShareView;
+  } else if (peerSharing && !isAudioOnly) {
+    ViewComponent = ScreenshareLayout;
   } else if (pinnedTrack) {
     ViewComponent = PinnedTrackView;
   } else {
     ViewComponent = EqualProminence;
   }
-  ViewComponent = RoleProminence;
 
   return (
     <Suspense fallback={<FullPageProgress />}>
