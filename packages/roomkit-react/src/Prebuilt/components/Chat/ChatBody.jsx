@@ -13,7 +13,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import { VerticalMenuIcon, PinIcon } from '@100mslive/react-icons';
 import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
@@ -21,7 +21,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-import { JoinChatEvent } from './JoinChatEvent';
+import { PeerJoinedMessage } from './PeerJoinedMessage';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -134,7 +134,7 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <HorizontalMenuIcon style={{ transform: 'rotate(90deg)' }} />
+            <VerticalMenuIcon style={{ transform: 'rotate(90deg)' }} />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
@@ -191,7 +191,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [message.read, hmsActions, inView, message.id]);
   if (message.type === 'JOIN_CHAT_EVENT') {
-    return <JoinChatEvent content={message.message} />;
+    return <PeerJoinedMessage content={message.message} />;
   }
 
   return (
