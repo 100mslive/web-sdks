@@ -13,7 +13,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import { CopyIcon, HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
 import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
@@ -23,6 +23,9 @@ import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { JoinChatEvent } from './JoinChatEvent';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useMedia } from 'react-use';
+import { config as cssConfig } from '../../../Theme';
+import { ToastManager } from '../Toast/ToastManager';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -125,8 +128,11 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-
-const ChatActions = ({ onPin }) => {
+const ChatActions = ({ onPin, showPinAction, messageContent }) => {
+  const isMobile = useMedia(cssConfig.media.md);
+  if (!isMobile && !showPinAction) {
+    return null;
+  }
   const [open, setOpen] = useState(false);
 
   return (
@@ -150,6 +156,30 @@ const ChatActions = ({ onPin }) => {
               Pin Message
             </Text>
           </Dropdown.Item>
+          {isMobile && showPinAction ? <Dropdown.ItemSeparator css={{ my: 0 }} /> : null}
+          {isMobile ? (
+            <Dropdown.Item
+              data-testid="pin_message_btn"
+              onClick={() => {
+                try {
+                  navigator?.clipboard.writeText(messageContent);
+                  ToastManager.addToast({
+                    title: 'Message copied successfully',
+                  });
+                } catch (e) {
+                  console.log(e);
+                  ToastManager.addToast({
+                    title: 'Could not copy message',
+                  });
+                }
+              }}
+            >
+              <CopyIcon />
+              <Text variant="sm" css={{ ml: '$4' }}>
+                Copy Message
+              </Text>
+            </Dropdown.Item>
+          ) : null}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -250,7 +280,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {showPinAction && <ChatActions onPin={onPin} />}
+          <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
         </Text>
         <Text
           variant="body2"
