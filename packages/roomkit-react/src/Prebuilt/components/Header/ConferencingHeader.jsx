@@ -10,7 +10,6 @@ export const ConferencingHeader = () => {
   const roomState = useHMSStore(selectRoomState);
   const isMobile = useMedia(cssConfig.media.md);
   const isPreview = roomState === HMSRoomState.Preview;
-  console.log('is preview ', isPreview);
   // no header if there in preview
   if (isPreview) {
     return <></>;

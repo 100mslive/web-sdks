@@ -23,6 +23,9 @@ export const DesktopLeaveRoom = ({
   const { isStreamingOn } = useRecordingStreaming();
 
   const showStreamingUI = useShowStreamingUI();
+
+  const showStream = showStreamingUI && isStreamingOn;
+
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -65,9 +68,9 @@ export const DesktopLeaveRoom = ({
             <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
                 <LeaveCard
-                  title={showStreamingUI && isStreamingOn ? 'Leave Stream' : 'Leave Session'}
+                  title={showStream ? 'Leave Stream' : 'Leave Session'}
                   subtitle={`Others will continue after you leave. You can join the ${
-                    showStreamingUI && isStreamingOn ? 'stream' : 'session'
+                    showStream ? 'stream' : 'session'
                   } again.`}
                   bg=""
                   titleColor="$on_surface_high"
@@ -79,9 +82,9 @@ export const DesktopLeaveRoom = ({
               </Dropdown.Item>
               <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
                 <LeaveCard
-                  title={showStreamingUI && isStreamingOn ? 'End Stream' : 'End Session'}
+                  title={showStream ? 'End Stream' : 'End Session'}
                   subtitle={`The ${
-                    showStreamingUI && isStreamingOn ? 'stream' : 'session'
+                    showStream ? 'stream' : 'session'
                   } will end for everyone. You can't undo this action.`}
                   bg=""
                   titleColor="$alert_error_brighter"
@@ -100,7 +103,7 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStreamingUI && isStreamingOn ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
           </Tooltip>
         </LeaveIconButton>
       )}
