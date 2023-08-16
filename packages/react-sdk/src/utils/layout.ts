@@ -82,6 +82,13 @@ export function mode(array: number[]): number | null {
 
 export type TrackWithPeer = { track?: HMSVideoTrack | HMSScreenVideoTrack; peer: HMSPeer };
 
+export type TrackWithPeerAndDimesions = {
+  track?: HMSVideoTrack | HMSScreenVideoTrack;
+  peer: HMSPeer;
+  width?: number;
+  height?: number;
+};
+
 /**
  * get the aspect ration occurring with the highest frequency
  * @param tracks - video tracks to infer aspect ratios from

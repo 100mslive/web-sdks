@@ -18,7 +18,7 @@ const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', log
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 Example.args = {
-  roomCode: 'cuf-wywo-trf',
+  roomCode: 'thirsty-malachite-quail',
   options: {
     endpoints: {
       roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
