@@ -6,7 +6,7 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-import { ScreenshareToggle } from '../ScreenShare';
+import { ScreenshareToggle } from '../ScreenShareToggle';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { FeatureFlags } from '../../services/FeatureFlags';
