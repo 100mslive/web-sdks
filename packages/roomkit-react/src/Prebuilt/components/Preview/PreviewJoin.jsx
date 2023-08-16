@@ -59,12 +59,12 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const [name, setName] = useState(initialName || previewPreference.name);
   const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
-  const { endpoints } = useHMSPrebuiltContext();
+  const { endpoints = '' } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
   const { enableJoin, preview, join } = usePreviewJoin({
     name,
     token: authToken,
-    initEndpoint: endpoints?.init,
+    initEndpoint: endpoints?.init || 'https://qa-init.100ms.live/init',
     initialSettings: {
       isAudioMuted: skipPreview || previewPreference.isAudioMuted,
       isVideoMuted: skipPreview || previewPreference.isVideoMuted,
