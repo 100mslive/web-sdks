@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   getPeersWithTiles,
@@ -11,28 +11,40 @@ import { config as cssConfig } from '../../../Theme';
 
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
+export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
+  const vanillaStore = useHMSVanillaStore();
+  const tracksMap = vanillaStore.getState(selectTracksMap);
+  const peersWithTiles = useMemo(
+    () => getPeersWithTiles(peers, tracksMap, () => false) as TrackWithPeerAndDimesions[],
+    [peers, tracksMap],
+  );
+  const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
+  const pagesList = useMemo(() => {
+    let sliceStart = 0;
+    let remaining = peersWithTiles.length;
+    const list = [];
+    // split into pages
+    for (let i = 0; i < noOfPages; i++) {
+      const count = Math.min(remaining, maxTileCount);
+      list.push(peersWithTiles.slice(sliceStart, sliceStart + count));
+      remaining = remaining - count;
+      sliceStart += count;
+    }
+    return list;
+  }, [peersWithTiles, noOfPages, maxTileCount]);
+  return pagesList;
+};
+
 export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
   const vanillaStore = useHMSVanillaStore();
   const [ref, { width, height }] = useMeasure();
   const isMobile = useMedia(cssConfig.media.md);
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimesions[][]>([]);
+  const pagesList = usePagesWithTiles({ peers, maxTileCount });
 
   useEffect(() => {
     if (width === 0 || height === 0) {
       return;
-    }
-    const tracksMap = vanillaStore.getState(selectTracksMap);
-    const peersWithTiles = getPeersWithTiles(peers, tracksMap, () => false) as TrackWithPeerAndDimesions[];
-    const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
-    let remaining = peersWithTiles.length;
-    let sliceStart = 0;
-    const pagesList = [];
-    // split into pages
-    for (let i = 0; i < noOfPages; i++) {
-      const count = Math.min(remaining, maxTileCount);
-      pagesList.push(peersWithTiles.slice(sliceStart, sliceStart + count));
-      remaining = remaining - count;
-      sliceStart += count;
     }
     // calculate dimesions for each page
     for (const page of pagesList) {
@@ -95,6 +107,6 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
       }
     }
     setPagesWithTiles(pagesList);
-  }, [width, height, maxTileCount, peers, vanillaStore, isMobile]);
+  }, [width, height, maxTileCount, pagesList, vanillaStore, isMobile]);
   return { pagesWithTiles, ref };
 };
