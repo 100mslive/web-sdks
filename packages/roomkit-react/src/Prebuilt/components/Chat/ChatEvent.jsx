@@ -6,14 +6,16 @@ export const ChatEvent = ({ icon, content }) => {
   return (
     <Flex
       align="center"
+      justify="center"
       css={{
         bg: '$surface_default',
         p: '$2 $4',
         r: '$1',
         mx: 'auto',
-        maxWidth: '100%',
         c: '$on_surface_low',
+        w: 'fit-content',
         gap: '$4',
+        mt: '$8',
       }}
     >
       {icon}

@@ -13,7 +13,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import { HorizontalMenuIcon, PeopleAddIcon, PinIcon } from '@100mslive/react-icons';
 import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
@@ -190,8 +190,8 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       hmsActions.setMessageRead(true, message.id);
     }
   }, [message.read, hmsActions, inView, message.id]);
-  if (isEvent) {
-    return <ChatEvent content={message} icon={icon} />;
+  if (message.type === 'CHAT_EVENT') {
+    return <ChatEvent content={message.message} icon={<PeopleAddIcon />} />;
   }
 
   return (
