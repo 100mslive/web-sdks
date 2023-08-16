@@ -28,7 +28,11 @@ export function ShareScreenOptions() {
   const { toggleScreenShare } = useScreenShare();
   return (
     <Fragment>
-      <Dropdown.Root open={openModals.has(MODALS.SHARE)} onOpenChange={value => updateState(MODALS.SHARE, value)}>
+      <Dropdown.Root
+        open={openModals.has(MODALS.SHARE)}
+        onOpenChange={value => updateState(MODALS.SHARE, value)}
+        modal={false}
+      >
         <Dropdown.Trigger asChild data-testid="sharing_btn" disabled={amIScreenSharing}>
           <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
