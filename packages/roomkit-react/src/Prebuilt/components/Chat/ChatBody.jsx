@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
@@ -19,13 +20,11 @@ import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { styled } from '../../../Theme';
+import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import { ToastManager } from '../Toast/ToastManager';
 import { JoinChatEvent } from './JoinChatEvent';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../Theme';
-import { ToastManager } from '../Toast/ToastManager';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -129,11 +128,11 @@ const getMessageType = ({ roles, receiver }) => {
   return receiver ? 'private' : '';
 };
 const ChatActions = ({ onPin, showPinAction, messageContent }) => {
+  const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   if (!isMobile && !showPinAction) {
     return null;
   }
-  const [open, setOpen] = useState(false);
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
