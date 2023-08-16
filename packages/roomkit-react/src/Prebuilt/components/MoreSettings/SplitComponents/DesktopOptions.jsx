@@ -1,4 +1,5 @@
 import React, { Fragment, useState } from 'react';
+import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -36,7 +37,6 @@ import { useMyMetadata } from '../../hooks/useMetadata';
 import { useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
-import { HMSHLSPlayer } from '@100mslive/hls-player';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
