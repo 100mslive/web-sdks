@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
@@ -12,14 +11,13 @@ import PreviewJoin from './PreviewJoin';
 import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
 import { useSkipPreview } from '../hooks/useSkipPreview';
-import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
+import { QUERY_PARAM_NAME, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
   const skipPreview = useSkipPreview();
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
-  const { userName } = useHMSPrebuiltContext();
-  const initialName = userName || (skipPreview ? 'Beam' : '');
+  const initialName = useSearchParam(QUERY_PARAM_NAME) || (skipPreview ? 'Beam' : '');
   const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const authToken = useAuthToken();
   const roomLayout = useRoomLayout();

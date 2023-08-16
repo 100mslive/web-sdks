@@ -1,6 +1,11 @@
 import React, { Fragment, useState } from "react";
 import { useScreenShare } from "@100mslive/react-sdk";
-import { StarIcon, VerticalMenuIcon } from "@100mslive/react-icons";
+import {
+  PdfShare,
+  ScreenShare,
+  StarIcon,
+  VerticalMenuIcon,
+} from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -10,8 +15,6 @@ import {
   Text,
   Tooltip,
 } from "@100mslive/roomkit-react";
-import PDFShareImg from "./../../images/pdf-share.png";
-import ScreenShareImg from "./../../images/screen-share.png";
 import { ShareMenuIcon } from "../ScreenShare";
 import { PDFFileOptions } from "./pdfFileOptions";
 
@@ -114,14 +117,12 @@ export function ShareScreenOptions() {
                   pb: "0",
                 }}
               >
-                <img
-                  src={ScreenShareImg}
-                  alt="screen-share"
+                <ScreenShare
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "0.5rem", // TODO: create image component to solve for style hardcoding
-                    borderTopRightRadius: "0.5rem",
+                    borderTopLeftRadius: "$0",
+                    borderTopRightRadius: "$0",
                   }}
                 />
               </IconButton>
@@ -160,14 +161,12 @@ export function ShareScreenOptions() {
                   pb: "0",
                 }}
               >
-                <img
-                  src={PDFShareImg}
-                  alt="pdf-share"
+                <PdfShare
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: "0.5rem", // TODO: create image component to solve for style hardcoding
-                    borderTopRightRadius: "0.5rem",
+                    borderTopLeftRadius: "$0",
+                    borderTopRightRadius: "$0",
                   }}
                 />
                 <Flex

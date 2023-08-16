@@ -2,17 +2,11 @@ import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
-import { ExpandIcon } from '@100mslive/react-icons';
-import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
-import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
-import IconButton from '../IconButton';
-import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { useRolePreference } from '../components/hooks/useFeatures';
-import { APP_DATA } from '../common/constants';
 
 const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   const role = roleMap[roleName];
@@ -157,23 +151,10 @@ export function InsetView() {
   );
 }
 
-const MinimisedTile = ({ setMinimised }) => {
-  return (
-    <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
-      <AudioVideoToggle hideOptions={true} />
-      <Text>You</Text>
-      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
-        <ExpandIcon />
-      </IconButton>
-    </Flex>
-  );
-};
-
 export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const localPeer = useHMSStore(selectLocalPeer);
-  const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   let height = 180;
   let width = height * aspectRatio;
@@ -214,29 +195,20 @@ export const InsetTile = () => {
           right: 0,
           boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
-          ...(!minimised
-            ? {
-                aspectRatio: aspectRatio,
-                h: height,
-              }
-            : {}),
+          aspectRatio: aspectRatio,
+          h: height,
         }}
       >
-        {minimised ? (
-          <MinimisedTile setMinimised={setMinimised} />
-        ) : (
-          <VideoTile
-            peerId={localPeer.id}
-            trackid={localPeer.videoTrack}
-            rootCSS={{
-              size: '100%',
-              padding: 0,
-            }}
-            width={width}
-            height={height}
-            canMinimise
-          />
-        )}
+        <VideoTile
+          peerId={localPeer.id}
+          trackid={localPeer.videoTrack}
+          rootCSS={{
+            size: '100%',
+            padding: 0,
+          }}
+          width={width}
+          height={height}
+        />
       </Box>
     </Draggable>
   );

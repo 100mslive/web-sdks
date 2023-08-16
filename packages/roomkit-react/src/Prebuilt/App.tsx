@@ -62,7 +62,7 @@ export type HMSPrebuiltProps = {
   themes?: Theme[];
   options?: HMSPrebuiltOptions;
   screens?: Screens;
-  onLeave?: () => void;
+  onLeave: () => void;
 };
 
 export type HMSPrebuiltRefType = {

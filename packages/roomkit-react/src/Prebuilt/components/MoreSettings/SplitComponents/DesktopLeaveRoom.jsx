@@ -101,7 +101,7 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
           </Tooltip>
         </LeaveIconButton>
       )}

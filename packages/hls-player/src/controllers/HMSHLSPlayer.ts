@@ -325,17 +325,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   }
 
   /**
-   * @param {Array} levels array
+   * @param {Array} levels array from hlsJS
    * @returns a new array with only video levels.
    */
   private removeAudioLevels(levels: LevelParsed[]) {
     return levels.filter(({ videoCodec, width, height }) => !!videoCodec || !!(width && height));
-  }
-
-  /**
-   * @returns true if HLS player is supported in the browser
-   */
-  public static isSupported(): boolean {
-    return Hls.isSupported();
   }
 }

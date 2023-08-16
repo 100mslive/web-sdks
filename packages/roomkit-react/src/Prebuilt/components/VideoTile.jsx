@@ -22,16 +22,7 @@ import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
-const Tile = ({
-  peerId,
-  trackId,
-  width,
-  height,
-  objectFit = 'cover',
-  canMinimise = false,
-  rootCSS = {},
-  containerCSS = {},
-}) => {
+const Tile = ({ peerId, trackId, width, height, objectFit = 'cover', rootCSS = {}, containerCSS = {} }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
@@ -133,12 +124,7 @@ const Tile = ({
             </StyledVideoTile.AudioIndicator>
           ) : null}
           {isMouseHovered && !isHeadless ? (
-            <TileMenu
-              peerID={peerId}
-              audioTrackID={audioTrack?.id}
-              videoTrackID={track?.id}
-              canMinimise={canMinimise}
-            />
+            <TileMenu peerID={peerId} audioTrackID={audioTrack?.id} videoTrackID={track?.id} />
           ) : null}
           <PeerMetadata peerId={peerId} />
           <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />

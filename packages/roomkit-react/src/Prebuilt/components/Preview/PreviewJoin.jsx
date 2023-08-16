@@ -104,8 +104,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
-  useEffect(() => setName(initialName), [initialName]);
-
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}

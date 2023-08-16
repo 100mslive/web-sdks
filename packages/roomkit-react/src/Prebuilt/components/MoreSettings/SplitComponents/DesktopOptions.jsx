@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { HMSHLSPlayer } from '@100mslive/hls-player';
+import Hls from 'hls.js';
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -181,7 +181,7 @@ export const DesktopOptions = () => {
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
             (localPeerRole === 'hls-viewer' ? (
-              HMSHLSPlayer.isSupported() ? (
+              Hls.isSupported() ? (
                 <Dropdown.Item
                   onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
                   data-testid="hls_stats"
