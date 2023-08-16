@@ -31,6 +31,7 @@ import { ChangeSelfRole } from '.././ChangeSelfRole';
 import { EmbedUrl, EmbedUrlModal } from '.././EmbedUrl';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -64,7 +65,8 @@ export const DesktopOptions = () => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
-
+  const hlsViewerRole = useHLSViewerRole();
+  const isHlsViewer = hlsViewerRole === localPeerRole;
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
@@ -135,7 +137,7 @@ export const DesktopOptions = () => {
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
-          {isPIPEnabled ? (
+          {isPIPEnabled && !isHlsViewer ? (
             <Dropdown.Item>
               <PIP
                 content={
