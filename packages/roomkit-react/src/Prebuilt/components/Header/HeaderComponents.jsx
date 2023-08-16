@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
@@ -40,9 +40,19 @@ export const Logo = () => {
   const logo = roomLayout?.logo?.url;
   const isMobile = useMedia(cssConfig.media.md);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const [hideImage, setHideImage] = useState(false);
   // Hide logo for now as there is not enough space
   if (isConnected && isMobile && isStreamingKit()) {
     return null;
   }
-  return logo ? <LogoImg src={logo} alt="Brand Logo" /> : null;
+  return logo && !hideImage ? (
+    <LogoImg
+      src={logo.slice(1)}
+      alt="Brand Logo"
+      onError={e => {
+        e.target.onerror = null;
+        setHideImage(true);
+      }}
+    />
+  ) : null;
 };
