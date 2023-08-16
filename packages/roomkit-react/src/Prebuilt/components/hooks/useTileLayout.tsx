@@ -18,7 +18,6 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimesions[][]>([]);
 
   useEffect(() => {
-    console.log({ width, height, peers });
     if (width === 0 || height === 0) {
       return;
     }
