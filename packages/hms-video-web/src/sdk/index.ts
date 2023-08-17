@@ -27,6 +27,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSMidCallPreviewConfig,
   HMSPlaylistType,
   HMSPreviewConfig,
   HMSRole,
@@ -388,6 +389,42 @@ export class HMSSdk implements HMSInterface {
         })
         .catch(errorHandler);
     });
+  }
+
+  async midCallPreview(config: HMSMidCallPreviewConfig): Promise<void> {
+    if (!this.localPeer || this.transportState !== TransportState.Joined) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'Not connected - midCallPreview');
+    }
+
+    const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+    if (!newRole) {
+      throw ErrorFactory.GenericErrors.InvalidRole(HMSAction.PREVIEW, `role ${config.asRole} does not exist in policy`);
+    }
+    this.localPeer.asRole = newRole;
+
+    const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
+    tracks.forEach(track => this.setLocalPeerTrack(track));
+    this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+
+    this.listener?.onPreview(this.store.getRoom()!, tracks);
+  }
+
+  async cancelMidCallPreview() {
+    if (!this.localPeer || !this.localPeer.isInPreview()) {
+      HMSLogger.w(this.TAG, 'Cannot cancel mid call preview as preview is not in progress');
+    }
+
+    if (this.localPeer?.asRole && this.localPeer.role) {
+      const oldRole = this.localPeer.asRole;
+      const newRole = this.localPeer.role;
+      delete this.localPeer.asRole;
+      await this.roleChangeManager?.diffRolesAndPublishTracks({
+        oldRole,
+        newRole,
+      });
+
+      this.listener?.onRoleUpdate(newRole.name);
+    }
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {

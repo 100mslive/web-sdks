@@ -82,4 +82,5 @@ export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreLis
   onChangeMultiTrackStateRequest(request: HMSChangeMultiTrackStateRequest): void;
   onRemovedFromRoom(request: HMSLeaveRoomRequest): void;
   onNetworkQuality?(score: number): void;
+  onPreview(room: HMSRoom, localTracks: HMSTrack[]): void;
 }

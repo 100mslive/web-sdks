@@ -731,6 +731,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
+      onPreview: this.onPreview.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onTrackUpdate: this.onTrackUpdate.bind(this),

@@ -68,4 +68,10 @@ export interface HMSPreviewConfig extends HMSConfig {
   asRole?: string;
 }
 
+export interface HMSMidCallPreviewConfig {
+  /** the role that would be used for preview which you're about to change to */
+  asRole: string;
+  settings?: InitialSettings;
+}
+
 export type { InitialSettings as HMSConfigInitialSettings };
