@@ -46,7 +46,7 @@ const SidePane = ({ css = {} }) => {
           ml: 0,
           right: 0,
           position: 'fixed',
-          bottom: mwebStreamingChat ? '$16' : 0,
+          bottom: mwebStreamingChat ? '$14' : 0,
           r: 0,
           zIndex: 10,
           ...(css['@lg'] || {}),
