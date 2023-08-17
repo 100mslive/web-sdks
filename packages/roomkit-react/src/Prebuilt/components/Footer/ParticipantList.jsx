@@ -2,11 +2,11 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 import {
   selectAudioTrackByPeerID,
+  selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
   selectPermissions,
-  selectIsPeerAudioEnabled,
   useHMSActions,
   useHMSStore,
   useParticipants,
@@ -25,17 +25,20 @@ import { Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
+import { RoleChangeModal } from '../RoleChangeModal';
+import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
-import { RoleAccordion } from './RoleAccordion';
-import { RoleChangeModal } from '../RoleChangeModal';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
   const results = { matches: false };
+
+  const handRaisedList = [];
+
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
       peersOrderedByRoles[participant.roleName] = [];
@@ -44,8 +47,12 @@ export const ParticipantList = () => {
       results.matches = true;
     }
     peersOrderedByRoles[participant.roleName].push(participant);
+    const isHandRaised = useHMSStore(selectPeerMetadata(participant.id))?.isHandRaised;
+    if (isHandRaised) {
+      handRaisedList.push(participant);
+    }
   });
-  // Can use to mute/unmute etc
+
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
@@ -72,6 +79,7 @@ export const ParticipantList = () => {
         ) : null}
         <VirtualizedParticipants
           peersOrderedByRoles={peersOrderedByRoles}
+          handRaisedList={handRaisedList}
           isConnected={isConnected}
           filter={filter}
           setSelectedPeerId={setSelectedPeerId}
@@ -125,14 +133,22 @@ export const ParticipantCount = () => {
   );
 };
 
-const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, setSelectedPeerId, filter }) => {
+const VirtualizedParticipants = ({
+  peersOrderedByRoles = {},
+  isConnected,
+  setSelectedPeerId,
+  filter,
+  handRaisedList = [],
+}) => {
   return (
     <Flex
       direction="column"
       css={{
         gap: '$8',
+        mt: '$4',
       }}
     >
+      <RoleAccordion peerList={handRaisedList} roleName="Hand Raised" filter={filter} isHandRaisedAccordion />
       {Object.keys(peersOrderedByRoles).map(role => (
         <RoleAccordion
           peerList={peersOrderedByRoles[role]}
