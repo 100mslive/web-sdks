@@ -20,6 +20,9 @@ import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+import { useMedia } from 'react-use';
+import { config as cssConfig } from '../../../Theme';
+import { useShowStreamingUI } from '../../common/hooks';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
@@ -83,6 +86,9 @@ export const Chat = () => {
   }, [notification, peerSelector, setPeerSelector]);
 
   const storeMessageSelector = selectHMSMessagesCount;
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
+  const mwebStreaming = isMobile && showStreamingUI;
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -100,10 +106,20 @@ export const Chat = () => {
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
-      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+      {!mwebStreaming ? (
+        <>
+          <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
+          <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+        </>
+      ) : null}
 
-      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
+      <ChatBody
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        ref={listRef}
+        scrollToBottom={scrollToBottom}
+        mwebStreaming={mwebStreaming}
+      />
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}

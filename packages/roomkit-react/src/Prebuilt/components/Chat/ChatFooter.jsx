@@ -19,6 +19,10 @@ import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
+import { selectLocalPeerID } from '@100mslive/react-sdk';
+import { useHMSStore } from '@100mslive/react-sdk';
+import { useHLSViewerRole } from '../AppData/useUISettings';
+import { selectLocalPeerRoleName } from '@100mslive/react-sdk';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -78,6 +82,10 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHLSViewer = hlsViewerRole === localPeerRole;
+
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -116,43 +124,45 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
 
   return (
     <>
-      <Flex align="center" css={{ mb: '$8' }}>
-        <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
-          Send To
-        </Text>
-        <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-          <Dropdown.Trigger
-            asChild
-            data-testid="participant_list_filter"
-            css={{
-              border: '1px solid $border_bright',
-              r: '$0',
-              p: '$1 $2',
-              ml: '$8',
-            }}
-            tabIndex={0}
-          >
-            <Flex align="center" css={{ c: '$on_surface_medium' }}>
-              <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
-                {selection}
-              </Text>
-              {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
-            </Flex>
-          </Dropdown.Trigger>
-          <Dropdown.Content
-            css={{
-              w: '$64',
-              overflow: 'hidden',
-              maxHeight: 'unset',
-              bg: '$surface_default',
-            }}
-            align="start"
-            sideOffset={8}
-          >
-            <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
-          </Dropdown.Content>
-        </Dropdown.Root>
-      </Flex>
+      {!isHLSViewer ? (
+        <Flex align="center" css={{ mb: '$8' }}>
+          <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
+            Send To
+          </Text>
+          <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+            <Dropdown.Trigger
+              asChild
+              data-testid="participant_list_filter"
+              css={{
+                border: '1px solid $border_bright',
+                r: '$0',
+                p: '$1 $2',
+                ml: '$8',
+              }}
+              tabIndex={0}
+            >
+              <Flex align="center" css={{ c: '$on_surface_medium' }}>
+                <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
+                  {selection}
+                </Text>
+                {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
+              </Flex>
+            </Dropdown.Trigger>
+            <Dropdown.Content
+              css={{
+                w: '$64',
+                overflow: 'hidden',
+                maxHeight: 'unset',
+                bg: '$surface_default',
+              }}
+              align="start"
+              sideOffset={8}
+            >
+              <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+            </Dropdown.Content>
+          </Dropdown.Root>
+        </Flex>
+      ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
