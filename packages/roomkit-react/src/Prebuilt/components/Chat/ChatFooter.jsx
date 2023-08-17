@@ -1,10 +1,22 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { useHMSActions } from '@100mslive/react-sdk';
-import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import { Box, Flex, IconButton, Popover, styled } from '../../../';
+import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
+import {
+  Box,
+  config as cssConfig,
+  Dropdown,
+  Flex,
+  IconButton as BaseIconButton,
+  Popover,
+  styled,
+  Text,
+  textEllipsis,
+} from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
+import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
@@ -32,9 +44,9 @@ function EmojiPicker({ onSelect }) {
   return (
     <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
       <Popover.Trigger asChild css={{ appearance: 'none' }}>
-        <IconButton as="div">
+        <BaseIconButton as="div">
           <EmojiIcon />
-        </IconButton>
+        </BaseIconButton>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
@@ -60,11 +72,12 @@ function EmojiPicker({ onSelect }) {
   );
 }
 
-export const ChatFooter = ({ role, peerId, onSend, children }) => {
+export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
-
+  const [open, setOpen] = useState(false);
+  const isMobile = useMedia(cssConfig.media.md);
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -102,49 +115,98 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
   }, [setDraftMessage]);
 
   return (
-    <Flex
-      align="center"
-      css={{
-        bg: '$surface_bright',
-        minHeight: '$16',
-        maxHeight: '$24',
-        position: 'relative',
-        py: '$6',
-        pl: '$8',
-        r: '$1',
-      }}
-    >
-      {children}
-      <TextArea
-        placeholder="Write something here"
-        ref={inputRef}
-        autoFocus
-        onKeyPress={async event => {
-          if (event.key === 'Enter') {
-            if (!event.shiftKey) {
-              event.preventDefault();
-              await sendMessage();
-            }
-          }
-        }}
-        autoComplete="off"
-        aria-autocomplete="none"
-        onPaste={e => e.stopPropagation()}
-        onCut={e => e.stopPropagation()}
-        onCopy={e => e.stopPropagation()}
-      />
-      <EmojiPicker
-        onSelect={emoji => {
-          inputRef.current.value += ` ${emoji.native} `;
-        }}
-      />
-      <IconButton
-        onClick={sendMessage}
-        css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
-        data-testid="send_msg_btn"
-      >
-        <SendIcon />
-      </IconButton>
-    </Flex>
+    <>
+      <Flex align="center" css={{ mb: '$8' }}>
+        <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
+          Send To
+        </Text>
+        <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+          <Dropdown.Trigger
+            asChild
+            data-testid="participant_list_filter"
+            css={{
+              border: '1px solid $border_bright',
+              r: '$0',
+              p: '$1 $2',
+              ml: '$8',
+            }}
+            tabIndex={0}
+          >
+            <Flex align="center" css={{ c: '$on_surface_medium' }}>
+              <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
+                {selection}
+              </Text>
+              {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
+            </Flex>
+          </Dropdown.Trigger>
+          <Dropdown.Content
+            css={{
+              w: '$64',
+              overflow: 'hidden',
+              maxHeight: 'unset',
+              bg: '$surface_default',
+            }}
+            align="start"
+            sideOffset={8}
+          >
+            <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+          </Dropdown.Content>
+        </Dropdown.Root>
+      </Flex>
+      <Flex align="center" css={{ gap: '$4', w: '100%' }}>
+        <Flex
+          align="center"
+          css={{
+            bg: '$surface_default',
+            minHeight: '$16',
+            maxHeight: '$24',
+            position: 'relative',
+            py: '$6',
+            pl: '$8',
+            flexGrow: 1,
+            r: '$1',
+            '@md': {
+              minHeight: 'unset',
+              h: '$14',
+              boxSizing: 'border-box',
+            },
+          }}
+        >
+          {children}
+          <TextArea
+            placeholder="Send a message...."
+            ref={inputRef}
+            autoFocus
+            onKeyPress={async event => {
+              if (event.key === 'Enter') {
+                if (!event.shiftKey) {
+                  event.preventDefault();
+                  await sendMessage();
+                }
+              }
+            }}
+            autoComplete="off"
+            aria-autocomplete="none"
+            onPaste={e => e.stopPropagation()}
+            onCut={e => e.stopPropagation()}
+            onCopy={e => e.stopPropagation()}
+          />
+          {!isMobile ? (
+            <EmojiPicker
+              onSelect={emoji => {
+                inputRef.current.value += ` ${emoji.native} `;
+              }}
+            />
+          ) : null}
+          <BaseIconButton
+            onClick={sendMessage}
+            css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
+            data-testid="send_msg_btn"
+          >
+            <SendIcon />
+          </BaseIconButton>
+        </Flex>
+      </Flex>
+    </>
   );
 };
