@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useFullscreen, useMedia, useToggle } from 'react-use';
+import { useFullscreen, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -14,10 +14,9 @@ import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
-import { config as cssConfig, useTheme } from '../../Theme';
+import { useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
-import { useSidepaneToggle } from '../components/AppData/useSidepane';
-import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
+import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;
 
@@ -42,16 +41,6 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
-
-  const isMobile = useMedia(cssConfig.media.md);
-  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-
-  // Open chat on load for mobile hls viewers
-  useEffect(() => {
-    if (isMobile) {
-      toggleChat();
-    }
-  }, []);
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {

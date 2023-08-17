@@ -3,7 +3,7 @@ import { PeopleAddIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 
-export const JoinChatEvent = ({ content }) => {
+export const PeerJoinedMessage = ({ content }) => {
   return (
     <Flex
       align="center"

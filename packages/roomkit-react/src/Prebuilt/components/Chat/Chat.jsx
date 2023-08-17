@@ -46,8 +46,11 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         </Text>
       </Box>
       {permissions.removeOthers && (
-        <Flex css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}>
-          <CrossIcon onClick={() => clearPinnedMessage()} />
+        <Flex
+          onClick={() => clearPinnedMessage()}
+          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+        >
+          <CrossIcon />
         </Flex>
       )}
     </Flex>

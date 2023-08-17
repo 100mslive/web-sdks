@@ -14,14 +14,14 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
-import emptyChat from '../../../assets/empty-chat.svg';
+import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
@@ -138,7 +138,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <HorizontalMenuIcon style={{ transform: 'rotate(90deg)' }} />
+            <VerticalMenuIcon style={{ transform: 'rotate(90deg)' }} />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
+import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 import { Flex, IconButton, Tabs } from '../../..';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
-import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 
 const tabTriggerCSS = {
   color: '$on_surface_high',
