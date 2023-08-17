@@ -14,13 +14,13 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import emptyChat from '../../images/empty-chat.svg'
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import emptyChat from '../../images/empty-chat.svg';
 import { PeerJoinedMessage } from './PeerJoinedMessage';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 

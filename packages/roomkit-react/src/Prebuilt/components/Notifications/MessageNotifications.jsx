@@ -11,7 +11,7 @@ export const MessageNotifications = () => {
   const isNewMessageSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.NEW_MESSAGE);
   const isHeadless = useIsHeadless();
   useEffect(() => {
-  if (!notification) {
+    if (!notification) {
       return;
     }
     console.debug(`[${notification.type}]`, notification);
