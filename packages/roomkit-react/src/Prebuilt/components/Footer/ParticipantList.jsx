@@ -1,11 +1,11 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 import {
-  selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
+  selectPeersByCondition,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -16,16 +16,16 @@ import {
   HandIcon,
   MicOffIcon,
   PeopleIcon,
-  RemoveUserIcon,
+  PeopleRemoveIcon,
   SearchIcon,
-  SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
+import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
@@ -37,7 +37,7 @@ export const ParticipantList = () => {
   const peersOrderedByRoles = {};
   const results = { matches: false };
 
-  const handRaisedList = [];
+  const handRaisedPeers = useHMSStore(selectPeersByCondition(peer => JSON.parse(peer.metadata || '{}')?.isHandRaised));
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
@@ -47,11 +47,6 @@ export const ParticipantList = () => {
       results.matches = true;
     }
     peersOrderedByRoles[participant.roleName].push(participant);
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    // const isHandRaised = useHMSStore(selectPeerMetadata(participant.id))?.isHandRaised;
-    // if (isHandRaised) {
-    // handRaisedList.push(participant);
-    // }
   });
 
   const [selectedPeerId, setSelectedPeerId] = useState(null);
@@ -80,7 +75,7 @@ export const ParticipantList = () => {
         ) : null}
         <VirtualizedParticipants
           peersOrderedByRoles={peersOrderedByRoles}
-          handRaisedList={handRaisedList}
+          handRaisedList={handRaisedPeers}
           isConnected={isConnected}
           filter={filter}
           setSelectedPeerId={setSelectedPeerId}
@@ -196,10 +191,7 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
 const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const localPeerId = useHMSStore(selectLocalPeerID);
-  const canChangeVolume = peerId !== localPeerId && audioTrack;
-  const shouldShowMoreActions = canChangeRole || canChangeVolume;
+  const shouldShowMoreActions = canChangeRole;
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
@@ -246,63 +238,40 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
         css={{ p: '$1', r: '$0', c: '$on_surface_high' }}
         tabIndex={0}
       >
-        <VerticalMenuIcon />
+        <Flex>
+          <VerticalMenuIcon />
+        </Flex>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64' }}>
+        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
           {canChangeRole && (
-            <Dropdown.Item onClick={() => onRoleChange(peerId)}>
+            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => onRoleChange(peerId)}>
               <ChangeRoleIcon />
-              <Text css={{ ml: '$4' }}>Change Role</Text>
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                Change Role
+              </Text>
             </Dropdown.Item>
           )}
-          <ParticipantVolume peerId={peerId} />
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
+              css={{ color: '$alert_error_default', bg: '$surface_default' }}
               onClick={async () => {
                 try {
                   await actions.removePeer(peerId, '');
                 } catch (error) {
-                  // TODO: Toast here
+                  ToastManager.addToast({ title: error.message, variant: 'error' });
                 }
               }}
             >
-              <RemoveUserIcon />
-              <Text css={{ ml: '$4', color: '$alert_error_default' }}>Remove Participant</Text>
+              <PeopleRemoveIcon />
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                Remove Participant
+              </Text>
             </Dropdown.Item>
           )}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
-  );
-};
-
-const ParticipantVolume = ({ peerId }) => {
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const localPeerId = useHMSStore(selectLocalPeerID);
-  const hmsActions = useHMSActions();
-  // No volume control for local peer or non audio publishing role
-  if (peerId === localPeerId || !audioTrack) {
-    return null;
-  }
-
-  return (
-    <Dropdown.Item css={{ h: 'auto' }}>
-      <Flex direction="column" css={{ w: '100%' }}>
-        <Flex align="center">
-          <SpeakerIcon />
-          <Text css={{ ml: '$4' }}>Volume{audioTrack.volume ? `(${audioTrack.volume})` : ''}</Text>
-        </Flex>
-        <Slider
-          css={{ my: '0.5rem' }}
-          step={5}
-          value={[audioTrack.volume]}
-          onValueChange={e => {
-            hmsActions.setVolume(e[0], audioTrack?.id);
-          }}
-        />
-      </Flex>
-    </Dropdown.Item>
   );
 };
 
