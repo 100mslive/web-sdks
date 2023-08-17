@@ -47,9 +47,7 @@ export const DesktopLeaveRoom = ({
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              <Box>
-                <HangUpIcon key="hangUp" />
-              </Box>
+              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen}>
