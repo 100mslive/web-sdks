@@ -20,6 +20,7 @@ import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
+import { ChatSelectorContainer } from './ChatSelectorContainer';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -122,43 +123,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   return (
     <>
       {!isHLSViewer ? (
-        <Flex align="center" css={{ mb: '$8' }}>
-          <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
-            Send To
-          </Text>
-          <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-            <Dropdown.Trigger
-              asChild
-              data-testid="participant_list_filter"
-              css={{
-                border: '1px solid $border_bright',
-                r: '$0',
-                p: '$1 $2',
-                ml: '$8',
-              }}
-              tabIndex={0}
-            >
-              <Flex align="center" css={{ c: '$on_surface_medium' }}>
-                <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
-                  {selection}
-                </Text>
-                {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
-              </Flex>
-            </Dropdown.Trigger>
-            <Dropdown.Content
-              css={{
-                w: '$64',
-                overflow: 'hidden',
-                maxHeight: 'unset',
-                bg: '$surface_default',
-              }}
-              align="start"
-              sideOffset={8}
-            >
-              <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
-            </Dropdown.Content>
-          </Dropdown.Root>
-        </Flex>
+        <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
       ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
@@ -207,7 +172,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
           ) : null}
           <BaseIconButton
             onClick={sendMessage}
-            css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
+            css={{ ml: 'auto', height: 'max-content', mr: '$4', color: '$on_surface_low' }}
             data-testid="send_msg_btn"
           >
             <SendIcon />
