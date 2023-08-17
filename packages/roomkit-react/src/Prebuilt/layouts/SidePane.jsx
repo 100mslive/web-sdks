@@ -25,7 +25,7 @@ const SidePane = ({ css = {} }) => {
         w: '$100',
         h: '100%',
         p: '$10',
-        bg: '$surface_default',
+        bg: '$surface_dim',
         r: '$1',
         ml: '$8',
         position: 'relative',
@@ -40,6 +40,10 @@ const SidePane = ({ css = {} }) => {
           r: 0,
           zIndex: 10,
           ...(css['@lg'] || {}),
+        },
+        '@md': {
+          p: '$6 $8',
+          pb: '$12',
         },
       }}
     >

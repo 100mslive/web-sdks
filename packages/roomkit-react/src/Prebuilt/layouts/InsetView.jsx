@@ -212,8 +212,9 @@ export const InsetTile = () => {
           position: 'absolute',
           bottom: 0,
           right: 0,
-          boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
           zIndex: 10,
+          boxShadow: '0 0 8px 0 rgba(0,0,0,0.3)',
+          r: '$2',
           ...(!minimised
             ? {
                 aspectRatio: aspectRatio,
@@ -234,6 +235,7 @@ export const InsetTile = () => {
             }}
             width={width}
             height={height}
+            containerCSS={{ background: '$surface_default' }}
             canMinimise
           />
         )}

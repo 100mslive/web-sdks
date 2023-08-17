@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
-import Hls from "hls.js";
+import { HMSHLSPlayer } from "@100mslive/hls-player";
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -85,6 +85,8 @@ export const MoreSettings = () => {
     setOpenModals(modals => {
       const copy = new Set(modals);
       if (value) {
+        // avoiding extra set state trigger which removes currently open dialog by clearing set.
+        copy.clear();
         copy.add(modalName);
       } else {
         copy.delete(modalName);
@@ -98,6 +100,7 @@ export const MoreSettings = () => {
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
+        modal={false}
       >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
@@ -192,7 +195,7 @@ export const MoreSettings = () => {
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
             (localPeerRole === "hls-viewer" ? (
-              Hls.isSupported() ? (
+              HMSHLSPlayer.isSupported() ? (
                 <Dropdown.Item
                   css={{ "&:hover": { backgroundColor: "$surfaceight" } }}
                   onClick={() =>
