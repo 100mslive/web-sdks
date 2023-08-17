@@ -20,7 +20,7 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import {  Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';

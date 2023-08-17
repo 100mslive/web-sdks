@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { useMeasure } from 'react-use';
 import {
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
@@ -92,7 +91,6 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
 };
 
 const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, searchValue, onSelect }) => {
-  const [ref] = useMeasure();
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
@@ -130,7 +128,7 @@ const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, search
   }, [onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
-    <Dropdown.Group ref={ref} css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
       <Box>
         {listItems.map((item, index) => (
           <Box key={index}>{item}</Box>
