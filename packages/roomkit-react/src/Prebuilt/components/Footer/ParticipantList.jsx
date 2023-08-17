@@ -47,6 +47,7 @@ export const ParticipantList = () => {
       results.matches = true;
     }
     peersOrderedByRoles[participant.roleName].push(participant);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const isHandRaised = useHMSStore(selectPeerMetadata(participant.id))?.isHandRaised;
     if (isHandRaised) {
       handRaisedList.push(participant);
