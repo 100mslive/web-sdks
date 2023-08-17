@@ -158,6 +158,7 @@ const VirtualisedParticipantListItem = React.memo(({ style, index, data }) => {
 });
 
 const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
+  const localPeerId = useHMSStore(selectLocalPeerID);
   return (
     <Fragment>
       <Flex
@@ -166,22 +167,10 @@ const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
         align="center"
         data-testid={'participant_' + peer.name}
       >
-        <Avatar
-          name={peer.name}
-          css={{
-            position: 'unset',
-            transform: 'unset',
-            mr: '$8',
-            fontSize: '$sm',
-            size: '$12',
-            p: '$4',
-          }}
-        />
         <Flex direction="column" css={{ flex: '1 1 0' }}>
-          <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
-            {peer.name}
+          <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
+            {peer.name} {localPeerId === peer.id ? '(You)' : ''}
           </Text>
-          <Text variant="sub2">{peer.roleName}</Text>
         </Flex>
         {isConnected && (
           <ParticipantActions

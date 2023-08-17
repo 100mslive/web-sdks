@@ -3,6 +3,7 @@ import { CrossIcon } from '@100mslive/react-icons';
 import { Flex, IconButton, Tabs } from '../../..';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 
 const tabTriggerCSS = {
   color: '$on_surface_high',
@@ -17,6 +18,7 @@ export const ChatParticipantHeader = React.memo(({ activeTabValue = SIDE_PANE_OP
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const [activeTab, setActiveTab] = useState(activeTabValue);
+  const peerCount = useHMSStore(selectPeerCount);
 
   return (
     <Flex
@@ -48,7 +50,7 @@ export const ChatParticipantHeader = React.memo(({ activeTabValue = SIDE_PANE_OP
                 color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
               }}
             >
-              Participants
+              Participants ({peerCount})
             </Tabs.Trigger>
           </Tabs.List>
         </Tabs.Root>
