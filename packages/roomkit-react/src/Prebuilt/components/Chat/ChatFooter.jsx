@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, HandIcon, SendIcon } from '@100mslive/react-icons';
+import { useHMSActions } from '@100mslive/react-sdk';
+import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import {
   Box,
   config as cssConfig,
@@ -15,13 +15,9 @@ import {
   Text,
   textEllipsis,
 } from '../../../';
-import IconButton from '../../IconButton';
-import { EmojiReaction } from '../EmojiReaction';
-import { MwebOptions } from '../MoreSettings/SplitComponents/MwebOptions';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
 const TextArea = styled('textarea', {
@@ -81,13 +77,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const [open, setOpen] = useState(false);
-  const hlsViewerRole = useHLSViewerRole();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isHlsViewer = hlsViewerRole === localPeerRole;
   const isMobile = useMedia(cssConfig.media.md);
-
-  const showMobileHLSViewerFooter = isMobile && isHlsViewer;
-
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -216,15 +206,6 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
             <SendIcon />
           </BaseIconButton>
         </Flex>
-        {showMobileHLSViewerFooter ? (
-          <>
-            <EmojiReaction />
-            <IconButton>
-              <HandIcon />
-            </IconButton>
-            <MwebOptions />
-          </>
-        ) : null}
       </Flex>
     </>
   );
