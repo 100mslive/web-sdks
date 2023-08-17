@@ -7,7 +7,7 @@ const TileConnection = ({ name, peerId, hideLabel, width, spotlighted, pinned })
   return (
     <Wrapper>
       {!hideLabel ? (
-        <Flex alignItems="center">
+        <Flex align="center">
           {pinned && (
             <IconWrapper>
               <PinIcon width="15" height="15" css={{ display: 'block' }} />

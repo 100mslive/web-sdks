@@ -51,8 +51,8 @@ const Tile = ({
   const [pinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
   const pinned = isSameTile({
     trackId: pinnedTrackId,
-    videoTrackID: track.id,
-    audioTrackID: audioTrack.id,
+    videoTrackID: track?.id,
+    audioTrackID: audioTrack?.id,
   });
   const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const label = getVideoTileLabel({
@@ -114,15 +114,15 @@ const Tile = ({
                 track?.source === 'regular' &&
                 track?.facingMode !== 'environment'
               }
-              degraded={isVideoDegraded}
               noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
               data-testid="participant_video_tile"
               css={{
                 objectFit,
+                filter: isVideoDegraded ? 'blur($space$4)' : undefined,
               }}
             />
           ) : null}
-          {isVideoMuted || isVideoDegraded || (!isLocal && isAudioOnly) ? (
+          {isVideoMuted || (!isLocal && isAudioOnly) ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={peerName || ''} data-testid="participant_avatar_icon" size={avatarSize} />
             </StyledVideoTile.AvatarContainer>
