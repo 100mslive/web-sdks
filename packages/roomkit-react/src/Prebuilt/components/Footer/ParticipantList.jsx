@@ -20,16 +20,15 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Box, config as cssConfig, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { useShowStreamingUI } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
-import { useShowStreamingUI } from '../../common/hooks';
-import { config as cssConfig } from '../../..';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();

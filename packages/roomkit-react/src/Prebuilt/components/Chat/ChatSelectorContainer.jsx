@@ -1,14 +1,14 @@
-import { Flex } from '../../../Layout';
-import { Text } from '../../../Text';
-import { Dropdown } from '../../../Dropdown';
-import { ChatSelector } from './ChatSelector';
-import { textEllipsis } from '../../../utils';
 import React, { useState } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
 import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../Theme';
-import { useShowStreamingUI } from '../../common/hooks';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
+import { Dropdown } from '../../../Dropdown';
+import { Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
+import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
+import { ChatSelector } from './ChatSelector';
+import { useShowStreamingUI } from '../../common/hooks';
+import { textEllipsis } from '../../../utils';
 
 export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => {
   const [open, setOpen] = useState(false);

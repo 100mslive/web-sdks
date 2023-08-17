@@ -3,24 +3,13 @@ import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import {
-  Box,
-  config as cssConfig,
-  Dropdown,
-  Flex,
-  IconButton as BaseIconButton,
-  Popover,
-  styled,
-  Text,
-  textEllipsis,
-} from '../../../';
+import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
+import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
-import { ChatSelector } from './ChatSelector';
+import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { ChatSelectorContainer } from './ChatSelectorContainer';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -78,7 +67,6 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
-  const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hlsViewerRole = useHLSViewerRole();
