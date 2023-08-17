@@ -48,10 +48,10 @@ export const ParticipantList = () => {
     }
     peersOrderedByRoles[participant.roleName].push(participant);
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const isHandRaised = useHMSStore(selectPeerMetadata(participant.id))?.isHandRaised;
-    if (isHandRaised) {
-      handRaisedList.push(participant);
-    }
+    // const isHandRaised = useHMSStore(selectPeerMetadata(participant.id))?.isHandRaised;
+    // if (isHandRaised) {
+    // handRaisedList.push(participant);
+    // }
   });
 
   const [selectedPeerId, setSelectedPeerId] = useState(null);
@@ -152,6 +152,7 @@ const VirtualizedParticipants = ({
       <RoleAccordion peerList={handRaisedList} roleName="Hand Raised" filter={filter} isHandRaisedAccordion />
       {Object.keys(peersOrderedByRoles).map(role => (
         <RoleAccordion
+          key={role}
           peerList={peersOrderedByRoles[role]}
           roleName={role}
           isConnected={isConnected}
@@ -176,9 +177,15 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
       <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
-      {isConnected && (
-        <ParticipantActions peerId={peer.id} role={peer.roleName} onSettings={() => setSelectedPeerId(peer.id)} />
-      )}
+      {isConnected && peer.id !== localPeerId ? (
+        <ParticipantActions
+          peerId={peer.id}
+          role={peer.roleName}
+          onSettings={() => {
+            setSelectedPeerId(peer.id);
+          }}
+        />
+      ) : null}
     </Flex>
   );
 };
@@ -230,6 +237,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const isLocal = localPeerId === peerId;
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
+
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
       <Dropdown.Trigger

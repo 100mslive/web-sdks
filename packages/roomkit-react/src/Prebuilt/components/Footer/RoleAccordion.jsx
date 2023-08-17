@@ -40,7 +40,7 @@ export const RoleAccordion = ({
           <Accordion.Content>
             <Box css={{ borderTop: '1px solid $border_default' }} />
             {peerList.map(peer => (
-              <Participant peer={peer} isConnected={isConnected} setSelectedPeerId={setSelectedPeerId} />
+              <Participant key={peer.id} peer={peer} isConnected={isConnected} setSelectedPeerId={setSelectedPeerId} />
             ))}
           </Accordion.Content>
         </Accordion.Item>
