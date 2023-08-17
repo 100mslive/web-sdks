@@ -53,7 +53,7 @@ export const IconButtonWithOptions = ({
     <Flex>
       <IconSection css={bgCss} onClick={onClick}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
-          <Flex align="center" justify="center" css={{ color: 'inherit' }}>
+          <Flex align="center" justify="center" css={iconCss}>
             {icon}
           </Flex>
         </Tooltip>
@@ -62,7 +62,7 @@ export const IconButtonWithOptions = ({
         <Dropdown.Trigger asChild>
           <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
-              <Box css={{ color: 'inherit' }}>
+              <Box css={iconCss}>
                 <VerticalMenuIcon />
               </Box>
             </Tooltip>
