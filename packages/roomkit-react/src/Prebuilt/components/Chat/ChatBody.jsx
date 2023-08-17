@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import emptyChat from '../../../assets/empty-chat.svg';
+import emptyChat from '../../images/empty-chat.svg'
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
