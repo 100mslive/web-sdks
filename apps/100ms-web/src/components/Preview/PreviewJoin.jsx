@@ -148,7 +148,7 @@ const Container = styled("div", {
   px: "$10",
 });
 
-const PreviewTile = ({ name, error }) => {
+export const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
