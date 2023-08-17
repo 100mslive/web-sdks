@@ -14,6 +14,7 @@ import {
 import {
   ChangeRoleIcon,
   HandIcon,
+  HandRaiseSlashedIcon,
   MicOffIcon,
   PeopleIcon,
   PeopleRemoveIcon,
@@ -29,7 +30,7 @@ import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { LOWER_HAND, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -144,7 +145,14 @@ const VirtualizedParticipants = ({
         mt: '$4',
       }}
     >
-      <RoleAccordion peerList={handRaisedList} roleName="Hand Raised" filter={filter} isHandRaisedAccordion />
+      <RoleAccordion
+        peerList={handRaisedList}
+        roleName="Hand Raised"
+        filter={filter}
+        isConnected={isConnected}
+        setSelectedPeerId={setSelectedPeerId}
+        isHandRaisedAccordion
+      />
       {Object.keys(peersOrderedByRoles).map(role => (
         <RoleAccordion
           key={role}
@@ -217,18 +225,23 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
       ) : null}
 
       {shouldShowMoreActions && !isInternalRole(role) && (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
+        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} isHandRaised={isHandRaised} />
       )}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
+const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
+  const hmsActions = useHMSActions();
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
+
+  const lowerHand = async () => {
+    await hmsActions.sendDirectMessage('Lower hand', peerId, LOWER_HAND);
+  };
 
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
@@ -252,6 +265,15 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
               </Text>
             </Dropdown.Item>
           )}
+          {isHandRaised ? (
+            <Dropdown.Item css={{ c: '$on_surface_high', bg: '$surface_default' }} onClick={lowerHand}>
+              <HandRaiseSlashedIcon />
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                Lower Hand
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
               css={{ color: '$alert_error_default', bg: '$surface_default' }}
