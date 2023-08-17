@@ -21,7 +21,7 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
@@ -29,14 +29,19 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 import { RoleAccordion } from './RoleAccordion';
+import { RoleChangeModal } from '../RoleChangeModal';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
+  const results = { matches: false };
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
       peersOrderedByRoles[participant.roleName] = [];
+    }
+    if (filter?.search && participant.name.includes(filter.search)) {
+      results.matches = true;
     }
     peersOrderedByRoles[participant.roleName].push(participant);
   });
@@ -60,16 +65,25 @@ export const ParticipantList = () => {
       <Flex direction="column" css={{ size: '100%' }}>
         <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
-        {participants.length === 0 && (
+        {participants.length === 0 || (filter?.search && !results.matches) ? (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
             <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
           </Flex>
-        )}
+        ) : null}
         <VirtualizedParticipants
           peersOrderedByRoles={peersOrderedByRoles}
           isConnected={isConnected}
+          filter={filter}
           setSelectedPeerId={setSelectedPeerId}
         />
+        {selectedPeerId && (
+          <RoleChangeModal
+            peerId={selectedPeerId}
+            onOpenChange={value => {
+              !value && setSelectedPeerId(null);
+            }}
+          />
+        )}
       </Flex>
     </Fragment>
   );
@@ -111,15 +125,12 @@ export const ParticipantCount = () => {
   );
 };
 
-function itemKey(index, data) {
-  return data.participants[index].id;
-}
-
-const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, setSelectedPeerId }) => {
+const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, setSelectedPeerId, filter }) => {
   return (
-    <Box
+    <Flex
+      direction="column"
       css={{
-        flex: '1 1 0',
+        gap: '$8',
       }}
     >
       {Object.keys(peersOrderedByRoles).map(role => (
@@ -128,23 +139,12 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, setSel
           roleName={role}
           isConnected={isConnected}
           setSelectedPeerId={setSelectedPeerId}
+          filter={filter}
         />
       ))}
-    </Box>
+    </Flex>
   );
 };
-
-const VirtualisedParticipantListItem = React.memo(({ style, index, data }) => {
-  return (
-    <div style={style} key={data.participants[index].id}>
-      <Participant
-        peer={data.participants[index]}
-        isConnected={data.isConnected}
-        setSelectedPeerId={data.setSelectedPeerId}
-      />
-    </div>
-  );
-});
 
 export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -160,13 +160,7 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
       {isConnected && (
-        <ParticipantActions
-          peerId={peer.id}
-          role={peer.roleName}
-          onSettings={() => {
-            setSelectedPeerId(peer.id);
-          }}
-        />
+        <ParticipantActions peerId={peer.id} role={peer.roleName} onSettings={() => setSelectedPeerId(peer.id)} />
       )}
     </Flex>
   );

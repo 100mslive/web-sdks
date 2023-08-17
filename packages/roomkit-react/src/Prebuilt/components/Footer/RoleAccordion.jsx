@@ -4,7 +4,11 @@ import { Box } from '../../../Layout';
 import { getFormattedCount } from '../../common/utils';
 import { Participant } from './ParticipantList';
 
-export const RoleAccordion = ({ peerList = [], roleName, setSelectedPeerId, isConnected }) => {
+export const RoleAccordion = ({ peerList = [], roleName, setSelectedPeerId, isConnected, filter }) => {
+  const showAcordion = filter?.search ? peerList.some(peer => peer.name.includes(filter.search)) : true;
+  if (!showAcordion) {
+    return null;
+  }
   return (
     <Box>
       <Accordion.Root
