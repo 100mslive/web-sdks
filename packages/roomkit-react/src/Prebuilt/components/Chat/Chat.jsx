@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -13,16 +14,15 @@ import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../Theme';
 import { useShowStreamingUI } from '../../common/hooks';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);

@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { useHMSActions } from '@100mslive/react-sdk';
+import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import {
   Box,
@@ -18,11 +18,8 @@ import {
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
-import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { selectLocalPeerID } from '@100mslive/react-sdk';
-import { useHMSStore } from '@100mslive/react-sdk';
 import { useHLSViewerRole } from '../AppData/useUISettings';
-import { selectLocalPeerRoleName } from '@100mslive/react-sdk';
+import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
 const TextArea = styled('textarea', {
   width: '100%',

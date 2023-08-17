@@ -1,13 +1,13 @@
 import React from 'react';
+import { useMedia } from 'react-use';
 import { selectAppData, useHMSStore } from '@100mslive/react-sdk';
 import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Footer/ParticipantList';
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { Box } from '../../Layout';
-import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
-import { useMedia } from 'react-use';
-import { useShowStreamingUI } from '../common/hooks';
 import { config as cssConfig } from '../../Theme';
+import { useShowStreamingUI } from '../common/hooks';
+import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({ css = {} }) => {
   const isMobile = useMedia(cssConfig.media.md);
