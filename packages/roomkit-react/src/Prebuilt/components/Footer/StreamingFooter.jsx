@@ -51,6 +51,11 @@ export const StreamingFooter = () => {
       >
         {isMobile ? (
           <>
+            {isHandRaiseEnabled ? (
+              <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
+                <HandIcon />
+              </IconButton>
+            ) : null}
             <ChatToggle />
             <MoreSettings />
           </>
