@@ -180,9 +180,10 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
       <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
-      {isConnected && peer.id !== localPeerId ? (
+      {isConnected ? (
         <ParticipantActions
           peerId={peer.id}
+          isLocal={peer.id === localPeerId}
           role={peer.roleName}
           onSettings={() => {
             setSelectedPeerId(peer.id);
@@ -196,7 +197,7 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
+const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) => {
   const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const shouldShowMoreActions = canChangeRole;
@@ -224,9 +225,9 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
         </Flex>
       ) : null}
 
-      {shouldShowMoreActions && !isInternalRole(role) && (
+      {shouldShowMoreActions && !isInternalRole(role) && !isLocal ? (
         <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} isHandRaised={isHandRaised} />
-      )}
+      ) : null}
     </Flex>
   );
 });
