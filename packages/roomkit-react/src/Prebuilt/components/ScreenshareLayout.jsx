@@ -17,6 +17,9 @@ export const ScreenshareLayout = () => {
 
   useEffect(() => {
     setActiveScreenSharePeer(activeSharePeerId);
+    return () => {
+      setActiveScreenSharePeer('');
+    };
   }, [activeSharePeerId, setActiveScreenSharePeer]);
 
   return (
