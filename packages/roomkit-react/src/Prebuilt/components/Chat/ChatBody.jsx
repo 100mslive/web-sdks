@@ -134,7 +134,7 @@ const ChatActions = ({ onPin }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <VerticalMenuIcon style={{ transform: 'rotate(90deg)' }} />
+            <VerticalMenuIcon />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
