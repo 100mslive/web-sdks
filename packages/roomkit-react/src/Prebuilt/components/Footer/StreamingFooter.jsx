@@ -1,7 +1,9 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { selectLocalPeer, selectPeerMetadata } from '@100mslive/hms-video-store';
+import { useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Footer as AppFooter } from '../../../';
+import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
@@ -17,7 +19,9 @@ import { FEATURE_LIST } from '../../common/constants';
 export const StreamingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const { isHandRaised, toggleHandRaise } = useMyMetadata();
+  const { toggleHandRaise } = useMyMetadata();
+  const localPeer = useHMSStore(selectLocalPeer);
+  const isHandRaised = useHMSStore(selectPeerMetadata(localPeer.id))?.isHandRaised || false;
 
   return (
     <AppFooter.Root
@@ -63,9 +67,11 @@ export const StreamingFooter = () => {
           <>
             <ScreenshareToggle />
             {isHandRaiseEnabled ? (
-              <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                <HandIcon />
-              </IconButton>
+              <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
+                <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
+                  <HandIcon />
+                </IconButton>
+              </Tooltip>
             ) : null}
             <EmojiReaction />
             <LeaveRoom />
