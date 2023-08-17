@@ -51,6 +51,7 @@ const HLSView = () => {
     if (isMobile) {
       toggleChat();
     }
+    // eslint-disable-next-line
   }, []);
 
   // FIXME: move this logic to player controller in next release

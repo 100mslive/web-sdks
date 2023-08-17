@@ -14,7 +14,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import emptyChat from '../../../assets/empty-chat.svg';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
@@ -138,7 +138,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
       <Dropdown.Trigger asChild>
         <IconButton>
           <Tooltip title="More options">
-            <HorizontalMenuIcon style={{ transform: 'rotate(90deg)' }} />
+            <VerticalMenuIcon style={{ transform: 'rotate(90deg)' }} />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
