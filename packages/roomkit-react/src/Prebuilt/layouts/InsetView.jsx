@@ -234,6 +234,7 @@ export const InsetTile = () => {
             }}
             width={width}
             height={height}
+            containerCSS={{ background: '$surface_default' }}
             canMinimise
           />
         )}

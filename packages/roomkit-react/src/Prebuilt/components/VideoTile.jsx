@@ -119,6 +119,7 @@ const Tile = ({
               css={{
                 objectFit,
                 filter: isVideoDegraded ? 'blur($space$4)' : undefined,
+                bg: 'transparent',
               }}
             />
           ) : null}
