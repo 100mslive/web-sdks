@@ -14,6 +14,7 @@ import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
+import { ScreenshareDisplay } from './ScreenshareDisplay';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
@@ -48,8 +49,12 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   });
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
+
+  if (isLocal && !['browser', 'window', 'application'].includes(track?.displaySurface)) {
+    return <ScreenshareDisplay />;
+  }
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0, pr: '$10' }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root css={{ width, height, p: 0 }} data-testid="screenshare_tile">
       {peer ? (
         <StyledVideoTile.Container
           transparentBg

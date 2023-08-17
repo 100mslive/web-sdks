@@ -20,8 +20,8 @@ export const ScreenshareLayout = () => {
   }, [activeSharePeerId, setActiveScreenSharePeer]);
 
   return (
-    <Flex direction="column">
-      <Box css={{ flex: '1 1 0', minHeight: 0 }}>
+    <Flex direction="column" css={{ size: '100%' }}>
+      <Box css={{ flex: '1 1 0', minHeight: 0, pr: '$10' }}>
         <ScreenshareTile peerId={peersSharing[page].id} />
       </Box>
       {peersSharing.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
