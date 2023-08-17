@@ -1,17 +1,28 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, IconButton, Popover, styled, Text, textEllipsis } from '../../../';
+import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, HandIcon, SendIcon } from '@100mslive/react-icons';
+import {
+  Box,
+  config as cssConfig,
+  Dropdown,
+  Flex,
+  IconButton as BaseIconButton,
+  Popover,
+  styled,
+  Text,
+  textEllipsis,
+} from '../../../';
+import IconButton from '../../IconButton';
+import { EmojiReaction } from '../EmojiReaction';
+import { MwebOptions } from '../MoreSettings/SplitComponents/MwebOptions';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelector } from './ChatSelector';
 import { useChatDraftMessage } from '../AppData/useChatState';
-import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useHLSViewerRole } from '../AppData/useUISettings';
-import { useMedia } from 'react-use';
-import { config as cssConfig } from '../../../';
-import { EmojiReaction } from '../EmojiReaction';
+import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -37,9 +48,9 @@ function EmojiPicker({ onSelect }) {
   return (
     <Popover.Root open={showEmoji} onOpenChange={setShowEmoji}>
       <Popover.Trigger asChild css={{ appearance: 'none' }}>
-        <IconButton as="div">
+        <BaseIconButton as="div">
           <EmojiIcon />
-        </IconButton>
+        </BaseIconButton>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
@@ -162,7 +173,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
             position: 'relative',
             py: '$6',
             pl: '$8',
-            w: '100%',
+            flexGrow: 1,
             r: '$1',
             '@md': {
               minHeight: 'unset',
@@ -197,15 +208,23 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
               }}
             />
           ) : null}
-          <IconButton
+          <BaseIconButton
             onClick={sendMessage}
             css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
             data-testid="send_msg_btn"
           >
             <SendIcon />
-          </IconButton>
+          </BaseIconButton>
         </Flex>
-        {showMobileHLSViewerFooter ? <EmojiReaction /> : null}
+        {showMobileHLSViewerFooter ? (
+          <>
+            <EmojiReaction />
+            <IconButton>
+              <HandIcon />
+            </IconButton>
+            <MwebOptions />
+          </>
+        ) : null}
       </Flex>
     </>
   );

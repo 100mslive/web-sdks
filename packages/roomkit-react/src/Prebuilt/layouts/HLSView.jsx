@@ -14,11 +14,10 @@ import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
-import { useTheme } from '../../Theme';
+import { config as cssConfig, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
-import { config as cssConfig } from '../../Theme';
-import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../components/AppData/useSidepane';
 
 let hlsPlayer;
 
@@ -46,15 +45,13 @@ const HLSView = () => {
 
   const isMobile = useMedia(cssConfig.media.md);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isParticipantListOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
 
-  // useeffect -> open chat
-  // isFullscreen -> close chat, sidepane
-  // isn't fullscreen -> open chat
-
-  useEffect(() => toggleChat(), []);
+  // Open chat on load for mobile hls viewers
+  useEffect(() => {
+    if (isMobile) {
+      toggleChat();
+    }
+  }, []);
 
   // FIXME: move this logic to player controller in next release
   useEffect(() => {

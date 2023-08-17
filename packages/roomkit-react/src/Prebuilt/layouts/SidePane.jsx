@@ -41,6 +41,10 @@ const SidePane = ({ css = {} }) => {
           zIndex: 10,
           ...(css['@lg'] || {}),
         },
+        '@md': {
+          p: '$6 $8',
+          pb: '$12',
+        },
       }}
     >
       <ViewComponent />
