@@ -1,5 +1,6 @@
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
@@ -13,15 +14,15 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { styled } from '../../../Theme';
+import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
-import { PeerJoinedMessage } from './PeerJoinedMessage';
+import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -125,9 +126,12 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-
-const ChatActions = ({ onPin }) => {
+const ChatActions = ({ onPin, showPinAction, messageContent }) => {
   const [open, setOpen] = useState(false);
+  const isMobile = useMedia(cssConfig.media.md);
+  if (!isMobile && !showPinAction) {
+    return null;
+  }
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -150,6 +154,30 @@ const ChatActions = ({ onPin }) => {
               Pin Message
             </Text>
           </Dropdown.Item>
+          {isMobile && showPinAction ? <Dropdown.ItemSeparator css={{ my: 0 }} /> : null}
+          {isMobile ? (
+            <Dropdown.Item
+              data-testid="copy_message_btn"
+              onClick={() => {
+                try {
+                  navigator?.clipboard.writeText(messageContent);
+                  ToastManager.addToast({
+                    title: 'Message copied successfully',
+                  });
+                } catch (e) {
+                  console.log(e);
+                  ToastManager.addToast({
+                    title: 'Could not copy message',
+                  });
+                }
+              }}
+            >
+              <CopyIcon />
+              <Text variant="sm" css={{ ml: '$4' }}>
+                Copy Message
+              </Text>
+            </Dropdown.Item>
+          ) : null}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -190,9 +218,6 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       hmsActions.setMessageRead(true, message.id);
     }
   }, [message.read, hmsActions, inView, message.id]);
-  if (message.type === 'JOIN_CHAT_EVENT') {
-    return <PeerJoinedMessage content={message.message} />;
-  }
 
   return (
     <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>
@@ -250,7 +275,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {showPinAction && <ChatActions onPin={onPin} />}
+          <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
         </Text>
         <Text
           variant="body2"
