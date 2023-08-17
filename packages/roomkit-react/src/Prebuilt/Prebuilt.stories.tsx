@@ -24,15 +24,15 @@ const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 const endpoints: HMSPrebuiltOptions['endpoints'] = {
-  roomLayout: process.env.ROOM_LAYOUT_ENDPOINT,
-  tokenByRoomCode: process.env.TOKEN_BY_ROOM_CODE_ENDPOINT,
-  init: process.env.INIT_API_ENDPOINT,
+  roomLayout: process.env.STORYBOOK_ROOM_LAYOUT_ENDPOINT,
+  tokenByRoomCode: process.env.STORYBOOK_TOKEN_BY_ROOM_CODE_ENDPOINT,
+  init: process.env.STORYBOOK_INIT_API_ENDPOINT,
 };
 
 const hasEndpoints = Object.values(endpoints).some(val => !!val);
 
 Example.args = {
-  roomCode: process.env.SAMPLE_ROOM_CODE,
+  roomCode: process.env.STORYBOOK_SAMPLE_ROOM_CODE,
   options: {
     userName: '',
     userId: '',
