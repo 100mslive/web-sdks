@@ -18,10 +18,12 @@ const PrebuiltRoomCodeStory: StoryFn<typeof HMSPrebuilt> = ({ roomCode = '', log
 
 export const Example = PrebuiltRoomCodeStory.bind({});
 Example.args = {
-  roomCode: 'cuf-wywo-trf',
+  roomCode: 'hwt-diz-gxv',
   options: {
     endpoints: {
-      roomLayout: 'https://demo8271564.mockable.io/v2/layouts/ui',
+      roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
+      init: 'https://qa-init.100ms.live/init',
+      tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
     },
   },
   typography: {

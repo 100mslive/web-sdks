@@ -22,9 +22,9 @@ export const VideoTime = ({ hlsPlayer }) => {
     <Text
       css={{
         minWidth: '$16',
-      }}
-      variant={{
-        '@sm': 'xs',
+        c: '$on_surface_medium',
+        display: 'flex',
+        justifyContent: 'center',
       }}
     >
       {videoTime}
