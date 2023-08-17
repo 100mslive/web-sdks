@@ -1,33 +1,34 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useDebounce, useMeasure } from 'react-use';
-import { FixedSizeList } from 'react-window';
+import { useDebounce } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
   selectPermissions,
+  selectIsPeerAudioEnabled,
   useHMSActions,
   useHMSStore,
   useParticipants,
 } from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
-  HandRaiseIcon,
+  HandIcon,
+  MicOffIcon,
   PeopleIcon,
   RemoveUserIcon,
   SearchIcon,
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
-import { RoleChangeModal } from '../RoleChangeModal';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { RoleAccordion } from './RoleAccordion';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -39,6 +40,7 @@ export const ParticipantList = () => {
     }
     peersOrderedByRoles[participant.roleName].push(participant);
   });
+  // Can use to mute/unmute etc
   const [selectedPeerId, setSelectedPeerId] = useState(null);
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
@@ -64,19 +66,11 @@ export const ParticipantList = () => {
           </Flex>
         )}
         <VirtualizedParticipants
-          participants={participants}
+          peersOrderedByRoles={peersOrderedByRoles}
           isConnected={isConnected}
           setSelectedPeerId={setSelectedPeerId}
         />
       </Flex>
-      {selectedPeerId && (
-        <RoleChangeModal
-          peerId={selectedPeerId}
-          onOpenChange={value => {
-            !value && setSelectedPeerId(null);
-          }}
-        />
-      )}
     </Fragment>
   );
 };
@@ -121,26 +115,21 @@ function itemKey(index, data) {
   return data.participants[index].id;
 }
 
-const VirtualizedParticipants = ({ participants, isConnected, setSelectedPeerId }) => {
-  const [ref, { width, height }] = useMeasure();
+const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, setSelectedPeerId }) => {
   return (
     <Box
-      ref={ref}
       css={{
         flex: '1 1 0',
-        mr: '-$10',
       }}
     >
-      <FixedSizeList
-        itemSize={68}
-        itemData={{ participants, isConnected, setSelectedPeerId }}
-        itemKey={itemKey}
-        itemCount={participants.length}
-        width={width}
-        height={height}
-      >
-        {VirtualisedParticipantListItem}
-      </FixedSizeList>
+      {Object.keys(peersOrderedByRoles).map(role => (
+        <RoleAccordion
+          peerList={peersOrderedByRoles[role]}
+          roleName={role}
+          isConnected={isConnected}
+          setSelectedPeerId={setSelectedPeerId}
+        />
+      ))}
     </Box>
   );
 };
@@ -157,32 +146,29 @@ const VirtualisedParticipantListItem = React.memo(({ style, index, data }) => {
   );
 });
 
-const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
+export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
-    <Fragment>
-      <Flex
-        key={peer.id}
-        css={{ w: '100%', py: '$4', pr: '$10' }}
-        align="center"
-        data-testid={'participant_' + peer.name}
-      >
-        <Flex direction="column" css={{ flex: '1 1 0' }}>
-          <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
-            {peer.name} {localPeerId === peer.id ? '(You)' : ''}
-          </Text>
-        </Flex>
-        {isConnected && (
-          <ParticipantActions
-            peerId={peer.id}
-            role={peer.roleName}
-            onSettings={() => {
-              setSelectedPeerId(peer.id);
-            }}
-          />
-        )}
-      </Flex>
-    </Fragment>
+    <Flex
+      key={peer.id}
+      css={{ w: '100%', p: '$8', pt: '$4', pr: '$6' }}
+      align="center"
+      justify="between"
+      data-testid={'participant_' + peer.name}
+    >
+      <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
+        {peer.name} {localPeerId === peer.id ? '(You)' : ''}
+      </Text>
+      {isConnected && (
+        <ParticipantActions
+          peerId={peer.id}
+          role={peer.roleName}
+          onSettings={() => {
+            setSelectedPeerId(peer.id);
+          }}
+        />
+      )}
+    </Flex>
   );
 };
 
@@ -196,11 +182,30 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const canChangeVolume = peerId !== localPeerId && audioTrack;
   const shouldShowMoreActions = canChangeRole || canChangeVolume;
+  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
-    <Flex align="center" css={{ flexShrink: 0 }}>
+    <Flex align="center" css={{ flexShrink: 0, gap: '$8', mt: '$2' }}>
       <ConnectionIndicator peerId={peerId} />
-      {isHandRaised && <HandRaiseIcon />}
+      {isHandRaised && (
+        <Flex
+          align="center"
+          justify="center"
+          css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+        >
+          <HandIcon height={19} width={19} />
+        </Flex>
+      )}
+      {isAudioMuted ? (
+        <Flex
+          align="center"
+          justify="center"
+          css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+        >
+          <MicOffIcon height={19} width={19} />
+        </Flex>
+      ) : null}
+
       {shouldShowMoreActions && !isInternalRole(role) && (
         <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
       )}
@@ -216,10 +221,13 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const [open, setOpen] = useState(false);
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-      <Dropdown.Trigger asChild data-testid="participant_more_actions" css={{ p: '$2', r: '$0' }} tabIndex={0}>
-        <Text>
-          <VerticalMenuIcon />
-        </Text>
+      <Dropdown.Trigger
+        asChild
+        data-testid="participant_more_actions"
+        css={{ p: '$1', r: '$0', c: '$on_surface_high' }}
+        tabIndex={0}
+      >
+        <VerticalMenuIcon />
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64' }}>
