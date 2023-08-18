@@ -3,11 +3,7 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
-<<<<<<< HEAD
-=======
-  selectLocalPeerRoleName,
   selectPeerCount,
->>>>>>> babc35cc (fix:  add participants to bottom sheet)
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -34,11 +30,7 @@ import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
-<<<<<<< HEAD
-=======
 import { useSidepaneToggle } from '../../AppData/useSidepane';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
->>>>>>> babc35cc (fix:  add participants to bottom sheet)
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -138,9 +130,6 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
-<<<<<<< HEAD
-            {isHandRaiseEnabled ? (
-=======
             <ActionTile
               title="Participants"
               icon={<PeopleIcon />}
@@ -148,8 +137,7 @@ export const MwebOptions = () => {
               setOpenOptionsSheet={setOpenOptionsSheet}
               number={peerCount}
             />
-            {isHandRaiseEnabled && !isHLSViewer ? (
->>>>>>> babc35cc (fix:  add participants to bottom sheet)
+            {isHandRaiseEnabled ? (
               <ActionTile
                 title="Raise Hand"
                 icon={<HandIcon />}
