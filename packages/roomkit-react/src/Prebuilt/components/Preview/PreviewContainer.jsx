@@ -1,13 +1,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
-import { Box, Flex } from '../../../';
+import { Flex } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
-import { Header } from '../Header';
 import PreviewJoin from './PreviewJoin';
 import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
@@ -25,9 +23,6 @@ const PreviewContainer = () => {
   const roomLayout = useRoomLayout();
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
 
-  const roomState = useHMSStore(selectRoomState);
-  const isPreview = roomState === HMSRoomState.Preview;
-
   const onJoin = () => {
     let meetingURL = `/meeting/${urlRoomId}`;
     if (userRole) {
@@ -37,11 +32,6 @@ const PreviewContainer = () => {
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      {isPreview ? null : (
-        <Box css={{ h: '$18', '@md': { h: '$17', flexShrink: 0 } }} data-testid="header">
-          <Header />
-        </Box>
-      )}
       <Flex
         css={{ flex: '1 1 0', position: 'relative', overflowY: 'auto', color: '$primary_default' }}
         justify="center"
