@@ -19,7 +19,7 @@ export const ConferencingHeader = () => {
   return (
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex align="center" gap="2" css={{ position: 'absolute', left: '$10' }}>
-        {showStreamingUI ? (
+        {!showStreamingUI ? (
           <>
             <Logo />
             <VerticalDivider style={{ marginLeft: '0.5rem' }} />
