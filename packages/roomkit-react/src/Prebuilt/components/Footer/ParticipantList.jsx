@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useDebounce } from 'react-use';
+import { useDebounce, useMedia } from 'react-use';
 import {
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
@@ -21,7 +21,7 @@ import {
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import { config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
