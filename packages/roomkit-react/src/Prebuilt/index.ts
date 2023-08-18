@@ -1,2 +1,1 @@
-import { HMSPrebuilt } from './App';
-export { HMSPrebuilt };
+export * from './App';

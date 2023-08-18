@@ -1,6 +1,4 @@
-import React, { Fragment, useMemo, useState } from 'react';
-import { useMeasure } from 'react-use';
-import { FixedSizeList } from 'react-window';
+import React, { useMemo, useState } from 'react';
 import {
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
@@ -19,7 +17,11 @@ const ChatDotIcon = () => {
 
 const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
-    <Dropdown.Item data-testid="chat_members" css={{ align: 'center', px: '$10' }} onClick={onClick}>
+    <Dropdown.Item
+      data-testid="chat_members"
+      css={{ align: 'center', px: '$10', bg: '$surface_default' }}
+      onClick={onClick}
+    >
       <Text variant="sm">{value}</Text>
       <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
         {unreadCount > 0 && (
@@ -89,7 +91,6 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
 };
 
 const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, searchValue, onSelect }) => {
-  const [ref, { width, height }] = useMeasure();
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
@@ -127,14 +128,12 @@ const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, search
   }, [onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
-    <Dropdown.Group ref={ref} css={{ height: '$64', overflowY: 'auto' }}>
-      <FixedSizeList itemSize={52} itemCount={listItems.length} width={width} height={height}>
-        {({ index, style }) => (
-          <div style={style} key={index}>
-            {listItems[index]}
-          </div>
-        )}
-      </FixedSizeList>
+    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+      <Box>
+        {listItems.map((item, index) => (
+          <Box key={index}>{item}</Box>
+        ))}
+      </Box>
     </Dropdown.Group>
   );
 };
@@ -144,9 +143,9 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
   const [search, setSearch] = useState('');
 
   return (
-    <Fragment>
+    <>
       {peers.length > 0 && (
-        <Box css={{ px: '$8' }}>
+        <Box css={{ px: '$4' }}>
           <ParticipantSearch onSearch={setSearch} placeholder="Search participants" />
         </Box>
       )}
@@ -157,6 +156,6 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         peers={peers}
         searchValue={search}
       />
-    </Fragment>
+    </>
   );
 };

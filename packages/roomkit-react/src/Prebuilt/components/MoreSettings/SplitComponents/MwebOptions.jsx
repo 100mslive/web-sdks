@@ -3,6 +3,7 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
+  selectLocalPeerRoleName,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -28,6 +29,7 @@ import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -66,6 +68,10 @@ export const MwebOptions = () => {
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
+  const hlsViewer = useHLSViewerRole();
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const isHLSViewer = hlsViewer === localPeerRole;
+
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
@@ -92,7 +98,7 @@ export const MwebOptions = () => {
             </Tooltip>
           </IconButton>
         </Sheet.Trigger>
-        <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
+        <Sheet.Content css={{ bg: isHLSViewer ? '$surface_default' : '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
               display: 'flex',
@@ -125,7 +131,7 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
-            {isHandRaiseEnabled ? (
+            {isHandRaiseEnabled && !isHLSViewer ? (
               <ActionTile
                 title="Raise Hand"
                 icon={<HandIcon />}
@@ -134,7 +140,7 @@ export const MwebOptions = () => {
                 setOpenOptionsSheet={setOpenOptionsSheet}
               />
             ) : null}
-            {isBRBEnabled ? (
+            {isBRBEnabled && !isHLSViewer ? (
               <ActionTile
                 title="Be Right Back"
                 icon={<BrbIcon />}
@@ -149,17 +155,19 @@ export const MwebOptions = () => {
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               setOpenOptionsSheet={setOpenOptionsSheet}
             />
-            {isVideoOn ? (
+            {isVideoOn && !isHLSViewer ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
             ) : null}
-            <ActionTile
-              title="Emoji Reactions"
-              icon={<EmojiIcon />}
-              onClick={() => setShowEmojiCard(true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
+            {!isHLSViewer ? (
+              <ActionTile
+                title="Emoji Reactions"
+                icon={<EmojiIcon />}
+                onClick={() => setShowEmojiCard(true)}
+                setOpenOptionsSheet={setOpenOptionsSheet}
+              />
+            ) : null}
             <ActionTile
               title="Settings"
               icon={<SettingsIcon />}
