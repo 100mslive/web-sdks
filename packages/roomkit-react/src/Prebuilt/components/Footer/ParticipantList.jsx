@@ -232,7 +232,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
   return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger asChild data-testid="participant_more_actions" css={{ p: '$2', r: '$0' }} tabIndex={0}>
         <Text>
           <VerticalMenuIcon />
