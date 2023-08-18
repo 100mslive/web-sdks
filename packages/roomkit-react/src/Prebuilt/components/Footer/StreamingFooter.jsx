@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerRoleName, useHMSStore, selectLocalPeer, selectPeerMetadata } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectLocalPeerRoleName, selectPeerMetadata, useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
