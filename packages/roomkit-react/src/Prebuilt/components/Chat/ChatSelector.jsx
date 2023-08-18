@@ -146,7 +146,7 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
     <>
       {peers.length > 0 && (
         <Box css={{ px: '$4' }}>
-          <ParticipantSearch onSearch={setSearch} placeholder="Search participants" />
+          <ParticipantSearch onSearch={setSearch} placeholder="Search for participants" />
         </Box>
       )}
       <VirtualizedSelectItemList

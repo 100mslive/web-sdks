@@ -172,14 +172,14 @@ export const MwebOptions = () => {
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
             ) : null}
-            {!isHLSViewer ? (
-              <ActionTile
-                title="Emoji Reactions"
-                icon={<EmojiIcon />}
-                onClick={() => setShowEmojiCard(true)}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            ) : null}
+
+            <ActionTile
+              title="Emoji Reactions"
+              icon={<EmojiIcon />}
+              onClick={() => setShowEmojiCard(true)}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+            />
+
             <ActionTile
               title="Settings"
               icon={<SettingsIcon />}
