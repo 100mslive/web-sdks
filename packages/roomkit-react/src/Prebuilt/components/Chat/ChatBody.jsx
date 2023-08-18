@@ -24,6 +24,7 @@ import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useShowStreamingUI } from '../../common/hooks';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -202,6 +203,9 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       setRowHeight(index, rowRef.current.clientHeight);
     }
   }, [index, setRowHeight]);
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
+  const mwebStreaming = isMobile && showStreamingUI;
 
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -226,7 +230,8 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         align="center"
         css={{
           flexWrap: 'wrap',
-          bg: messageType ? '$surface_default' : undefined,
+          // Theme independent color, token should not be used for transparent chat
+          bg: messageType ? (mwebStreaming ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -258,24 +263,28 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
                 </SenderName>
               </Tooltip>
             )}
-            <Text
-              as="span"
-              variant="xs"
-              css={{
-                ml: '$4',
-                color: '$on_primary_medium',
-                flexShrink: 0,
-              }}
-            >
-              {formatTime(message.time)}
-            </Text>
+            {!mwebStreaming ? (
+              <Text
+                as="span"
+                variant="xs"
+                css={{
+                  ml: '$4',
+                  color: '$on_primary_medium',
+                  flexShrink: 0,
+                }}
+              >
+                {formatTime(message.time)}
+              </Text>
+            ) : null}
           </Flex>
           <MessageType
             hasCurrentUserSent={message.sender === localPeerId}
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
+          {!mwebStreaming ? (
+            <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
+          ) : null}
         </Text>
         <Text
           variant="body2"
@@ -375,7 +384,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, 
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebStreaming }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
@@ -383,7 +392,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
     : selectHMSMessages;
   const messages = useHMSStore(storeMessageSelector) || [];
 
-  if (messages.length === 0) {
+  if (messages.length === 0 && !mwebStreaming) {
     return (
       <Flex
         css={{
