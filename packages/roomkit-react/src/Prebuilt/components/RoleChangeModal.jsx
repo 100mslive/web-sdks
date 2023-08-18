@@ -96,7 +96,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                 minWidth: 0,
               }}
             >
-              <Dropdown.Root open={open} onOpenChange={setOpen} modal={false} css={{ width: '100%' }}>
+              <Dropdown.Root open={open} onOpenChange={setOpen} css={{ width: '100%' }}>
                 <Dropdown.Trigger
                   data-testid="open_role_selection_dropdown"
                   asChild
