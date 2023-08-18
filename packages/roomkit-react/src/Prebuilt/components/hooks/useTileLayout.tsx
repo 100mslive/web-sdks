@@ -72,7 +72,10 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
 
       const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
-      const aspectRatios = isMobile && noOfTilesInPage > 3 ? aspectRatioConfig.mobile : aspectRatioConfig.default;
+      const aspectRatios =
+        isMobile && (noOfTilesInPage === 1 || noOfTilesInPage > 3)
+          ? aspectRatioConfig.mobile
+          : aspectRatioConfig.default;
       // calculate height and width of each tile in a row
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * 8) / row.length;
