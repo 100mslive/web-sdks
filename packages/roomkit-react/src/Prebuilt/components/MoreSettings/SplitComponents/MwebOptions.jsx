@@ -3,6 +3,11 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
+<<<<<<< HEAD
+=======
+  selectLocalPeerRoleName,
+  selectPeerCount,
+>>>>>>> babc35cc (fix:  add participants to bottom sheet)
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -15,6 +20,7 @@ import {
   EmojiIcon,
   HandIcon,
   PencilIcon,
+  PeopleIcon,
   RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
@@ -28,10 +34,15 @@ import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
+<<<<<<< HEAD
+=======
+import { useSidepaneToggle } from '../../AppData/useSidepane';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
+>>>>>>> babc35cc (fix:  add participants to bottom sheet)
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { FEATURE_LIST } from '../../../common/constants';
+import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -62,6 +73,8 @@ export const MwebOptions = () => {
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
+  const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const peerCount = useHMSStore(selectPeerCount);
 
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -125,7 +138,18 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
+<<<<<<< HEAD
             {isHandRaiseEnabled ? (
+=======
+            <ActionTile
+              title="Participants"
+              icon={<PeopleIcon />}
+              onClick={toggleParticipants}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+              number={peerCount}
+            />
+            {isHandRaiseEnabled && !isHLSViewer ? (
+>>>>>>> babc35cc (fix:  add participants to bottom sheet)
               <ActionTile
                 title="Raise Hand"
                 icon={<HandIcon />}
