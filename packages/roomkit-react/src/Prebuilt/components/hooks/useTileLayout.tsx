@@ -38,7 +38,7 @@ export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; m
 export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
   const vanillaStore = useHMSVanillaStore();
   const [ref, { width, height }] = useMeasure();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = useMedia(cssConfig.media.lg);
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimesions[][]>([]);
   const pagesList = usePagesWithTiles({ peers, maxTileCount });
 
@@ -72,7 +72,10 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
 
       const maxHeight = height - (maxRows - 1) * 8;
       const maxRowHeight = maxHeight / matrix.length;
-      const aspectRatios = isMobile && noOfTilesInPage > 3 ? aspectRatioConfig.mobile : aspectRatioConfig.default;
+      const aspectRatios =
+        isMobile && (noOfTilesInPage === 1 || noOfTilesInPage > 3)
+          ? aspectRatioConfig.mobile
+          : aspectRatioConfig.default;
       // calculate height and width of each tile in a row
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * 8) / row.length;
@@ -106,7 +109,7 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
         }
       }
     }
-    setPagesWithTiles(pagesList);
+    setPagesWithTiles([...pagesList]);
   }, [width, height, maxTileCount, pagesList, vanillaStore, isMobile]);
   return { pagesWithTiles, ref };
 };

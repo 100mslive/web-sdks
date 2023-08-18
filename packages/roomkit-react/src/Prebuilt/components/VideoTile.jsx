@@ -5,13 +5,14 @@ import {
   selectLocalPeerID,
   selectPeerMetadata,
   selectPeerNameByID,
+  selectSessionStore,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
-import TileMenu from './TileMenu/TileMenu';
+import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
@@ -19,8 +20,8 @@ import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
-import { useIsHeadless, useUISettings } from './AppData/useUISettings';
-import { UI_SETTINGS } from '../common/constants';
+import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
+import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
   peerId,
@@ -47,6 +48,13 @@ const Tile = ({
   const borderAudioRef = useBorderAudioLevel(audioTrack?.id);
   const isVideoDegraded = track?.degraded;
   const isLocal = localPeerID === peerId;
+  const [pinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
+  const pinned = isSameTile({
+    trackId: pinnedTrackId,
+    videoTrackID: track?.id,
+    audioTrackID: audioTrack?.id,
+  });
+  const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const label = getVideoTileLabel({
     peerName,
     track,
@@ -106,15 +114,16 @@ const Tile = ({
                 track?.source === 'regular' &&
                 track?.facingMode !== 'environment'
               }
-              degraded={isVideoDegraded}
               noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
               data-testid="participant_video_tile"
               css={{
                 objectFit,
+                filter: isVideoDegraded ? 'blur($space$4)' : undefined,
+                bg: 'transparent',
               }}
             />
           ) : null}
-          {isVideoMuted || isVideoDegraded || (!isLocal && isAudioOnly) ? (
+          {isVideoMuted || (!isLocal && isAudioOnly) ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={peerName || ''} data-testid="participant_avatar_icon" size={avatarSize} />
             </StyledVideoTile.AvatarContainer>
@@ -141,7 +150,15 @@ const Tile = ({
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
-          <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />
+          <TileConnection
+            hideLabel={hideLabel}
+            name={label}
+            isTile
+            peerId={peerId}
+            width={width}
+            pinned={pinned}
+            spotlighted={spotlighted}
+          />
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>

@@ -1,15 +1,32 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
+import { useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { usePagesWithTiles } from './hooks/useTileLayout';
+import PeersSorter from '../common/PeersSorter';
 
 export const SecondaryTiles = ({ peers }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const pagesWithTiles = usePagesWithTiles({ peers, maxTileCount: isMobile ? 2 : 4 });
+  const maxTileCount = isMobile ? 2 : 4;
+  const [sortedPeers, setSortedPeers] = useState(peers);
+  const pagesWithTiles = usePagesWithTiles({ peers: sortedPeers, maxTileCount });
   const [page, setPage] = useState(0);
+  const vanillaStore = useHMSVanillaStore();
+  const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
+
+  useEffect(() => {
+    if (page !== 0) {
+      return;
+    }
+    peersSorter.setPeersAndTilesPerPage({
+      peers,
+      tilesPerPage: maxTileCount,
+    });
+    peersSorter.onUpdate(setSortedPeers);
+  }, [page, peers, peersSorter, maxTileCount]);
 
   return (
     <Flex direction="column" css={{ flexShrink: 0 }}>

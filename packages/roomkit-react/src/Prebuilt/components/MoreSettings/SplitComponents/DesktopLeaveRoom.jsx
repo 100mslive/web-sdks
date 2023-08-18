@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import { selectIsConnectedToRoom, selectPermissions, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../../Dropdown';
 import { Box, Flex } from '../../../../Layout';
@@ -20,7 +20,12 @@ export const DesktopLeaveRoom = ({
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
+  const { isStreamingOn } = useRecordingStreaming();
+
   const showStreamingUI = useShowStreamingUI();
+
+  const showStream = showStreamingUI && isStreamingOn;
+
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -42,12 +47,10 @@ export const DesktopLeaveRoom = ({
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              <Box>
-                <HangUpIcon key="hangUp" />
-              </Box>
+              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
             </Tooltip>
           </LeaveIconButton>
-          <Dropdown.Root open={open} onOpenChange={setOpen}>
+          <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
             <Dropdown.Trigger
               asChild
               css={{
@@ -63,9 +66,9 @@ export const DesktopLeaveRoom = ({
             <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
               <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
                 <LeaveCard
-                  title={showStreamingUI ? 'Leave Stream' : 'Leave Session'}
+                  title={showStream ? 'Leave Stream' : 'Leave Session'}
                   subtitle={`Others will continue after you leave. You can join the ${
-                    showStreamingUI ? 'stream' : 'session'
+                    showStream ? 'stream' : 'session'
                   } again.`}
                   bg=""
                   titleColor="$on_surface_high"
@@ -77,9 +80,9 @@ export const DesktopLeaveRoom = ({
               </Dropdown.Item>
               <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
                 <LeaveCard
-                  title={showStreamingUI ? 'End Stream' : 'End Session'}
+                  title={showStream ? 'End Stream' : 'End Session'}
                   subtitle={`The ${
-                    showStreamingUI ? 'stream' : 'session'
+                    showStream ? 'stream' : 'session'
                   } will end for everyone. You can't undo this action.`}
                   bg=""
                   titleColor="$alert_error_brighter"
@@ -98,12 +101,12 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
           </Tooltip>
         </LeaveIconButton>
       )}
 
-      <Dialog.Root open={showEndRoomAlert}>
+      <Dialog.Root open={showEndRoomAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
