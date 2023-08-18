@@ -26,6 +26,7 @@ const SidePane = ({ css = {} }) => {
     return null;
   }
   const mwebStreamingChat = isMobile && showStreamingUI && ViewComponent === Chat;
+  console.log(isMobile, showStreamingUI, ViewComponent === Chat, 'paramCheck');
   return (
     <Box
       css={{
@@ -33,7 +34,7 @@ const SidePane = ({ css = {} }) => {
         h: mwebStreamingChat ? '0' : '100%',
         p: '$10',
         maxHeight: mwebStreamingChat ? '300px' : 'unset',
-        bg: mwebStreamingChat
+        background: mwebStreamingChat
           ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
           : '$surface_dim',
         r: '$1',
@@ -46,14 +47,14 @@ const SidePane = ({ css = {} }) => {
           ml: 0,
           right: 0,
           position: 'fixed',
-          bottom: mwebStreamingChat ? '$14' : 0,
+          bottom: 0,
           r: 0,
           zIndex: 10,
           ...(css['@lg'] || {}),
         },
         '@md': {
           p: '$6 $8',
-          pb: '$12',
+          pb: mwebStreamingChat ? '$20' : '$12',
         },
       }}
     >

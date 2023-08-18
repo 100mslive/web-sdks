@@ -31,6 +31,8 @@ export const StreamingFooter = () => {
         '@md': {
           justifyContent: 'center',
           gap: '$10',
+          position: 'relative',
+          zIndex: 20,
         },
       }}
     >
