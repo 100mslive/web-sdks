@@ -32,6 +32,7 @@ import { ChangeSelfRole } from '.././ChangeSelfRole';
 import { EmbedUrl, EmbedUrlModal } from '.././EmbedUrl';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
@@ -65,7 +66,8 @@ export const DesktopOptions = () => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
-
+  const hlsViewerRole = useHLSViewerRole();
+  const isHlsViewer = hlsViewerRole === localPeerRole;
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
   const isPipOn = PictureInPicture.isOn();
 
@@ -75,6 +77,8 @@ export const DesktopOptions = () => {
     setOpenModals(modals => {
       const copy = new Set(modals);
       if (value) {
+        // avoiding extra set state trigger which removes currently open dialog by clearing set.
+        copy.clear();
         copy.add(modalName);
       } else {
         copy.delete(modalName);
@@ -88,6 +92,7 @@ export const DesktopOptions = () => {
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
+        modal={false}
       >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
@@ -137,7 +142,7 @@ export const DesktopOptions = () => {
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
-          {isPIPEnabled ? (
+          {isPIPEnabled && !isHlsViewer ? (
             <Dropdown.Item>
               <PIP
                 content={
