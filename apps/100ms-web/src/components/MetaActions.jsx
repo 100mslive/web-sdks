@@ -1,6 +1,6 @@
 import { selectIsConnectedToRoom, useHMSStore } from "@100mslive/react-sdk";
 import { BrbIcon, HandIcon } from "@100mslive/react-icons";
-import { Flex, Tooltip } from "@100mslive/react-ui";
+import { Flex, Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../IconButton";
 import { useIsFeatureEnabled } from "./hooks/useFeatures";
 import { useMyMetadata } from "./hooks/useMetadata";
@@ -23,16 +23,14 @@ const MetaActions = ({ isMobile = false, compact = false }) => {
           <IconButton
             onClick={toggleHandRaise}
             active={!isHandRaised}
-            data-testid={`${
-              isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"
-            }`}
+            data-testid={isMobile ? "raise_hand_btn_mobile" : "raise_hand_btn"}
           >
             <HandIcon />
           </IconButton>
         </Tooltip>
       )}
       {isBRBEnabled && (
-        <Tooltip title={`${isBRBOn ? `I'm back` : `I'll be right back`}`}>
+        <Tooltip title={isBRBOn ? `I'm back` : `I'll be right back`}>
           <IconButton
             onClick={toggleBRB}
             active={!isBRBOn}

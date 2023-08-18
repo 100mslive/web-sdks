@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import { Box, Dropdown, Flex, Text, textEllipsis } from "@100mslive/react-ui";
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -7,6 +6,13 @@ import {
   HandRaiseIcon,
   PeopleIcon,
 } from "@100mslive/react-icons";
+import {
+  Box,
+  Dropdown,
+  Flex,
+  Text,
+  textEllipsis,
+} from "@100mslive/roomkit-react";
 import { isInternalRole } from "../../common/utils";
 
 export const ParticipantFilter = ({
@@ -31,7 +37,7 @@ export const ParticipantFilter = ({
         asChild
         data-testid="participant_list_filter"
         css={{
-          border: "1px solid $textDisabled",
+          border: "1px solid $on_surface_low",
           r: "$0",
           p: "$2 $4",
         }}
@@ -41,7 +47,7 @@ export const ParticipantFilter = ({
           <Text variant="sm" css={{ ...textEllipsis(80) }}>
             {selectionValue || "Everyone"}
           </Text>
-          <Box css={{ ml: "$2", color: "$textDisabled" }}>
+          <Box css={{ ml: "$2", color: "$on_surface_low" }}>
             {open ? (
               <ChevronUpIcon width={14} height={14} />
             ) : (
@@ -58,6 +64,7 @@ export const ParticipantFilter = ({
           maxHeight: "$96",
           boxShadow: "$md",
           w: "$48",
+          backgroundColor: "$surface_default",
         }}
       >
         <Item
@@ -73,7 +80,9 @@ export const ParticipantFilter = ({
           icon={<HandRaiseIcon />}
           value={{ metadata: { isHandRaised: true }, role: "" }}
         />
-        <Dropdown.ItemSeparator />
+        <Dropdown.ItemSeparator
+          css={{ backgroundColor: "$surface_brighter" }}
+        />
         {roles
           .filter(role => !isInternalRole(role))
           .map(role => (
@@ -93,6 +102,7 @@ export const ParticipantFilter = ({
 const Item = ({ selected, title, onSelection, value, icon }) => {
   return (
     <Dropdown.Item
+      css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
       onClick={e => {
         e.preventDefault();
         onSelection(value);

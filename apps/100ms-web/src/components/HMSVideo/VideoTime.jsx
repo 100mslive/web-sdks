@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { HMSHLSPlayerEvents } from "@100mslive/hls-player";
-import { Text } from "@100mslive/react-ui";
+import { Text } from "@100mslive/roomkit-react";
 import { getDurationFromSeconds } from "./HMSVIdeoUtils";
 
 export const VideoTime = ({ hlsPlayer }) => {
@@ -27,6 +27,8 @@ export const VideoTime = ({ hlsPlayer }) => {
       variant={{
         "@sm": "xs",
       }}
-    >{`${videoTime}`}</Text>
+    >
+      {videoTime}
+    </Text>
   ) : null;
 };

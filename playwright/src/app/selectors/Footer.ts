@@ -18,7 +18,7 @@ export class Footer {
   end_room_btn = "text='End Room for All'";
   lock_end_room = 'button[data-testid="lock_end_room"]';
 
-  screen_share_btn = 'button[data-testid="screen_share_btn"]';
+  screen_share_btn = 'div > button:right-of(button[data-testid="video_btn"])'; 
   stop_screen_share_btn = 'button[data-testid="stop_screen_share_btn"]';
 
   more_settings_btn = 'button[data-testid="more_settings_btn"]';
@@ -81,7 +81,7 @@ export class Footer {
   emoji_btn = '[data-testid="emoji_reaction_btn"]';
   emoji_container = '[class="emoji-mart-emoji"]';
   expected_emoji_container_text = 'Reactions will be timed for Live Streaming viewers.';
-  expected_emoji_container_href_text = 'Learn more ->';
+  expected_emoji_container_href_text = 'Learn more';
   emoji_container_text = '//*[@role="menu"]/div[3]/p[1]'
   emoji_container_href = '[role="menu"] div p a'
   expected_emoji_href_link = 'https://www.100ms.live/docs/javascript/v2/how--to-guides/record-and-live-stream/hls/hls-timed-metadata'

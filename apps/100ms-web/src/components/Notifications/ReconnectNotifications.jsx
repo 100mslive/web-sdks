@@ -4,7 +4,7 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { Dialog, Flex, Loading, Text } from "@100mslive/react-ui";
+import { Dialog, Flex, Loading, Text } from "@100mslive/roomkit-react";
 import { ToastConfig } from "../Toast/ToastConfig";
 import { ToastManager } from "../Toast/ToastManager";
 
@@ -67,7 +67,7 @@ export const ReconnectNotifications = () => {
             <div style={{ display: "inline", margin: "0.25rem" }}>
               <Loading size={16} />
             </div>
-            <Text css={{ fontSize: "$space$8", color: "$textHighEmp" }}>
+            <Text css={{ fontSize: "$space$8", color: "$on_surface_high" }}>
               You lost your network connection. Trying to reconnect.
             </Text>
           </Flex>

@@ -32,6 +32,8 @@ const getParamsForRole = (roleName: string) => ({
     hlsStreaming: false,
     rtmpStreaming: false,
     browserRecording: false,
+    pollRead: false,
+    pollWrite: false,
   },
   priority: 0,
 });
