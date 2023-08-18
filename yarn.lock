@@ -2,6 +2,71 @@
 # yarn lockfile v1
 
 
+"@100mslive/hls-player@0.1.12":
+  version "0.1.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-player/-/hls-player-0.1.12.tgz#ccd0fe2cd01590209921412778354b47d6809ecb"
+  integrity sha512-F1/3zYQ3JN/J0TWR+CEy+mf3aleezuMmfBvcXiIyQtMTDIgBodjHVEPiZmqI3hgja4ccLsvoGQXyA89/iSEfBQ==
+  dependencies:
+    "@100mslive/hls-stats" "0.2.12"
+    eventemitter2 "^6.4.7"
+    hls.js "^1.3.0"
+
+"@100mslive/hls-stats@0.2.12":
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/hls-stats/-/hls-stats-0.2.12.tgz#00f5c842ed7e4a69b3879a39a50e11d1710bf734"
+  integrity sha512-xYtjheUXEWyaL41f4ljf0lqpn2ZesIjJnpZti3IFqq2SdPqFBOAvdFpjegkKUnhz6HN2LvW9jxLrhF+msPHR/A==
+
+"@100mslive/hms-video-store@0.10.12":
+  version "0.10.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.10.12.tgz#675aaaec69d71d2fdf320902162b2ca2522f2e30"
+  integrity sha512-mgsyRe4Zj7kG54N4r4Kdc0BPAAIS2gc357YwEY6O7IIJyXBmJgDwVF2f25+UgRd8ybx7PAq6F/PmXurSVxl8cA==
+  dependencies:
+    "@100mslive/hms-video" "0.9.12"
+    eventemitter2 "^6.4.7"
+    immer "^9.0.6"
+    reselect "4.0.0"
+    zustand "3.5.7"
+
+"@100mslive/hms-video@0.9.12":
+  version "0.9.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.9.12.tgz#cbd0578186bc7e7502a2353cd1cc33654bbb24a2"
+  integrity sha512-Ui0lhqfhwltm7RK7dliAuoXO91kuCjD7f2NOhLsET1UGp5jY20WVBQH1xpjw2zsMjA1BbpEUSthECDDtDY41qw==
+  dependencies:
+    eventemitter2 "^6.4.7"
+    sdp-transform "^2.14.1"
+    ua-parser-js "^1.0.1"
+    uuid "^8.3.2"
+    webrtc-adapter "^8.0.0"
+
+"@100mslive/hms-virtual-background@1.11.12":
+  version "1.11.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.11.12.tgz#ff4b712d780631ecbebe932a2bc4e11cfef87f66"
+  integrity sha512-QwibSukksTConPTeU5xPtLhD7yHdrNd5WfFc/onGIid4Ad8J5x6TnvIuVVj6wxKedeZVKPh9UonF6fcSB1nEAg==
+  dependencies:
+    "@mediapipe/selfie_segmentation" "^0.1.1632777926"
+    "@tensorflow-models/body-segmentation" "^1.0.1"
+    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
+    "@tensorflow/tfjs-converter" "^3.19.0"
+    "@tensorflow/tfjs-core" "^3.19.0"
+    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
+    "@webassemblyjs/wasm-gen" "1.11.1"
+    gifuct-js "^2.1.2"
+    wasm-check "^2.0.2"
+
+"@100mslive/react-icons@0.8.12":
+  version "0.8.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.8.12.tgz#4e88ea5c014b1cbff3f199bfc32dbd4c8b845f03"
+  integrity sha512-/Z7ctgmEOmgZnmtyCA8tMC4ixa90y4STBlvJc+QsMq8TPR27frKizhr4MErRaYyL1FVlQ6gX+r0ekp6f0xGREg==
+
+"@100mslive/react-sdk@0.8.12":
+  version "0.8.12"
+  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.8.12.tgz#685eb1c2e758c840aa21845cec8b6934b05fbe88"
+  integrity sha512-W9XP3+etBzBDAF600mTrBBruiYJe9J3LAO/R2/eJpZpMyLq0KTlgBjw+BldHVFAjlkUDuwKbgj16kxESKxN76A==
+  dependencies:
+    "@100mslive/hms-video-store" "0.10.12"
+    react-resize-detector "^7.0.0"
+    zustand "^3.6.2"
+
 "@adobe/css-tools@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@adobe/css-tools/-/css-tools-4.0.1.tgz#b38b444ad3aa5fedbb15f2f746dcd934226a12dd"
