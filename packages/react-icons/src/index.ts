@@ -247,6 +247,8 @@ export { default as VideoPlayerIcon } from './VideoPlayerIcon';
 export { default as ViewIcon } from './ViewIcon';
 export { default as VirtualBackgroundIcon } from './VirtualBackgroundIcon';
 export { default as VolumeOneIcon } from './VolumeOneIcon';
+export { default as VolumeTwoIcon } from './VolumeTwoIcon';
+export { default as VolumeZeroIcon } from './VolumeZeroIcon';
 export { default as WalletIcon } from './WalletIcon';
 export { default as WebhookIcon } from './WebhookIcon';
 export { default as WiredMicIcon } from './WiredMicIcon';

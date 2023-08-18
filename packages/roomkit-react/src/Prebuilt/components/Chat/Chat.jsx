@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -13,12 +14,14 @@ import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
+import { useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
@@ -83,6 +86,9 @@ export const Chat = () => {
   }, [notification, peerSelector, setPeerSelector]);
 
   const storeMessageSelector = selectHMSMessagesCount;
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
+  const mwebStreaming = isMobile && showStreamingUI;
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -100,10 +106,20 @@ export const Chat = () => {
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
-      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+      {!mwebStreaming ? (
+        <>
+          <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
+          <PinnedMessage clearPinnedMessage={setPinnedMessage} />
+        </>
+      ) : null}
 
-      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
+      <ChatBody
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        ref={listRef}
+        scrollToBottom={scrollToBottom}
+        mwebStreaming={mwebStreaming}
+      />
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}

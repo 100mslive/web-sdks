@@ -2,22 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { useHMSActions } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import {
-  Box,
-  config as cssConfig,
-  Dropdown,
-  Flex,
-  IconButton as BaseIconButton,
-  Popover,
-  styled,
-  Text,
-  textEllipsis,
-} from '../../../';
+import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
+import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
-import { ChatSelector } from './ChatSelector';
+import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
+import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
 const TextArea = styled('textarea', {
@@ -76,8 +67,11 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
-  const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHLSViewer = hlsViewerRole === localPeerRole;
+
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -116,43 +110,9 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
 
   return (
     <>
-      <Flex align="center" css={{ mb: '$8' }}>
-        <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
-          Send To
-        </Text>
-        <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
-          <Dropdown.Trigger
-            asChild
-            data-testid="participant_list_filter"
-            css={{
-              border: '1px solid $border_bright',
-              r: '$0',
-              p: '$1 $2',
-              ml: '$8',
-            }}
-            tabIndex={0}
-          >
-            <Flex align="center" css={{ c: '$on_surface_medium' }}>
-              <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
-                {selection}
-              </Text>
-              {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
-            </Flex>
-          </Dropdown.Trigger>
-          <Dropdown.Content
-            css={{
-              w: '$64',
-              overflow: 'hidden',
-              maxHeight: 'unset',
-              bg: '$surface_default',
-            }}
-            align="start"
-            sideOffset={8}
-          >
-            <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
-          </Dropdown.Content>
-        </Dropdown.Root>
-      </Flex>
+      {!isHLSViewer ? (
+        <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
+      ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
@@ -200,7 +160,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
           ) : null}
           <BaseIconButton
             onClick={sendMessage}
-            css={{ ml: 'auto', height: 'max-content', mr: '$4' }}
+            css={{ ml: 'auto', height: 'max-content', mr: '$4', color: '$on_surface_low' }}
             data-testid="send_msg_btn"
           >
             <SendIcon />
