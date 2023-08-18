@@ -230,7 +230,8 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         align="center"
         css={{
           flexWrap: 'wrap',
-          bg: messageType ? '$surface_default' : undefined,
+          // Theme independent color, token should not be used for transparent chat
+          bg: messageType ? (mwebStreaming ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
