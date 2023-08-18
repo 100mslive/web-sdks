@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectLocalPeer, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
-import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
 import { SecondaryTiles } from './SecondaryTiles';
 import VideoTile from './VideoTile';
@@ -67,7 +66,6 @@ export function RoleProminence() {
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
       <SecondaryTiles peers={secondaryPeers} />
-      {peers.length > 0 && <InsetTile />}
     </Flex>
   );
 }
