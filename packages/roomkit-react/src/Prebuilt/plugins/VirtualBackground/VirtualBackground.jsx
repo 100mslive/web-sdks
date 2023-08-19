@@ -77,18 +77,20 @@ export const VirtualBackground = ({
   }
   if (asActionTile) {
     return (
-      <ActionTile
-        title="Virtual Background"
-        icon={<VirtualBackgroundIcon />}
+      <ActionTile.Root
+        data-testid="virtual_bg_btn"
+        active={isVBPresent}
+        disabled={isVBLoading}
         onClick={() => {
           setIsVBOn(!isVBOn);
           !isVBPresent ? addPlugin() : removePlugin();
           onVBClick();
+          setOpenOptionsSheet(false);
         }}
-        active={isVBPresent}
-        disabled={isVBLoading}
-        data-testid="virtual_bg_btn"
-      />
+      >
+        <VirtualBackgroundIcon />
+        <ActionTile.Title>Virtual Background</ActionTile.Title>
+      </ActionTile.Root>
     );
   }
 
