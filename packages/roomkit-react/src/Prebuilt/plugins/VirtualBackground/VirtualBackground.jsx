@@ -85,7 +85,6 @@ export const VirtualBackground = ({
           setIsVBOn(!isVBOn);
           !isVBPresent ? addPlugin() : removePlugin();
           onVBClick();
-          setOpenOptionsSheet(false);
         }}
       >
         <VirtualBackgroundIcon />
