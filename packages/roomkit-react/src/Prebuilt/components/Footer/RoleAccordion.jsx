@@ -1,8 +1,27 @@
 import React from 'react';
+import { useMeasure } from 'react-use';
+import { FixedSizeList } from 'react-window';
 import { Accordion } from '../../../Accordion';
-import { Box } from '../../../Layout';
+import { Box, Flex } from '../../../Layout';
 import { Participant } from './ParticipantList';
 import { getFormattedCount } from '../../common/utils';
+
+const ROW_HEIGHT = 54;
+
+function itemKey(index, data) {
+  return data.peerList[index].id;
+}
+
+const VirtualizedParticipantItem = React.memo(({ index, data }) => {
+  return (
+    <Participant
+      key={data.peerList[index].id}
+      peer={data.peerList[index]}
+      isConnected={data.isConnected}
+      setSelectedPeerId={data.setSelectedPeerId}
+    />
+  );
+});
 
 export const RoleAccordion = ({
   peerList = [],
@@ -12,13 +31,15 @@ export const RoleAccordion = ({
   filter,
   isHandRaisedAccordion = false,
 }) => {
+  const [ref, { width }] = useMeasure();
+  const height = ROW_HEIGHT * peerList.length;
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.includes(filter.search)) : true;
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
     return null;
   }
 
   return (
-    <Box>
+    <Flex direction="column" css={{ w: '100%' }} ref={ref}>
       <Accordion.Root
         type="single"
         collapsible
@@ -39,12 +60,19 @@ export const RoleAccordion = ({
           </Accordion.Header>
           <Accordion.Content>
             <Box css={{ borderTop: '1px solid $border_default' }} />
-            {peerList.map(peer => (
-              <Participant key={peer.id} peer={peer} isConnected={isConnected} setSelectedPeerId={setSelectedPeerId} />
-            ))}
+            <FixedSizeList
+              itemSize={ROW_HEIGHT}
+              itemData={{ peerList, isConnected, setSelectedPeerId }}
+              itemKey={itemKey}
+              itemCount={peerList.length}
+              width={width}
+              height={height}
+            >
+              {VirtualizedParticipantItem}
+            </FixedSizeList>
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>
-    </Box>
+    </Flex>
   );
 };
