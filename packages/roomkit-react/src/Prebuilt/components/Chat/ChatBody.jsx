@@ -23,6 +23,7 @@ import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
+import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useShowStreamingUI } from '../../common/hooks';
 
@@ -204,8 +205,11 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHLSViewer = localPeerRole === hlsViewerRole;
   const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && showStreamingUI;
+  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);

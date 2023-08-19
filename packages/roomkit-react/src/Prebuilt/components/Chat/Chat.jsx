@@ -3,6 +3,7 @@ import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
+  selectLocalPeerRoleName,
   selectPeerNameByID,
   selectPermissions,
   selectSessionStore,
@@ -18,7 +19,7 @@ import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatParticipantHeader } from './ChatParticipantHeader';
-import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { useHLSViewerRole, useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
 import { useShowStreamingUI } from '../../common/hooks';
@@ -88,7 +89,10 @@ export const Chat = () => {
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && showStreamingUI;
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHLSViewer = localPeerRole === hlsViewerRole;
+  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(

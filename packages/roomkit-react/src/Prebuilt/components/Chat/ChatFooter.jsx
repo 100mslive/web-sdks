@@ -119,7 +119,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
         <Flex
           align="center"
           css={{
-            bg: showStreamingUI && isMobile ? '$surface_dim' : '$surface_default',
+            bg: (showStreamingUI || isHLSViewer) && isMobile ? '$surface_dim' : '$surface_default',
             minHeight: '$16',
             maxHeight: '$24',
             position: 'relative',

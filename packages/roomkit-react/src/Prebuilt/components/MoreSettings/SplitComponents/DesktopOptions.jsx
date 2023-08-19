@@ -114,7 +114,7 @@ export const DesktopOptions = () => {
             },
           }}
         >
-          {isHandRaiseEnabled && !showStreamingUI ? (
+          {isHandRaiseEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -126,7 +126,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled && !showStreamingUI ? (
+          {isBRBEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -138,7 +138,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {(isBRBEnabled || isHandRaiseEnabled) && !showStreamingUI ? (
+          {(isBRBEnabled || isHandRaiseEnabled) && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 

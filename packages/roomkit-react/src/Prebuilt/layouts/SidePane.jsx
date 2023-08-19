@@ -1,17 +1,20 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectAppData, useHMSStore } from '@100mslive/react-sdk';
+import { selectAppData, selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Footer/ParticipantList';
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+import { useHLSViewerRole } from '../components/AppData/useUISettings';
 import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({ css = {} }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
 
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   let ViewComponent;
@@ -25,8 +28,10 @@ const SidePane = ({ css = {} }) => {
   if (!ViewComponent) {
     return null;
   }
-  const mwebStreamingChat = isMobile && showStreamingUI && ViewComponent === Chat;
-  console.log(isMobile, showStreamingUI, ViewComponent === Chat, 'paramCheck');
+
+  const isHLSViewer = localPeerRole === hlsViewerRole;
+  const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
+
   return (
     <Box
       css={{

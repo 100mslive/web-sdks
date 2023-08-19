@@ -58,7 +58,7 @@ export const StreamingFooter = () => {
       >
         {isMobile ? (
           <>
-            {isHandRaiseEnabled ? (
+            {isHandRaiseEnabled && isHlsViewer ? (
               <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
                 <HandIcon />
               </IconButton>
