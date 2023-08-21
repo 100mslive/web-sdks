@@ -15,7 +15,6 @@ import {
   DragHandleIcon,
   EmojiIcon,
   HandIcon,
-  PencilIcon,
   PeopleIcon,
   RecordIcon,
   SettingsIcon,
@@ -167,16 +166,6 @@ export const MwebOptions = () => {
                 <ActionTile.Title>Be Right Back</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
-
-            <ActionTile.Root
-              onClick={() => {
-                updateState(MODALS.CHANGE_NAME, true);
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <PencilIcon />
-              <ActionTile.Title>Change Name</ActionTile.Title>
-            </ActionTile.Root>
 
             {isVideoOn ? (
               <Suspense fallback="">
