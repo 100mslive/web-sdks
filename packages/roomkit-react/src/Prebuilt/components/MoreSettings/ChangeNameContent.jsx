@@ -49,6 +49,12 @@ export const ChangeNameContent = ({
           autoComplete="name"
           required
           data-testid="change_name_field"
+          onKeyDown={async e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              changeName();
+            }
+          }}
         />
       </Flex>
 
