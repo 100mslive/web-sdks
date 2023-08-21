@@ -36,7 +36,7 @@ export const LeaveSessionContent = ({ setShowLeaveRoomAlert, leaveRoom, isModal 
         >
           Cancel
         </Button>
-        <Button variant="danger" css={{ w: '100%' }} onClick={leaveRoom} id="lockRoom" data-testid="lock_end_room">
+        <Button variant="danger" css={{ w: '100%' }} onClick={leaveRoom} id="leaveRoom" data-testid="leave_room">
           Leave Session
         </Button>
       </Flex>
