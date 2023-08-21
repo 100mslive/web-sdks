@@ -1,18 +1,11 @@
 import React, { Fragment, useState } from 'react';
-import {
-  selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
-  selectPermissions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, HangUpIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../../Layout';
 import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
