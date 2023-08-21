@@ -207,4 +207,4 @@ export const SESSION_STORE_KEY = {
   SPOTLIGHT: 'spotlight',
 };
 
-export const LOWER_HAND = 'LOWER_HAND';
+export const LOWER_HAND = 'lowerHand';
