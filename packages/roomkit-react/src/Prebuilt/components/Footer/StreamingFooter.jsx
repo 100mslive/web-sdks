@@ -13,8 +13,8 @@ import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
-import { FEATURE_LIST } from '../../common/constants';
 import { useIsLocalPeerHLSViewer } from '../../common/hooks';
+import { FEATURE_LIST } from '../../common/constants';
 
 export const StreamingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);

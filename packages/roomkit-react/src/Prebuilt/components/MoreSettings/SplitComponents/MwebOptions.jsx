@@ -34,8 +34,8 @@ import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
 import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
+import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 

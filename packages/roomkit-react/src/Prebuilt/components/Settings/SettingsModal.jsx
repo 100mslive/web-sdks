@@ -9,8 +9,8 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { settingContent, settingsList } from './common.js';
 import { useIsLocalPeerHLSViewer } from '../../common/hooks';
+import { settingContent, settingsList } from './common.js';
 
 const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;

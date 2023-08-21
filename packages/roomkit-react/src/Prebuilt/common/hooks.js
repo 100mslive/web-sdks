@@ -9,8 +9,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
-import { isInternalRole } from './utils';
 import { useHLSViewerRole } from '../components/AppData/useUISettings';
+import { isInternalRole } from './utils';
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
