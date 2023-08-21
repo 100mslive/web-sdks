@@ -6,14 +6,14 @@ import { ParticipantList } from '../components/Footer/ParticipantList';
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
-import { useShowStreamingUI } from '../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({ css = {} }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const isHLSViewer = useIsLocalPeerHLSViewer();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = ParticipantList;
@@ -25,7 +25,9 @@ const SidePane = ({ css = {} }) => {
   if (!ViewComponent) {
     return null;
   }
-  const mwebStreamingChat = isMobile && showStreamingUI && ViewComponent === Chat;
+
+  const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
+
   return (
     <Box
       css={{
@@ -33,7 +35,7 @@ const SidePane = ({ css = {} }) => {
         h: mwebStreamingChat ? '0' : '100%',
         p: '$10',
         maxHeight: mwebStreamingChat ? '300px' : 'unset',
-        bg: mwebStreamingChat
+        background: mwebStreamingChat
           ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
           : '$surface_dim',
         r: '$1',
@@ -46,14 +48,14 @@ const SidePane = ({ css = {} }) => {
           ml: 0,
           right: 0,
           position: 'fixed',
-          bottom: mwebStreamingChat ? '$14' : 0,
+          bottom: 0,
           r: 0,
           zIndex: 10,
           ...(css['@lg'] || {}),
         },
         '@md': {
           p: '$6 $8',
-          pb: '$12',
+          pb: mwebStreamingChat ? '$20' : '$12',
         },
       }}
     >

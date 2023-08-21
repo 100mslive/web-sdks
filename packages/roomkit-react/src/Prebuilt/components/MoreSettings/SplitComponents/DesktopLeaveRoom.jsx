@@ -8,7 +8,7 @@ import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
 export const DesktopLeaveRoom = ({
   menuTriggerButton: MenuTriggerButton,
@@ -23,7 +23,7 @@ export const DesktopLeaveRoom = ({
   const { isStreamingOn } = useRecordingStreaming();
 
   const showStreamingUI = useShowStreamingUI();
-
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStream = showStreamingUI && isStreamingOn;
 
   useDropdownList({ open, name: 'LeaveRoom' });
@@ -47,7 +47,13 @@ export const DesktopLeaveRoom = ({
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+              <Box>
+                {showStreamingUI || isHlsViewer ? (
+                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+                ) : (
+                  <HangUpIcon key="hangUp" />
+                )}
+              </Box>
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
@@ -73,7 +79,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   subtitleColor="$on_surface_low"
-                  icon={<ExitIcon height={24} width={24} />}
+                  icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                   onClick={leaveRoom}
                   css={{ p: 0 }}
                 />
@@ -101,7 +107,13 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              {showStream || isHlsViewer ? (
+                <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+              ) : (
+                <HangUpIcon key="hangUp" />
+              )}
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
