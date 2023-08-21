@@ -1,12 +1,20 @@
 import React, { Fragment, useState } from 'react';
-import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import {
+  selectIsConnectedToRoom,
+  selectLocalPeerRoleName,
+  selectPermissions,
+  useHMSStore,
+  useRecordingStreaming,
+} from '@100mslive/react-sdk';
+import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../../Dropdown';
-import { Box, Flex } from '../../../../Layout';
+import { Flex } from '../../../../Layout';
 import { Dialog } from '../../../../Modal';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
+import { LeaveSessionContent } from '../../LeaveSessionContent';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useShowStreamingUI } from '../../../common/hooks';
 
@@ -18,12 +26,15 @@ export const DesktopLeaveRoom = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
+  const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
 
   const showStreamingUI = useShowStreamingUI();
-
+  const hlsViewerRole = useHLSViewerRole();
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
+  const isHLSViewer = hlsViewerRole === localPeerRoleName;
   const showStream = showStreamingUI && isStreamingOn;
 
   useDropdownList({ open, name: 'LeaveRoom' });
@@ -44,10 +55,16 @@ export const DesktopLeaveRoom = ({
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
             }}
-            onClick={leaveRoom}
+            onClick={() => {
+              if (isHLSViewer) {
+                setShowLeaveRoomAlert(true);
+              } else {
+                leaveRoom();
+              }
+            }}
           >
             <Tooltip title="Leave Room">
-              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
@@ -73,7 +90,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   subtitleColor="$on_surface_low"
-                  icon={<ExitIcon height={24} width={24} />}
+                  icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                   onClick={leaveRoom}
                   css={{ p: 0 }}
                 />
@@ -99,9 +116,20 @@ export const DesktopLeaveRoom = ({
           </Dropdown.Root>
         </Flex>
       ) : (
-        <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+        <LeaveIconButton
+          onClick={() => {
+            if (isHLSViewer) {
+              setShowLeaveRoomAlert(true);
+            } else {
+              leaveRoom();
+            }
+          }}
+          variant="danger"
+          key="LeaveRoom"
+          data-testid="leave_room_btn"
+        >
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <ExitIcon style={{ transform: 'rotate(180deg)' }} />
           </Tooltip>
         </LeaveIconButton>
       )}
@@ -114,6 +142,17 @@ export const DesktopLeaveRoom = ({
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
+
+      {isHLSViewer ? (
+        <Dialog.Root open={showLeaveRoomAlert} modal={false}>
+          <Dialog.Portal>
+            <Dialog.Overlay />
+            <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+              <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+      ) : null}
     </Fragment>
   );
 };

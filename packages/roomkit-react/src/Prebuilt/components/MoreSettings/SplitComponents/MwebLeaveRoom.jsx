@@ -1,21 +1,32 @@
 import React, { Fragment, useState } from 'react';
-import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ExitIcon, HangUpIcon, StopIcon } from '@100mslive/react-icons';
+import {
+  selectIsConnectedToRoom,
+  selectLocalPeerRoleName,
+  selectPermissions,
+  useHMSStore,
+  useRecordingStreaming,
+} from '@100mslive/react-sdk';
+import { ExitIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../../Layout';
 import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
+import { LeaveSessionContent } from '../../LeaveSessionContent';
+import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useShowStreamingUI } from '../../../common/hooks';
 
 export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leaveRoom }) => {
   const [open, setOpen] = useState(false);
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
+  const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-
+  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHLSViewer = hlsViewerRole === localPeerRoleName;
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;
@@ -31,6 +42,11 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
+              onClick={() => {
+                if (isHLSViewer) {
+                  setShowLeaveRoomAlert(true);
+                }
+              }}
               variant="danger"
               key="LeaveRoom"
               data-testid="leave_room_btn"
@@ -40,7 +56,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               }}
             >
               <Tooltip title="Leave Room">
-                <Box>{showStream ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
+                <ExitIcon style={{ transform: 'rotate(180deg)' }} />
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
@@ -53,7 +69,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               bg="$surface_default"
               titleColor="$on_surface_high"
               subtitleColor="$on_surface_low"
-              icon={<ExitIcon height={24} width={24} />}
+              icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
               css={{ pt: 0, mt: '$10' }}
             />
@@ -74,9 +90,20 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+        <LeaveIconButton
+          variant="danger"
+          key="LeaveRoom"
+          data-testid="leave_room_btn"
+          onClick={() => {
+            if (isHLSViewer) {
+              setShowLeaveRoomAlert(true);
+            }
+          }}
+        >
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
@@ -85,6 +112,14 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
           <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} />
         </Sheet.Content>
       </Sheet.Root>
+
+      {isHLSViewer ? (
+        <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
+          <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+            <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
+          </Sheet.Content>
+        </Sheet.Root>
+      ) : null}
     </Fragment>
   );
 };
