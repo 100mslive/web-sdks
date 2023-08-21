@@ -3,7 +3,6 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
-  selectLocalPeerRoleName,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -32,11 +31,11 @@ import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -72,10 +71,7 @@ export const MwebOptions = () => {
 
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-
-  const hlsViewer = useHLSViewerRole();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isHLSViewer = hlsViewer === localPeerRole;
+  const isHLSViewer = useIsLocalPeerHLSViewer();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
