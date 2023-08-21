@@ -14,7 +14,7 @@ import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
 import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
 export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leaveRoom }) => {
   const [open, setOpen] = useState(false);
@@ -22,9 +22,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;

@@ -1,11 +1,5 @@
 import React, { Fragment, useState } from 'react';
-import {
-  selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
-  selectPermissions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../../Dropdown';
 import { Box, Flex } from '../../../../Layout';
@@ -13,9 +7,8 @@ import { Dialog } from '../../../../Modal';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
 export const DesktopLeaveRoom = ({
   menuTriggerButton: MenuTriggerButton,
@@ -30,9 +23,7 @@ export const DesktopLeaveRoom = ({
   const { isStreamingOn } = useRecordingStreaming();
 
   const showStreamingUI = useShowStreamingUI();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStream = showStreamingUI && isStreamingOn;
 
   useDropdownList({ open, name: 'LeaveRoom' });

@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { useHMSActions } from '@100mslive/react-sdk';
 import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useShowStreamingUI } from '../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -69,9 +68,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHLSViewer = hlsViewerRole === localPeerRole;
+  const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const sendMessage = useCallback(async () => {

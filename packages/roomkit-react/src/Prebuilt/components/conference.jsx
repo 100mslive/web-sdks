@@ -5,7 +5,6 @@ import {
   HMSRoomState,
   selectAppData,
   selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
   selectRoomState,
   useHMSActions,
   useHMSStore,
@@ -20,9 +19,10 @@ import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
-import { useAuthToken, useHLSViewerRole, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
+import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
+import { useIsLocalPeerHLSViewer } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
@@ -43,9 +43,7 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = localPeerRole === hlsViewerRole;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {

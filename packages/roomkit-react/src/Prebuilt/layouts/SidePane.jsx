@@ -1,22 +1,19 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectAppData, selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
+import { selectAppData, useHMSStore } from '@100mslive/react-sdk';
 import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Footer/ParticipantList';
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
-import { useHLSViewerRole } from '../components/AppData/useUISettings';
-import { useShowStreamingUI } from '../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({ css = {} }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const isHLSViewer = useIsLocalPeerHLSViewer();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = ParticipantList;
@@ -29,7 +26,6 @@ const SidePane = ({ css = {} }) => {
     return null;
   }
 
-  const isHLSViewer = localPeerRole === hlsViewerRole;
   const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
 
   return (
