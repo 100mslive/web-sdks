@@ -31,6 +31,8 @@ export const StreamingFooter = () => {
         '@md': {
           justifyContent: 'center',
           gap: '$10',
+          position: 'relative',
+          zIndex: 20,
         },
       }}
     >
@@ -56,7 +58,7 @@ export const StreamingFooter = () => {
       >
         {isMobile ? (
           <>
-            {isHandRaiseEnabled ? (
+            {isHandRaiseEnabled && isHlsViewer ? (
               <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
                 <HandIcon />
               </IconButton>

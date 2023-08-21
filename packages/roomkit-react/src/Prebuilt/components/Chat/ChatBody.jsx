@@ -24,7 +24,7 @@ import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
-import { useShowStreamingUI } from '../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -204,8 +204,9 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
+  const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && showStreamingUI;
+  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
