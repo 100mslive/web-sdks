@@ -181,11 +181,10 @@ const PreviewTile = ({ name, error }) => {
       css={{
         bg: '$surface_default',
         aspectRatio: 16 / 9,
-        height: 'unset',
         width: 'min(640px, 80vw)',
+        overflow: 'clip',
         '@md': {
           aspectRatio: 9 / 16,
-          height: 'unset',
           width: 'min(275px, 70vw)',
           maxWidth: '100%',
         },
