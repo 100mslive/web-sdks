@@ -20,6 +20,7 @@ export const PeerNotifications = () => {
     if (!notification || (notification?.data?.roleName && isInternalRole(notification.data.roleName))) {
       return;
     }
+
     console.debug(`[${notification.type}]`, notification);
     switch (notification.type) {
       case HMSNotificationTypes.PEER_LIST:

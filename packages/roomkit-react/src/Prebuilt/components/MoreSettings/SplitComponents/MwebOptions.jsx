@@ -3,7 +3,7 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
-  selectLocalPeerRoleName,
+  selectPeerCount,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -16,6 +16,7 @@ import {
   EmojiIcon,
   HandIcon,
   PencilIcon,
+  PeopleIcon,
   RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
@@ -29,11 +30,12 @@ import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
+import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { FEATURE_LIST } from '../../../common/constants';
+import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
+import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -64,13 +66,12 @@ export const MwebOptions = () => {
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
+  const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const peerCount = useHMSStore(selectPeerCount);
 
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-
-  const hlsViewer = useHLSViewerRole();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isHLSViewer = hlsViewer === localPeerRole;
+  const isHLSViewer = useIsLocalPeerHLSViewer();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -131,6 +132,13 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
+            <ActionTile
+              title="Participants"
+              icon={<PeopleIcon />}
+              onClick={toggleParticipants}
+              setOpenOptionsSheet={setOpenOptionsSheet}
+              number={peerCount}
+            />
             {isHandRaiseEnabled && !isHLSViewer ? (
               <ActionTile
                 title="Raise Hand"
