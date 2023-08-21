@@ -9,7 +9,6 @@ import {
   selectPermissions,
   useHMSActions,
   useHMSStore,
-  useParticipants,
 } from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
@@ -32,21 +31,18 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 import { useShowStreamingUI } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
 import { LOWER_HAND, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { useParticipants } from '../../common/hooks';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
-  const results = { matches: false };
 
   const handRaisedPeers = useHMSStore(selectPeersByCondition(peer => JSON.parse(peer.metadata || '{}')?.isHandRaised));
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
       peersOrderedByRoles[participant.roleName] = [];
-    }
-    if (filter?.search && participant.name.includes(filter.search)) {
-      results.matches = true;
     }
     peersOrderedByRoles[participant.roleName].push(participant);
   });
@@ -70,7 +66,7 @@ export const ParticipantList = () => {
       <Flex direction="column" css={{ size: '100%' }}>
         <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
-        {participants.length === 0 || (filter?.search && !results.matches) ? (
+        {participants.length === 0 ? (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
             <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
           </Flex>
