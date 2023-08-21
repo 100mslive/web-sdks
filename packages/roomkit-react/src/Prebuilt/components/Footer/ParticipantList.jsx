@@ -28,10 +28,9 @@ import { RoleChangeModal } from '../RoleChangeModal';
 import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { useShowStreamingUI } from '../../common/hooks';
+import { useParticipants, useShowStreamingUI } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
 import { LOWER_HAND, SIDE_PANE_OPTIONS } from '../../common/constants';
-import { useParticipants } from '../../common/hooks';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
