@@ -15,10 +15,12 @@ export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
   const isPeerJoinSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_JOINED);
   const isPeerLeftSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_LEFT);
+
   useEffect(() => {
     if (!notification || (notification?.data?.roleName && isInternalRole(notification.data.roleName))) {
       return;
     }
+
     console.debug(`[${notification.type}]`, notification);
     switch (notification.type) {
       case HMSNotificationTypes.PEER_LIST:
@@ -39,6 +41,7 @@ export const PeerNotifications = () => {
       default:
         return;
     }
+
     ToastBatcher.showToast({ notification });
   }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
 

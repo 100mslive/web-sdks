@@ -29,7 +29,7 @@ import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
-const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
+export const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };

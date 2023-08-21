@@ -47,12 +47,10 @@ export const DesktopLeaveRoom = ({
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              <Box>
-                <HangUpIcon key="hangUp" />
-              </Box>
+              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
             </Tooltip>
           </LeaveIconButton>
-          <Dropdown.Root open={open} onOpenChange={setOpen}>
+          <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
             <Dropdown.Trigger
               asChild
               css={{
@@ -108,7 +106,7 @@ export const DesktopLeaveRoom = ({
         </LeaveIconButton>
       )}
 
-      <Dialog.Root open={showEndRoomAlert}>
+      <Dialog.Root open={showEndRoomAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
