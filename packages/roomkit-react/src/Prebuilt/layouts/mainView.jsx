@@ -27,6 +27,7 @@ import {
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
+import { useIsRoleProminenceLayout } from '../provider/roomLayoutProvider/hooks/useIsRoleProminenceLayout';
 import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
@@ -50,6 +51,7 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
+  const isRoleProminenceLayout = useIsRoleProminenceLayout();
 
   const startHLS = useCallback(async () => {
     try {
@@ -118,6 +120,8 @@ export const ConferenceMainView = () => {
     ViewComponent = ScreenshareLayout;
   } else if (pinnedTrack) {
     ViewComponent = PinnedTrackView;
+  } else if (isRoleProminenceLayout) {
+    ViewComponent = RoleProminence;
   } else {
     ViewComponent = EqualProminence;
   }

@@ -4,7 +4,7 @@ import {
   getPeersWithTiles,
   HMSPeer,
   selectTracksMap,
-  TrackWithPeerAndDimesions,
+  TrackWithPeerAndDimensions,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
@@ -15,7 +15,7 @@ export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; m
   const vanillaStore = useHMSVanillaStore();
   const tracksMap = vanillaStore.getState(selectTracksMap);
   const peersWithTiles = useMemo(
-    () => getPeersWithTiles(peers, tracksMap, () => false) as TrackWithPeerAndDimesions[],
+    () => getPeersWithTiles(peers, tracksMap, () => false) as TrackWithPeerAndDimensions[],
     [peers, tracksMap],
   );
   const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
@@ -37,9 +37,9 @@ export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; m
 
 export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
   const vanillaStore = useHMSVanillaStore();
-  const [ref, { width, height }] = useMeasure();
+  const [ref, { width, height }] = useMeasure<HTMLDivElement>();
   const isMobile = useMedia(cssConfig.media.lg);
-  const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimesions[][]>([]);
+  const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimensions[][]>([]);
   const pagesList = usePagesWithTiles({ peers, maxTileCount });
 
   useEffect(() => {

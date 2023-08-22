@@ -82,7 +82,7 @@ export function mode(array: number[]): number | null {
 
 export type TrackWithPeer = { track?: HMSVideoTrack | HMSScreenVideoTrack; peer: HMSPeer };
 
-export type TrackWithPeerAndDimesions = {
+export type TrackWithPeerAndDimensions = {
   track?: HMSVideoTrack | HMSScreenVideoTrack;
   peer: HMSPeer;
   width?: number;
