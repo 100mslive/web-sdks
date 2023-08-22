@@ -1422,11 +1422,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private onRoleUpdate() {
     this.syncRoomState('roleUpdate');
-    if (this.store.getState(selectIsInPreview)) {
-      this.setState(store => {
-        store.room.roomState = HMSRoomState.Connected;
-      }, 'midCallPreviewCompleted');
-    }
   }
 
   private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
@@ -1450,8 +1445,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
+    if (
+      [
+        sdkTypes.HMSPeerUpdate.PEER_JOINED,
+        sdkTypes.HMSPeerUpdate.PEER_LEFT,
+        sdkTypes.HMSPeerUpdate.ROLE_UPDATED,
+      ].includes(type)
+    ) {
       this.syncRoomState(actionName);
+      if (this.store.getState(selectIsInPreview)) {
+        this.setState(store => {
+          store.room.roomState = HMSRoomState.Connected;
+        }, 'midCallPreviewCompleted');
+      }
       // if peer wasn't available before sync(will happen if event is peer join)
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));

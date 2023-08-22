@@ -44,7 +44,7 @@ import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
-import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -423,7 +423,7 @@ export class HMSSdk implements HMSInterface {
         newRole,
       });
 
-      this.listener?.onRoleUpdate(newRole.name);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, this.localPeer);
     }
   }
 
