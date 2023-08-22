@@ -51,7 +51,11 @@ export function EqualProminence() {
       return;
     }
     const tracksMap = vanillaStore.getState(selectTracksMap);
-    const peersWithTiles = getPeersWithTiles(sortedPeers, tracksMap, () => false);
+    const peersWithTiles = getPeersWithTiles(
+      sortedPeers.length === 0 ? [localPeer] : sortedPeers,
+      tracksMap,
+      () => false,
+    );
     const noOfPages = Math.ceil(peersWithTiles.length / maxTileCount);
     let remaining = peersWithTiles.length;
     let sliceStart = 0;
@@ -170,7 +174,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      {isInsetEnabled && pagesWithTiles.length > 0 && <InsetTile />}
+      {isInsetEnabled && sortedPeers.length > 1 && <InsetTile />}
     </Flex>
   );
 }
