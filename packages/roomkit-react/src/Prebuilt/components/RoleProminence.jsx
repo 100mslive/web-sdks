@@ -1,22 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { selectLocalPeer, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { selectPeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
+import { InsetTile } from '../layouts/InsetView';
 import { Pagination } from './Pagination';
 import { SecondaryTiles } from './SecondaryTiles';
 import VideoTile from './VideoTile';
+import { useRoleProminence } from './hooks/useRoleProminence';
 import { useTileLayout } from './hooks/useTileLayout';
 import PeersSorter from '../common/PeersSorter';
 
 export function RoleProminence() {
-  const peers = useHMSStore(selectRemotePeers);
-  const localPeer = useHMSStore(selectLocalPeer);
-  const prominentPeers = useMemo(() => peers.filter(peer => peer.roleName !== localPeer.roleName), [peers, localPeer]);
-  const secondaryPeers = peers.filter(peer => peer.roleName === localPeer.roleName);
+  const peers = useHMSStore(selectPeers);
+  const { prominentPeers, secondaryPeers, isInsetEnabled } = useRoleProminence(peers);
   const [sortedPeers, setSortedPeers] = useState(prominentPeers);
   const vanillaStore = useHMSVanillaStore();
   const maxTileCount = 4;
   const { ref, pagesWithTiles } = useTileLayout({
-    peers: sortedPeers.length === 0 ? [localPeer] : sortedPeers,
+    peers: sortedPeers,
     maxTileCount: 4,
   });
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
@@ -66,6 +66,7 @@ export function RoleProminence() {
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
       <SecondaryTiles peers={secondaryPeers} />
+      {isInsetEnabled && <InsetTile />}
     </Flex>
   );
 }
