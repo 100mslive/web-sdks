@@ -93,7 +93,11 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
-  useEffect(() => setName(initialName), [initialName]);
+  useEffect(() => {
+    if (initialName) {
+      setName(initialName);
+    }
+  }, [initialName]);
 
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
@@ -181,11 +185,10 @@ const PreviewTile = ({ name, error }) => {
       css={{
         bg: '$surface_default',
         aspectRatio: 16 / 9,
-        height: 'unset',
         width: 'min(640px, 80vw)',
+        overflow: 'clip',
         '@md': {
           aspectRatio: 9 / 16,
-          height: 'unset',
           width: 'min(275px, 70vw)',
           maxWidth: '100%',
         },

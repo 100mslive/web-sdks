@@ -8,16 +8,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  BrbIcon,
-  CheckIcon,
-  DragHandleIcon,
-  HandIcon,
-  InfoIcon,
-  PencilIcon,
-  PipIcon,
-  SettingsIcon,
-} from '@100mslive/react-icons';
+import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
 import { PIP } from '../../PIP';
@@ -26,7 +17,6 @@ import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
 import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '.././BulkRoleChangeModal';
-import { ChangeNameModal } from '.././ChangeNameModal';
 import { ChangeSelfRole } from '.././ChangeSelfRole';
 import { EmbedUrl, EmbedUrlModal } from '.././EmbedUrl';
 import { FullScreenItem } from '.././FullScreenItem';
@@ -57,7 +47,6 @@ export const DesktopOptions = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
   const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
@@ -155,14 +144,6 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isChangeNameEnabled && (
-            <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">
-              <PencilIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Change Name
-              </Text>
-            </Dropdown.Item>
-          )}
           <ChangeSelfRole onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)} />
           <FullScreenItem />
           {isAllowedToPublish.screen && isEmbedEnabled && (
@@ -223,9 +204,7 @@ export const DesktopOptions = () => {
         <BulkRoleChangeModal onOpenChange={value => updateState(MODALS.BULK_ROLE_CHANGE, value)} />
       )}
       {openModals.has(MODALS.MUTE_ALL) && <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />}
-      {openModals.has(MODALS.CHANGE_NAME) && (
-        <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
-      )}
+
       {openModals.has(MODALS.START_RECORDING) && (
         <StartRecording open onOpenChange={value => updateState(MODALS.START_RECORDING, value)} />
       )}
