@@ -16,7 +16,7 @@ export const LeaveSessionContent = ({ setShowLeaveRoomAlert, leaveRoom, isModal 
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
         <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
-          Leave Session
+          Leave
         </Text>
         {isModal ? null : (
           <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowLeaveRoomAlert(false)}>
