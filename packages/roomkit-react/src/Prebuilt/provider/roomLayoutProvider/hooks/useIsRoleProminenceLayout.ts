@@ -6,5 +6,5 @@ export const useIsRoleProminenceLayout = () => {
     //@ts-ignore
     layout?.screens?.conferencing?.default?.elements?.video_tile_layout?.grid || {};
 
-  return prominent_roles?.length > 0;
+  return prominent_roles.length > 0;
 };

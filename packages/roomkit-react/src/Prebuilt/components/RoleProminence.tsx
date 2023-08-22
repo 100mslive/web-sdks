@@ -1,12 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
+// @ts-ignore: No implicit Any
 import { InsetTile } from '../layouts/InsetView';
+// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
+// @ts-ignore: No implicit Any
 import { SecondaryTiles } from './SecondaryTiles';
+// @ts-ignore: No implicit Any
 import VideoTile from './VideoTile';
 import { useRoleProminence } from './hooks/useRoleProminence';
 import { useTileLayout } from './hooks/useTileLayout';
+// @ts-ignore: No implicit Any
 import PeersSorter from '../common/PeersSorter';
 
 export function RoleProminence() {
