@@ -9,13 +9,13 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { StreamingFooter } from './Footer/StreamingFooter';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
-import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
@@ -171,7 +171,7 @@ const Conference = () => {
           }}
           data-testid="footer"
         >
-          <Footer />
+          <StreamingFooter />
         </Box>
       )}
       <RoleChangeRequestModal />

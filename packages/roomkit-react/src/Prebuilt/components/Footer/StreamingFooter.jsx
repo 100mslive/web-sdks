@@ -44,7 +44,7 @@ export const StreamingFooter = () => {
         }}
       >
         {isMobile ? <LeaveRoom /> : null}
-        <AudioVideoToggle hideOptions />
+        <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
         css={{

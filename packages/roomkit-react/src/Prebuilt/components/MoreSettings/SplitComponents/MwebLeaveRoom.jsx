@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ExitIcon, HangUpIcon, StopIcon } from '@100mslive/react-icons';
+import { ExitIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../../Layout';
 import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
@@ -40,7 +40,9 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               }}
             >
               <Tooltip title="Leave Room">
-                <Box>{showStream ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
+                <Box>
+                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+                </Box>
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
@@ -53,7 +55,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               bg="$surface_default"
               titleColor="$on_surface_high"
               subtitleColor="$on_surface_low"
-              icon={<ExitIcon height={24} width={24} />}
+              icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
               css={{ pt: 0, mt: '$10' }}
             />
@@ -74,9 +76,11 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn" onClick={leaveRoom}>
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
