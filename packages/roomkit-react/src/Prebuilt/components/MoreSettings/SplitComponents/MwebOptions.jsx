@@ -15,7 +15,6 @@ import {
   DragHandleIcon,
   EmojiIcon,
   HandIcon,
-  PencilIcon,
   PeopleIcon,
   RecordIcon,
   SettingsIcon,
@@ -35,6 +34,7 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
+import { getFormattedCount } from '../../../common/utils';
 import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
@@ -132,62 +132,72 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
-            <ActionTile
-              title="Participants"
-              icon={<PeopleIcon />}
-              onClick={toggleParticipants}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-              number={peerCount}
-            />
-            {isHandRaiseEnabled && !isHLSViewer ? (
-              <ActionTile
-                title="Raise Hand"
-                icon={<HandIcon />}
-                onClick={toggleHandRaise}
+            <ActionTile.Root
+              onClick={() => {
+                toggleParticipants();
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
+              <PeopleIcon />
+              <ActionTile.Title>Participants</ActionTile.Title>
+            </ActionTile.Root>
+
+            {isHandRaiseEnabled ? (
+              <ActionTile.Root
                 active={isHandRaised}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
+                onClick={() => {
+                  toggleHandRaise();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <HandIcon />
+                <ActionTile.Title>Raise Hand</ActionTile.Title>
+              </ActionTile.Root>
             ) : null}
-            {isBRBEnabled && !isHLSViewer ? (
-              <ActionTile
-                title="Be Right Back"
-                icon={<BrbIcon />}
-                onClick={toggleBRB}
+
+            {isBRBEnabled && isHLSViewer? (
+              <ActionTile.Root
                 active={isBRBOn}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
+                onClick={() => {
+                  toggleBRB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <BrbIcon />
+                <ActionTile.Title>Be Right Back</ActionTile.Title>
+              </ActionTile.Root>
             ) : null}
-            <ActionTile
-              title="Change Name"
-              icon={<PencilIcon />}
-              onClick={() => updateState(MODALS.CHANGE_NAME, true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
-            {isVideoOn && !isHLSViewer ? (
+
+            {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
             ) : null}
 
-            <ActionTile
-              title="Emoji Reactions"
-              icon={<EmojiIcon />}
-              onClick={() => setShowEmojiCard(true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
+            <ActionTile.Root
+              onClick={() => {
+                setShowEmojiCard(true);
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <EmojiIcon />
+              <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+            </ActionTile.Root>
 
-            <ActionTile
-              title="Settings"
-              icon={<SettingsIcon />}
-              onClick={() => setOpenSettingsSheet(true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
+            <ActionTile.Root
+              onClick={() => {
+                setOpenSettingsSheet(true);
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <SettingsIcon />
+              <ActionTile.Title>Settings</ActionTile.Title>
+            </ActionTile.Root>
 
-            {isConnected && permissions?.browserRecording && (
-              <ActionTile
-                title={isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}
+            {isConnected && permissions?.browserRecording ? (
+              <ActionTile.Root
                 disabled={isHLSRunning}
-                icon={<RecordIcon />}
                 onClick={async () => {
                   if (isBrowserRecordingOn || isStreamingOn) {
                     setShowRecordingOn(true);
@@ -212,10 +222,15 @@ export const MwebOptions = () => {
                       }
                     }
                   }
+                  if (isHLSRunning) {
+                    setOpenOptionsSheet(false);
+                  }
                 }}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            )}
+              >
+                <RecordIcon />
+                <ActionTile.Title>{isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
           </Box>
         </Sheet.Content>
       </Sheet.Root>

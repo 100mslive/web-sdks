@@ -33,6 +33,7 @@ export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const canMuteVideo = videoTrack?.enabled ? permissions?.mute : permissions?.unmute;
   const canMuteAudio = audioTrack?.enabled ? permissions?.mute : permissions?.unmute;
+
   const toggleTrackEnabled = async (track?: HMSTrack | null) => {
     if (track) {
       try {
@@ -55,6 +56,7 @@ export const TileMenu: React.FC<TileMenuProps> = ({ peerId }) => {
             <span>{`${videoTrack?.enabled ? 'Mute' : 'Unmute'} Video`}</span>
           </StyledMenuTile.ItemButton>
         ) : null}
+
         {canMuteAudio ? (
           <StyledMenuTile.ItemButton onClick={() => toggleTrackEnabled(audioTrack)}>
             {audioTrack?.enabled ? <MicOnIcon /> : <MicOffIcon />}
