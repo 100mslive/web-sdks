@@ -2,16 +2,13 @@ import React, { Suspense, useCallback, useEffect } from 'react';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
-  selectPeerScreenSharing,
   selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
-import { RoleProminence } from '../components/RoleProminence';
-import { ScreenshareLayout } from '../components/ScreenshareLayout';
+import { GridLayout } from '../components/GridLayout';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
@@ -23,11 +20,9 @@ import {
   usePDFAnnotator,
   usePinnedTrack,
   useSetAppDataByKey,
-  useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
-import { useIsRoleProminenceLayout } from '../provider/roomLayoutProvider/hooks/useIsRoleProminenceLayout';
 import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
@@ -38,11 +33,9 @@ const PinnedTrackView = React.lazy(() => import('./PinnedTrackView'));
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const pinnedTrack = usePinnedTrack();
-  const peerSharing = useHMSStore(selectPeerScreenSharing);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const { isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
@@ -51,7 +44,6 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
-  const isRoleProminenceLayout = useIsRoleProminenceLayout();
 
   const startHLS = useCallback(async () => {
     try {
@@ -116,14 +108,10 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     // ViewComponent = WhiteboardView;
-  } else if (peerSharing && !isAudioOnly) {
-    ViewComponent = ScreenshareLayout;
   } else if (pinnedTrack) {
     ViewComponent = PinnedTrackView;
-  } else if (isRoleProminenceLayout) {
-    ViewComponent = RoleProminence;
   } else {
-    ViewComponent = EqualProminence;
+    ViewComponent = GridLayout;
   }
 
   return (
