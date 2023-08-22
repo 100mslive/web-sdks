@@ -21,10 +21,10 @@ export const RoleChangeRequestModal = () => {
       return;
     }
 
-    hmsActions.sdk.midCallPreview({ asRole: roleChangeRequest.role.name });
+    hmsActions.preview({ asRole: roleChangeRequest.role.name });
 
     return () => {
-      hmsActions.sdk.cancelMidCallPreview();
+      hmsActions.cancelMidCallPreview();
     };
   }, [roleChangeRequest, isHeadless]);
 

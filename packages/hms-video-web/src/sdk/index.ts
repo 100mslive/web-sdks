@@ -27,7 +27,6 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
-  HMSMidCallPreviewConfig,
   HMSPlaylistType,
   HMSPreviewConfig,
   HMSRole,
@@ -321,6 +320,10 @@ export class HMSSdk implements HMSInterface {
       );
     }
 
+    if (this.transportState === TransportState.Joined) {
+      return this.midCallPreview(config.asRole, config.settings);
+    }
+
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
@@ -391,18 +394,18 @@ export class HMSSdk implements HMSInterface {
     });
   }
 
-  async midCallPreview(config: HMSMidCallPreviewConfig): Promise<void> {
+  private async midCallPreview(asRole?: string, settings?: InitialSettings): Promise<void> {
     if (!this.localPeer || this.transportState !== TransportState.Joined) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'Not connected - midCallPreview');
     }
 
-    const newRole = config.asRole && this.store.getPolicyForRole(config.asRole);
+    const newRole = asRole && this.store.getPolicyForRole(asRole);
     if (!newRole) {
-      throw ErrorFactory.GenericErrors.InvalidRole(HMSAction.PREVIEW, `role ${config.asRole} does not exist in policy`);
+      throw ErrorFactory.GenericErrors.InvalidRole(HMSAction.PREVIEW, `role ${asRole} does not exist in policy`);
     }
     this.localPeer.asRole = newRole;
 
-    const tracks = await this.localTrackManager.getTracksToPublish(config.settings);
+    const tracks = await this.localTrackManager.getTracksToPublish(settings);
     tracks.forEach(track => this.setLocalPeerTrack(track));
     this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
 

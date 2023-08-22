@@ -1,6 +1,6 @@
 import { HMSInteractivityCenter } from './session-store/interactivity-center';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
-import { HMSConfig, HMSMidCallPreviewConfig, HMSPreviewConfig } from './config';
+import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
@@ -24,8 +24,6 @@ export interface HMSInterface {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
-
-  midCallPreview(config: HMSMidCallPreviewConfig): Promise<void>;
   cancelMidCallPreview(): Promise<void>;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;

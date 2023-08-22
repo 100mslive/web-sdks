@@ -196,10 +196,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async preview(config: sdkTypes.HMSPreviewConfig) {
-    if (this.isRoomJoinCalled) {
-      this.logPossibleInconsistency('attempting to call preview after join was called');
-      return; // ignore
-    }
     const roomState = this.store.getState(selectRoomState);
     if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {
       this.logPossibleInconsistency('attempting to call preview while room is in preview/connecting');
@@ -207,14 +203,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
 
     try {
-      this.setState(store => {
-        store.room.roomState = HMSRoomState.Connecting;
-      }, 'connecting');
+      if (this.store.getState(selectRoomState) !== HMSRoomState.Connected) {
+        this.setState(store => {
+          store.room.roomState = HMSRoomState.Connecting;
+        }, 'connecting');
+      }
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
     }
+  }
+
+  async cancelMidCallPreview() {
+    return this.sdk.cancelMidCallPreview();
   }
 
   async join(config: sdkTypes.HMSConfig) {
