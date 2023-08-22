@@ -1,6 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectPeerMetadata, useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
@@ -11,18 +11,18 @@ import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
+import { useIsLocalPeerHLSViewer } from '../../common/hooks';
 import { FEATURE_LIST } from '../../common/constants';
 
 export const StreamingFooter = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
-  const { isHandRaised, toggleHandRaise } = useMyMetadata();
+  const { toggleHandRaise } = useMyMetadata();
+  const localPeer = useHMSStore(selectLocalPeer);
+  const isHandRaised = useHMSStore(selectPeerMetadata(localPeer.id))?.isHandRaised || false;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
 
   return (
     <AppFooter.Root
@@ -31,6 +31,8 @@ export const StreamingFooter = () => {
         '@md': {
           justifyContent: 'center',
           gap: '$10',
+          position: 'relative',
+          zIndex: 20,
         },
       }}
     >
@@ -56,7 +58,7 @@ export const StreamingFooter = () => {
       >
         {isMobile ? (
           <>
-            {isHandRaiseEnabled ? (
+            {isHandRaiseEnabled && isHlsViewer ? (
               <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
                 <HandIcon />
               </IconButton>

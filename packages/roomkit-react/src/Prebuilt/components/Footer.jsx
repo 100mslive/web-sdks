@@ -1,9 +1,10 @@
 import React from 'react';
 import { ConferencingFooter } from './Footer/ConferencingFooter';
 import { StreamingFooter } from './Footer/StreamingFooter';
-import { useShowStreamingUI } from '../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../common/hooks';
 
 export const Footer = () => {
   const showStreamingUI = useShowStreamingUI();
-  return showStreamingUI ? <StreamingFooter /> : <ConferencingFooter />;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
+  return showStreamingUI || isHlsViewer ? <StreamingFooter /> : <ConferencingFooter />;
 };

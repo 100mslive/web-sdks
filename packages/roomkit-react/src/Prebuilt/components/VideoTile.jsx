@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -16,11 +17,13 @@ import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
+import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
+import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -77,6 +80,8 @@ const Tile = ({
     }
     return 'large';
   }, [width, height]);
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
 
   return (
     <StyledVideoTile.Root
@@ -150,15 +155,17 @@ const Tile = ({
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
-          <TileConnection
-            hideLabel={hideLabel}
-            name={label}
-            isTile
-            peerId={peerId}
-            width={width}
-            pinned={pinned}
-            spotlighted={spotlighted}
-          />
+          {showStreamingUI && isMobile ? null : (
+            <TileConnection
+              hideLabel={hideLabel}
+              name={label}
+              isTile
+              peerId={peerId}
+              width={width}
+              pinned={pinned}
+              spotlighted={spotlighted}
+            />
+          )}
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>
