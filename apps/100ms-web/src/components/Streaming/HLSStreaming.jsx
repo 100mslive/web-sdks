@@ -160,7 +160,12 @@ const StartHLS = () => {
         setHLSStarted(true);
         setError("");
         await hmsActions.startHLSStreaming({
-          variants,
+          variants: [
+            {
+              meetingURL:
+                "https://qahmsui.vercel.app/iframe.html?args=roomCode:hwt-diz-gxv&id=ui-components-prebuilt--example&viewMode=story&skip_preview=true",
+            },
+          ],
           recording: { hlsVod: record, singleFilePerLayer: record },
         });
       } catch (error) {

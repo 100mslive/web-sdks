@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectPeers, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
@@ -20,18 +20,24 @@ const getAspectRatio = ({ roleMap, roleName, isMobile }) => {
   return isMobile ? height / width : width / height;
 };
 
-export function InsetView() {
+export function InsetView({ inset = true }) {
   const remotePeers = useHMSStore(selectRemotePeers);
   const localPeer = useHMSStore(selectLocalPeer);
+  const peers = useHMSStore(selectPeers);
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const roleMap = useHMSStore(selectRolesMap);
   const rolePreference = useRolePreference();
   let centerPeers = [];
   let sidepanePeers = [];
+  const hideInset = !inset || (sidepanePeers.length > 0 && (isMobile || isLandscape));
+
   if (rolePreference) {
     const center = rolePreference[localPeer.roleName]?.split(',') || [];
-    for (const peer of remotePeers) {
+    for (const peer of peers) {
+      if (peer.id === localPeer.id) {
+        continue;
+      }
       if (center.includes(peer.roleName)) {
         centerPeers.push(peer);
       } else {
@@ -43,10 +49,10 @@ export function InsetView() {
       sidepanePeers = [];
     }
   } else {
-    centerPeers = remotePeers;
+    centerPeers = hideInset ? peers : remotePeers;
   }
-  const hideInset = sidepanePeers.length > 0 && (isMobile || isLandscape);
 
+  console.log('inset ', inset, hideInset, sidepanePeers.length);
   return (
     <Fragment>
       <Box

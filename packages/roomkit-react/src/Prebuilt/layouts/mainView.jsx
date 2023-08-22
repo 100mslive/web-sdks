@@ -21,6 +21,7 @@ import { WaitingView } from './WaitingView';
 import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
   useHLSViewerRole,
+  useIsHeadless,
   usePDFAnnotator,
   usePinnedTrack,
   useSetAppDataByKey,
@@ -34,6 +35,7 @@ import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
 const PinnedTrackView = React.lazy(() => import('./PinnedTrackView'));
+const HeadlessView = React.lazy(() => import('./HeadlessView'));
 
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
@@ -53,6 +55,8 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
+  // const isHeadless = useIsHeadless();
+  const isHeadless = true;
 
   const startHLS = useCallback(async () => {
     try {
@@ -111,6 +115,8 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
+  } else if (isHeadless) {
+    ViewComponent = HeadlessView;
   } else if (pdfAnnotatorActive) {
     ViewComponent = PDFView;
   } else if (urlToIframe) {

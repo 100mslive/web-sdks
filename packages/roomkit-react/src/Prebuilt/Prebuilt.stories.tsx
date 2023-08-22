@@ -33,11 +33,13 @@ const endpoints: HMSPrebuiltOptions['endpoints'] = {
 const hasEndpoints = Object.values(endpoints).some(val => !!val);
 
 Example.args = {
-  roomCode: process.env.STORYBOOK_SAMPLE_ROOM_CODE,
+  roomCode: 'hwt-diz-gxv',
   options: {
-    userName: '',
-    userId: '',
-    endpoints: hasEndpoints ? endpoints : undefined,
+    endpoints: {
+      roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
+      init: 'https://qa-init.100ms.live/init',
+      tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
+    },
   },
   typography: {
     font_family: 'Roboto',
