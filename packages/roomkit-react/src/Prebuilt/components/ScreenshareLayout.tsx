@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
+// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
+// @ts-ignore: No implicit Any
 import ScreenshareTile from './ScreenshareTile';
 import { SecondaryTiles } from './SecondaryTiles';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
 
 export const ScreenshareLayout = () => {
