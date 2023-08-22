@@ -8,7 +8,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { ArrowRightIcon, CheckIcon, PersonIcon } from "@100mslive/react-icons";
-import { config, Dropdown, Text } from "@100mslive/react-ui";
+import { config, Dropdown, Text } from "@100mslive/roomkit-react";
 import { ToastManager } from "../Toast/ToastManager";
 import { useAppLayout } from "../AppData/useAppLayout";
 import { useFilteredRoles } from "../../common/hooks";
@@ -49,12 +49,18 @@ export const ChangeSelfRole = ({ onClick }) => {
       <Dropdown.SubMenuContent
         sideOffset={8}
         alignOffset={-5}
-        css={{ "@md": { w: "$64" } }}
+        css={{
+          backgroundColor: "$surface_default",
+          "@md": { w: "$64" },
+        }}
       >
         {availableSelfChangeRoles.map((role, i) => (
           <Dropdown.Item
             key={role}
-            css={{ justifyContent: "space-between" }}
+            css={{
+              justifyContent: "space-between",
+              "&:hover": { backgroundColor: "$surface_bright" },
+            }}
             onClick={async () => {
               try {
                 await hmsActions.changeRole(localPeerId, role, true);

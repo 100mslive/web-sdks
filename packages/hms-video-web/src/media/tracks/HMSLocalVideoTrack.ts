@@ -98,7 +98,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (value === this.enabled) {
       return;
     }
-    super.setEnabled(value);
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
       if (value) {
@@ -109,6 +108,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await this.replaceSender(track, value);
       this.nativeTrack?.stop();
       this.nativeTrack = track;
+      await super.setEnabled(value);
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });

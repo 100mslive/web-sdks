@@ -16,13 +16,13 @@ import {
   HorizontalDivider,
   Text,
   Tooltip,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { ParticipantSearch } from "../Header/ParticipantList";
 import { useFilteredRoles } from "../../common/hooks";
 
 const ChatDotIcon = () => {
   return (
-    <Box css={{ size: "$6", bg: "$brandDefault", mx: "$2", r: "$round" }} />
+    <Box css={{ size: "$6", bg: "$primary_default", mx: "$2", r: "$round" }} />
   );
 };
 
@@ -30,11 +30,15 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   return (
     <Dropdown.Item
       data-testid="chat_members"
-      css={{ align: "center", px: "$10" }}
+      css={{
+        align: "center",
+        px: "$10",
+        "&:hover": { backgroundColor: "$surface_brighter" },
+      }}
       onClick={onClick}
     >
       <Text variant="sm">{value}</Text>
-      <Flex align="center" css={{ ml: "auto", color: "$textPrimary" }}>
+      <Flex align="center" css={{ ml: "auto", color: "$on_surface_high" }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
             <Box css={{ mr: active ? "$3" : 0 }}>

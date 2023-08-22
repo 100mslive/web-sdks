@@ -1,5 +1,5 @@
 import { InfoIcon } from "@100mslive/react-icons";
-import { Text } from "@100mslive/react-ui";
+import { Text } from "@100mslive/roomkit-react";
 import { DialogRow } from "../../primitives/DialogContent";
 import { isChrome } from "../../common/constants";
 
@@ -12,10 +12,10 @@ export const PDFInfo = () => {
     <DialogRow
       css={{
         p: "$8",
-        bg: "$surfaceLight",
+        bg: "$surface_bright",
         r: "$1",
         outline: "none",
-        border: "1px solid $borderLight",
+        border: "1px solid $border_bright",
         mt: "$0",
       }}
     >
@@ -27,7 +27,7 @@ export const PDFInfo = () => {
           minWidth: "20px",
         }}
       />
-      <Text variant="caption" css={{ color: "$textMedEmp" }}>
+      <Text variant="caption" css={{ color: "$on_surface_medium" }}>
         On the next screen, ensure you select{" "}
         <span style={{ fontWeight: "600" }}>“This Tab”</span> and click on{" "}
         <span style={{ fontWeight: "600" }}>“Share” </span>

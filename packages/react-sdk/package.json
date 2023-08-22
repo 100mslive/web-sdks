@@ -4,7 +4,7 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "version": "0.8.9",
+  "version": "0.8.12",
   "author": "100ms",
   "license": "MIT",
   "files": [
@@ -26,14 +26,14 @@
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier -w src/**",
-    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store"
+    "docs": "typedoc && rm -f ./docs/README.md && mkdir ./docs/home && mv ./docs/modules.md ./docs/home/content.md && node ../../scripts/docs-store && npx prettier --write './docs/**/*'"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^21.0.3",
     "@rollup/plugin-node-resolve": "^13.1.3",
     "@rollup/plugin-replace": "^5.0.1",
     "@rollup/plugin-typescript": "^8.3.1",
-    "@types/react": "^18.0.8",
+    "@types/react": "^18.1.0",
     "react": "^18.1.0",
     "rollup": "^2.70.1",
     "rollup-plugin-esbuild": "^4.9.3",
@@ -43,7 +43,7 @@
     "react": ">=16.8 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hms-video-store": "0.10.9",
+    "@100mslive/hms-video-store": "0.10.12",
     "react-resize-detector": "^7.0.0",
     "zustand": "^3.6.2"
   }

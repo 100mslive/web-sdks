@@ -3,7 +3,7 @@ import {
   HMSNotificationTypes,
   useHMSNotifications,
 } from "@100mslive/react-sdk";
-import { Dialog, Text } from "@100mslive/react-ui";
+import { Dialog, Text } from "@100mslive/roomkit-react";
 
 export function PermissionErrorModal() {
   const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
@@ -51,7 +51,7 @@ export function PermissionErrorModal() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              borderBottom: "1px solid $borderDefault",
+              borderBottom: "1px solid $border_default",
               pb: "$8",
             }}
           >

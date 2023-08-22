@@ -4,31 +4,31 @@ import usePrevious, { isChromiumBased, pdfIframeURL } from '../utils/commons';
 
 export interface usePDFShareResult {
   /**
-   * used to start screen share
-   * It throws error in given below scenarios:
-   * 1. When file or url is not passed.
-   * 2. Reference to a iframe or element is not yet attached.
-   * 3. Unable to start screen share
+   * Start sharing a PDF file or URL.
+   * It will throw an error in the following scenarios:
+   * - When file or URL has not been passed, or is invalid
+   * - When the reference has not been attached to an iframe
+   * - When screen share cannot be started
    */
   startPDFShare: (value: File | string) => Promise<void>;
 
   /**
-   * stop your screen share.
+   * Stop sharing the PDF file or URL.
    */
   stopPDFShare: () => Promise<void>;
   /**
-   * am I sharing pdf annotator in a room
+   * Flag to check if PDF sharing is currently in progress.
    */
   isPDFShareInProgress: boolean;
 
   /**
-   * reference of iframe where pdf annotator will be launched
+   * Reference to attach to the iframe that is responsible for rendering the PDF.
    */
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 /**
- * @param resetConfig pass resetConfig where you were mounting the iframe, it will help to clear configuration when stop screen share occurs
+ * @param resetConfig  Callback that implements cleanup after PDF sharing stops. Typically used to reset the currently selected PDF file or URL in your state. It is an optional parameter.
  * @returns usePDFShareResult
  */
 export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {

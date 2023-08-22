@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgPdfShare = (props: SVGProps<SVGSVGElement>) => (
   <svg
     width="24px"
@@ -25,5 +24,4 @@ const SvgPdfShare = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 );
-
 export default SvgPdfShare;

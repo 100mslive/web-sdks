@@ -1,3 +1,7 @@
+/**
+ * Please refer the following docs for more detals.
+ * https://www.100ms.live/docs/javascript/v2/how--to-guides/extend-capabilities/plugins/virtual-background
+ */
 import { useEffect, useRef, useState } from "react";
 import { HMSVirtualBackgroundTypes } from "@100mslive/hms-virtual-background";
 import {
@@ -9,7 +13,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { VirtualBackgroundIcon } from "@100mslive/react-icons";
-import { Loading, Tooltip } from "@100mslive/react-ui";
+import { Loading, Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { useIsFeatureEnabled } from "../../components/hooks/useFeatures";
 import { getRandomVirtualBackground } from "./vbutils";
