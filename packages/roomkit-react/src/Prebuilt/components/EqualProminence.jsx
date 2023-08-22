@@ -170,7 +170,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      {isInsetEnabled && pagesWithTiles.length > 0 && <InsetTile />}
+      {isInsetEnabled && sortedPeers.length > 1 && <InsetTile />}
     </Flex>
   );
 }
