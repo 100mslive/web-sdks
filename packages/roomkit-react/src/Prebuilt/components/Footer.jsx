@@ -1,29 +1,19 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectPeerMetadata, useHMSStore } from '@100mslive/react-sdk';
-import { HandIcon } from '@100mslive/react-icons';
 import { ChatToggle } from './Footer/ChatToggle';
 import { ParticipantCount } from './Footer/ParticipantList';
 import { MoreSettings } from './MoreSettings/MoreSettings';
 import { Footer as AppFooter } from '../../Footer';
 import { config as cssConfig } from '../../Theme';
-import { Tooltip } from '../../Tooltip';
-import IconButton from '../IconButton';
 import { AudioVideoToggle } from './AudioVideoToggle';
 import { EmojiReaction } from './EmojiReaction';
 import { LeaveRoom } from './LeaveRoom';
+import { RaiseHand } from './RaiseHand';
 import { ScreenshareToggle } from './ScreenShare';
-import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { useMyMetadata } from './hooks/useMetadata';
 import { useIsLocalPeerHLSViewer } from '../common/hooks';
-import { FEATURE_LIST } from '../common/constants';
 
 export const Footer = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const { toggleHandRaise } = useMyMetadata();
-  const localPeer = useHMSStore(selectLocalPeer);
-  const isHandRaised = useHMSStore(selectPeerMetadata(localPeer.id))?.isHandRaised || false;
   const isHlsViewer = useIsLocalPeerHLSViewer();
 
   return (
@@ -60,24 +50,14 @@ export const Footer = () => {
       >
         {isMobile ? (
           <>
-            {isHandRaiseEnabled && isHlsViewer ? (
-              <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                <HandIcon />
-              </IconButton>
-            ) : null}
+            {isHlsViewer ? <RaiseHand /> : null}
             <ChatToggle />
             <MoreSettings />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHandRaiseEnabled && isHlsViewer ? (
-              <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
-                <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                  <HandIcon />
-                </IconButton>
-              </Tooltip>
-            ) : null}
+            {isHlsViewer ? <RaiseHand /> : null}
             <EmojiReaction />
             <LeaveRoom />
           </>
