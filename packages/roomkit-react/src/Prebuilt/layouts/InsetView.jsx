@@ -1,7 +1,13 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsAllowedToPublish,
+  selectLocalPeer,
+  selectRemotePeers,
+  selectRolesMap,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
@@ -173,6 +179,7 @@ export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const localPeer = useHMSStore(selectLocalPeer);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   let height = 180;
@@ -203,6 +210,10 @@ export const InsetTile = () => {
       resizeObserver?.disconnect();
     };
   }, []);
+
+  if (!isAllowedToPublish.audio && isAllowedToPublish.video) {
+    return null;
+  }
 
   return (
     <Draggable bounds="parent" nodeRef={nodeRef}>
