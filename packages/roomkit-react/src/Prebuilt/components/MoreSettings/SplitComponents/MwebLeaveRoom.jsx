@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ExitIcon, HangUpIcon, StopIcon } from '@100mslive/react-icons';
+import { ExitIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../../Layout';
 import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
@@ -9,9 +9,9 @@ import { LeaveCard } from '../../LeaveCard';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useShowStreamingUI } from '../../../common/hooks';
 
-export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leaveRoom }) => {
+export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, stopStream }) => {
   const [open, setOpen] = useState(false);
-  const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
+  const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
@@ -27,7 +27,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
 
   return (
     <Fragment>
-      {permissions.endRoom ? (
+      {permissions?.hlsStreaming ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
@@ -40,7 +40,9 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               }}
             >
               <Tooltip title="Leave Room">
-                <Box>{showStream ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
+                <Box>
+                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+                </Box>
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
@@ -53,36 +55,44 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               bg="$surface_default"
               titleColor="$on_surface_high"
               subtitleColor="$on_surface_low"
-              icon={<ExitIcon height={24} width={24} />}
+              icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
               css={{ pt: 0, mt: '$10' }}
             />
-            <LeaveCard
-              title={showStream ? 'End Stream' : 'End Session'}
-              subtitle={`The will end the ${
-                showStream ? 'stream' : 'session'
-              } for everyone. You can't undo this action.`}
-              bg="$alert_error_dim"
-              titleColor="$alert_error_brighter"
-              subtitleColor="$alert_error_bright"
-              icon={<StopIcon height={24} width={24} />}
-              onClick={() => {
-                setOpen(false);
-                setShowEndRoomAlert(true);
-              }}
-            />
+            {isStreamingOn && permissions?.hlsStreaming ? (
+              <LeaveCard
+                title={showStream ? 'End Stream' : 'End Session'}
+                subtitle={`The will end the ${
+                  showStream ? 'stream' : 'session'
+                } for everyone. You can't undo this action.`}
+                bg="$alert_error_dim"
+                titleColor="$alert_error_brighter"
+                subtitleColor="$alert_error_bright"
+                icon={<StopIcon height={24} width={24} />}
+                onClick={() => {
+                  setOpen(false);
+                  setShowEndStreamAlert(true);
+                }}
+              />
+            ) : null}
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn" onClick={leaveRoom}>
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
-      <Sheet.Root open={showEndRoomAlert} onOpenChange={setShowEndRoomAlert}>
+      <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
-          <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} />
+          <EndSessionContent
+            setShowEndStreamAlert={setShowEndStreamAlert}
+            stopStream={stopStream}
+            leaveRoom={leaveRoom}
+          />
         </Sheet.Content>
       </Sheet.Root>
     </Fragment>

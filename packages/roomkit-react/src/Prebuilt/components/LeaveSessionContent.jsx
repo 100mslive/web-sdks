@@ -3,10 +3,8 @@ import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { useShowStreamingUI } from '../common/hooks';
 
-export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom, isModal = false }) => {
-  const showStreamingUI = useShowStreamingUI();
+export const LeaveSessionContent = ({ setShowLeaveRoomAlert, leaveRoom, isModal = false }) => {
   return (
     <Box>
       <Flex
@@ -18,38 +16,28 @@ export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
         <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
-          End {showStreamingUI ? 'Stream' : 'Session'}
+          Leave
         </Text>
         {isModal ? null : (
-          <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowEndStreamAlert(false)}>
+          <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowLeaveRoomAlert(false)}>
             <CrossIcon />
           </Box>
         )}
       </Flex>
       <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-        The {showStreamingUI ? 'stream' : 'session'} will end for everyone. You can't undo this action.
+        Others will continue after you leave. You can join the session again.
       </Text>
       <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
         <Button
           outlined
           variant="standard"
           css={{ w: '100%', '@md': { display: 'none' } }}
-          onClick={() => setShowEndStreamAlert(false)}
+          onClick={() => setShowLeaveRoomAlert(false)}
         >
           Cancel
         </Button>
-        <Button
-          variant="danger"
-          css={{ w: '100%' }}
-          onClick={async () => {
-            await stopStream();
-            leaveRoom();
-            setShowEndStreamAlert(false);
-          }}
-          id="stopStream"
-          data-testid="stop_stream_btn"
-        >
-          End {showStreamingUI ? 'Stream' : 'Session'}
+        <Button variant="danger" css={{ w: '100%' }} onClick={leaveRoom} id="leaveRoom" data-testid="leave_room">
+          Leave Session
         </Button>
       </Flex>
     </Box>
