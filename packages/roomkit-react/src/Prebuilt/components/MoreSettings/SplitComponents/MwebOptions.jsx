@@ -156,7 +156,7 @@ export const MwebOptions = () => {
               </ActionTile.Root>
             ) : null}
 
-            {isBRBEnabled && isHLSViewer? (
+            {isBRBEnabled && isHLSViewer ? (
               <ActionTile.Root
                 active={isBRBOn}
                 onClick={() => {
