@@ -199,7 +199,7 @@ export const PreviewTile = ({ name, error }) => {
   );
 };
 
-const PreviewControls = () => {
+export const PreviewControls = () => {
   return (
     <Flex
       justify="between"
