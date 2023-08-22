@@ -31,6 +31,7 @@ const Settings = ({ setHide }) => {
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(videoTrackId);
   const track = useHMSStore(trackSelector);
+  console.log('devices', videoInput, audioInput, audioOutput);
 
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given
@@ -146,7 +147,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
               open={open}
             />
             <Dropdown.Portal>
-              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1001 }}>
                 {devices.map(device => {
                   return (
                     <Dropdown.Item
