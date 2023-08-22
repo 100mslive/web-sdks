@@ -73,7 +73,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      {isInsetEnabled && sortedPeers.length > 1 && <InsetTile />}
+      {isInsetEnabled && sortedPeers.length > 0 && <InsetTile />}
     </Flex>
   );
 }
