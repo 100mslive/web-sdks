@@ -6,16 +6,18 @@ import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
+import { LeaveSessionContent } from '../../LeaveSessionContent';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
 export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leaveRoom }) => {
   const [open, setOpen] = useState(false);
   const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
+  const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;
@@ -40,7 +42,13 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               }}
             >
               <Tooltip title="Leave Room">
-                <Box>{showStream ? <HangUpIcon key="hangUp" /> : <ExitIcon key="hangUp" />}</Box>
+                <Box>
+                  {showStream || isHlsViewer ? (
+                    <ExitIcon key="hangUp" style={{ transform: 'rotate(180deg)' }} />
+                  ) : (
+                    <HangUpIcon key="hangUp" />
+                  )}
+                </Box>
               </Tooltip>
             </LeaveIconButton>
           </Sheet.Trigger>
@@ -53,7 +61,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
               bg="$surface_default"
               titleColor="$on_surface_high"
               subtitleColor="$on_surface_low"
-              icon={<ExitIcon height={24} width={24} />}
+              icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
               css={{ pt: 0, mt: '$10' }}
             />
@@ -74,9 +82,20 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
+        <LeaveIconButton
+          variant="danger"
+          key="LeaveRoom"
+          data-testid="leave_room_btn"
+          onClick={() => {
+            if (isHlsViewer) {
+              setShowLeaveRoomAlert(true);
+            }
+          }}
+        >
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
@@ -85,6 +104,13 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, endRoom, leave
           <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} />
         </Sheet.Content>
       </Sheet.Root>
+      {isHlsViewer ? (
+        <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
+          <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+            <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
+          </Sheet.Content>
+        </Sheet.Root>
+      ) : null}
     </Fragment>
   );
 };

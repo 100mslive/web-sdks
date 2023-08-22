@@ -21,7 +21,7 @@ import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { useShowStreamingUI } from '../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
@@ -88,7 +88,8 @@ export const Chat = () => {
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && showStreamingUI;
+  const isHLSViewer = useIsLocalPeerHLSViewer();
+  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(

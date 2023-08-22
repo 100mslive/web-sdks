@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
@@ -12,7 +13,11 @@ import PeersSorter from '../common/PeersSorter';
 import { UI_SETTINGS } from '../common/constants';
 
 export function EqualProminence() {
-  const peers = useHMSStore(selectRemotePeers);
+  const layout = useRoomLayout();
+  const { enable_local_tile_inset: isInsetEnabled = true } =
+    //@ts-ignore
+    layout?.screens?.conferencing?.default?.elements?.video_tile_layout?.grid || {};
+  const peers = useHMSStore(isInsetEnabled ? selectRemotePeers : selectPeers);
   const [sortedPeers, setSortedPeers] = useState(peers);
   const localPeer = useHMSStore(selectLocalPeer);
   const vanillaStore = useHMSVanillaStore();
@@ -68,7 +73,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      {peers.length > 0 && <InsetTile />}
+      {isInsetEnabled && sortedPeers.length > 0 && <InsetTile />}
     </Flex>
   );
 }

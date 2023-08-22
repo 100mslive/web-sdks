@@ -10,6 +10,7 @@ import {
 import { config as cssConfig } from '../../../Theme';
 
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
+const gap = 8; // gap between flex items
 
 export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
   const vanillaStore = useHMSVanillaStore();
@@ -70,7 +71,7 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
         return rowElements;
       });
 
-      const maxHeight = height - (maxRows - 1) * 8;
+      const maxHeight = height - (maxRows - 1) * gap;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios =
         isMobile && (noOfTilesInPage === 1 || noOfTilesInPage > 3)
@@ -78,7 +79,7 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
           : aspectRatioConfig.default;
       // calculate height and width of each tile in a row
       for (const row of matrix) {
-        let tileWidth = (width - (row.length - 1) * 8) / row.length;
+        let tileWidth = (width - (row.length - 1) * gap) / row.length;
         let tileHeight = 0;
         const calcHeights = aspectRatios.map(aR => tileWidth / aR);
         for (const h of calcHeights) {
