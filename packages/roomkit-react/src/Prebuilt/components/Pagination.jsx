@@ -17,7 +17,7 @@ export const Pagination = ({ page, onPageChange, numPages }) => {
   useEffect(() => {
     // currentPageIndex should not exceed pages length
     if (page >= numPages) {
-      onPageChange(Math.max(0,numPages - 1));
+      onPageChange(Math.max(0, numPages - 1));
     }
   }, [numPages, onPageChange, page]);
   return (
