@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
-import { useHMSVanillaStore } from '@100mslive/react-sdk';
+import { HMSPeer, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
+// @ts-ignore: No implicit Any
 import VideoTile from './VideoTile';
 import { usePagesWithTiles } from './hooks/useTileLayout';
+// @ts-ignore: No implicit Any
 import PeersSorter from '../common/PeersSorter';
 
-export const SecondaryTiles = ({ peers }) => {
+export const SecondaryTiles = ({ peers }: { peers: HMSPeer[] }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const maxTileCount = isMobile ? 2 : 4;
   const [sortedPeers, setSortedPeers] = useState(peers);
@@ -29,7 +32,7 @@ export const SecondaryTiles = ({ peers }) => {
   }, [page, peers, peersSorter, maxTileCount]);
 
   return (
-    <Flex direction="column">
+    <Flex direction="column" css={{ flexShrink: 0 }}>
       <Flex justify="center" align="center" css={{ gap: '$4' }}>
         {pagesWithTiles[page]?.map(tile => {
           return (

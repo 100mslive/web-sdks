@@ -6,7 +6,7 @@ import { config as cssConfig } from '../../Theme';
 import { SidePane } from './screenShareView';
 // import { Whiteboard } from '../plugins/whiteboard';
 
-const Editor = React.memo(({ roomId }) => {
+const Editor = React.memo(() => {
   return (
     <Box
       css={{

@@ -48,6 +48,7 @@ export const APP_DATA = {
   authToken: 'authToken',
   pdfConfig: 'pdfConfig',
   minimiseInset: 'minimiseInset',
+  activeScreensharePeerId: 'activeScreensharePeerId',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
@@ -63,8 +64,6 @@ export const SIDE_PANE_OPTIONS = {
   PARTICIPANTS: 'Participants',
   CHAT: 'Chat',
   STREAMING: 'STREAMING',
-  TILES: 'TILES',
-  SCREEN_TILES: 'SCREEN_TILES',
 };
 
 export const SUBSCRIBED_NOTIFICATIONS = {
