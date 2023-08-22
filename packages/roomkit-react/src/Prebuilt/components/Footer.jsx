@@ -2,18 +2,18 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectPeerMetadata, useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
+import { ChatToggle } from './Footer/ChatToggle';
+import { ParticipantCount } from './Footer/ParticipantList';
+import { MoreSettings } from './MoreSettings/MoreSettings';
 import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../..';
 import IconButton from '../IconButton';
 import { AudioVideoToggle } from './AudioVideoToggle';
 import { EmojiReaction } from './EmojiReaction';
 import { LeaveRoom } from './LeaveRoom';
-import { MoreSettings } from './MoreSettings/MoreSettings';
 import { ScreenshareToggle } from './ScreenShare';
-import { ChatToggle } from './Footer/ChatToggle';
-import { useIsLocalPeerHLSViewer } from '../common/hooks';
-import { ParticipantCount } from './Footer/ParticipantList';
-import { useMyMetadata } from './hooks/useMetadata';
 import { useIsFeatureEnabled } from './hooks/useFeatures';
+import { useMyMetadata } from './hooks/useMetadata';
+import { useIsLocalPeerHLSViewer } from '../common/hooks';
 import { FEATURE_LIST } from '../common/constants';
 
 export const Footer = () => {
