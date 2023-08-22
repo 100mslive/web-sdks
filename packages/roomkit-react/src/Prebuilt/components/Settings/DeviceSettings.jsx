@@ -31,7 +31,6 @@ const Settings = ({ setHide }) => {
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(videoTrackId);
   const track = useHMSStore(trackSelector);
-  console.log('devices', videoInput, audioInput, audioOutput);
 
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given
