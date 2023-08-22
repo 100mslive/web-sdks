@@ -5,7 +5,7 @@ import { HandIcon } from '@100mslive/react-icons';
 import { ChatToggle } from './Footer/ChatToggle';
 import { ParticipantCount } from './Footer/ParticipantList';
 import { MoreSettings } from './MoreSettings/MoreSettings';
-import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../..';
+import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
 import IconButton from '../IconButton';
 import { AudioVideoToggle } from './AudioVideoToggle';
 import { EmojiReaction } from './EmojiReaction';
