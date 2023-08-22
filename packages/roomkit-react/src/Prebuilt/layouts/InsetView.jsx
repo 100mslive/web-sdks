@@ -211,7 +211,7 @@ export const InsetTile = () => {
     };
   }, []);
 
-  if (!isAllowedToPublish.audio && isAllowedToPublish.video) {
+  if (!isAllowedToPublish.audio && !isAllowedToPublish.video) {
     return null;
   }
 
