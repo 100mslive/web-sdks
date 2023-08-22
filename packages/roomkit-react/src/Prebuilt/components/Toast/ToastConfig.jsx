@@ -38,33 +38,24 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
     roomLayout.screens?.conferencing?.default?.elements?.participant_list?.viewer_on_stage?.on_stage_role;
   const onViewerRole =
     roomLayout.screens?.conferencing?.default?.elements?.participant_list?.viewer_on_stage?.off_stage_role;
-  console.log('isSingle hand raise ', isSingleHandRaise, peer, onViewerRole);
 
-  const bringToStage = useCallback(() => {
-    hmsActions.changeRoleOfPeer(id, onStageRole, true);
-  }, [hmsActions, id, onStageRole]);
-
-  const openParticipantList = useCallback(() => {
-    !isParticipantsOpen && toggleSidepane();
-  }, [isParticipantsOpen, toggleSidepane]);
+  const onClickHandler = useCallback(() => {
+    if (isSingleHandRaise) {
+      hmsActions.changeRoleOfPeer(id, onStageRole, true);
+    } else {
+      !isParticipantsOpen && toggleSidepane();
+    }
+  }, [hmsActions, id, isParticipantsOpen, isSingleHandRaise, onStageRole, toggleSidepane]);
 
   // show nothing if handRaise is single and peer role is not hls
-  if (isSingleHandRaise && ((peer && peer.roleName !== onViewerRole) || !peer)) {
+  if (isSingleHandRaise && (!peer || peer.roleName !== onViewerRole)) {
     return null;
   }
-  if (!isSingleHandRaise) {
-    return (
-      <Button outlined as="div" variant="standard" css={{ w: 'max-content' }} onClick={openParticipantList} ref={ref}>
-        View
-      </Button>
-    );
-  } else {
-    return (
-      <Button outlined as="div" variant="standard" css={{ w: 'max-content' }} onClick={bringToStage} ref={ref}>
-        Bring on stage
-      </Button>
-    );
-  }
+  return (
+    <Button outlined as="div" variant="standard" css={{ w: 'max-content' }} onClick={onClickHandler} ref={ref}>
+      {isSingleHandRaise ? 'Bring on stage' : 'View'}
+    </Button>
+  );
 });
 export const ToastConfig = {
   PEER_LIST: {
