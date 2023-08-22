@@ -66,6 +66,7 @@ import {
 import {
   HMSRoleChangeRequest,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -1421,6 +1422,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private onRoleUpdate() {
     this.syncRoomState('roleUpdate');
+    if (this.store.getState(selectIsInPreview)) {
+      this.setState(store => {
+        store.room.roomState = HMSRoomState.Connected;
+      }, 'midCallPreviewCompleted');
+    }
   }
 
   private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
