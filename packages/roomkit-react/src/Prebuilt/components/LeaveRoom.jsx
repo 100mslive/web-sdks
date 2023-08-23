@@ -17,9 +17,19 @@ export const LeaveRoom = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
-
   const hmsActions = useHMSActions();
   const { showLeave, onLeave } = useHMSPrebuiltContext();
+
+  const stopStream = async () => {
+    try {
+      console.log('Stopping HLS stream');
+      await hmsActions.stopHLSStreaming();
+      ToastManager.addToast({ title: 'Stopping the stream' });
+    } catch (e) {
+      console.error('Error stopping stream', e);
+      ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
+    }
+  };
 
   const redirectToLeavePage = () => {
     if (showLeave) {
@@ -39,22 +49,22 @@ export const LeaveRoom = () => {
     redirectToLeavePage();
   };
 
-  const endRoom = () => {
-    hmsActions.endRoom(false, 'End Room');
-    redirectToLeavePage();
-  };
+  // const endRoom = () => {
+  //   hmsActions.endRoom(false, 'End Room');
+  //   redirectToLeavePage();
+  // };
 
   if (!permissions || !isConnected) {
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} endRoom={endRoom} />
+    <MwebLeaveRoom leaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} stopStream={stopStream} />
   ) : (
     <DesktopLeaveRoom
       leaveIconButton={LeaveIconButton}
       menuTriggerButton={MenuTriggerButton}
       leaveRoom={leaveRoom}
-      endRoom={endRoom}
+      stopStream={stopStream}
     />
   );
 };

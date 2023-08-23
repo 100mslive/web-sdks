@@ -216,7 +216,7 @@ export const InsetTile = () => {
   }
 
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef}>
+    <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
         css={{
@@ -246,6 +246,7 @@ export const InsetTile = () => {
             }}
             width={width}
             height={height}
+            isDragabble={isMobile}
             canMinimise
           />
         )}
