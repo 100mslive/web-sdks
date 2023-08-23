@@ -1,8 +1,15 @@
 // @ts-check
 import { useEffect, useRef, useState } from 'react';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
-import { selectAvailableRoleNames, selectIsConnectedToRoom, selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectAvailableRoleNames,
+  selectIsConnectedToRoom,
+  selectLocalPeerRoleName,
+  selectPeerCount,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+import { useHLSViewerRole } from '../components/AppData/useUISettings';
 import { isInternalRole } from './utils';
 
 /**
