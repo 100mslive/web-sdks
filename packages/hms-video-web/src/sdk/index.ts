@@ -320,7 +320,7 @@ export class HMSSdk implements HMSInterface {
       );
     }
 
-    if (this.transportState === TransportState.Joined) {
+    if ([TransportState.Joined, TransportState.Reconnecting].includes(this.transportState)) {
       return this.midCallPreview(config.asRole, config.settings);
     }
 
