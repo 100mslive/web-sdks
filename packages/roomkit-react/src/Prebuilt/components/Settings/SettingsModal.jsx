@@ -91,7 +91,6 @@ const MobileSettingModal = ({
       <Sheet.Content
         css={{
           bg: '$surface_dim',
-          maxHeught: '100vh',
           overflowY: 'auto',
         }}
       >
