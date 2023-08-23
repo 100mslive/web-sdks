@@ -9,16 +9,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import {
-  BrbIcon,
-  CrossIcon,
-  DragHandleIcon,
-  EmojiIcon,
-  HandIcon,
-  PeopleIcon,
-  RecordIcon,
-  SettingsIcon,
-} from '@100mslive/react-icons';
+import { CrossIcon, DragHandleIcon, EmojiIcon, PeopleIcon, RecordIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
@@ -31,10 +22,8 @@ import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../../hooks/useFeatures';
-import { useMyMetadata } from '../../hooks/useMetadata';
 import { getFormattedCount } from '../../../common/utils';
-import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -57,9 +46,6 @@ export const MwebOptions = () => {
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
 
   const [openModals, setOpenModals] = useState(new Set());
-  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
 
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
@@ -68,7 +54,6 @@ export const MwebOptions = () => {
   const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
-
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
@@ -141,32 +126,6 @@ export const MwebOptions = () => {
               <PeopleIcon />
               <ActionTile.Title>Participants</ActionTile.Title>
             </ActionTile.Root>
-
-            {isHandRaiseEnabled ? (
-              <ActionTile.Root
-                active={isHandRaised}
-                onClick={() => {
-                  toggleHandRaise();
-                  setOpenOptionsSheet(false);
-                }}
-              >
-                <HandIcon />
-                <ActionTile.Title>Raise Hand</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
-
-            {isBRBEnabled ? (
-              <ActionTile.Root
-                active={isBRBOn}
-                onClick={() => {
-                  toggleBRB();
-                  setOpenOptionsSheet(false);
-                }}
-              >
-                <BrbIcon />
-                <ActionTile.Title>Be Right Back</ActionTile.Title>
-              </ActionTile.Root>
-            ) : null}
 
             {isVideoOn ? (
               <Suspense fallback="">

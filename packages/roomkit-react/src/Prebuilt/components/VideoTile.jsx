@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -15,11 +16,13 @@ import TileMenu from './TileMenu/TileMenu';
 import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
+import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { useShowStreamingUI } from '../common/hooks';
 import { UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -48,6 +51,8 @@ const Tile = ({
   const borderAudioRef = useBorderAudioLevel(audioTrack?.id);
   const isVideoDegraded = track?.degraded;
   const isLocal = localPeerID === peerId;
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
   const label = getVideoTileLabel({
     peerName,
     track,
@@ -142,7 +147,9 @@ const Tile = ({
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
-          <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />
+          {showStreamingUI && isMobile ? null : (
+            <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />
+          )}
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>
