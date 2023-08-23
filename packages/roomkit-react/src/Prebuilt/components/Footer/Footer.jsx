@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { HandIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
+import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../..';
 import IconButton from '../../IconButton';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
@@ -16,7 +16,7 @@ import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
 import { FEATURE_LIST } from '../../common/constants';
 
-export const StreamingFooter = () => {
+export const Footer = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
@@ -44,7 +44,7 @@ export const StreamingFooter = () => {
         }}
       >
         {isMobile ? <LeaveRoom /> : null}
-        <AudioVideoToggle hideOptions />
+        <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
         css={{
