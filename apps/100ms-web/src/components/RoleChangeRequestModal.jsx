@@ -22,7 +22,7 @@ export const RoleChangeRequestModal = () => {
     }
 
     hmsActions.preview({ asRole: roleChangeRequest.role.name });
-  }, [roleChangeRequest, isHeadless]);
+  }, [hmsActions, roleChangeRequest, isHeadless]);
 
   if (!roleChangeRequest?.role || isHeadless) {
     return null;
