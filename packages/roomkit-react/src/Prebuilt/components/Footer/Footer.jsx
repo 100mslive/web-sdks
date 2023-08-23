@@ -6,14 +6,11 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { RaiseHand } from '../RaiseHand';
 import { ScreenshareToggle } from '../ScreenShare';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { useHLSViewerRole } from '../AppData/useUISettings';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { useMyMetadata } from '../hooks/useMetadata';
-import { FEATURE_LIST } from '../../common/constants';
-import { RaiseHand } from '../RaiseHand';
 
 export const Footer = () => {
   const isMobile = useMedia(cssConfig.media.md);
