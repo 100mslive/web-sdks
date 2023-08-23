@@ -9,7 +9,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { StreamingFooter } from './Footer/StreamingFooter';
+import { Footer } from './Footer/Footer';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
@@ -171,7 +171,7 @@ const Conference = () => {
           }}
           data-testid="footer"
         >
-          <StreamingFooter />
+          <Footer />
         </Box>
       )}
       <RoleChangeRequestModal />
