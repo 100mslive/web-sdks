@@ -203,7 +203,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
 
     try {
-      if (this.store.getState(selectRoomState) !== HMSRoomState.Connected) {
+      if (roomState !== HMSRoomState.Connected) {
         this.setState(store => {
           store.room.roomState = HMSRoomState.Connecting;
         }, 'connecting');
