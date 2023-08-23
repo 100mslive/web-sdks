@@ -14,14 +14,13 @@ export const DesktopLeaveRoom = ({
   menuTriggerButton: MenuTriggerButton,
   leaveIconButton: LeaveIconButton,
   leaveRoom,
-  endRoom,
+  stopStream,
 }) => {
   const [open, setOpen] = useState(false);
-  const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
+  const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;
@@ -34,7 +33,7 @@ export const DesktopLeaveRoom = ({
 
   return (
     <Fragment>
-      {permissions.endRoom ? (
+      {permissions.hlsStreaming ? (
         <Flex>
           <LeaveIconButton
             variant="danger"
@@ -80,23 +79,25 @@ export const DesktopLeaveRoom = ({
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
-              <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
-                <LeaveCard
-                  title={showStream ? 'End Stream' : 'End Session'}
-                  subtitle={`The ${
-                    showStream ? 'stream' : 'session'
-                  } will end for everyone. You can't undo this action.`}
-                  bg=""
-                  titleColor="$alert_error_brighter"
-                  subtitleColor="$alert_error_bright"
-                  icon={<StopIcon height={24} width={24} />}
-                  onClick={() => {
-                    setOpen(false);
-                    setShowEndRoomAlert(true);
-                  }}
-                  css={{ p: 0 }}
-                />
-              </Dropdown.Item>
+              {isStreamingOn && permissions?.hlsStreaming ? (
+                <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
+                  <LeaveCard
+                    title={showStream ? 'End Stream' : 'End Session'}
+                    subtitle={`The ${
+                      showStream ? 'stream' : 'session'
+                    } will end for everyone. You can't undo this action.`}
+                    bg=""
+                    titleColor="$alert_error_brighter"
+                    subtitleColor="$alert_error_bright"
+                    icon={<StopIcon height={24} width={24} />}
+                    onClick={() => {
+                      setOpen(false);
+                      setShowEndStreamAlert(true);
+                    }}
+                    css={{ p: 0 }}
+                  />
+                </Dropdown.Item>
+              ) : null}
             </Dropdown.Content>
           </Dropdown.Root>
         </Flex>
@@ -104,17 +105,22 @@ export const DesktopLeaveRoom = ({
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
             <Box>
-              <ExitIcon style={{ transform: 'rotate(180deg)' }} />{' '}
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
             </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
 
-      <Dialog.Root open={showEndRoomAlert} modal={false}>
+      <Dialog.Root open={showEndStreamAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
-            <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} isModal />
+            <EndSessionContent
+              setShowEndStreamAlert={setShowEndStreamAlert}
+              stopStream={stopStream}
+              leaveRoom={leaveRoom}
+              isModal
+            />
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
