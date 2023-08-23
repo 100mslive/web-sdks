@@ -19,7 +19,7 @@ import {
   RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Box, Tooltip } from '../../../../';
+import { Box, Loading, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
 import { EmojiCard } from '../../Footer/EmojiCard';
@@ -65,6 +65,7 @@ export const MwebOptions = () => {
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
+  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
 
@@ -197,15 +198,21 @@ export const MwebOptions = () => {
               <ActionTile.Root
                 disabled={isHLSRunning}
                 onClick={async () => {
+                  if (isRecordingLoading) {
+                    return;
+                  }
                   if (isBrowserRecordingOn || isStreamingOn) {
+                    setOpenOptionsSheet(false);
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setOpenOptionsSheet(false);
+                    setIsRecordingLoading(true);
                     try {
                       await hmsActions.startRTMPOrRecording({
                         record: true,
                       });
+                      setOpenOptionsSheet(false);
+                      setIsRecordingLoading(false);
                     } catch (error) {
                       if (error.message.includes('stream already running')) {
                         ToastManager.addToast({
@@ -218,6 +225,7 @@ export const MwebOptions = () => {
                           variant: 'error',
                         });
                       }
+                      setIsRecordingLoading(false);
                     }
                   }
                   if (isHLSRunning) {
@@ -225,8 +233,14 @@ export const MwebOptions = () => {
                   }
                 }}
               >
-                <RecordIcon />
-                <ActionTile.Title>{isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}</ActionTile.Title>
+                {isRecordingLoading ? <Loading /> : <RecordIcon />}
+                <ActionTile.Title>
+                  {isBrowserRecordingOn
+                    ? 'Recording On'
+                    : isRecordingLoading
+                    ? 'Starting Recording'
+                    : 'Start Recording'}
+                </ActionTile.Title>
               </ActionTile.Root>
             ) : null}
           </Box>
