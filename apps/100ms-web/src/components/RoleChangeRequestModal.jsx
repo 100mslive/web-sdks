@@ -22,10 +22,6 @@ export const RoleChangeRequestModal = () => {
     }
 
     hmsActions.preview({ asRole: roleChangeRequest.role.name });
-
-    return () => {
-      hmsActions.cancelMidCallPreview();
-    };
   }, [roleChangeRequest, isHeadless]);
 
   if (!roleChangeRequest?.role || isHeadless) {
@@ -56,7 +52,7 @@ export const RoleChangeRequestModal = () => {
       title="Role Change Request"
       onOpenChange={value => {
         if (!value) {
-          hmsActions.sdk.cancelMidCallPreview();
+          hmsActions.cancelMidCallPreview();
           hmsActions.rejectChangeRole(roleChangeRequest);
         }
       }}
