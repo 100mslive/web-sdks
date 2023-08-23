@@ -1,9 +1,7 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
-import { HandIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../..';
-import IconButton from '../../IconButton';
+import { config as cssConfig, Footer as AppFooter } from '../../..';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
@@ -15,14 +13,13 @@ import { useHLSViewerRole } from '../AppData/useUISettings';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { useMyMetadata } from '../hooks/useMetadata';
 import { FEATURE_LIST } from '../../common/constants';
+import { RaiseHand } from '../RaiseHand';
 
 export const Footer = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hlsViewerRole = useHLSViewerRole();
   const isHlsViewer = hlsViewerRole === localPeerRole;
-  const { isHandRaised, toggleHandRaise } = useMyMetadata();
 
   return (
     <AppFooter.Root
@@ -56,19 +53,14 @@ export const Footer = () => {
       >
         {isMobile ? (
           <>
+            {isHlsViewer ? <RaiseHand /> : null}
             <ChatToggle />
             <MoreSettings />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHandRaiseEnabled && isHlsViewer ? (
-              <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
-                <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                  <HandIcon />
-                </IconButton>
-              </Tooltip>
-            ) : null}
+            {isHlsViewer ? <RaiseHand /> : null}
             <EmojiReaction />
             <LeaveRoom />
           </>
