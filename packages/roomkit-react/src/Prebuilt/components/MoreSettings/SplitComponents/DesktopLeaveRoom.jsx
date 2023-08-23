@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-import { ExitIcon, HangUpIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../../Dropdown';
 import { Box, Flex } from '../../../../Layout';
 import { Dialog } from '../../../../Modal';
@@ -47,7 +47,9 @@ export const DesktopLeaveRoom = ({
             onClick={leaveRoom}
           >
             <Tooltip title="Leave Room">
-              <Box>{showStreamingUI ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+              <Box>
+                <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+              </Box>
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
@@ -73,7 +75,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   subtitleColor="$on_surface_low"
-                  icon={<ExitIcon height={24} width={24} />}
+                  icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                   onClick={leaveRoom}
                   css={{ p: 0 }}
                 />
@@ -101,7 +103,9 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton onClick={leaveRoom} variant="danger" key="LeaveRoom" data-testid="leave_room_btn">
           <Tooltip title="Leave Room">
-            <Box>{showStream ? <ExitIcon /> : <HangUpIcon key="hangUp" />}</Box>
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />{' '}
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
