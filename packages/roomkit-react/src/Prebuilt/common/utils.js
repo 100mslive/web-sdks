@@ -83,3 +83,18 @@ export const getUpdatedHeight = (e, MINIMUM_HEIGHT) => {
   const sheetHeightInVH = Math.max(MINIMUM_HEIGHT, heightToPercentage > 80 ? 100 : heightToPercentage);
   return `${sheetHeightInVH}vh`;
 };
+
+export const getFormattedCount = num => {
+  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  const formattedNum = formatter.format(num);
+  return formattedNum;
+};
+
+export const formatTime = timeInSeconds => {
+  timeInSeconds = Math.floor(timeInSeconds / 1000);
+  const hours = Math.floor(timeInSeconds / 3600);
+  const minutes = Math.floor((timeInSeconds % 3600) / 60);
+  const seconds = timeInSeconds % 60;
+  const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
+  return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};

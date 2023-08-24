@@ -12,18 +12,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
-import {
-  Avatar,
-  Box,
-  Flex,
-  flexCenter,
-  styled,
-  StyledVideoTile,
-  Text,
-  useBorderAudioLevel,
-  useTheme,
-  Video,
-} from '../../../';
+import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, useBorderAudioLevel, Video } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -36,6 +25,7 @@ import SettingsModal from '../Settings/SettingsModal';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+import { getFormattedCount } from '../../common/utils';
 import { UI_SETTINGS } from '../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
@@ -44,8 +34,7 @@ const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
     return 'You are the first to join';
   }
-  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
-  const formattedNum = formatter.format(peerCount);
+  const formattedNum = getFormattedCount(peerCount);
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
 };
 
@@ -104,10 +93,16 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authToken, skipPreview]);
 
+  useEffect(() => {
+    if (initialName) {
+      setName(initialName);
+    }
+  }, [initialName]);
+
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
-      <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '360px' }}>
+      <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
         <Logo />
         <Text
           variant="h4"
@@ -121,7 +116,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         >
           {previewHeader.sub_title}
         </Text>
-        <Flex justify="center" css={{ mt: '$14', mb: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
+        <Flex justify="center" css={{ mt: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
           {isStreamingOn ? (
             <Chip
               content="LIVE"
@@ -138,6 +133,8 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           align="center"
           justify="center"
           css={{
+            mt: '$14',
+            '@md': { mt: 0 },
             '@sm': { width: '100%' },
             flexDirection: 'column',
           }}
@@ -145,7 +142,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-      <Box css={{ w: '100%', maxWidth: '360px' }}>
+      <Box css={{ w: '100%', maxWidth: '640px' }}>
         <PreviewControls
           enableJoin={enableJoin}
           savePreferenceAndJoin={savePreferenceAndJoin}
@@ -183,19 +180,16 @@ const PreviewTile = ({ name, error }) => {
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
 
-  const {
-    aspectRatio: { width, height },
-  } = useTheme();
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
-        aspectRatio: width / height,
-        width: 'unset',
-        height: 'min(360px, 60vh)',
-        '@sm': {
-          height: 'unset',
-          width: 'min(360px, 100%)',
+        aspectRatio: 16 / 9,
+        width: 'min(640px, 80vw)',
+        overflow: 'clip',
+        '@md': {
+          aspectRatio: 9 / 16,
+          width: 'min(275px, 70vw)',
           maxWidth: '100%',
         },
       }}
@@ -246,7 +240,6 @@ const PreviewControls = ({ hideSettings }) => {
   );
 };
 
-// Bottom action sheet goes here, if isMobile
 export const PreviewSettings = React.memo(() => {
   const [open, setOpen] = useState(false);
 

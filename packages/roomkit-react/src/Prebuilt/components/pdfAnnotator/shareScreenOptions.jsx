@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import { useScreenShare } from '@100mslive/react-sdk';
-import { PdfShare, ScreenShare, StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import PDFShareImg from './../../images/pdf-share.png';
+import ScreenShareImg from './../../images/screen-share.png';
 import { Box, Button, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
@@ -28,7 +30,11 @@ export function ShareScreenOptions() {
   const { toggleScreenShare } = useScreenShare();
   return (
     <Fragment>
-      <Dropdown.Root open={openModals.has(MODALS.SHARE)} onOpenChange={value => updateState(MODALS.SHARE, value)}>
+      <Dropdown.Root
+        open={openModals.has(MODALS.SHARE)}
+        onOpenChange={value => updateState(MODALS.SHARE, value)}
+        modal={false}
+      >
         <Dropdown.Trigger asChild data-testid="sharing_btn" disabled={amIScreenSharing}>
           <ShareMenuIcon disabled={amIScreenSharing}>
             <Tooltip title="Share">
@@ -44,6 +50,7 @@ export function ShareScreenOptions() {
             w: '$96',
             maxHeight: '$96',
             p: 0,
+            bg: '$surface_dim',
           }}
         >
           <Dropdown.Item
@@ -95,12 +102,14 @@ export function ShareScreenOptions() {
                   pb: '0',
                 }}
               >
-                <ScreenShare
+                <img
+                  src={ScreenShareImg}
+                  alt="screen-share"
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: '$0',
-                    borderTopRightRadius: '$0',
+                    borderTopLeftRadius: '0.5rem', // TODO: create image component to solve for style hardcoding
+                    borderTopRightRadius: '0.5rem',
                   }}
                 />
               </IconButton>
@@ -139,12 +148,14 @@ export function ShareScreenOptions() {
                   pb: '0',
                 }}
               >
-                <PdfShare
+                <img
+                  src={PDFShareImg}
+                  alt="pdf-share"
                   width="100%"
                   height="100%"
                   style={{
-                    borderTopLeftRadius: '$0',
-                    borderTopRightRadius: '$0',
+                    borderTopLeftRadius: '0.5rem', // TODO: create image component to solve for style hardcoding
+                    borderTopRightRadius: '0.5rem',
                   }}
                 />
                 <Flex

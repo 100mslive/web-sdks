@@ -131,6 +131,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
             position: 'relative',
             flex: '1 1 0',
             minWidth: 0,
+            w: '100%',
             maxWidth: '100%',
             '@md': {
               mb: children ? '$8' : 0,
@@ -145,7 +146,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
               open={open}
             />
             <Dropdown.Portal>
-              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1001 }}>
                 {devices.map(device => {
                   return (
                     <Dropdown.Item

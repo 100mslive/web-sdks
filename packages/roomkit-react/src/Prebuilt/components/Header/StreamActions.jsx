@@ -1,7 +1,8 @@
-import React, { Fragment, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSRoomState,
+  selectHLSState,
   selectIsConnectedToRoom,
   selectPermissions,
   selectRoomState,
@@ -9,31 +10,65 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { RecordIcon, WrenchIcon } from '@100mslive/react-icons';
-import { Box, Button, config as cssConfig, Flex, Loading, Popover, Text, Tooltip } from '../../../';
-import GoLiveButton from '../GoLiveButton';
+import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
+import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
+import { Sheet } from '../../../Sheet';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
-import { useSidepaneToggle } from '../AppData/useSidepane';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { formatTime } from '../../common/utils';
+import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const hlsState = useHMSStore(selectHLSState);
+  const isMobile = useMedia(cssConfig.media.md);
+  const intervalRef = useRef(null);
+
+  const [liveTime, setLiveTime] = useState(0);
+
+  const startTimer = useCallback(() => {
+    intervalRef.current = setInterval(() => {
+      if (hlsState?.running) {
+        setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
+      }
+    }, 1000);
+  }, [hlsState?.running, hlsState?.variants]);
+
+  useEffect(() => {
+    if (hlsState?.running) {
+      startTimer();
+    }
+    if (!hlsState?.running && intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [hlsState.running, isMobile, startTimer]);
+
   if (!isHLSRunning && !isRTMPRunning) {
     return null;
   }
   return (
-    <Flex align="center">
+    <Flex
+      align="center"
+      gap="1"
+      css={{
+        border: '1px solid $border_default',
+        padding: '$4 $6 $4 $6',
+        borderRadius: '$1',
+      }}
+    >
       <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
-      <Text>
-        Live
-        <Text as="span" css={{ '@md': { display: 'none' } }}>
-          &nbsp;with {isHLSRunning ? 'HLS' : 'RTMP'}
-        </Text>
-      </Text>
+      <Flex align="center" gap="2">
+        <Text variant={!isMobile ? 'button' : 'body2'}>LIVE</Text>
+        <Text variant="caption">{hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}</Text>
+      </Flex>
     </Flex>
   );
 };
@@ -41,6 +76,7 @@ export const LiveStatus = () => {
 export const RecordingStatus = () => {
   const { isBrowserRecordingOn, isServerRecordingOn, isHLSRecordingOn, isRecordingOn } = useRecordingStreaming();
   const permissions = useHMSStore(selectPermissions);
+  const isMobile = useMedia(cssConfig.media.md);
 
   if (
     !isRecordingOn ||
@@ -50,8 +86,10 @@ export const RecordingStatus = () => {
       value => !!value,
     )
   ) {
-    return null;
+    // show recording icon in mobile without popover
+    if (!(isMobile && isRecordingOn)) return null;
   }
+
   return (
     <Tooltip
       title={getRecordingText({
@@ -60,25 +98,15 @@ export const RecordingStatus = () => {
         isHLSRecordingOn,
       })}
     >
-      <Box
+      <Flex
         css={{
           color: '$alert_error_default',
+          alignItems: 'center',
         }}
       >
         <RecordIcon width={24} height={24} />
-      </Box>
+      </Flex>
     </Tooltip>
-  );
-};
-
-const EndStream = () => {
-  const toggleStreaming = useSidepaneToggle(SIDE_PANE_OPTIONS.STREAMING);
-
-  return (
-    <Button data-testid="end_stream" variant="danger" icon onClick={toggleStreaming}>
-      <WrenchIcon />
-      Manage Stream
-    </Button>
   );
 };
 
@@ -192,24 +220,61 @@ const StartRecording = () => {
   );
 };
 
+/**
+ * @description only start recording button will be shown.
+ */
 export const StreamActions = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
-  const { isStreamingOn } = useRecordingStreaming();
   const roomState = useHMSStore(selectRoomState);
 
   return (
     <Flex align="center" css={{ gap: '$4' }}>
       <AdditionalRoomState />
-      <Flex align="center" css={{ gap: '$4', '@md': { display: 'none' } }}>
-        {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
-        <RecordingStatus />
-      </Flex>
-      {isConnected && !isMobile ? <StartRecording /> : null}
-      {isConnected && (permissions.hlsStreaming || permissions.rtmpStreaming) && (
-        <Fragment>{isStreamingOn ? <EndStream /> : <GoLiveButton />}</Fragment>
+      {!isMobile && (
+        <Flex align="center" css={{ gap: '$4' }}>
+          <RecordingStatus />
+          {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
+        </Flex>
       )}
+      {isConnected && !isMobile ? <StartRecording /> : null}
     </Flex>
+  );
+};
+
+export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
+  return (
+    <Sheet.Root open={true}>
+      <Sheet.Content>
+        <Sheet.Title css={{ p: '$10' }}>
+          <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
+            <Flex justify="start" align="center" gap="3">
+              <AlertTriangleIcon />
+              <Text variant="h5" css={{ c: '$alert_error_default' }}>
+                Stop Recording
+              </Text>
+            </Flex>
+            <Sheet.Close css={{ color: 'white' }} onClick={onClose}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Flex>
+        </Sheet.Title>
+        <HorizontalDivider />
+        <Box as="div" css={{ p: '$10', overflowY: 'scroll', maxHeight: '70vh' }}>
+          <Text variant="caption" css={{ c: '$on_surface_medium', pb: '$8' }}>
+            Are you sure you want to stop recording? You can’t undo this action.
+          </Text>
+          <Button
+            variant="danger"
+            css={{ width: '100%' }}
+            type="submit"
+            data-testid="popup_change_btn"
+            onClick={onStopRecording}
+          >
+            Stop
+          </Button>
+        </Box>
+      </Sheet.Content>
+    </Sheet.Root>
   );
 };

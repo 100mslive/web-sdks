@@ -14,7 +14,7 @@ export enum ThemeTypes {
 }
 
 export type ThemeContextValue = {
-  themeType: ThemeTypes;
+  themeType: string;
   theme: Theme;
   aspectRatio: { width: number; height: number };
   /**
@@ -27,7 +27,7 @@ export type ThemeContextValue = {
 };
 
 export type ThemeProviderProps = {
-  themeType?: ThemeTypes;
+  themeType?: string;
   theme?: Theme;
   aspectRatio?: { width: number; height: number };
 };
@@ -40,7 +40,7 @@ const defaultContext = {
     return;
   },
 };
-export const ThemeContext = React.createContext(defaultContext);
+export const ThemeContext = React.createContext<ThemeContextValue>(defaultContext);
 
 /**
  * Wrap this around your root component to get access to theme
@@ -72,16 +72,13 @@ export const HMSThemeProvider: React.FC<React.PropsWithChildren<ThemeProviderPro
     return updatedTheme;
   }, [userTheme, currentTheme, isBrowser]);
 
-  const toggleTheme = useCallback(
-    (themeToUpdateTo?: ThemeTypes) => {
-      if (themeToUpdateTo) {
-        setCurrentTheme(themeToUpdateTo);
-        return;
-      }
-      setCurrentTheme(ThemeTypes.default);
-    },
-    [currentTheme],
-  );
+  const toggleTheme = useCallback((themeToUpdateTo?: ThemeTypes) => {
+    if (themeToUpdateTo) {
+      setCurrentTheme(themeToUpdateTo);
+      return;
+    }
+    setCurrentTheme(ThemeTypes.default);
+  }, []);
 
   useEffect(() => {
     if (themeType) {

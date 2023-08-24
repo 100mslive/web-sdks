@@ -134,6 +134,7 @@ export const APP_DATA = {
   dropdownList: 'dropdownList',
   authToken: 'authToken',
   pdfConfig: 'pdfConfig',
+  minimiseInset: 'minimiseInset',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
@@ -143,8 +144,6 @@ export const UI_SETTINGS = {
   showStatsOnTiles: 'showStatsOnTiles',
   enableAmbientMusic: 'enableAmbientMusic',
   mirrorLocalVideo: 'mirrorLocalVideo',
-  activeSpeakerSorting: 'activeSpeakerSorting',
-  hideLocalVideo: 'hideLocalVideo',
 };
 
 export const SIDE_PANE_OPTIONS = {
