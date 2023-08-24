@@ -41,6 +41,7 @@ const ActionTileCount = styled(Text, {
   boxSizing: 'border-box',
   bg: '$surface_bright',
   r: '$round',
+  letterSpacing: '1.5px',
   fontSize: '$tiny !important',
   lineHeight: '$tiny !important',
 });
