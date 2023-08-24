@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import {
   DeviceType,
+  HMSRoomState,
   selectLocalVideoTrackID,
+  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useDevices,
@@ -64,6 +66,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const actions = useHMSActions();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
+  const roomState = useHMSStore(selectRoomState);
 
   return (
     <Fragment>
@@ -137,7 +140,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         )
       ) : null}
 
-      {localVideoTrack?.facingMode && !hideOptions ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
