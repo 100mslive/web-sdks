@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
 import {
@@ -15,6 +16,7 @@ import { EmojiCard } from './Footer/EmojiCard';
 import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
 import { Box } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useHLSViewerRole } from './AppData/useUISettings';
@@ -35,6 +37,7 @@ export const EmojiReaction = () => {
   const hlsViewerRole = useHLSViewerRole();
   const { isStreamingOn } = useRecordingStreaming();
   const filteredRoles = useMemo(() => roles.filter(role => role !== hlsViewerRole), [roles, hlsViewerRole]);
+  const isMobile = useMedia(cssConfig.media.md);
 
   const onEmojiEvent = useCallback(data => {
     window.showFlyingEmoji(data?.emojiId, data?.senderId);
@@ -70,7 +73,9 @@ export const EmojiReaction = () => {
   if (!isConnected || !isFeatureEnabled) {
     return null;
   }
-  return (
+  return isMobile ? (
+    <EmojiCard sendReaction={sendReaction} />
+  ) : (
     <Fragment>
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
