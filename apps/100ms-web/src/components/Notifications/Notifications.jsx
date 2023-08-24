@@ -38,7 +38,7 @@ export function Notifications() {
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   const toggleWidget = useWidgetToggle();
-  const roomState = useHMSStore(selectRoomState)
+  const roomState = useHMSStore(selectRoomState);
 
   useEffect(() => {
     if (!notification) {
@@ -46,7 +46,7 @@ export function Notifications() {
     }
     switch (notification.type) {
       case HMSNotificationTypes.METADATA_UPDATED:
-        if(roomState !== HMSRoomState.Connected){
+        if (roomState !== HMSRoomState.Connected) {
           return;
         }
         // Don't toast message when metadata is updated and raiseHand is false.
