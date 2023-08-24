@@ -4,9 +4,9 @@ import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVan
 import { Grid } from './VideoLayouts/Grid';
 import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
-// @ts-ignore: No implicit Any
-import { InsetTile } from '../layouts/InsetView';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+// @ts-ignore: No implicit Any
+import { InsetTile } from './InsetView';
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';

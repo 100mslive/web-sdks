@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Grid } from './VideoLayouts/Grid';
 import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
-// @ts-ignore: No implicit Any
-import { InsetTile } from '../layouts/InsetView';
+import { InsetTile } from './InsetView';
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import { SecondaryTiles } from './SecondaryTiles';
