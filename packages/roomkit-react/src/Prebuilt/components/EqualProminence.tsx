@@ -4,12 +4,16 @@ import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVan
 import { Grid } from './VideoLayouts/Grid';
 import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
 import { InsetTile } from '../layouts/InsetView';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Pagination } from './Pagination';
+// @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
 import { useTileLayout } from './hooks/useTileLayout';
+// @ts-ignore: No implicit Any
 import PeersSorter from '../common/PeersSorter';
+// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../common/constants';
 
 export function EqualProminence() {
@@ -25,7 +29,7 @@ export function EqualProminence() {
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
   const { ref, pagesWithTiles } = useTileLayout({
-    peers: sortedPeers.length === 0 ? [localPeer] : sortedPeers,
+    peers: sortedPeers.length === 0 ? (!localPeer ? [] : [localPeer]) : sortedPeers,
     maxTileCount,
   });
   const [page, setPage] = useState(0);

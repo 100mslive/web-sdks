@@ -2,14 +2,22 @@ import React, { useEffect } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { StyledPagination } from '../../Pagination';
 
-export const Pagination = ({ page, onPageChange, numPages }) => {
+export const Pagination = ({
+  page,
+  onPageChange,
+  numPages,
+}: {
+  page: number;
+  onPageChange: (page: number) => void;
+  numPages: number;
+}) => {
   const disableLeft = page === 0;
   const disableRight = page === numPages - 1;
-  const nextPage = e => {
+  const nextPage = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     onPageChange(Math.min(page + 1, numPages - 1));
   };
-  const prevPage = e => {
+  const prevPage = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     onPageChange(Math.max(page - 1, 0));
   };

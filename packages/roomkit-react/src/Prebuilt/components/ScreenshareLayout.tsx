@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
-// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import ScreenshareTile from './ScreenshareTile';

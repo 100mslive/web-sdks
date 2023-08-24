@@ -4,7 +4,6 @@ import { Grid } from './VideoLayouts/Grid';
 import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
 // @ts-ignore: No implicit Any
 import { InsetTile } from '../layouts/InsetView';
-// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import { SecondaryTiles } from './SecondaryTiles';
