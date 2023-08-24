@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSNotificationTypes,
+  HMSRoomState,
+  selectRoomState,
+  useHMSNotifications,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { useSubscribedNotifications } from '../AppData/useUISettings';
 import { isInternalRole } from '../../common/utils';
@@ -15,8 +21,11 @@ export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
   const isPeerJoinSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_JOINED);
   const isPeerLeftSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_LEFT);
-
+  const roomState = useHMSStore(selectRoomState);
   useEffect(() => {
+    if (roomState !== HMSRoomState.Connected) {
+      return;
+    }
     if (!notification || (notification?.data?.roleName && isInternalRole(notification.data.roleName))) {
       return;
     }

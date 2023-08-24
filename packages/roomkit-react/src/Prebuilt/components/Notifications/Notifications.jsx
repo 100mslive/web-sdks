@@ -1,6 +1,12 @@
 /* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSNotificationTypes,
+  HMSRoomState,
+  selectRoomState,
+  useHMSNotifications,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
@@ -23,6 +29,7 @@ export function Notifications() {
   const HLS_VIEWER_ROLE = useHLSViewerRole();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
+  const roomState = useHMSStore(selectRoomState);
 
   useEffect(() => {
     if (!notification) {
@@ -30,6 +37,9 @@ export function Notifications() {
     }
     switch (notification.type) {
       case HMSNotificationTypes.METADATA_UPDATED:
+        if (roomState !== HMSRoomState.Connected) {
+          return;
+        }
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
