@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
-import { Box, Flex } from '../../Layout';
+import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import ScreenshareTile from './ScreenshareTile';
@@ -26,12 +26,12 @@ export const ScreenshareLayout = () => {
   }, [activeSharePeerId, setActiveScreenSharePeer]);
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
-      <Box css={{ flex: '1 1 0', minHeight: 0, pr: '$10' }}>
+    <RoleProminenceLayout.Root>
+      <RoleProminenceLayout.ProminentSection css={{ pr: '$8', pb: '$8' }}>
         <ScreenshareTile peerId={peersSharing[page].id} />
-      </Box>
-      {peersSharing.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
+        <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />
+      </RoleProminenceLayout.ProminentSection>
       <SecondaryTiles peers={secondaryPeers} />
-    </Flex>
+    </RoleProminenceLayout.Root>
   );
 };

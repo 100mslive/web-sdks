@@ -34,7 +34,7 @@ export const Pagination = ({
   }
 
   return (
-    <StyledPagination.Root>
+    <StyledPagination.Root css={{ flexShrink: 0 }}>
       <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>
         <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>

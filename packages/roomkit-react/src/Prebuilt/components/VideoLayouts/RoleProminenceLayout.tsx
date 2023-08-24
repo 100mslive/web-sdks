@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Flex } from '../../../Layout';
-import { config as cssConfig } from '../../../Theme';
+import { config as cssConfig, CSS } from '../../../Theme';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
 
@@ -12,9 +12,9 @@ const Root = ({ children }: React.PropsWithChildren) => (
   </Flex>
 );
 
-const ProminentSection = ({ children }: React.PropsWithChildren) => {
+const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css: CSS }>) => {
   return (
-    <Flex direction="column" css={{ flex: '1 1 0' }}>
+    <Flex direction="column" css={{ flex: '1 1 0', minHeight: 0, ...css }}>
       {children}
     </Flex>
   );
