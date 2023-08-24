@@ -159,9 +159,6 @@ export class TrackManager {
         this.processPendingTracks();
       } else {
         track.setEnabled(!trackEntry.mute);
-        if (track.type === 'audio') {
-          console.log({ trackEntry });
-        }
         const eventType = this.processTrackUpdate(track as HMSRemoteTrack, currentTrackStateInfo, trackEntry);
         if (eventType) {
           this.listener?.onTrackUpdate(eventType, track, hmsPeer);
