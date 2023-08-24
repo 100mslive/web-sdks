@@ -220,7 +220,9 @@ export const TileMenuContent = props => {
             }}
           >
             <PencilIcon />
-            <span>Change Name</span>
+            <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+              Change Name
+            </Text>
           </StyledMenuTile.ItemButton>
         ) : null}
       </>

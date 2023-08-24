@@ -50,7 +50,7 @@ export const ChangeNameContent = ({
           required
           data-testid="change_name_field"
           onKeyDown={async e => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
               changeName();
             }
