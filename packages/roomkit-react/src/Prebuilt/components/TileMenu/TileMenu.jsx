@@ -113,7 +113,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8' }}>
+              <Box css={{ px: '$8', pb: '$10' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
