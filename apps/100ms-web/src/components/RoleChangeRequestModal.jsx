@@ -31,8 +31,10 @@ export const RoleChangeRequestModal = () => {
   const body = (
     <>
       <Text
-        css={{ fontWeight: 400, c: "$on_surface_medium" }}
-      >{`${roleChangeRequest?.requestedBy?.name} has requested you to change your role to ${roleChangeRequest?.role?.name}.`}</Text>
+        css={{ fontWeight: 400, c: "$on_surface_medium", textAlign: "center" }}
+      >
+        Setup your audio and video before joining
+      </Text>
       <Flex
         align="center"
         justify="center"
@@ -49,7 +51,7 @@ export const RoleChangeRequestModal = () => {
 
   return (
     <RequestDialog
-      title="Role Change Request"
+      title={`You're invited to join the ${roleChangeRequest.role.name} role`}
       onOpenChange={value => {
         if (!value) {
           hmsActions.cancelMidCallPreview();

@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { selectLocalPeerName, selectRoleChangeRequest, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
-import { Flex, Text } from '../../';
-import { RequestDialog } from '../primitives/DialogContent';
+import { Box, Button, Dialog, Flex, Text } from '../../';
 import { useIsHeadless } from './AppData/useUISettings';
 
 export const RoleChangeRequestModal = () => {
@@ -25,15 +24,16 @@ export const RoleChangeRequestModal = () => {
 
   const body = (
     <>
-      <Text
-        css={{ fontWeight: 400, c: '$on_surface_medium' }}
-      >{`${roleChangeRequest?.requestedBy?.name} has requested you to change your role to ${roleChangeRequest?.role?.name}.`}</Text>
+      <Text css={{ fontWeight: 400, c: '$on_surface_medium', textAlign: 'center' }}>
+        Setup your audio and video before joining
+      </Text>
       <Flex
         align="center"
         justify="center"
         css={{
           '@sm': { width: '100%' },
           flexDirection: 'column',
+          mt: '$6',
         }}
       >
         <PreviewTile name={name} />
@@ -44,7 +44,7 @@ export const RoleChangeRequestModal = () => {
 
   return (
     <RequestDialog
-      title="Role Change Request"
+      title={`You're invited to join the ${roleChangeRequest.role.name} role`}
       onOpenChange={value => {
         if (!value) {
           hmsActions.cancelMidCallPreview();
@@ -59,3 +59,32 @@ export const RoleChangeRequestModal = () => {
     />
   );
 };
+
+const RequestDialog = ({ open = true, onOpenChange, title, body, actionText = 'Accept', onAction, Icon }) => (
+  <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Portal>
+      <Dialog.Overlay />
+      <Dialog.Content css={{ p: '$10' }}>
+        <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>
+          {Icon ? Icon : null}
+          <Text variant="h6">{title}</Text>
+        </Dialog.Title>
+        <Box css={{ mt: '$4', mb: '$10' }}>{body}</Box>
+        <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
+          <Box css={{ width: '50%' }}>
+            <Dialog.Close css={{ width: '100%' }}>
+              <Button variant="standard" outlined css={{ width: '100%' }}>
+                Cancel
+              </Button>
+            </Dialog.Close>
+          </Box>
+          <Box css={{ width: '50%' }}>
+            <Button variant="primary" css={{ width: '100%' }} onClick={onAction}>
+              {actionText}
+            </Button>
+          </Box>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+);
