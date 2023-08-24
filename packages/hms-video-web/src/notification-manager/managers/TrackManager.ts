@@ -134,7 +134,6 @@ export class TrackManager {
     }
   };
 
-  // eslint-disable-next-line complexity
   handleTrackUpdate = (params: TrackStateNotification, callListener = true) => {
     const hmsPeer = this.store.getPeerById(params.peer.peer_id);
     if (!hmsPeer) {
