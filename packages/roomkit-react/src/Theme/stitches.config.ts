@@ -82,7 +82,7 @@ export const createTheme = ({
   theme,
   className,
 }: {
-  themeType: ThemeType;
+  themeType: string;
   className?: string;
   theme?: Partial<Theme>;
 }) => {

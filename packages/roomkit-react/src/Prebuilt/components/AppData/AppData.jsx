@@ -48,8 +48,6 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
-    [UI_SETTINGS.activeSpeakerSorting]: process.env.REACT_APP_ENV === 'qa',
-    [UI_SETTINGS.hideLocalVideo]: false,
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,
@@ -72,6 +70,7 @@ const initialAppData = {
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
   [APP_DATA.authToken]: '',
+  [APP_DATA.minimiseInset]: false,
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {

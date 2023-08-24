@@ -25,6 +25,7 @@ export const UploadedFile = ({
             w: 'min(420px,80%)',
             overflow: 'auto',
             p: '$10',
+            bg: '$surface_dim',
           }}
         >
           <Flex direction="column">
