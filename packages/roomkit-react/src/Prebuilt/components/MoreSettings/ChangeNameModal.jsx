@@ -49,7 +49,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
   if (isMobile) {
     return (
       <Sheet.Root defaultOpen onOpenChange={onOpenChange}>
-        <Sheet.Content css={{ bg: '$surface_dim', py: '$8', px: 0 }}>
+        <Sheet.Content css={{ bg: '$surface_dim', py: '$8 0', pb: '$10' }}>
           <ChangeNameContent {...props} />
         </Sheet.Content>
       </Sheet.Root>
