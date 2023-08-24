@@ -20,6 +20,11 @@ export const Pagination = ({ page, onPageChange, numPages }) => {
       onPageChange(Math.max(0, numPages - 1));
     }
   }, [numPages, onPageChange, page]);
+
+  if (numPages <= 1) {
+    return null;
+  }
+
   return (
     <StyledPagination.Root>
       <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>

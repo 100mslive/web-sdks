@@ -48,7 +48,7 @@ export const SecondaryTiles = ({ peers }: { peers: HMSPeer[] }) => {
           );
         })}
       </Flex>
-      {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
+      <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />
     </Flex>
   );
 };

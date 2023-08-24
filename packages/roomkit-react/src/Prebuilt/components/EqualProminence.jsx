@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { Box, Flex } from '../../Layout';
+import { Grid } from './VideoLayouts/Grid';
+import { Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Pagination } from './Pagination';
-import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
 import { useTileLayout } from './hooks/useTileLayout';
 import PeersSorter from '../common/PeersSorter';
@@ -45,34 +45,8 @@ export function EqualProminence() {
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
-      <Box
-        ref={ref}
-        css={{
-          flex: '1 1 0',
-          gap: '$4',
-          display: 'flex',
-          placeContent: 'center',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexFlow: 'row wrap',
-          minHeight: 0,
-        }}
-      >
-        {pagesWithTiles[page]?.map(tile => {
-          return (
-            <VideoTile
-              key={tile.track?.id || tile.peer?.id}
-              width={tile.width}
-              height={tile.height}
-              peerId={tile.peer?.id}
-              trackId={tile.track?.id}
-              rootCSS={{ padding: 0 }}
-              objectFit="contain"
-            />
-          );
-        })}
-      </Box>
-      {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
+      <Grid tiles={pagesWithTiles[page]} ref={ref} />
+      <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />
       {isInsetEnabled && sortedPeers.length > 0 && <InsetTile />}
     </Flex>
   );
