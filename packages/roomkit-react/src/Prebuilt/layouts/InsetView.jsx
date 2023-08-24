@@ -168,7 +168,11 @@ const MinimisedTile = ({ setMinimised }) => {
     <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
       <AudioVideoToggle hideOptions={true} />
       <Text>You</Text>
-      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
+      <IconButton
+        onClick={() => setMinimised(false)}
+        css={{ bg: 'transparent', border: 'transparent' }}
+        className="__cancel-drag-event"
+      >
         <ExpandIcon />
       </IconButton>
     </Flex>

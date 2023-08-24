@@ -70,7 +70,13 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       {toggleAudio ? (
         hideOptions ? (
           <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
-            <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
+            <IconButton
+              active={isLocalAudioEnabled}
+              onClick={toggleAudio}
+              key="toggleAudio"
+              data-testid="audio_btn"
+              className="__cancel-drag-event"
+            >
               {!isLocalAudioEnabled ? (
                 <MicOffIcon data-testid="audio_off_btn" />
               ) : (
@@ -99,7 +105,13 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       {toggleVideo ? (
         hideOptions ? (
           <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
-            <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
+            <IconButton
+              key="toggleVideo"
+              active={isLocalVideoEnabled}
+              onClick={toggleVideo}
+              data-testid="video_btn"
+              className="__cancel-drag-event"
+            >
               {!isLocalVideoEnabled ? (
                 <VideoOffIcon data-testid="video_off_btn" />
               ) : (
