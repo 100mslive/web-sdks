@@ -22,7 +22,7 @@ import {
 import { Box, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
-import { EmojiCard } from '../../Footer/EmojiCard';
+import { EmojiReaction } from '../../EmojiReaction';
 import { StopRecordingInSheet } from '../../Header/StreamActions';
 import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
@@ -264,7 +264,7 @@ export const MwebOptions = () => {
             mx: '$4',
           }}
         >
-          <EmojiCard />
+          <EmojiReaction />
         </Box>
       )}
       {showRecordingOn && (
