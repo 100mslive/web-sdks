@@ -44,6 +44,7 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   errors: HMSException[]; // for the convenience of debugging and seeing any error in devtools
   sessionStore: T['sessionStore'];
   polls: Record<string, HMSPoll>;
+  /** @internal */
   hideLocalPeer: boolean;
 }
 

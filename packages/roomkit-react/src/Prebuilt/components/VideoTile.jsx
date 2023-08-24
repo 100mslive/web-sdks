@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -9,20 +10,32 @@ import {
   selectVideoTrackByPeerID,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { BrbIcon, HandRaiseFilledIcon, MicOffIcon } from '@100mslive/react-icons';
+import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
+import TileMenu from './TileMenu/TileMenu';
 import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
+import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
-import TileMenu from './TileMenu';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { useShowStreamingUI } from '../common/hooks';
 import { UI_SETTINGS } from '../common/constants';
 
-const Tile = ({ peerId, trackId, width, height, objectFit = 'cover', rootCSS = {}, containerCSS = {} }) => {
+const Tile = ({
+  peerId,
+  trackId,
+  width,
+  height,
+  objectFit = 'cover',
+  canMinimise = false,
+  isDragabble = false,
+  rootCSS = {},
+  containerCSS = {},
+}) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
@@ -38,6 +51,8 @@ const Tile = ({ peerId, trackId, width, height, objectFit = 'cover', rootCSS = {
   const borderAudioRef = useBorderAudioLevel(audioTrack?.id);
   const isVideoDegraded = track?.degraded;
   const isLocal = localPeerID === peerId;
+  const isMobile = useMedia(cssConfig.media.md);
+  const showStreamingUI = useShowStreamingUI();
   const label = getVideoTileLabel({
     peerName,
     track,
@@ -123,11 +138,18 @@ const Tile = ({ peerId, trackId, width, height, objectFit = 'cover', rootCSS = {
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {isMouseHovered && !isHeadless ? (
-            <TileMenu peerID={peerId} audioTrackID={audioTrack?.id} videoTrackID={track?.id} />
+          {(isMouseHovered || isDragabble) && !isHeadless ? (
+            <TileMenu
+              peerID={peerId}
+              audioTrackID={audioTrack?.id}
+              videoTrackID={track?.id}
+              canMinimise={canMinimise}
+            />
           ) : null}
           <PeerMetadata peerId={peerId} />
-          <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />
+          {showStreamingUI && isMobile ? null : (
+            <TileConnection hideLabel={hideLabel} name={label} isTile peerId={peerId} width={width} />
+          )}
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>
@@ -145,12 +167,12 @@ const PeerMetadata = ({ peerId }) => {
     <Fragment>
       {isHandRaised ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="raiseHand_icon_onTile">
-          <HandRaiseFilledIcon width={40} height={40} />
+          <HandIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
       {isBRB ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
-          <BrbIcon width={40} height={40} />
+          <BrbTileIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
     </Fragment>

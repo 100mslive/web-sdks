@@ -21,11 +21,11 @@ import {
   SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../../';
+import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
+import { ParticipantFilter } from '../Header/ParticipantFilter';
 import { RoleChangeModal } from '../RoleChangeModal';
-import { ParticipantFilter } from './ParticipantFilter';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
@@ -232,7 +232,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
   return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger asChild data-testid="participant_more_actions" css={{ p: '$2', r: '$0' }} tabIndex={0}>
         <Text>
           <VerticalMenuIcon />
@@ -320,8 +320,8 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
       </Box>
       <Input
         type="text"
-        placeholder={placeholder || 'Find what you are looking for'}
-        css={{ w: '100%', pl: '$14' }}
+        placeholder={placeholder || 'Search among participants'}
+        css={{ w: '100%', pl: '$14', bg: '$surface_bright' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();

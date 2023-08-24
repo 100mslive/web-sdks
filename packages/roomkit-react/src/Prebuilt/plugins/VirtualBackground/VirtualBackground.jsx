@@ -9,6 +9,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
+import { ActionTile } from '../../components/MoreSettings/ActionTile';
 import { Loading } from '../../../Loading';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
@@ -16,13 +17,19 @@ import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
 import { getRandomVirtualBackground } from './vbutils';
 import { FEATURE_LIST } from '../../common/constants';
 
-export const VirtualBackground = () => {
+export const VirtualBackground = ({
+  asActionTile = false,
+  onVBClick = () => {
+    return;
+  },
+}) => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const role = useHMSStore(selectLocalPeerRole);
   const [isVBLoading, setIsVBLoading] = useState(false);
   const [isVBSupported, setIsVBSupported] = useState(false);
+  const [isVBOn, setIsVBOn] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent('HMSVB'));
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.VIDEO_PLUGINS);
@@ -67,6 +74,23 @@ export const VirtualBackground = () => {
 
   if (!isAllowedToPublish.video || !isVBSupported || !isFeatureEnabled) {
     return null;
+  }
+  if (asActionTile) {
+    return (
+      <ActionTile.Root
+        data-testid="virtual_bg_btn"
+        active={isVBPresent}
+        disabled={isVBLoading}
+        onClick={() => {
+          setIsVBOn(!isVBOn);
+          !isVBPresent ? addPlugin() : removePlugin();
+          onVBClick();
+        }}
+      >
+        <VirtualBackgroundIcon />
+        <ActionTile.Title>Virtual Background</ActionTile.Title>
+      </ActionTile.Root>
+    );
   }
 
   return (

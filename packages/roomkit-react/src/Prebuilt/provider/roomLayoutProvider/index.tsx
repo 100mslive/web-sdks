@@ -7,7 +7,7 @@ import { useFetchRoomLayout } from './hooks/useFetchRoomLayout';
 
 export type RoomLayoutProviderProps = {
   roomLayoutEndpoint?: string;
-  overrideLayout?: Layout;
+  overrideLayout?: Partial<Layout>;
 };
 
 export const RoomLayoutContext = React.createContext<Layout | undefined>(undefined);

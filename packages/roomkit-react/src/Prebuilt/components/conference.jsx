@@ -9,11 +9,13 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Footer } from './Footer/Footer';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
+import { ActivatedPIP } from './PIP/PIPComponent';
+import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
-import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
@@ -106,6 +108,12 @@ const Conference = () => {
     }
   }, [isHeadless, hmsActions]);
 
+  useEffect(() => {
+    return () => {
+      PictureInPicture.stop().catch(error => console.error('stopping pip', error));
+    };
+  }, []);
+
   if (!isConnectedToRoom) {
     return <FullPageProgress loadingText="Joining..." />;
   }
@@ -137,7 +145,11 @@ const Conference = () => {
           w: '100%',
           flex: '1 1 0',
           minHeight: 0,
+          px: '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
+          '@lg': {
+            px: '$4',
+          },
         }}
         id="conferencing"
         data-testid="conferencing"
@@ -164,6 +176,7 @@ const Conference = () => {
       )}
       <RoleChangeRequestModal />
       <HLSFailureModal />
+      <ActivatedPIP />
     </Flex>
   );
 };

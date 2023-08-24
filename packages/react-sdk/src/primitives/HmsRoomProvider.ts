@@ -7,8 +7,8 @@ import {
   HMSNotifications,
   HMSNotificationTypeParam,
   HMSReactiveStore,
-  HMSStats,
   HMSStatsStore,
+  HMSStatsStoreWrapper,
   HMSStore,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
@@ -19,7 +19,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
   actions?: HMSActions<T>;
   store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
-  stats?: HMSStats;
+  stats?: HMSStatsStoreWrapper;
   /**
    * if true this will enable webrtc stats collection
    */
