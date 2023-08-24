@@ -28,6 +28,7 @@ const SidePane = ({ css = {} }) => {
         bg: '$surface_default',
         r: '$1',
         ml: '$8',
+        flexShrink: 0,
         position: 'relative',
         ...css,
         '@lg': {

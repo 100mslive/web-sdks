@@ -3,6 +3,7 @@ import { useMeasure, useMedia } from 'react-use';
 import {
   getPeersWithTiles,
   selectLocalPeer,
+  selectPeers,
   selectRemotePeers,
   selectTracksMap,
   useHMSStore,
@@ -11,6 +12,7 @@ import {
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { InsetTile } from '../layouts/InsetView';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Pagination } from './Pagination';
 import VideoTile from './VideoTile';
 import { useUISettings } from './AppData/useUISettings';
@@ -20,7 +22,11 @@ import { UI_SETTINGS } from '../common/constants';
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
 
 export function EqualProminence() {
-  const peers = useHMSStore(selectRemotePeers);
+  const layout = useRoomLayout();
+  const { enable_local_tile_inset: isInsetEnabled = true } =
+    //@ts-ignore
+    layout?.screens?.conferencing?.default?.elements?.video_tile_layout?.grid || {};
+  const peers = useHMSStore(isInsetEnabled ? selectRemotePeers : selectPeers);
   const [sortedPeers, setSortedPeers] = useState(peers);
   const localPeer = useHMSStore(selectLocalPeer);
   const vanillaStore = useHMSVanillaStore();
@@ -168,7 +174,7 @@ export function EqualProminence() {
         })}
       </Box>
       {pagesWithTiles.length > 1 && <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />}
-      {peers.length > 0 && <InsetTile />}
+      {isInsetEnabled && sortedPeers.length > 0 && <InsetTile />}
     </Flex>
   );
 }

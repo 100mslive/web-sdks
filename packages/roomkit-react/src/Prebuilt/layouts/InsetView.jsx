@@ -1,7 +1,13 @@
 import React, { Fragment, useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectRemotePeers, selectRolesMap, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsAllowedToPublish,
+  selectLocalPeer,
+  selectRemotePeers,
+  selectRolesMap,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { AudioVideoToggle } from '../components/AudioVideoToggle';
 import { FirstPersonDisplay } from '../components/FirstPersonDisplay';
@@ -162,7 +168,11 @@ const MinimisedTile = ({ setMinimised }) => {
     <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
       <AudioVideoToggle hideOptions={true} />
       <Text>You</Text>
-      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
+      <IconButton
+        onClick={() => setMinimised(false)}
+        css={{ bg: 'transparent', border: 'transparent' }}
+        className="__cancel-drag-event"
+      >
         <ExpandIcon />
       </IconButton>
     </Flex>
@@ -173,6 +183,7 @@ export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const localPeer = useHMSStore(selectLocalPeer);
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const aspectRatio = isMobile ? 9 / 16 : 16 / 9;
   let height = 180;
@@ -204,8 +215,12 @@ export const InsetTile = () => {
     };
   }, []);
 
+  if (!isAllowedToPublish.audio && !isAllowedToPublish.video) {
+    return null;
+  }
+
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef}>
+    <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
         css={{
@@ -235,6 +250,7 @@ export const InsetTile = () => {
             }}
             width={width}
             height={height}
+            isDragabble={isMobile}
             canMinimise
           />
         )}

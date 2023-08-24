@@ -11,6 +11,7 @@ import {
 import {
   MicOffIcon,
   MicOnIcon,
+  PencilIcon,
   PinIcon,
   RemoveUserIcon,
   ShareScreenIcon,
@@ -27,7 +28,8 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
-import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
+import { useIsFeatureEnabled } from '../hooks/useFeatures';
+import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
 const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
@@ -188,6 +190,9 @@ export const TileMenuContent = props => {
     closeSheetOnClick = () => {
       return;
     },
+    openNameChangeModal = () => {
+      return;
+    },
   } = props;
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
@@ -199,12 +204,27 @@ export const TileMenuContent = props => {
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
+  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
+
   return isLocal ? (
     (showPinAction || canMinimise) && (
       <>
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         {canMinimise && <MinimiseInset />}
+        {isChangeNameEnabled ? (
+          <StyledMenuTile.ItemButton
+            onClick={() => {
+              openNameChangeModal();
+              closeSheetOnClick();
+            }}
+          >
+            <PencilIcon />
+            <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+              Change Name
+            </Text>
+          </StyledMenuTile.ItemButton>
+        ) : null}
       </>
     )
   ) : (
@@ -222,6 +242,7 @@ export const TileMenuContent = props => {
           <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
+
       {toggleAudio ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
@@ -235,6 +256,7 @@ export const TileMenuContent = props => {
           <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
+
       {audioTrackID ? (
         <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
           <Flex align="center" gap={1}>
@@ -246,13 +268,16 @@ export const TileMenuContent = props => {
           <Slider css={{ my: '0.5rem' }} step={5} value={[volume]} onValueChange={e => setVolume(e[0])} />
         </StyledMenuTile.VolumeItem>
       ) : null}
+
       {showPinAction && (
         <>
           <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />
           {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         </>
       )}
+
       <SimulcastLayers trackId={videoTrackID} />
+
       {removeOthers ? (
         <StyledMenuTile.RemoveItem
           css={{ ...spacingCSS, borderTop: 'none' }}

@@ -1,33 +1,55 @@
 import React from 'react';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { styled } from '../../../Theme';
 
-export const ActionTile = ({ icon, title, active, onClick, disabled = false, setOpenOptionsSheet }) => {
-  return (
-    <Flex
-      direction="column"
-      align="center"
-      onClick={() => {
-        if (!disabled) {
-          onClick();
-          setOpenOptionsSheet(false);
-        }
-      }}
-      css={{
-        p: '$4 $2',
-        bg: active ? '$surface_bright' : '',
-        color: disabled ? '$on_surface_low' : '$on_surface_high',
-        gap: '$4',
-        r: '$1',
-        '&:hover': {
-          bg: '$surface_bright',
-        },
-      }}
-    >
-      {icon}
-      <Text variant="xs" css={{ fontWeight: '$semiBold', color: 'inherit', textAlign: 'center' }}>
-        {title}
-      </Text>
-    </Flex>
-  );
+const ActionTileRoot = ({ active, disabled = false, children, onClick, ...props }) => (
+  <Flex
+    {...props}
+    css={{
+      flexDirection: 'column',
+      alignItems: 'center',
+      p: '$4 $2',
+      position: 'relative',
+      bg: active ? '$surface_bright' : '',
+      color: disabled ? '$on_surface_low' : '$on_surface_high',
+      gap: '$4',
+      r: '$1',
+      '&:hover': {
+        bg: '$surface_bright',
+      },
+    }}
+    onClick={() => {
+      if (!disabled) {
+        onClick();
+      }
+    }}
+  >
+    {children}
+  </Flex>
+);
+
+const ActionTileCount = styled(Text, {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  fontWeight: '$semiBold',
+  color: '$on_surface_high',
+  p: '$1 $2',
+  bg: '$surface_bright',
+  r: '$round',
+  fontSize: '$tiny !important',
+});
+
+const ActionTileTitle = styled(Text, {
+  fontWeight: '$semiBold',
+  color: 'inherit',
+  textAlign: 'center',
+  fontSize: '$xs !important',
+});
+
+export const ActionTile = {
+  Root: ActionTileRoot,
+  Title: ActionTileTitle,
+  Count: ActionTileCount,
 };
