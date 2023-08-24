@@ -43,12 +43,12 @@ export const ChangeNameContent = ({
         <Input
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
+          inputMode="none"
           onChange={e => {
             setCurrentName(e.target.value);
           }}
           autoComplete="name"
           required
-          type="text"
           data-testid="change_name_field"
           onKeyDown={async e => {
             if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
