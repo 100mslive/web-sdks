@@ -36,7 +36,7 @@ const ActionTileCount = styled(Text, {
   fontWeight: '$semiBold',
   color: '$on_surface_high',
   p: '$1 $2',
-  minWidth: '20px',
+  minWidth: '$9',
   textAlign: 'center',
   boxSizing: 'border-box',
   bg: '$surface_bright',
