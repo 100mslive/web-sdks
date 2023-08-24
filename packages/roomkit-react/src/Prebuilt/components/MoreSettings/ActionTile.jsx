@@ -42,6 +42,7 @@ const ActionTileCount = styled(Text, {
   bg: '$surface_bright',
   r: '$round',
   fontSize: '$tiny !important',
+  lineHeight: '$tiny !important',
 });
 
 const ActionTileTitle = styled(Text, {
