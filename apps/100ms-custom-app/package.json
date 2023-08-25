@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "100ms_edtech_template": "0.1.4",
-    "@100mslive/react-icons": "0.8.13",
-    "@100mslive/roomkit-react": "0.1.4",
+    "@100mslive/react-icons": "0.8.14",
+    "@100mslive/roomkit-react": "0.1.5",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "lodash.merge": "^4.6.2",
