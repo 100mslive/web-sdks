@@ -1,36 +1,33 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSPeer, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { LayoutProps } from './VideoLayouts/interface';
 import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
 import { config as cssConfig } from '../../Theme';
-// @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
 import { usePagesWithTiles } from './hooks/useTileLayout';
-import PeersSorter from '../common/PeersSorter';
 
-export const SecondaryTiles = ({ peers }: { peers: HMSPeer[] }) => {
+export const SecondaryTiles = ({ peers, onPageChange, onPageSize }: LayoutProps) => {
   const isMobile = useMedia(cssConfig.media.md);
   const maxTileCount = isMobile ? 2 : 4;
-  const [sortedPeers, setSortedPeers] = useState(peers);
-  const pagesWithTiles = usePagesWithTiles({ peers: sortedPeers, maxTileCount });
+  const pagesWithTiles = usePagesWithTiles({ peers, maxTileCount });
   const [page, setPage] = useState(0);
-  const vanillaStore = useHMSVanillaStore();
-  const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
+  const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    if (page !== 0) {
-      return;
-    }
-    peersSorter.setPeersAndTilesPerPage({
-      peers,
-      tilesPerPage: maxTileCount,
-    });
-    peersSorter.onUpdate(setSortedPeers);
-  }, [page, peers, peersSorter, maxTileCount]);
+    onPageSize?.(pageSize);
+  }, [pageSize, onPageSize]);
+  onPageSize?.(maxTileCount);
 
   return (
     <RoleProminenceLayout.SecondarySection tiles={pagesWithTiles[page]}>
-      <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />
+      <Pagination
+        page={page}
+        onPageChange={page => {
+          setPage(page);
+          onPageChange?.(page);
+        }}
+        numPages={pagesWithTiles.length}
+      />
     </RoleProminenceLayout.SecondarySection>
   );
 };
