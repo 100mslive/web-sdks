@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Box, Button, Flex, IconButton, Text } from "@100mslive/react-ui";
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -11,6 +10,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { ChevronDownIcon, CrossIcon, PinIcon } from "@100mslive/react-icons";
+import { Box, Button, Flex, IconButton, Text } from "@100mslive/roomkit-react";
 import { AnnotisedMessage, ChatBody } from "./ChatBody";
 import { ChatFooter } from "./ChatFooter";
 import { ChatHeader } from "./ChatHeader";
@@ -27,7 +27,12 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: "$8", color: "$textMedEmp", bg: "$surfaceLight", r: "$1" }}
+      css={{
+        p: "$8",
+        color: "$on_surface_medium",
+        bg: "$surface_bright",
+        r: "$1",
+      }}
       align="center"
       justify="between"
     >
@@ -37,7 +42,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
       <Box
         css={{
           ml: "$8",
-          color: "$textMedEmp",
+          color: "$on_surface_medium",
           w: "100%",
           maxHeight: "$18",
           overflowY: "auto",

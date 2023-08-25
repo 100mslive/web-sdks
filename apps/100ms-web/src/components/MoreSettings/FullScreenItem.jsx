@@ -1,6 +1,6 @@
 import React from "react";
 import { ExpandIcon } from "@100mslive/react-icons";
-import { Dropdown, Text } from "@100mslive/react-ui";
+import { Dropdown, Text } from "@100mslive/roomkit-react";
 import { useIsFeatureEnabled } from "../hooks/useFeatures";
 import { useFullscreen } from "../hooks/useFullscreen";
 import { FEATURE_LIST } from "../../common/constants";
@@ -15,6 +15,7 @@ export const FullScreenItem = () => {
 
   return (
     <Dropdown.Item
+      css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
       onClick={() => {
         toggleFullscreen();
       }}

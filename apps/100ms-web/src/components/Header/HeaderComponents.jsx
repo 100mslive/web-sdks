@@ -12,7 +12,7 @@ import {
   Text,
   textEllipsis,
   useTheme,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { useLogo } from "../AppData/useUISettings";
 import { isStreamingKit } from "../../common/utils";
 
@@ -22,7 +22,11 @@ export const SpeakerTag = () => {
     <Flex
       align="center"
       justify="center"
-      css={{ flex: "1 1 0", color: "$textPrimary", "@md": { display: "none" } }}
+      css={{
+        flex: "1 1 0",
+        color: "$on_surface_high",
+        "@md": { display: "none" },
+      }}
     >
       <VolumeOneIcon />
       <Text

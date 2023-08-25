@@ -26,7 +26,7 @@ export class HMSAudioTrack extends HMSTrack {
     // Don't subscribe to audio when volume is 0
     await this.subscribeToAudio(value === 0 ? false : this.enabled);
     if (this.audioElement) {
-      this.audioElement.volume = Math.floor(value / 100);
+      this.audioElement.volume = value / 100;
     }
   }
 

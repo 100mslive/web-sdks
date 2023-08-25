@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgClosedCaptionIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <rect x={3.625} y={5.625} width={16.75} height={11.75} rx={2.875} stroke="currentColor" strokeWidth={1.25} />
@@ -10,5 +9,4 @@ const SvgClosedCaptionIcon = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
-
 export default SvgClosedCaptionIcon;

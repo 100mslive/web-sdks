@@ -24,7 +24,7 @@ test(`Verify room URL`, async ({ page: nativePage }) => {
 
 const peersCount = Number(process.env.multi_peer_count);
 
-//publishing role and non publishing roll
+//publishing role and non publishing role
 test(`Verify Join peers`, async ({ context }) => {
   const pages = await PageWrapper.openPages(context, peersCount);
 
@@ -59,7 +59,7 @@ test(`Verify network on tile and peerlist`, async ({ context }) => {
 test(`Verify emoji container text and is clickable`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.assertVisible(page.footer.emoji_btn);
-  await page.click(page.footer.emoji_btn)
+  await page.click(page.footer.emoji_btn);
   await page.assertVisible(page.footer.emoji_container);
 
   //verify emoji container text
@@ -94,7 +94,7 @@ test(`Verify SFN cta in advanced settings`, async ({ page: nativePage }) => {
 });
 
 
-test(`Verify full screen page`, async ({ page: nativePage }) => {
+test.skip(`Verify full screen page`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   // switch to full screen mode
   await page.click(page.footer.more_settings_btn, page.footer.full_screen_btn);
@@ -108,18 +108,20 @@ test(`Verify full screen page`, async ({ page: nativePage }) => {
   await page.close();
 });
 
-test(`Verify valid embed url and stop embed`, async ({ page: nativePage }) => {
+//Disabled it on 24th July as this feature(Just embed) doesn't exist anymore
+test.skip(`Verify valid embed url and stop embed`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url)
-  await page.click(page.footer.embed_cta)
-  await page.assertNotVisible(page.center.first_person_img)
+  await page.click(page.footer.embed_share_cta);
+  await page.assertNotVisible(page.center.first_person_img);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta, page.footer.stop_embed_cta);
   await page.endRoom();
   await page.close();
 });
 
-test(`Verify invalid embed url`, async ({ page: nativePage }) => {
+//Disabled it on 24th July as this feature(Just embed) doesn't exist anymore
+test.skip(`Verify invalid embed url`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.invalid_embed_url)
@@ -131,11 +133,12 @@ test(`Verify invalid embed url`, async ({ page: nativePage }) => {
   await page.close();
 });
 
-test(`Update embed url`, async ({ page: nativePage }) => {
+//Disabled it on 24th July as this feature(Just embed) doesn't exist anymore
+test.skip(`Update embed url`, async ({ page: nativePage }) => {
   page = await PageWrapper.openMeetingPage(nativePage);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.valid_embed_url);
-  await page.click(page.footer.embed_cta);
+  await page.click(page.footer.embed_share_cta);
   await page.assertNotVisible(page.center.first_person_img);
   await page.click(page.footer.more_settings_btn, page.footer.embed_url_cta);
   await page.sendText(page.footer.embed_url_text_field, page.footer.invalid_embed_url);
