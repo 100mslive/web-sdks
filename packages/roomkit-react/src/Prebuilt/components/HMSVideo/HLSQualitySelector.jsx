@@ -34,7 +34,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                   '@sm': 'xs',
                   '@xs': 'tiny',
                 }}
-                css={{ display: 'flex', alignItems: 'center', ml: '$2' }}
+                css={{ display: 'flex', alignItems: 'center', ml: '$2', c: '$on_surface_medium' }}
               >
                 {isAuto && (
                   <>
@@ -57,26 +57,49 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
         </Flex>
       </Dropdown.Trigger>
       {layers.length > 0 && (
-        <Dropdown.Content sideOffset={5} align="end" css={{ height: 'auto', maxHeight: '$96', w: '$64' }}>
-          <Dropdown.Item onClick={() => onQualityChange({ height: 'auto' })} key="auto">
-            <Text css={{ flex: '1 1 0' }}>Automatic</Text>
-            {isAuto && <CheckCircleIcon />}
-          </Dropdown.Item>
+        <Dropdown.Content
+          sideOffset={5}
+          align="end"
+          css={{ height: 'auto', maxHeight: '$96', w: '$64', bg: '$surface_bright' }}
+        >
           {layers.map(layer => {
             return (
-              <Dropdown.Item onClick={() => onQualityChange(layer)} key={layer.width}>
-                <Text css={{ flex: '1 1 0' }}>{getQualityText(layer)}</Text>
+              <Dropdown.Item
+                onClick={() => onQualityChange(layer)}
+                key={layer.width}
+                css={{
+                  bg: '$surface_bright',
+                  '&:hover': {
+                    bg: '$surface_default',
+                  },
+                }}
+              >
+                <Text>{getQualityText(layer)}</Text>
+                <Text css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>{getBitrateText(layer)}</Text>
                 {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
                   <CheckCircleIcon />
                 )}
               </Dropdown.Item>
             );
           })}
+          <Dropdown.Item
+            onClick={() => onQualityChange({ height: 'auto' })}
+            key="auto"
+            css={{
+              bg: '$surface_bright',
+              '&:hover': {
+                bg: '$surface_default',
+              },
+            }}
+          >
+            <Text css={{ flex: '1 1 0' }}>Auto</Text>
+            {isAuto && <CheckCircleIcon />}
+          </Dropdown.Item>
         </Dropdown.Content>
       )}
     </Dropdown.Root>
   );
 }
 
-const getQualityText = layer =>
-  `${Math.min(layer.height, layer.width)}p (${(Number(layer.bitrate / 1000) / 1000).toFixed(2)} Mbps)`;
+const getQualityText = layer => `${Math.min(layer.height, layer.width)}p `;
+const getBitrateText = layer => `(${(Number(layer.bitrate / 1000) / 1000).toFixed(2)} Mbps)`;

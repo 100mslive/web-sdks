@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertOctagonIcon, ChatIcon, ExitIcon, HandIcon, PersonIcon } from '@100mslive/react-icons';
+import { AlertOctagonIcon, ChatIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@100mslive/react-icons';
 import { Box } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetSubscribedNotifications, useSubscribedNotifications } from '../AppData/useUISettings';
@@ -29,13 +29,13 @@ export const NotificationSettings = () => {
       <NotificationItem
         label="Peer Joined"
         type={SUBSCRIBED_NOTIFICATIONS.PEER_JOINED}
-        icon={<PersonIcon />}
+        icon={<PeopleAddIcon />}
         checked={subscribedNotifications.PEER_JOINED}
       />
       <NotificationItem
         label="Peer Leave"
         type={SUBSCRIBED_NOTIFICATIONS.PEER_LEFT}
-        icon={<ExitIcon />}
+        icon={<PeopleRemoveIcon />}
         checked={subscribedNotifications.PEER_LEFT}
       />
       <NotificationItem
