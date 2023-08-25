@@ -114,13 +114,13 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8', pb: '$10' }}>
+              <Box css={{ px: '$8', pb: '$8' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
           </Sheet.Root>
         ) : (
-          <StyledMenuTile.Content side="top" align="end">
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
             <TileMenuContent {...props} />
           </StyledMenuTile.Content>
         )}
@@ -129,5 +129,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     </>
   );
 };
+
+export { isSameTile } from './TileMenuContent';
 
 export default TileMenu;

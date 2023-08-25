@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, Footer as AppFooter } from '../../..';
+import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
@@ -25,6 +25,8 @@ export const Footer = () => {
         '@md': {
           justifyContent: 'center',
           gap: '$10',
+          position: 'relative',
+          zIndex: 20,
         },
       }}
     >

@@ -6,16 +6,18 @@ import { Sheet } from '../../../../Sheet';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
+import { LeaveSessionContent } from '../../LeaveSessionContent';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 
 export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, stopStream }) => {
   const [open, setOpen] = useState(false);
+  const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;
@@ -78,7 +80,16 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton variant="danger" key="LeaveRoom" data-testid="leave_room_btn" onClick={leaveRoom}>
+        <LeaveIconButton
+          variant="danger"
+          key="LeaveRoom"
+          data-testid="leave_room_btn"
+          onClick={() => {
+            if (isHlsViewer) {
+              setShowLeaveRoomAlert(true);
+            }
+          }}
+        >
           <Tooltip title="Leave Room">
             <Box>
               <ExitIcon style={{ transform: 'rotate(180deg)' }} />
@@ -95,6 +106,13 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
           />
         </Sheet.Content>
       </Sheet.Root>
+      {isHlsViewer ? (
+        <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
+          <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+            <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
+          </Sheet.Content>
+        </Sheet.Root>
+      ) : null}
     </Fragment>
   );
 };

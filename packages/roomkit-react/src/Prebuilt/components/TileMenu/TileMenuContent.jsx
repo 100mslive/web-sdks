@@ -31,7 +31,7 @@ import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
 import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
-const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
+export const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
@@ -220,7 +220,7 @@ export const TileMenuContent = props => {
             }}
           >
             <PencilIcon />
-            <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
               Change Name
             </Text>
           </StyledMenuTile.ItemButton>

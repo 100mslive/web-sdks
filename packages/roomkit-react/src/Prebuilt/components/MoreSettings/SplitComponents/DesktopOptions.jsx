@@ -11,6 +11,7 @@ import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, Settin
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
 import { PIP } from '../../PIP';
+import { PictureInPicture } from '../../PIP/PIPManager';
 import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
@@ -18,11 +19,10 @@ import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '.././BulkRoleChangeModal';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
 
@@ -49,9 +49,9 @@ export const DesktopOptions = () => {
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const isPipOn = PictureInPicture.isOn();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -96,7 +96,7 @@ export const DesktopOptions = () => {
             },
           }}
         >
-          {isHandRaiseEnabled && !showStreamingUI ? (
+          {isHandRaiseEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -108,7 +108,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled && !showStreamingUI ? (
+          {isBRBEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -120,7 +120,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {(isBRBEnabled || isHandRaiseEnabled) && !showStreamingUI ? (
+          {(isBRBEnabled || isHandRaiseEnabled) && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
@@ -131,7 +131,7 @@ export const DesktopOptions = () => {
                   <Flex css={{ w: '100%' }}>
                     <PipIcon />
                     <Text variant="sm" css={{ ml: '$4' }}>
-                      Picture in picture mode
+                      {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
                     </Text>
                   </Flex>
                 }

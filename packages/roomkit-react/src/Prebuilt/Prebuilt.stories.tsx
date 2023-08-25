@@ -9,6 +9,7 @@ export default {
     roomCode: { control: { type: 'text' }, defaultValue: '' },
     logo: { control: { type: 'object' }, defaultValue: null },
     typography: { control: { type: 'object' }, defaultValue: 'Roboto' },
+    options: { control: { type: 'object' }, defaultValue: {} },
   },
 } as Meta<typeof HMSPrebuilt>;
 
