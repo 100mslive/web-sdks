@@ -6,14 +6,14 @@ import { InsetTile } from './InsetView';
 import { Pagination } from './Pagination';
 // @ts-ignore: No implicit Any
 import { SecondaryTiles } from './SecondaryTiles';
-import { useRoleProminence } from './hooks/useRoleProminence';
+import { usePeerPartition } from './hooks/usePeerPartition';
 import { useTileLayout } from './hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import PeersSorter from '../common/PeersSorter';
 
 export function RoleProminence() {
   const peers = useHMSStore(selectPeers);
-  const { prominentPeers, secondaryPeers, isInsetEnabled } = useRoleProminence(peers);
+  const { prominentPeers, secondaryPeers, isInsetEnabled } = usePeerPartition(peers);
   const [sortedPeers, setSortedPeers] = useState(prominentPeers);
   const vanillaStore = useHMSVanillaStore();
   const maxTileCount = 4;

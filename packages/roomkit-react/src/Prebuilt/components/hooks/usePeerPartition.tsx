@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { HMSPeer } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
-export const useRoleProminence = (peers: HMSPeer[]) => {
+export const usePeerPartition = (peers: HMSPeer[]) => {
   const layout = useRoomLayout();
   const { prominent_roles = [], enable_local_tile_inset = true } =
     //@ts-ignore
