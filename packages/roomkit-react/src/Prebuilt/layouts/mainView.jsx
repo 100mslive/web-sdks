@@ -18,7 +18,6 @@ import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
   useHLSViewerRole,
   usePDFAnnotator,
-  usePinnedTrack,
   useSetAppDataByKey,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -28,11 +27,9 @@ import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
-const PinnedTrackView = React.lazy(() => import('./PinnedTrackView'));
 
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const pinnedTrack = usePinnedTrack();
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
@@ -108,8 +105,6 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     // ViewComponent = WhiteboardView;
-  } else if (pinnedTrack) {
-    ViewComponent = PinnedTrackView;
   } else {
     ViewComponent = GridLayout;
   }
