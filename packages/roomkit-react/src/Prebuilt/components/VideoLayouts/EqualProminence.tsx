@@ -1,20 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { Grid } from './VideoLayouts/Grid';
-import { Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
-import { useRoomLayout } from '../provider/roomLayoutProvider';
+import { Flex } from '../../../Layout';
+import { config as cssConfig } from '../../../Theme';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
-import { InsetTile } from './InsetView';
-import { Pagination } from './Pagination';
+import { InsetTile } from '../InsetView';
+import { Pagination } from '../Pagination';
+import { Grid } from './Grid';
 // @ts-ignore: No implicit Any
-import { useUISettings } from './AppData/useUISettings';
-import { useTileLayout } from './hooks/useTileLayout';
+import { useUISettings } from '../AppData/useUISettings';
+import { useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
-import PeersSorter from '../common/PeersSorter';
+import PeersSorter from '../../common/PeersSorter';
 // @ts-ignore: No implicit Any
-import { UI_SETTINGS } from '../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 export function EqualProminence() {
   const layout = useRoomLayout();

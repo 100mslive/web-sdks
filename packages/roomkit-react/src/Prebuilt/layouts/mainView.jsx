@@ -8,7 +8,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import FullPageProgress from '../components/FullPageProgress';
-import { GridLayout } from '../components/GridLayout';
+import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';

@@ -1,15 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { Grid } from './VideoLayouts/Grid';
-import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
-import { InsetTile } from './InsetView';
-import { Pagination } from './Pagination';
+import { InsetTile } from '../InsetView';
+import { Pagination } from '../Pagination';
 // @ts-ignore: No implicit Any
-import { SecondaryTiles } from './SecondaryTiles';
-import { usePeerPartition } from './hooks/usePeerPartition';
-import { useTileLayout } from './hooks/useTileLayout';
+import { SecondaryTiles } from '../SecondaryTiles';
+import { Grid } from './Grid';
+import { RoleProminenceLayout } from './RoleProminenceLayout';
+import { usePeerPartition } from '../hooks/usePeerPartition';
+import { useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
-import PeersSorter from '../common/PeersSorter';
+import PeersSorter from '../../common/PeersSorter';
 
 export function RoleProminence() {
   const peers = useHMSStore(selectPeers);

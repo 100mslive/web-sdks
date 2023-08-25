@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { selectPeers, selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
-import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
-import { Pagination } from './Pagination';
+import { Pagination } from '../Pagination';
 // @ts-ignore: No implicit Any
-import ScreenshareTile from './ScreenshareTile';
-import { SecondaryTiles } from './SecondaryTiles';
+import ScreenshareTile from '../ScreenshareTile';
+import { SecondaryTiles } from '../SecondaryTiles';
+import { RoleProminenceLayout } from './RoleProminenceLayout';
 // @ts-ignore: No implicit Any
-import { useSetAppDataByKey } from './AppData/useUISettings';
+import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
-import { APP_DATA } from '../common/constants';
+import { APP_DATA } from '../../common/constants';
 
 export const ScreenshareLayout = () => {
   const peersSharing = useHMSStore(selectPeersScreenSharing);

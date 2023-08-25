@@ -4,7 +4,7 @@ import { selectPeerScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
-import { useIsRoleProminenceLayout } from '../provider/roomLayoutProvider/hooks/useIsRoleProminenceLayout';
+import { useIsRoleProminenceLayout } from '../../provider/roomLayoutProvider/hooks/useIsRoleProminenceLayout';
 
 export const GridLayout = () => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
