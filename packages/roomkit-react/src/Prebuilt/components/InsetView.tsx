@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Draggable from 'react-draggable';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectVideoTrackByID, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsAllowedToPublish, selectLocalPeer, selectVideoTrackByID, useHMSStore } from '@100mslive/react-sdk';
 import { ExpandIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
@@ -35,6 +35,7 @@ export const InsetTile = () => {
   const localPeer = useHMSStore(selectLocalPeer);
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const aspectRatio = (videoTrack?.width || (isMobile ? 9 : 16)) / (videoTrack?.height || (isMobile ? 16 : 9));
   let height = 180;
   let width = height * aspectRatio;
@@ -64,6 +65,10 @@ export const InsetTile = () => {
       resizeObserver?.disconnect();
     };
   }, []);
+
+  if (!isAllowedToPublish.video && !isAllowedToPublish.audio) {
+    return null;
+  }
 
   return (
     <Draggable bounds="parent" nodeRef={nodeRef}>
