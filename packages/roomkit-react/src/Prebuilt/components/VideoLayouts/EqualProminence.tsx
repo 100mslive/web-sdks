@@ -10,7 +10,7 @@ import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
-import { useTileLayout } from '../hooks/useTileLayout';
+import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import PeersSorter from '../../common/PeersSorter';
 // @ts-ignore: No implicit Any
@@ -28,8 +28,16 @@ export function EqualProminence() {
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
+  const inputPeers = useMemo(
+    () => (sortedPeers.length === 0 ? (!localPeer ? [] : [localPeer]) : sortedPeers),
+    [sortedPeers, localPeer],
+  );
+  const pageList = usePagesWithTiles({
+    peers: inputPeers,
+    maxTileCount,
+  });
   const { ref, pagesWithTiles } = useTileLayout({
-    peers: sortedPeers.length === 0 ? (!localPeer ? [] : [localPeer]) : sortedPeers,
+    pageList,
     maxTileCount,
   });
   const [page, setPage] = useState(0);
@@ -40,6 +48,7 @@ export function EqualProminence() {
     if (page !== 0) {
       return;
     }
+    console.log('sorting peers');
     peersSorter.setPeersAndTilesPerPage({
       peers,
       tilesPerPage: pageSize || maxTileCount,
@@ -51,7 +60,7 @@ export function EqualProminence() {
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
       <Grid tiles={pagesWithTiles[page]} ref={ref} />
       <Pagination page={page} onPageChange={setPage} numPages={pagesWithTiles.length} />
-      {isInsetEnabled && sortedPeers.length > 0 && <InsetTile />}
+      {isInsetEnabled && pageList.length > 0 && pageList[0][0].peer.id !== localPeer?.id && <InsetTile />}
     </Flex>
   );
 }

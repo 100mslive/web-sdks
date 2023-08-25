@@ -36,19 +36,24 @@ export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; m
   return pagesList;
 };
 
-export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
+export const useTileLayout = ({
+  pageList,
+  maxTileCount,
+}: {
+  pageList: TrackWithPeerAndDimensions[][];
+  maxTileCount: number;
+}) => {
   const vanillaStore = useHMSVanillaStore();
   const [ref, { width, height }] = useMeasure<HTMLDivElement>();
   const isMobile = useMedia(cssConfig.media.lg);
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimensions[][]>([]);
-  const pagesList = usePagesWithTiles({ peers, maxTileCount });
 
   useEffect(() => {
     if (width === 0 || height === 0) {
       return;
     }
     // calculate dimesions for each page
-    for (const page of pagesList) {
+    for (const page of pageList) {
       const noOfTilesInPage = page.length;
       let maxCols =
         noOfTilesInPage > 2 && noOfTilesInPage < 9
@@ -110,7 +115,7 @@ export const useTileLayout = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTi
         }
       }
     }
-    setPagesWithTiles([...pagesList]);
-  }, [width, height, maxTileCount, pagesList, vanillaStore, isMobile]);
+    setPagesWithTiles([...pageList]);
+  }, [width, height, maxTileCount, pageList, vanillaStore, isMobile]);
   return { pagesWithTiles, ref };
 };

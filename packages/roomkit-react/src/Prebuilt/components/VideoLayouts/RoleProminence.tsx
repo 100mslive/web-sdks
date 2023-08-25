@@ -7,7 +7,7 @@ import { SecondaryTiles } from '../SecondaryTiles';
 import { Grid } from './Grid';
 import { RoleProminenceLayout } from './RoleProminenceLayout';
 import { usePeerPartition } from '../hooks/usePeerPartition';
-import { useTileLayout } from '../hooks/useTileLayout';
+import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import PeersSorter from '../../common/PeersSorter';
 
@@ -17,8 +17,12 @@ export function RoleProminence() {
   const [sortedPeers, setSortedPeers] = useState(prominentPeers);
   const vanillaStore = useHMSVanillaStore();
   const maxTileCount = 4;
-  const { ref, pagesWithTiles } = useTileLayout({
+  const pageList = usePagesWithTiles({
     peers: sortedPeers,
+    maxTileCount,
+  });
+  const { ref, pagesWithTiles } = useTileLayout({
+    pageList,
     maxTileCount: 4,
   });
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
