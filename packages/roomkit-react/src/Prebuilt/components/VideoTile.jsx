@@ -24,7 +24,7 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { useShowStreamingUI } from '../common/hooks';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
+import { UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
   peerId,
@@ -33,6 +33,7 @@ const Tile = ({
   height,
   objectFit = 'cover',
   canMinimise = false,
+  isDragabble = false,
   rootCSS = {},
   containerCSS = {},
 }) => {
@@ -146,7 +147,7 @@ const Tile = ({
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {isMouseHovered && !isHeadless ? (
+          {(isMouseHovered || isDragabble) && !isHeadless ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}

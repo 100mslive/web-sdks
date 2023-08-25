@@ -223,7 +223,9 @@ export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
           <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
             <Flex justify="start" align="center" gap="3">
               <AlertTriangleIcon />
-              <Text variant="h5">Stop Recording</Text>
+              <Text variant="h5" css={{ c: '$alert_error_default' }}>
+                Stop Recording
+              </Text>
             </Flex>
             <Sheet.Close css={{ color: 'white' }} onClick={onClose}>
               <CrossIcon />

@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import {
   DeviceType,
+  HMSRoomState,
   selectLocalVideoTrackID,
+  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useDevices,
@@ -64,13 +66,20 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const actions = useHMSActions();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
+  const roomState = useHMSStore(selectRoomState);
 
   return (
     <Fragment>
       {toggleAudio ? (
         hideOptions ? (
           <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
-            <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
+            <IconButton
+              active={isLocalAudioEnabled}
+              onClick={toggleAudio}
+              key="toggleAudio"
+              data-testid="audio_btn"
+              className="__cancel-drag-event"
+            >
               {!isLocalAudioEnabled ? (
                 <MicOffIcon data-testid="audio_off_btn" />
               ) : (
@@ -99,7 +108,13 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       {toggleVideo ? (
         hideOptions ? (
           <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
-            <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
+            <IconButton
+              key="toggleVideo"
+              active={isLocalVideoEnabled}
+              onClick={toggleVideo}
+              data-testid="video_btn"
+              className="__cancel-drag-event"
+            >
               {!isLocalVideoEnabled ? (
                 <VideoOffIcon data-testid="video_off_btn" />
               ) : (
@@ -125,7 +140,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         )
       ) : null}
 
-      {localVideoTrack?.facingMode && !hideOptions ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {

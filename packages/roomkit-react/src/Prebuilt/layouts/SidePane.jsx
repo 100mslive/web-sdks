@@ -40,6 +40,7 @@ const SidePane = ({ css = {} }) => {
           : '$surface_dim',
         r: '$1',
         ml: '$8',
+        flexShrink: 0,
         position: 'relative',
         ...css,
         '@lg': {

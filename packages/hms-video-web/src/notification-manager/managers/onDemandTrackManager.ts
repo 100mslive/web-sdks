@@ -27,8 +27,9 @@ export class OnDemandTrackManager extends TrackManager {
   }
 
   handleTrackRemove(track: HMSRemoteTrack) {
-    super.handleTrackRemove(track);
-    if (track.type === 'video' && track.source === 'regular') {
+    const isRegularVideo = track.type === 'video' && track.source === 'regular';
+    super.handleTrackRemove(track, !isRegularVideo);
+    if (isRegularVideo) {
       this.processTrackInfo(
         {
           track_id: track.trackId,
