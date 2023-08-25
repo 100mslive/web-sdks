@@ -12,7 +12,7 @@ const Root = ({ children }: React.PropsWithChildren) => (
   </Flex>
 );
 
-const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css: CSS }>) => {
+const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
   return (
     <Flex direction="column" css={{ flex: '1 1 0', minHeight: 0, ...css }}>
       {children}
