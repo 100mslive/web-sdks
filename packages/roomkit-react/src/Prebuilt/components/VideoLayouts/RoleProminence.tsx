@@ -8,7 +8,6 @@ import { Grid } from './Grid';
 import { RoleProminenceLayout } from './RoleProminenceLayout';
 import { usePeerPartition } from '../hooks/usePeerPartition';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
-// @ts-ignore: No implicit Any
 import PeersSorter from '../../common/PeersSorter';
 
 export function RoleProminence() {

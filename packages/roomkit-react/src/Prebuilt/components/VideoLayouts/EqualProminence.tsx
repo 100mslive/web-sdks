@@ -3,24 +3,19 @@ import { useMedia } from 'react-use';
 import { selectLocalPeer, selectPeers, selectRemotePeers, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
-// @ts-ignore: No implicit Any
 import { InsetTile } from '../InsetView';
 import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
+import { useInsetEnabled } from '../../provider/roomLayoutProvider/hooks/useInsetEnabled';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
-// @ts-ignore: No implicit Any
 import PeersSorter from '../../common/PeersSorter';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
 export function EqualProminence() {
-  const layout = useRoomLayout();
-  const { enable_local_tile_inset: isInsetEnabled = true } =
-    //@ts-ignore
-    layout?.screens?.conferencing?.default?.elements?.video_tile_layout?.grid || {};
+  const isInsetEnabled = useInsetEnabled();
   const peers = useHMSStore(isInsetEnabled ? selectRemotePeers : selectPeers);
   const [sortedPeers, setSortedPeers] = useState(peers);
   const localPeer = useHMSStore(selectLocalPeer);
@@ -48,7 +43,6 @@ export function EqualProminence() {
     if (page !== 0) {
       return;
     }
-    console.log('sorting peers');
     peersSorter.setPeersAndTilesPerPage({
       peers,
       tilesPerPage: pageSize || maxTileCount,

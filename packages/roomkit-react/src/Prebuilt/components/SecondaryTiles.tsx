@@ -6,7 +6,6 @@ import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { Pagination } from './Pagination';
 import { usePagesWithTiles } from './hooks/useTileLayout';
-// @ts-ignore: No implicit Any
 import PeersSorter from '../common/PeersSorter';
 
 export const SecondaryTiles = ({ peers }: { peers: HMSPeer[] }) => {
