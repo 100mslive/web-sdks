@@ -24,7 +24,7 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { useShowStreamingUI } from '../common/hooks';
-import { UI_SETTINGS } from '../common/constants';
+import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
   peerId,
