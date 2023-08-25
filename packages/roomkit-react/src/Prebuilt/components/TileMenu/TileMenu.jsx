@@ -78,6 +78,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
           data-testid="participant_menu_btn"
           css={{ bg: `${theme.colors.background_dim.value}A3` }}
           onClick={e => e.stopPropagation()}
+          className={isMobile ? '__cancel-drag-event' : ''}
         >
           <VerticalMenuIcon width={20} height={20} />
         </StyledMenuTile.Trigger>
@@ -113,13 +114,13 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8' }}>
+              <Box css={{ px: '$8', pb: '$8' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
           </Sheet.Root>
         ) : (
-          <StyledMenuTile.Content side="top" align="end">
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
             <TileMenuContent {...props} />
           </StyledMenuTile.Content>
         )}

@@ -2,7 +2,6 @@ import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   selectAppData,
-  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   useHMSActions,
@@ -18,8 +17,6 @@ import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
 import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '.././BulkRoleChangeModal';
-import { ChangeSelfRole } from '.././ChangeSelfRole';
-import { EmbedUrl, EmbedUrlModal } from '.././EmbedUrl';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
@@ -42,12 +39,10 @@ const MODALS = {
 };
 
 export const DesktopOptions = () => {
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
@@ -144,11 +139,10 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          <ChangeSelfRole onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)} />
           <FullScreenItem />
-          {isAllowedToPublish.screen && isEmbedEnabled && (
+          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
             <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )}
+          )} */}
 
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
 
@@ -217,9 +211,9 @@ export const DesktopOptions = () => {
       {openModals.has(MODALS.SELF_ROLE_CHANGE) && (
         <RoleChangeModal peerId={localPeerId} onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)} />
       )}
-      {openModals.has(MODALS.EMBED_URL) && (
+      {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
-      )}
+      )} */}
     </Fragment>
   );
 };

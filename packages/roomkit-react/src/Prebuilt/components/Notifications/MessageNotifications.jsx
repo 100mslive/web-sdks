@@ -16,7 +16,7 @@ export const MessageNotifications = () => {
   const metadata = useMyMetadata();
 
   useEffect(() => {
-    if (!notification) {
+    if (!notification || isHeadless) {
       return;
     }
 

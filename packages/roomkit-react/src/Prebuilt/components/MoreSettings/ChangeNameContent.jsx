@@ -27,22 +27,27 @@ export const ChangeNameContent = ({
           color: '$on_surface_high',
           fontWeight: '$semiBold',
           display: 'flex',
-          borderBottom: isMobile ? '1px solid $border_default' : '',
-          pb: '$6',
-          mb: '$8',
-          px: isMobile ? '$8' : '',
+          '@md': { px: '$8', borderBottom: '1px solid $border_default' },
         }}
       >
         {isMobile ? <ChevronLeftIcon onClick={onBackClick} style={{ marginRight: '0.5rem' }} /> : null}
         Change Name
-        <Box css={{ color: 'inherit', ml: 'auto' }} onClick={onExit}>
+        <Box
+          css={{ color: 'inherit', ml: 'auto', '&:hover': { color: '$on_surface_medium', cursor: 'pointer' } }}
+          onClick={onExit}
+        >
           <CrossIcon />
         </Box>
       </Text>
-      <Flex justify="center" align="center" css={{ my: '$8', w: '100%', px: isMobile ? '$8' : '' }}>
+      <Text variant="sm" css={{ color: '$on_surface_medium', pb: '$6', mb: '$8', '@md': { px: '$8', mt: '$4' } }}>
+        Your name will be visible to other participants in the session.
+      </Text>
+      <Flex justify="center" align="center" css={{ my: '$8', w: '100%', '@md': { px: '$8' } }}>
         <Input
           css={{ width: '100%', bg: '$surface_default' }}
           value={currentName}
+          // Prevents popup from showing up on chrome mweb
+          type={isMobile ? 'search' : 'text'}
           onChange={e => {
             setCurrentName(e.target.value);
           }}
@@ -50,7 +55,7 @@ export const ChangeNameContent = ({
           required
           data-testid="change_name_field"
           onKeyDown={async e => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
               changeName();
             }
@@ -65,7 +70,7 @@ export const ChangeNameContent = ({
           width: '100%',
           gap: '$md',
           mt: '$10',
-          px: isMobile ? '$4' : '',
+          '@md': { px: '$4' },
         }}
       >
         {isMobile ? null : (

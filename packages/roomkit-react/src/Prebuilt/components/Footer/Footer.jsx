@@ -1,28 +1,22 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectPeerMetadata, useHMSStore } from '@100mslive/react-sdk';
-import { HandIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Footer as AppFooter, Tooltip } from '../../../';
-import IconButton from '../../IconButton';
+import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
+import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
 import { LeaveRoom } from '../LeaveRoom';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
+import { RaiseHand } from '../RaiseHand';
 import { ScreenshareToggle } from '../ScreenShareToggle';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { useMyMetadata } from '../hooks/useMetadata';
-import { useIsLocalPeerHLSViewer } from '../../common/hooks';
-import { FEATURE_LIST } from '../../common/constants';
+import { useHLSViewerRole } from '../AppData/useUISettings';
 
-export const StreamingFooter = () => {
+export const Footer = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const { toggleHandRaise } = useMyMetadata();
-  const localPeer = useHMSStore(selectLocalPeer);
-  const isHandRaised = useHMSStore(selectPeerMetadata(localPeer.id))?.isHandRaised || false;
-  const isHlsViewer = useIsLocalPeerHLSViewer();
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const hlsViewerRole = useHLSViewerRole();
+  const isHlsViewer = hlsViewerRole === localPeerRole;
 
   return (
     <AppFooter.Root
@@ -46,7 +40,7 @@ export const StreamingFooter = () => {
         }}
       >
         {isMobile ? <LeaveRoom /> : null}
-        <AudioVideoToggle hideOptions />
+        <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
         css={{
@@ -58,24 +52,14 @@ export const StreamingFooter = () => {
       >
         {isMobile ? (
           <>
-            {isHandRaiseEnabled && isHlsViewer ? (
-              <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                <HandIcon />
-              </IconButton>
-            ) : null}
+            {isHlsViewer ? <RaiseHand /> : null}
             <ChatToggle />
             <MoreSettings />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHandRaiseEnabled && isHlsViewer ? (
-              <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
-                <IconButton active={!isHandRaised} onClick={toggleHandRaise}>
-                  <HandIcon />
-                </IconButton>
-              </Tooltip>
-            ) : null}
+            {isHlsViewer ? <RaiseHand /> : null}
             <EmojiReaction />
             <LeaveRoom />
           </>
