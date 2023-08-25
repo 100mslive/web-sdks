@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../../Dropdown';
-import { Flex } from '../../../../Layout';
+import { Box, Flex } from '../../../../Layout';
 import { Dialog } from '../../../../Modal';
 import { Tooltip } from '../../../../Tooltip';
 import { EndSessionContent } from '../../EndSessionContent';
@@ -15,15 +15,14 @@ export const DesktopLeaveRoom = ({
   menuTriggerButton: MenuTriggerButton,
   leaveIconButton: LeaveIconButton,
   leaveRoom,
-  endRoom,
+  stopStream,
 }) => {
   const [open, setOpen] = useState(false);
-  const [showEndRoomAlert, setShowEndRoomAlert] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
+  const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-
   const showStreamingUI = useShowStreamingUI();
   const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStream = showStreamingUI && isStreamingOn;
@@ -36,7 +35,7 @@ export const DesktopLeaveRoom = ({
 
   return (
     <Fragment>
-      {permissions.endRoom ? (
+      {permissions.hlsStreaming ? (
         <Flex>
           <LeaveIconButton
             variant="danger"
@@ -55,7 +54,9 @@ export const DesktopLeaveRoom = ({
             }}
           >
             <Tooltip title="Leave Room">
-              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+              <Box>
+                <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+              </Box>
             </Tooltip>
           </LeaveIconButton>
           <Dropdown.Root open={open} onOpenChange={setOpen} modal={false}>
@@ -86,23 +87,25 @@ export const DesktopLeaveRoom = ({
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
-              <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
-                <LeaveCard
-                  title={showStream ? 'End Stream' : 'End Session'}
-                  subtitle={`The ${
-                    showStream ? 'stream' : 'session'
-                  } will end for everyone. You can't undo this action.`}
-                  bg=""
-                  titleColor="$alert_error_brighter"
-                  subtitleColor="$alert_error_bright"
-                  icon={<StopIcon height={24} width={24} />}
-                  onClick={() => {
-                    setOpen(false);
-                    setShowEndRoomAlert(true);
-                  }}
-                  css={{ p: 0 }}
-                />
-              </Dropdown.Item>
+              {isStreamingOn && permissions?.hlsStreaming ? (
+                <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
+                  <LeaveCard
+                    title={showStream ? 'End Stream' : 'End Session'}
+                    subtitle={`The ${
+                      showStream ? 'stream' : 'session'
+                    } will end for everyone. You can't undo this action.`}
+                    bg=""
+                    titleColor="$alert_error_brighter"
+                    subtitleColor="$alert_error_bright"
+                    icon={<StopIcon height={24} width={24} />}
+                    onClick={() => {
+                      setOpen(false);
+                      setShowEndStreamAlert(true);
+                    }}
+                    css={{ p: 0 }}
+                  />
+                </Dropdown.Item>
+              ) : null}
             </Dropdown.Content>
           </Dropdown.Root>
         </Flex>
@@ -120,16 +123,23 @@ export const DesktopLeaveRoom = ({
           data-testid="leave_room_btn"
         >
           <Tooltip title="Leave Room">
-            <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            <Box>
+              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+            </Box>
           </Tooltip>
         </LeaveIconButton>
       )}
 
-      <Dialog.Root open={showEndRoomAlert} modal={false}>
+      <Dialog.Root open={showEndStreamAlert} modal={false}>
         <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
-            <EndSessionContent setShowEndRoomAlert={setShowEndRoomAlert} endRoom={endRoom} isModal />
+            <EndSessionContent
+              setShowEndStreamAlert={setShowEndStreamAlert}
+              stopStream={stopStream}
+              leaveRoom={leaveRoom}
+              isModal
+            />
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>

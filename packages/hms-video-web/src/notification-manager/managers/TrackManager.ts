@@ -85,7 +85,7 @@ export class TrackManager {
   /**
    * Sets the track of corresponding peer to null and returns the peer
    */
-  handleTrackRemove(track: HMSRemoteTrack) {
+  handleTrackRemove(track: HMSRemoteTrack, remove = true) {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
 
     const trackStateEntry = this.store.getTrackState(track.trackId);
@@ -100,8 +100,19 @@ export class TrackManager {
       return;
     }
 
-    // emit this event here as peer will already be removed(if left the room) by the time this event is received
-    track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+    // remove tracks only when onDemandTracks flag is false
+    if (remove) {
+      this.store.removeTrack(track);
+      const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
+      if (!hmsPeer) {
+        return;
+      }
+      this.removePeerTracks(hmsPeer, track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+
+      // emit this event here as peer will already be removed(if left the room) by the time this event is received
+      track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+    }
   }
 
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {

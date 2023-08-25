@@ -33,6 +33,7 @@ const Tile = ({
   height,
   objectFit = 'cover',
   canMinimise = false,
+  isDragabble = false,
   rootCSS = {},
   containerCSS = {},
 }) => {
@@ -146,7 +147,7 @@ const Tile = ({
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {isMouseHovered && !isHeadless ? (
+          {(isMouseHovered || isDragabble) && !isHeadless ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}
