@@ -55,8 +55,8 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
-  // const isHeadless = useIsHeadless();
-  const isHeadless = true;
+  const isHeadless = useIsHeadless();
+  // const isHeadless = true;
 
   const startHLS = useCallback(async () => {
     try {
