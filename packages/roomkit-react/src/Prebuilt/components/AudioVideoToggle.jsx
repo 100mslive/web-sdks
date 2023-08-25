@@ -21,7 +21,7 @@ const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100
 export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
-
+  console.log('videoInput', videoInput, 'audioInput', audioInput);
   const formattedVideoInputList = videoInput?.map(videoInput => ({
     active: selectedDeviceIDs.videoInput === videoInput.deviceId,
     content: (
@@ -68,7 +68,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   return (
     <Fragment>
       {toggleAudio ? (
-        hideOptions ? (
+        hideOptions || audioInput.length === 0 ? (
           <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
             <IconButton active={isLocalAudioEnabled} onClick={toggleAudio} key="toggleAudio" data-testid="audio_btn">
               {!isLocalAudioEnabled ? (
@@ -97,7 +97,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       ) : null}
 
       {toggleVideo ? (
-        hideOptions ? (
+        hideOptions || videoInput.length === 0 ? (
           <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
             <IconButton key="toggleVideo" active={isLocalVideoEnabled} onClick={toggleVideo} data-testid="video_btn">
               {!isLocalVideoEnabled ? (
