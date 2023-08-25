@@ -119,7 +119,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
             </Sheet.Content>
           </Sheet.Root>
         ) : (
-          <StyledMenuTile.Content side="top" align="end">
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
             <TileMenuContent {...props} />
           </StyledMenuTile.Content>
         )}
