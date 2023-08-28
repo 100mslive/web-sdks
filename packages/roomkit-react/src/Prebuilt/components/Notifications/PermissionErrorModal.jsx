@@ -47,11 +47,17 @@ export function PermissionErrorModal() {
               borderBottom: '1px solid $border_default',
             }}
           >
-            {isMobile && isIOS ? <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={iosPermissions} /> : null}
+            {isMobile && isIOS ? (
+              <img style={{ maxWidth: '100%', maxHeight: '100%' }} src={iosPermissions} alt="iOS Permission flow" />
+            ) : null}
 
             {/* Images for android */}
             {isMobile && isAndroid ? (
-              <img src={androidPermissionAlert} style={{ maxWidth: '100%', maxHeight: '100%' }} />
+              <img
+                src={androidPermissionAlert}
+                style={{ maxWidth: '100%', maxHeight: '100%' }}
+                alt="Android Permission flow "
+              />
             ) : null}
 
             <Text variant="h6">We can't access your {deviceType}</Text>

@@ -87,6 +87,7 @@ const MobileSettingModal = ({
       <Sheet.Content
         css={{
           bg: '$surface_dim',
+          overflowY: 'auto',
         }}
       >
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
@@ -116,8 +117,8 @@ const MobileSettingModal = ({
             direction="column"
             css={{
               px: '$8',
-              maxHeight: '80vh',
-              overflowY: 'scroll',
+              pb: '$8',
+              overflowY: 'auto',
             }}
           >
             {settingsList
