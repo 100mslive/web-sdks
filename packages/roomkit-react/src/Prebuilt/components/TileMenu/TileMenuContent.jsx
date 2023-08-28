@@ -309,7 +309,7 @@ export const TileMenuContent = props => {
             sendEvent({});
             closeSheetOnClick();
           }}
-          css={{spacingCSS}}
+          css={spacingCSS}
         >
           <ShareScreenIcon />
           <span>Stop Screenshare</span>
