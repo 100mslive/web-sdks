@@ -1,3 +1,4 @@
+// @ts-check
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
@@ -22,6 +23,7 @@ import {
 } from '@100mslive/react-icons';
 import { config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
@@ -228,16 +230,30 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
   );
 });
 
-const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
+const ParticipantMoreActions = ({ onRoleChange, peerId, role, isHandRaised }) => {
   const hmsActions = useHMSActions();
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
+  const layout = useRoomLayout();
+  const { bring_to_stage_label, remove_from_stage_label, on_stage_role, off_stage_roles } =
+    layout.screens.conferencing.default.elements.on_stage_exp || {};
+  const canBringToStage = off_stage_roles.includes(role);
+  const isInStage = role === on_stage_role;
+  const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
-  const actions = useHMSActions();
   const [open, setOpen] = useState(false);
 
   const lowerHand = async () => {
     await hmsActions.sendDirectMessage('Lower hand', peerId, LOWER_HAND);
+  };
+
+  const handleStageAction = async () => {
+    if (isInStage) {
+      hmsActions.changeRoleOfPeer(peerId, prevRole || off_stage_roles[0]);
+    } else {
+      await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
+    }
+    setOpen(false);
   };
 
   return (
@@ -254,7 +270,14 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {canChangeRole && (
+          {canChangeRole && canBringToStage ? (
+            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
+              <ChangeRoleIcon />
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                {isInStage ? remove_from_stage_label : bring_to_stage_label}
+              </Text>
+            </Dropdown.Item>
+          ) : (
             <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => onRoleChange(peerId)}>
               <ChangeRoleIcon />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>

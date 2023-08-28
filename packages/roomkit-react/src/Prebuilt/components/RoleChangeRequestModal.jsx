@@ -1,12 +1,21 @@
 import React, { useEffect } from 'react';
-import { selectLocalPeerName, selectRoleChangeRequest, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectLocalPeerName,
+  selectLocalPeerRoleName,
+  selectRoleChangeRequest,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
 import { Box, Button, Dialog, Flex, Text } from '../../';
 import { useIsHeadless } from './AppData/useUISettings';
+import { useMyMetadata } from './hooks/useMetadata';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
   const isHeadless = useIsHeadless();
+  const { setPrevRole } = useMyMetadata();
+  const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const name = useHMSStore(selectLocalPeerName);
 
@@ -54,6 +63,7 @@ export const RoleChangeRequestModal = () => {
       body={body}
       onAction={() => {
         hmsActions.acceptChangeRole(roleChangeRequest);
+        setPrevRole(currentRole);
       }}
       actionText="Accept"
     />
