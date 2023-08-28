@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
-import { InsetTile } from '../InsetView';
+import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { SecondaryTiles } from '../SecondaryTiles';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
-import { RoleProminenceLayout } from './RoleProminenceLayout';
-import { usePeerPartition } from '../hooks/usePeerPartition';
+import { ProminenceLayout } from './ProminenceLayout';
+import { useRoleProminencePeers } from '../hooks/useRoleProminencePeers';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 
 export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps) {
-  const { prominentPeers, secondaryPeers, isInsetEnabled } = usePeerPartition(peers);
+  const { prominentPeers, secondaryPeers, isInsetEnabled } = useRoleProminencePeers(peers);
   const localPeer = useHMSStore(selectLocalPeer);
   const maxTileCount = 4;
   const pageList = usePagesWithTiles({
@@ -29,10 +29,10 @@ export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps)
   }, [pageSize, onPageSize]);
 
   return (
-    <RoleProminenceLayout.Root>
-      <RoleProminenceLayout.ProminentSection>
+    <ProminenceLayout.Root>
+      <ProminenceLayout.ProminentSection>
         <Grid ref={ref} tiles={pagesWithTiles[page]} />
-      </RoleProminenceLayout.ProminentSection>
+      </ProminenceLayout.ProminentSection>
       <Pagination
         page={page}
         onPageChange={page => {
@@ -43,6 +43,6 @@ export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps)
       />
       <SecondaryTiles peers={secondaryPeers} />
       {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
-    </RoleProminenceLayout.Root>
+    </ProminenceLayout.Root>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { LayoutProps } from './VideoLayouts/interface';
-import { RoleProminenceLayout } from './VideoLayouts/RoleProminenceLayout';
+import { ProminenceLayout } from './VideoLayouts/ProminenceLayout';
 import { config as cssConfig } from '../../Theme';
 import { Pagination } from './Pagination';
 import { usePagesWithTiles } from './hooks/useTileLayout';
@@ -19,7 +19,7 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize }: LayoutProps)
   onPageSize?.(maxTileCount);
 
   return (
-    <RoleProminenceLayout.SecondarySection tiles={pagesWithTiles[page]}>
+    <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]}>
       <Pagination
         page={page}
         onPageChange={page => {
@@ -28,6 +28,6 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize }: LayoutProps)
         }}
         numPages={pagesWithTiles.length}
       />
-    </RoleProminenceLayout.SecondarySection>
+    </ProminenceLayout.SecondarySection>
   );
 };

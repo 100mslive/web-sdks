@@ -5,7 +5,7 @@ import { Pagination } from '../Pagination';
 import ScreenshareTile from '../ScreenshareTile';
 import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutProps } from './interface';
-import { RoleProminenceLayout } from './RoleProminenceLayout';
+import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
@@ -25,12 +25,12 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
   }, [activeSharePeerId, setActiveScreenSharePeer]);
 
   return (
-    <RoleProminenceLayout.Root>
-      <RoleProminenceLayout.ProminentSection css={{ pr: '$8', pb: '$8' }}>
+    <ProminenceLayout.Root>
+      <ProminenceLayout.ProminentSection css={{ pr: '$8', pb: '$8' }}>
         <ScreenshareTile peerId={peersSharing[page].id} />
         <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />
-      </RoleProminenceLayout.ProminentSection>
+      </ProminenceLayout.ProminentSection>
       <SecondaryTiles peers={secondaryPeers} onPageChange={onPageChange} onPageSize={onPageSize} />
-    </RoleProminenceLayout.Root>
+    </ProminenceLayout.Root>
   );
 };

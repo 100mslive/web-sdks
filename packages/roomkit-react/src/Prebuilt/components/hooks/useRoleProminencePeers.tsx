@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import { HMSPeer } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
-import { usePinnedTrack } from '../../components/AppData/useUISettings';
+import { usePinnedTrack } from '../AppData/useUISettings';
 
-export const usePeerPartition = (peers: HMSPeer[]) => {
+export const useRoleProminencePeers = (peers: HMSPeer[]) => {
   const layout = useRoomLayout();
   const { prominent_roles, enable_local_tile_inset } =
     //@ts-ignore

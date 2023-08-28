@@ -29,6 +29,11 @@ const MinimisedTile = ({ setMinimised }: { setMinimised: (value: boolean) => voi
   );
 };
 
+const insetHeightPx = 180;
+const insetMaxWidthPx = 240;
+const defaultMobileAspectRatio = 9 / 16;
+const desktopAspectRatio = 1 / defaultMobileAspectRatio;
+
 export const InsetTile = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
@@ -36,10 +41,16 @@ export const InsetTile = () => {
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const aspectRatio = (videoTrack?.width || (isMobile ? 9 : 16)) / (videoTrack?.height || (isMobile ? 16 : 9));
-  let height = 180;
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height
+      ? videoTrack.width / videoTrack.height
+      : isMobile
+      ? defaultMobileAspectRatio
+      : desktopAspectRatio;
+  let height = insetHeightPx;
   let width = height * aspectRatio;
-  if (isLandscape && width > 240) {
+  // Convert to 16/9 in landscape mode with a max width of 240
+  if (isLandscape && width > insetMaxWidthPx) {
     width = 240;
     height = width / aspectRatio;
   }

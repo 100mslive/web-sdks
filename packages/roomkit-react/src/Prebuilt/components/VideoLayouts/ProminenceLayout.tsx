@@ -45,7 +45,7 @@ const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: 
   );
 };
 
-export const RoleProminenceLayout = {
+export const ProminenceLayout = {
   Root,
   ProminentSection,
   SecondarySection,

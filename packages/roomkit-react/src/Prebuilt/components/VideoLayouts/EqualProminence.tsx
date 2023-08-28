@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-import { InsetTile } from '../InsetView';
+import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
