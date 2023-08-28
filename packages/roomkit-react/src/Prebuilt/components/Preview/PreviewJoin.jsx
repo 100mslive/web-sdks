@@ -189,7 +189,7 @@ const PreviewTile = ({ name, error }) => {
         overflow: 'clip',
         '@md': {
           aspectRatio: 9 / 16,
-          width: 'min(275px, 70vw)',
+          width: 'min(250px, 70vw)',
           maxWidth: '100%',
         },
       }}
