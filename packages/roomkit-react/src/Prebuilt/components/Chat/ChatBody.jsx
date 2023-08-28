@@ -21,7 +21,7 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-import emptyChat from '../../images/empty-chat.svg';
+import emptyChat from './../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
