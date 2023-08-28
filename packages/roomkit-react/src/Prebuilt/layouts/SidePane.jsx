@@ -34,7 +34,7 @@ const SidePane = ({ css = {} }) => {
         w: '$100',
         h: mwebStreamingChat ? '0' : '100%',
         p: '$10',
-        maxHeight: mwebStreamingChat ? '300px' : 'unset',
+        maxHeight: mwebStreamingChat ? '300px' : '100%',
         background: mwebStreamingChat
           ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
           : '$surface_dim',
@@ -42,6 +42,7 @@ const SidePane = ({ css = {} }) => {
         ml: '$8',
         flexShrink: 0,
         position: 'relative',
+        overflowY: 'auto',
         ...css,
         '@lg': {
           w: '100%',

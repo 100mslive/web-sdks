@@ -6,7 +6,7 @@ import { Box, Flex } from '../../../Layout';
 import { Participant } from './ParticipantList';
 import { getFormattedCount } from '../../common/utils';
 
-const ROW_HEIGHT = 55;
+const ROW_HEIGHT = 56;
 
 function itemKey(index, data) {
   return data.peerList[index].id;
