@@ -66,6 +66,7 @@ import {
 import {
   HMSRoleChangeRequest,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -195,10 +196,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async preview(config: sdkTypes.HMSPreviewConfig) {
-    if (this.isRoomJoinCalled) {
-      this.logPossibleInconsistency('attempting to call preview after join was called');
-      return; // ignore
-    }
     const roomState = this.store.getState(selectRoomState);
     if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {
       this.logPossibleInconsistency('attempting to call preview while room is in preview/connecting');
@@ -206,14 +203,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
 
     try {
-      this.setState(store => {
-        store.room.roomState = HMSRoomState.Connecting;
-      }, 'connecting');
+      if (roomState !== HMSRoomState.Connected) {
+        this.setState(store => {
+          store.room.roomState = HMSRoomState.Connecting;
+        }, 'connecting');
+      }
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
     }
+  }
+
+  async cancelMidCallPreview() {
+    return this.sdk.cancelMidCallPreview();
   }
 
   async join(config: sdkTypes.HMSConfig) {
@@ -731,6 +734,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
+      onPreview: this.onPreview.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onTrackUpdate: this.onTrackUpdate.bind(this),
@@ -1443,8 +1447,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
+    if (
+      [
+        sdkTypes.HMSPeerUpdate.PEER_JOINED,
+        sdkTypes.HMSPeerUpdate.PEER_LEFT,
+        sdkTypes.HMSPeerUpdate.ROLE_UPDATED,
+      ].includes(type)
+    ) {
       this.syncRoomState(actionName);
+      if (this.store.getState(selectIsInPreview)) {
+        this.setState(store => {
+          store.room.roomState = HMSRoomState.Connected;
+        }, 'midCallPreviewCompleted');
+      }
       // if peer wasn't available before sync(will happen if event is peer join)
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
