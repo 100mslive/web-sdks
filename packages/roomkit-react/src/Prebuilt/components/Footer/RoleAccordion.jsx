@@ -33,7 +33,9 @@ export const RoleAccordion = ({
 }) => {
   const [ref, { width }] = useMeasure();
   const height = ROW_HEIGHT * peerList.length;
-  const showAcordion = filter?.search ? peerList.some(peer => peer.name.includes(filter.search)) : true;
+  const showAcordion = filter?.search
+    ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search.toLowerCase()))
+    : true;
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
     return null;
   }
