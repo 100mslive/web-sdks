@@ -27,7 +27,7 @@ const HMSEdtechTemplate = React.lazy(() =>
 let hostname = window.location.hostname;
 if (!hostname.endsWith('app.100ms.live')) {
   hostname =
-    'anshul-sugarfit.app.100ms.live/' ||
+    'anshul-sugarfit.app.100ms.live' ||
     process.env.REACT_APP_HOST_NAME ||
     hostname;
 } else if (hostname.endsWith('dev-app.100ms.live')) {
