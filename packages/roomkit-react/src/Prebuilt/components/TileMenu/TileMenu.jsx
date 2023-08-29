@@ -4,7 +4,6 @@ import {
   selectLocalPeerID,
   selectPeerByID,
   selectPermissions,
-  selectTemplateAppData,
   selectTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
@@ -19,8 +18,6 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { FEATURE_LIST } from '../../common/constants';
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -36,11 +33,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   const showSpotlight = changeRole;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
-  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
-  const isInset = uiMode === 'inset';
-
-  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
-  const showPinAction = isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
+  const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
@@ -53,7 +46,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     return null;
   }
 
-  if (isInset && isLocal) {
+  if (isLocal) {
     return null;
   }
   const openNameChangeModal = () => setShowNameChangeModal(true);
@@ -114,7 +107,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8', pb: '$8' }}>
+              <Box css={{ px: '$8', pb: '$8', maxHeight: '80vh', overflowY: 'auto' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
