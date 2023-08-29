@@ -24,7 +24,7 @@ export const LeaveSessionContent = ({ setShowLeaveRoomAlert, leaveRoom, isModal 
           </Box>
         )}
       </Flex>
-      <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
+      <Text variant="sm" css={{ color: '$on_surface_low', mb: '$8', mt: '$4' }}>
         Others will continue after you leave. You can join the session again.
       </Text>
       <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>

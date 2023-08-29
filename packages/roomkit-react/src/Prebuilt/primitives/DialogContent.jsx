@@ -67,17 +67,21 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
           {Icon ? Icon : null}
           <Text variant="h6">{title}</Text>
         </Dialog.Title>
-        <Text
-          variant="md"
-          css={{
-            fontWeight: 400,
-            mt: '$4',
-            mb: '$10',
-            c: '$on_surface_medium',
-          }}
-        >
-          {body}
-        </Text>
+        {typeof body === 'string' ? (
+          <Text
+            variant="md"
+            css={{
+              fontWeight: 400,
+              mt: '$4',
+              mb: '$10',
+              c: '$on_surface_medium',
+            }}
+          >
+            {body}
+          </Text>
+        ) : (
+          <Box css={{ mt: '$4', mb: '$10' }}>{body}</Box>
+        )}
         <Flex justify="center" align="center" css={{ width: '100%', gap: '$md' }}>
           <Box css={{ width: '50%' }}>
             <Dialog.Close css={{ width: '100%' }}>

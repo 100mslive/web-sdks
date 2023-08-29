@@ -29,7 +29,7 @@ export const MessageNotifications = () => {
       return;
     }
     ToastBatcher.showToast({ notification });
-  }, [notification, isNewMessageSubscribed, isHeadless, isChatEnabled]);
+  }, [notification, isNewMessageSubscribed, isHeadless, isChatEnabled, metadata, hmsActions]);
 
   return null;
 };
