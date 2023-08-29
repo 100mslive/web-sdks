@@ -19,8 +19,6 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { FEATURE_LIST } from '../../common/constants';
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -39,8 +37,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   const uiMode = useHMSStore(selectTemplateAppData).uiMode;
   const isInset = uiMode === 'inset';
 
-  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
-  const showPinAction = isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
+  const showPinAction = (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
