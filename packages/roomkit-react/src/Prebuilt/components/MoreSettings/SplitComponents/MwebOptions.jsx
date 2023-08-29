@@ -78,7 +78,7 @@ export const MwebOptions = () => {
   return (
     <>
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
-        <Sheet.Trigger asChild data-testid="more_settings_btn">
+        <Sheet.Trigger asChild data-testid="more_settings_btn" onClick={e => e.stopPropagation()}>
           <IconButton>
             <Tooltip title="More options">
               <DragHandleIcon />
