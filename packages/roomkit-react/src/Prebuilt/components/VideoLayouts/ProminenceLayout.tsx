@@ -24,8 +24,8 @@ const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: 
   const isMobile = useMedia(cssConfig.media.md);
 
   return (
-    <Flex direction="column" css={{ flexShrink: 0 }}>
-      <Flex justify="center" align="center" css={{ gap: '$4' }}>
+    <Flex direction="column" css={{ flexBasis: tiles?.length > 0 ? 154 : 0, minHeight: 0, gap: '$2' }}>
+      <Flex justify="center" align="center" css={{ gap: '$4', minHeight: 0 }}>
         {tiles?.map(tile => {
           return (
             <VideoTile
