@@ -13,9 +13,7 @@ import { ActionTile } from '../../components/MoreSettings/ActionTile';
 import { Loading } from '../../../Loading';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
-import { useIsFeatureEnabled } from '../../components/hooks/useFeatures';
 import { getRandomVirtualBackground } from './vbutils';
-import { FEATURE_LIST } from '../../common/constants';
 
 export const VirtualBackground = ({
   asActionTile = false,
@@ -32,7 +30,6 @@ export const VirtualBackground = ({
   const [isVBOn, setIsVBOn] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const isVBPresent = useHMSStore(selectIsLocalVideoPluginPresent('HMSVB'));
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.VIDEO_PLUGINS);
 
   async function createPlugin() {
     if (!pluginRef.current) {
@@ -72,7 +69,7 @@ export const VirtualBackground = ({
     }
   }
 
-  if (!isAllowedToPublish.video || !isVBSupported || !isFeatureEnabled) {
+  if (!isAllowedToPublish.video || !isVBSupported) {
     return null;
   }
   if (asActionTile) {

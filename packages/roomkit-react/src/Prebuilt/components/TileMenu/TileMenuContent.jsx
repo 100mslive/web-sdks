@@ -28,8 +28,7 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
 export const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
@@ -211,27 +210,23 @@ export const TileMenuContent = props => {
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
-  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
-
   return isLocal ? (
     (showPinAction || canMinimise) && (
       <>
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         {canMinimise && <MinimiseInset />}
-        {isChangeNameEnabled ? (
-          <StyledMenuTile.ItemButton
-            onClick={() => {
-              openNameChangeModal();
-              closeSheetOnClick();
-            }}
-          >
-            <PencilIcon />
-            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
-              Change Name
-            </Text>
-          </StyledMenuTile.ItemButton>
-        ) : null}
+        <StyledMenuTile.ItemButton
+          onClick={() => {
+            openNameChangeModal();
+            closeSheetOnClick();
+          }}
+        >
+          <PencilIcon />
+          <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+            Change Name
+          </Text>
+        </StyledMenuTile.ItemButton>
       </>
     )
   ) : (
