@@ -40,7 +40,7 @@ export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom
         </Button>
         <Button
           variant="danger"
-          css={{ w: '100%', c: '$alert_error_brighter' }}
+          css={{ w: '100%' }}
           onClick={async () => {
             await stopStream();
             leaveRoom();

@@ -151,8 +151,8 @@ const StyledButton = styled('button', {
         '$alert_error_bright',
         '$alert_error_dim',
         '$alert_error_dim',
-        '$on_surface_high',
-        '$on_surface_low',
+        '$alert_error_brighter',
+        '$on_primary_low',
       ),
       primary: getButtonVariants(
         '$primary_default',
