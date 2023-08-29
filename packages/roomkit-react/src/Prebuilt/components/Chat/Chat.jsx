@@ -24,10 +24,11 @@ import { useUnreadCount } from './useUnreadCount';
 import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
+const PINNED_MESSAGE_LENGTH = 80;
+
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
   const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
-  const PINNED_MESSAGE_LENGTH = 80;
   const formattedPinnedMessage =
     pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
       ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
