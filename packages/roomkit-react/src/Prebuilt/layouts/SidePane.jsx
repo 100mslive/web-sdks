@@ -32,7 +32,11 @@ const SidePane = ({ css = {} }) => {
   const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
 
   return (
-    <Flex direction="column" justify="center" css={{ w: '$100', h: '100%', flexShrink: 0 }}>
+    <Flex
+      direction="column"
+      justify="center"
+      css={{ w: '$100', h: '100%', flexShrink: 0, '@md': { position: mwebStreamingChat ? 'absolute' : '' } }}
+    >
       {trackId && (
         <VideoTile
           peerId={activeScreensharePeerId}
