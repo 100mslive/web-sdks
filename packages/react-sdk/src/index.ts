@@ -39,6 +39,7 @@ export type { useAutoplayErrorResult } from './hooks/useAutoplayError';
 export type { useCustomEventInput, useCustomEventResult } from './hooks/useCustomEvent';
 export type { useEmbedShareResult } from './hooks/useEmbedShare';
 export type { usePDFShareResult } from './hooks/usePDFShare';
+export type { TrackWithPeerAndDimensions } from './utils/layout';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';

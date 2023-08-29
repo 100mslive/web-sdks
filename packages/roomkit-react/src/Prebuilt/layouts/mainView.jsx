@@ -2,29 +2,23 @@ import React, { Suspense, useCallback, useEffect } from 'react';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
-  selectPeerScreenSharing,
-  selectPeerSharingAudio,
-  selectPeerSharingVideoPlaylist,
   selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { EqualProminence } from '../components/EqualProminence';
 import FullPageProgress from '../components/FullPageProgress';
+import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
-import ScreenShareView from './screenShareView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
   useHLSViewerRole,
   usePDFAnnotator,
-  usePinnedTrack,
   useSetAppDataByKey,
-  useUISettings,
   useUrlToEmbed,
   useWaitingViewerRole,
 } from '../components/AppData/useUISettings';
@@ -33,18 +27,12 @@ import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 const HLSView = React.lazy(() => import('./HLSView'));
-const PinnedTrackView = React.lazy(() => import('./PinnedTrackView'));
 
 export const ConferenceMainView = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const pinnedTrack = usePinnedTrack();
-  const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const peerSharingAudio = useHMSStore(selectPeerSharingAudio);
-  const peerSharingPlaylist = useHMSStore(selectPeerSharingVideoPlaylist);
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const { isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
@@ -117,12 +105,8 @@ export const ConferenceMainView = () => {
     ViewComponent = EmbedView;
   } else if (whiteboardShared) {
     // ViewComponent = WhiteboardView;
-  } else if (((peerSharing && peerSharing.id !== peerSharingAudio?.id) || peerSharingPlaylist) && !isAudioOnly) {
-    ViewComponent = ScreenShareView;
-  } else if (pinnedTrack) {
-    ViewComponent = PinnedTrackView;
   } else {
-    ViewComponent = EqualProminence;
+    ViewComponent = GridLayout;
   }
 
   return (

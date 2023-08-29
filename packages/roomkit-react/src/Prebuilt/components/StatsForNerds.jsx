@@ -76,7 +76,9 @@ export const StatsForNerds = ({ onOpenChange }) => {
               minWidth: 0,
             }}
           >
-            <Label variant="body2">Stats For</Label>
+            <Label variant="body2" css={{ c: '$on_surface_high' }}>
+              Stats For
+            </Label>
             <Dropdown.Root data-testid="dialog_select_Stats For" open={open} onOpenChange={setOpen}>
               <DialogDropdownTrigger
                 title={selectedStat.label || 'Select Stats'}
