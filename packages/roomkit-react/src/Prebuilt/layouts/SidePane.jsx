@@ -58,7 +58,6 @@ const SidePane = ({ css = {} }) => {
               ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
               : '$surface_dim',
             r: '$1',
-            ml: '$8',
             position: 'relative',
             ...css,
             '@lg': {

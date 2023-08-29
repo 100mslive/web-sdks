@@ -1,8 +1,7 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Flex } from '../../../Layout';
-import { config as cssConfig, CSS } from '../../../Theme';
+import { CSS } from '../../../Theme';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
 
@@ -21,20 +20,17 @@ const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?
 };
 
 const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[] }>) => {
-  const isMobile = useMedia(cssConfig.media.md);
-
   return (
-    <Flex direction="column" css={{ flexShrink: 0 }}>
-      <Flex justify="center" align="center" css={{ gap: '$4' }}>
+    <Flex direction="column" css={{ flexBasis: tiles?.length > 0 ? 154 : 0, minHeight: 0, gap: '$2' }}>
+      <Flex justify="center" align="center" css={{ gap: '$4', minHeight: 0 }}>
         {tiles?.map(tile => {
           return (
             <VideoTile
               key={tile.track?.id || tile.peer?.id}
-              width={tile.width}
               height="100%"
               peerId={tile.peer?.id}
               trackId={tile.track?.id}
-              rootCSS={{ padding: 0, aspectRatio: isMobile ? 1 : 16 / 9 }}
+              rootCSS={{ padding: 0, flex: '1 1 0', maxWidth: 'max-content' }}
               objectFit="contain"
             />
           );
