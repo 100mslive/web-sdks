@@ -1,12 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
-import {
-  selectAppData,
-  selectLocalPeerID,
-  selectLocalPeerRoleName,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
@@ -21,7 +15,7 @@ import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
+import { useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, isMacOS } from '../../../common/constants';
 
@@ -37,15 +31,13 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const DesktopOptions = () => {
+export const DesktopOptions = ({ isHLSViewer }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const showStreamingUI = useShowStreamingUI();
-  const isHlsViewer = useIsLocalPeerHLSViewer();
   const isPipOn = PictureInPicture.isOn();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
@@ -91,7 +83,7 @@ export const DesktopOptions = () => {
             },
           }}
         >
-          {!(showStreamingUI || isHlsViewer) ? (
+          {!(showStreamingUI || isHLSViewer) ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -103,7 +95,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {!(showStreamingUI || isHlsViewer) ? (
+          {!(showStreamingUI || isHLSViewer) ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -115,9 +107,9 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {!(showStreamingUI || isHlsViewer) ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
+          {!(showStreamingUI || isHLSViewer) ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
 
-          {!isHlsViewer ? (
+          {!isHLSViewer ? (
             <Dropdown.Item>
               <PIP
                 content={
@@ -147,7 +139,7 @@ export const DesktopOptions = () => {
           </Dropdown.Item>
 
           {FeatureFlags.enableStatsForNerds &&
-            (localPeerRole === 'hls-viewer' ? (
+            (isHLSViewer ? (
               HMSHLSPlayer.isSupported() ? (
                 <Dropdown.Item
                   onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}

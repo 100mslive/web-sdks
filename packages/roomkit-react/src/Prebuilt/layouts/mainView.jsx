@@ -10,13 +10,13 @@ import {
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { EmbedView } from './EmbedView';
 import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
-  useHLSViewerRole,
   usePDFAnnotator,
   useSetAppDataByKey,
   useUrlToEmbed,
@@ -33,7 +33,6 @@ export const ConferenceMainView = () => {
   const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
@@ -41,6 +40,7 @@ export const ConferenceMainView = () => {
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
+  const isHLSViewer = useRoomLayout()?.screens?.conferencing?.hls_live_streaming;
 
   const startHLS = useCallback(async () => {
     try {
@@ -95,7 +95,7 @@ export const ConferenceMainView = () => {
   }
 
   let ViewComponent;
-  if (localPeerRole === hlsViewerRole) {
+  if (isHLSViewer) {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
@@ -119,7 +119,7 @@ export const ConferenceMainView = () => {
         }}
       >
         <ViewComponent />
-        <SidePane />
+        <SidePane isHLSViewer={isHLSViewer} />
       </Flex>
     </Suspense>
   );

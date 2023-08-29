@@ -22,7 +22,6 @@ import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
@@ -40,7 +39,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = () => {
+export const MwebOptions = ({ isHLSViewer }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -57,7 +56,6 @@ export const MwebOptions = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-  const isHLSViewer = useIsLocalPeerHLSViewer();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 

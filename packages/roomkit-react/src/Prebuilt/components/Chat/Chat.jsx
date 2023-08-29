@@ -21,7 +21,7 @@ import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
+import { useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
@@ -60,7 +60,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = () => {
+export const Chat = ({ isHLSViewer }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -88,7 +88,6 @@ export const Chat = () => {
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = useIsLocalPeerHLSViewer();
   const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
@@ -120,11 +119,13 @@ export const Chat = () => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         mwebStreaming={mwebStreaming}
+        isHLSViewer={isHLSViewer}
       />
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}
         selection={chatOptions.selection}
+        isHLSViewer={isHLSViewer}
         onSelect={({ role, peerId, selection }) => {
           setChatOptions({
             role,

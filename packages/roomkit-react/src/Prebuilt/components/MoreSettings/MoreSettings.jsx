@@ -4,7 +4,7 @@ import { DesktopOptions } from './SplitComponents/DesktopOptions';
 import { MwebOptions } from './SplitComponents/MwebOptions';
 import { config as cssConfig } from '../../../';
 
-export const MoreSettings = () => {
+export const MoreSettings = ({ isHLSViewer }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  return isMobile ? <MwebOptions /> : <DesktopOptions />;
+  return isMobile ? <MwebOptions isHLSViewer={isHLSViewer} /> : <DesktopOptions isHLSViewer={isHLSViewer} />;
 };

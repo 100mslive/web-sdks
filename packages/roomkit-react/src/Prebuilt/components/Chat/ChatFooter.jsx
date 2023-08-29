@@ -9,7 +9,7 @@ import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
+import { useShowStreamingUI } from '../../common/hooks';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -63,12 +63,11 @@ function EmojiPicker({ onSelect }) {
   );
 }
 
-export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection }) => {
+export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection, isHLSViewer }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const sendMessage = useCallback(async () => {

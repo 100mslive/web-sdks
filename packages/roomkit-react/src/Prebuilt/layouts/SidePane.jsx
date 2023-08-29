@@ -7,23 +7,22 @@ import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../common/hooks';
+import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ css = {} }) => {
+const SidePane = ({ isHLSViewer, css = {} }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
-  const isHLSViewer = useIsLocalPeerHLSViewer();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
-    ViewComponent = ParticipantList;
+    ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = Chat;
+    ViewComponent = <Chat isHLSViewer={isHLSViewer} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = StreamingLanding;
+    ViewComponent = <StreamingLanding />;
   }
   if (!ViewComponent && !activeScreensharePeerId) {
     return null;

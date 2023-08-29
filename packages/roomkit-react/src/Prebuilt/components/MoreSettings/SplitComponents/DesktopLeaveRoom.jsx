@@ -9,13 +9,14 @@ import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
 import { LeaveSessionContent } from '../../LeaveSessionContent';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
+import { useShowStreamingUI } from '../../../common/hooks';
 
 export const DesktopLeaveRoom = ({
   menuTriggerButton: MenuTriggerButton,
   leaveIconButton: LeaveIconButton,
   leaveRoom,
   stopStream,
+  isHLSViewer,
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -24,7 +25,6 @@ export const DesktopLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStream = showStreamingUI && isStreamingOn;
 
   useDropdownList({ open, name: 'LeaveRoom' });

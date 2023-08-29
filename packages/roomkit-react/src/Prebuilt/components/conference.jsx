@@ -16,13 +16,13 @@ import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
 import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
-import { useIsLocalPeerHLSViewer } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
@@ -43,7 +43,7 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-  const isHlsViewer = useIsLocalPeerHLSViewer();
+  const isHLSViewer = useRoomLayout()?.screens?.conferencing?.hls_live_streaming;
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
@@ -170,7 +170,7 @@ const Conference = () => {
             marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
             '@md': {
               maxHeight: 'unset',
-              bg: isHlsViewer ? 'transparent' : '$background_dim',
+              bg: isHLSViewer ? 'transparent' : '$background_dim',
             },
           }}
           data-testid="footer"

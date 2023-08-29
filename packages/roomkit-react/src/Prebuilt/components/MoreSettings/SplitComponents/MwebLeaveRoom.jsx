@@ -8,16 +8,15 @@ import { EndSessionContent } from '../../EndSessionContent';
 import { LeaveCard } from '../../LeaveCard';
 import { LeaveSessionContent } from '../../LeaveSessionContent';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
+import { useShowStreamingUI } from '../../../common/hooks';
 
-export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, stopStream }) => {
+export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, stopStream, isHLSViewer }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const isHlsViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
   const showStream = showStreamingUI && isStreamingOn;
@@ -85,7 +84,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
           key="LeaveRoom"
           data-testid="leave_room_btn"
           onClick={() => {
-            if (isHlsViewer) {
+            if (isHLSViewer) {
               setShowLeaveRoomAlert(true);
             }
           }}
@@ -106,7 +105,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
           />
         </Sheet.Content>
       </Sheet.Root>
-      {isHlsViewer ? (
+      {isHLSViewer ? (
         <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
           <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
             <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />

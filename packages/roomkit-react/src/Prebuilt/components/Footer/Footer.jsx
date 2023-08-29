@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../../';
 import { AudioVideoToggle } from '../AudioVideoToggle';
 import { EmojiReaction } from '../EmojiReaction';
@@ -10,13 +9,9 @@ import { RaiseHand } from '../RaiseHand';
 import { ScreenshareToggle } from '../ScreenShareToggle';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 
-export const Footer = () => {
+export const Footer = ({ isHLSViewer }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
 
   return (
     <AppFooter.Root
@@ -39,7 +34,7 @@ export const Footer = () => {
           },
         }}
       >
-        {isMobile ? <LeaveRoom /> : null}
+        {isMobile ? <LeaveRoom isHLSViewer={isHLSViewer} /> : null}
         <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
@@ -52,23 +47,23 @@ export const Footer = () => {
       >
         {isMobile ? (
           <>
-            {isHlsViewer ? <RaiseHand /> : null}
+            {isHLSViewer ? <RaiseHand /> : null}
             <ChatToggle />
-            <MoreSettings />
+            <MoreSettings isHLSViewer={isHLSViewer} />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHlsViewer ? <RaiseHand /> : null}
+            {isHLSViewer ? <RaiseHand /> : null}
             <EmojiReaction />
-            <LeaveRoom />
+            <LeaveRoom isHLSViewer={isHLSViewer} />
           </>
         )}
       </AppFooter.Center>
       <AppFooter.Right>
         <ChatToggle />
         <ParticipantCount />
-        <MoreSettings />
+        <MoreSettings isHLSViewer={isHLSViewer} />
       </AppFooter.Right>
     </AppFooter.Root>
   );

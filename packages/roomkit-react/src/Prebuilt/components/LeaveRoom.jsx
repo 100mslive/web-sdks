@@ -11,7 +11,7 @@ import { config as cssConfig, styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { useNavigation } from './hooks/useNavigation';
 
-export const LeaveRoom = () => {
+export const LeaveRoom = ({ isHLSViewer }) => {
   const navigate = useNavigation();
   const params = useParams();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -58,13 +58,19 @@ export const LeaveRoom = () => {
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveIconButton={LeaveIconButton} leaveRoom={leaveRoom} stopStream={stopStream} />
+    <MwebLeaveRoom
+      leaveIconButton={LeaveIconButton}
+      leaveRoom={leaveRoom}
+      stopStream={stopStream}
+      isHLSViewer={isHLSViewer}
+    />
   ) : (
     <DesktopLeaveRoom
       leaveIconButton={LeaveIconButton}
       menuTriggerButton={MenuTriggerButton}
       leaveRoom={leaveRoom}
       stopStream={stopStream}
+      isHLSViewer={isHLSViewer}
     />
   );
 };
