@@ -1,4 +1,3 @@
-// @ts-check
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
@@ -235,7 +234,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role, isHandRaised }) =>
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
   const layout = useRoomLayout();
   const { bring_to_stage_label, remove_from_stage_label, on_stage_role, off_stage_roles } =
-    layout.screens.conferencing.default.elements.on_stage_exp || {};
+    layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
   const canBringToStage = off_stage_roles.includes(role);
   const isInStage = role === on_stage_role;
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
