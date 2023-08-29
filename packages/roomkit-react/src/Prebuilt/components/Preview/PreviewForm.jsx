@@ -42,6 +42,12 @@ const PreviewForm = ({
           placeholder="Enter name"
           autoFocus
           autoComplete="name"
+          onKeyDown={e => {
+            if (e.key === 'Enter' && name.trim().length > 0) {
+              e.preventDefault();
+              onJoin();
+            }
+          }}
         />
         {cannotPublishAudio && cannotPublishVideo && !isMobile ? <PreviewSettings /> : null}
       </Flex>

@@ -39,6 +39,10 @@ const OptionsSection = styled(IconButton, {
 });
 
 export const IconButtonWithOptions = ({
+  disabled = false,
+  onDisabledClick = () => {
+    return;
+  },
   tooltipMessage = '',
   icon,
   options = [],
@@ -47,8 +51,9 @@ export const IconButtonWithOptions = ({
     return;
   },
 }) => {
-  const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
-  const iconCss = { color: active ? '$on_surface_high' : '$on_primary_high' };
+  const bgCss = { backgroundColor: disabled ? '$surface_brighter' : active ? '$transparent' : '$secondary_dim' };
+  const iconCss = { color: disabled ? '$on_surface_low' : active ? '$on_surface_high' : '$on_primary_high' };
+
   return (
     <Flex>
       <IconSection css={bgCss} onClick={onClick}>
@@ -59,7 +64,16 @@ export const IconButtonWithOptions = ({
         </Tooltip>
       </IconSection>
       <Dropdown.Root>
-        <Dropdown.Trigger asChild>
+        <Dropdown.Trigger
+          asChild
+          // onClick does not work
+          onPointerDown={e => {
+            if (disabled) {
+              e.preventDefault();
+              onDisabledClick();
+            }
+          }}
+        >
           <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
               <Box css={iconCss}>

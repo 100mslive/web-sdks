@@ -9,6 +9,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Footer } from './Footer/Footer';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
@@ -16,13 +17,13 @@ import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
-import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
 import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
 import { useSkipPreview } from './hooks/useSkipPreview';
+import { useIsLocalPeerHLSViewer } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
@@ -45,6 +46,7 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+  const isHlsViewer = useIsLocalPeerHLSViewer();
 
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
@@ -151,7 +153,7 @@ const Conference = () => {
           px: '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
           '@lg': {
-            px: 0,
+            px: '$4',
           },
         }}
         id="conferencing"
@@ -167,9 +169,11 @@ const Conference = () => {
             flexShrink: 0,
             maxHeight: '$24',
             transition: 'margin 0.3s ease-in-out',
+            bg: '$background_dim',
             marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
             '@md': {
               maxHeight: 'unset',
+              bg: isHlsViewer ? 'transparent' : '$background_dim',
             },
           }}
           data-testid="footer"

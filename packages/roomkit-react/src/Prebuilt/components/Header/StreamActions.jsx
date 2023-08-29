@@ -13,13 +13,11 @@ import {
 import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
 import { Sheet } from '../../../Sheet';
-import { ResolutionInput } from '../Streaming/ResolutionInput';
-import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { formatTime } from '../../common/utils';
-import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
+import { APP_DATA } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
@@ -112,7 +110,6 @@ export const RecordingStatus = () => {
 
 const StartRecording = () => {
   const permissions = useHMSStore(selectPermissions);
-  const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
   const [open, setOpen] = useState(false);
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
@@ -161,62 +158,38 @@ const StartRecording = () => {
     );
   }
   return (
-    <Popover.Root open={open} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>
-        <Button
-          data-testid="start_recording"
-          variant="standard"
-          icon
-          disabled={recordingStarted || isStreamingOn}
-          onClick={() => setOpen(true)}
-        >
-          {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}
-          <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
-            {recordingStarted ? 'Starting' : 'Start'} Recording
-          </Text>
-        </Button>
-      </Popover.Trigger>
-      <Popover.Content align="end" sideOffset={8} css={{ w: '$64' }}>
-        <ResolutionInput
-          testId="recording_resolution"
-          css={{ flexDirection: 'column', alignItems: 'start' }}
-          onResolutionChange={setResolution}
-        />
-        <Button
-          data-testid="start_recording_confirm"
-          variant="primary"
-          icon
-          css={{ ml: 'auto' }}
-          type="submit"
-          disabled={recordingStarted || isStreamingOn}
-          onClick={async () => {
-            try {
-              setRecordingState(true);
-              await hmsActions.startRTMPOrRecording({
-                resolution: getResolution(resolution),
-                record: true,
-              });
-            } catch (error) {
-              if (error.message.includes('stream already running')) {
-                ToastManager.addToast({
-                  title: 'Recording already running',
-                  variant: 'error',
-                });
-              } else {
-                ToastManager.addToast({
-                  title: error.message,
-                  variant: 'error',
-                });
-              }
-              setRecordingState(false);
-            }
-            setOpen(false);
-          }}
-        >
-          Start
-        </Button>
-      </Popover.Content>
-    </Popover.Root>
+    <Button
+      data-testid="start_recording"
+      variant="standard"
+      icon
+      disabled={recordingStarted || isStreamingOn}
+      onClick={async () => {
+        try {
+          setRecordingState(true);
+          await hmsActions.startRTMPOrRecording({
+            record: true,
+          });
+        } catch (error) {
+          if (error.message.includes('stream already running')) {
+            ToastManager.addToast({
+              title: 'Recording already running',
+              variant: 'error',
+            });
+          } else {
+            ToastManager.addToast({
+              title: error.message,
+              variant: 'error',
+            });
+          }
+          setRecordingState(false);
+        }
+      }}
+    >
+      {recordingStarted ? <Loading size={24} color="currentColor" /> : <RecordIcon />}
+      <Text as="span" css={{ '@md': { display: 'none' }, color: 'currentColor' }}>
+        {recordingStarted ? 'Starting' : 'Start'} Recording
+      </Text>
+    </Button>
   );
 };
 
@@ -250,7 +223,9 @@ export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
           <Flex direction="row" justify="between" css={{ w: '100%', c: '$alert_error_default' }}>
             <Flex justify="start" align="center" gap="3">
               <AlertTriangleIcon />
-              <Text variant="h5">Stop Recording</Text>
+              <Text variant="h5" css={{ c: '$alert_error_default' }}>
+                Stop Recording
+              </Text>
             </Flex>
             <Sheet.Close css={{ color: 'white' }} onClick={onClose}>
               <CrossIcon />

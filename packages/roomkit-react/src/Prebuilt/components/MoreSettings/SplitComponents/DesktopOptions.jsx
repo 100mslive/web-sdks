@@ -2,40 +2,27 @@ import React, { Fragment, useState } from 'react';
 import { HMSHLSPlayer } from '@100mslive/hls-player';
 import {
   selectAppData,
-  selectIsAllowedToPublish,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  BrbIcon,
-  CheckIcon,
-  DragHandleIcon,
-  HandIcon,
-  InfoIcon,
-  PencilIcon,
-  PipIcon,
-  SettingsIcon,
-} from '@100mslive/react-icons';
+import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../../';
 import IconButton from '../../../IconButton';
 import { PIP } from '../../PIP';
+import { PictureInPicture } from '../../PIP/PIPManager';
 import { RoleChangeModal } from '../../RoleChangeModal';
 import SettingsModal from '../../Settings/SettingsModal';
 import StartRecording from '../../Settings/StartRecording';
 import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '.././BulkRoleChangeModal';
-import { ChangeNameModal } from '.././ChangeNameModal';
-import { ChangeSelfRole } from '.././ChangeSelfRole';
-import { EmbedUrl, EmbedUrlModal } from '.././EmbedUrl';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
-import { useHLSViewerRole } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
 import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
 
@@ -52,22 +39,19 @@ const MODALS = {
 };
 
 export const DesktopOptions = () => {
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
-  const isEmbedEnabled = useIsFeatureEnabled(FEATURE_LIST.EMBED_URL);
   const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
   const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
+  const isHlsViewer = useIsLocalPeerHLSViewer();
   const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
+  const isPipOn = PictureInPicture.isOn();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -112,7 +96,7 @@ export const DesktopOptions = () => {
             },
           }}
         >
-          {isHandRaiseEnabled && !showStreamingUI ? (
+          {isHandRaiseEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -124,7 +108,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled && !showStreamingUI ? (
+          {isBRBEnabled && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -136,7 +120,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {(isBRBEnabled || isHandRaiseEnabled) && !showStreamingUI ? (
+          {(isBRBEnabled || isHandRaiseEnabled) && !(showStreamingUI || isHlsViewer) ? (
             <Dropdown.ItemSeparator css={{ mx: '0' }} />
           ) : null}
 
@@ -147,7 +131,7 @@ export const DesktopOptions = () => {
                   <Flex css={{ w: '100%' }}>
                     <PipIcon />
                     <Text variant="sm" css={{ ml: '$4' }}>
-                      Picture in picture mode
+                      {isPipOn ? 'Disable' : 'Enable'} Picture-in-Picture
                     </Text>
                   </Flex>
                 }
@@ -155,19 +139,10 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isChangeNameEnabled && (
-            <Dropdown.Item onClick={() => updateState(MODALS.CHANGE_NAME, true)} data-testid="change_name_btn">
-              <PencilIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Change Name
-              </Text>
-            </Dropdown.Item>
-          )}
-          <ChangeSelfRole onClick={() => updateState(MODALS.SELF_ROLE_CHANGE, true)} />
           <FullScreenItem />
-          {isAllowedToPublish.screen && isEmbedEnabled && (
+          {/* {isAllowedToPublish.screen && isEmbedEnabled && (
             <EmbedUrl setShowOpenUrl={() => updateState(MODALS.EMBED_URL, true)} />
-          )}
+          )} */}
 
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
 
@@ -223,9 +198,7 @@ export const DesktopOptions = () => {
         <BulkRoleChangeModal onOpenChange={value => updateState(MODALS.BULK_ROLE_CHANGE, value)} />
       )}
       {openModals.has(MODALS.MUTE_ALL) && <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} />}
-      {openModals.has(MODALS.CHANGE_NAME) && (
-        <ChangeNameModal onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)} />
-      )}
+
       {openModals.has(MODALS.START_RECORDING) && (
         <StartRecording open onOpenChange={value => updateState(MODALS.START_RECORDING, value)} />
       )}
@@ -238,9 +211,9 @@ export const DesktopOptions = () => {
       {openModals.has(MODALS.SELF_ROLE_CHANGE) && (
         <RoleChangeModal peerId={localPeerId} onOpenChange={value => updateState(MODALS.SELF_ROLE_CHANGE, value)} />
       )}
-      {openModals.has(MODALS.EMBED_URL) && (
+      {/* {openModals.has(MODALS.EMBED_URL) && (
         <EmbedUrlModal onOpenChange={value => updateState(MODALS.EMBED_URL, value)} />
-      )}
+      )} */}
     </Fragment>
   );
 };

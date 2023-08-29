@@ -146,7 +146,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
               open={open}
             />
             <Dropdown.Portal>
-              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
+              <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1001 }}>
                 {devices.map(device => {
                   return (
                     <Dropdown.Item

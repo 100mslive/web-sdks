@@ -16,6 +16,7 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig, useTheme } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
+import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
 import { useIsFeatureEnabled } from '../hooks/useFeatures';
@@ -45,7 +46,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   const isMobile = useMedia(cssConfig.media.md);
   const peer = useHMSStore(selectPeerByID(peerID));
-
+  const [showNameChangeModal, setShowNameChangeModal] = useState(false);
   useDropdownList({ open, name: 'TileMenu' });
 
   if (!(removeOthers || toggleAudio || toggleVideo || setVolume || showPinAction) && hideSimulcastLayers) {
@@ -55,6 +56,8 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   if (isInset && isLocal) {
     return null;
   }
+  const openNameChangeModal = () => setShowNameChangeModal(true);
+
   const props = {
     isLocal,
     isScreenshare,
@@ -65,61 +68,68 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     showSpotlight,
     showPinAction,
     canMinimise,
+    openNameChangeModal,
   };
 
   return (
-    <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
-      <StyledMenuTile.Trigger
-        data-testid="participant_menu_btn"
-        css={{ bg: `${theme.colors.background_dim.value}A3` }}
-        onClick={e => e.stopPropagation()}
-      >
-        <VerticalMenuIcon width={20} height={20} />
-      </StyledMenuTile.Trigger>
+    <>
+      <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
+        <StyledMenuTile.Trigger
+          data-testid="participant_menu_btn"
+          css={{ bg: `${theme.colors.background_dim.value}A3` }}
+          onClick={e => e.stopPropagation()}
+          className={isMobile ? '__cancel-drag-event' : ''}
+        >
+          <VerticalMenuIcon width={20} height={20} />
+        </StyledMenuTile.Trigger>
 
-      {isMobile ? (
-        <Sheet.Root open={open} onOpenChange={setOpen}>
-          <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
-            <Flex
-              css={{
-                color: '$on_surface_high',
-                display: 'flex',
-                w: '100%',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                px: '$10',
-                pb: '$8',
-                borderBottom: '1px solid $border_default',
-              }}
-            >
-              <Box>
-                <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                  {peer.name}
-                  {isLocal ? ` (You)` : null}
-                </Text>
-                {peer?.roleName ? (
-                  <Text variant="xs" css={{ color: '$on_surface_low', mt: '$2' }}>
-                    {peer.roleName}
+        {isMobile ? (
+          <Sheet.Root open={open} onOpenChange={setOpen}>
+            <Sheet.Content css={{ bg: '$surface_dim', pt: '$8' }}>
+              <Flex
+                css={{
+                  color: '$on_surface_high',
+                  display: 'flex',
+                  w: '100%',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  px: '$10',
+                  pb: '$8',
+                  borderBottom: '1px solid $border_default',
+                }}
+              >
+                <Box>
+                  <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
+                    {peer.name}
+                    {isLocal ? ` (You)` : null}
                   </Text>
-                ) : null}
-              </Box>
+                  {peer?.roleName ? (
+                    <Text variant="xs" css={{ color: '$on_surface_low', mt: '$2' }}>
+                      {peer.roleName}
+                    </Text>
+                  ) : null}
+                </Box>
 
-              <Sheet.Close css={{ color: 'inherit' }}>
-                <CrossIcon />
-              </Sheet.Close>
-            </Flex>
-            <Box css={{ px: '$8' }}>
-              <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
-            </Box>
-          </Sheet.Content>
-        </Sheet.Root>
-      ) : (
-        <StyledMenuTile.Content side="top" align="end">
-          <TileMenuContent {...props} />
-        </StyledMenuTile.Content>
-      )}
-    </StyledMenuTile.Root>
+                <Sheet.Close css={{ color: 'inherit' }}>
+                  <CrossIcon />
+                </Sheet.Close>
+              </Flex>
+              <Box css={{ px: '$8', pb: '$8' }}>
+                <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
+              </Box>
+            </Sheet.Content>
+          </Sheet.Root>
+        ) : (
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
+            <TileMenuContent {...props} />
+          </StyledMenuTile.Content>
+        )}
+      </StyledMenuTile.Root>
+      {showNameChangeModal && <ChangeNameModal onOpenChange={setShowNameChangeModal} />}
+    </>
   );
 };
+
+export { isSameTile } from './TileMenuContent';
 
 export default TileMenu;

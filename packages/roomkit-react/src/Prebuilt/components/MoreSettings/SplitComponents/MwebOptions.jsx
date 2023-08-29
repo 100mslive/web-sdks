@@ -3,35 +3,28 @@ import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
   selectIsLocalVideoEnabled,
+  selectPeerCount,
   selectPermissions,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import {
-  BrbIcon,
-  CrossIcon,
-  DragHandleIcon,
-  EmojiIcon,
-  HandIcon,
-  PencilIcon,
-  RecordIcon,
-  SettingsIcon,
-} from '@100mslive/react-icons';
-import { Box, Tooltip } from '../../../../';
+import { CrossIcon, DragHandleIcon, EmojiIcon, PeopleIcon, RecordIcon, SettingsIcon } from '@100mslive/react-icons';
+import { Box, Loading, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
-import { EmojiCard } from '../../Footer/EmojiCard';
+import { EmojiReaction } from '../../EmojiReaction';
 import { StopRecordingInSheet } from '../../Header/StreamActions';
 import SettingsModal from '../../Settings/SettingsModal';
 import { ToastManager } from '../../Toast/ToastManager';
 import { ActionTile } from '.././ActionTile';
 import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
+import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../../hooks/useFeatures';
-import { useMyMetadata } from '../../hooks/useMetadata';
-import { FEATURE_LIST } from '../../../common/constants';
+import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
+import { getFormattedCount } from '../../../common/utils';
+import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -54,17 +47,17 @@ export const MwebOptions = () => {
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
 
   const [openModals, setOpenModals] = useState(new Set());
-  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
 
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
   const [showRecordingOn, setShowRecordingOn] = useState(false);
-
+  const [isRecordingLoading, setIsRecordingLoading] = useState(false);
+  const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const isHLSViewer = useIsLocalPeerHLSViewer();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
@@ -92,7 +85,7 @@ export const MwebOptions = () => {
             </Tooltip>
           </IconButton>
         </Sheet.Trigger>
-        <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
+        <Sheet.Content css={{ bg: isHLSViewer ? '$surface_default' : '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
               display: 'flex',
@@ -125,63 +118,62 @@ export const MwebOptions = () => {
               px: '$9',
             }}
           >
-            {isHandRaiseEnabled ? (
-              <ActionTile
-                title="Raise Hand"
-                icon={<HandIcon />}
-                onClick={toggleHandRaise}
-                active={isHandRaised}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            ) : null}
-            {isBRBEnabled ? (
-              <ActionTile
-                title="Be Right Back"
-                icon={<BrbIcon />}
-                onClick={toggleBRB}
-                active={isBRBOn}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            ) : null}
-            <ActionTile
-              title="Change Name"
-              icon={<PencilIcon />}
-              onClick={() => updateState(MODALS.CHANGE_NAME, true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
+            <ActionTile.Root
+              onClick={() => {
+                toggleParticipants();
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
+              <PeopleIcon />
+              <ActionTile.Title>Participants</ActionTile.Title>
+            </ActionTile.Root>
+
             {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
             ) : null}
-            <ActionTile
-              title="Emoji Reactions"
-              icon={<EmojiIcon />}
-              onClick={() => setShowEmojiCard(true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
-            <ActionTile
-              title="Settings"
-              icon={<SettingsIcon />}
-              onClick={() => setOpenSettingsSheet(true)}
-              setOpenOptionsSheet={setOpenOptionsSheet}
-            />
 
-            {isConnected && permissions?.browserRecording && (
-              <ActionTile
-                title={isBrowserRecordingOn ? 'Recording On' : 'Start Recording'}
+            <ActionTile.Root
+              onClick={() => {
+                setShowEmojiCard(true);
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <EmojiIcon />
+              <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+            </ActionTile.Root>
+
+            <ActionTile.Root
+              onClick={() => {
+                setOpenSettingsSheet(true);
+                setOpenOptionsSheet(false);
+              }}
+            >
+              <SettingsIcon />
+              <ActionTile.Title>Settings</ActionTile.Title>
+            </ActionTile.Root>
+
+            {isConnected && permissions?.browserRecording ? (
+              <ActionTile.Root
                 disabled={isHLSRunning}
-                icon={<RecordIcon />}
                 onClick={async () => {
+                  if (isRecordingLoading) {
+                    return;
+                  }
                   if (isBrowserRecordingOn || isStreamingOn) {
+                    setOpenOptionsSheet(false);
                     setShowRecordingOn(true);
                   } else {
                     // start recording
-                    setOpenOptionsSheet(false);
+                    setIsRecordingLoading(true);
                     try {
                       await hmsActions.startRTMPOrRecording({
                         record: true,
                       });
+                      setOpenOptionsSheet(false);
+                      setIsRecordingLoading(false);
                     } catch (error) {
                       if (error.message.includes('stream already running')) {
                         ToastManager.addToast({
@@ -194,12 +186,24 @@ export const MwebOptions = () => {
                           variant: 'error',
                         });
                       }
+                      setIsRecordingLoading(false);
                     }
                   }
+                  if (isHLSRunning) {
+                    setOpenOptionsSheet(false);
+                  }
                 }}
-                setOpenOptionsSheet={setOpenOptionsSheet}
-              />
-            )}
+              >
+                {isRecordingLoading ? <Loading /> : <RecordIcon />}
+                <ActionTile.Title>
+                  {isBrowserRecordingOn
+                    ? 'Recording On'
+                    : isRecordingLoading
+                    ? 'Starting Recording'
+                    : 'Start Recording'}
+                </ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
           </Box>
         </Sheet.Content>
       </Sheet.Root>
@@ -233,7 +237,7 @@ export const MwebOptions = () => {
             mx: '$4',
           }}
         >
-          <EmojiCard />
+          <EmojiReaction />
         </Box>
       )}
       {showRecordingOn && (
