@@ -99,6 +99,10 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     }
   }, [initialName]);
 
+  if (roomState === HMSRoomState.Connected) {
+    return;
+  }
+
   return roomState === HMSRoomState.Preview ? (
     <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
       {toggleVideo ? null : <Box />}
