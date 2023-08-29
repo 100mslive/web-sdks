@@ -18,11 +18,11 @@ const SidePane = ({ isHLSViewer, css = {} }) => {
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
-    ViewComponent = <ParticipantList />;
+    ViewComponent = ParticipantList;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat isHLSViewer={isHLSViewer} />;
+    ViewComponent = Chat;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = <StreamingLanding />;
+    ViewComponent = StreamingLanding;
   }
   if (!ViewComponent && !activeScreensharePeerId) {
     return null;
@@ -76,7 +76,7 @@ const SidePane = ({ isHLSViewer, css = {} }) => {
             },
           }}
         >
-          <ViewComponent />
+          <ViewComponent isHLSViewer={isHLSViewer} />
         </Box>
       )}
     </Flex>
