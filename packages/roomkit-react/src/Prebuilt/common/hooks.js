@@ -90,7 +90,7 @@ export const useParticipants = params => {
   if (params?.search) {
     const search = params.search.toLowerCase();
     // Removed peer.roleName?.toLowerCase().includes(search)
-    participantList = participantList.filter(peer => peer.name.toLowerCase().includes(search.toLowerCase()));
+    participantList = participantList.filter(peer => peer.name.toLowerCase().includes(search));
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };
