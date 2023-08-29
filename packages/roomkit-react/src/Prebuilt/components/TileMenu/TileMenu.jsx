@@ -4,7 +4,6 @@ import {
   selectLocalPeerID,
   selectPeerByID,
   selectPermissions,
-  selectTemplateAppData,
   selectTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
@@ -34,10 +33,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
   const showSpotlight = changeRole;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
-  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
-  const isInset = uiMode === 'inset';
-
-  const showPinAction = (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
+  const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
@@ -50,7 +46,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     return null;
   }
 
-  if (isInset && isLocal) {
+  if (isLocal) {
     return null;
   }
   const openNameChangeModal = () => setShowNameChangeModal(true);
