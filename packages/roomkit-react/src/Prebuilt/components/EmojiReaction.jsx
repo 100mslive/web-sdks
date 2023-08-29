@@ -21,15 +21,13 @@ import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
-import { useIsFeatureEnabled } from './hooks/useFeatures';
-import { EMOJI_REACTION_TYPE, FEATURE_LIST } from '../common/constants';
+import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 init({ data });
 
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.EMOJI_REACTION);
   useDropdownList({ open: open, name: 'EmojiReaction' });
   const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
@@ -70,7 +68,7 @@ export const EmojiReaction = () => {
     }
   };
 
-  if (!isConnected || !isFeatureEnabled) {
+  if (!isConnected) {
     return null;
   }
   return isMobile ? (

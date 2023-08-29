@@ -9,9 +9,8 @@ import { AudioOutputActions, CamaraFlipActions } from './common';
 export const ConferencingHeader = () => {
   const roomState = useHMSStore(selectRoomState);
   const isMobile = useMedia(cssConfig.media.md);
-  const isPreview = roomState === HMSRoomState.Preview;
-  // no header if there in preview
-  if (isPreview) {
+  // Header should be present only inside the call - not in preview, leave room states
+  if (roomState !== HMSRoomState.Connected) {
     return <></>;
   }
   return (
@@ -35,12 +34,12 @@ export const ConferencingHeader = () => {
         }}
       >
         <StreamActions />
-        {isMobile && (
+        {isMobile ? (
           <>
             <CamaraFlipActions />
             <AudioOutputActions />
           </>
-        )}
+        ) : null}
       </Flex>
     </Flex>
   );
