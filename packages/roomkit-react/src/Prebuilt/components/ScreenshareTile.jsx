@@ -22,6 +22,7 @@ const labelStyles = {
   position: 'unset',
   width: '100%',
   textAlign: 'center',
+  c: '$on_surface_high',
   transform: 'none',
   mt: '$2',
   flexShrink: 0,

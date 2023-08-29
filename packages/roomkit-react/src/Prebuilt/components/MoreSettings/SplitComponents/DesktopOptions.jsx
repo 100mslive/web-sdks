@@ -20,11 +20,10 @@ import { BulkRoleChangeModal } from '.././BulkRoleChangeModal';
 import { FullScreenItem } from '.././FullScreenItem';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../../hooks/useFeatures';
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
 import { FeatureFlags } from '../../../services/FeatureFlags';
-import { APP_DATA, FEATURE_LIST, isMacOS } from '../../../common/constants';
+import { APP_DATA, isMacOS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -43,14 +42,10 @@ export const DesktopOptions = () => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const isSFNEnabled = useIsFeatureEnabled(FEATURE_LIST.STARTS_FOR_NERDS);
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
-  const isHandRaiseEnabled = useIsFeatureEnabled(FEATURE_LIST.HAND_RAISE);
-  const isBRBEnabled = useIsFeatureEnabled(FEATURE_LIST.BRB);
   const showStreamingUI = useShowStreamingUI();
   const isHlsViewer = useIsLocalPeerHLSViewer();
-  const isPIPEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
   const isPipOn = PictureInPicture.isOn();
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
@@ -96,7 +91,7 @@ export const DesktopOptions = () => {
             },
           }}
         >
-          {isHandRaiseEnabled && !(showStreamingUI || isHlsViewer) ? (
+          {!(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -108,7 +103,7 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled && !(showStreamingUI || isHlsViewer) ? (
+          {!(showStreamingUI || isHlsViewer) ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -120,11 +115,9 @@ export const DesktopOptions = () => {
             </Dropdown.Item>
           ) : null}
 
-          {(isBRBEnabled || isHandRaiseEnabled) && !(showStreamingUI || isHlsViewer) ? (
-            <Dropdown.ItemSeparator css={{ mx: '0' }} />
-          ) : null}
+          {!(showStreamingUI || isHlsViewer) ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
 
-          {isPIPEnabled && !isHlsViewer ? (
+          {!isHlsViewer ? (
             <Dropdown.Item>
               <PIP
                 content={
@@ -154,7 +147,6 @@ export const DesktopOptions = () => {
           </Dropdown.Item>
 
           {FeatureFlags.enableStatsForNerds &&
-            isSFNEnabled &&
             (localPeerRole === 'hls-viewer' ? (
               HMSHLSPlayer.isSupported() ? (
                 <Dropdown.Item

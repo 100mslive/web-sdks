@@ -4,18 +4,12 @@ import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { FEATURE_LIST, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ChatToggle = () => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.CHAT);
-
-  if (!isFeatureEnabled) {
-    return;
-  }
 
   return (
     <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
