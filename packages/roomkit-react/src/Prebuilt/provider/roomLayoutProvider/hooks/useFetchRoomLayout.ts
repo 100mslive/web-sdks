@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
+import merge from 'lodash.merge';
 import { defaultLayout } from '../constants';
 
 // TODO: remove this usage
@@ -48,7 +49,8 @@ export const useFetchRoomLayout = ({
         },
       });
       const layoutResp: GetResponse = await resp.json();
-      setLayout(layoutResp.data[0]);
+      const layout = merge(defaultLayout, layoutResp.data?.[0]);
+      setLayout(layout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);

@@ -32,10 +32,9 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider';
+import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
-// @ts-ignore: No implicit Any
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
@@ -163,8 +162,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         <HMSPrebuiltContext.Provider
           value={{
             roomCode,
-            showPreview: true,
-            showLeave: true,
             onLeave,
             userName,
             userId,
@@ -252,8 +249,9 @@ const Redirector = ({ showPreview }: { showPreview: boolean }) => {
 };
 
 const RouteList = () => {
-  const { showPreview, showLeave } = useHMSPrebuiltContext();
-
+  const roomLayout = useRoomLayout();
+  const showPreview = !!roomLayout?.screens?.preview;
+  const showLeave = !!roomLayout?.screens?.leave;
   return (
     <Routes>
       {showPreview && (

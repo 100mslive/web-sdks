@@ -6,6 +6,7 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Header } from './Header';
 import { useNavigation } from './hooks/useNavigation';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
@@ -14,7 +15,9 @@ import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
   const navigate = useNavigation();
-  const { showPreview, roomCode } = useHMSPrebuiltContext();
+  const roomLayout = useRoomLayout();
+  const showPreview = !!roomLayout?.screens?.preview;
+  const { roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (

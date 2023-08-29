@@ -15,6 +15,7 @@ import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ConferenceMainView } from '../layouts/mainView';
+import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { Footer } from './Footer';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
@@ -28,6 +29,9 @@ const Conference = () => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
+  const { userName } = useHMSPrebuiltContext();
+  const roomLayout = useRoomLayout();
+  const showPreview = !!roomLayout?.screens?.preview;
   const roomState = useHMSStore(selectRoomState);
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
@@ -35,7 +39,6 @@ const Conference = () => {
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const skipPreview = useSkipPreview();
-  const { showPreview } = useHMSPrebuiltContext();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
@@ -86,7 +89,7 @@ const Conference = () => {
     if (authTokenInAppData && !isConnectedToRoom && !showPreview && roomState !== HMSRoomState.Connecting) {
       hmsActions
         .join({
-          userName: 'Test',
+          userName,
           authToken: authTokenInAppData,
           initEndpoint: process.env.REACT_APP_ENV
             ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
@@ -99,7 +102,7 @@ const Conference = () => {
         })
         .catch(console.error);
     }
-  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, showPreview, roomState]);
+  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, showPreview, roomState, userName]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
