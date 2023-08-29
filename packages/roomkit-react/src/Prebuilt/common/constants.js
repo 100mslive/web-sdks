@@ -118,3 +118,4 @@ export const SESSION_STORE_KEY = {
 };
 
 export const LOWER_HAND = 'lowerHand';
+export const ROLE_CHANGE_DECLINED = 'role_change_declined';

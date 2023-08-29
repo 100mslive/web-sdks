@@ -6,6 +6,7 @@ import {
   useHMSStore,
 } from "@100mslive/react-sdk";
 import { Flex, Text } from "@100mslive/roomkit-react";
+import { ROLE_CHANGE_DECLINED } from "@100mslive/roomkit-react/src/Prebuilt/common/constants";
 import { PreviewControls, PreviewTile } from "./Preview/PreviewJoin";
 import { RequestDialog } from "../primitives/DialogContent";
 import { useIsHeadless } from "./AppData/useUISettings";
@@ -52,10 +53,15 @@ export const RoleChangeRequestModal = () => {
   return (
     <RequestDialog
       title={`You're invited to join the ${roleChangeRequest.role.name} role`}
-      onOpenChange={value => {
+      onOpenChange={async value => {
         if (!value) {
-          hmsActions.cancelMidCallPreview();
-          hmsActions.rejectChangeRole(roleChangeRequest);
+          await hmsActions.rejectChangeRole(roleChangeRequest);
+          await hmsActions.sendDirectMessage(
+            "",
+            roleChangeRequest.requestedBy?.id,
+            ROLE_CHANGE_DECLINED
+          );
+          await hmsActions.cancelMidCallPreview();
         }
       }}
       body={body}
