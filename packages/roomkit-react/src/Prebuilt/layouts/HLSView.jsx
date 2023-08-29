@@ -3,7 +3,7 @@ import { useFullscreen, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ExpandIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
@@ -288,9 +288,15 @@ const HLSView = () => {
           </HMSVideoPlayer.Root>
         </Flex>
       ) : (
-        <Flex align="center" justify="center" css={{ size: '100%', px: '$10' }}>
-          <Text variant="md" css={{ textAlign: 'center' }}>
-            Waiting for the stream to start...
+        <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+          <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
+            <RadioIcon height={56} width={56} />
+          </Flex>
+          <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
+            Stream yet to start
+          </Text>
+          <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
+            Sit back and relax
           </Text>
         </Flex>
       )}
