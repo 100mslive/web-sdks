@@ -13,7 +13,7 @@ export const MessageNotifications = () => {
   const isChatEnabled = useIsFeatureEnabled(FEATURE_LIST.CHAT);
   const isNewMessageSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.NEW_MESSAGE);
   const isHeadless = useIsHeadless();
-  const metadata = useMyMetadata();
+  const { metaData, updateMetaData } = useMyMetadata();
 
   useEffect(() => {
     if (!notification || isHeadless) {
@@ -21,15 +21,15 @@ export const MessageNotifications = () => {
     }
 
     if (notification.data?.type === LOWER_HAND) {
-      const newMetadata = { ...metadata, isHandRaised: false };
-      hmsActions.changeMetadata(newMetadata);
+      const newMetadata = { ...metaData, isHandRaised: false };
+      updateMetaData(newMetadata);
     }
     console.debug(`[${notification.type}]`, notification);
     if (!isNewMessageSubscribed || notification.data?.ignored || !isChatEnabled) {
       return;
     }
     ToastBatcher.showToast({ notification });
-  }, [notification, isNewMessageSubscribed, isHeadless, isChatEnabled]);
+  }, [notification, isNewMessageSubscribed, isHeadless, isChatEnabled, metaData, updateMetaData]);
 
   return null;
 };
