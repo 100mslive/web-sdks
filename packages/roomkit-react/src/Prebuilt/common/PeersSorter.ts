@@ -1,17 +1,22 @@
-import { selectDominantSpeaker } from '@100mslive/hms-video-store';
+import { HMSPeer, HMSPeerID, IStoreReadOnly, selectDominantSpeaker } from '@100mslive/react-sdk';
 
 class PeersSorter {
-  listeners = new Set();
-  storeUnsubscribe;
+  storeUnsubscribe: undefined | (() => void) = undefined;
+  store: IStoreReadOnly<any>;
+  peers: Map<string, HMSPeer>;
+  lruPeers: Set<HMSPeerID>;
+  tilesPerPage!: number;
+  speaker?: HMSPeer;
+  listeners: Set<(peers: HMSPeer[]) => void> = new Set();
 
-  constructor(store) {
+  constructor(store: IStoreReadOnly<any>) {
     this.store = store;
     this.peers = new Map();
     this.lruPeers = new Set();
     this.speaker = undefined;
   }
 
-  setPeersAndTilesPerPage = ({ peers, tilesPerPage }) => {
+  setPeersAndTilesPerPage = ({ peers, tilesPerPage }: { peers: HMSPeer[]; tilesPerPage: number }) => {
     this.tilesPerPage = tilesPerPage;
     const peerIds = new Set(peers.map(peer => peer.id));
     // remove existing peers which are no longer provided
@@ -33,7 +38,7 @@ class PeersSorter {
     this.moveSpeakerToFront(this.speaker);
   };
 
-  onUpdate = cb => {
+  onUpdate = (cb: (peers: HMSPeer[]) => void) => {
     this.listeners.add(cb);
   };
 
@@ -43,7 +48,7 @@ class PeersSorter {
     this.storeUnsubscribe?.();
   };
 
-  moveSpeakerToFront = speaker => {
+  moveSpeakerToFront = (speaker?: HMSPeer) => {
     if (!speaker) {
       this.updateListeners();
       return;
@@ -54,7 +59,7 @@ class PeersSorter {
     }
     // delete to insert at beginning
     this.lruPeers.delete(speaker.id);
-    let lruPeerArray = Array.from(this.lruPeers);
+    const lruPeerArray = Array.from(this.lruPeers);
     while (lruPeerArray.length >= this.tilesPerPage) {
       lruPeerArray.pop();
     }
@@ -62,7 +67,7 @@ class PeersSorter {
     this.updateListeners();
   };
 
-  onDominantSpeakerChange = speaker => {
+  onDominantSpeakerChange = (speaker: HMSPeer | null) => {
     if (speaker && speaker.id !== this?.speaker?.id) {
       this.speaker = speaker;
       this.moveSpeakerToFront(speaker);
@@ -70,7 +75,7 @@ class PeersSorter {
   };
 
   updateListeners = () => {
-    const orderedPeers = [];
+    const orderedPeers: HMSPeer[] = [];
     this.lruPeers.forEach(key => {
       const peer = this.peers.get(key);
       if (peer) {

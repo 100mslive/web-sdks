@@ -138,11 +138,18 @@ const SimulcastLayers = ({ trackId }) => {
                 textTransform: 'capitalize',
                 mr: '$2',
                 fontWeight: track.preferredLayer === layer.layer ? '$semiBold' : '$regular',
+                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
               }}
             >
               {layer.layer}
             </Text>
-            <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
+            <Text
+              as="span"
+              variant="xs"
+              css={{
+                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
+              }}
+            >
               {layer.resolution.width}x{layer.resolution.height}
             </Text>
           </StyledMenuTile.ItemButton>

@@ -170,7 +170,7 @@ const Container = styled('div', {
   px: '$10',
 });
 
-const PreviewTile = ({ name, error }) => {
+export const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
@@ -189,8 +189,9 @@ const PreviewTile = ({ name, error }) => {
         overflow: 'clip',
         '@md': {
           aspectRatio: 9 / 16,
-          width: 'min(275px, 70vw)',
+          width: 'min(220px, 70vw)',
           maxWidth: '100%',
+          my: '$4',
         },
       }}
       ref={borderAudioRef}
@@ -221,7 +222,7 @@ const PreviewTile = ({ name, error }) => {
   );
 };
 
-const PreviewControls = ({ hideSettings }) => {
+export const PreviewControls = ({ hideSettings }) => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   return (
     <Flex
