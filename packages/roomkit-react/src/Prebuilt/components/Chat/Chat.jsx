@@ -27,8 +27,11 @@ import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
   const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
+  const PINNED_MESSAGE_LENGTH = 80;
   const formattedPinnedMessage =
-    pinnedMessage?.length && pinnedMessage.length > 80 ? `${pinnedMessage.slice(0, 80)}...` : pinnedMessage;
+    pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
+      ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
+      : pinnedMessage;
 
   return pinnedMessage ? (
     <Flex
