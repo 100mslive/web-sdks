@@ -13,7 +13,6 @@ import {
 import {
   ChangeRoleIcon,
   HandIcon,
-  HandRaiseSlashedIcon,
   MicOffIcon,
   PeopleIcon,
   PeopleRemoveIcon,
@@ -30,7 +29,7 @@ import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useParticipants, useShowStreamingUI } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
-import { LOWER_HAND, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -222,23 +221,18 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
       ) : null}
 
       {shouldShowMoreActions && !isInternalRole(role) && !isLocal ? (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} isHandRaised={isHandRaised} />
+        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
       ) : null}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
-  const hmsActions = useHMSActions();
+const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
   const actions = useHMSActions();
   const [open, setOpen] = useState(false);
-
-  const lowerHand = async () => {
-    await hmsActions.sendDirectMessage('Lower hand', peerId, LOWER_HAND);
-  };
 
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
@@ -262,14 +256,6 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
               </Text>
             </Dropdown.Item>
           )}
-          {isHandRaised ? (
-            <Dropdown.Item css={{ c: '$on_surface_high', bg: '$surface_default' }} onClick={lowerHand}>
-              <HandRaiseSlashedIcon />
-              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
-                Lower Hand
-              </Text>
-            </Dropdown.Item>
-          ) : null}
 
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
