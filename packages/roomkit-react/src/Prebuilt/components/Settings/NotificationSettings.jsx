@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertOctagonIcon, ChatIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@100mslive/react-icons';
+import { AlertOctagonIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@100mslive/react-icons';
 import { Box } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetSubscribedNotifications, useSubscribedNotifications } from '../AppData/useUISettings';
@@ -37,12 +37,6 @@ export const NotificationSettings = () => {
         type={SUBSCRIBED_NOTIFICATIONS.PEER_LEFT}
         icon={<PeopleRemoveIcon />}
         checked={subscribedNotifications.PEER_LEFT}
-      />
-      <NotificationItem
-        label="New Message"
-        type={SUBSCRIBED_NOTIFICATIONS.NEW_MESSAGE}
-        icon={<ChatIcon />}
-        checked={subscribedNotifications.NEW_MESSAGE}
       />
       <NotificationItem
         label="Hand Raised"
