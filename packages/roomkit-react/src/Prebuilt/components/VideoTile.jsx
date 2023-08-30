@@ -196,11 +196,11 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
       if (ref.current) {
         ref.current.style['animation'] = `${heightAnimation(
           audioLevel ? value : 1,
-        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite`;
+        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite ${delay}s`;
       }
     }, selectTrackAudioByID(trackId));
     return unsubscribe;
-  }, [vanillaStore, trackId, value]);
+  }, [vanillaStore, trackId, value, delay]);
   return (
     <Box
       ref={ref}
@@ -209,7 +209,6 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
         height: 6,
         r: 2,
         bg: '$on_primary_high',
-        animationDelay: `${delay}s`,
       }}
     />
   );
