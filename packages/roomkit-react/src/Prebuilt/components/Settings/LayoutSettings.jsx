@@ -10,7 +10,7 @@ export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [{ isAudioOnly, uiViewMode, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
+  const [{ isAudioOnly, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn) {
