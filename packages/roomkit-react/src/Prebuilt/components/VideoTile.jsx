@@ -34,10 +34,10 @@ const Tile = ({
   isDragabble = false,
   rootCSS = {},
   containerCSS = {},
-  rounded = true,
-  hideAudioMute = false,
-  hideParticipantName = false,
-  hideAudioLevel = false,
+  enableSpotlightingPeer = true,
+  hideParticipantNameOnTile = false,
+  roundedVideoTile = true,
+  hideAudioMuteOnTile = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -96,8 +96,8 @@ const Tile = ({
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={hideAudioLevel ? undefined : borderAudioRef}
-          noRadius={!rounded}
+          ref={hideAudioMuteOnTile ? undefined : borderAudioRef}
+          noRadius={!roundedVideoTile}
           css={containerCSS}
         >
           {showStatsOnTiles && isTileBigEnoughToShowStats ? (
@@ -114,7 +114,7 @@ const Tile = ({
                 track?.source === 'regular' &&
                 track?.facingMode !== 'environment'
               }
-              noRadius={!rounded}
+              noRadius={!roundedVideoTile}
               data-testid="participant_video_tile"
               css={{
                 objectFit,
@@ -130,7 +130,7 @@ const Tile = ({
           ) : null}
 
           {showAudioMuted({
-            hideAudioMute,
+            hideAudioMuteOnTile,
             isHeadless,
             isAudioMuted,
           }) ? (
@@ -147,12 +147,13 @@ const Tile = ({
               audioTrackID={audioTrack?.id}
               videoTrackID={track?.id}
               canMinimise={canMinimise}
+              enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
           {isMobile ? null : (
             <TileConnection
-              hideLabel={hideParticipantName}
+              hideLabel={hideParticipantNameOnTile}
               name={label}
               isTile
               peerId={peerId}

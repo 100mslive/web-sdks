@@ -10,6 +10,7 @@ import {
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
+import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 
 export type GridLayoutProps = GridVideoTileLayout & {
@@ -22,20 +23,25 @@ export type GridLayoutProps = GridVideoTileLayout & {
 export const GridLayout = ({
   enable_local_tile_inset: isInsetEnabled = true,
   prominent_roles: prominentRoles = [],
-}: // enable_spotlighting_peer = false,
-// hide_participant_name_on_tile = false,
-// hide_audio_level_on_tile = false,
-// rounded_video_tile = true,
-// hide_audio_mute_on_tile = false,
-GridLayoutProps) => {
+  enable_spotlighting_peer = false,
+  hide_participant_name_on_tile = false,
+  rounded_video_tile = true,
+  hide_audio_mute_on_tile = false,
+}: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const isRoleProminence = prominentRoles.length > 0;
-  const peers = useHMSStore(isInsetEnabled && !isRoleProminence ? selectRemotePeers : selectPeers);
+  const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(peers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
+  const tileLayout = {
+    enableSpotlightingPeer: enable_spotlighting_peer,
+    hideParticipantNameOnTile: hide_participant_name_on_tile,
+    roundedVideoTile: rounded_video_tile,
+    hideAudioMuteOnTile: hide_audio_mute_on_tile,
+  };
 
   useEffect(() => {
     if (mainPage !== 0) {
@@ -49,24 +55,32 @@ GridLayoutProps) => {
   }, [mainPage, peersSorter, peers, pageSize]);
 
   if (peerSharing) {
-    return <ScreenshareLayout peers={sortedPeers} onPageSize={setPageSize} onPageChange={setMainPage} />;
+    return (
+      <VideoTileContext.Provider value={tileLayout}>
+        <ScreenshareLayout peers={sortedPeers} onPageSize={setPageSize} onPageChange={setMainPage} />
+      </VideoTileContext.Provider>
+    );
   } else if (isRoleProminence) {
     return (
-      <RoleProminence
-        peers={sortedPeers}
-        onPageSize={setPageSize}
-        onPageChange={setMainPage}
-        prominentRoles={prominentRoles}
-        isInsetEnabled={isInsetEnabled}
-      />
+      <VideoTileContext.Provider value={tileLayout}>
+        <RoleProminence
+          peers={sortedPeers}
+          onPageSize={setPageSize}
+          onPageChange={setMainPage}
+          prominentRoles={prominentRoles}
+          isInsetEnabled={isInsetEnabled}
+        />
+      </VideoTileContext.Provider>
     );
   }
   return (
-    <EqualProminence
-      peers={sortedPeers}
-      onPageSize={setPageSize}
-      onPageChange={setMainPage}
-      isInsetEnabled={isInsetEnabled}
-    />
+    <VideoTileContext.Provider value={tileLayout}>
+      <EqualProminence
+        peers={sortedPeers}
+        onPageSize={setPageSize}
+        onPageChange={setMainPage}
+        isInsetEnabled={isInsetEnabled}
+      />
+    </VideoTileContext.Provider>
   );
 };

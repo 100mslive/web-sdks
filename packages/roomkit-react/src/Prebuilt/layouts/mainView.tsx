@@ -15,6 +15,7 @@ import {
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
+// @ts-ignore: No implicit Any
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
@@ -72,10 +73,6 @@ export const ConferenceMainView = ({
       if ((error as HMSException).message === 'beam already started') {
         return;
       }
-      if ((error as HMSException).message.includes('invalid input')) {
-        await startHLS();
-        return;
-      }
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted]);
@@ -124,6 +121,7 @@ export const ConferenceMainView = ({
         css={{
           size: '100%',
           position: 'relative',
+          gap: '$4',
         }}
       >
         {ViewComponent}

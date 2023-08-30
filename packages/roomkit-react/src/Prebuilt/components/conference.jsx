@@ -25,7 +25,6 @@ import {
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
-import { useSkipPreview } from './hooks/useSkipPreview';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
@@ -41,7 +40,6 @@ const Conference = () => {
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
-  const skipPreview = useSkipPreview();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
@@ -97,14 +95,14 @@ const Conference = () => {
             ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
             : undefined,
           initialSettings: {
-            isAudioMuted: skipPreview,
-            isVideoMuted: skipPreview,
+            isAudioMuted: !isPreviewScreenEnabled,
+            isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
         .catch(console.error);
     }
-  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
+  }, [authTokenInAppData, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls

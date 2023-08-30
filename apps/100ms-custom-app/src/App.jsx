@@ -1,9 +1,11 @@
 import React from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
+import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { getRoomCodeFromUrl } from './utils/utils';
 
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
+  const overrideLayout = useOverridePrebuiltLayout();
   return (
     <Flex
       direction="column"
@@ -11,6 +13,7 @@ const App = () => {
     >
       <HMSPrebuilt
         roomCode={roomCode}
+        screens={overrideLayout ? overrideLayout : undefined}
         options={{
           endpoints: {
             tokenByRoomCode: process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,

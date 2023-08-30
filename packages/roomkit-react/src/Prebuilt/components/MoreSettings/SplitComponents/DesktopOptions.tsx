@@ -5,13 +5,7 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import {
-  selectAppData,
-  selectLocalPeerID,
-  selectLocalPeerRoleName,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
 // @ts-ignore: No implicit any
@@ -61,7 +55,6 @@ export const DesktopOptions = ({
   screenType: keyof ConferencingScreen;
 }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const [openModals, setOpenModals] = useState(new Set());
@@ -71,7 +64,7 @@ export const DesktopOptions = ({
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
-  const updateState = (modalName, value) => {
+  const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
       if (value) {
@@ -165,7 +158,7 @@ export const DesktopOptions = ({
             </Text>
           </Dropdown.Item>
 
-          {localPeerRole === 'hls-viewer' ? (
+          {screenType === 'hls_live_streaming' ? (
             HMSHLSPlayer.isSupported() ? (
               <Dropdown.Item
                 onClick={() => hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)}
