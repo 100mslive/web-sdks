@@ -52,7 +52,7 @@ export const ParticipantList = () => {
       if (!filterValue) {
         filterValue = {};
       }
-      filterValue.search = value;
+      filterValue.search = value.toLowerCase();
       return { ...filterValue };
     });
   }, []);
