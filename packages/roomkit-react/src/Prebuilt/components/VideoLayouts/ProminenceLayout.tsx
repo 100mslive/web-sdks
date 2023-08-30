@@ -30,7 +30,16 @@ const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: 
               height="100%"
               peerId={tile.peer?.id}
               trackId={tile.track?.id}
-              rootCSS={{ padding: 0, flex: '1 1 0', maxWidth: 'max-content' }}
+              rootCSS={{
+                padding: 0,
+                flex: '1 1 0',
+                maxWidth: 'max-content',
+              }}
+              containerCSS={{
+                width: 'unset',
+                aspectRatio: 16 / 9,
+                '@md': { aspectRatio: 1 },
+              }}
               objectFit="contain"
             />
           );
