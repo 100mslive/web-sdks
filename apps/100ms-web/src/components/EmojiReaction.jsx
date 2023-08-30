@@ -64,6 +64,7 @@ export const EmojiReaction = () => {
     () => roles.filter(role => role !== hlsViewerRole),
     [roles, hlsViewerRole]
   );
+
   useDropdownList({ open: open, name: "EmojiReaction" });
 
   const onEmojiEvent = useCallback(data => {

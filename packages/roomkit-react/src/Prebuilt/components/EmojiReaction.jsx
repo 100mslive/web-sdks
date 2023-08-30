@@ -52,7 +52,9 @@ export const EmojiReaction = () => {
       emojiId: emojiId,
       senderId: localPeerId,
     };
+
     sendEvent(data, { roleNames: filteredRoles });
+
     if (isStreamingOn) {
       try {
         await hmsActions.sendHLSTimedMetadata([
