@@ -235,7 +235,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger
         asChild
         data-testid="participant_more_actions"
