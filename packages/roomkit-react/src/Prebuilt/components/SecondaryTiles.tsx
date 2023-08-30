@@ -14,7 +14,9 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize }: LayoutProps)
   const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    onPageSize?.(pageSize);
+    if (pageSize > 0) {
+      onPageSize?.(pageSize + 1); // include screenshare peer as well for page size
+    }
   }, [pageSize, onPageSize]);
 
   return (
