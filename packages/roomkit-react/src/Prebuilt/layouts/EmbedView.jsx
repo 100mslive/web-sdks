@@ -31,6 +31,7 @@ export const EmbebScreenShareView = ({ children }) => {
   const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
   const amIPresenting = localPeerID === peerPresenting?.id;
   const showPresenterInSmallTile = amIPresenting || isPresenterFromMyRole;
+  const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
@@ -39,6 +40,13 @@ export const EmbebScreenShareView = ({ children }) => {
     }
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
+
+  useEffect(() => {
+    setActiveScreenSharePeer(peerPresenting?.id);
+    return () => {
+      setActiveScreenSharePeer('');
+    };
+  }, [peerPresenting?.id, setActiveScreenSharePeer]);
   return (
     <ProminenceLayout.Root>
       <ProminenceLayout.ProminentSection>{children}</ProminenceLayout.ProminentSection>
