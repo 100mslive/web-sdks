@@ -25,7 +25,7 @@ const SidePane = ({ css = {} }) => {
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = StreamingLanding;
   }
-  if (!ViewComponent && !activeScreensharePeerId) {
+  if (!ViewComponent && !trackId) {
     return null;
   }
 
@@ -39,6 +39,7 @@ const SidePane = ({ css = {} }) => {
         w: '$100',
         h: '100%',
         flexShrink: 0,
+        gap: '$4',
         '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 21 },
       }}
     >
