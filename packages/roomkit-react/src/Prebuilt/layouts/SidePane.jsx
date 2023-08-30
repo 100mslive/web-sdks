@@ -59,6 +59,8 @@ const SidePane = ({ css = {} }) => {
             w: '$100',
             h: mwebStreamingChat ? '0' : '100%',
             p: '$10',
+            flex: '1 1 0',
+            minHeight: 0,
             maxHeight: mwebStreamingChat ? '300px' : 'unset',
             background: mwebStreamingChat
               ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
