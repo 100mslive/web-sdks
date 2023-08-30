@@ -33,27 +33,25 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peer = useHMSStore(selectPeerByID(id));
-  const roomLayout = useRoomLayout();
-  const onStageRole =
-    roomLayout.screens?.conferencing?.default?.elements?.participant_list?.viewer_on_stage?.on_stage_role;
-  const onViewerRole =
-    roomLayout.screens?.conferencing?.default?.elements?.participant_list?.viewer_on_stage?.off_stage_role;
+  const layout = useRoomLayout();
+  const { bring_to_stage_label, on_stage_role, off_stage_roles } =
+    layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
 
   const onClickHandler = useCallback(() => {
     if (isSingleHandRaise) {
-      hmsActions.changeRoleOfPeer(id, onStageRole, true);
+      hmsActions.changeRoleOfPeer(id, on_stage_role);
     } else {
       !isParticipantsOpen && toggleSidepane();
     }
-  }, [hmsActions, id, isParticipantsOpen, isSingleHandRaise, onStageRole, toggleSidepane]);
+  }, [hmsActions, id, isParticipantsOpen, isSingleHandRaise, on_stage_role, toggleSidepane]);
 
   // show nothing if handRaise is single and peer role is not hls
-  if (isSingleHandRaise && (!peer || peer.roleName !== onViewerRole)) {
+  if (isSingleHandRaise && (!peer || !off_stage_roles.includes(peer.roleName))) {
     return null;
   }
   return (
     <Button outlined as="div" variant="standard" css={{ w: 'max-content' }} onClick={onClickHandler} ref={ref}>
-      {isSingleHandRaise ? 'Bring on stage' : 'View'}
+      {isSingleHandRaise ? bring_to_stage_label : 'View'}
     </Button>
   );
 });

@@ -35,7 +35,12 @@ const SidePane = ({ css = {} }) => {
     <Flex
       direction="column"
       justify="center"
-      css={{ w: '$100', h: '100%', flexShrink: 0, '@md': { position: mwebStreamingChat ? 'absolute' : '' } }}
+      css={{
+        w: '$100',
+        h: '100%',
+        flexShrink: 0,
+        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 21 },
+      }}
     >
       {trackId && (
         <VideoTile

@@ -41,6 +41,12 @@ export const useMyMetadata = () => {
     }
   }, [isHandRaised, isBRBOn]); //eslint-disable-line
 
+  const setPrevRole = async role => {
+    await update({
+      prevRole: role,
+    });
+  };
+
   return {
     isHandRaised,
     isBRBOn,
@@ -48,5 +54,6 @@ export const useMyMetadata = () => {
     updateMetaData: update,
     toggleHandRaise,
     toggleBRB,
+    setPrevRole,
   };
 };
