@@ -19,7 +19,7 @@ import {
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
@@ -167,7 +167,13 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
   return (
     <Flex
       key={peer.id}
-      css={{ w: '100%', p: '$8', pt: '$4', pr: '$6' }}
+      css={{
+        w: '100%',
+        p: '$4 $8',
+        pr: '$6',
+        h: '$16',
+        '&:hover .participant_item': { display: 'flex' },
+      }}
       align="center"
       justify="between"
       data-testid={'participant_' + peer.name}
@@ -199,7 +205,14 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
-    <Flex align="center" css={{ flexShrink: 0, gap: '$8', mt: '$2' }}>
+    <Flex
+      align="center"
+      css={{
+        flexShrink: 0,
+        gap: '$8',
+        mt: '$2',
+      }}
+    >
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && (
         <Flex
@@ -214,7 +227,7 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
         <Flex
           align="center"
           justify="center"
-          css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+          css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
         >
           <MicOffIcon height={19} width={19} />
         </Flex>
@@ -239,12 +252,24 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
       <Dropdown.Trigger
         asChild
         data-testid="participant_more_actions"
-        css={{ p: '$1', r: '$0', c: '$on_surface_high' }}
+        className="participant_item"
+        css={{
+          p: '$1',
+          r: '$0',
+          c: '$on_surface_high',
+          display: open ? 'flex' : 'none',
+          '&:hover': {
+            bg: '$surface_bright',
+          },
+          '@md': {
+            display: 'flex',
+          },
+        }}
         tabIndex={0}
       >
-        <Flex>
+        <Box css={{ my: 'auto' }}>
           <VerticalMenuIcon />
-        </Flex>
+        </Box>
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
