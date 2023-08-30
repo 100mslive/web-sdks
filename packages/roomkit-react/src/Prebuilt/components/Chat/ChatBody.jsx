@@ -257,7 +257,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
           }}
           as="div"
         >
-          <Flex align="center">
+          <Flex align="baseline">
             {message.senderName === 'You' || !message.senderName ? (
               <SenderName as="span" variant="sm">
                 {message.senderName || 'Anonymous'}
