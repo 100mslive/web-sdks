@@ -46,9 +46,6 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     return null;
   }
 
-  if (isLocal) {
-    return null;
-  }
   const openNameChangeModal = () => setShowNameChangeModal(true);
 
   const props = {
