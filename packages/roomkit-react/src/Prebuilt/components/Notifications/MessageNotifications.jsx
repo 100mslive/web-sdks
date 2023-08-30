@@ -19,7 +19,7 @@ export const MessageNotifications = () => {
       return;
     }
     ToastBatcher.showToast({ notification });
-  }, [notification, isNewMessageSubscribed, isHeadless, metadata, hmsActions]);
+  }, [notification, isNewMessageSubscribed, isHeadless]);
 
   return null;
 };
