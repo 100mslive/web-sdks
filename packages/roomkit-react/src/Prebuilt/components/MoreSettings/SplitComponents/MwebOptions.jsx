@@ -22,7 +22,6 @@ import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer } from '../../../common/hooks';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
@@ -57,9 +56,8 @@ export const MwebOptions = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-  const isHLSViewer = useIsLocalPeerHLSViewer();
 
-  useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
+  useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
@@ -85,7 +83,7 @@ export const MwebOptions = () => {
             </Tooltip>
           </IconButton>
         </Sheet.Trigger>
-        <Sheet.Content css={{ bg: isHLSViewer ? '$surface_default' : '$surface_dim', pb: '$14' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
               display: 'flex',

@@ -17,7 +17,7 @@ export const GridLayout = () => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const isRoleProminence = useIsRoleProminenceLayout();
   const isInsetEnabled = useInsetEnabled();
-  const peers = useHMSStore(isInsetEnabled && !isRoleProminence ? selectRemotePeers : selectPeers);
+  const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(peers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);

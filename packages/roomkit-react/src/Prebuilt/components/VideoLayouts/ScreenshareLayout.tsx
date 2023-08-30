@@ -26,7 +26,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
 
   return (
     <ProminenceLayout.Root>
-      <ProminenceLayout.ProminentSection css={{ pr: '$8', pb: '$8' }}>
+      <ProminenceLayout.ProminentSection>
         <ScreenshareTile peerId={peersSharing[page].id} />
         <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />
       </ProminenceLayout.ProminentSection>
