@@ -10,6 +10,7 @@ import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
 import { Box, Button, Dialog, Flex, Text } from '../../';
 import { useIsHeadless } from './AppData/useUISettings';
 import { useMyMetadata } from './hooks/useMetadata';
+import { ROLE_CHANGE_DECLINED } from '../common/constants';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
@@ -54,10 +55,11 @@ export const RoleChangeRequestModal = () => {
   return (
     <RequestDialog
       title={`You're invited to join the ${roleChangeRequest.role.name} role`}
-      onOpenChange={value => {
+      onOpenChange={async value => {
         if (!value) {
-          hmsActions.cancelMidCallPreview();
-          hmsActions.rejectChangeRole(roleChangeRequest);
+          await hmsActions.rejectChangeRole(roleChangeRequest);
+          await hmsActions.sendDirectMessage('', roleChangeRequest.requestedBy?.id, ROLE_CHANGE_DECLINED);
+          await hmsActions.cancelMidCallPreview();
         }
       }}
       body={body}
