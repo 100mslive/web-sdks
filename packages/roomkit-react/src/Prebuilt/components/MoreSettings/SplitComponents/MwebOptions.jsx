@@ -57,7 +57,7 @@ export const MwebOptions = () => {
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
-  useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
+  useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
