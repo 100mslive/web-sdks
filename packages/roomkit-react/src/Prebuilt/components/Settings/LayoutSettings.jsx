@@ -25,16 +25,6 @@ export const LayoutSettings = () => {
 
   return (
     <Box className={settingOverflow()}>
-      <SwitchWithLabel
-        checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
-        onChange={value => {
-          setUISettings({
-            [UI_SETTINGS.uiViewMode]: value ? UI_MODE_ACTIVE_SPEAKER : UI_MODE_GRID,
-          });
-        }}
-        id="activeSpeakerMode"
-        label="Active Speaker Mode"
-      />
       <SwitchWithLabel label="Audio Only Mode" id="audioOnlyMode" checked={isAudioOnly} onChange={toggleIsAudioOnly} />
       <SwitchWithLabel
         label="Mirror Local Video"
