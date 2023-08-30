@@ -97,3 +97,5 @@ export const SESSION_STORE_KEY = {
   PINNED_MESSAGE: 'pinnedMessage',
   SPOTLIGHT: 'spotlight',
 };
+
+export const ROLE_CHANGE_DECLINED = 'role_change_declined';

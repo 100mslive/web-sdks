@@ -136,7 +136,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger asChild>
+      <Dropdown.Trigger className="chat_actions" css={{ opacity: open ? 1 : 0, '@md': { opacity: 1 } }} asChild>
         <IconButton>
           <Tooltip title="More options">
             <VerticalMenuIcon />
@@ -225,7 +225,12 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   }, [message.read, hmsActions, inView, message.id]);
 
   return (
-    <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>
+    <Box
+      ref={ref}
+      as="div"
+      css={{ mb: '$10', pr: '$10', mt: '$8', '&:hover .chat_actions': { opacity: 1 } }}
+      style={style}
+    >
       <Flex
         ref={rowRef}
         align="center"
@@ -406,7 +411,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebSt
         justify="center"
       >
         <Box>
-          <img src={emptyChat} alt="Empty Chat" height={132} width={185} />
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
           <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
             Start a conversation
           </Text>
