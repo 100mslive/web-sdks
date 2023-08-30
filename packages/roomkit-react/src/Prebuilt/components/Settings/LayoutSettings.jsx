@@ -4,13 +4,13 @@ import { Box, Flex, Slider, Text } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { settingOverflow } from './common.js';
-import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [{ isAudioOnly, uiViewMode, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
+  const [{ isAudioOnly, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async isAudioOnlyModeOn => {
       if (isAudioOnlyModeOn) {
@@ -25,16 +25,6 @@ export const LayoutSettings = () => {
 
   return (
     <Box className={settingOverflow()}>
-      <SwitchWithLabel
-        checked={uiViewMode === UI_MODE_ACTIVE_SPEAKER}
-        onChange={value => {
-          setUISettings({
-            [UI_SETTINGS.uiViewMode]: value ? UI_MODE_ACTIVE_SPEAKER : UI_MODE_GRID,
-          });
-        }}
-        id="activeSpeakerMode"
-        label="Active Speaker Mode"
-      />
       <SwitchWithLabel label="Audio Only Mode" id="audioOnlyMode" checked={isAudioOnly} onChange={toggleIsAudioOnly} />
       <SwitchWithLabel
         label="Mirror Local Video"
