@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -11,6 +11,7 @@ import {
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
@@ -186,24 +187,40 @@ const heightAnimation = value =>
     },
   });
 
+const AudioLevelIndicator = ({ trackId, value, delay }) => {
+  const vanillaStore = useHMSVanillaStore();
+  const ref = useRef();
+
+  useEffect(() => {
+    const unsubscribe = vanillaStore.subscribe(audioLevel => {
+      if (ref.current) {
+        ref.current.style['animation'] = `${heightAnimation(
+          audioLevel ? value : 1,
+        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite`;
+      }
+    }, selectTrackAudioByID(trackId));
+    return unsubscribe;
+  }, [vanillaStore, trackId, value]);
+  return (
+    <Box
+      ref={ref}
+      css={{
+        w: 4,
+        height: 6,
+        r: 2,
+        bg: '$on_primary_high',
+        animationDelay: `${delay}s`,
+      }}
+    />
+  );
+};
+
 export const AudioLevel = ({ trackId }) => {
-  const audioLevel = useHMSStore(selectTrackAudioByID(trackId));
   return (
     <StyledVideoTile.AudioIndicator>
       <Flex align="center" justify="center" css={{ gap: '$2' }}>
-        {[4, 3, 4].map((v, i) => (
-          <Box
-            key={i}
-            css={{
-              w: 4,
-              height: 6,
-              r: '$1',
-              bg: '$on_primary_high',
-              animation: `${heightAnimation(audioLevel ? v : 1)} 0.3s`,
-              animationDelay: `${i * 0.1}s`,
-              animationIterationCount: audioLevel,
-            }}
-          />
+        {[3, 2, 3].map((v, i) => (
+          <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
         ))}
       </Flex>
     </StyledVideoTile.AudioIndicator>
