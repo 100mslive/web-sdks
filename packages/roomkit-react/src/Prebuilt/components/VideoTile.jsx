@@ -1,4 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import Lottie from 'react-lottie';
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -7,6 +8,7 @@ import {
   selectPeerMetadata,
   selectPeerNameByID,
   selectSessionStore,
+  selectTrackAudioByID,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
@@ -14,7 +16,6 @@ import {
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
-import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
 import { config as cssConfig } from '../../Theme';
@@ -24,6 +25,7 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { useShowStreamingUI } from '../common/hooks';
+import * as audioLevel from '../common/audio-level.json';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -49,7 +51,6 @@ const Tile = ({
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);
-  const borderAudioRef = useBorderAudioLevel(audioTrack?.id);
   const isVideoDegraded = track?.degraded;
   const isLocal = localPeerID === peerId;
   const [pinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
@@ -102,7 +103,6 @@ const Tile = ({
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={isHeadless && headlessConfig?.hideAudioLevel ? undefined : borderAudioRef}
           noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
           css={containerCSS}
         >
@@ -146,7 +146,9 @@ const Tile = ({
             >
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
-          ) : null}
+          ) : (
+            <TileAudioLevel trackId={audioTrack?.id} />
+          )}
           {(isMouseHovered || isDragabble) && !isHeadless ? (
             <TileMenu
               peerID={peerId}
@@ -171,6 +173,16 @@ const Tile = ({
       ) : null}
     </StyledVideoTile.Root>
   );
+};
+
+export const TileAudioLevel = ({ trackId }) => {
+  const level = useHMSStore(selectTrackAudioByID(trackId));
+
+  return level > 0 ? (
+    <StyledVideoTile.AudioIndicator>
+      <Lottie options={{ loop: true, autoplay: true, animationData: audioLevel }} width={48} height={48} />
+    </StyledVideoTile.AudioIndicator>
+  ) : null;
 };
 
 const metaStyles = { top: '$4', left: '$4' };
