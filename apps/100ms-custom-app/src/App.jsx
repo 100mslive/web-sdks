@@ -5,7 +5,7 @@ import { getRoomCodeFromUrl } from './utils/utils';
 
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
-  const overrideLayout = useOverridePrebuiltLayout();
+  const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   return (
     <Flex
       direction="column"
@@ -15,6 +15,7 @@ const App = () => {
         roomCode={roomCode}
         screens={overrideLayout ? overrideLayout : undefined}
         options={{
+          userName: isHeadless ? 'Beam' : undefined,
           endpoints: {
             tokenByRoomCode: process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
             roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,

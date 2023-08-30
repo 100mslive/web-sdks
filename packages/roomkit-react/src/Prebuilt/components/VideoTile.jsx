@@ -21,7 +21,7 @@ import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
-import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
+import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -47,7 +47,6 @@ const Tile = ({
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
-  const isHeadless = useIsHeadless();
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);
@@ -130,8 +129,7 @@ const Tile = ({
           ) : null}
 
           {showAudioMuted({
-            hideAudioMuteOnTile,
-            isHeadless,
+            hideAudioMute: hideAudioMuteOnTile,
             isAudioMuted,
           }) ? (
             <StyledVideoTile.AudioIndicator
@@ -141,7 +139,7 @@ const Tile = ({
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : null}
-          {(isMouseHovered || isDragabble) && !isHeadless ? (
+          {isMouseHovered || isDragabble ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}
@@ -193,10 +191,7 @@ const PeerMetadata = ({ peerId }) => {
 
 const VideoTile = React.memo(Tile);
 
-const showAudioMuted = ({ hideAudioMute, isHeadless, isAudioMuted }) => {
-  if (!isHeadless) {
-    return isAudioMuted;
-  }
+const showAudioMuted = ({ hideAudioMute, isAudioMuted }) => {
   return isAudioMuted && !hideAudioMute;
 };
 

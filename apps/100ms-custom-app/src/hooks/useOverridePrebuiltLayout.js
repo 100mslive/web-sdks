@@ -30,7 +30,8 @@ export const useOverridePrebuiltLayout = () => {
               hide_participant_name_on_tile: true,
               hide_audio_level_on_tile: true,
               rounded_video_tile: false,
-              hide_audio_mute_on_tile: false,
+              hide_audio_mute_on_tile: true,
+              video_object_fit: 'cover',
             },
           },
         },
@@ -44,5 +45,8 @@ export const useOverridePrebuiltLayout = () => {
     };
   }
 
-  return overrideLayout;
+  return {
+    overrideLayout,
+    isHeadless: skipPreview || beamInToken || directJoinHeadful,
+  };
 };

@@ -5,6 +5,7 @@ type TileContextType = {
   hideParticipantNameOnTile?: boolean;
   roundedVideoTile?: boolean;
   hideAudioMuteOnTile?: boolean;
+  objectFit?: 'cover' | 'contain';
 };
 
 export const VideoTileContext = React.createContext<TileContextType>({
@@ -12,6 +13,7 @@ export const VideoTileContext = React.createContext<TileContextType>({
   hideParticipantNameOnTile: false,
   roundedVideoTile: true,
   hideAudioMuteOnTile: false,
+  objectFit: 'contain',
 });
 
 export const useVideoTileContext = () => {
