@@ -9,9 +9,10 @@ import {
   useHMSStore,
   useScreenShare,
 } from '@100mslive/react-sdk';
-import { Box, Flex } from '../../Layout';
+import { SecondaryTiles } from '../components/SecondaryTiles';
+import { ProminenceLayout } from '../components/VideoLayouts/ProminenceLayout';
+import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
-import { SidePane } from './screenShareView';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
@@ -43,28 +44,10 @@ export const EmbebScreenShareView = ({ children }) => {
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
   return (
-    <Flex css={{ size: '100%' }} direction={showSidebarInBottom ? 'column' : 'row'}>
-      {children}
-      <Flex
-        direction={{ '@initial': 'column', '@lg': 'row' }}
-        css={{
-          overflow: 'hidden',
-          p: '$4 $8',
-          flex: '0 0 20%',
-          '@xl': {
-            flex: '1 1 0',
-          },
-        }}
-      >
-        <SidePane
-          showSidebarInBottom={showSidebarInBottom}
-          peerScreenSharing={peerPresenting}
-          isPresenterInSmallTiles={showPresenterInSmallTile}
-          smallTilePeers={smallTilePeers}
-          totalPeers={peers.length}
-        />
-      </Flex>
-    </Flex>
+    <ProminenceLayout.Root>
+      <ProminenceLayout.ProminentSection>{children}</ProminenceLayout.ProminentSection>
+      <SecondaryTiles peers={smallTilePeers} />
+    </ProminenceLayout.Root>
   );
 };
 
@@ -117,17 +100,7 @@ const EmbedComponent = () => {
   }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
 
   return (
-    <Box
-      ref={iframeRef}
-      css={{
-        flex: '3 1 0',
-        '@lg': {
-          flex: '2 1 0',
-          display: 'flex',
-          alignItems: 'center',
-        },
-      }}
-    >
+    <Box ref={iframeRef} css={{ size: '100%' }}>
       <iframe
         src={src}
         title={src}
