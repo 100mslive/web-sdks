@@ -24,6 +24,10 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
     };
   }, [activeSharePeerId, setActiveScreenSharePeer]);
 
+  if (!activeSharePeerId) {
+    return null;
+  }
+
   return (
     <ProminenceLayout.Root>
       <ProminenceLayout.ProminentSection>
