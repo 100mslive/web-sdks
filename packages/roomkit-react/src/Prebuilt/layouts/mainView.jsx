@@ -115,6 +115,7 @@ export const ConferenceMainView = () => {
         css={{
           size: '100%',
           position: 'relative',
+          gap: '$4',
         }}
       >
         <ViewComponent />

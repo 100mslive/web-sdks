@@ -24,13 +24,20 @@ import { useUnreadCount } from './useUnreadCount';
 import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
+const PINNED_MESSAGE_LENGTH = 80;
+
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
   const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
+  const formattedPinnedMessage =
+    pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
+      ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
+      : pinnedMessage;
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8' }}
+      title={pinnedMessage}
+      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8', mt: '$8' }}
       align="center"
       justify="between"
     >
@@ -45,7 +52,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         }}
       >
         <Text variant="sm">
-          <AnnotisedMessage message={pinnedMessage} />
+          <AnnotisedMessage message={formattedPinnedMessage} />
         </Text>
       </Box>
       {permissions.removeOthers && (

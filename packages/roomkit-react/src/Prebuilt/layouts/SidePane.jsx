@@ -32,7 +32,11 @@ const SidePane = ({ css = {} }) => {
   const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
 
   return (
-    <Flex direction="column" justify="center" css={{ w: '$100', h: '100%', flexShrink: 0 }}>
+    <Flex
+      direction="column"
+      justify="center"
+      css={{ w: '$100', h: '100%', flexShrink: 0, '@md': { position: mwebStreamingChat ? 'absolute' : '' } }}
+    >
       {trackId && (
         <VideoTile
           peerId={activeScreensharePeerId}
@@ -54,7 +58,6 @@ const SidePane = ({ css = {} }) => {
               ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
               : '$surface_dim',
             r: '$1',
-            ml: '$8',
             position: 'relative',
             ...css,
             '@lg': {
