@@ -60,7 +60,7 @@ export function HLSFailureModal() {
             <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => setOpenModal(false)}>
               Dismiss
             </Button>
-            <Button css={{ w: '100%' }}>Go Live</Button>
+            <Button css={{ w: '100%' }} onClick={startHLS}>Go Live</Button>
           </Flex>
         </Dialog.Content>
       </Dialog.Portal>
