@@ -56,7 +56,6 @@ export const ConferenceMainView = () => {
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
   const isHeadless = useIsHeadless();
-  // const isHeadless = true;
 
   const startHLS = useCallback(async () => {
     try {

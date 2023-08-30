@@ -1,9 +1,11 @@
 import React from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
-import { getRoomCodeFromUrl } from './utils/utils';
+import { getRoomCodeFromUrl, getRoomLayout } from './utils/utils';
 
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
+  const roomLayout = getRoomLayout(process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT);
+  console.log('room layout ', roomLayout);
   return (
     <Flex
       direction="column"

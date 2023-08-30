@@ -7,6 +7,35 @@ export const getRoomCodeFromUrl = () => {
   return path.match(regex)?.groups?.code || null;
 };
 
+const fetchRoomLayout = async ({ endpoint = '', authToken = '' }) => {
+  let layoutResp = {};
+  // eslint-disable-next-line no-useless-catch
+  try {
+    const resp = await getWithRetry(endpoint, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+    layoutResp = await resp.json();
+  } catch (err) {
+    throw err;
+  }
+  return layoutResp;
+};
+export const getRoomLayout = async roomLayoutEndpoint => {
+  const { token } = getAuthInfo();
+  try {
+    let layout = await fetchRoomLayout({
+      authToken: token,
+      endpoint: roomLayoutEndpoint,
+    });
+    return layout;
+  } catch (err) {
+    console.error('error while fetching room layout ', err);
+    return null;
+  }
+};
+
 export const getAuthInfo = () => {
   let info = { token: undefined, userEmail: undefined };
   try {

@@ -15,7 +15,7 @@
     "zipyai": "^1.3.24"
   },
   "scripts": {
-    "start": "webpack serve",
+    "start": "webpack serve --port 3000",
     "prebuild": "cd ../100ms-web && yarn esbuild",
     "build": "webpack --node-env production",
     "lint": "eslint -c .eslintrc --no-error-on-unmatched-pattern src --ext .js --ext jsx",
