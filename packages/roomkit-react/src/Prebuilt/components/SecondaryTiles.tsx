@@ -16,7 +16,6 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize }: LayoutProps)
   useEffect(() => {
     onPageSize?.(pageSize);
   }, [pageSize, onPageSize]);
-  onPageSize?.(maxTileCount);
 
   return (
     <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]}>
