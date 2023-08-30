@@ -1,4 +1,3 @@
-// @ts-check
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
@@ -246,8 +245,12 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
   const hmsActions = useHMSActions();
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
   const layout = useRoomLayout();
-  const { bring_to_stage_label, remove_from_stage_label, on_stage_role, off_stage_roles } =
-    layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
+  const {
+    bring_to_stage_label,
+    remove_from_stage_label,
+    on_stage_role,
+    off_stage_roles = [],
+  } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
   const canBringToStage = off_stage_roles.includes(role);
   const isInStage = role === on_stage_role;
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
@@ -265,7 +268,7 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
   };
 
   return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger
         asChild
         data-testid="participant_more_actions"
