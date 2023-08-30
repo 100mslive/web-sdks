@@ -4,7 +4,7 @@ import { Box, Flex, Slider, Text } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetUiSettings } from '../AppData/useUISettings';
 import { settingOverflow } from './common.js';
-import { UI_MODE_ACTIVE_SPEAKER, UI_MODE_GRID, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
