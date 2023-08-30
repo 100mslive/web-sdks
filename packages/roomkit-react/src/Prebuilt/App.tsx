@@ -40,6 +40,10 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { getRoutePrefix } from './common/utils';
 // @ts-ignore: No implicit Any
@@ -249,12 +253,11 @@ const Redirector = ({ showPreview }: { showPreview: boolean }) => {
 };
 
 const RouteList = () => {
-  const roomLayout = useRoomLayout();
-  const showPreview = !!roomLayout?.screens?.preview;
-  const showLeave = !!roomLayout?.screens?.leave;
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   return (
     <Routes>
-      {showPreview && (
+      {isPreviewScreenEnabled && (
         <Route path="preview">
           <Route
             path=":roomId/:role"
@@ -292,15 +295,15 @@ const RouteList = () => {
           }
         />
       </Route>
-      {showLeave && (
+      {isLeaveScreenEnabled && (
         <Route path="leave">
           <Route path=":roomId/:role" element={<PostLeave />} />
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
       )}
 
-      <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
-      <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
+      <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
+      <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
     </Routes>
   );
 };
@@ -334,6 +337,7 @@ const Router = ({ children }: { children: ReactElement }) => {
 };
 
 function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
+  const roomLayout = useRoomLayout();
   return (
     <Router>
       <>
@@ -345,9 +349,11 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoin
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
-        <Routes>
-          <Route path="/*" element={<RouteList />} />
-        </Routes>
+        {roomLayout && (
+          <Routes>
+            <Route path="/*" element={<RouteList />} />
+          </Routes>
+        )}
       </>
     </Router>
   );

@@ -21,9 +21,7 @@ import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
-import { useAppConfig } from './AppData/useAppConfig';
 import { useIsHeadless, useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
-import { useShowStreamingUI } from '../common/hooks';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -36,6 +34,10 @@ const Tile = ({
   isDragabble = false,
   rootCSS = {},
   containerCSS = {},
+  rounded = true,
+  hideAudioMute = false,
+  hideParticipantName = false,
+  hideAudioLevel = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -67,8 +69,6 @@ const Tile = ({
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === 'mouseenter');
   }, []);
-  const headlessConfig = useAppConfig('headlessConfig');
-  const hideLabel = isHeadless && headlessConfig?.hideTileName;
   const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
   const avatarSize = useMemo(() => {
     if (!width || !height) {
@@ -82,18 +82,12 @@ const Tile = ({
     return 'large';
   }, [width, height]);
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
 
   return (
     <StyledVideoTile.Root
       css={{
         width,
         height,
-        padding: getPadding({
-          isHeadless,
-          tileOffset: headlessConfig?.tileOffset,
-          hideAudioLevel: headlessConfig?.hideAudioLevel,
-        }),
         ...rootCSS,
       }}
       data-testid={`participant_tile_${peerName}`}
@@ -102,8 +96,8 @@ const Tile = ({
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={isHeadless && headlessConfig?.hideAudioLevel ? undefined : borderAudioRef}
-          noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
+          ref={hideAudioLevel ? undefined : borderAudioRef}
+          noRadius={!rounded}
           css={containerCSS}
         >
           {showStatsOnTiles && isTileBigEnoughToShowStats ? (
@@ -120,7 +114,7 @@ const Tile = ({
                 track?.source === 'regular' &&
                 track?.facingMode !== 'environment'
               }
-              noRadius={isHeadless && Number(headlessConfig?.tileOffset) === 0}
+              noRadius={!rounded}
               data-testid="participant_video_tile"
               css={{
                 objectFit,
@@ -136,7 +130,7 @@ const Tile = ({
           ) : null}
 
           {showAudioMuted({
-            hideTileAudioMute: headlessConfig?.hideTileAudioMute,
+            hideAudioMute,
             isHeadless,
             isAudioMuted,
           }) ? (
@@ -156,9 +150,9 @@ const Tile = ({
             />
           ) : null}
           <PeerMetadata peerId={peerId} />
-          {showStreamingUI && isMobile ? null : (
+          {isMobile ? null : (
             <TileConnection
-              hideLabel={hideLabel}
+              hideLabel={hideParticipantName}
               name={label}
               isTile
               peerId={peerId}
@@ -198,19 +192,11 @@ const PeerMetadata = ({ peerId }) => {
 
 const VideoTile = React.memo(Tile);
 
-const showAudioMuted = ({ hideTileAudioMute, isHeadless, isAudioMuted }) => {
+const showAudioMuted = ({ hideAudioMute, isHeadless, isAudioMuted }) => {
   if (!isHeadless) {
     return isAudioMuted;
   }
-  return isAudioMuted && !hideTileAudioMute;
-};
-
-const getPadding = ({ isHeadless, tileOffset, hideAudioLevel }) => {
-  if (!isHeadless || isNaN(Number(tileOffset))) {
-    return undefined;
-  }
-  // Adding extra padding of 3px to ensure that the audio border is visible properly between tiles when tileOffset is 0.
-  return Number(tileOffset) === 0 ? (hideAudioLevel ? 0 : 3) : undefined;
+  return isAudioMuted && !hideAudioMute;
 };
 
 export default VideoTile;

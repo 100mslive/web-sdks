@@ -1,11 +1,17 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { config as cssConfig, Flex } from '../../../';
+import { config as cssConfig, Flex } from '../../..';
+// @ts-ignore: No implicit any
 import { EmojiReaction } from '../EmojiReaction';
+// @ts-ignore: No implicit any
 import { ParticipantCount } from '../Footer/ParticipantList';
+// @ts-ignore: No implicit any
 import { LeaveRoom } from '../LeaveRoom';
+// @ts-ignore: No implicit any
 import MetaActions from '../MetaActions';
+// @ts-ignore: No implicit any
 import { SpeakerTag } from './HeaderComponents';
+// @ts-ignore: No implicit any
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 
 export const StreamingHeader = () => {

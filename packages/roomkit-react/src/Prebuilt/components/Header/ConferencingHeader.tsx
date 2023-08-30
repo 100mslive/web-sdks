@@ -1,9 +1,12 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, Flex } from '../../../';
+import { config as cssConfig, Flex } from '../../..';
+// @ts-ignore: No implicit any
 import { Logo, SpeakerTag } from './HeaderComponents';
+// @ts-ignore: No implicit any
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
+// @ts-ignore: No implicit any
 import { AudioOutputActions, CamaraFlipActions } from './common';
 
 export const ConferencingHeader = () => {
