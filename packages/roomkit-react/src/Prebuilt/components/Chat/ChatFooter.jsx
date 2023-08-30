@@ -71,27 +71,31 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const isHLSViewer = useIsLocalPeerHLSViewer();
   const showStreamingUI = useShowStreamingUI();
 
-  const sendMessage = useCallback(async () => {
-    const message = inputRef.current.value;
-    if (!message || !message.trim().length) {
-      return;
-    }
-    try {
-      if (role) {
-        await hmsActions.sendGroupMessage(message, [role]);
-      } else if (peerId) {
-        await hmsActions.sendDirectMessage(message, peerId);
-      } else {
-        await hmsActions.sendBroadcastMessage(message);
+  const sendMessage = useCallback(
+    async e => {
+      e.stopPropagation();
+      const message = inputRef.current.value;
+      if (!message || !message.trim().length) {
+        return;
       }
-      inputRef.current.value = '';
-      setTimeout(() => {
-        onSend();
-      }, 0);
-    } catch (error) {
-      ToastManager.addToast({ title: error.message });
-    }
-  }, [role, peerId, hmsActions, onSend]);
+      try {
+        if (role) {
+          await hmsActions.sendGroupMessage(message, [role]);
+        } else if (peerId) {
+          await hmsActions.sendDirectMessage(message, peerId);
+        } else {
+          await hmsActions.sendBroadcastMessage(message);
+        }
+        inputRef.current.value = '';
+        setTimeout(() => {
+          onSend();
+        }, 0);
+      } catch (error) {
+        ToastManager.addToast({ title: error.message });
+      }
+    },
+    [role, peerId, hmsActions, onSend],
+  );
 
   useEffect(() => {
     const messageElement = inputRef.current;
