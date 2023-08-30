@@ -6,10 +6,7 @@ const Root = styled('div', {
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',
-  '& > * + *': {
-    marginRight: '0',
-    marginLeft: '0.5rem',
-  },
+  gap: '$6',
 });
 
 const Chevron = styled('button', {
@@ -28,10 +25,8 @@ const Chevron = styled('button', {
 const Dots = styled('div', {
   display: 'flex',
   alignItems: 'center',
-  '& > * + *': {
-    marginRight: '0',
-    marginLeft: '0.5rem',
-  },
+  gap: '$6',
+  transition: 'all .2s',
 });
 
 const Dot = styled('button', {
@@ -39,8 +34,9 @@ const Dot = styled('button', {
     outline: 'none',
   },
   borderRadius: '9999px',
-  width: '0.5rem',
-  height: '0.5rem',
+  width: '$4',
+  height: '$4',
+  flexShrink: 0,
   backgroundColor: '$on_surface_low',
   padding: '0px',
   border: 'none',
