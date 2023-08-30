@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
   selectLocalPeerRoleName,
@@ -12,7 +11,6 @@ import {
 import { SecondaryTiles } from '../components/SecondaryTiles';
 import { ProminenceLayout } from '../components/VideoLayouts/ProminenceLayout';
 import { Box } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
@@ -27,14 +25,12 @@ export const EmbedView = () => {
 export const EmbebScreenShareView = ({ children }) => {
   const peers = useHMSStore(selectPeers);
 
-  const mediaQueryLg = cssConfig.media.xl;
-  const showSidebarInBottom = useMedia(mediaQueryLg);
   const localPeerID = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
   const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
   const amIPresenting = localPeerID === peerPresenting?.id;
-  const showPresenterInSmallTile = showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
+  const showPresenterInSmallTile = amIPresenting || isPresenterFromMyRole;
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
