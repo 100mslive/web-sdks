@@ -139,6 +139,10 @@ const VirtualizedParticipants = ({
       css={{
         gap: '$8',
         mt: '$4',
+        maxHeight: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        pr: '$3',
       }}
     >
       <RoleAccordion
