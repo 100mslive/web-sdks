@@ -68,7 +68,7 @@ export const VideoStreamingSection = ({
         return;
       }
       setHLSStarted(true);
-      await hmsActions.startHLSStreaming({});
+      await hmsActions.startHLSStreaming();
     } catch (error) {
       if ((error as HMSException).message?.includes('beam already started')) {
         return;
