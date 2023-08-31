@@ -1,5 +1,6 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { Chat } from '../components/Chat/Chat';
@@ -14,7 +15,7 @@ import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = () => {
+const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
@@ -23,7 +24,7 @@ const SidePane = () => {
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat />;
+    ViewComponent = <Chat screenType={screenType} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }

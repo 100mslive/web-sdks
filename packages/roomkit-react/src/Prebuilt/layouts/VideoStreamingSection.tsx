@@ -125,7 +125,7 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane />
+        <SidePane screenType={screenType} />
       </Flex>
     </Suspense>
   );
