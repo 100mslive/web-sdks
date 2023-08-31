@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { Flex } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
-import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
 import PreviewJoin from './PreviewJoin';
@@ -43,13 +42,6 @@ const PreviewContainer = () => {
         ) : (
           <FullPageProgress />
         )}
-        <SidePane
-          css={{
-            position: 'unset',
-            mr: '$10',
-            '@lg': { position: 'fixed', mr: '$0' },
-          }}
-        />
       </Flex>
     </Flex>
   );

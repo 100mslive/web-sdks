@@ -9,7 +9,6 @@ import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -63,13 +62,11 @@ function EmojiPicker({ onSelect }) {
   );
 }
 
-export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection }) => {
+export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection, screenType }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const isHLSViewer = useIsLocalPeerHLSViewer();
-  const showStreamingUI = useShowStreamingUI();
 
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
@@ -109,14 +106,14 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
 
   return (
     <>
-      {!isHLSViewer ? (
+      {screenType !== 'hls_live_streaming' ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
       ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
           css={{
-            bg: (showStreamingUI || isHLSViewer) && isMobile ? '$surface_dim' : '$surface_default',
+            bg: isMobile ? '$surface_dim' : '$surface_default',
             minHeight: '$16',
             maxHeight: '$24',
             position: 'relative',

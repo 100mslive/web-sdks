@@ -105,17 +105,19 @@ export const DesktopOptions = ({
             },
           }}
         >
-          <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
-            <HandIcon />
-            <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
-              Raise Hand
-            </Text>
-            <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
-              {isHandRaised ? <CheckIcon /> : null}
-            </Flex>
-          </Dropdown.Item>
+          {screenType === 'hls_live_streaming' ? (
+            <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
+              <HandIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                Raise Hand
+              </Text>
+              <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
+                {isHandRaised ? <CheckIcon /> : null}
+              </Flex>
+            </Dropdown.Item>
+          ) : null}
 
-          {isBRBEnabled ? (
+          {isBRBEnabled && screenType === 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -127,7 +129,7 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
+          {isBRBEnabled && screenType === 'hls_live_streaming' ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
 
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item>
@@ -205,7 +207,11 @@ export const DesktopOptions = ({
         <StartRecording open onOpenChange={(value: boolean) => updateState(MODALS.START_RECORDING, value)} />
       )}
       {openModals.has(MODALS.DEVICE_SETTINGS) && (
-        <SettingsModal open onOpenChange={(value: boolean) => updateState(MODALS.DEVICE_SETTINGS, value)} />
+        <SettingsModal
+          open
+          onOpenChange={(value: boolean) => updateState(MODALS.DEVICE_SETTINGS, value)}
+          screenType={screenType}
+        />
       )}
       {openModals.has(MODALS.STATS_FOR_NERDS) && (
         <StatsForNerds open onOpenChange={(value: boolean) => updateState(MODALS.STATS_FOR_NERDS, value)} />

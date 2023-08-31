@@ -1,26 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  selectLocalPeerRoleName,
-  selectPeers,
-  selectTracksMap,
-  useHMSActions,
-  useHMSStore,
-  useHMSVanillaStore,
-} from '@100mslive/react-sdk';
+import { selectPeers, selectTracksMap, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
 import { usePinnedTrack } from '../AppData/useUISettings';
-import { DEFAULT_HLS_VIEWER_ROLE } from '../../common/constants';
 
 /**
  * shows a button which when clicked shows some videos in PIP, clicking
  * again turns it off.
  */
 const PIPComponent = ({ content = null }) => {
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const [isPipOn, setIsPipOn] = useState(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
   const store = useHMSVanillaStore();
@@ -34,7 +25,7 @@ const PIPComponent = ({ content = null }) => {
     }
   }, [hmsActions, isPipOn, store]);
 
-  if (!PictureInPicture.isSupported() || localPeerRole === DEFAULT_HLS_VIEWER_ROLE) {
+  if (!PictureInPicture.isSupported()) {
     return null;
   }
   return (

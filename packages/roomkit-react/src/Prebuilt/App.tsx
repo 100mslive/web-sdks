@@ -187,7 +187,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
-                {layout => {
+                {data => {
+                  const layout = data?.layout;
                   const theme: Theme = layout?.themes?.[0] || ({} as Theme);
                   const { typography } = layout || {};
                   let fontFamily = ['sans-serif'];

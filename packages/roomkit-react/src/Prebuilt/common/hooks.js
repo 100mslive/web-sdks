@@ -4,7 +4,6 @@ import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_fo
 import {
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
   selectPeerCount,
   selectPeerMetadata,
   selectPeers,
@@ -13,7 +12,6 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
-import { useHLSViewerRole } from '../components/AppData/useUISettings';
 import { isInternalRole } from './utils';
 
 /**
@@ -63,12 +61,6 @@ export const useShowStreamingUI = () => {
   const layout = useRoomLayout();
   const { join_form } = layout?.screens?.preview?.default?.elements || {};
   return join_form?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE;
-};
-
-export const useIsLocalPeerHLSViewer = () => {
-  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  return localPeerRoleName === hlsViewerRole;
 };
 
 // The search results should not have role name matches

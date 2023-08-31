@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
 import merge from 'lodash.merge';
 import { defaultLayout } from '../constants';
@@ -26,6 +26,7 @@ export type useFetchRoomLayoutProps = {
 
 export type useFetchRoomLayoutResponse = {
   layout: Layout | undefined;
+  updateRoomLayoutForRole: (role: string) => void;
 };
 
 export const useFetchRoomLayout = ({
@@ -33,7 +34,17 @@ export const useFetchRoomLayout = ({
   authToken = '',
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
+  const layoutResp = useRef<GetResponse>();
   const isFetchInProgress = useRef(false);
+  const updateRoomLayoutForRole = useCallback((role: string) => {
+    if (!layoutResp.current) {
+      return;
+    }
+    const [layout] = (layoutResp.current?.data || []).filter(layout => layout.role === role);
+    if (layout) {
+      setLayout(layout);
+    }
+  }, []);
   useEffect(() => {
     (async () => {
       if (isFetchInProgress.current || !authToken) {
@@ -45,12 +56,12 @@ export const useFetchRoomLayout = ({
           Authorization: `Bearer ${authToken}`,
         },
       });
-      const layoutResp: GetResponse = await resp.json();
-      const layout = merge(defaultLayout, layoutResp.data?.[0]);
+      layoutResp.current = await resp.json();
+      const layout = merge(defaultLayout, layoutResp.current?.data?.[0]);
       setLayout(layout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);
 
-  return { layout };
+  return { layout, updateRoomLayoutForRole };
 };

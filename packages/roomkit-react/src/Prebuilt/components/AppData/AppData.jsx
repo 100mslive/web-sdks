@@ -16,12 +16,9 @@ import { normalizeAppPolicyConfig } from '../init/initUtils';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneState, useSidepaneToggle } from './useSidepane';
 import { useSetAppDataByKey } from './useUISettings';
-import { getMetadata } from '../../common/utils';
 import {
   APP_DATA,
   CHAT_SELECTOR,
-  DEFAULT_HLS_ROLE_KEY,
-  DEFAULT_HLS_VIEWER_ROLE,
   DEFAULT_WAITING_VIEWER_ROLE,
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
@@ -63,7 +60,6 @@ const initialAppData = {
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
-  [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
   [APP_DATA.authToken]: '',
@@ -108,7 +104,6 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   useEffect(() => {
     const appData = {
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
-      [APP_DATA.hlsViewerRole]: getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] || DEFAULT_HLS_VIEWER_ROLE,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     for (const key in appData) {
