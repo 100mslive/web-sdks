@@ -10,6 +10,8 @@ import {
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
+// @ts-ignore: No implicit Any
+import { usePinnedTrack } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 
@@ -31,7 +33,8 @@ export const GridLayout = ({
   video_object_fit = 'contain',
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
-  const isRoleProminence = prominentRoles.length > 0;
+  const pinnedTrack = usePinnedTrack();
+  const isRoleProminence = prominentRoles.length > 0 || pinnedTrack;
   const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(peers);
