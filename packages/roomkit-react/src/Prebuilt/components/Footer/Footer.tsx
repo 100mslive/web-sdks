@@ -67,7 +67,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             <RaiseHand />
-            <ChatToggle />
+            {elements.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
