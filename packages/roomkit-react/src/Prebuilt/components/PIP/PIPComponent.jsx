@@ -59,13 +59,15 @@ const PIPComponent = ({ content = null }) => {
  * the subscriptions to store are done only if required.
  */
 export const ActivatedPIP = () => {
-  const vanillaStore = useHMSVanillaStore();
+  const tracksMap = useHMSStore(selectTracksMap);
+  const storePeers = useHMSStore(selectPeers);
   const pinnedTrack = usePinnedTrack();
 
   useEffect(() => {
-    let unsubscribe;
-    const handleUpdate = storePeers => {
-      const tracksMap = vanillaStore.getState(selectTracksMap);
+    function updatePIP() {
+      if (!PictureInPicture.isOn()) {
+        return;
+      }
       let pipPeers = storePeers;
       if (pinnedTrack) {
         pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
@@ -73,18 +75,10 @@ export const ActivatedPIP = () => {
       PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
         console.error('error in updating pip', err);
       });
-    };
-    PictureInPicture.listenToStateChange(isPipOn => {
-      if (!isPipOn) {
-        return;
-      }
-      unsubscribe = vanillaStore.subscribe(handleUpdate, selectPeers);
-    });
-    if (PictureInPicture.isOn) {
-      handleUpdate(vanillaStore.getState(selectPeers));
     }
-    return () => unsubscribe?.();
-  }, [vanillaStore, pinnedTrack]);
+    PictureInPicture.listenToStateChange(updatePIP);
+    updatePIP();
+  }, [storePeers, tracksMap, pinnedTrack]);
 
   return <></>;
 };
