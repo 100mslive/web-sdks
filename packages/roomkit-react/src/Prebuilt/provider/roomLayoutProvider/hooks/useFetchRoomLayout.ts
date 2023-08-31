@@ -29,7 +29,7 @@ export type useFetchRoomLayoutResponse = {
 };
 
 export const useFetchRoomLayout = ({
-  endpoint = '',
+  endpoint = 'https://api.100ms.live/v2/layouts/ui',
   authToken = '',
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
@@ -38,9 +38,6 @@ export const useFetchRoomLayout = ({
     (async () => {
       if (isFetchInProgress.current || !authToken) {
         return;
-      }
-      if (!endpoint) {
-        setLayout(defaultLayout);
       }
       isFetchInProgress.current = true;
       const resp = await fetchWithRetry(endpoint, {
