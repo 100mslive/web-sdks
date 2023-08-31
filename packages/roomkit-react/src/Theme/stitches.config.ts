@@ -1,4 +1,4 @@
-import * as Stitches from '@stitches/react';
+import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
