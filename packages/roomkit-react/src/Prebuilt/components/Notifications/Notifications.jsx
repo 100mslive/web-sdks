@@ -8,6 +8,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
+import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -28,6 +29,7 @@ export function Notifications() {
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);
+  const updateRoomLayoutForRole = useUpdateRoomLayout();
 
   useEffect(() => {
     if (!notification) {
@@ -102,6 +104,7 @@ export function Notifications() {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
+          updateRoomLayoutForRole(notification.data.roleName);
         }
         break;
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
