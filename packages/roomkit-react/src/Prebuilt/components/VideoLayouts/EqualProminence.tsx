@@ -22,6 +22,7 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
     peers,
     maxTileCount,
   });
+  // useMemo is needed to prevent recursion as new array is created for localPeer
   const inputPeers = useMemo(
     () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
     [pageList.length, peers, localPeer],
