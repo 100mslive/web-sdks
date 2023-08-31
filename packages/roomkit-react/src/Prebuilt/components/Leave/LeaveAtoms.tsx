@@ -1,6 +1,5 @@
+import { IconButton } from '../../../IconButton';
 import { styled } from '../../../Theme';
-// @ts-ignore: No implicit Any
-import { IconButton } from '../../IconButton.jsx';
 
 export const LeaveIconButton = styled(IconButton, {
   color: '$on_primary_high',
