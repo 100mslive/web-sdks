@@ -12,7 +12,7 @@ import {
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { useStageDetails } from '../../common/hooks';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 const dropdownItemCSS = { backgroundColor: '$surface_default', gap: '$4', p: '$8' };
 const optionTextCSS = { fontWeight: '$semiBold', color: '$on_surface_high', textTransform: 'none' };
@@ -21,7 +21,8 @@ export const RoleOptions = ({ roleName, peerList }) => {
   const [openOptions, setOpenOptions] = useState(false);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
-  const stageDetails = useStageDetails();
+  const layout = useRoomLayout();
+  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elementson_stage_exp || {};
 
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();
@@ -36,12 +37,11 @@ export const RoleOptions = ({ roleName, peerList }) => {
     allPeersHaveVideoOn = allPeersHaveVideoOn && isVideoOn;
   });
 
-  const canMuteRole = permissions.mute && roleName === stageDetails?.on_stage_role;
-  const canRemoveRoleFromStage = permissions.changeRole && roleName === stageDetails?.on_stage_role;
+  const canMuteRole = permissions.mute && roleName === on_stage_role;
+  const canRemoveRoleFromStage = permissions.changeRole && roleName === on_stage_role;
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
-    permissions.removeOthers &&
-    (stageDetails?.on_stage_role === roleName || stageDetails?.off_stage_roles?.includes(roleName));
+    permissions.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
   if (!(canMuteRole || canRemoveRoleFromStage || canRemoveRoleFromRoom)) {
     return null;
@@ -97,7 +97,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
           <Dropdown.Item
             css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
             onClick={() => {
-              hmsActions.changeRoleOfPeersWithRoles([stageDetails.on_stage_role], stageDetails.off_stage_roles[0]);
+              hmsActions.changeRoleOfPeersWithRoles([on_stage_role], off_stage_roles?.[0]);
             }}
           >
             <PersonRectangleIcon />
