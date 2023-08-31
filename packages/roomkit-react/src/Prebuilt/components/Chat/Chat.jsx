@@ -67,7 +67,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ isHLSViewer }) => {
+export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -95,6 +95,7 @@ export const Chat = ({ isHLSViewer }) => {
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
+  const isHLSViewer = screenType === 'hls_live_streaming';
   const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;

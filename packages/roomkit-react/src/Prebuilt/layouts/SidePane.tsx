@@ -1,16 +1,23 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { Chat } from '../components/Chat/Chat';
+// @ts-ignore: No implicit Any
 import { ParticipantList } from '../components/Footer/ParticipantList';
+// @ts-ignore: No implicit Any
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
+// @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
+import { config as cssConfig, CSS } from '../../Theme';
+// @ts-ignore: No implicit Any
 import { useShowStreamingUI } from '../common/hooks';
+// @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ isHLSViewer, css = {} }) => {
+const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScreen; css?: CSS }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
@@ -18,17 +25,18 @@ const SidePane = ({ isHLSViewer, css = {} }) => {
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
-    ViewComponent = ParticipantList;
+    ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = Chat;
+    ViewComponent = <Chat screenType={screenType} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = StreamingLanding;
+    ViewComponent = <StreamingLanding />;
   }
   if (!ViewComponent && !trackId) {
     return null;
   }
 
-  const mwebStreamingChat = isMobile && (showStreamingUI || isHLSViewer) && ViewComponent === Chat;
+  const mwebStreamingChat =
+    isMobile && (showStreamingUI || screenType === 'hls_live_streaming') && sidepane === SIDE_PANE_OPTIONS.CHAT;
 
   return (
     <Flex
@@ -74,7 +82,7 @@ const SidePane = ({ isHLSViewer, css = {} }) => {
               right: 0,
               position: 'fixed',
               bottom: 0,
-              r: 0,
+              borderRadius: 0,
               zIndex: 10,
               ...(css['@lg'] || {}),
             },
@@ -84,7 +92,7 @@ const SidePane = ({ isHLSViewer, css = {} }) => {
             },
           }}
         >
-          <ViewComponent isHLSViewer={isHLSViewer} />
+          {ViewComponent}
         </Box>
       )}
     </Flex>
