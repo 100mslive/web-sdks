@@ -57,8 +57,8 @@ export const RoleOptions = ({ roleName, peerList }) => {
 
   const removeRoleFromRoom = async () => {
     try {
-      peerIDList.forEach(async peerID => {
-        await hmsActions.removePeer(peerID, '');
+      peerList.forEach(async peer => {
+        await hmsActions.removePeer(peer.id, '');
       });
     } catch (e) {
       console.error(e);
