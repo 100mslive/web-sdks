@@ -24,7 +24,6 @@ import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
-import { useShowStreamingUI } from '../../common/hooks';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -195,7 +194,7 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, screenType }) => {
+const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const rowRef = useRef(null);
   useEffect(() => {
@@ -204,8 +203,6 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && (showStreamingUI || screenType === 'hls_live_streaming');
 
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -236,7 +233,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         css={{
           flexWrap: 'wrap',
           // Theme independent color, token should not be used for transparent chat
-          bg: messageType ? (mwebStreaming ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
+          bg: messageType ? (isMobile ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -268,7 +265,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
                 </SenderName>
               </Tooltip>
             )}
-            {!mwebStreaming ? (
+            {!isMobile ? (
               <Text
                 as="span"
                 variant="xs"
@@ -287,7 +284,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {!mwebStreaming ? (
+          {!isMobile ? (
             <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
           ) : null}
         </Text>
@@ -309,7 +306,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   );
 });
 const ChatList = React.forwardRef(
-  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom, screenType }, listRef) => {
+  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom }, listRef) => {
     const { setPinnedMessage } = useSetPinnedMessage();
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
@@ -336,7 +333,6 @@ const ChatList = React.forwardRef(
             key={messages[index].id}
             message={messages[index]}
             setRowHeight={setRowHeight}
-            screenType={screenType}
             onPin={() => setPinnedMessage(messages[index])}
           />
         )}
@@ -344,7 +340,7 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, screenType }, listRef) => {
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
@@ -383,7 +379,6 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, sc
             getRowHeight={getRowHeight}
             scrollToBottom={scrollToBottom}
             ref={listRef}
-            screenType={screenType}
           />
         )}
       </AutoSizer>
@@ -391,15 +386,16 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, sc
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebStreaming, screenType }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
   const messages = useHMSStore(storeMessageSelector) || [];
+  const isMobile = useMedia(cssConfig.media.md);
 
-  if (messages.length === 0 && !mwebStreaming) {
+  if (messages.length === 0 && !isMobile) {
     return (
       <Flex
         css={{
@@ -429,12 +425,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebSt
 
   return (
     <Fragment>
-      <VirtualizedChatMessages
-        messages={messages}
-        scrollToBottom={scrollToBottom}
-        ref={listRef}
-        screenType={screenType}
-      />
+      <VirtualizedChatMessages messages={messages} scrollToBottom={scrollToBottom} ref={listRef} />
     </Fragment>
   );
 });

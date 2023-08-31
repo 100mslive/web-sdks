@@ -9,7 +9,6 @@ import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useShowStreamingUI } from '../../common/hooks';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -68,7 +67,6 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
 
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
@@ -115,7 +113,7 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
         <Flex
           align="center"
           css={{
-            bg: showStreamingUI && isMobile ? '$surface_dim' : '$surface_default',
+            bg: isMobile ? '$surface_dim' : '$surface_default',
             minHeight: '$16',
             maxHeight: '$24',
             position: 'relative',

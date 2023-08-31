@@ -1,6 +1,5 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { Chat } from '../components/Chat/Chat';
@@ -11,15 +10,12 @@ import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig, CSS } from '../../Theme';
-// @ts-ignore: No implicit Any
-import { useShowStreamingUI } from '../common/hooks';
+import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScreen; css?: CSS }) => {
+const SidePane = () => {
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
@@ -27,7 +23,7 @@ const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScre
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat screenType={screenType} />;
+    ViewComponent = <Chat />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }
@@ -35,8 +31,7 @@ const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScre
     return null;
   }
 
-  const mwebStreamingChat =
-    isMobile && (showStreamingUI || screenType === 'hls_live_streaming') && sidepane === SIDE_PANE_OPTIONS.CHAT;
+  const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT;
 
   return (
     <Flex
@@ -74,7 +69,6 @@ const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScre
               : '$surface_dim',
             r: '$1',
             position: 'relative',
-            ...css,
             '@lg': {
               w: '100%',
               h: '100%',
@@ -84,7 +78,6 @@ const SidePane = ({ css = {}, screenType }: { screenType: keyof ConferencingScre
               bottom: 0,
               borderRadius: 0,
               zIndex: 10,
-              ...(css['@lg'] || {}),
             },
             '@md': {
               p: '$6 $8',

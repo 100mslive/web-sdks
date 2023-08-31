@@ -21,7 +21,6 @@ import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 80;
@@ -94,8 +93,6 @@ export const Chat = ({ screenType }) => {
 
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && (showStreamingUI || screenType === 'hls_live_streaming');
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -113,7 +110,7 @@ export const Chat = ({ screenType }) => {
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      {!mwebStreaming ? (
+      {!isMobile ? (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
           <PinnedMessage clearPinnedMessage={setPinnedMessage} />
@@ -125,7 +122,6 @@ export const Chat = ({ screenType }) => {
         peerId={chatOptions.peerId}
         ref={listRef}
         scrollToBottom={scrollToBottom}
-        mwebStreaming={mwebStreaming}
         screenType={screenType}
       />
       <ChatFooter

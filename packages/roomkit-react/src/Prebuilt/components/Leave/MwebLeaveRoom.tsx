@@ -11,8 +11,6 @@ import { LeaveCard } from './LeaveCard';
 import { LeaveSessionContent } from './LeaveSessionContent';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
-// @ts-ignore: No implicit Any
-import { useShowStreamingUI } from '../../common/hooks';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
@@ -29,9 +27,8 @@ export const MwebLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const showStreamingUI = useShowStreamingUI();
 
-  const showStream = showStreamingUI && isStreamingOn;
+  const showStream = permissions?.hlsStreaming && isStreamingOn;
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -112,6 +109,7 @@ export const MwebLeaveRoom = ({
             setShowEndStreamAlert={setShowEndStreamAlert}
             stopStream={stopStream}
             leaveRoom={leaveRoom}
+            isStreamingOn={isStreamingOn}
           />
         </Sheet.Content>
       </Sheet.Root>
