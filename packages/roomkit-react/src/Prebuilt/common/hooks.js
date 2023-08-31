@@ -100,7 +100,7 @@ export const useStageDetails = () => {
   // @ts-ignore
   const stageDetails = layout?.screens?.conferencing?.default?.elements?.on_stage_exp || {
     on_stage_role: '',
-    off_stage_role: '',
+    off_stage_roles: '',
   };
   return stageDetails;
 };
