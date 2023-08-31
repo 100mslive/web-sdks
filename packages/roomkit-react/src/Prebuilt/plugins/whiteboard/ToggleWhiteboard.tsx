@@ -1,10 +1,13 @@
 import React from 'react';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { PencilDrawIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
+// @ts-ignore: No implicit any
 import IconButton from '../../IconButton';
+// @ts-ignore: No implicit any
 import { useWhiteboardMetadata } from './useWhiteboardMetadata';
 
-export const ToggleWhiteboard = ({ isHLSViewer }) => {
+export const ToggleWhiteboard = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const {
     whiteboardEnabled,
     whiteboardOwner: whiteboardActive,
@@ -12,7 +15,7 @@ export const ToggleWhiteboard = ({ isHLSViewer }) => {
     toggleWhiteboard,
   } = useWhiteboardMetadata();
 
-  if (!whiteboardEnabled || isHLSViewer) {
+  if (!whiteboardEnabled || screenType === 'hls_live_streaming') {
     return null;
   }
 
