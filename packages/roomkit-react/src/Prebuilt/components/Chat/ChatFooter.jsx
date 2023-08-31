@@ -63,7 +63,7 @@ function EmojiPicker({ onSelect }) {
   );
 }
 
-export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection, isHLSViewer }) => {
+export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection, screenType }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -108,14 +108,14 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
 
   return (
     <>
-      {!isHLSViewer ? (
+      {screenType !== 'hls_live_streaming' ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
       ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
           css={{
-            bg: (showStreamingUI || isHLSViewer) && isMobile ? '$surface_dim' : '$surface_default',
+            bg: showStreamingUI && isMobile ? '$surface_dim' : '$surface_default',
             minHeight: '$16',
             maxHeight: '$24',
             position: 'relative',

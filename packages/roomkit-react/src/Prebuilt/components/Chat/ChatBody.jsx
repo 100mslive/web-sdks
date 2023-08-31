@@ -195,7 +195,7 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, isHLSViewer }) => {
+const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, screenType }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const rowRef = useRef(null);
   useEffect(() => {
@@ -205,7 +205,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
+  const mwebStreaming = isMobile && (showStreamingUI || screenType === 'hls_live_streaming');
 
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -309,7 +309,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   );
 });
 const ChatList = React.forwardRef(
-  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom, isHLSViewer }, listRef) => {
+  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom, screenType }, listRef) => {
     const { setPinnedMessage } = useSetPinnedMessage();
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
@@ -336,7 +336,7 @@ const ChatList = React.forwardRef(
             key={messages[index].id}
             message={messages[index]}
             setRowHeight={setRowHeight}
-            isHLSViewer={isHLSViewer}
+            screenType={screenType}
             onPin={() => setPinnedMessage(messages[index])}
           />
         )}
@@ -344,7 +344,7 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, isHLSViewer }, listRef) => {
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, screenType }, listRef) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
@@ -383,7 +383,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, is
             getRowHeight={getRowHeight}
             scrollToBottom={scrollToBottom}
             ref={listRef}
-            isHLSViewer={isHLSViewer}
+            screenType={screenType}
           />
         )}
       </AutoSizer>
@@ -391,7 +391,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, is
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebStreaming, isHLSViewer }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebStreaming, screenType }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
@@ -433,7 +433,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, mwebSt
         messages={messages}
         scrollToBottom={scrollToBottom}
         ref={listRef}
-        isHLSViewer={isHLSViewer}
+        screenType={screenType}
       />
     </Fragment>
   );

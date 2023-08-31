@@ -95,8 +95,7 @@ export const Chat = ({ screenType }) => {
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
   const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = screenType === 'hls_live_streaming';
-  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
+  const mwebStreaming = isMobile && (showStreamingUI || screenType === 'hls_live_streaming');
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -127,13 +126,13 @@ export const Chat = ({ screenType }) => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         mwebStreaming={mwebStreaming}
-        isHLSViewer={isHLSViewer}
+        screenType={screenType}
       />
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}
         selection={chatOptions.selection}
-        isHLSViewer={isHLSViewer}
+        screenType={screenType}
         onSelect={({ role, peerId, selection }) => {
           setChatOptions({
             role,
