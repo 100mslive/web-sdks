@@ -346,7 +346,7 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoin
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        <FlyingEmoji />
+        {!roomLayout?.screens?.conferencing?.hls_live_streaming && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
