@@ -94,3 +94,13 @@ export const useParticipants = params => {
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };
+
+export const useStageDetails = () => {
+  const layout = useRoomLayout();
+  // @ts-ignore
+  const stageDetails = layout?.screens?.conferencing?.default?.elements?.on_stage_exp || {
+    on_stage_role: '',
+    off_stage_role: '',
+  };
+  return stageDetails;
+};
