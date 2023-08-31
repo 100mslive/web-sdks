@@ -61,7 +61,6 @@ export const VideoStreamingSection = ({
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const permissions = useHMSStore(selectPermissions);
   const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = useRoomLayout()?.screens?.conferencing?.hls_live_streaming;
 
   const startHLS = useCallback(async () => {
     try {
