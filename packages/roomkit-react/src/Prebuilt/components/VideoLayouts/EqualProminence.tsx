@@ -18,8 +18,15 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-  const inputPeers = useMemo(() => (peers.length === 0 ? (!localPeer ? [] : [localPeer]) : peers), [peers, localPeer]);
-  const pageList = usePagesWithTiles({
+  let pageList = usePagesWithTiles({
+    peers,
+    maxTileCount,
+  });
+  const inputPeers = useMemo(
+    () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
+    [pageList.length, peers, localPeer],
+  );
+  pageList = usePagesWithTiles({
     peers: inputPeers,
     maxTileCount,
   });
