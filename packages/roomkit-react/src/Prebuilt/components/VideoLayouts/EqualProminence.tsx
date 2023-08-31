@@ -26,6 +26,7 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
     () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
     [pageList.length, peers, localPeer],
   );
+  // Pass local peer to main grid if no other peer has tiles
   pageList = usePagesWithTiles({
     peers: inputPeers,
     maxTileCount,
