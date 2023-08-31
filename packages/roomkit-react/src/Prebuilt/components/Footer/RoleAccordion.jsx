@@ -39,9 +39,7 @@ export const RoleAccordion = ({
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
     return null;
   }
-  const peerIDList = peerList.map(peer => peer.id);
   const height = ROW_HEIGHT * peerList.length;
-  console.log(peerList);
 
   return (
     <Flex direction="column" css={{ flexGrow: 1, '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
@@ -65,7 +63,7 @@ export const RoleAccordion = ({
               <Text variant="sm" css={{ fontWeight: '$semiBold', textTransform: 'capitalize', c: 'inherit' }}>
                 {roleName} {`(${getFormattedCount(peerList.length)})`}
               </Text>
-              <RoleOptions roleName={roleName} peerIDList={peerIDList} />
+              <RoleOptions roleName={roleName} peerList={peerList} />
             </Flex>
           </Accordion.Header>
           <Accordion.Content>
