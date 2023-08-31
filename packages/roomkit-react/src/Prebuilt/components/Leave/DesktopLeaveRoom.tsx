@@ -1,22 +1,28 @@
 import React, { Fragment, useState } from 'react';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Dropdown } from '../../../../Dropdown';
-import { Box, Flex } from '../../../../Layout';
-import { Dialog } from '../../../../Modal';
-import { Tooltip } from '../../../../Tooltip';
-import { EndSessionContent } from '../../EndSessionContent';
-import { LeaveCard } from '../../LeaveCard';
-import { LeaveSessionContent } from '../../LeaveSessionContent';
-import { useDropdownList } from '../../hooks/useDropdownList';
-import { useShowStreamingUI } from '../../../common/hooks';
+import { Dropdown } from '../../../Dropdown';
+import { Box, Flex } from '../../../Layout';
+import { Dialog } from '../../../Modal';
+import { Tooltip } from '../../../Tooltip';
+import { EndSessionContent } from './EndSessionContent';
+import { LeaveIconButton, MenuTriggerButton } from './LeaveAtoms';
+import { LeaveCard } from './LeaveCard';
+import { LeaveSessionContent } from './LeaveSessionContent';
+// @ts-ignore: No implicit Any
+import { useDropdownList } from '../hooks/useDropdownList';
+// @ts-ignore: No implicit Any
+import { useShowStreamingUI } from '../../common/hooks';
 
 export const DesktopLeaveRoom = ({
-  menuTriggerButton: MenuTriggerButton,
-  leaveIconButton: LeaveIconButton,
   leaveRoom,
   stopStream,
-  isHLSViewer,
+  screenType,
+}: {
+  leaveRoom: () => void;
+  stopStream: () => Promise<void>;
+  screenType: keyof ConferencingScreen;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -46,7 +52,7 @@ export const DesktopLeaveRoom = ({
               borderBottomRightRadius: 0,
             }}
             onClick={() => {
-              if (isHLSViewer) {
+              if (screenType === 'hls_live_streaming') {
                 setShowLeaveRoomAlert(true);
               } else {
                 leaveRoom();
@@ -112,7 +118,7 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton
           onClick={() => {
-            if (isHLSViewer) {
+            if (screenType === 'hls_live_streaming') {
               setShowLeaveRoomAlert(true);
             } else {
               leaveRoom();
@@ -144,7 +150,7 @@ export const DesktopLeaveRoom = ({
         </Dialog.Portal>
       </Dialog.Root>
 
-      {isHLSViewer ? (
+      {screenType === 'hls_live_streaming' ? (
         <Dialog.Root open={showLeaveRoomAlert} modal={false}>
           <Dialog.Portal>
             <Dialog.Overlay />

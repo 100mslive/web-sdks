@@ -1,11 +1,22 @@
 import React from 'react';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Button } from '../../Button';
-import { Box, Flex } from '../../Layout';
-import { Text } from '../../Text';
-import { useShowStreamingUI } from '../common/hooks';
+import { Button } from '../../../Button';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
+// @ts-ignore: No implicit Any
+import { useShowStreamingUI } from '../../common/hooks';
 
-export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom, isModal = false }) => {
+export const EndSessionContent = ({
+  setShowEndStreamAlert,
+  stopStream,
+  leaveRoom,
+  isModal = false,
+}: {
+  setShowEndStreamAlert: (value: boolean) => void;
+  stopStream: () => Promise<void>;
+  leaveRoom: () => void;
+  isModal?: boolean;
+}) => {
   const showStreamingUI = useShowStreamingUI();
   return (
     <Box>

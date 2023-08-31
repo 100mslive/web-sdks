@@ -11,7 +11,7 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 // @ts-ignore: No implicit Any
-import { LeaveRoom } from '../LeaveRoom';
+import { LeaveRoom } from '../Leave/LeaveRoom';
 // @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 // @ts-ignore: No implicit Any
@@ -53,7 +53,7 @@ export const Footer = ({
           },
         }}
       >
-        {isMobile ? <LeaveRoom isHLSViewer={isHLSViewer} /> : null}
+        {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
@@ -75,7 +75,7 @@ export const Footer = ({
             <ScreenshareToggle />
             <RaiseHand />
             {elements.emoji_reactions && <EmojiReaction />}
-            <LeaveRoom />
+            <LeaveRoom screenType={screenType} />
           </>
         )}
       </AppFooter.Center>

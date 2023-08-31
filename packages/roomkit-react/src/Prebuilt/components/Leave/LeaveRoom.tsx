@@ -1,17 +1,21 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useMedia } from 'react-use';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { DesktopLeaveRoom } from './MoreSettings/SplitComponents/DesktopLeaveRoom';
-import { MwebLeaveRoom } from './MoreSettings/SplitComponents/MwebLeaveRoom';
-import { PictureInPicture } from './PIP/PIPManager';
-import { ToastManager } from './Toast/ToastManager';
-import { IconButton } from '../../IconButton';
-import { config as cssConfig, styled } from '../../Theme';
-import { useHMSPrebuiltContext } from '../AppContext';
-import { useNavigation } from './hooks/useNavigation';
+import { config as cssConfig } from '../../../Theme';
+// @ts-ignore: No implicit Any
+import { useHMSPrebuiltContext } from '../../AppContext';
+// @ts-ignore: No implicit Any
+import { PictureInPicture } from '../PIP/PIPManager';
+// @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
+import { DesktopLeaveRoom } from './DesktopLeaveRoom';
+import { MwebLeaveRoom } from './MwebLeaveRoom';
+// @ts-ignore: No implicit Any
+import { useNavigation } from '../hooks/useNavigation';
 
-export const LeaveRoom = ({ isHLSViewer }) => {
+export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const navigate = useNavigation();
   const params = useParams();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -56,43 +60,8 @@ export const LeaveRoom = ({ isHLSViewer }) => {
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom
-      leaveIconButton={LeaveIconButton}
-      leaveRoom={leaveRoom}
-      stopStream={stopStream}
-      isHLSViewer={isHLSViewer}
-    />
+    <MwebLeaveRoom leaveRoom={leaveRoom} stopStream={stopStream} screenType={screenType} />
   ) : (
-    <DesktopLeaveRoom
-      leaveIconButton={LeaveIconButton}
-      menuTriggerButton={MenuTriggerButton}
-      leaveRoom={leaveRoom}
-      stopStream={stopStream}
-      isHLSViewer={isHLSViewer}
-    />
+    <DesktopLeaveRoom leaveRoom={leaveRoom} stopStream={stopStream} screenType={screenType} />
   );
 };
-
-const LeaveIconButton = styled(IconButton, {
-  color: '$on_primary_high',
-  h: '$14',
-  px: '$4',
-  r: '$1',
-  bg: '$alert_error_default',
-  '&:not([disabled]):hover': {
-    bg: '$alert_error_bright',
-  },
-  '&:not([disabled]):active': {
-    bg: '$alert_error_default',
-  },
-  '@md': {
-    mx: 0,
-  },
-});
-
-const MenuTriggerButton = styled(LeaveIconButton, {
-  borderLeft: '1px solid $alert_error_dim',
-  borderTopLeftRadius: 0,
-  borderBottomLeftRadius: 0,
-  px: '$2',
-});
