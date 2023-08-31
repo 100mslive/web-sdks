@@ -22,7 +22,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const layout = useRoomLayout();
-  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elementson_stage_exp || {};
+  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
 
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();
