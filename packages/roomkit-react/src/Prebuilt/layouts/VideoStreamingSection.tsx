@@ -43,7 +43,7 @@ import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
-export const ConferenceMainView = ({
+export const VideoStreamingSection = ({
   screenType,
   elements,
 }: {

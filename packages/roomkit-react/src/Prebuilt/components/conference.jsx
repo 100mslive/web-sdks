@@ -15,7 +15,7 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { ConferenceMainView } from '../layouts/mainView';
+import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
@@ -158,7 +158,7 @@ const Conference = () => {
         data-testid="conferencing"
         onClick={toggleControls}
       >
-        <ConferenceMainView screenType={screenProps.screenType} elements={screenProps.elements} />
+        <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
       </Box>
       {!screenProps.hideSections.includes('footer') && (
         <Box
