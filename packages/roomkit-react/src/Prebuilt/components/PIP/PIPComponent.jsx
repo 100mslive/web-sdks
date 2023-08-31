@@ -74,7 +74,6 @@ export const ActivatedPIP = () => {
         if (pinnedTrack) {
           pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
         }
-        console.log({ storePeers });
         PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
           console.error('error in updating pip', err);
         });
