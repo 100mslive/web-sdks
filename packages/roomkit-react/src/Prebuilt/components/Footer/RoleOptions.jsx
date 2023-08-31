@@ -47,7 +47,7 @@ export const RoleOptions = ({ roleName, peerIDList }) => {
 
   const allPeersHaveAudioOn = peersWithAudioOn.length === peerIDList.length;
 
-  const canMuteRole = (permissions.mute && roleName === stageDetails?.on_stage_role) || true;
+  const canMuteRole = permissions.mute && roleName === stageDetails?.on_stage_role;
   const canRemoveRoleFromStage = permissions.changeRole && roleName === stageDetails?.on_stage_role;
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
