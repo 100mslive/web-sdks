@@ -44,7 +44,6 @@ export const DesktopLeaveRoom = ({
       {permissions.hlsStreaming ? (
         <Flex>
           <LeaveIconButton
-            variant="danger"
             key="LeaveRoom"
             data-testid="leave_room_btn"
             css={{
@@ -74,7 +73,7 @@ export const DesktopLeaveRoom = ({
                 },
               }}
             >
-              <MenuTriggerButton variant="danger" data-testid="leave_end_dropdown_trigger">
+              <MenuTriggerButton data-testid="leave_end_dropdown_trigger">
                 <VerticalMenuIcon />
               </MenuTriggerButton>
             </Dropdown.Trigger>
@@ -124,7 +123,6 @@ export const DesktopLeaveRoom = ({
               leaveRoom();
             }
           }}
-          variant="danger"
           key="LeaveRoom"
           data-testid="leave_room_btn"
         >

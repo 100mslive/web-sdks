@@ -44,7 +44,6 @@ export const MwebLeaveRoom = ({
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
-              variant="danger"
               key="LeaveRoom"
               data-testid="leave_room_btn"
               css={{
@@ -92,7 +91,6 @@ export const MwebLeaveRoom = ({
         </Sheet.Root>
       ) : (
         <LeaveIconButton
-          variant="danger"
           key="LeaveRoom"
           data-testid="leave_room_btn"
           onClick={() => {
