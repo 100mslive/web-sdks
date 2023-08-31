@@ -42,7 +42,7 @@ const SidePane = () => {
         h: '100%',
         flexShrink: 0,
         gap: '$4',
-        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 21 },
+        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
       {trackId && (
