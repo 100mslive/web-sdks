@@ -64,21 +64,25 @@ export const ActivatedPIP = () => {
 
   useEffect(() => {
     let unsubscribe;
+    const handleUpdate = storePeers => {
+      const tracksMap = vanillaStore.getState(selectTracksMap);
+      let pipPeers = storePeers;
+      if (pinnedTrack) {
+        pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
+      }
+      PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
+        console.error('error in updating pip', err);
+      });
+    };
     PictureInPicture.listenToStateChange(isPipOn => {
       if (!isPipOn) {
         return;
       }
-      unsubscribe = vanillaStore.subscribe(storePeers => {
-        const tracksMap = vanillaStore.getState(selectTracksMap);
-        let pipPeers = storePeers;
-        if (pinnedTrack) {
-          pipPeers = storePeers.filter(peer => pinnedTrack.peerId === peer.id);
-        }
-        PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
-          console.error('error in updating pip', err);
-        });
-      }, selectPeers);
+      unsubscribe = vanillaStore.subscribe(handleUpdate, selectPeers);
     });
+    if (PictureInPicture.isOn) {
+      handleUpdate(vanillaStore.getState(selectPeers));
+    }
     return () => unsubscribe?.();
   }, [vanillaStore, pinnedTrack]);
 

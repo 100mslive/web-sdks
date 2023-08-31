@@ -14,7 +14,7 @@ export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps)
   const localPeer = useHMSStore(selectLocalPeer);
   const maxTileCount = 4;
   const pageList = usePagesWithTiles({
-    peers,
+    peers: prominentPeers,
     maxTileCount,
   });
   const { ref, pagesWithTiles } = useTileLayout({

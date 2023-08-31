@@ -108,6 +108,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       const hmsActions = hms.getActions();
       const hmsNotifications = hms.getNotifications();
       const hmsStats = hms.getStats();
+      hms.triggerOnSubscribe();
 
       reactiveStore.current = {
         hmsActions,
