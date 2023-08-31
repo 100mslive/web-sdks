@@ -7,14 +7,15 @@ import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
 import PreviewJoin from './PreviewJoin';
+import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAuthToken } from '../AppData/useUISettings';
 import { useNavigation } from '../hooks/useNavigation';
-import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
   const navigate = useNavigation();
-  const skipPreview = useSkipPreview();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   const { userName } = useHMSPrebuiltContext();
   const initialName = userName || (skipPreview ? 'Beam' : '');

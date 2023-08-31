@@ -22,15 +22,22 @@ import { useDropdownList } from '../hooks/useDropdownList';
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
-const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, canMinimise }) => {
+const TileMenu = ({
+  audioTrackID,
+  videoTrackID,
+  peerID,
+  isScreenshare = false,
+  canMinimise,
+  enableSpotlightingPeer = true,
+}) => {
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
+  const { removeOthers } = useHMSStore(selectPermissions);
   const { setVolume, toggleAudio, toggleVideo } = useRemoteAVToggle(audioTrackID, videoTrackID);
-  const showSpotlight = changeRole;
+  const showSpotlight = enableSpotlightingPeer;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
   const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);

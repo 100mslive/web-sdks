@@ -7,15 +7,13 @@ import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
-import { useInsetEnabled } from '../../provider/roomLayoutProvider/hooks/useInsetEnabled';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
-export function EqualProminence({ peers, onPageChange, onPageSize }: LayoutProps) {
-  const isInsetEnabled = useInsetEnabled();
+export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize }: LayoutProps) {
   const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);

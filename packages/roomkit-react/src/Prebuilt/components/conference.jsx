@@ -15,36 +15,37 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { ConferenceMainView } from '../layouts/mainView';
+import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
+import {
+  useRoomLayoutConferencingScreen,
+  useRoomLayoutPreviewScreen,
+} from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
 import { useNavigation } from './hooks/useNavigation';
-import { useSkipPreview } from './hooks/useSkipPreview';
-import { useIsLocalPeerHLSViewer } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
   const navigate = useNavigation();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
+  const { userName } = useHMSPrebuiltContext();
+  const screenProps = useRoomLayoutConferencingScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
-  const skipPreview = useSkipPreview();
-  const { showPreview } = useHMSPrebuiltContext();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
   const dropdownListRef = useRef();
   const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-  const isHlsViewer = useIsLocalPeerHLSViewer();
-
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
       setHideControls(value => !value);
@@ -72,7 +73,7 @@ const Conference = () => {
       navigate(`/`);
       return;
     }
-    if (!showPreview) {
+    if (!isPreviewScreenEnabled) {
       return;
     }
     if (
@@ -82,26 +83,26 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ''}/${role}`);
       else navigate(`/preview/${roomId || ''}`);
     }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, showPreview]);
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]);
 
   useEffect(() => {
-    if (authTokenInAppData && !isConnectedToRoom && !showPreview && roomState !== HMSRoomState.Connecting) {
+    if (authTokenInAppData && !isConnectedToRoom && !isPreviewScreenEnabled && roomState !== HMSRoomState.Connecting) {
       hmsActions
         .join({
-          userName: 'Test',
+          userName,
           authToken: authTokenInAppData,
           initEndpoint: process.env.REACT_APP_ENV
             ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
             : undefined,
           initialSettings: {
-            isAudioMuted: skipPreview,
-            isVideoMuted: skipPreview,
+            isAudioMuted: !isPreviewScreenEnabled,
+            isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
         .catch(console.error);
     }
-  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, showPreview, roomState]);
+  }, [authTokenInAppData, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
   useEffect(() => {
     // beam doesn't need to store messages, saves on unnecessary store updates in large calls
@@ -126,7 +127,7 @@ const Conference = () => {
 
   return (
     <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-      {!isHeadless && (
+      {!screenProps.hideSections.includes('header') && (
         <Box
           ref={headerRef}
           css={{
@@ -139,7 +140,7 @@ const Conference = () => {
           }}
           data-testid="header"
         >
-          <Header />
+          <Header elements={screenProps.elements} screenType={screenProps.screenType} />
         </Box>
       )}
       <Box
@@ -157,9 +158,9 @@ const Conference = () => {
         data-testid="conferencing"
         onClick={toggleControls}
       >
-        <ConferenceMainView />
+        <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
       </Box>
-      {!isHeadless && (
+      {!screenProps.hideSections.includes('footer') && (
         <Box
           ref={footerRef}
           css={{
@@ -170,12 +171,12 @@ const Conference = () => {
             marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
             '@md': {
               maxHeight: 'unset',
-              bg: isHlsViewer ? 'transparent' : '$background_dim',
+              bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
             },
           }}
           data-testid="footer"
         >
-          <Footer />
+          <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
         </Box>
       )}
       <RoleChangeRequestModal />

@@ -19,7 +19,7 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
 }) => {
   const authToken: string = useAuthToken();
   let { layout } = useFetchRoomLayout({ authToken, endpoint: roomLayoutEndpoint });
-  layout = merge(layout, overrideLayout);
+  layout = authToken && layout ? merge(layout, overrideLayout) : layout;
   return <RoomLayoutContext.Provider value={layout}>{children}</RoomLayoutContext.Provider>;
 };
 
