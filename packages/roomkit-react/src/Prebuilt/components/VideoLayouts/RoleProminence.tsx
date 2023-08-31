@@ -9,12 +9,18 @@ import { ProminenceLayout } from './ProminenceLayout';
 import { useRoleProminencePeers } from '../hooks/useRoleProminencePeers';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 
-export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps) {
-  const { prominentPeers, secondaryPeers, isInsetEnabled } = useRoleProminencePeers(peers);
+export function RoleProminence({
+  isInsetEnabled = false,
+  prominentRoles = [],
+  peers,
+  onPageChange,
+  onPageSize,
+}: LayoutProps) {
+  const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
   const maxTileCount = 4;
   const pageList = usePagesWithTiles({
-    peers,
+    peers: prominentPeers,
     maxTileCount,
   });
   const { ref, pagesWithTiles } = useTileLayout({
@@ -25,7 +31,9 @@ export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps)
   const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    onPageSize?.(pageSize);
+    if (pageSize > 0) {
+      onPageSize?.(pageSize);
+    }
   }, [pageSize, onPageSize]);
 
   return (
@@ -41,7 +49,7 @@ export function RoleProminence({ peers, onPageChange, onPageSize }: LayoutProps)
         }}
         numPages={pagesWithTiles.length}
       />
-      <SecondaryTiles peers={secondaryPeers} />
+      <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} />
       {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );

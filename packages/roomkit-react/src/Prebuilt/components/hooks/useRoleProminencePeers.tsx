@@ -1,14 +1,9 @@
 import { useMemo } from 'react';
 import { HMSPeer } from '@100mslive/react-sdk';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { usePinnedTrack } from '../AppData/useUISettings';
 
-export const useRoleProminencePeers = (peers: HMSPeer[]) => {
-  const layout = useRoomLayout();
-  const { prominent_roles, enable_local_tile_inset } =
-    //@ts-ignore
-    layout?.screens?.conferencing?.default?.elements?.video_tile_layout?.grid || {};
+export const useRoleProminencePeers = (prominentRoles: string[], peers: HMSPeer[], isInsetEnabled: boolean) => {
   const pinnedTrack = usePinnedTrack();
 
   const [prominentPeers, secondaryPeers] = useMemo(() => {
@@ -22,10 +17,10 @@ export const useRoleProminencePeers = (peers: HMSPeer[]) => {
           }
           return acc;
         }
-        if (peer.isLocal && enable_local_tile_inset) {
+        if (peer.isLocal && isInsetEnabled) {
           return acc;
         }
-        if (prominent_roles?.includes(peer.roleName)) {
+        if (prominentRoles?.includes(peer.roleName || '')) {
           acc[0].push(peer);
         } else {
           acc[1].push(peer);
@@ -34,11 +29,10 @@ export const useRoleProminencePeers = (peers: HMSPeer[]) => {
       },
       [[], []],
     );
-  }, [peers, enable_local_tile_inset, prominent_roles, pinnedTrack]);
+  }, [peers, isInsetEnabled, prominentRoles, pinnedTrack]);
 
   return {
     prominentPeers,
     secondaryPeers,
-    isInsetEnabled: enable_local_tile_inset,
   };
 };

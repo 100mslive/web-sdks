@@ -7,6 +7,7 @@ import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { Header } from './Header';
+import { useRoomLayoutPreviewScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useNavigation } from './hooks/useNavigation';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { getRoutePrefix } from '../common/utils';
@@ -14,7 +15,8 @@ import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
   const navigate = useNavigation();
-  const { showPreview, roomCode } = useHMSPrebuiltContext();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
@@ -57,7 +59,7 @@ const PostLeave = () => {
           </Text>
           <Button
             onClick={() => {
-              let redirectUrl = `${showPreview ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
+              let redirectUrl = `${isPreviewScreenEnabled ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
               if (role && roomId) redirectUrl += '/' + role;
               navigate(redirectUrl);
               ToastManager.clearAllToast();

@@ -64,8 +64,8 @@ export const ActivatedPIP = () => {
   const pinnedTrack = usePinnedTrack();
 
   useEffect(() => {
-    PictureInPicture.listenToStateChange(isPipOn => {
-      if (!isPipOn) {
+    function updatePIP() {
+      if (!PictureInPicture.isOn()) {
         return;
       }
       let pipPeers = storePeers;
@@ -75,7 +75,9 @@ export const ActivatedPIP = () => {
       PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
         console.error('error in updating pip', err);
       });
-    });
+    }
+    PictureInPicture.listenToStateChange(updatePIP);
+    updatePIP();
   }, [storePeers, tracksMap, pinnedTrack]);
 
   return <></>;

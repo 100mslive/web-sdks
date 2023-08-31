@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
+import merge from 'lodash.merge';
 import { defaultLayout } from '../constants';
 
 // TODO: remove this usage
@@ -28,7 +29,7 @@ export type useFetchRoomLayoutResponse = {
 };
 
 export const useFetchRoomLayout = ({
-  endpoint = '',
+  endpoint = 'https://api.100ms.live/v2/layouts/ui',
   authToken = '',
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
@@ -38,9 +39,6 @@ export const useFetchRoomLayout = ({
       if (isFetchInProgress.current || !authToken) {
         return;
       }
-      if (!endpoint) {
-        setLayout(defaultLayout);
-      }
       isFetchInProgress.current = true;
       const resp = await fetchWithRetry(endpoint, {
         headers: {
@@ -48,7 +46,8 @@ export const useFetchRoomLayout = ({
         },
       });
       const layoutResp: GetResponse = await resp.json();
-      setLayout(layoutResp.data[0]);
+      const layout = merge(defaultLayout, layoutResp.data?.[0]);
+      setLayout(layout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);

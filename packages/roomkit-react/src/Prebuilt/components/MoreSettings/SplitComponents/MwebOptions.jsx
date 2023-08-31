@@ -39,7 +39,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = () => {
+export const MwebOptions = ({ elements }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -133,15 +133,17 @@ export const MwebOptions = () => {
               </Suspense>
             ) : null}
 
-            <ActionTile.Root
-              onClick={() => {
-                setShowEmojiCard(true);
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <EmojiIcon />
-              <ActionTile.Title>Emoji Reactions</ActionTile.Title>
-            </ActionTile.Root>
+            {elements.emoji_reactions && (
+              <ActionTile.Root
+                onClick={() => {
+                  setShowEmojiCard(true);
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <EmojiIcon />
+                <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
 
             <ActionTile.Root
               onClick={() => {
