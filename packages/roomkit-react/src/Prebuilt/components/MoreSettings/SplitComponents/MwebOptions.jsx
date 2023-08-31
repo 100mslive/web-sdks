@@ -39,7 +39,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = ({ isHLSViewer }) => {
+export const MwebOptions = ({ elements }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -57,7 +57,7 @@ export const MwebOptions = ({ isHLSViewer }) => {
   const emojiCardRef = useRef(null);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
-  useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
+  useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
   const updateState = (modalName, value) => {
     setOpenModals(modals => {
@@ -83,7 +83,7 @@ export const MwebOptions = ({ isHLSViewer }) => {
             </Tooltip>
           </IconButton>
         </Sheet.Trigger>
-        <Sheet.Content css={{ bg: isHLSViewer ? '$surface_default' : '$surface_dim', pb: '$14' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
               display: 'flex',
@@ -133,15 +133,17 @@ export const MwebOptions = ({ isHLSViewer }) => {
               </Suspense>
             ) : null}
 
-            <ActionTile.Root
-              onClick={() => {
-                setShowEmojiCard(true);
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <EmojiIcon />
-              <ActionTile.Title>Emoji Reactions</ActionTile.Title>
-            </ActionTile.Root>
+            {elements.emoji_reactions && (
+              <ActionTile.Root
+                onClick={() => {
+                  setShowEmojiCard(true);
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <EmojiIcon />
+                <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
 
             <ActionTile.Root
               onClick={() => {

@@ -18,7 +18,7 @@ export const LeaveRoom = ({ isHLSViewer }) => {
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
   const hmsActions = useHMSActions();
-  const { showLeave, onLeave } = useHMSPrebuiltContext();
+  const { onLeave } = useHMSPrebuiltContext();
 
   const stopStream = async () => {
     try {
@@ -32,12 +32,10 @@ export const LeaveRoom = ({ isHLSViewer }) => {
   };
 
   const redirectToLeavePage = () => {
-    if (showLeave) {
-      if (params.role) {
-        navigate('/leave/' + params.roomId + '/' + params.role);
-      } else {
-        navigate('/leave/' + params.roomId);
-      }
+    if (params.role) {
+      navigate('/leave/' + params.roomId + '/' + params.role);
+    } else {
+      navigate('/leave/' + params.roomId);
     }
     PictureInPicture.stop().catch(() => console.error('stopping pip'));
     ToastManager.clearAllToast();

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectLocalPeerID,
   selectLocalPeerRoleName,
@@ -9,9 +8,9 @@ import {
   useHMSStore,
   useScreenShare,
 } from '@100mslive/react-sdk';
-import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
-import { SidePane } from './screenShareView';
+import { SecondaryTiles } from '../components/SecondaryTiles';
+import { ProminenceLayout } from '../components/VideoLayouts/ProminenceLayout';
+import { Box } from '../../Layout';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
@@ -26,14 +25,13 @@ export const EmbedView = () => {
 export const EmbebScreenShareView = ({ children }) => {
   const peers = useHMSStore(selectPeers);
 
-  const mediaQueryLg = cssConfig.media.xl;
-  const showSidebarInBottom = useMedia(mediaQueryLg);
   const localPeerID = useHMSStore(selectLocalPeerID);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
   const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
   const amIPresenting = localPeerID === peerPresenting?.id;
-  const showPresenterInSmallTile = showSidebarInBottom || amIPresenting || isPresenterFromMyRole;
+  const showPresenterInSmallTile = amIPresenting || isPresenterFromMyRole;
+  const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
@@ -42,29 +40,18 @@ export const EmbebScreenShareView = ({ children }) => {
     }
     return smallTilePeers;
   }, [peers, peerPresenting, showPresenterInSmallTile]);
+
+  useEffect(() => {
+    setActiveScreenSharePeer(peerPresenting?.id);
+    return () => {
+      setActiveScreenSharePeer('');
+    };
+  }, [peerPresenting?.id, setActiveScreenSharePeer]);
   return (
-    <Flex css={{ size: '100%' }} direction={showSidebarInBottom ? 'column' : 'row'}>
-      {children}
-      <Flex
-        direction={{ '@initial': 'column', '@lg': 'row' }}
-        css={{
-          overflow: 'hidden',
-          p: '$4 $8',
-          flex: '0 0 20%',
-          '@xl': {
-            flex: '1 1 0',
-          },
-        }}
-      >
-        <SidePane
-          showSidebarInBottom={showSidebarInBottom}
-          peerScreenSharing={peerPresenting}
-          isPresenterInSmallTiles={showPresenterInSmallTile}
-          smallTilePeers={smallTilePeers}
-          totalPeers={peers.length}
-        />
-      </Flex>
-    </Flex>
+    <ProminenceLayout.Root>
+      <ProminenceLayout.ProminentSection>{children}</ProminenceLayout.ProminentSection>
+      <SecondaryTiles peers={smallTilePeers} />
+    </ProminenceLayout.Root>
   );
 };
 
@@ -117,17 +104,7 @@ const EmbedComponent = () => {
   }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
 
   return (
-    <Box
-      ref={iframeRef}
-      css={{
-        flex: '3 1 0',
-        '@lg': {
-          flex: '2 1 0',
-          display: 'flex',
-          alignItems: 'center',
-        },
-      }}
-    >
+    <Box ref={iframeRef} css={{ size: '100%' }}>
       <iframe
         src={src}
         title={src}

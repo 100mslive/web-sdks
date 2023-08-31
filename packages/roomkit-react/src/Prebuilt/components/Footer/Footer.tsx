@@ -1,16 +1,35 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { config as cssConfig, Footer as AppFooter } from '../../../';
+import {
+  ConferencingScreen,
+  DefaultConferencingScreen_Elements,
+  HLSLiveStreamingScreen_Elements,
+} from '@100mslive/types-prebuilt';
+import { config as cssConfig, Footer as AppFooter } from '../../..';
+// @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+// @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
+// @ts-ignore: No implicit Any
 import { LeaveRoom } from '../LeaveRoom';
+// @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
+// @ts-ignore: No implicit Any
 import { RaiseHand } from '../RaiseHand';
+// @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
+// @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
+// @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
 
-export const Footer = ({ isHLSViewer }) => {
+export const Footer = ({
+  screenType,
+  elements,
+}: {
+  screenType: keyof ConferencingScreen;
+  elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
 
   return (
@@ -47,23 +66,23 @@ export const Footer = ({ isHLSViewer }) => {
       >
         {isMobile ? (
           <>
-            {isHLSViewer ? <RaiseHand /> : null}
-            <ChatToggle />
-            <MoreSettings isHLSViewer={isHLSViewer} />
+            <RaiseHand />
+            {elements.chat && <ChatToggle />}
+            <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHLSViewer ? <RaiseHand /> : null}
-            <EmojiReaction />
-            <LeaveRoom isHLSViewer={isHLSViewer} />
+            <RaiseHand />
+            {elements.emoji_reactions && <EmojiReaction />}
+            <LeaveRoom />
           </>
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        <ChatToggle />
+        {elements.chat && <ChatToggle />}
         <ParticipantCount />
-        <MoreSettings isHLSViewer={isHLSViewer} />
+        <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
     </AppFooter.Root>
   );

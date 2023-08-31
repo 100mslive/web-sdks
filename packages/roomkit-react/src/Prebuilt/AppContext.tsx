@@ -1,8 +1,16 @@
 import React, { useContext } from 'react';
 
-export const HMSPrebuiltContext = React.createContext({
-  showPreview: true,
-  showLeave: true,
+type HMSPrebuiltContextType = {
+  roomCode: string;
+  roomId?: string;
+  role?: string;
+  userName?: string;
+  userId?: string;
+  endpoints?: object;
+  onLeave?: () => void;
+};
+
+export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   roomCode: '',
   userName: '',
   userId: '',

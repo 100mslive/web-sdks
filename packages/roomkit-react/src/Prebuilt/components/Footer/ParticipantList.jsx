@@ -13,15 +13,15 @@ import {
 import {
   ChangeRoleIcon,
   HandIcon,
-  HandRaiseSlashedIcon,
   MicOffIcon,
   PeopleIcon,
   PeopleRemoveIcon,
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
+import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { RoleChangeModal } from '../RoleChangeModal';
@@ -30,7 +30,7 @@ import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useParticipants, useShowStreamingUI } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
-import { LOWER_HAND, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
@@ -52,7 +52,7 @@ export const ParticipantList = () => {
       if (!filterValue) {
         filterValue = {};
       }
-      filterValue.search = value;
+      filterValue.search = value.toLowerCase();
       return { ...filterValue };
     });
   }, []);
@@ -139,6 +139,10 @@ const VirtualizedParticipants = ({
       css={{
         gap: '$8',
         mt: '$4',
+        maxHeight: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        pr: '$3',
       }}
     >
       <RoleAccordion
@@ -168,7 +172,13 @@ export const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
   return (
     <Flex
       key={peer.id}
-      css={{ w: '100%', p: '$8', pt: '$4', pr: '$6' }}
+      css={{
+        w: '100%',
+        p: '$4 $8',
+        pr: '$6',
+        h: '$16',
+        '&:hover .participant_item': { display: 'flex' },
+      }}
       align="center"
       justify="between"
       data-testid={'participant_' + peer.name}
@@ -200,7 +210,14 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
-    <Flex align="center" css={{ flexShrink: 0, gap: '$8', mt: '$2' }}>
+    <Flex
+      align="center"
+      css={{
+        flexShrink: 0,
+        gap: '$8',
+        mt: '$2',
+      }}
+    >
       <ConnectionIndicator peerId={peerId} />
       {isHandRaised && (
         <Flex
@@ -215,46 +232,79 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
         <Flex
           align="center"
           justify="center"
-          css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+          css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
         >
           <MicOffIcon height={19} width={19} />
         </Flex>
       ) : null}
 
       {shouldShowMoreActions && !isInternalRole(role) && !isLocal ? (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} isHandRaised={isHandRaised} />
+        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
       ) : null}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
+const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
   const hmsActions = useHMSActions();
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
+  const layout = useRoomLayout();
+  const {
+    bring_to_stage_label,
+    remove_from_stage_label,
+    on_stage_role,
+    off_stage_roles = [],
+  } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
+  const canBringToStage = off_stage_roles.includes(role);
+  const isInStage = role === on_stage_role;
+  const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
-  const actions = useHMSActions();
   const [open, setOpen] = useState(false);
 
-  const lowerHand = async () => {
-    await hmsActions.sendDirectMessage('Lower hand', peerId, LOWER_HAND);
+  const handleStageAction = async () => {
+    if (isInStage) {
+      hmsActions.changeRoleOfPeer(peerId, prevRole || off_stage_roles[0]);
+    } else {
+      await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
+    }
+    setOpen(false);
   };
 
   return (
-    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
       <Dropdown.Trigger
         asChild
         data-testid="participant_more_actions"
-        css={{ p: '$1', r: '$0', c: '$on_surface_high' }}
+        className="participant_item"
+        css={{
+          p: '$1',
+          r: '$0',
+          c: '$on_surface_high',
+          display: open ? 'flex' : 'none',
+          '&:hover': {
+            bg: '$surface_bright',
+          },
+          '@md': {
+            display: 'flex',
+          },
+        }}
         tabIndex={0}
       >
-        <Flex>
+        <Box css={{ my: 'auto' }}>
           <VerticalMenuIcon />
-        </Flex>
+        </Box>
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {canChangeRole && (
+          {canChangeRole && canBringToStage ? (
+            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
+              <ChangeRoleIcon />
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                {isInStage ? remove_from_stage_label : bring_to_stage_label}
+              </Text>
+            </Dropdown.Item>
+          ) : (
             <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => onRoleChange(peerId)}>
               <ChangeRoleIcon />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
@@ -262,21 +312,13 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, isHandRaised }) => {
               </Text>
             </Dropdown.Item>
           )}
-          {isHandRaised ? (
-            <Dropdown.Item css={{ c: '$on_surface_high', bg: '$surface_default' }} onClick={lowerHand}>
-              <HandRaiseSlashedIcon />
-              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
-                Lower Hand
-              </Text>
-            </Dropdown.Item>
-          ) : null}
 
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
               css={{ color: '$alert_error_default', bg: '$surface_default' }}
               onClick={async () => {
                 try {
-                  await actions.removePeer(peerId, '');
+                  await hmsActions.removePeer(peerId, '');
                 } catch (error) {
                   ToastManager.addToast({ title: error.message, variant: 'error' });
                 }

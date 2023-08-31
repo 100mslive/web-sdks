@@ -158,7 +158,13 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
           ) : null}
           <BaseIconButton
             onClick={sendMessage}
-            css={{ ml: 'auto', height: 'max-content', mr: '$4', color: '$on_surface_low' }}
+            css={{
+              ml: 'auto',
+              height: 'max-content',
+              mr: '$4',
+              color: '$on_surface_low',
+              '&:hover': { c: '$on_surface_high' },
+            }}
             data-testid="send_msg_btn"
           >
             <SendIcon />

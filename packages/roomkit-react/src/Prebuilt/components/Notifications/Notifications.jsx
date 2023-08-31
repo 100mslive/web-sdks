@@ -12,7 +12,6 @@ import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { InitErrorModal } from './InitErrorModal';
-import { MessageNotifications } from './MessageNotifications';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
@@ -146,7 +145,6 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
-      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );

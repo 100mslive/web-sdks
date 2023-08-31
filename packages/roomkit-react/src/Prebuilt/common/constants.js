@@ -7,7 +7,6 @@ export const QUERY_PARAM_NAME = 'name';
 export const QUERY_PARAM_VIEW_MODE = 'ui_mode';
 export const QUERY_PARAM_AUTH_TOKEN = 'auth_token';
 export const QUERY_PARAM_PREVIEW_AS_ROLE = 'preview_as_role';
-export const UI_MODE_ACTIVE_SPEAKER = 'activespeaker';
 export const UI_MODE_GRID = 'grid';
 export const MAX_TOASTS = 5;
 export const RTMP_RECORD_RESOLUTION_MIN = 480;
@@ -96,4 +95,4 @@ export const SESSION_STORE_KEY = {
   SPOTLIGHT: 'spotlight',
 };
 
-export const LOWER_HAND = 'lowerHand';
+export const ROLE_CHANGE_DECLINED = 'role_change_declined';

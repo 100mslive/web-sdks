@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.10.0.tgz#465cf94dd71cf795609f874464ac2294cc241bac"
-  integrity sha512-9wtHTR1HJdaqj/tTj2DJJDriB5OJj8dg0CKaQxzZGQGN09tNIce+hWLEPGsMNajFyLs/G7RIn9Wdd7UP3sFhKw==
+"@100mslive/types-prebuilt@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.11.0.tgz#911755da1ae448b6ec7ec76cf12fbd1b66826b72"
+  integrity sha512-62FtDO1s1jcxMOq6VWMgRM7as2qfTxdeTGI8b2LlNUMVVprK2yXST9P1N7fx/8zZMTFwRj8twYb+LThRHVFfrw==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"

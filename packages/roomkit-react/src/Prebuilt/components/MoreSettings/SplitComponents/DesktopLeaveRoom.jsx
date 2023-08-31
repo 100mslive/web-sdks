@@ -27,7 +27,7 @@ export const DesktopLeaveRoom = ({
   const showStreamingUI = useShowStreamingUI();
   const showStream = showStreamingUI && isStreamingOn;
 
-  useDropdownList({ open, name: 'LeaveRoom' });
+  useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
     return null;

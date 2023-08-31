@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useSearchParam } from 'react-use';
 import {
   HMSRoomState,
   selectAvailableRoleNames,
@@ -21,9 +20,7 @@ import {
   APP_DATA,
   CHAT_SELECTOR,
   DEFAULT_WAITING_VIEWER_ROLE,
-  QUERY_PARAM_VIEW_MODE,
   SIDE_PANE_OPTIONS,
-  UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
@@ -79,7 +76,6 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isDefaultModeActiveSpeaker = useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
 
   useEffect(() => {
     if (!isConnected && sidePane && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
@@ -100,12 +96,10 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
     const uiSettings = preferences || {};
     const updatedSettings = {
       ...uiSettings,
-      [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
-        ? UI_MODE_ACTIVE_SPEAKER
-        : uiSettings.uiViewMode || UI_MODE_GRID,
+      [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, isDefaultModeActiveSpeaker, hmsActions]);
+  }, [preferences, hmsActions]);
 
   useEffect(() => {
     const appData = {

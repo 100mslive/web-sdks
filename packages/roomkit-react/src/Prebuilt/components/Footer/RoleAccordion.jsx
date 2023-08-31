@@ -6,7 +6,7 @@ import { Box, Flex } from '../../../Layout';
 import { Participant } from './ParticipantList';
 import { getFormattedCount } from '../../common/utils';
 
-const ROW_HEIGHT = 55;
+const ROW_HEIGHT = 50;
 
 function itemKey(index, data) {
   return data.peerList[index].id;
@@ -33,13 +33,13 @@ export const RoleAccordion = ({
 }) => {
   const [ref, { width }] = useMeasure();
   const height = ROW_HEIGHT * peerList.length;
-  const showAcordion = filter?.search ? peerList.some(peer => peer.name.includes(filter.search)) : true;
+  const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
     return null;
   }
 
   return (
-    <Flex direction="column" css={{ w: '100%' }} ref={ref}>
+    <Flex direction="column" css={{ flexGrow: 1 }} ref={ref}>
       <Accordion.Root
         type="single"
         collapsible
