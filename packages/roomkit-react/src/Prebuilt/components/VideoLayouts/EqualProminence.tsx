@@ -31,7 +31,9 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    onPageSize?.(pageSize);
+    if (pageSize > 0) {
+      onPageSize?.(pageSize);
+    }
   }, [pageSize, onPageSize]);
 
   return (

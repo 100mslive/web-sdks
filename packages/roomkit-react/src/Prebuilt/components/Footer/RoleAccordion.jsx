@@ -6,7 +6,7 @@ import { Box, Flex } from '../../../Layout';
 import { Participant } from './ParticipantList';
 import { getFormattedCount } from '../../common/utils';
 
-const ROW_HEIGHT = 55;
+const ROW_HEIGHT = 50;
 
 function itemKey(index, data) {
   return data.peerList[index].id;
@@ -39,7 +39,7 @@ export const RoleAccordion = ({
   }
 
   return (
-    <Flex direction="column" css={{ w: '100%' }} ref={ref}>
+    <Flex direction="column" css={{ flexGrow: 1 }} ref={ref}>
       <Accordion.Root
         type="single"
         collapsible

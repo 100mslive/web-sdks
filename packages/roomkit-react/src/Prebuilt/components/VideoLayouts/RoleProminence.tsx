@@ -20,7 +20,7 @@ export function RoleProminence({
   const localPeer = useHMSStore(selectLocalPeer);
   const maxTileCount = 4;
   const pageList = usePagesWithTiles({
-    peers,
+    peers: prominentPeers,
     maxTileCount,
   });
   const { ref, pagesWithTiles } = useTileLayout({
@@ -31,7 +31,9 @@ export function RoleProminence({
   const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    onPageSize?.(pageSize);
+    if (pageSize > 0) {
+      onPageSize?.(pageSize);
+    }
   }, [pageSize, onPageSize]);
 
   return (

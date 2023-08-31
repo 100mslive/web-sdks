@@ -7,14 +7,14 @@ import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
 const Root = ({ children }: React.PropsWithChildren) => (
-  <Flex direction="column" css={{ size: '100%' }}>
+  <Flex direction="column" css={{ size: '100%', gap: '$6' }}>
     {children}
   </Flex>
 );
 
 const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
   return (
-    <Flex direction="column" css={{ flex: '1 1 0', minHeight: 0, ...css }}>
+    <Flex direction="column" css={{ flex: '1 1 0', gap: '$2', minHeight: 0, ...css }}>
       {children}
     </Flex>
   );

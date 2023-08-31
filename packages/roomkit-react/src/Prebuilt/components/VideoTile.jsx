@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -7,17 +7,19 @@ import {
   selectPeerMetadata,
   selectPeerNameByID,
   selectSessionStore,
+  selectTrackAudioByID,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
-import { useBorderAudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
+import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { config as cssConfig } from '../../Theme';
+import { config as cssConfig, keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
@@ -50,7 +52,6 @@ const Tile = ({
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
   const isVideoMuted = !track?.enabled;
   const [isMouseHovered, setIsMouseHovered] = useState(false);
-  const borderAudioRef = useBorderAudioLevel(audioTrack?.id);
   const isVideoDegraded = track?.degraded;
   const isLocal = localPeerID === peerId;
   const [pinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
@@ -95,7 +96,6 @@ const Tile = ({
         <StyledVideoTile.Container
           onMouseEnter={onHoverHandler}
           onMouseLeave={onHoverHandler}
-          ref={hideAudioMuteOnTile ? undefined : borderAudioRef}
           noRadius={!roundedVideoTile}
           css={containerCSS}
         >
@@ -138,7 +138,9 @@ const Tile = ({
             >
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
-          ) : null}
+          ) : (
+            <AudioLevel trackId={audioTrack?.id} />
+          )}
           {isMouseHovered || isDragabble ? (
             <TileMenu
               peerID={peerId}
@@ -167,6 +169,55 @@ const Tile = ({
 };
 
 const metaStyles = { top: '$4', left: '$4' };
+
+const heightAnimation = value =>
+  keyframes({
+    '50%': {
+      transform: `scale3d(1,${value},1)`,
+    },
+    '100%': {
+      transform: `scale3d(1,1,1)`,
+    },
+  });
+
+const AudioLevelIndicator = ({ trackId, value, delay }) => {
+  const vanillaStore = useHMSVanillaStore();
+  const ref = useRef();
+
+  useEffect(() => {
+    const unsubscribe = vanillaStore.subscribe(audioLevel => {
+      if (ref.current) {
+        ref.current.style['animation'] = `${heightAnimation(
+          audioLevel ? value : 1,
+        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite ${delay}s`;
+      }
+    }, selectTrackAudioByID(trackId));
+    return unsubscribe;
+  }, [vanillaStore, trackId, value, delay]);
+  return (
+    <Box
+      ref={ref}
+      css={{
+        w: 4,
+        height: 6,
+        r: 2,
+        bg: '$on_primary_high',
+      }}
+    />
+  );
+};
+
+export const AudioLevel = ({ trackId }) => {
+  return (
+    <StyledVideoTile.AudioIndicator>
+      <Flex align="center" justify="center" css={{ gap: '$2' }}>
+        {[3, 2, 3].map((v, i) => (
+          <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
+        ))}
+      </Flex>
+    </StyledVideoTile.AudioIndicator>
+  );
+};
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
