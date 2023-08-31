@@ -41,6 +41,7 @@ export const RoleAccordion = ({
   }
   const peerIDList = peerList.map(peer => peer.id);
   const height = ROW_HEIGHT * peerList.length;
+  console.log(peerList);
 
   return (
     <Flex direction="column" css={{ flexGrow: 1, '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>

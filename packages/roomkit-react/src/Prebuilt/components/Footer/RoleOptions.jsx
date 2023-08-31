@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
-import { selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectPeersByCondition,
+  selectPermissions,
+  useHMSActions,
+  useHMSStore,
+  useRemoteAVToggle,
+} from '@100mslive/react-sdk';
 import {
   MicOffIcon,
+  MicOnIcon,
   PersonRectangleIcon,
   RemoveUserIcon,
   VerticalMenuIcon,
   VideoOffIcon,
+  VideoOnIcon,
 } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
@@ -21,10 +29,26 @@ export const RoleOptions = ({ roleName, peerIDList }) => {
   const hmsActions = useHMSActions();
   const stageDetails = useStageDetails();
 
-  const canMuteRole = permissions.mute && roleName === stageDetails?.on_stage_role;
+  const peersWithVideoOn = useHMSStore(
+    selectPeersByCondition(peer => {
+      const { isVideoEnabled } = useRemoteAVToggle(peer.audioTrack, peer.videoTrack);
+      return peer.roleName === roleName && isVideoEnabled;
+    }),
+  );
 
+  const allPeersHaveVideoOn = peersWithVideoOn.length === peerIDList.length;
+
+  const peersWithAudioOn = useHMSStore(
+    selectPeersByCondition(peer => {
+      const { isAudioEnabled } = useRemoteAVToggle(peer.audioTrack, peer.videoTrack);
+      return peer.roleName === roleName && isAudioEnabled;
+    }),
+  );
+
+  const allPeersHaveAudioOn = peersWithAudioOn.length === peerIDList.length;
+
+  const canMuteRole = (permissions.mute && roleName === stageDetails?.on_stage_role) || true;
   const canRemoveRoleFromStage = permissions.changeRole && roleName === stageDetails?.on_stage_role;
-
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
     permissions.removeOthers &&
@@ -82,7 +106,7 @@ export const RoleOptions = ({ roleName, peerIDList }) => {
       >
         {canRemoveRoleFromStage && (
           <Dropdown.Item
-            css={dropdownItemCSS}
+            css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
             onClick={() => {
               hmsActions.changeRoleOfPeersWithRoles([stageDetails.on_stage_role], stageDetails.off_stage_roles[0]);
             }}
@@ -96,23 +120,20 @@ export const RoleOptions = ({ roleName, peerIDList }) => {
 
         {canMuteRole && (
           <>
-            <Dropdown.Item
-              css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright' }}
-              onClick={() => setTrackEnabled('audio')}
-            >
-              <MicOffIcon />
+            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', !allPeersHaveAudioOn)}>
+              {allPeersHaveAudioOn ? <MicOffIcon /> : <MicOnIcon />}
               <Text variant="sm" css={optionTextCSS}>
-                Mute Audio
+                {allPeersHaveAudioOn ? 'Mute' : 'Unmute'} Audio
               </Text>
             </Dropdown.Item>
 
             <Dropdown.Item
               css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright' }}
-              onClick={() => setTrackEnabled('video')}
+              onClick={() => setTrackEnabled('video', !allPeersHaveVideoOn)}
             >
-              <VideoOffIcon />
+              {allPeersHaveVideoOn ? <VideoOffIcon /> : <VideoOnIcon />}
               <Text variant="sm" css={optionTextCSS}>
-                Mute Video
+                {allPeersHaveVideoOn ? 'Mute' : 'Unmute'} Video
               </Text>
             </Dropdown.Item>
           </>
