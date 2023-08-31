@@ -205,7 +205,11 @@ export const DesktopOptions = ({
         <StartRecording open onOpenChange={(value: boolean) => updateState(MODALS.START_RECORDING, value)} />
       )}
       {openModals.has(MODALS.DEVICE_SETTINGS) && (
-        <SettingsModal open onOpenChange={(value: boolean) => updateState(MODALS.DEVICE_SETTINGS, value)} />
+        <SettingsModal
+          open
+          onOpenChange={(value: boolean) => updateState(MODALS.DEVICE_SETTINGS, value)}
+          screenType={screenType}
+        />
       )}
       {openModals.has(MODALS.STATS_FOR_NERDS) && (
         <StatsForNerds open onOpenChange={(value: boolean) => updateState(MODALS.STATS_FOR_NERDS, value)} />

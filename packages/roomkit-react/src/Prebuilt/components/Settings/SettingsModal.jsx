@@ -11,7 +11,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { settingContent, settingsList } from './common.js';
 
-const SettingsModal = ({ open, onOpenChange, isHLSViewer, children = <></> }) => {
+const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
 
@@ -25,10 +25,10 @@ const SettingsModal = ({ open, onOpenChange, isHLSViewer, children = <></> }) =>
   );
 
   useEffect(() => {
-    if (isHLSViewer) {
+    if (screenType === 'hls_live_streaming') {
       hideSettingByTabName('layout')(true);
     }
-  }, [isHLSViewer, hideSettingByTabName]);
+  }, [screenType, hideSettingByTabName]);
 
   const [selection, setSelection] = useState(() => Object.keys(showSetting).find(key => showSetting[key]) ?? '');
   const resetSelection = useCallback(() => {
