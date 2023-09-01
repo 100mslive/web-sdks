@@ -6,7 +6,7 @@ import { useHMSActions } from '@100mslive/react-sdk';
 import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
-import { ChatSelectorContainer } from './ChatSelectorContainer';
+// import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 
@@ -62,7 +62,7 @@ function EmojiPicker({ onSelect }) {
   );
 }
 
-export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection, screenType }) => {
+export const ChatFooter = ({ role, peerId, onSend, children /* onSelect, selection, screenType */ }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -106,9 +106,9 @@ export const ChatFooter = ({ role, peerId, onSend, children, onSelect, selection
 
   return (
     <>
-      {screenType !== 'hls_live_streaming' ? (
+      {/* {screenType !== 'hls_live_streaming' ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
-      ) : null}
+      ) : null} */}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
