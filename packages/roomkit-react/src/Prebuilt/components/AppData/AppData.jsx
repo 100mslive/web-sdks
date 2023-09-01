@@ -26,6 +26,7 @@ import {
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
+  WIDGET_STATE,
 } from '../../common/constants';
 
 export const getAppDetails = appDetails => {
@@ -69,6 +70,10 @@ const initialAppData = {
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
+  [APP_DATA.widgetState]: {
+    [WIDGET_STATE.pollInView]: '',
+    [WIDGET_STATE.view]: '',
+  },
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {

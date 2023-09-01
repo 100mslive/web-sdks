@@ -1,8 +1,11 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   selectAppData,
   selectAppDataByPath,
   selectAudioTrackByPeerID,
+  selectIsAllowedToPublish,
+  selectPermissions,
+  selectPolls,
   selectSessionStore,
   selectTrackByID,
   selectVideoTrackByPeerID,
@@ -11,7 +14,8 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
+import { isScreenshareSupported } from '../../common/utils';
+import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS, WIDGET_STATE } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -156,4 +160,50 @@ const useSetAppData = ({ key1, key2 }) => {
     [actions, key1, key2, store, setPreferences],
   );
   return setValue;
+};
+
+export const useWidgetState = () => {
+  const [widgetState, setWidgetState] = useSetAppDataByKey(APP_DATA.widgetState);
+
+  const setWidgetView = useCallback(
+    view => {
+      setWidgetState({
+        [WIDGET_STATE.pollInView]: widgetState?.pollInView,
+        [WIDGET_STATE.view]: view,
+      });
+    },
+    [widgetState?.pollInView, setWidgetState],
+  );
+
+  return {
+    setWidgetState,
+    setWidgetView,
+    pollInView: widgetState?.pollInView,
+    widgetView: widgetState?.view,
+  };
+};
+
+export const useShowAudioShare = () => {
+  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+
+  const showAudioShare = useMemo(() => {
+    return !(!isAllowedToPublish.screen || !isScreenshareSupported());
+  }, [isAllowedToPublish.screen]);
+
+  return {
+    showAudioShare: showAudioShare,
+  };
+};
+
+export const useShowPolls = () => {
+  const permissions = useHMSStore(selectPermissions);
+  const polls = useHMSStore(selectPolls)?.filter(poll => poll.state === 'started' || poll.state === 'stopped');
+
+  const showPolls = useMemo(() => {
+    return permissions?.pollWrite || (permissions?.pollRead && polls?.length > 0);
+  }, [permissions?.pollRead, permissions?.pollWrite, polls?.length]);
+
+  return {
+    showPolls: showPolls,
+  };
 };
