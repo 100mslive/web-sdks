@@ -3,7 +3,7 @@ import cookies from 'js-cookies';
 
 function isRoomCode(str) {
   const regex = /^[A-Za-z]{3}(-[A-Za-z]{3,4}){2}$/;
-  regex.test(str);
+  return regex.test(str);
 }
 
 export const getRoomCodeFromUrl = () => {
