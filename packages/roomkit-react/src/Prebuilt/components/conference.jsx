@@ -150,7 +150,7 @@ const Conference = () => {
           px: '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
           '@lg': {
-            px: '$4',
+            px: 0,
           },
         }}
         id="conferencing"
