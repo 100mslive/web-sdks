@@ -14,14 +14,12 @@ import {
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
-// @ts-ignore: No implicit Any
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
 import { PDFView } from './PDFView';
-// @ts-ignore: No implicit Any
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
