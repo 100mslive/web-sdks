@@ -68,7 +68,10 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                 onClick={() => onQualityChange(layer)}
                 key={layer.width}
                 css={{
-                  bg: '$surface_bright',
+                  bg:
+                    !isAuto && layer.width === selection?.width && layer.height === selection?.height
+                      ? '$surface_default'
+                      : '$surface_bright',
                   '&:hover': {
                     bg: '$surface_default',
                   },
@@ -86,7 +89,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
             onClick={() => onQualityChange({ height: 'auto' })}
             key="auto"
             css={{
-              bg: '$surface_bright',
+              bg: !isAuto ? '$surface_bright' : '$surface_default',
               '&:hover': {
                 bg: '$surface_default',
               },
