@@ -6,7 +6,6 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import {
-  selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectPermissions,
   useHMSActions,
@@ -52,7 +51,6 @@ export const VideoStreamingSection = ({
 }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   // const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
@@ -78,23 +76,17 @@ export const VideoStreamingSection = ({
   }, [hmsActions, isHLSStarted, setHLSStarted]);
 
   useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
     // Is a streaming kit and broadcaster joins
     if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
       startHLS();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected]);
+  }, []);
 
   useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, hmsActions]);
+  }, [hmsActions]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
