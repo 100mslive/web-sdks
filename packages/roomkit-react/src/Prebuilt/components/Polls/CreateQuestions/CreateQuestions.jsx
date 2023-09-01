@@ -1,19 +1,15 @@
 // @ts-check
-import React, { useMemo, useState } from "react";
-import { v4 as uuid } from "uuid";
-import {
-  selectPollByID,
-  useHMSActions,
-  useHMSStore,
-} from "@100mslive/react-sdk";
-import { AddCircleIcon } from "@100mslive/react-icons";
-import { Button, Flex, Text } from "@100mslive/roomkit-react";
-import { Container, ContentHeader } from "../../Streaming/Common";
-import { isValidQuestion, QuestionForm } from "./QuestionForm";
-import { SavedQuestion } from "./SavedQuestion";
-import { useWidgetToggle } from "../../AppData/useSidepane";
-import { useWidgetState } from "../../AppData/useUISettings";
-import { WIDGET_VIEWS } from "../../../common/constants";
+import React, { useMemo, useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import { selectPollByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { AddCircleIcon } from '@100mslive/react-icons';
+import { Button, Flex, Text } from '../../../../';
+import { Container, ContentHeader } from '../../Streaming/Common';
+import { isValidQuestion, QuestionForm } from './QuestionForm';
+import { SavedQuestion } from './SavedQuestion';
+import { useWidgetToggle } from '../../AppData/useSidepane';
+import { useWidgetState } from '../../AppData/useUISettings';
+import { WIDGET_VIEWS } from '../../../common/constants';
 
 export function CreateQuestions() {
   const [questions, setQuestions] = useState([{ draftID: uuid() }]);
@@ -23,10 +19,8 @@ export function CreateQuestions() {
   const interaction = useHMSStore(selectPollByID(id));
 
   const isValidPoll = useMemo(
-    () =>
-      questions.length > 0 &&
-      questions.every(question => isValidQuestion(question)),
-    [questions]
+    () => questions.length > 0 && questions.every(question => isValidQuestion(question)),
+    [questions],
   );
 
   const launchPoll = async () => {
@@ -44,8 +38,8 @@ export function CreateQuestions() {
   };
   const headingTitle = interaction?.type
     ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
-    : "Polls/Quiz";
-  const isQuiz = interaction?.type === "quiz";
+    : 'Polls/Quiz';
+  const isQuiz = interaction?.type === 'quiz';
   return (
     <Container rounded>
       <ContentHeader
@@ -53,7 +47,7 @@ export function CreateQuestions() {
         onClose={toggleWidget}
         onBack={() => setWidgetView(WIDGET_VIEWS.CREATE_POLL_QUIZ)}
       />
-      <Flex direction="column" css={{ p: "$10" }}>
+      <Flex direction="column" css={{ p: '$10' }}>
         <Flex direction="column">
           {questions.map((question, index) => (
             <QuestionCard
@@ -71,9 +65,7 @@ export function CreateQuestions() {
               isQuiz={isQuiz}
               removeQuestion={questionID =>
                 setQuestions(prev => {
-                  return prev.filter(
-                    questionFromSet => questionID !== questionFromSet.draftID
-                  );
+                  return prev.filter(questionFromSet => questionID !== questionFromSet.draftID);
                 })
               }
               convertToDraft={questionID =>
@@ -92,19 +84,19 @@ export function CreateQuestions() {
         </Flex>
         <Flex
           css={{
-            c: "$on_surface_low",
-            my: "$sm",
-            cursor: "pointer",
-            "&:hover": { c: "$on_surface_medium" },
+            c: '$on_surface_low',
+            my: '$sm',
+            cursor: 'pointer',
+            '&:hover': { c: '$on_surface_medium' },
           }}
           onClick={() => setQuestions([...questions, { draftID: uuid() }])}
         >
           <AddCircleIcon />
-          <Text variant="body1" css={{ ml: "$md", c: "$inherit" }}>
+          <Text variant="body1" css={{ ml: '$md', c: '$inherit' }}>
             Add another question
           </Text>
         </Flex>
-        <Flex css={{ w: "100%" }} justify="end">
+        <Flex css={{ w: '100%' }} justify="end">
           <Button disabled={!isValidPoll} onClick={launchPoll}>
             Launch {interaction.type}
           </Button>
@@ -114,27 +106,11 @@ export function CreateQuestions() {
   );
 }
 
-const QuestionCard = ({
-  question,
-  onSave,
-  index,
-  length,
-  removeQuestion,
-  isQuiz,
-  convertToDraft,
-}) => {
+const QuestionCard = ({ question, onSave, index, length, removeQuestion, isQuiz, convertToDraft }) => {
   return (
-    <Flex
-      direction="column"
-      css={{ p: "$md", bg: "$surface_default", r: "$1", mb: "$sm" }}
-    >
+    <Flex direction="column" css={{ p: '$md', bg: '$surface_default', r: '$1', mb: '$sm' }}>
       {question.saved ? (
-        <SavedQuestion
-          question={question}
-          index={index}
-          length={length}
-          convertToDraft={convertToDraft}
-        />
+        <SavedQuestion question={question} index={index} length={length} convertToDraft={convertToDraft} />
       ) : (
         <QuestionForm
           question={question}

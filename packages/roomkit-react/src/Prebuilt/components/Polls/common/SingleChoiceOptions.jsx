@@ -1,8 +1,8 @@
 // @ts-check
-import React, { useCallback } from "react";
-import { Flex, Input, Label, RadioGroup, Text } from "@100mslive/roomkit-react";
-import { VoteCount } from "./VoteCount";
-import { VoteProgress } from "./VoteProgress";
+import React, { useCallback } from 'react';
+import { Flex, Input, Label, RadioGroup, Text } from '../../../../';
+import { VoteCount } from './VoteCount';
+import { VoteProgress } from './VoteProgress';
 
 export const SingleChoiceOptions = ({
   questionIndex,
@@ -16,34 +16,27 @@ export const SingleChoiceOptions = ({
   showVoteCount,
 }) => {
   return (
-    <RadioGroup.Root
-      value={response?.option}
-      onValueChange={value => setAnswer(value)}
-    >
-      <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
+    <RadioGroup.Root value={response?.option} onValueChange={value => setAnswer(value)}>
+      <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           const isCorrectAnswer = isQuiz && option.index === correctOptionIndex;
 
           return (
-            <Flex
-              align="center"
-              key={`${questionIndex}-${option.index}`}
-              css={{ w: "100%", gap: "$5" }}
-            >
+            <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$5' }}>
               <RadioGroup.Item
                 css={{
-                  background: "none",
-                  h: "$9",
-                  w: "$9",
-                  border: "2px solid",
-                  borderColor: "$on_surface_high",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  cursor: canRespond ? "pointer" : "not-allowed",
+                  background: 'none',
+                  h: '$9',
+                  w: '$9',
+                  border: '2px solid',
+                  borderColor: '$on_surface_high',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  cursor: canRespond ? 'pointer' : 'not-allowed',
                   '&[data-state="checked"]': {
-                    borderColor: "$primary_bright",
-                    borderWidth: "2px",
+                    borderColor: '$primary_bright',
+                    borderWidth: '2px',
                   },
                 }}
                 disabled={!canRespond}
@@ -52,35 +45,24 @@ export const SingleChoiceOptions = ({
               >
                 <RadioGroup.Indicator
                   css={{
-                    h: "80%",
-                    w: "80%",
-                    background: "$primary_bright",
-                    borderRadius: "$round",
+                    h: '80%',
+                    w: '80%',
+                    background: '$primary_bright',
+                    borderRadius: '$round',
                   }}
                 />
               </RadioGroup.Item>
 
-              <Flex direction="column" css={{ flexGrow: "1" }}>
-                <Flex css={{ w: "100%" }}>
-                  <Text css={{ display: "flex", flexGrow: "1" }}>
-                    <Label htmlFor={`${questionIndex}-${option.index}`}>
-                      {option.text}
-                    </Label>
+              <Flex direction="column" css={{ flexGrow: '1' }}>
+                <Flex css={{ w: '100%' }}>
+                  <Text css={{ display: 'flex', flexGrow: '1' }}>
+                    <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
                   </Text>
                   {showVoteCount && (
-                    <VoteCount
-                      isQuiz={isQuiz}
-                      isCorrectAnswer={isCorrectAnswer}
-                      voteCount={option.voteCount}
-                    />
+                    <VoteCount isQuiz={isQuiz} isCorrectAnswer={isCorrectAnswer} voteCount={option.voteCount} />
                   )}
                 </Flex>
-                {showVoteCount && (
-                  <VoteProgress
-                    option={option}
-                    totalResponses={totalResponses}
-                  />
-                )}
+                {showVoteCount && <VoteProgress option={option} totalResponses={totalResponses} />}
               </Flex>
             </Flex>
           );
@@ -100,51 +82,45 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
         options.map((option, index) => ({
           ...option,
           isCorrectAnswer: index === answerIndex,
-        }))
+        })),
       );
     },
-    [setOptions, isQuiz]
+    [setOptions, isQuiz],
   );
 
-  const correctOptionIndex = options.findIndex(
-    option => option.isCorrectAnswer
-  );
+  const correctOptionIndex = options.findIndex(option => option.isCorrectAnswer);
 
   return (
     <RadioGroup.Root value={correctOptionIndex} onValueChange={selectAnswer}>
-      <Flex direction="column" css={{ gap: "$md", w: "100%", mb: "$md" }}>
+      <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map((option, index) => {
           return (
-            <Flex
-              align="center"
-              key={`option-${index}`}
-              css={{ w: "100%", gap: "$9" }}
-            >
+            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$9' }}>
               {isQuiz && (
                 <RadioGroup.Item
                   css={{
-                    background: "none",
-                    h: "$9",
-                    w: "$9",
-                    border: "2px solid",
-                    borderColor: "$on_surface_high",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    cursor: "pointer",
+                    background: 'none',
+                    h: '$9',
+                    w: '$9',
+                    border: '2px solid',
+                    borderColor: '$on_surface_high',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: 'pointer',
                     '&[data-state="checked"]': {
-                      borderColor: "$primary_bright",
-                      borderWidth: "2px",
+                      borderColor: '$primary_bright',
+                      borderWidth: '2px',
                     },
                   }}
                   value={index}
                 >
                   <RadioGroup.Indicator
                     css={{
-                      h: "80%",
-                      w: "80%",
-                      background: "$primary_bright",
-                      borderRadius: "$round",
+                      h: '80%',
+                      w: '80%',
+                      background: '$primary_bright',
+                      borderRadius: '$round',
                     }}
                   />
                 </RadioGroup.Item>
@@ -153,11 +129,11 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
               <Input
                 placeholder={`Option ${index + 1}`}
                 css={{
-                  w: "100%",
-                  backgroundColor: "$surface_default",
-                  border: "1px solid $border_bright",
+                  w: '100%',
+                  backgroundColor: '$surface_default',
+                  border: '1px solid $border_bright',
                 }}
-                value={option?.text || ""}
+                value={option?.text || ''}
                 key={index}
                 onChange={event => {
                   setOptions(options => [
