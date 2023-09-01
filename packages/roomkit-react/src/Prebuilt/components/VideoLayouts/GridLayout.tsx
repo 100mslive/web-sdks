@@ -24,7 +24,7 @@ export type GridLayoutProps = GridVideoTileLayout & {
 };
 
 export const GridLayout = ({
-  enable_local_tile_inset: isInsetEnabled = true,
+  enable_local_tile_inset: isInsetEnabled = false,
   prominent_roles: prominentRoles = [],
   enable_spotlighting_peer = false,
   hide_participant_name_on_tile = false,
