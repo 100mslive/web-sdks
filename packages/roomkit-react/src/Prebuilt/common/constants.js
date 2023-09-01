@@ -98,3 +98,5 @@ export const SESSION_STORE_KEY = {
 };
 
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
+
+export const MAX_NO_OF_DOTS = 5;

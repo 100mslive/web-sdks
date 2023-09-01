@@ -39,18 +39,34 @@ const Dot = styled('button', {
     outline: 'none',
   },
   borderRadius: '9999px',
-  width: '0.5rem',
-  height: '0.5rem',
   backgroundColor: '$on_surface_low',
-  padding: '0px',
+  padding: '4px',
   border: 'none',
   cursor: 'pointer',
+  transition: 'height width 1s ease',
   variants: {
     active: {
       true: {
         backgroundColor: '$on_surface_high',
       },
     },
+    size: {
+      normal: {
+        width: '0.5rem',
+        height: '0.5rem',
+      },
+      medium: {
+        width: '0.438rem',
+        height: '0.438rem',
+      },
+      small: {
+        width: '0.375rem',
+        height: '0.375rem',
+      },
+    },
+  },
+  defaultVariants: {
+    size: 'normal',
   },
 });
 
