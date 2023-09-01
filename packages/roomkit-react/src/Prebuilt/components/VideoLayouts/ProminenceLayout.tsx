@@ -34,8 +34,7 @@ const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: 
               trackId={tile.track?.id}
               rootCSS={{
                 padding: 0,
-                flex: '1 1 0',
-                maxWidth: 'max-content',
+                flex: '0 0 25%',
               }}
               containerCSS={{
                 width: 'unset',

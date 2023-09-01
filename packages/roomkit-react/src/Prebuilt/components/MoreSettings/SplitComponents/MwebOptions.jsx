@@ -133,7 +133,7 @@ export const MwebOptions = ({ elements }) => {
               </Suspense>
             ) : null}
 
-            {elements.emoji_reactions && (
+            {elements?.emoji_reactions && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);

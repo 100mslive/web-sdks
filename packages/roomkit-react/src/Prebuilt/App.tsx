@@ -41,6 +41,7 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 import {
+  useRoomLayoutConferencingScreen,
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -263,7 +264,7 @@ const RouteList = () => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   return (
     <Routes>
-      {isPreviewScreenEnabled && (
+      {isPreviewScreenEnabled ? (
         <Route path="preview">
           <Route
             path=":roomId/:role"
@@ -282,7 +283,7 @@ const RouteList = () => {
             }
           />
         </Route>
-      )}
+      ) : null}
       <Route path="meeting">
         <Route
           path=":roomId/:role"
@@ -301,12 +302,12 @@ const RouteList = () => {
           }
         />
       </Route>
-      {isLeaveScreenEnabled && (
+      {isLeaveScreenEnabled ? (
         <Route path="leave">
           <Route path=":roomId/:role" element={<PostLeave />} />
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
-      )}
+      ) : null}
 
       <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
@@ -350,13 +351,14 @@ function AppRoutes({
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
+  const { screenType } = useRoomLayoutConferencingScreen();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        <FlyingEmoji />
+        {screenType !== 'hls_live_streaming' && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />

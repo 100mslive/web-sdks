@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
@@ -20,12 +21,11 @@ import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
-import { useNavigation } from '../hooks/useNavigation';
 import { getMetadata } from '../../common/utils';
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);
