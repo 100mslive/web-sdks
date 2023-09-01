@@ -60,7 +60,7 @@ export const DesktopOptions = ({
   const [openModals, setOpenModals] = useState(new Set());
   const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
-  const isBRBEnabled = !!elements.brb;
+  const isBRBEnabled = !!elements?.brb;
 
   useDropdownList({ open: openModals.size > 0, name: 'MoreSettings' });
 
