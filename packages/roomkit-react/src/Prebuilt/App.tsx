@@ -46,8 +46,6 @@ import {
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
-import { getRoutePrefix } from './common/utils';
-// @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 
 // @ts-ignore: No implicit Any
@@ -241,18 +239,7 @@ HMSPrebuilt.displayName = 'HMSPrebuilt';
 
 const Redirector = ({ showPreview }: { showPreview: boolean }) => {
   const { roomId, role } = useParams();
-
-  if (!roomId && !role) {
-    return <Navigate to="/" />;
-  }
-  if (!roomId) {
-    return <Navigate to="/" />;
-  }
-  if (['streaming', 'preview', 'meeting', 'leave'].includes(roomId) && !role) {
-    return <Navigate to="/" />;
-  }
-
-  return <Navigate to={`${getRoutePrefix()}/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
+  return <Navigate to={`/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
 };
 
 const RouteList = () => {
