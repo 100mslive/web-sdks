@@ -105,7 +105,7 @@ export const DesktopOptions = ({
             },
           }}
         >
-          {screenType === 'hls_live_streaming' ? (
+          {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
               <HandIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
