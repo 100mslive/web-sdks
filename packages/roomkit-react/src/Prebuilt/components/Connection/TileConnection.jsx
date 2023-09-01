@@ -7,30 +7,32 @@ const TileConnection = ({ name, peerId, hideLabel, width, spotlighted, pinned })
   return (
     <Wrapper>
       {!hideLabel ? (
-        <Flex align="center">
-          {pinned && (
-            <IconWrapper>
-              <PinIcon width="15" height="15" css={{ display: 'block' }} />
-            </IconWrapper>
-          )}
-          {spotlighted && (
-            <IconWrapper>
-              <SpotlightIcon width="15" height="15" css={{ display: 'block' }} />
-            </IconWrapper>
-          )}
-          <Text
-            css={{
-              c: '$on_surface_high',
-              verticalAlign: 'baseline',
-              ...textEllipsis(width - 60),
-            }}
-            variant="xs"
-          >
-            {name}
-          </Text>
-        </Flex>
+        <>
+          <Flex align="center">
+            {pinned && (
+              <IconWrapper>
+                <PinIcon width="15" height="15" css={{ display: 'block' }} />
+              </IconWrapper>
+            )}
+            {spotlighted && (
+              <IconWrapper>
+                <SpotlightIcon width="15" height="15" css={{ display: 'block' }} />
+              </IconWrapper>
+            )}
+            <Text
+              css={{
+                c: '$on_surface_high',
+                verticalAlign: 'baseline',
+                ...textEllipsis(width - 60),
+              }}
+              variant="xs"
+            >
+              {name}
+            </Text>
+          </Flex>
+          <ConnectionIndicator isTile peerId={peerId} />
+        </>
       ) : null}
-      <ConnectionIndicator isTile peerId={peerId} />
     </Wrapper>
   );
 };

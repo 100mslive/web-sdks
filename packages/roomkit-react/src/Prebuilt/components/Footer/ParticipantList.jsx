@@ -28,7 +28,7 @@ import { RoleChangeModal } from '../RoleChangeModal';
 import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { useParticipants, useShowStreamingUI } from '../../common/hooks';
+import { useParticipants } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -339,7 +339,6 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
 export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false }) => {
   const [value, setValue] = React.useState('');
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
 
   useDebounce(
     () => {
@@ -352,14 +351,14 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
     <Flex
       align="center"
       css={{
-        p: isMobile && showStreamingUI ? '$0 $6' : '$2 0',
+        p: isMobile ? '$0 $6' : '$2 0',
         mb: '$2',
         position: 'relative',
         color: '$on_surface_medium',
         mt: inSidePane ? '$4' : '',
       }}
     >
-      <SearchIcon style={{ position: 'absolute', left: isMobile && showStreamingUI ? '1.25rem' : '0.5rem' }} />
+      <SearchIcon style={{ position: 'absolute', left: isMobile ? '1.25rem' : '0.5rem' }} />
       <Input
         type="text"
         placeholder={placeholder || 'Search for participants'}

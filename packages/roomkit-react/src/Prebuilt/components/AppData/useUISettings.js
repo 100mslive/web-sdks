@@ -55,10 +55,6 @@ export const useIsHeadless = () => {
   return isHeadless;
 };
 
-export const useHLSViewerRole = () => {
-  return useHMSStore(selectAppData(APP_DATA.hlsViewerRole));
-};
-
 export const useWaitingViewerRole = () => {
   return useHMSStore(selectAppData(APP_DATA.waitingViewerRole));
 };

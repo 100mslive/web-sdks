@@ -107,6 +107,7 @@ class PipManager {
     this.pipVideo?.removeEventListener(LEAVE_EVENT_NAME, this.stop);
     if (this.timeoutRef) {
       workerTimers.clearTimeout(this.timeoutRef);
+      this.timeoutRef = null;
     }
     if (this.isOn()) {
       this.exitPIP();

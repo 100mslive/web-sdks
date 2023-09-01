@@ -1,22 +1,36 @@
 import React from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, Footer as AppFooter } from '../../../';
+import {
+  ConferencingScreen,
+  DefaultConferencingScreen_Elements,
+  HLSLiveStreamingScreen_Elements,
+} from '@100mslive/types-prebuilt';
+import { config as cssConfig, Footer as AppFooter } from '../../..';
+// @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+// @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
-import { LeaveRoom } from '../LeaveRoom';
+// @ts-ignore: No implicit Any
+import { LeaveRoom } from '../Leave/LeaveRoom';
+// @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
+// @ts-ignore: No implicit Any
 import { RaiseHand } from '../RaiseHand';
+// @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
+// @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
+// @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 
-export const Footer = () => {
+export const Footer = ({
+  screenType,
+  elements,
+}: {
+  screenType: keyof ConferencingScreen;
+  elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const hlsViewerRole = useHLSViewerRole();
-  const isHlsViewer = hlsViewerRole === localPeerRole;
 
   return (
     <AppFooter.Root
@@ -39,7 +53,7 @@ export const Footer = () => {
           },
         }}
       >
-        {isMobile ? <LeaveRoom /> : null}
+        {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
@@ -52,23 +66,23 @@ export const Footer = () => {
       >
         {isMobile ? (
           <>
-            {isHlsViewer ? <RaiseHand /> : null}
-            <ChatToggle />
-            <MoreSettings />
+            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            {elements.chat && <ChatToggle />}
+            <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            {isHlsViewer ? <RaiseHand /> : null}
-            <EmojiReaction />
-            <LeaveRoom />
+            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            {elements?.emoji_reactions && <EmojiReaction />}
+            <LeaveRoom screenType={screenType} />
           </>
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        <ChatToggle />
+        {elements.chat && <ChatToggle />}
         <ParticipantCount />
-        <MoreSettings />
+        <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
     </AppFooter.Root>
   );

@@ -1,7 +1,5 @@
 import { parsedUserAgent } from '@100mslive/react-sdk';
 
-export const DEFAULT_HLS_ROLE_KEY = 'HLS_VIEWER_ROLE';
-export const DEFAULT_HLS_VIEWER_ROLE = 'hls-viewer';
 export const DEFAULT_WAITING_VIEWER_ROLE = 'waiting-room';
 export const QUERY_PARAM_SKIP_PREVIEW = 'skip_preview';
 export const QUERY_PARAM_SKIP_PREVIEW_HEADFUL = 'skip_preview_headful';
