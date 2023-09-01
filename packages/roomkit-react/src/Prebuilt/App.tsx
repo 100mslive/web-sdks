@@ -63,6 +63,9 @@ export type HMSPrebuiltProps = {
   themes?: Theme[];
   options?: HMSPrebuiltOptions;
   screens?: Screens;
+  authToken?: string;
+  roomId?: string;
+  role?: string;
   onLeave?: () => void;
 };
 
@@ -87,6 +90,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   (
     {
       roomCode = '',
+      authToken = '',
+      roomId = '',
+      role = '',
       logo,
       typography,
       themes,
@@ -154,6 +160,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
     };
 
+    if (!roomCode && !(authToken && roomId && role)) {
+      console.error(`
+          HMSPrebuilt can be initialised by providing: 
+          either just "roomCode" or "authToken" and "roomId" and "role".
+          Please check if you are providing the above values for initialising prebuilt.
+        `);
+      throw Error('Incorrect initializing params for HMSPrebuilt component');
+    }
+
     if (!hydrated) {
       return null;
     }
@@ -165,6 +180,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         <HMSPrebuiltContext.Provider
           value={{
             roomCode,
+            roomId,
+            role,
             onLeave,
             userName,
             userId,
@@ -220,7 +237,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           '-webkit-text-size-adjust': '100%',
                         }}
                       >
-                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />
                       </Box>
                     </HMSThemeProvider>
                   );
@@ -325,7 +342,13 @@ const Router = ({ children }: { children: ReactElement }) => {
   );
 };
 
-function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
+function AppRoutes({
+  authTokenByRoomCodeEndpoint,
+  defaultAuthToken,
+}: {
+  authTokenByRoomCodeEndpoint: string;
+  defaultAuthToken?: string;
+}) {
   const roomLayout = useRoomLayout();
   return (
     <Router>
@@ -337,7 +360,7 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoin
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
+        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && (
           <Routes>
             <Route path="/*" element={<RouteList />} />
