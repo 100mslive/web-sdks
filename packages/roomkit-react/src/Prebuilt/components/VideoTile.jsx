@@ -117,7 +117,7 @@ const Tile = ({
               data-testid="participant_video_tile"
               css={{
                 objectFit,
-                filter: isVideoDegraded ? 'blur($space$4)' : undefined,
+                filter: isVideoDegraded ? 'blur($space$2)' : undefined,
                 bg: 'transparent',
               }}
             />
