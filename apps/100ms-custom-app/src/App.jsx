@@ -8,6 +8,7 @@ const App = () => {
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   return (
     <Flex
+      className="prebuilt-wrapper"
       direction="column"
       css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
     >
