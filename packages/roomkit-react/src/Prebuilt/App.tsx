@@ -41,7 +41,6 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 import {
-  useRoomLayoutConferencingScreen,
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -351,14 +350,13 @@ function AppRoutes({
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
-  const { screenType } = useRoomLayoutConferencingScreen();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        {screenType !== 'hls_live_streaming' && <FlyingEmoji />}
+        <FlyingEmoji />
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
