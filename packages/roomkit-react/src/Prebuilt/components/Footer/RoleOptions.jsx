@@ -47,6 +47,12 @@ export const RoleOptions = ({ roleName, peerList }) => {
     return null;
   }
 
+  const removeAllFromStage = () => {
+    peerList.forEach(peer => {
+      hmsActions.changeRoleOfPeer(peer.id, peer.metadata?.prevRole || off_stage_roles?.[0]);
+    });
+  };
+
   const setTrackEnabled = async (type, enabled = false) => {
     try {
       await hmsActions.setRemoteTracksEnabled({ roles: [roleName], source: 'regular', type, enabled });
@@ -96,9 +102,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
         {canRemoveRoleFromStage && (
           <Dropdown.Item
             css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
-            onClick={() => {
-              hmsActions.changeRoleOfPeersWithRoles([on_stage_role], off_stage_roles?.[0]);
-            }}
+            onClick={removeAllFromStage}
           >
             <PersonRectangleIcon />
             <Text variant="sm" css={optionTextCSS}>
