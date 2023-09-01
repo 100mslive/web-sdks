@@ -84,7 +84,12 @@ export const VideoStreamingSection = ({
   }, []);
 
   useEffect(() => {
-    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
+    const sessionKeys = [SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT];
+    hmsActions.sessionStore.observe(sessionKeys);
+
+    return () => {
+      hmsActions.sessionStore.unobserve(sessionKeys);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hmsActions]);
 
