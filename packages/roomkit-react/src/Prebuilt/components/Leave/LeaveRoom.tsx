@@ -12,6 +12,7 @@ import { PictureInPicture } from '../PIP/PIPManager';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
+import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   const isMobile = useMedia(cssConfig.media.md);
   const hmsActions = useHMSActions();
   const { onLeave } = useHMSPrebuiltContext();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
 
   const stopStream = async () => {
     try {
@@ -34,10 +36,11 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   };
 
   const redirectToLeavePage = () => {
+    const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
     if (params.role) {
-      navigate('/leave/' + params.roomId + '/' + params.role);
+      navigate(prefix + params.roomId + '/' + params.role);
     } else {
-      navigate('/leave/' + params.roomId);
+      navigate(prefix + params.roomId);
     }
     PictureInPicture.stop().catch(() => console.error('stopping pip'));
     ToastManager.clearAllToast();
