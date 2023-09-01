@@ -112,7 +112,7 @@ export const VideoStreamingSection = ({
     ViewComponent = <EmbedView />;
   } else {
     //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements).video_tile_layout?.grid} />;
+    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
   }
 
   return (

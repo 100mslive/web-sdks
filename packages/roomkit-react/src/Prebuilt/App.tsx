@@ -247,7 +247,7 @@ const RouteList = () => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   return (
     <Routes>
-      {isPreviewScreenEnabled && (
+      {isPreviewScreenEnabled ? (
         <Route path="preview">
           <Route
             path=":roomId/:role"
@@ -266,7 +266,7 @@ const RouteList = () => {
             }
           />
         </Route>
-      )}
+      ) : null}
       <Route path="meeting">
         <Route
           path=":roomId/:role"
@@ -285,12 +285,12 @@ const RouteList = () => {
           }
         />
       </Route>
-      {isLeaveScreenEnabled && (
+      {isLeaveScreenEnabled ? (
         <Route path="leave">
           <Route path=":roomId/:role" element={<PostLeave />} />
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
-      )}
+      ) : null}
 
       <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
       <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />

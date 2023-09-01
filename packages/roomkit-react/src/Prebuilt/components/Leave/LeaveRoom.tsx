@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -12,11 +12,9 @@ import { PictureInPicture } from '../PIP/PIPManager';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
-// @ts-ignore: No implicit Any
-import { useNavigation } from '../hooks/useNavigation';
 
 export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const params = useParams();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
@@ -50,11 +48,6 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     hmsActions.leave();
     redirectToLeavePage();
   };
-
-  // const endRoom = () => {
-  //   hmsActions.endRoom(false, 'End Room');
-  //   redirectToLeavePage();
-  // };
 
   if (!permissions || !isConnected) {
     return null;

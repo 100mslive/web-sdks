@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
@@ -8,12 +8,11 @@ import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { Header } from './Header';
 import { useRoomLayoutPreviewScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useNavigation } from './hooks/useNavigation';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
