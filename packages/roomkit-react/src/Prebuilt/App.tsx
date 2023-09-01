@@ -41,6 +41,7 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 import {
+  useRoomLayoutConferencingScreen,
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -340,13 +341,14 @@ const Router = ({ children }: { children: ReactElement }) => {
 
 function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
   const roomLayout = useRoomLayout();
+  const { screenType } = useRoomLayoutConferencingScreen();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        {!roomLayout?.screens?.conferencing?.hls_live_streaming && <FlyingEmoji />}
+        {screenType !== 'hls_live_streaming' && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
