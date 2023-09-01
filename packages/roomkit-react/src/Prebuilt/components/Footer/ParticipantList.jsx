@@ -62,7 +62,7 @@ export const ParticipantList = () => {
 
   return (
     <Fragment>
-      <Flex direction="column" css={{ size: '100%' }}>
+      <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
         <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
         {participants.length === 0 ? (
@@ -138,7 +138,6 @@ const VirtualizedParticipants = ({
       direction="column"
       css={{
         gap: '$8',
-        mt: '$4',
         maxHeight: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -362,7 +361,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
       <Input
         type="text"
         placeholder={placeholder || 'Search for participants'}
-        css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '$6', pl: '$14', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();

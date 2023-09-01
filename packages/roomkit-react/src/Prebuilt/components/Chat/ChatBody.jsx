@@ -401,7 +401,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
       <Flex
         css={{
           width: '100%',
-          height: '100%',
+          flex: '1 1 0',
           textAlign: 'center',
           px: '$4',
         }}

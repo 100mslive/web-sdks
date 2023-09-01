@@ -109,7 +109,7 @@ export const Chat = ({ screenType }) => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
+    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
       {!isMobile ? (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
