@@ -124,6 +124,7 @@ const Conference = () => {
     return <FullPageProgress loadingText="Starting live stream..." />;
   }
 
+  console.log(screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge);
   return (
     <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
       {!screenProps.hideSections.includes('header') && (
@@ -147,7 +148,7 @@ const Conference = () => {
           w: '100%',
           flex: '1 1 0',
           minHeight: 0,
-          px: '$10',
+          px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10',
           paddingBottom: 'env(safe-area-inset-bottom)',
           '@lg': {
             px: 0,

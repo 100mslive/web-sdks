@@ -132,15 +132,17 @@ const Tile = ({
             hideAudioMute: hideAudioMuteOnTile,
             isAudioMuted,
           }) ? (
-            <StyledVideoTile.AudioIndicator
-              data-testid="participant_audio_mute_icon"
-              size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
-            >
-              <MicOffIcon />
-            </StyledVideoTile.AudioIndicator>
-          ) : (
-            <AudioLevel trackId={audioTrack?.id} />
-          )}
+            isAudioMuted ? (
+              <StyledVideoTile.AudioIndicator
+                data-testid="participant_audio_mute_icon"
+                size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
+              >
+                <MicOffIcon />
+              </StyledVideoTile.AudioIndicator>
+            ) : (
+              <AudioLevel trackId={audioTrack?.id} />
+            )
+          ) : null}
           {isMouseHovered || isDragabble ? (
             <TileMenu
               peerID={peerId}

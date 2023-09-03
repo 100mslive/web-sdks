@@ -21,6 +21,7 @@ export type GridLayoutProps = GridVideoTileLayout & {
   rounded_video_tile: boolean;
   hide_audio_mute_on_tile: boolean;
   video_object_fit: 'contain' | 'cover';
+  edge_to_edge: boolean;
 };
 
 export const GridLayout = ({
@@ -31,6 +32,7 @@ export const GridLayout = ({
   rounded_video_tile = true,
   hide_audio_mute_on_tile = false,
   video_object_fit = 'contain',
+  edge_to_edge = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
@@ -86,6 +88,7 @@ export const GridLayout = ({
         onPageSize={setPageSize}
         onPageChange={setMainPage}
         isInsetEnabled={isInsetEnabled}
+        edgeToEdge={edge_to_edge}
       />
     </VideoTileContext.Provider>
   );

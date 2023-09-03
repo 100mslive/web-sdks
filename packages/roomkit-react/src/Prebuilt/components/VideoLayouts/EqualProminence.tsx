@@ -13,7 +13,7 @@ import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
-export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize }: LayoutProps) {
+export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) {
   const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
@@ -35,6 +35,7 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   const { ref, pagesWithTiles } = useTileLayout({
     pageList,
     maxTileCount,
+    edgeToEdge,
   });
   const [page, setPage] = useState(0);
   const pageSize = pagesWithTiles[0]?.length || 0;
@@ -47,7 +48,7 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
 
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
-      <Grid tiles={pagesWithTiles[page]} ref={ref} />
+      <Grid tiles={pagesWithTiles[page]} ref={ref} edgeToEdge={edgeToEdge} />
       <Pagination
         page={page}
         onPageChange={page => {
