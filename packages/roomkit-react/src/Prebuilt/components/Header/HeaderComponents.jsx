@@ -4,7 +4,6 @@ import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@10
 import { VolumeOneIcon } from '@100mslive/react-icons';
 import { config as cssConfig, Flex, styled, Text, textEllipsis, VerticalDivider } from '../../../';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
-import { isStreamingKit } from '../../common/utils';
 
 export const SpeakerTag = () => {
   const dominantSpeaker = useHMSStore(selectDominantSpeaker);
@@ -42,7 +41,7 @@ export const Logo = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [hideImage, setHideImage] = useState(false);
   // Hide logo for now as there is not enough space
-  if (isConnected && isMobile && isStreamingKit()) {
+  if (isConnected && isMobile) {
     return null;
   }
   return logo && !hideImage ? (

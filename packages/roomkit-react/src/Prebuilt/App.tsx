@@ -32,17 +32,18 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider';
+import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
-// @ts-ignore: No implicit Any
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
-// @ts-ignore: No implicit Any
-import { getRoutePrefix } from './common/utils';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 
@@ -62,6 +63,9 @@ export type HMSPrebuiltProps = {
   themes?: Theme[];
   options?: HMSPrebuiltOptions;
   screens?: Screens;
+  authToken?: string;
+  roomId?: string;
+  role?: string;
   onLeave?: () => void;
 };
 
@@ -86,6 +90,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   (
     {
       roomCode = '',
+      authToken = '',
+      roomId = '',
+      role = '',
       logo,
       typography,
       themes,
@@ -108,6 +115,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       const hmsActions = hms.getActions();
       const hmsNotifications = hms.getNotifications();
       const hmsStats = hms.getStats();
+      hms.triggerOnSubscribe();
 
       reactiveStore.current = {
         hmsActions,
@@ -152,6 +160,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
     };
 
+    if (!roomCode && !(authToken && roomId && role)) {
+      console.error(`
+          HMSPrebuilt can be initialised by providing: 
+          either just "roomCode" or "authToken" and "roomId" and "role".
+          Please check if you are providing the above values for initialising prebuilt.
+        `);
+      throw Error('Incorrect initializing params for HMSPrebuilt component');
+    }
+
     if (!hydrated) {
       return null;
     }
@@ -163,8 +180,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         <HMSPrebuiltContext.Provider
           value={{
             roomCode,
-            showPreview: true,
-            showLeave: true,
+            roomId,
+            role,
             onLeave,
             userName,
             userId,
@@ -185,7 +202,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
-                {layout => {
+                {data => {
+                  const layout = data?.layout;
                   const theme: Theme = layout?.themes?.[0] || ({} as Theme);
                   const { typography } = layout || {};
                   let fontFamily = ['sans-serif'];
@@ -219,7 +237,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           '-webkit-text-size-adjust': '100%',
                         }}
                       >
-                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />
                       </Box>
                     </HMSThemeProvider>
                   );
@@ -237,26 +255,15 @@ HMSPrebuilt.displayName = 'HMSPrebuilt';
 
 const Redirector = ({ showPreview }: { showPreview: boolean }) => {
   const { roomId, role } = useParams();
-
-  if (!roomId && !role) {
-    return <Navigate to="/" />;
-  }
-  if (!roomId) {
-    return <Navigate to="/" />;
-  }
-  if (['streaming', 'preview', 'meeting', 'leave'].includes(roomId) && !role) {
-    return <Navigate to="/" />;
-  }
-
-  return <Navigate to={`${getRoutePrefix()}/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
+  return <Navigate to={`/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
 };
 
 const RouteList = () => {
-  const { showPreview, showLeave } = useHMSPrebuiltContext();
-
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   return (
     <Routes>
-      {showPreview && (
+      {isPreviewScreenEnabled ? (
         <Route path="preview">
           <Route
             path=":roomId/:role"
@@ -275,7 +282,7 @@ const RouteList = () => {
             }
           />
         </Route>
-      )}
+      ) : null}
       <Route path="meeting">
         <Route
           path=":roomId/:role"
@@ -294,15 +301,15 @@ const RouteList = () => {
           }
         />
       </Route>
-      {showLeave && (
+      {isLeaveScreenEnabled ? (
         <Route path="leave">
           <Route path=":roomId/:role" element={<PostLeave />} />
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
-      )}
+      ) : null}
 
-      <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
-      <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
+      <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
+      <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
     </Routes>
   );
 };
@@ -335,7 +342,14 @@ const Router = ({ children }: { children: ReactElement }) => {
   );
 };
 
-function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
+function AppRoutes({
+  authTokenByRoomCodeEndpoint,
+  defaultAuthToken,
+}: {
+  authTokenByRoomCodeEndpoint: string;
+  defaultAuthToken?: string;
+}) {
+  const roomLayout = useRoomLayout();
   return (
     <Router>
       <>
@@ -346,10 +360,12 @@ function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoin
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <BeamSpeakerLabelsLogging />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
-        <Routes>
-          <Route path="/*" element={<RouteList />} />
-        </Routes>
+        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        {roomLayout && (
+          <Routes>
+            <Route path="/*" element={<RouteList />} />
+          </Routes>
+        )}
       </>
     </Router>
   );

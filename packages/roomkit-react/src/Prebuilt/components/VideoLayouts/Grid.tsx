@@ -3,8 +3,10 @@ import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Box } from '../../../Layout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
+import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
 export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[] }>(({ tiles }, ref) => {
+  const videoTileProps = useVideoTileContext();
   return (
     <Box
       ref={ref}
@@ -30,6 +32,7 @@ export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDi
             trackId={tile.track?.id}
             rootCSS={{ padding: 0 }}
             objectFit="contain"
+            {...videoTileProps}
           />
         );
       })}

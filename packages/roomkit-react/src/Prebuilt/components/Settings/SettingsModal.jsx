@@ -9,13 +9,11 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { useIsLocalPeerHLSViewer } from '../../common/hooks';
 import { settingContent, settingsList } from './common.js';
 
-const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
+const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
-  const isHlsViewer = useIsLocalPeerHLSViewer();
 
   const [showSetting, setShowSetting] = useState(() =>
     settingsList.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {}),
@@ -27,10 +25,10 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
   );
 
   useEffect(() => {
-    if (isHlsViewer) {
+    if (screenType === 'hls_live_streaming') {
       hideSettingByTabName('layout')(true);
     }
-  }, [isHlsViewer, hideSettingByTabName]);
+  }, [screenType, hideSettingByTabName]);
 
   const [selection, setSelection] = useState(() => Object.keys(showSetting).find(key => showSetting[key]) ?? '');
   const resetSelection = useCallback(() => {

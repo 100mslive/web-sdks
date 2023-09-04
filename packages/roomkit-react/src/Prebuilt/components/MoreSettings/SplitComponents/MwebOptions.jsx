@@ -1,8 +1,7 @@
-import React, { Suspense, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import {
   selectIsConnectedToRoom,
-  selectIsLocalVideoEnabled,
   selectPeerCount,
   selectPermissions,
   useHMSActions,
@@ -25,7 +24,7 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
-const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
+// const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -39,7 +38,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = () => {
+export const MwebOptions = ({ elements }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -55,7 +54,7 @@ export const MwebOptions = () => {
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -127,21 +126,23 @@ export const MwebOptions = () => {
               <ActionTile.Title>Participants</ActionTile.Title>
             </ActionTile.Root>
 
-            {isVideoOn ? (
+            {/* {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
               </Suspense>
-            ) : null}
+            ) : null} */}
 
-            <ActionTile.Root
-              onClick={() => {
-                setShowEmojiCard(true);
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <EmojiIcon />
-              <ActionTile.Title>Emoji Reactions</ActionTile.Title>
-            </ActionTile.Root>
+            {elements?.emoji_reactions && (
+              <ActionTile.Root
+                onClick={() => {
+                  setShowEmojiCard(true);
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <EmojiIcon />
+                <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
 
             <ActionTile.Root
               onClick={() => {

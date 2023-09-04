@@ -26,7 +26,6 @@ export const ChatParticipantHeader = React.memo(({ activeTabValue = SIDE_PANE_OP
       css={{
         color: '$on_primary_high',
         h: '$16',
-        mb: '$2',
       }}
     >
       <Flex css={{ w: '100%', bg: '$surface_default', borderRadius: '$2' }}>

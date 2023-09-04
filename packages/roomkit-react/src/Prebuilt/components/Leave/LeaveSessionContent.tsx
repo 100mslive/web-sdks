@@ -1,10 +1,18 @@
 import React from 'react';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Button } from '../../Button';
-import { Box, Flex } from '../../Layout';
-import { Text } from '../../Text';
+import { Button } from '../../../Button';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
 
-export const LeaveSessionContent = ({ setShowLeaveRoomAlert, leaveRoom, isModal = false }) => {
+export const LeaveSessionContent = ({
+  setShowLeaveRoomAlert,
+  leaveRoom,
+  isModal = false,
+}: {
+  setShowLeaveRoomAlert: (value: boolean) => void;
+  leaveRoom: () => void;
+  isModal?: boolean;
+}) => {
   return (
     <Box>
       <Flex

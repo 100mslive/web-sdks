@@ -1,4 +1,10 @@
 import React, { Suspense, useCallback, useEffect } from 'react';
+import { HMSException } from '@100mslive/hms-video';
+import {
+  ConferencingScreen,
+  DefaultConferencingScreen_Elements,
+  HLSLiveStreamingScreen_Elements,
+} from '@100mslive/types-prebuilt';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -7,33 +13,47 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
+// @ts-ignore: No implicit Any
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
+// @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
+// @ts-ignore: No implicit Any
 import { PDFView } from './PDFView';
+// @ts-ignore: No implicit Any
 import SidePane from './SidePane';
+// @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
-import { useWhiteboardMetadata } from '../plugins/whiteboard';
+// import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
-  useHLSViewerRole,
   usePDFAnnotator,
   useSetAppDataByKey,
   useUrlToEmbed,
   useWaitingViewerRole,
+  // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { useShowStreamingUI } from '../common/hooks';
+// @ts-ignore: No implicit Any
 import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
+// @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 
-export const ConferenceMainView = () => {
+export const VideoStreamingSection = ({
+  screenType,
+  elements,
+}: {
+  screenType: keyof ConferencingScreen;
+  elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+}) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
+  // const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
@@ -48,13 +68,9 @@ export const ConferenceMainView = () => {
         return;
       }
       setHLSStarted(true);
-      await hmsActions.startHLSStreaming({});
+      await hmsActions.startHLSStreaming();
     } catch (error) {
-      if (error.message === 'beam already started') {
-        return;
-      }
-      if (error.message.includes('invalid input')) {
-        await startHLS();
+      if ((error as HMSException).message?.includes('beam already started')) {
         return;
       }
       setHLSStarted(false);
@@ -76,15 +92,6 @@ export const ConferenceMainView = () => {
     if (!isConnected) {
       return;
     }
-    const audioPlaylist = JSON.parse(process.env.REACT_APP_AUDIO_PLAYLIST || '[]');
-    const videoPlaylist = JSON.parse(process.env.REACT_APP_VIDEO_PLAYLIST || '[]');
-    if (videoPlaylist.length > 0) {
-      hmsActions.videoPlaylist.setList(videoPlaylist);
-    }
-    if (audioPlaylist.length > 0) {
-      hmsActions.audioPlaylist.setList(audioPlaylist);
-    }
-
     hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
@@ -95,18 +102,17 @@ export const ConferenceMainView = () => {
   }
 
   let ViewComponent;
-  if (localPeerRole === hlsViewerRole) {
-    ViewComponent = HLSView;
+  if (screenType === 'hls_live_streaming') {
+    ViewComponent = <HLSView />;
   } else if (localPeerRole === waitingViewerRole) {
-    ViewComponent = WaitingView;
+    ViewComponent = <WaitingView />;
   } else if (pdfAnnotatorActive) {
-    ViewComponent = PDFView;
+    ViewComponent = <PDFView />;
   } else if (urlToIframe) {
-    ViewComponent = EmbedView;
-  } else if (whiteboardShared) {
-    // ViewComponent = WhiteboardView;
+    ViewComponent = <EmbedView />;
   } else {
-    ViewComponent = GridLayout;
+    //@ts-ignore
+    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
   }
 
   return (
@@ -118,8 +124,8 @@ export const ConferenceMainView = () => {
           gap: '$4',
         }}
       >
-        <ViewComponent />
-        <SidePane />
+        {ViewComponent}
+        <SidePane screenType={screenType} />
       </Flex>
     </Suspense>
   );

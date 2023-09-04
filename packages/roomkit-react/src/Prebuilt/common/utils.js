@@ -56,14 +56,6 @@ export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
 };
 
-export const getRoutePrefix = () => {
-  return window.location.pathname.startsWith('/streaming') ? '/streaming' : '';
-};
-
-export const isStreamingKit = () => {
-  return window.location.pathname.startsWith('/streaming');
-};
-
 export const isInternalRole = role => role && role.startsWith('__internal');
 
 export const metadataPayloadParser = payload => {

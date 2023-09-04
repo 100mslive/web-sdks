@@ -12,7 +12,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, useBorderAudioLevel, Video } from '../../../';
+import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -22,6 +22,7 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 import SettingsModal from '../Settings/SettingsModal';
+import { AudioLevel } from '../VideoTile';
 import PreviewForm from './PreviewForm';
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
@@ -172,7 +173,6 @@ const Container = styled('div', {
 
 export const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
-  const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
@@ -194,7 +194,6 @@ export const PreviewTile = ({ name, error }) => {
           my: '$4',
         },
       }}
-      ref={borderAudioRef}
     >
       {localPeer ? (
         <>
@@ -217,7 +216,9 @@ export const PreviewTile = ({ name, error }) => {
         <StyledVideoTile.AudioIndicator size="medium">
           <MicOffIcon />
         </StyledVideoTile.AudioIndicator>
-      ) : null}
+      ) : (
+        <AudioLevel trackId={localPeer.audioTrack} />
+      )}
     </StyledVideoTile.Container>
   );
 };

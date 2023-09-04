@@ -28,7 +28,7 @@ import { RoleChangeModal } from '../RoleChangeModal';
 import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { useParticipants, useShowStreamingUI } from '../../common/hooks';
+import { useParticipants } from '../../common/hooks';
 import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
@@ -62,7 +62,7 @@ export const ParticipantList = () => {
 
   return (
     <Fragment>
-      <Flex direction="column" css={{ size: '100%' }}>
+      <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
         <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
         {participants.length === 0 ? (
@@ -138,7 +138,6 @@ const VirtualizedParticipants = ({
       direction="column"
       css={{
         gap: '$8',
-        mt: '$4',
         maxHeight: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
@@ -339,7 +338,6 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
 export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false }) => {
   const [value, setValue] = React.useState('');
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
 
   useDebounce(
     () => {
@@ -352,18 +350,18 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
     <Flex
       align="center"
       css={{
-        p: isMobile && showStreamingUI ? '$0 $6' : '$2 0',
+        p: isMobile ? '$0 $6' : '$2 0',
         mb: '$2',
         position: 'relative',
         color: '$on_surface_medium',
         mt: inSidePane ? '$4' : '',
       }}
     >
-      <SearchIcon style={{ position: 'absolute', left: isMobile && showStreamingUI ? '1.25rem' : '0.5rem' }} />
+      <SearchIcon style={{ position: 'absolute', left: isMobile ? '1.25rem' : '0.5rem' }} />
       <Input
         type="text"
         placeholder={placeholder || 'Search for participants'}
-        css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '$6', pl: '$14', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();
