@@ -39,11 +39,11 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
     allPeersHaveVideoOn = allPeersHaveVideoOn && isVideoOn;
   });
 
-  const canMuteRole = permissions.mute && roleName === on_stage_role;
-  const canRemoveRoleFromStage = permissions.changeRole && roleName === on_stage_role;
+  const canMuteRole = permissions?.mute && roleName === on_stage_role;
+  const canRemoveRoleFromStage = permissions?.changeRole && roleName === on_stage_role;
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
-    permissions.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
+    permissions?.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
   if (!(canMuteRole || canRemoveRoleFromStage || canRemoveRoleFromRoom)) {
     return null;
