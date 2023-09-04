@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircleIcon, SettingsIcon } from '@100mslive/react-icons';
+import { CheckIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
 
 export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto }) {
@@ -60,7 +60,15 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ height: 'auto', maxHeight: '$96', w: '$64', bg: '$surface_bright' }}
+          css={{
+            height: 'auto',
+            maxHeight: '$52',
+            w: '$40',
+            bg: '$surface_bright',
+            p: '$4 0 $4 0',
+            gap: '$4',
+            display: 'grid',
+          }}
         >
           {layers.map(layer => {
             return (
@@ -73,15 +81,20 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                       ? '$surface_default'
                       : '$surface_bright',
                   '&:hover': {
-                    bg: '$surface_default',
+                    bg: '$surface_brighter',
                   },
+                  p: '$2 $4 $2 $8',
+                  h: '$12',
+                  gap: '$2',
                 }}
               >
-                <Text>{getQualityText(layer)}</Text>
-                <Text css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>{getBitrateText(layer)}</Text>
-                {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
-                  <CheckCircleIcon />
-                )}
+                <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                  {getQualityText(layer)}
+                </Text>
+                <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                  {getBitrateText(layer)}
+                </Text>
+                {!isAuto && layer.width === selection?.width && layer.height === selection?.height && <CheckIcon />}
               </Dropdown.Item>
             );
           })}
@@ -91,12 +104,17 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
             css={{
               bg: !isAuto ? '$surface_bright' : '$surface_default',
               '&:hover': {
-                bg: '$surface_default',
+                bg: '$surface_brighter',
               },
+              p: '$2 $4 $2 $8',
+              h: '$12',
+              gap: '$2',
             }}
           >
-            <Text css={{ flex: '1 1 0' }}>Auto</Text>
-            {isAuto && <CheckCircleIcon />}
+            <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+              Auto
+            </Text>
+            {isAuto && <CheckIcon />}
           </Dropdown.Item>
         </Dropdown.Content>
       )}
