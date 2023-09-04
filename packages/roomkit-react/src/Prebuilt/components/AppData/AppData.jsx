@@ -159,9 +159,9 @@ const ResetStreamingStart = () => {
     }
   }, [roomState, setHLSStarted, setRTMPStarted, setRecordingStarted]);
   useEffect(() => {
-    console.log('hls streaming reset');
     if (isHLSRunning || hlsError) {
       if (hlsStarted) {
+        console.log('hls streaming reset');
         setHLSStarted(false);
         if (isStreamingOpen) {
           toggleStreaming();
