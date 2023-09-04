@@ -28,9 +28,10 @@ const Chevron = styled('button', {
 const Dots = styled('div', {
   display: 'flex',
   alignItems: 'center',
+  gap: '$6',
   '& > * + *': {
     marginRight: '0',
-    marginLeft: '0.5rem',
+    marginLeft: '0',
   },
 });
 
@@ -40,10 +41,9 @@ const Dot = styled('button', {
   },
   borderRadius: '9999px',
   backgroundColor: '$on_surface_low',
-  padding: '4px',
+  padding: '$2',
   border: 'none',
   cursor: 'pointer',
-  transition: 'height width 1s ease',
   variants: {
     active: {
       true: {
@@ -51,7 +51,7 @@ const Dot = styled('button', {
       },
     },
     size: {
-      normal: {
+      large: {
         width: '0.5rem',
         height: '0.5rem',
       },
@@ -66,7 +66,7 @@ const Dot = styled('button', {
     },
   },
   defaultVariants: {
-    size: 'normal',
+    size: 'large',
   },
 });
 
