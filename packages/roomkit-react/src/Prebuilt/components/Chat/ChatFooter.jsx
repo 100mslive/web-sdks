@@ -130,6 +130,7 @@ export const ChatFooter = ({ role, peerId, onSend, children /* onSelect, selecti
         >
           {children}
           <TextArea
+            css={{ c: '$on_surface_high' }}
             placeholder="Send a message...."
             ref={inputRef}
             autoFocus
