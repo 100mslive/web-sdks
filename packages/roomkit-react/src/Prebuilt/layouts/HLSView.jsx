@@ -209,7 +209,7 @@ const HLSView = () => {
               justify="flex-end"
               align="flex-start"
               css={{
-                background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #000 100%)',
+                background: `linear-gradient(180deg, $background_dim 0%, $background_dim 100%)`,
               }}
             >
               <HMSVideoPlayer.Controls.Root css={{ p: '$4 $8' }}>
