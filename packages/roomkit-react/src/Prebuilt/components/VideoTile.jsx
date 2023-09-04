@@ -140,7 +140,7 @@ const Tile = ({
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : (
-            !hideAudioLevelOnTile && <AudioLevel trackId={audioTrack?.id} />
+            <AudioLevel trackId={audioTrack?.id} hide={hideAudioLevelOnTile} />
           )}
           {isMouseHovered || isDragabble ? (
             <TileMenu
@@ -208,7 +208,10 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
   );
 };
 
-export const AudioLevel = ({ trackId }) => {
+export const AudioLevel = ({ trackId, hide = false }) => {
+  if (hide) {
+    return null;
+  }
   return (
     <StyledVideoTile.AudioIndicator>
       <Flex align="center" justify="center" css={{ gap: '$2' }}>
