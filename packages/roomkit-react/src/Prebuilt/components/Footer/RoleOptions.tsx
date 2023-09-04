@@ -12,7 +12,7 @@ import {
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
 
@@ -23,8 +23,9 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const [openOptions, setOpenOptions] = useState(false);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
-  const layout = useRoomLayout();
-  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elements?.on_stage_exp || {};
+  const { elements } = useRoomLayoutConferencingScreen();
+  // @ts-ignore
+  const { on_stage_role, off_stage_roles = [] } = elements?.on_stage_exp || {};
 
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();

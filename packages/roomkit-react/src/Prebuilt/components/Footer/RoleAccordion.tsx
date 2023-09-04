@@ -15,7 +15,6 @@ const ROW_HEIGHT = 50;
 
 interface ItemData {
   peerList: HMSPeer[];
-  setSelectedPeerId: (peerId: string) => void;
   isConnected: boolean;
 }
 
@@ -24,20 +23,12 @@ function itemKey(index: number, data: ItemData) {
 }
 
 const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
-  return (
-    <Participant
-      key={data.peerList[index].id}
-      peer={data.peerList[index]}
-      isConnected={data.isConnected}
-      setSelectedPeerId={data.setSelectedPeerId}
-    />
-  );
+  return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
 });
 
 export const RoleAccordion = ({
   peerList = [],
   roleName,
-  setSelectedPeerId,
   isConnected,
   filter,
   isHandRaisedAccordion = false,
@@ -83,7 +74,7 @@ export const RoleAccordion = ({
             <Box css={{ borderTop: '1px solid $border_default' }} />
             <FixedSizeList
               itemSize={ROW_HEIGHT}
-              itemData={{ peerList, isConnected, setSelectedPeerId }}
+              itemData={{ peerList, isConnected }}
               itemKey={itemKey}
               itemCount={peerList.length}
               width={width}
