@@ -4,8 +4,10 @@ import { FixedSizeList } from 'react-window';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+// @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
+// @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
 
 const ROW_HEIGHT = 50;

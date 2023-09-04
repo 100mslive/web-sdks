@@ -22,7 +22,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const layout = useRoomLayout();
-  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
+  const { on_stage_role, off_stage_roles = [] } = layout?.screens?.conferencing?.default?.elements?.on_stage_exp || {};
 
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();
@@ -61,7 +61,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
     }
   };
 
-  const removeRoleFromRoom = async () => {
+  const removePeersFromRoom = async () => {
     try {
       peerList.forEach(async peer => {
         await hmsActions.removePeer(peer.id, '');
@@ -135,7 +135,7 @@ export const RoleOptions = ({ roleName, peerList }) => {
         {canRemoveRoleFromRoom && (
           <Dropdown.Item
             css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: '$alert_error_default' }}
-            onClick={removeRoleFromRoom}
+            onClick={removePeersFromRoom}
           >
             <RemoveUserIcon />
             <Text variant="sm" css={{ ...optionTextCSS, color: 'inherit' }}>
