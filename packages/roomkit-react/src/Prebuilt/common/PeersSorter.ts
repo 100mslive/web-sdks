@@ -60,7 +60,7 @@ class PeersSorter {
     // delete to insert at beginning
     this.lruPeers.delete(speaker.id);
     const lruPeerArray = Array.from(this.lruPeers);
-    while (lruPeerArray.length >= this.tilesPerPage) {
+    while (lruPeerArray.length >= this.tilesPerPage && lruPeerArray.length) {
       lruPeerArray.pop();
     }
     this.lruPeers = new Set([speaker.id, ...lruPeerArray]);
