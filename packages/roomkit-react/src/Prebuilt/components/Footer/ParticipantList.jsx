@@ -254,7 +254,6 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
     on_stage_role,
     off_stage_roles = [],
   } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
-  const canBringToStage = off_stage_roles.includes(role);
   const isInStage = role === on_stage_role;
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -296,21 +295,23 @@ const ParticipantMoreActions = ({ onRoleChange, peerId, role }) => {
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {canChangeRole && canBringToStage ? (
-            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
-              <ChangeRoleIcon />
-              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
-                {isInStage ? remove_from_stage_label : bring_to_stage_label}
-              </Text>
-            </Dropdown.Item>
-          ) : (
-            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => onRoleChange(peerId)}>
-              <ChangeRoleIcon />
-              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
-                Change Role
-              </Text>
-            </Dropdown.Item>
-          )}
+          {canChangeRole ? (
+            remove_from_stage_label && bring_to_stage_label ? (
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
+                <ChangeRoleIcon />
+                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                  {isInStage ? remove_from_stage_label : bring_to_stage_label}
+                </Text>
+              </Dropdown.Item>
+            ) : (
+              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => onRoleChange(peerId)}>
+                <ChangeRoleIcon />
+                <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                  Change Role
+                </Text>
+              </Dropdown.Item>
+            )
+          ) : null}
 
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
