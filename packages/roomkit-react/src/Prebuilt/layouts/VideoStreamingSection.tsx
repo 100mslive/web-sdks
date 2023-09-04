@@ -1,43 +1,30 @@
-import React, { Suspense, useCallback, useEffect } from 'react';
-import { HMSException } from '@100mslive/hms-video';
+import React, { Suspense, useEffect } from 'react';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import {
-  selectIsConnectedToRoom,
-  selectLocalPeerRoleName,
-  selectPermissions,
-  useHMSActions,
-  useHMSStore,
-  useRecordingStreaming,
-} from '@100mslive/react-sdk';
+import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
-// @ts-ignore: No implicit Any
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
 import { PDFView } from './PDFView';
-// @ts-ignore: No implicit Any
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
 // import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
   usePDFAnnotator,
-  useSetAppDataByKey,
   useUrlToEmbed,
   useWaitingViewerRole,
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 // @ts-ignore: No implicit Any
-import { useShowStreamingUI } from '../common/hooks';
-// @ts-ignore: No implicit Any
-import { APP_DATA, SESSION_STORE_KEY } from '../common/constants';
+import { SESSION_STORE_KEY } from '../common/constants';
 
 // const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 // @ts-ignore: No implicit Any
@@ -57,36 +44,6 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFAnnotator();
-  const { isHLSRunning } = useRecordingStreaming();
-  const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-  const permissions = useHMSStore(selectPermissions);
-  const showStreamingUI = useShowStreamingUI();
-
-  const startHLS = useCallback(async () => {
-    try {
-      if (isHLSStarted) {
-        return;
-      }
-      setHLSStarted(true);
-      await hmsActions.startHLSStreaming();
-    } catch (error) {
-      if ((error as HMSException).message?.includes('beam already started')) {
-        return;
-      }
-      setHLSStarted(false);
-    }
-  }, [hmsActions, isHLSStarted, setHLSStarted]);
-
-  useEffect(() => {
-    if (!isConnected) {
-      return;
-    }
-    // Is a streaming kit and broadcaster joins
-    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
-      startHLS();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected]);
 
   useEffect(() => {
     if (!isConnected) {

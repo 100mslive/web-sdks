@@ -63,10 +63,9 @@ export const MwebLeaveRoom = ({
               } again.`}
               bg="$surface_default"
               titleColor="$on_surface_high"
-              subtitleColor="$on_surface_low"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
-              css={{ pt: 0, mt: '$10' }}
+              css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
             {isStreamingOn && permissions?.hlsStreaming ? (
               <LeaveCard
@@ -76,7 +75,7 @@ export const MwebLeaveRoom = ({
                 } for everyone. You can't undo this action.`}
                 bg="$alert_error_dim"
                 titleColor="$alert_error_brighter"
-                subtitleColor="$alert_error_bright"
+                css={{ color: '$alert_error_bright', '&:hover': { color: '$alert_error_brighter' } }}
                 icon={<StopIcon height={24} width={24} />}
                 onClick={() => {
                   setOpen(false);

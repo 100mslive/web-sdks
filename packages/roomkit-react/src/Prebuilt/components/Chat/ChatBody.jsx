@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -392,7 +392,8 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  const messages = useHMSStore(storeMessageSelector) || [];
+  let messages = useHMSStore(storeMessageSelector);
+  messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
   const isMobile = useMedia(cssConfig.media.md);
 
   if (messages.length === 0 && !isMobile) {
@@ -400,7 +401,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
       <Flex
         css={{
           width: '100%',
-          height: '100%',
+          flex: '1 1 0',
           textAlign: 'center',
           px: '$4',
         }}
