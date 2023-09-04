@@ -124,8 +124,6 @@ const Conference = () => {
     return <FullPageProgress loadingText="Starting live stream..." />;
   }
 
-  console.log('conference rendering');
-
   return (
     <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
       {!screenProps.hideSections.includes('header') && (
