@@ -1,22 +1,21 @@
 import React from 'react';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { PencilDrawIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
+// @ts-ignore: No implicit any
 import IconButton from '../../IconButton';
-import { useHLSViewerRole } from '../../components/AppData/useUISettings';
+// @ts-ignore: No implicit any
 import { useWhiteboardMetadata } from './useWhiteboardMetadata';
 
-export const ToggleWhiteboard = () => {
+export const ToggleWhiteboard = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const {
     whiteboardEnabled,
     whiteboardOwner: whiteboardActive,
     amIWhiteboardOwner,
     toggleWhiteboard,
   } = useWhiteboardMetadata();
-  const hlsViewerRole = useHLSViewerRole();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
 
-  if (!whiteboardEnabled || localPeerRole === hlsViewerRole) {
+  if (!whiteboardEnabled || screenType === 'hls_live_streaming') {
     return null;
   }
 

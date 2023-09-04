@@ -11,7 +11,7 @@ import { AudioVideoToggle } from '../AudioVideoToggle';
 // @ts-ignore: No implicit Any
 import { EmojiReaction } from '../EmojiReaction';
 // @ts-ignore: No implicit Any
-import { LeaveRoom } from '../LeaveRoom';
+import { LeaveRoom } from '../Leave/LeaveRoom';
 // @ts-ignore: No implicit Any
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 // @ts-ignore: No implicit Any
@@ -53,7 +53,7 @@ export const Footer = ({
           },
         }}
       >
-        {isMobile ? <LeaveRoom /> : null}
+        {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
       </AppFooter.Left>
       <AppFooter.Center
@@ -66,21 +66,21 @@ export const Footer = ({
       >
         {isMobile ? (
           <>
-            <RaiseHand />
-            {elements.chat && <ChatToggle />}
+            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
           <>
             <ScreenshareToggle />
-            <RaiseHand />
-            {elements.emoji_reactions && <EmojiReaction />}
-            <LeaveRoom />
+            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            {elements?.emoji_reactions && <EmojiReaction />}
+            <LeaveRoom screenType={screenType} />
           </>
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {elements.chat && <ChatToggle />}
+        {elements?.chat && <ChatToggle />}
         <ParticipantCount />
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>

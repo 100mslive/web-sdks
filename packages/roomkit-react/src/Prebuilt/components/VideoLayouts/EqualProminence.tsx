@@ -18,8 +18,17 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-  const inputPeers = useMemo(() => (peers.length === 0 ? (!localPeer ? [] : [localPeer]) : peers), [peers, localPeer]);
-  const pageList = usePagesWithTiles({
+  let pageList = usePagesWithTiles({
+    peers,
+    maxTileCount,
+  });
+  // useMemo is needed to prevent recursion as new array is created for localPeer
+  const inputPeers = useMemo(
+    () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
+    [pageList.length, peers, localPeer],
+  );
+  // Pass local peer to main grid if no other peer has tiles
+  pageList = usePagesWithTiles({
     peers: inputPeers,
     maxTileCount,
   });

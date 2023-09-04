@@ -21,7 +21,6 @@ import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 80;
@@ -67,7 +66,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = () => {
+export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -94,9 +93,6 @@ export const Chat = () => {
 
   const storeMessageSelector = selectHMSMessagesCount;
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = useIsLocalPeerHLSViewer();
-  const mwebStreaming = isMobile && (showStreamingUI || isHLSViewer);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -113,8 +109,8 @@ export const Chat = () => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
-      {!mwebStreaming ? (
+    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
+      {!isMobile ? (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
           <PinnedMessage clearPinnedMessage={setPinnedMessage} />
@@ -126,12 +122,13 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         ref={listRef}
         scrollToBottom={scrollToBottom}
-        mwebStreaming={mwebStreaming}
+        screenType={screenType}
       />
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}
         selection={chatOptions.selection}
+        screenType={screenType}
         onSelect={({ role, peerId, selection }) => {
           setChatOptions({
             role,

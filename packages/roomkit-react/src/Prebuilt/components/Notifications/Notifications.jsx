@@ -1,5 +1,6 @@
 /* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
@@ -8,6 +9,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
+import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -18,17 +20,16 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { useHLSViewerRole, useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
-import { useNavigation } from '../hooks/useNavigation';
+import { useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
 import { getMetadata } from '../../common/utils';
 
 export function Notifications() {
   const notification = useHMSNotifications();
-  const navigate = useNavigation();
-  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const navigate = useNavigate();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);
+  const updateRoomLayoutForRole = useUpdateRoomLayout();
 
   useEffect(() => {
     if (!notification) {
@@ -99,13 +100,11 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED:
-        if (notification.data.roleName === HLS_VIEWER_ROLE) {
-          return;
-        }
         if (notification.data?.isLocal) {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
+          updateRoomLayoutForRole(notification.data.roleName);
         }
         break;
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
@@ -138,7 +137,7 @@ export function Notifications() {
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED, HLS_VIEWER_ROLE]);
+  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED]);
 
   return (
     <>

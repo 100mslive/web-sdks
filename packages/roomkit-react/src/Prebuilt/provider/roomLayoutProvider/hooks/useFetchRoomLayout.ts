@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
-import merge from 'lodash.merge';
 import { defaultLayout } from '../constants';
 
 // TODO: remove this usage
@@ -26,6 +25,7 @@ export type useFetchRoomLayoutProps = {
 
 export type useFetchRoomLayoutResponse = {
   layout: Layout | undefined;
+  updateRoomLayoutForRole: (role: string) => void;
 };
 
 export const useFetchRoomLayout = ({
@@ -33,24 +33,48 @@ export const useFetchRoomLayout = ({
   authToken = '',
 }: useFetchRoomLayoutProps): useFetchRoomLayoutResponse => {
   const [layout, setLayout] = useState<Layout | undefined>(undefined);
+  const layoutResp = useRef<GetResponse>();
   const isFetchInProgress = useRef(false);
+  const updateRoomLayoutForRole = useCallback((role: string) => {
+    if (!layoutResp.current) {
+      return;
+    }
+    const [layout] = (layoutResp.current?.data || []).filter(layout => layout.role === role);
+    if (layout) {
+      setLayout(layout);
+    }
+  }, []);
   useEffect(() => {
     (async () => {
       if (isFetchInProgress.current || !authToken) {
         return;
       }
       isFetchInProgress.current = true;
-      const resp = await fetchWithRetry(endpoint, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
-      const layoutResp: GetResponse = await resp.json();
-      const layout = merge(defaultLayout, layoutResp.data?.[0]);
+      try {
+        const resp = await fetchWithRetry(endpoint, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        layoutResp.current = await resp.json();
+      } catch (e) {
+        console.error('[Room Layout API]: Failed to fetch / process room layout. Resorting to default layout.', e);
+        layoutResp.current = {
+          data: [defaultLayout],
+        };
+      }
+      let layoutForRole = layoutResp.current?.data?.[0];
+      if (!layoutForRole) {
+        console.error(
+          '[Room Layout API]: Unable to figure out room layout from API response. Resorting to default layout.',
+        );
+        layoutForRole = defaultLayout;
+      }
+      const layout = layoutForRole;
       setLayout(layout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);
 
-  return { layout };
+  return { layout, updateRoomLayoutForRole };
 };

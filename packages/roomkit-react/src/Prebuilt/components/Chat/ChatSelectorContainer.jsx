@@ -7,13 +7,11 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { ChatSelector } from './ChatSelector';
-import { useShowStreamingUI } from '../../common/hooks';
 import { textEllipsis } from '../../../utils';
 
 export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
-  const showStreamingUI = useShowStreamingUI();
 
   return (
     <Flex align="center" css={{ mb: '$8' }}>
@@ -51,7 +49,7 @@ export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => 
           align="start"
           sideOffset={8}
         >
-          {isMobile && showStreamingUI ? (
+          {isMobile ? (
             <Sheet.Root open={open} onOpenChange={value => setOpen(value)}>
               <Sheet.Content css={{ pt: '$8' }}>
                 <Sheet.Title

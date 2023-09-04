@@ -68,9 +68,9 @@ export const VideoStreamingSection = ({
         return;
       }
       setHLSStarted(true);
-      await hmsActions.startHLSStreaming({});
+      await hmsActions.startHLSStreaming();
     } catch (error) {
-      if ((error as HMSException).message === 'beam already started') {
+      if ((error as HMSException).message?.includes('beam already started')) {
         return;
       }
       setHLSStarted(false);
@@ -112,7 +112,7 @@ export const VideoStreamingSection = ({
     ViewComponent = <EmbedView />;
   } else {
     //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements).video_tile_layout?.grid} />;
+    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
   }
 
   return (
@@ -125,7 +125,7 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane />
+        <SidePane screenType={screenType} />
       </Flex>
     </Suspense>
   );

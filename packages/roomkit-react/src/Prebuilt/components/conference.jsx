@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
@@ -24,11 +24,10 @@ import {
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
-import { useNavigation } from './hooks/useNavigation';
 import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const { roomId, role } = useParams();
   const isHeadless = useIsHeadless();
   const { userName } = useHMSPrebuiltContext();
