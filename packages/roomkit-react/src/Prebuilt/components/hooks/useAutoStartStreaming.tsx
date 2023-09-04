@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   HMSException,
   selectIsConnectedToRoom,
@@ -21,32 +21,38 @@ export const useAutoStartStreaming = () => {
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const { isHLSRunning } = useRecordingStreaming();
+  const streamStartedRef = useRef(false);
 
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted) {
+      if (isHLSStarted || !showStreamingUI || isHLSRunning) {
         return;
       }
       console.log('starting hls called');
       setHLSStarted(true);
+      streamStartedRef.current = true;
       await hmsActions.startHLSStreaming();
     } catch (error) {
       if ((error as HMSException).message?.includes('beam already started')) {
         return;
       }
+      streamStartedRef.current = false;
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSStarted, setHLSStarted]);
+  }, [hmsActions, isHLSRunning, isHLSStarted, setHLSStarted, showStreamingUI]);
 
   useEffect(() => {
-    if (!isConnected) {
+    if (!isHLSStarted && !isHLSRunning) {
+      streamStartedRef.current = false;
+    }
+  }, [isHLSStarted, isHLSRunning]);
+
+  useEffect(() => {
+    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming) {
       return;
     }
     // Is a streaming kit and broadcaster joins
-    if (permissions?.hlsStreaming && !isHLSRunning && showStreamingUI) {
-      console.log('start hls called');
-      startHLS();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected]);
+    console.log('start hls called');
+    startHLS();
+  }, [isConnected, permissions?.hlsStreaming, startHLS]);
 };
