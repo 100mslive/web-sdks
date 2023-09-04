@@ -10,7 +10,6 @@ export const LeaveCard = ({
   onClick,
   bg,
   titleColor,
-  subtitleColor,
   css = {},
 }: {
   icon: React.JSX.Element;
@@ -18,18 +17,17 @@ export const LeaveCard = ({
   subtitle: string;
   onClick: () => void;
   titleColor: string;
-  subtitleColor: string;
   bg: string;
   css?: CSS;
 }) => {
   return (
-    <Flex css={{ p: '$10', flexGrow: 1, gap: '$8', bg, ...css }} onClick={onClick}>
+    <Flex css={{ p: '$10', flexGrow: 1, gap: '$8', bg, c: 'inherit', ...css }} onClick={onClick}>
       <Box css={{ color: titleColor }}>{icon}</Box>
-      <Box css={{ gap: '$2' }}>
+      <Box css={{ gap: '$2', c: 'inherit' }}>
         <Text variant="lg" css={{ color: titleColor }}>
           {title}
         </Text>
-        <Text variant="sm" css={{ color: subtitleColor }}>
+        <Text variant="sm" css={{ c: 'inherit' }}>
           {subtitle}
         </Text>
       </Box>
