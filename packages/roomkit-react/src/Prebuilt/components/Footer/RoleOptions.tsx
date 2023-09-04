@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { HMSPeer, selectPermissions, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import {
   MicOffIcon,
@@ -24,7 +25,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const { elements } = useRoomLayoutConferencingScreen();
-  const { on_stage_role, off_stage_roles = [] } = elements?.on_stage_exp || {};
+  const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
 
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();
