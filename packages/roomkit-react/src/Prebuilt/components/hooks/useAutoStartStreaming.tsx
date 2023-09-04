@@ -28,7 +28,6 @@ export const useAutoStartStreaming = () => {
       if (isHLSStarted || !showStreamingUI || isHLSRunning) {
         return;
       }
-      console.log('starting hls called');
       setHLSStarted(true);
       streamStartedRef.current = true;
       await hmsActions.startHLSStreaming();
@@ -52,7 +51,7 @@ export const useAutoStartStreaming = () => {
       return;
     }
     // Is a streaming kit and broadcaster joins
-    console.log('start hls called');
     startHLS();
-  }, [isConnected, permissions?.hlsStreaming, startHLS]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected]);
 };
