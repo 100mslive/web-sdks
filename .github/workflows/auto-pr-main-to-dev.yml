@@ -1,0 +1,22 @@
+name: Create PR from main to dev
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        if: github.event.pull_request.merged == true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: ''
+          destination_branch: 'dev'
+          pr_title: 'PR for main to dev backmerge'
+          pr_body: ':robot: Automated PR from **${{ github.ref }}** to **dev**'
+          pr_label: 'backmerge'
