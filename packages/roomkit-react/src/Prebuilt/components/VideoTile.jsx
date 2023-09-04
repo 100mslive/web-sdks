@@ -40,6 +40,7 @@ const Tile = ({
   hideParticipantNameOnTile = false,
   roundedVideoTile = true,
   hideAudioMuteOnTile = false,
+  hideAudioLevelOnTile = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -139,7 +140,7 @@ const Tile = ({
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
           ) : (
-            <AudioLevel trackId={audioTrack?.id} />
+            !hideAudioLevelOnTile && <AudioLevel trackId={audioTrack?.id} />
           )}
           {isMouseHovered || isDragabble ? (
             <TileMenu

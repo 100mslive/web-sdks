@@ -30,6 +30,7 @@ export const GridLayout = ({
   hide_participant_name_on_tile = false,
   rounded_video_tile = true,
   hide_audio_mute_on_tile = false,
+  hide_audio_level_on_tile = false,
   video_object_fit = 'contain',
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
@@ -46,6 +47,7 @@ export const GridLayout = ({
     hideParticipantNameOnTile: hide_participant_name_on_tile,
     roundedVideoTile: rounded_video_tile,
     hideAudioMuteOnTile: hide_audio_mute_on_tile,
+    hideAudioLevelOnTile: hide_audio_level_on_tile,
     objectFit: video_object_fit,
   };
 
