@@ -1,3 +1,5 @@
+import { useMedia } from 'react-use';
+import { config as cssConfig } from '@100mslive/roomkit-react';
 import { useSearchParam } from './useSearchParam';
 
 export const QUERY_PARAM_SKIP_PREVIEW = 'skip_preview';
@@ -13,6 +15,7 @@ export const useOverridePrebuiltLayout = () => {
     useSearchParam(QUERY_PARAM_SKIP_PREVIEW_HEADFUL) === 'true' ||
     directJoinHeadfulFromEnv;
   let skipPreview = useSearchParam(QUERY_PARAM_SKIP_PREVIEW) === 'true';
+  const isMobile = useMedia(cssConfig.media.md);
 
   let overrideLayout = undefined;
 
@@ -31,7 +34,7 @@ export const useOverridePrebuiltLayout = () => {
               hide_audio_level_on_tile: true,
               rounded_video_tile: false,
               hide_audio_mute_on_tile: true,
-              video_object_fit: 'cover',
+              video_object_fit: isMobile ? 'cover' : 'contain',
               edge_to_edge: true,
             },
           },

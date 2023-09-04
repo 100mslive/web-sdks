@@ -1,12 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import {
-  selectPeers,
-  selectPeerScreenSharing,
-  selectRemotePeers,
-  useHMSStore,
-  useHMSVanillaStore,
-} from '@100mslive/react-sdk';
+import { selectPeers, selectPeerScreenSharing, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -36,8 +30,16 @@ export const GridLayout = ({
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
-  const isRoleProminence = prominentRoles.length > 0 || pinnedTrack;
-  const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
+  let peers = useHMSStore(selectPeers);
+  const isRoleProminence =
+    (prominentRoles.length &&
+      peers.some(
+        peer => peer.roleName && prominentRoles.includes(peer.roleName) && (peer.videoTrack || peer.audioTrack),
+      )) ||
+    pinnedTrack;
+  if (isInsetEnabled && !isRoleProminence && !peerSharing) {
+    peers = peers.filter(peer => !peer.isLocal);
+  }
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(peers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
