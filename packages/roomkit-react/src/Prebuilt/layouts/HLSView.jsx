@@ -204,15 +204,16 @@ const HLSView = () => {
             </Flex>
           )}
           <HMSVideoPlayer.Root ref={videoRef}>
-            <Flex
-              direction="column"
-              justify="flex-end"
-              align="flex-start"
-              css={{
-                background: `linear-gradient(180deg, $background_dim 0%, $background_dim 100%)`,
-              }}
-            >
-              <HMSVideoPlayer.Controls.Root css={{ p: '$4 $8' }}>
+            <Flex direction="column" justify="flex-end" align="flex-start">
+              <HMSVideoPlayer.Controls.Root
+                css={{
+                  p: '$4 $8',
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0',
+                  background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, $background_dim 100%)`,
+                }}
+              >
                 <HMSVideoPlayer.Controls.Left>
                   <HMSVideoPlayer.PlayButton
                     onClick={async () => {

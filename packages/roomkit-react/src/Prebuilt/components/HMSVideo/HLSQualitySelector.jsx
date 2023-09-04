@@ -65,7 +65,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
             maxHeight: '$52',
             w: '$40',
             bg: '$surface_bright',
-            p: '$4 0 $4 0',
+            py: '$4',
             gap: '$4',
             display: 'grid',
           }}
