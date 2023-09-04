@@ -49,7 +49,7 @@ export const RoleAccordion = ({
         type="single"
         collapsible
         defaultValue={roleName}
-        css={{ borderRadius: '$3', border: '1px solid $border_bright' }}
+        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
       >
         <Accordion.Item value={roleName}>
           <Accordion.Header

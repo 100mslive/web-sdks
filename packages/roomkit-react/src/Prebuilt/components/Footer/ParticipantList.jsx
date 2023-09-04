@@ -214,7 +214,6 @@ const ParticipantActions = React.memo(({ onSettings, peerId, role, isLocal }) =>
       css={{
         flexShrink: 0,
         gap: '$8',
-        mt: '$2',
       }}
     >
       <ConnectionIndicator peerId={peerId} />
