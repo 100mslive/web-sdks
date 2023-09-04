@@ -75,7 +75,15 @@ export const DesktopLeaveRoom = ({
               </MenuTriggerButton>
             </Dropdown.Trigger>
             <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
+              <Dropdown.Item
+                css={{
+                  bg: '$surface_dim',
+                  color: '$on_surface_low',
+                  '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
+                }}
+                onClick={leaveRoom}
+                data-testid="just_leave_btn"
+              >
                 <LeaveCard
                   title={showStream ? 'Leave Stream' : 'Leave Session'}
                   subtitle={`Others will continue after you leave. You can join the ${
@@ -83,14 +91,20 @@ export const DesktopLeaveRoom = ({
                   } again.`}
                   bg=""
                   titleColor="$on_surface_high"
-                  subtitleColor="$on_surface_low"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                   onClick={leaveRoom}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
               {isStreamingOn && permissions?.hlsStreaming ? (
-                <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
+                <Dropdown.Item
+                  css={{
+                    bg: '$alert_error_dim',
+                    color: '$alert_error_bright',
+                    '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+                  }}
+                  data-testid="end_room_btn"
+                >
                   <LeaveCard
                     title={showStream ? 'End Stream' : 'End Session'}
                     subtitle={`The ${
@@ -98,7 +112,6 @@ export const DesktopLeaveRoom = ({
                     } will end for everyone. You can't undo this action.`}
                     bg=""
                     titleColor="$alert_error_brighter"
-                    subtitleColor="$alert_error_bright"
                     icon={<StopIcon height={24} width={24} />}
                     onClick={() => {
                       setOpen(false);

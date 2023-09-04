@@ -10,7 +10,6 @@ export const LeaveCard = ({
   onClick,
   bg,
   titleColor,
-  subtitleColor,
   css = {},
 }: {
   icon: React.JSX.Element;
@@ -18,7 +17,6 @@ export const LeaveCard = ({
   subtitle: string;
   onClick: () => void;
   titleColor: string;
-  subtitleColor: string;
   bg: string;
   css?: CSS;
 }) => {
@@ -29,7 +27,7 @@ export const LeaveCard = ({
         <Text variant="lg" css={{ color: titleColor }}>
           {title}
         </Text>
-        <Text variant="sm" css={{ color: subtitleColor }}>
+        <Text variant="sm" css={{ c: 'inherit' }}>
           {subtitle}
         </Text>
       </Box>
