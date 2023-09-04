@@ -21,9 +21,9 @@ export const LeaveCard = ({
   css?: CSS;
 }) => {
   return (
-    <Flex css={{ p: '$10', flexGrow: 1, gap: '$8', bg, c: 'inherit', ...css }} onClick={onClick}>
+    <Flex css={{ p: '$10', flexGrow: 1, gap: '$8', bg, ...css }} onClick={onClick}>
       <Box css={{ color: titleColor }}>{icon}</Box>
-      <Box css={{ gap: '$2', c: 'inherit' }}>
+      <Box css={{ gap: '$2' }}>
         <Text variant="lg" css={{ color: titleColor }}>
           {title}
         </Text>
