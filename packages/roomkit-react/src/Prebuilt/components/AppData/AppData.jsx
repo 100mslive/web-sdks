@@ -152,12 +152,14 @@ const ResetStreamingStart = () => {
    */
   useEffect(() => {
     if (roomState === HMSRoomState.Disconnected) {
+      console.log('hls streaming reset on disconnected');
       setHLSStarted(false);
       setRecordingStarted(false);
       setRTMPStarted(false);
     }
   }, [roomState, setHLSStarted, setRTMPStarted, setRecordingStarted]);
   useEffect(() => {
+    console.log('hls streaming reset');
     if (isHLSRunning || hlsError) {
       if (hlsStarted) {
         setHLSStarted(false);
