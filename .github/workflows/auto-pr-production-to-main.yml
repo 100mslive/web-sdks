@@ -1,9 +1,9 @@
-name: Create PR from main to main-prebuilt
+name: Create PR from production to main
 on:
   pull_request:
     types: [closed]
     branches:
-      - main
+      - production
 
 jobs:
   pull-request:
@@ -16,7 +16,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           source_branch: ''
-          destination_branch: 'main-prebuilt'
-          pr_title: 'PR for Prebuilt Link QA deployment'
-          pr_body: ':robot: Automated PR from **${{ github.ref }}** to **main-prebuilt**'
-          pr_label: 'Prebuilt Link QA deployment'
+          destination_branch: 'main'
+          pr_title: 'Hotfix backmerge to main'
+          pr_body: ':robot: Automated PR from **${{ github.ref }}** to **main**'
+          pr_label: 'backmerge'
