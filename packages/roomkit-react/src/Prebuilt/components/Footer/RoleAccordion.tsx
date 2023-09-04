@@ -1,6 +1,7 @@
 import React from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
+import { HMSPeer } from '@100mslive/react-sdk';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -12,11 +13,17 @@ import { getFormattedCount } from '../../common/utils';
 
 const ROW_HEIGHT = 50;
 
-function itemKey(index, data) {
+interface ItemData {
+  peerList: HMSPeer[];
+  setSelectedPeerId: (peerId: string) => void;
+  isConnected: boolean;
+}
+
+function itemKey(index: number, data: ItemData) {
   return data.peerList[index].id;
 }
 
-const VirtualizedParticipantItem = React.memo(({ index, data }) => {
+const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
   return (
     <Participant
       key={data.peerList[index].id}
@@ -34,6 +41,10 @@ export const RoleAccordion = ({
   isConnected,
   filter,
   isHandRaisedAccordion = false,
+}: ItemData & {
+  roleName: string;
+  isHandRaisedAccordion?: boolean;
+  filter?: { search: string };
 }) => {
   const [ref, { width }] = useMeasure();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;

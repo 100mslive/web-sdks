@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { selectPermissions, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { HMSPeer, selectPermissions, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import {
   MicOffIcon,
   MicOnIcon,
@@ -13,11 +13,13 @@ import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
+// @ts-ignore: No implicit Any
+import { getMetadata } from '../../common/utils';
 
 const dropdownItemCSS = { backgroundColor: '$surface_default', gap: '$4', p: '$8' };
 const optionTextCSS = { fontWeight: '$semiBold', color: '$on_surface_high', textTransform: 'none' };
 
-export const RoleOptions = ({ roleName, peerList }) => {
+export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList: HMSPeer[] }) => {
   const [openOptions, setOpenOptions] = useState(false);
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
@@ -31,8 +33,8 @@ export const RoleOptions = ({ roleName, peerList }) => {
   let allPeersHaveAudioOn = true;
 
   peerList.forEach(peer => {
-    const isAudioOn = store.tracks[peer.audioTrack]?.enabled;
-    const isVideoOn = store.tracks[peer.videoTrack]?.enabled;
+    const isAudioOn = !!peer.audioTrack && store.tracks[peer.audioTrack]?.enabled;
+    const isVideoOn = !!peer.videoTrack && store.tracks[peer.videoTrack]?.enabled;
     allPeersHaveAudioOn = allPeersHaveAudioOn && isAudioOn;
     allPeersHaveVideoOn = allPeersHaveVideoOn && isVideoOn;
   });
@@ -49,11 +51,11 @@ export const RoleOptions = ({ roleName, peerList }) => {
 
   const removeAllFromStage = () => {
     peerList.forEach(peer => {
-      hmsActions.changeRoleOfPeer(peer.id, peer.metadata?.prevRole || off_stage_roles?.[0]);
+      hmsActions.changeRoleOfPeer(peer.id, getMetadata(peer.metadata).prevRole || off_stage_roles?.[0]);
     });
   };
 
-  const setTrackEnabled = async (type, enabled = false) => {
+  const setTrackEnabled = async (type: 'audio' | 'video', enabled = false) => {
     try {
       await hmsActions.setRemoteTracksEnabled({ roles: [roleName], source: 'regular', type, enabled });
     } catch (e) {
