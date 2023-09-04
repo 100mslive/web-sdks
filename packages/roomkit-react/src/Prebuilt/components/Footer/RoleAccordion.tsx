@@ -46,7 +46,7 @@ export const RoleAccordion = ({
   isHandRaisedAccordion?: boolean;
   filter?: { search: string };
 }) => {
-  const [ref, { width }] = useMeasure();
+  const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
 
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
