@@ -24,7 +24,6 @@ const labelStyles = {
   textAlign: 'center',
   c: '$on_surface_high',
   transform: 'none',
-  mt: '$2',
   flexShrink: 0,
 };
 
@@ -59,11 +58,11 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
     return null;
   }
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0, mb: '$4', minHeight: 0 }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0 }} data-testid="screenshare_tile">
       <StyledVideoTile.Container
         transparentBg
         ref={fullscreenRef}
-        css={{ flexDirection: 'column' }}
+        css={{ flexDirection: 'column', gap: '$2' }}
         onMouseEnter={() => setIsMouseHovered(true)}
         onMouseLeave={() => {
           setIsMouseHovered(false);
@@ -83,6 +82,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
             mirror={peer.isLocal && track?.source === 'regular'}
             attach={!isAudioOnly}
             trackId={track.id}
+            css={{ minHeight: 0 }}
           />
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
