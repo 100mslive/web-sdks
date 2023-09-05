@@ -31,6 +31,8 @@ export const Footer = ({
   elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
+  // @ts-ignore
+  const isOverlayChat = !!elements?.chat?.is_overlay;
 
   return (
     <AppFooter.Root
@@ -40,7 +42,8 @@ export const Footer = ({
           justifyContent: 'center',
           gap: '$10',
           position: 'relative',
-          zIndex: 20,
+          // To prevent it from showing over the sidepane if chat type is not overlay
+          zIndex: isOverlayChat ? 20 : 1,
         },
       }}
     >
@@ -67,7 +70,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
-            {elements?.chat && <ChatToggle />}
+            {elements?.chat && <ChatToggle chatElement={elements.chat} />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
@@ -80,7 +83,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {elements?.chat && <ChatToggle />}
+        {elements?.chat && <ChatToggle chatElement={elements.chat} />}
         <ParticipantCount />
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>

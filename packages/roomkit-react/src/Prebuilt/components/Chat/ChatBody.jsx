@@ -23,6 +23,7 @@ import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -203,7 +204,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
-
+  const { elements } = useRoomLayoutConferencingScreen();
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
   const permissions = useHMSStore(selectPermissions);
@@ -212,7 +213,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     receiver: message.recipientPeer,
   });
   // show pin action only if peer has remove others permission and the message is of broadcast type
-  const showPinAction = permissions.removeOthers && !messageType;
+  const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
 
   useEffect(() => {
     if (message.id && !message.read && inView) {
