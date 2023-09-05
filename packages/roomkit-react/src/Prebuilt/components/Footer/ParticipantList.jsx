@@ -3,7 +3,6 @@ import { useDebounce, useMedia } from 'react-use';
 import {
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
-  selectPeerByID,
   selectPeerCount,
   selectPeerMetadata,
   selectPeersByCondition,
@@ -231,14 +230,10 @@ const ParticipantMoreActions = ({ peerId, role }) => {
   const isInStage = role === on_stage_role;
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const peer = useHMSStore(selectPeerByID(peerId));
   const isLocal = localPeerId === peerId;
   const [open, setOpen] = useState(false);
   const showStageOption =
-    canChangeRole &&
-    peer?.roleName &&
-    off_stage_roles.includes(peer.roleName) &&
-    (isInStage ? remove_from_stage_label : bring_to_stage_label);
+    canChangeRole && off_stage_roles.includes(role) && (isInStage ? remove_from_stage_label : bring_to_stage_label);
 
   const handleStageAction = async () => {
     if (isInStage) {
