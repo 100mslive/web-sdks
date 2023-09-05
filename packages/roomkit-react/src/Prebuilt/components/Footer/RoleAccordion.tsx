@@ -61,13 +61,13 @@ export const RoleAccordion = ({
               p: '$6 $8',
               fontSize: '$sm',
               fontWeight: '$semiBold',
-              c: 'on_surface_medium',
+              c: '$on_surface_medium',
             }}
           >
             <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
               <Text
                 variant="sm"
-                css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium !important' }}
+                css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
               >
                 {roleName} {`(${getFormattedCount(peerList.length)})`}
               </Text>
