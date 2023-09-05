@@ -117,7 +117,7 @@ export const DesktopOptions = ({
             </Dropdown.Item>
           ) : null}
 
-          {isBRBEnabled && screenType === 'hls_live_streaming' ? (
+          {isBRBEnabled && screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
