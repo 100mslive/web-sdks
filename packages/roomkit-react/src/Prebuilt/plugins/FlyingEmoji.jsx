@@ -1,9 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerID, selectPeerNameByID, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  selectLocalPeerID,
+  selectPeerNameByID,
+  useCustomEvent,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { config as cssConfig, keyframes } from '../../Theme';
+import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 let emojiCount = 1;
 
@@ -66,6 +73,11 @@ export function FlyingEmoji() {
     },
     [localPeerId, vanillaStore, startingPoints],
   );
+
+  useCustomEvent({
+    type: EMOJI_REACTION_TYPE,
+    onEvent: showFlyingEmoji,
+  });
 
   useEffect(() => {
     window.showFlyingEmoji = showFlyingEmoji;
