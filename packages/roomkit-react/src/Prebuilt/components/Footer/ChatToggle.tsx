@@ -2,12 +2,16 @@ import React, { useEffect } from 'react';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../../';
+import { Tooltip } from '../../..';
+// @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
+// @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 
-export const ChatToggle = ({ chatElement }) => {
+export const ChatToggle = ({ chatElement }: { chatElement: DefaultConferencingScreen_Elements['chat'] }) => {
   const openByDefault = chatElement?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
