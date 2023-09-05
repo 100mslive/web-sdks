@@ -8,7 +8,15 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { CrossIcon, DragHandleIcon, EmojiIcon, PeopleIcon, RecordIcon, SettingsIcon } from '@100mslive/react-icons';
+import {
+  BrbIcon,
+  CrossIcon,
+  DragHandleIcon,
+  EmojiIcon,
+  PeopleIcon,
+  RecordIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
@@ -21,6 +29,7 @@ import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
+import { useMyMetadata } from '../../hooks/useMetadata';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
@@ -54,6 +63,7 @@ export const MwebOptions = ({ elements }) => {
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
+  const { isBRBOn, toggleBRB } = useMyMetadata();
   // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -115,16 +125,18 @@ export const MwebOptions = ({ elements }) => {
               px: '$9',
             }}
           >
-            <ActionTile.Root
-              onClick={() => {
-                toggleParticipants();
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
-              <PeopleIcon />
-              <ActionTile.Title>Participants</ActionTile.Title>
-            </ActionTile.Root>
+            {elements?.participant_list && (
+              <ActionTile.Root
+                onClick={() => {
+                  toggleParticipants();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
+                <PeopleIcon />
+                <ActionTile.Title>Participants</ActionTile.Title>
+              </ActionTile.Root>
+            )}
 
             {/* {isVideoOn ? (
               <Suspense fallback="">
@@ -141,6 +153,19 @@ export const MwebOptions = ({ elements }) => {
               >
                 <EmojiIcon />
                 <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
+
+            {elements?.brb && (
+              <ActionTile.Root
+                active={isBRBOn}
+                onClick={() => {
+                  toggleBRB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <BrbIcon />
+                <ActionTile.Title>Be Right Back</ActionTile.Title>
               </ActionTile.Root>
             )}
 

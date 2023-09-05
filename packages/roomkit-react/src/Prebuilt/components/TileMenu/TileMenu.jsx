@@ -73,7 +73,7 @@ const TileMenu = ({
       <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
         <StyledMenuTile.Trigger
           data-testid="participant_menu_btn"
-          css={{ bg: `${theme.colors.background_dim.value}A3` }}
+          css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
           onClick={e => e.stopPropagation()}
           className={isMobile ? '__cancel-drag-event' : ''}
         >

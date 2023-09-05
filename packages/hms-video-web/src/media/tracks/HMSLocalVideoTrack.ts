@@ -344,6 +344,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return newSettings;
   };
 
+  // eslint-disable-next-line complexity
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
@@ -352,10 +353,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      const track = await this.replaceTrackWith(settings);
-      await this.replaceSender(track, this.enabled);
-      this.nativeTrack = track;
-      this.videoHandler.updateSinks();
+      if (this.source === 'video') {
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        this.videoHandler.updateSinks();
+      } else {
+        await this.nativeTrack.applyConstraints(settings.toConstraints());
+      }
     }
   };
 

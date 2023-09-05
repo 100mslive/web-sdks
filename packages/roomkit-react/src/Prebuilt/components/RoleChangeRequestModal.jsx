@@ -1,24 +1,39 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   selectLocalPeerName,
   selectLocalPeerRoleName,
   selectRoleChangeRequest,
+  useCustomEvent,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
+import { ToastManager } from './Toast/ToastManager';
 import { Box, Button, Dialog, Flex, Text } from '../../';
 import { useIsHeadless } from './AppData/useUISettings';
 import { useMyMetadata } from './hooks/useMetadata';
-import { ROLE_CHANGE_DECLINED } from '../common/constants';
+
+const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
   const isHeadless = useIsHeadless();
-  const { setPrevRole } = useMyMetadata();
+  const { setPrevRole, toggleHandRaise } = useMyMetadata();
   const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const name = useHMSStore(selectLocalPeerName);
+
+  const handleRoleChangeDenied = useCallback(request => {
+    ToastManager.addToast({
+      title: `${request.peerName} denied your request to join the ${request.role.name} role`,
+      variant: 'error',
+    });
+  }, []);
+
+  const { sendEvent } = useCustomEvent({
+    type: ROLE_CHANGE_DECLINED,
+    onEvent: handleRoleChangeDenied,
+  });
 
   useEffect(() => {
     if (!roleChangeRequest?.role || isHeadless) {
@@ -58,14 +73,16 @@ export const RoleChangeRequestModal = () => {
       onOpenChange={async value => {
         if (!value) {
           await hmsActions.rejectChangeRole(roleChangeRequest);
-          await hmsActions.sendDirectMessage('', roleChangeRequest.requestedBy?.id, ROLE_CHANGE_DECLINED);
+          sendEvent({ ...roleChangeRequest, peerName: name }, { peerId: roleChangeRequest.requestedBy?.id });
           await hmsActions.cancelMidCallPreview();
+          await toggleHandRaise();
         }
       }}
       body={body}
       onAction={() => {
         hmsActions.acceptChangeRole(roleChangeRequest);
         setPrevRole(currentRole);
+        toggleHandRaise();
       }}
       actionText="Accept"
     />

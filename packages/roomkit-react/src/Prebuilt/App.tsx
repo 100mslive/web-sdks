@@ -40,6 +40,7 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
@@ -261,6 +262,7 @@ const Redirector = ({ showPreview }: { showPreview: boolean }) => {
 const RouteList = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  useAutoStartStreaming();
   return (
     <Routes>
       {isPreviewScreenEnabled ? (

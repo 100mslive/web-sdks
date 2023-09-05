@@ -40,7 +40,7 @@ export const arrayIntersection = (a, b) => {
 
 export const getMetadata = metadataString => {
   try {
-    return metadataString === '' ? {} : JSON.parse(metadataString);
+    return !metadataString ? {} : JSON.parse(metadataString);
   } catch (error) {
     return {};
   }

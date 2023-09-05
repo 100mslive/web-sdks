@@ -1,4 +1,5 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -12,7 +13,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
+import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -73,8 +74,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
-      isAudioMuted: !isLocalAudioEnabled,
-      isVideoMuted: !isLocalVideoEnabled,
     });
     join();
     onJoin && onJoin();
@@ -179,16 +178,19 @@ export const PreviewTile = ({ name, error }) => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
-        aspectRatio: 16 / 9,
-        width: 'min(640px, 80vw)',
+        aspectRatio,
+        height: 'min(640px, 40vh)',
+        maxWidth: '640px',
         overflow: 'clip',
         '@md': {
-          aspectRatio: 9 / 16,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
