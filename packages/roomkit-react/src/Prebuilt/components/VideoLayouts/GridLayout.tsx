@@ -1,12 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import {
-  selectPeers,
-  selectPeerScreenSharing,
-  selectRemotePeers,
-  useHMSStore,
-  useHMSVanillaStore,
-} from '@100mslive/react-sdk';
+import { selectPeers, selectPeerScreenSharing, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -20,6 +14,7 @@ export type GridLayoutProps = GridVideoTileLayout & {
   rounded_video_tile: boolean;
   hide_audio_mute_on_tile: boolean;
   video_object_fit: 'contain' | 'cover';
+  edge_to_edge: boolean;
 };
 
 export const GridLayout = ({
@@ -30,11 +25,20 @@ export const GridLayout = ({
   rounded_video_tile = true,
   hide_audio_mute_on_tile = false,
   video_object_fit = 'contain',
+  edge_to_edge = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
-  const isRoleProminence = prominentRoles.length > 0 || pinnedTrack;
-  const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
+  let peers = useHMSStore(selectPeers);
+  const isRoleProminence =
+    (prominentRoles.length &&
+      peers.some(
+        peer => peer.roleName && prominentRoles.includes(peer.roleName) && (peer.videoTrack || peer.audioTrack),
+      )) ||
+    pinnedTrack;
+  if (isInsetEnabled && !isRoleProminence && !peerSharing) {
+    peers = peers.filter(peer => !peer.isLocal);
+  }
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(peers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
@@ -62,7 +66,12 @@ export const GridLayout = ({
   if (peerSharing) {
     return (
       <VideoTileContext.Provider value={tileLayout}>
-        <ScreenshareLayout peers={sortedPeers} onPageSize={setPageSize} onPageChange={setMainPage} />
+        <ScreenshareLayout
+          peers={sortedPeers}
+          onPageSize={setPageSize}
+          onPageChange={setMainPage}
+          edgeToEdge={edge_to_edge}
+        />
       </VideoTileContext.Provider>
     );
   } else if (isRoleProminence) {
@@ -74,6 +83,7 @@ export const GridLayout = ({
           onPageChange={setMainPage}
           prominentRoles={prominentRoles}
           isInsetEnabled={isInsetEnabled}
+          edgeToEdge={edge_to_edge}
         />
       </VideoTileContext.Provider>
     );
@@ -85,6 +95,7 @@ export const GridLayout = ({
         onPageSize={setPageSize}
         onPageChange={setMainPage}
         isInsetEnabled={isInsetEnabled}
+        edgeToEdge={edge_to_edge}
       />
     </VideoTileContext.Provider>
   );

@@ -6,8 +6,8 @@ import { CSS } from '../../../Theme';
 import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
-const Root = ({ children }: React.PropsWithChildren) => (
-  <Flex direction="column" css={{ size: '100%', gap: '$6' }}>
+const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => (
+  <Flex direction="column" css={{ size: '100%', gap: edgeToEdge ? 0 : '$6' }}>
     {children}
   </Flex>
 );
@@ -20,11 +20,15 @@ const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?
   );
 };
 
-const SecondarySection = ({ tiles, children }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[] }>) => {
+const SecondarySection = ({
+  tiles,
+  children,
+  edgeToEdge,
+}: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
   return (
     <Flex direction="column" css={{ flexBasis: tiles?.length > 0 ? 154 : 0, minHeight: 0, gap: '$2' }}>
-      <Flex justify="center" align="center" css={{ gap: '$4', minHeight: 0, margin: '0 auto' }}>
+      <Flex justify="center" align="center" css={{ gap: edgeToEdge ? 0 : '$4', minHeight: 0, margin: '0 auto' }}>
         {tiles?.map(tile => {
           return (
             <VideoTile

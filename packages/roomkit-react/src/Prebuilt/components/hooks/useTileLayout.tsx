@@ -10,7 +10,6 @@ import {
 import { config as cssConfig } from '../../../Theme';
 
 const aspectRatioConfig = { default: [1 / 1, 4 / 3, 16 / 9], mobile: [1 / 1, 3 / 4, 9 / 16] };
-const gap = 8; // gap between flex items
 
 export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; maxTileCount: number }) => {
   const vanillaStore = useHMSVanillaStore();
@@ -39,9 +38,11 @@ export const usePagesWithTiles = ({ peers, maxTileCount }: { peers: HMSPeer[]; m
 export const useTileLayout = ({
   pageList,
   maxTileCount,
+  edgeToEdge = false,
 }: {
   pageList: TrackWithPeerAndDimensions[][];
   maxTileCount: number;
+  edgeToEdge?: boolean;
 }) => {
   const vanillaStore = useHMSVanillaStore();
   const [ref, { width, height }] = useMeasure<HTMLDivElement>();
@@ -76,6 +77,7 @@ export const useTileLayout = ({
         return rowElements;
       });
 
+      const gap = edgeToEdge ? 0 : 8; // gap between flex items
       const maxHeight = height - (maxRows - 1) * gap;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios =
@@ -86,25 +88,29 @@ export const useTileLayout = ({
       for (const row of matrix) {
         let tileWidth = (width - (row.length - 1) * gap) / row.length;
         let tileHeight = 0;
-        const calcHeights = aspectRatios.map(aR => tileWidth / aR);
-        for (const h of calcHeights) {
-          if (h < maxRowHeight) {
-            if (tileHeight < h) {
-              tileHeight = h;
+        if (edgeToEdge) {
+          tileHeight = maxRowHeight;
+        } else {
+          const calcHeights = aspectRatios.map(aR => tileWidth / aR);
+          for (const h of calcHeights) {
+            if (h < maxRowHeight) {
+              if (tileHeight < h) {
+                tileHeight = h;
+              }
             }
           }
-        }
 
-        // tileHeight is not calculated as it could be exceeding the max possible height
-        // find the max possible width instead
-        if (tileHeight === 0) {
-          tileHeight = maxRowHeight;
-          const calcWidths = aspectRatios.map(aR => tileHeight * aR);
-          tileWidth = 0;
-          for (const w of calcWidths) {
-            if (w < width) {
-              if (tileWidth < w) {
-                tileWidth = w;
+          // tileHeight is not calculated as it could be exceeding the max possible height
+          // find the max possible width instead
+          if (tileHeight === 0) {
+            tileHeight = maxRowHeight;
+            const calcWidths = aspectRatios.map(aR => tileHeight * aR);
+            tileWidth = 0;
+            for (const w of calcWidths) {
+              if (w < width) {
+                if (tileWidth < w) {
+                  tileWidth = w;
+                }
               }
             }
           }
@@ -116,6 +122,6 @@ export const useTileLayout = ({
       }
     }
     setPagesWithTiles([...pageList]);
-  }, [width, height, maxTileCount, pageList, vanillaStore, isMobile]);
+  }, [width, height, maxTileCount, pageList, vanillaStore, isMobile, edgeToEdge]);
   return { pagesWithTiles, ref };
 };
