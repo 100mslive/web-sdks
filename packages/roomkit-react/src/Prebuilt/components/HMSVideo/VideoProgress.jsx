@@ -44,7 +44,7 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
   return hlsPlayer.getVideoElement() ? (
     <Flex
       ref={progressRootRef}
-      css={{ paddingLeft: '$8', paddingRight: '$8', cursor: 'pointer' }}
+      css={{ cursor: 'pointer', h: '$4', alignSelf: 'stretch' }}
       onClick={onProgressChangeHandler}
     >
       <Box
@@ -53,23 +53,22 @@ export const VideoProgress = ({ onValueChange, hlsPlayer }) => {
           display: 'inline',
           width: `${videoProgress}%`,
           background: '$primary_default',
-          height: '0.3rem',
         }}
       />
       <Box
         id="video-buffer"
         css={{
           width: `${bufferProgress - videoProgress}%`,
-          background: '$primary_dim',
-          height: '0.3rem',
+          background: '$on_surface_high',
+          opacity: '25%',
         }}
       />
       <Box
         id="video-rest"
         css={{
           width: `${100 - bufferProgress}%`,
-          background: '$surface_brighter',
-          height: '0.3rem',
+          background: '$on_surface_high',
+          opacity: '10%',
         }}
       />
     </Flex>
