@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -13,6 +14,7 @@ import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatParticipantHeader } from './ChatParticipantHeader';
@@ -92,6 +94,7 @@ export const Chat = ({ screenType }) => {
 
   const storeMessageSelector = selectHMSMessagesCount;
   const { elements } = useRoomLayoutConferencingScreen();
+  const isMobile = useMedia(cssConfig.media.md);
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -109,7 +112,7 @@ export const Chat = ({ screenType }) => {
 
   return (
     <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
-      {elements?.chat?.overlay_view ? null : (
+      {isMobile && elements?.chat?.overlay_view ? null : (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
           {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}
