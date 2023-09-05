@@ -12,6 +12,7 @@ import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -20,6 +21,7 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
+  const { elements } = useRoomLayoutConferencingScreen();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = <ParticipantList />;
@@ -32,7 +34,7 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
     return null;
   }
 
-  const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT;
+  const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (
     <Flex
