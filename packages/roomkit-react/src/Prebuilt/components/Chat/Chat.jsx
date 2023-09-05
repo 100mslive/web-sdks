@@ -112,7 +112,7 @@ export const Chat = ({ screenType }) => {
 
   return (
     <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
-      {isMobile && elements?.chat?.overlay_view ? null : (
+      {isMobile && elements?.chat?.is_overlay ? null : (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
           {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}

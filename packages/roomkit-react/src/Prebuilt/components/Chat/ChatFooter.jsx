@@ -6,6 +6,7 @@ import { useHMSActions } from '@100mslive/react-sdk';
 import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../../';
 import { ToastManager } from '../Toast/ToastManager';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useChatDraftMessage } from '../AppData/useChatState';
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
@@ -67,6 +68,8 @@ export const ChatFooter = ({ role, peerId, onSend, children /* onSelect, selecti
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isOverlayChat = elements?.chat?.is_overlay;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
@@ -113,7 +116,7 @@ export const ChatFooter = ({ role, peerId, onSend, children /* onSelect, selecti
         <Flex
           align="center"
           css={{
-            bg: isMobile ? '$surface_dim' : '$surface_default',
+            bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
             minHeight: '$16',
             maxHeight: '$24',
             position: 'relative',
