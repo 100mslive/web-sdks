@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
+import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import {
   selectIsConnectedToRoom,
   selectPeerCount,
@@ -13,24 +14,39 @@ import {
   CrossIcon,
   DragHandleIcon,
   EmojiIcon,
+  HandIcon,
+  HandRaiseSlashedIcon,
   PeopleIcon,
   RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
-import { Box, Loading, Tooltip } from '../../../../';
+import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
+// @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
+// @ts-ignore: No implicit any
 import { EmojiReaction } from '../../EmojiReaction';
+// @ts-ignore: No implicit any
 import { StopRecordingInSheet } from '../../Header/StreamActions';
+// @ts-ignore: No implicit any
 import SettingsModal from '../../Settings/SettingsModal';
+// @ts-ignore: No implicit any
 import { ToastManager } from '../../Toast/ToastManager';
-import { ActionTile } from '.././ActionTile';
-import { ChangeNameModal } from '.././ChangeNameModal';
-import { MuteAllModal } from '.././MuteAllModal';
+// @ts-ignore: No implicit any
+import { ActionTile } from '../ActionTile';
+// @ts-ignore: No implicit any
+import { ChangeNameModal } from '../ChangeNameModal';
+// @ts-ignore: No implicit any
+import { MuteAllModal } from '../MuteAllModal';
+// @ts-ignore: No implicit any
 import { useSidepaneToggle } from '../../AppData/useSidepane';
+// @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
+// @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
+// @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
+// @ts-ignore: No implicit any
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 // const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
@@ -47,14 +63,18 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = ({ elements }) => {
+export const MwebOptions = ({
+  elements,
+  screenType,
+}: {
+  elements: DefaultConferencingScreen_Elements;
+  screenType: keyof ConferencingScreen;
+}) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
-
   const [openModals, setOpenModals] = useState(new Set());
-
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
@@ -63,12 +83,12 @@ export const MwebOptions = ({ elements }) => {
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
-  const { isBRBOn, toggleBRB } = useMyMetadata();
+  const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
   // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
-  const updateState = (modalName, value) => {
+  const updateState = (modalName: string, value: boolean) => {
     setOpenModals(modals => {
       const copy = new Set(modals);
       if (value) {
@@ -138,6 +158,19 @@ export const MwebOptions = ({ elements }) => {
               </ActionTile.Root>
             )}
 
+            {screenType !== 'hls_live_streaming' ? (
+              <ActionTile.Root
+                active={isHandRaised}
+                onClick={() => {
+                  toggleHandRaise();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
+                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+
             {/* {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
@@ -199,6 +232,7 @@ export const MwebOptions = ({ elements }) => {
                       setOpenOptionsSheet(false);
                       setIsRecordingLoading(false);
                     } catch (error) {
+                      // @ts-ignore
                       if (error.message.includes('stream already running')) {
                         ToastManager.addToast({
                           title: 'Recording already running',
@@ -206,6 +240,7 @@ export const MwebOptions = ({ elements }) => {
                         });
                       } else {
                         ToastManager.addToast({
+                          // @ts-ignore
                           title: error.message,
                           variant: 'error',
                         });
@@ -233,11 +268,11 @@ export const MwebOptions = ({ elements }) => {
       </Sheet.Root>
       <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} />
       {openModals.has(MODALS.MUTE_ALL) && (
-        <MuteAllModal onOpenChange={value => updateState(MODALS.MUTE_ALL, value)} isMobile />
+        <MuteAllModal onOpenChange={(value: boolean) => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}
       {openModals.has(MODALS.CHANGE_NAME) && (
         <ChangeNameModal
-          onOpenChange={value => updateState(MODALS.CHANGE_NAME, value)}
+          onOpenChange={(value: boolean) => updateState(MODALS.CHANGE_NAME, value)}
           openParentSheet={() => setOpenOptionsSheet(true)}
         />
       )}
@@ -273,6 +308,7 @@ export const MwebOptions = ({ elements }) => {
               setShowRecordingOn(false);
             } catch (error) {
               ToastManager.addToast({
+                // @ts-ignore
                 title: error.message,
                 variant: 'error',
               });
