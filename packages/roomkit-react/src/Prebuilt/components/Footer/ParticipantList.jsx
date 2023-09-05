@@ -235,7 +235,7 @@ const ParticipantMoreActions = ({ peerId, role }) => {
 
   const handleStageAction = async () => {
     if (isInStage) {
-      hmsActions.changeRoleOfPeer(peerId, prevRole || off_stage_roles[0]);
+      hmsActions.changeRoleOfPeer(peerId, prevRole || off_stage_roles[0], true);
     } else {
       await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
     }
