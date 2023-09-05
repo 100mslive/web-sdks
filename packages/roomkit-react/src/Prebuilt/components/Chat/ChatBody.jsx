@@ -290,7 +290,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
           ) : null}
         </Text>
         <Text
-          variant="body2"
+          variant="sm"
           css={{
             w: '100%',
             mt: '$2',
