@@ -21,14 +21,16 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge }: 
 
   return (
     <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]} edgeToEdge={edgeToEdge}>
-      <Pagination
-        page={page}
-        onPageChange={page => {
-          setPage(page);
-          onPageChange?.(page);
-        }}
-        numPages={pagesWithTiles.length}
-      />
+      {!edgeToEdge && (
+        <Pagination
+          page={page}
+          onPageChange={page => {
+            setPage(page);
+            onPageChange?.(page);
+          }}
+          numPages={pagesWithTiles.length}
+        />
+      )}
     </ProminenceLayout.SecondarySection>
   );
 };

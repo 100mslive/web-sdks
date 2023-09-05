@@ -49,14 +49,16 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
   return (
     <Flex direction="column" css={{ flex: '1 1 0', h: '100%', position: 'relative', minWidth: 0 }}>
       <Grid tiles={pagesWithTiles[page]} ref={ref} edgeToEdge={edgeToEdge} />
-      <Pagination
-        page={page}
-        onPageChange={page => {
-          setPage(page);
-          onPageChange?.(page);
-        }}
-        numPages={pagesWithTiles.length}
-      />
+      {!edgeToEdge && (
+        <Pagination
+          page={page}
+          onPageChange={page => {
+            setPage(page);
+            onPageChange?.(page);
+          }}
+          numPages={pagesWithTiles.length}
+        />
+      )}
       {isInsetEnabled && pageList.length > 0 && pageList[0][0].peer.id !== localPeer?.id && <InsetTile />}
     </Flex>
   );

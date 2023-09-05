@@ -37,7 +37,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
     <ProminenceLayout.Root edgeToEdge={edgeToEdge}>
       <ProminenceLayout.ProminentSection>
         <ScreenshareTile peerId={peersSharing[page].id} />
-        <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />
+        {!edgeToEdge && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
       </ProminenceLayout.ProminentSection>
       <SecondaryTiles
         peers={secondaryPeers}

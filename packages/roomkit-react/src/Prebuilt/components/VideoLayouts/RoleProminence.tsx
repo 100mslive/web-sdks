@@ -42,14 +42,16 @@ export function RoleProminence({
       <ProminenceLayout.ProminentSection>
         <Grid ref={ref} tiles={pagesWithTiles[page]} />
       </ProminenceLayout.ProminentSection>
-      <Pagination
-        page={page}
-        onPageChange={page => {
-          setPage(page);
-          onPageChange?.(page);
-        }}
-        numPages={pagesWithTiles.length}
-      />
+      {!edgeToEdge && (
+        <Pagination
+          page={page}
+          onPageChange={page => {
+            setPage(page);
+            onPageChange?.(page);
+          }}
+          numPages={pagesWithTiles.length}
+        />
+      )}
       <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} edgeToEdge={edgeToEdge} />
       {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
