@@ -45,7 +45,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                         mx: '$2',
                         w: '$2',
                         h: '$2',
-                        background: '$on_surface_',
+                        background: '$on_surface_medium',
                         r: '$1',
                       }}
                     />
