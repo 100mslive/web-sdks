@@ -129,19 +129,15 @@ const Tile = ({
             </StyledVideoTile.AvatarContainer>
           ) : null}
 
-          {showAudioMuted({
-            hideAudioMute: hideAudioMuteOnTile,
-            isAudioMuted,
-          }) ? (
+          {!hideAudioMuteOnTile && isAudioMuted ? (
             <StyledVideoTile.AudioIndicator
               data-testid="participant_audio_mute_icon"
               size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
             >
               <MicOffIcon />
             </StyledVideoTile.AudioIndicator>
-          ) : (
-            <AudioLevel trackId={audioTrack?.id} hide={hideAudioLevelOnTile} />
-          )}
+          ) : null}
+          {!isAudioMuted && !hideAudioLevelOnTile ? <AudioLevel trackId={audioTrack?.id} /> : null}
           {isMouseHovered || isDragabble ? (
             <TileMenu
               peerID={peerId}
@@ -208,10 +204,7 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
   );
 };
 
-export const AudioLevel = ({ trackId, hide = false }) => {
-  if (hide) {
-    return null;
-  }
+export const AudioLevel = ({ trackId }) => {
   return (
     <StyledVideoTile.AudioIndicator>
       <Flex align="center" justify="center" css={{ gap: '$2' }}>
@@ -245,9 +238,5 @@ const PeerMetadata = ({ peerId }) => {
 };
 
 const VideoTile = React.memo(Tile);
-
-const showAudioMuted = ({ hideAudioMute, isAudioMuted }) => {
-  return isAudioMuted && !hideAudioMute;
-};
 
 export default VideoTile;
