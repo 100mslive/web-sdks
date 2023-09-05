@@ -232,7 +232,7 @@ const PeerMetadata = ({ peerId }) => {
       ) : null}
       {isBRB ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
-          <BrbTileIcon width={24} height={24} />
+          <BrbTileIcon width={20} height={10} />
         </StyledVideoTile.AttributeBox>
       ) : null}
     </Fragment>

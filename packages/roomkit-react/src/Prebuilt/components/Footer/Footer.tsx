@@ -63,7 +63,7 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        {isMobile ? null : <Suspense fallback="">{isVideoOn ? <VirtualBackground /> : null}</Suspense>}
+        {isMobile ? null : <Suspense fallback={<></>}>{isVideoOn ? <VirtualBackground /> : null}</Suspense>}
       </AppFooter.Left>
       <AppFooter.Center
         css={{
