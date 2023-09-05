@@ -22,7 +22,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
   const secondaryPeers = useMemo(
     () =>
       isMobile
-        ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)]
+        ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)] //keep active sharing peer as first tile
         : peers.filter(p => p.id !== activeSharePeer?.id),
     [activeSharePeer, peers, isMobile],
   );
