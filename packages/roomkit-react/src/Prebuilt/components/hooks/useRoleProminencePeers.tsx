@@ -12,7 +12,7 @@ export const useRoleProminencePeers = (prominentRoles: string[], peers: HMSPeer[
         if (pinnedTrack) {
           if (pinnedTrack.peerId === peer.id) {
             acc[0].push(peer);
-          } else {
+          } else if (!(isInsetEnabled && peer.isLocal)) {
             acc[1].push(peer);
           }
           return acc;
