@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
@@ -11,8 +10,8 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ChatToggle = ({ chatElement }: { chatElement: DefaultConferencingScreen_Elements['chat'] }) => {
-  const openByDefault = chatElement?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
+export const ChatToggle = ({ initialState }: { initialState: Chat_ChatState | undefined }) => {
+  const openByDefault = initialState === Chat_ChatState.CHAT_STATE_OPEN;
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);

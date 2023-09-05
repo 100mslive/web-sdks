@@ -69,7 +69,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
-            {elements?.chat && <ChatToggle chatElement={elements.chat} />}
+            {elements?.chat && <ChatToggle initialState={elements.chat?.initial_state} />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
@@ -82,7 +82,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {elements?.chat && <ChatToggle chatElement={elements.chat} />}
+        {elements?.chat && <ChatToggle initialState={elements.chat?.initial_state} />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
