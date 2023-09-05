@@ -23,6 +23,7 @@ import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { useMyMetadata } from '../../hooks/useMetadata';
 
 // const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -43,9 +44,7 @@ export const MwebOptions = ({ elements }) => {
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
-
   const [openModals, setOpenModals] = useState(new Set());
-
   const [openOptionsSheet, setOpenOptionsSheet] = useState(false);
   const [openSettingsSheet, setOpenSettingsSheet] = useState(false);
   const [showEmojiCard, setShowEmojiCard] = useState(false);
