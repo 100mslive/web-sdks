@@ -7,7 +7,7 @@ import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
 const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => (
-  <Flex direction="column" css={{ size: '100%', gap: edgeToEdge ? 0 : '$6' }}>
+  <Flex direction="column" css={{ size: '100%', gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}>
     {children}
   </Flex>
 );
@@ -28,7 +28,11 @@ const SecondarySection = ({
   const tileLayoutProps = useVideoTileContext();
   return (
     <Flex direction="column" css={{ flexBasis: tiles?.length > 0 ? 154 : 0, minHeight: 0, gap: '$2' }}>
-      <Flex justify="center" align="center" css={{ gap: edgeToEdge ? 0 : '$4', minHeight: 0, margin: '0 auto' }}>
+      <Flex
+        justify="center"
+        align="center"
+        css={{ gap: '$4', minHeight: 0, margin: '0 auto', '@md': { gap: edgeToEdge ? 0 : '$4' } }}
+      >
         {tiles?.map(tile => {
           return (
             <VideoTile
