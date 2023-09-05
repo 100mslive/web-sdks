@@ -84,7 +84,7 @@ export const Footer = ({
       </AppFooter.Center>
       <AppFooter.Right>
         {elements?.chat && <ChatToggle chatElement={elements.chat} />}
-        <ParticipantCount />
+        {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
     </AppFooter.Root>
