@@ -24,6 +24,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                   h: '$9',
                   display: 'inline-flex',
                   alignItems: 'center',
+                  c: '$on_surface_high',
                 }}
               >
                 <SettingsIcon />
@@ -44,7 +45,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                         mx: '$2',
                         w: '$2',
                         h: '$2',
-                        background: '$on_primary_high',
+                        background: '$on_surface_medium',
                         r: '$1',
                       }}
                     />
