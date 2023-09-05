@@ -40,7 +40,6 @@ const Tile = ({
   hideParticipantNameOnTile = false,
   roundedVideoTile = true,
   hideAudioMuteOnTile = false,
-  hideAudioLevelOnTile = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -129,15 +128,18 @@ const Tile = ({
             </StyledVideoTile.AvatarContainer>
           ) : null}
 
-          {!hideAudioMuteOnTile && isAudioMuted ? (
-            <StyledVideoTile.AudioIndicator
-              data-testid="participant_audio_mute_icon"
-              size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
-            >
-              <MicOffIcon />
-            </StyledVideoTile.AudioIndicator>
+          {!hideAudioMuteOnTile ? (
+            isAudioMuted ? (
+              <StyledVideoTile.AudioIndicator
+                data-testid="participant_audio_mute_icon"
+                size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
+              >
+                <MicOffIcon />
+              </StyledVideoTile.AudioIndicator>
+            ) : (
+              <AudioLevel trackId={audioTrack?.id} />
+            )
           ) : null}
-          {!isAudioMuted && !hideAudioLevelOnTile ? <AudioLevel trackId={audioTrack?.id} /> : null}
           {isMouseHovered || isDragabble ? (
             <TileMenu
               peerID={peerId}
