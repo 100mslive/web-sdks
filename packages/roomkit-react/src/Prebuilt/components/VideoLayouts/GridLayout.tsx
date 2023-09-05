@@ -67,7 +67,12 @@ export const GridLayout = ({
   if (peerSharing) {
     return (
       <VideoTileContext.Provider value={tileLayout}>
-        <ScreenshareLayout peers={sortedPeers} onPageSize={setPageSize} onPageChange={setMainPage} />
+        <ScreenshareLayout
+          peers={sortedPeers}
+          onPageSize={setPageSize}
+          onPageChange={setMainPage}
+          edgeToEdge={edge_to_edge}
+        />
       </VideoTileContext.Provider>
     );
   } else if (isRoleProminence) {
@@ -79,6 +84,7 @@ export const GridLayout = ({
           onPageChange={setMainPage}
           prominentRoles={prominentRoles}
           isInsetEnabled={isInsetEnabled}
+          edgeToEdge={edge_to_edge}
         />
       </VideoTileContext.Provider>
     );

@@ -147,7 +147,7 @@ const Conference = () => {
           w: '100%',
           flex: '1 1 0',
           minHeight: 0,
-          px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10',
+          px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10', // TODO: padding to be controlled by section/element
           paddingBottom: 'env(safe-area-inset-bottom)',
           '@lg': {
             px: 0,

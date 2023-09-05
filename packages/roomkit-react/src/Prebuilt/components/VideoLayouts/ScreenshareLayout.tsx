@@ -13,7 +13,7 @@ import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../../common/constants';
 
-export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutProps) => {
+export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {
   const peersSharing = useHMSStore(selectPeersScreenSharing);
   const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const [page, setPage] = useState(0);
@@ -34,12 +34,17 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
   }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
 
   return (
-    <ProminenceLayout.Root>
+    <ProminenceLayout.Root edgeToEdge={edgeToEdge}>
       <ProminenceLayout.ProminentSection>
         <ScreenshareTile peerId={peersSharing[page].id} />
         <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />
       </ProminenceLayout.ProminentSection>
-      <SecondaryTiles peers={secondaryPeers} onPageChange={onPageChange} onPageSize={onPageSize} />
+      <SecondaryTiles
+        peers={secondaryPeers}
+        onPageChange={onPageChange}
+        onPageSize={onPageSize}
+        edgeToEdge={edgeToEdge}
+      />
     </ProminenceLayout.Root>
   );
 };
