@@ -8,7 +8,17 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { CrossIcon, DragHandleIcon, EmojiIcon, PeopleIcon, RecordIcon, SettingsIcon } from '@100mslive/react-icons';
+import {
+  BrbIcon,
+  CrossIcon,
+  DragHandleIcon,
+  EmojiIcon,
+  HandIcon,
+  HandRaiseSlashedIcon,
+  PeopleIcon,
+  RecordIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../../';
 import { Sheet } from '../../../../Sheet';
 import IconButton from '../../../IconButton';
@@ -21,9 +31,9 @@ import { ChangeNameModal } from '.././ChangeNameModal';
 import { MuteAllModal } from '.././MuteAllModal';
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 import { useDropdownList } from '../../hooks/useDropdownList';
+import { useMyMetadata } from '../../hooks/useMetadata';
 import { getFormattedCount } from '../../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
-import { useMyMetadata } from '../../hooks/useMetadata';
 
 // const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
@@ -39,7 +49,7 @@ const MODALS = {
   EMBED_URL: 'embedUrl',
 };
 
-export const MwebOptions = ({ elements }) => {
+export const MwebOptions = ({ elements, screenType }) => {
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -53,6 +63,7 @@ export const MwebOptions = ({ elements }) => {
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
+  const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
   // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -127,6 +138,19 @@ export const MwebOptions = ({ elements }) => {
               </ActionTile.Root>
             )}
 
+            {screenType !== 'hls_live_streaming' ? (
+              <ActionTile.Root
+                active={isHandRaised}
+                onClick={() => {
+                  toggleHandRaise();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
+                <ActionTile.Title>{isHandRaised ? 'Lower' : 'Raise'} Hand</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+
             {/* {isVideoOn ? (
               <Suspense fallback="">
                 <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
@@ -142,6 +166,19 @@ export const MwebOptions = ({ elements }) => {
               >
                 <EmojiIcon />
                 <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
+
+            {elements?.brb && (
+              <ActionTile.Root
+                active={isBRBOn}
+                onClick={() => {
+                  toggleBRB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <BrbIcon />
+                <ActionTile.Title>Be Right Back</ActionTile.Title>
               </ActionTile.Root>
             )}
 
