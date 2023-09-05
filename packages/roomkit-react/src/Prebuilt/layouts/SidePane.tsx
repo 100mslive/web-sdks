@@ -34,7 +34,6 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
     return null;
   }
 
-  // @ts-ignore
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (

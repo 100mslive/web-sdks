@@ -31,7 +31,6 @@ export const Footer = ({
   elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  // @ts-ignore
   const isOverlayChat = !!elements?.chat?.is_overlay;
 
   return (
