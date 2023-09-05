@@ -55,6 +55,7 @@ export const RoleAccordion = ({
       >
         <Accordion.Item value={roleName}>
           <Accordion.Header
+            iconStyles={{ c: '$on_surface_high' }}
             css={{
               textTransform: 'capitalize',
               p: '$6 $8',
@@ -63,8 +64,11 @@ export const RoleAccordion = ({
               c: '$on_surface_medium',
             }}
           >
-            <Flex justify="between" css={{ c: 'inherit', flexGrow: 1, pr: '$6' }}>
-              <Text variant="sm" css={{ fontWeight: '$semiBold', textTransform: 'capitalize', c: 'inherit' }}>
+            <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
+              <Text
+                variant="sm"
+                css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
+              >
                 {roleName} {`(${getFormattedCount(peerList.length)})`}
               </Text>
               <RoleOptions roleName={roleName} peerList={peerList} />
