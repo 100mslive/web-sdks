@@ -73,8 +73,6 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
-      isAudioMuted: !isLocalAudioEnabled,
-      isVideoMuted: !isLocalVideoEnabled,
     });
     join();
     onJoin && onJoin();

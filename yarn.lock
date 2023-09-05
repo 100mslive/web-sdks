@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.11.0.tgz#911755da1ae448b6ec7ec76cf12fbd1b66826b72"
-  integrity sha512-62FtDO1s1jcxMOq6VWMgRM7as2qfTxdeTGI8b2LlNUMVVprK2yXST9P1N7fx/8zZMTFwRj8twYb+LThRHVFfrw==
+"@100mslive/types-prebuilt@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.0.tgz#7057a01251606a03d4c6ac2c10f0e18ba189e3e9"
+  integrity sha512-vhmvWzfZhpyaYFew8UNRBzK38S4YgqjwbYV+KGhWwxb9Ny69bD8pMoHGQG2or1Eog3KVeepg1qG31pH2HWo90A==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
@@ -5718,6 +5718,13 @@
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/@types/range-parser/-/range-parser-1.2.4.tgz#cd667bcfdd025213aafb7ca5915a932590acdcdc"
   integrity sha512-EEhsLsD6UsDM1yFhAvy0Cjr6VwmpMWqFBCb9w07wVugF7w9nfajxLuVmngTIpgS6svCnm6Vaw+MZhoDCKnOfsw==
+
+"@types/react-window@^1.8.5":
+  version "1.8.5"
+  resolved "https://registry.yarnpkg.com/@types/react-window/-/react-window-1.8.5.tgz#285fcc5cea703eef78d90f499e1457e9b5c02fc1"
+  integrity sha512-V9q3CvhC9Jk9bWBOysPGaWy/Z0lxYcTXLtLipkt2cnRj1JOSFNF7wqGpkScSXMgBwC+fnVRg/7shwgddBG5ICw==
+  dependencies:
+    "@types/react" "*"
 
 "@types/react@*", "@types/react@16 || 17 || 18", "@types/react@>=16", "@types/react@^18.1.0":
   version "18.2.20"
