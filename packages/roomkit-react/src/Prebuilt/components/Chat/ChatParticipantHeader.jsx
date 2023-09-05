@@ -34,7 +34,7 @@ export const ChatParticipantHeader = React.memo(({ activeTabValue = SIDE_PANE_OP
       }}
     >
       {hideTabs ? (
-        <Text css={{ fontWeight: '$semiBold', c: '$on_surface_high' }}>
+        <Text variant="sm" css={{ fontWeight: '$semiBold', c: '$on_surface_high' }}>
           {showChat ? 'Chat' : `Participants (${peerCount})`}
         </Text>
       ) : (
