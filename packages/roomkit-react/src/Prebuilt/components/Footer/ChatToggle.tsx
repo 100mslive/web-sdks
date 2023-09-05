@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
@@ -10,8 +9,7 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ChatToggle = ({ initialState }: { initialState: Chat_ChatState | undefined }) => {
-  const openByDefault = initialState === Chat_ChatState.CHAT_STATE_OPEN;
+export const ChatToggle = ({ openByDefault }: { openByDefault: boolean }) => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);

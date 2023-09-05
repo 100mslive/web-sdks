@@ -5,6 +5,7 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -32,6 +33,7 @@ export const Footer = ({
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
+  const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
 
   return (
     <AppFooter.Root
@@ -69,7 +71,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
-            {elements?.chat && <ChatToggle initialState={elements.chat?.initial_state} />}
+            {elements?.chat && <ChatToggle openByDefault={openByDefault} />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
@@ -82,7 +84,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {elements?.chat && <ChatToggle initialState={elements.chat?.initial_state} />}
+        {elements?.chat && <ChatToggle openByDefault={openByDefault} />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
