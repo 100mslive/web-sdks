@@ -45,7 +45,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                         mx: '$2',
                         w: '$2',
                         h: '$2',
-                        background: '$on_surface_medium',
+                        background: '$on_surface_',
                         r: '$1',
                       }}
                     />
@@ -95,7 +95,9 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                 <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
                   {getBitrateText(layer)}
                 </Text>
-                {!isAuto && layer.width === selection?.width && layer.height === selection?.height && <CheckIcon />}
+                {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
+                  <CheckIcon width="16px" height="16px" />
+                )}
               </Dropdown.Item>
             );
           })}
@@ -115,7 +117,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
             <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
               Auto
             </Text>
-            {isAuto && <CheckIcon />}
+            {isAuto && <CheckIcon width="16px" height="16px" />}
           </Dropdown.Item>
         </Dropdown.Content>
       )}
