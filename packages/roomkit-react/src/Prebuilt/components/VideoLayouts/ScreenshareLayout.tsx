@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import { selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
+import { config as cssConfig } from '../../../Theme';
 import { Pagination } from '../Pagination';
 // @ts-ignore: No implicit Any
 import ScreenshareTile from '../ScreenshareTile';
@@ -15,14 +17,21 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize }: LayoutPro
   const peersSharing = useHMSStore(selectPeersScreenSharing);
   const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const [page, setPage] = useState(0);
-  const activeSharePeerId = peersSharing[page]?.id;
-  const secondaryPeers = useMemo(() => peers.filter(p => p.id !== activeSharePeerId), [activeSharePeerId, peers]);
+  const activeSharePeer = peersSharing[page];
+  const isMobile = useMedia(cssConfig.media.md);
+  const secondaryPeers = useMemo(
+    () =>
+      isMobile
+        ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)]
+        : peers.filter(p => p.id !== activeSharePeer?.id),
+    [activeSharePeer, peers, isMobile],
+  );
   useEffect(() => {
-    setActiveScreenSharePeer(activeSharePeerId);
+    setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
     return () => {
       setActiveScreenSharePeer('');
     };
-  }, [activeSharePeerId, setActiveScreenSharePeer]);
+  }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
 
   return (
     <ProminenceLayout.Root>

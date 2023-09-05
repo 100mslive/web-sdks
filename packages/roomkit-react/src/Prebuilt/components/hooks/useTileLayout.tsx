@@ -50,7 +50,6 @@ export const useTileLayout = ({
   const [pagesWithTiles, setPagesWithTiles] = useState<TrackWithPeerAndDimensions[][]>([]);
 
   useEffect(() => {
-    console.log({ width, height });
     if (width === 0 || height === 0) {
       return;
     }
@@ -65,7 +64,6 @@ export const useTileLayout = ({
         maxCols = noOfTilesInPage < 4 ? 1 : Math.min(maxCols, 2);
       }
       const maxRows = Math.ceil(noOfTilesInPage / maxCols);
-      console.log({ maxCols, maxRows });
       let index = 0;
       // convert the current page to a matrix(grid)
       const matrix = new Array(maxRows).fill(null).map((_, i) => {
