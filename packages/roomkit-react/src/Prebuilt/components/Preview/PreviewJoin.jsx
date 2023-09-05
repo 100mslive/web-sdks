@@ -190,7 +190,6 @@ export const PreviewTile = ({ name, error }) => {
         maxWidth: '640px',
         overflow: 'clip',
         '@md': {
-          aspectRatio: width / height,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
