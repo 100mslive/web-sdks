@@ -18,7 +18,7 @@ export const ChatToggle = ({ chatElement }) => {
       toggleChat();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [toggleChat, openByDefault]);
 
   return (
     <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
