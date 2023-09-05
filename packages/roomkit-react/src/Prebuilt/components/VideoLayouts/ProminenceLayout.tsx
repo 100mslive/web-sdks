@@ -7,7 +7,7 @@ import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
 const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => (
-  <Flex direction="column" css={{ size: '100%', gap: edgeToEdge ? '$6' : 0 }}>
+  <Flex direction="column" css={{ size: '100%', gap: edgeToEdge ? 0 : '$6' }}>
     {children}
   </Flex>
 );

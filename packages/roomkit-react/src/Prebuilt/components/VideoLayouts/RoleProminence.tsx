@@ -15,6 +15,7 @@ export function RoleProminence({
   peers,
   onPageChange,
   onPageSize,
+  edgeToEdge,
 }: LayoutProps) {
   const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
@@ -49,7 +50,7 @@ export function RoleProminence({
         }}
         numPages={pagesWithTiles.length}
       />
-      <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} />
+      <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} edgeToEdge={edgeToEdge} />
       {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );
