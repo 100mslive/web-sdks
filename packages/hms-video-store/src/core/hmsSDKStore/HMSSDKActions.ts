@@ -1455,11 +1455,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       ].includes(type)
     ) {
       this.syncRoomState(actionName);
-      if (this.store.getState(selectIsInPreview)) {
-        this.setState(store => {
-          store.room.roomState = HMSRoomState.Connected;
-        }, 'midCallPreviewCompleted');
-      }
+      this.updateMidCallPreviewRoomState(type, sdkPeer);
       // if peer wasn't available before sync(will happen if event is peer join)
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
@@ -1479,6 +1475,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
+
+  private updateMidCallPreviewRoomState(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
+    if (sdkPeer.isLocal && type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED && this.store.getState(selectIsInPreview)) {
+      this.setState(store => {
+        store.room.roomState = HMSRoomState.Connected;
+      }, 'midCallPreviewCompleted');
+    }
+  }
 
   private setSessionStoreValueLocally(
     updates: SessionStoreUpdate | SessionStoreUpdate[],
