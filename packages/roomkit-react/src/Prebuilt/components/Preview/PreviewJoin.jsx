@@ -3,6 +3,7 @@ import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
+  selectRolesMap,
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
@@ -177,16 +178,19 @@ export const PreviewTile = ({ name, error }) => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
+  const roleMap = useHMSStore(selectRolesMap);
+  const { height, width } = roleMap[localPeer?.roleName].publishParams.video;
 
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
-        aspectRatio: 16 / 9,
-        width: 'min(640px, 80vw)',
+        aspectRatio: width / height,
+        height: 'min(600px, 40vh)',
+        maxWidth: '640px',
         overflow: 'clip',
         '@md': {
-          aspectRatio: 9 / 16,
+          aspectRatio: width / height,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
