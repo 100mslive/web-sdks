@@ -1,9 +1,9 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
-  selectRolesMap,
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
@@ -13,7 +13,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
+import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -178,15 +178,16 @@ export const PreviewTile = ({ name, error }) => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-  const roleMap = useHMSStore(selectRolesMap);
-  const { height, width } = roleMap[localPeer?.roleName].publishParams.video;
-
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
-        aspectRatio: width / height,
-        height: 'min(600px, 40vh)',
+        aspectRatio,
+        height: 'min(640px, 40vh)',
         maxWidth: '640px',
         overflow: 'clip',
         '@md': {
