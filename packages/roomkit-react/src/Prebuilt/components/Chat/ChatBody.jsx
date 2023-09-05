@@ -271,7 +271,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
                 variant="xs"
                 css={{
                   ml: '$4',
-                  color: '$on_primary_medium',
+                  color: '$on_surface_medium',
                   flexShrink: 0,
                 }}
               >

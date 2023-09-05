@@ -31,7 +31,6 @@ export const useOverridePrebuiltLayout = () => {
             grid: {
               enable_local_tile_inset: false,
               hide_participant_name_on_tile: true,
-              hide_audio_level_on_tile: true,
               rounded_video_tile: !isMobile,
               hide_audio_mute_on_tile: true,
               video_object_fit: isMobile ? 'cover' : 'contain',

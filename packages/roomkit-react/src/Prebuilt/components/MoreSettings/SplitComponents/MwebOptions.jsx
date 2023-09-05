@@ -115,16 +115,18 @@ export const MwebOptions = ({ elements }) => {
               px: '$9',
             }}
           >
-            <ActionTile.Root
-              onClick={() => {
-                toggleParticipants();
-                setOpenOptionsSheet(false);
-              }}
-            >
-              <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
-              <PeopleIcon />
-              <ActionTile.Title>Participants</ActionTile.Title>
-            </ActionTile.Root>
+            {elements?.participant_list && (
+              <ActionTile.Root
+                onClick={() => {
+                  toggleParticipants();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <ActionTile.Count>{getFormattedCount(peerCount)}</ActionTile.Count>
+                <PeopleIcon />
+                <ActionTile.Title>Participants</ActionTile.Title>
+              </ActionTile.Root>
+            )}
 
             {/* {isVideoOn ? (
               <Suspense fallback="">

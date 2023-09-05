@@ -62,7 +62,7 @@ const SpotlightActions = ({
         onSpotLightClick();
       }}
     >
-      <StarIcon />
+      <StarIcon height={20} width={20} />
       <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
     </StyledMenuTile.ItemButton>
   );
@@ -83,7 +83,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         css={spacingCSS}
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
-        <PinIcon />
+        <PinIcon height={20} width={20} />
         <span>{isTilePinned ? 'Unpin' : 'Pin'} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
@@ -96,7 +96,7 @@ const MinimiseInset = () => {
   return (
     <>
       <StyledMenuTile.ItemButton css={spacingCSS} onClick={() => setMinimised(!minimised)}>
-        <ShrinkIcon />
+        <ShrinkIcon height={20} width={20} />
         <span>{minimised ? 'Show' : 'Minimise'} your video</span>
       </StyledMenuTile.ItemButton>
     </>
@@ -222,7 +222,7 @@ export const TileMenuContent = props => {
             closeSheetOnClick();
           }}
         >
-          <PencilIcon />
+          <PencilIcon height={20} width={20} />
           <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
             Change Name
           </Text>
@@ -240,7 +240,7 @@ export const TileMenuContent = props => {
           }}
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
-          {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
+          {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
           <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
@@ -254,7 +254,7 @@ export const TileMenuContent = props => {
           }}
           data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
-          {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
+          {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
           <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
@@ -262,7 +262,7 @@ export const TileMenuContent = props => {
       {audioTrackID ? (
         <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
           <Flex align="center" gap={1}>
-            <SpeakerIcon />
+            <SpeakerIcon height={20} width={20} />
             <Box as="span" css={{ ml: '$4' }}>
               Volume ({volume})
             </Box>
@@ -293,7 +293,7 @@ export const TileMenuContent = props => {
           }}
           data-testid="remove_participant_btn"
         >
-          <RemoveUserIcon />
+          <RemoveUserIcon height={20} width={20} />
           <span>Remove Participant</span>
         </StyledMenuTile.RemoveItem>
       ) : null}
@@ -306,7 +306,7 @@ export const TileMenuContent = props => {
           }}
           css={spacingCSS}
         >
-          <ShareScreenIcon />
+          <ShareScreenIcon height={20} width={20} />
           <span>Stop Screenshare</span>
         </StyledMenuTile.RemoveItem>
       ) : null}

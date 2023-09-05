@@ -128,10 +128,7 @@ const Tile = ({
             </StyledVideoTile.AvatarContainer>
           ) : null}
 
-          {showAudioMuted({
-            hideAudioMute: hideAudioMuteOnTile,
-            isAudioMuted,
-          }) ? (
+          {!hideAudioMuteOnTile ? (
             isAudioMuted ? (
               <StyledVideoTile.AudioIndicator
                 data-testid="participant_audio_mute_icon"
@@ -243,9 +240,5 @@ const PeerMetadata = ({ peerId }) => {
 };
 
 const VideoTile = React.memo(Tile);
-
-const showAudioMuted = ({ hideAudioMute, isAudioMuted }) => {
-  return isAudioMuted && !hideAudioMute;
-};
 
 export default VideoTile;

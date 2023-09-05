@@ -11,7 +11,6 @@ import PeersSorter from '../../common/PeersSorter';
 
 export type GridLayoutProps = GridVideoTileLayout & {
   hide_participant_name_on_tile: boolean;
-  hide_audio_level_on_tile: boolean;
   rounded_video_tile: boolean;
   hide_audio_mute_on_tile: boolean;
   video_object_fit: 'contain' | 'cover';
