@@ -49,7 +49,7 @@ export function FlyingEmoji() {
   const startingPoints = useMemo(() => getStartingPoints(isMobile), [isMobile]);
 
   const showFlyingEmoji = useCallback(
-    (emojiId, senderId) => {
+    ({ emojiId, senderId }) => {
       if (!emojiId || !senderId || document.hidden) {
         return;
       }
