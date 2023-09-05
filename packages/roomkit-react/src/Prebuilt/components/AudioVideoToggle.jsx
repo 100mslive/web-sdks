@@ -67,8 +67,6 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const roomState = useHMSStore(selectRoomState);
-  const isAudioPermitted = toggleAudio && audioInput?.length > 0;
-  const isVideoPermitted = toggleVideo && videoInput?.length > 0;
 
   return (
     <Fragment>
@@ -92,7 +90,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         ) : (
           <IconButtonWithOptions
             options={formattedAudioInputList}
-            disabled={!isAudioPermitted}
+            disabled={!toggleAudio}
             onDisabledClick={toggleAudio}
             tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
             icon={
@@ -128,7 +126,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           </Tooltip>
         ) : (
           <IconButtonWithOptions
-            disabled={!isVideoPermitted}
+            disabled={!toggleVideo}
             onDisabledClick={toggleVideo}
             options={formattedVideoInputList}
             tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
