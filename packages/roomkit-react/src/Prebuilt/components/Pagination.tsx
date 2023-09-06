@@ -38,20 +38,20 @@ export const Pagination = ({
       <StyledPagination.Chevron disabled={disableLeft} onClick={prevPage}>
         <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
-      <StyledPagination.Dots>
-        {numPages <= 5
-          ? [...Array(numPages)].map((_, i) => (
-              <StyledPagination.Dot
-                key={i}
-                active={page === i}
-                onClick={e => {
-                  e.stopPropagation();
-                  onPageChange(i);
-                }}
-              />
-            ))
-          : null}
-      </StyledPagination.Dots>
+      {numPages <= 5 ? (
+        <StyledPagination.Dots>
+          {[...Array(numPages)].map((_, i) => (
+            <StyledPagination.Dot
+              key={i}
+              active={page === i}
+              onClick={e => {
+                e.stopPropagation();
+                onPageChange(i);
+              }}
+            />
+          ))}
+        </StyledPagination.Dots>
+      ) : null}
       <StyledPagination.Chevron disabled={disableRight} onClick={nextPage}>
         <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
