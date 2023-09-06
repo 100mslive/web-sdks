@@ -136,7 +136,7 @@ export const ChatFooter = ({ role, peerId, onSend, children /* onSelect, selecti
             css={{ c: '$on_surface_high' }}
             placeholder="Send a message...."
             ref={inputRef}
-            autoFocus
+            autoFocus={!isMobile}
             onKeyPress={async event => {
               if (event.key === 'Enter') {
                 if (!event.shiftKey) {

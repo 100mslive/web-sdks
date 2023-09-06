@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import {
   HMSRoomState,
-  selectAppData,
   selectAvailableRoleNames,
   selectFullAppData,
   selectHLSState,
