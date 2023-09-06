@@ -85,13 +85,13 @@ export const DesktopOptions = ({
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
         modal={false}
       >
-        <Dropdown.Trigger asChild data-testid="more_settings_btn">
-          <IconButton>
-            <Tooltip title="More options">
+        <Tooltip title="More options">
+          <Dropdown.Trigger asChild data-testid="more_settings_btn">
+            <IconButton>
               <DragHandleIcon />
-            </Tooltip>
-          </IconButton>
-        </Dropdown.Trigger>
+            </IconButton>
+          </Dropdown.Trigger>
+        </Tooltip>
 
         <Dropdown.Content
           sideOffset={5}

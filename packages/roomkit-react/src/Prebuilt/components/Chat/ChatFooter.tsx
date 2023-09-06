@@ -154,8 +154,8 @@ export const ChatFooter = ({
             }}
             placeholder="Send a message...."
             ref={inputRef}
-            autoFocus
             required
+            autoFocus={!isMobile}
             onKeyPress={async event => {
               if (event.key === 'Enter') {
                 if (!event.shiftKey) {

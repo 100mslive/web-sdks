@@ -228,12 +228,13 @@ const ParticipantMoreActions = ({ peerId, role }) => {
     off_stage_roles = [],
   } = elements.on_stage_exp || {};
   const isInStage = role === on_stage_role;
+  const shouldShowStageRoleChange =
+    canChangeRole &&
+    ((isInStage && remove_from_stage_label) || (off_stage_roles?.includes(role) && bring_to_stage_label));
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
   const [open, setOpen] = useState(false);
-  const showStageOption =
-    canChangeRole && off_stage_roles.includes(role) && (isInStage ? remove_from_stage_label : bring_to_stage_label);
 
   const handleStageAction = async () => {
     if (isInStage) {
@@ -270,7 +271,7 @@ const ParticipantMoreActions = ({ peerId, role }) => {
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {showStageOption ? (
+          {shouldShowStageRoleChange ? (
             <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
               <ChangeRoleIcon />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>

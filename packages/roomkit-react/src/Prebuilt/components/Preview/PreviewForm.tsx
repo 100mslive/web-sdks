@@ -26,8 +26,7 @@ const PreviewForm = ({
   const formSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
   };
-  const mediaQueryLg = cssConfig.media.md;
-  const isMobile = useMedia(mediaQueryLg);
+  const isMobile = useMedia(cssConfig.media.md);
   const { isHLSRunning } = useRecordingStreaming();
   const layout = useRoomLayout();
   const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
@@ -51,6 +50,9 @@ const PreviewForm = ({
           onKeyDown={e => {
             if (e.key === 'Enter' && name.trim().length > 0) {
               e.preventDefault();
+              if (isMobile) {
+                return;
+              }
               onJoin();
             }
           }}

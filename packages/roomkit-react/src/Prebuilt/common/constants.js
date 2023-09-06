@@ -45,10 +45,10 @@ export const APP_DATA = {
   pdfConfig: 'pdfConfig',
   minimiseInset: 'minimiseInset',
   activeScreensharePeerId: 'activeScreensharePeerId',
+  disableNotificiations: 'disableNotificiations',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
-  isHeadless: 'isHeadless',
   maxTileCount: 'maxTileCount',
   uiViewMode: 'uiViewMode',
   showStatsOnTiles: 'showStatsOnTiles',
@@ -93,3 +93,5 @@ export const SESSION_STORE_KEY = {
   PINNED_MESSAGE: 'pinnedMessage',
   SPOTLIGHT: 'spotlight',
 };
+
+export const ROLE_CHANGE_DECLINED = 'role_change_declined';

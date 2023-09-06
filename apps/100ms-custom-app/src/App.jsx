@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
@@ -15,6 +15,18 @@ const App = () => {
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const hmsPrebuiltRef = useRef();
+
+  useEffect(() => {
+    // remove notifications and messages for beam
+    // enable beam speaker logging for transcription
+    if ((authToken || roomCode) && hmsPrebuiltRef.current && isHeadless) {
+      const { hmsActions } = hmsPrebuiltRef.current;
+      hmsActions?.enableBeamSpeakerLabelsLogging?.();
+      hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
+      hmsActions?.setAppData?.('disableNotificiations', true);
+    }
+  }, [authToken, roomCode, isHeadless]);
 
   useEffect(() => {
     if (!roomCode && !authToken) {
@@ -52,6 +64,7 @@ const App = () => {
               init: process.env.REACT_APP_INIT_ENDPOINT,
             },
           }}
+          ref={hmsPrebuiltRef}
         />
       )}
     </Flex>
