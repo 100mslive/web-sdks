@@ -170,7 +170,10 @@ export const ChatFooter = ({
           {!isMobile ? (
             <EmojiPicker
               onSelect={(emoji: any) => {
-                if (inputRef?.current) inputRef.current.value += ` ${emoji.native} `;
+                if (inputRef?.current) {
+                  inputRef.current.value += ` ${emoji.native} `;
+                  setChatHasContent(true);
+                }
               }}
             />
           ) : null}
@@ -181,7 +184,7 @@ export const ChatFooter = ({
               height: 'max-content',
               mr: '$4',
               color: chatHasContent ? '$on_surface_high' : '$on_surface_low',
-              '&:hover': { c: '$on_surface_high' },
+              '&:hover': { c: chatHasContent ? '$on_surface_medium' : '$on_surface_low' },
             }}
             data-testid="send_msg_btn"
           >
