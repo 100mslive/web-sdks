@@ -148,9 +148,9 @@ const StartRecording = () => {
                 try {
                   await hmsActions.stopRTMPAndRecording();
                 } catch (error) {
+                  const err = error as Error;
                   ToastManager.addToast({
-                    // @ts-ignore
-                    title: error.message,
+                    title: err.message,
                     variant: 'error',
                   });
                 }
@@ -177,16 +177,15 @@ const StartRecording = () => {
             record: true,
           });
         } catch (error) {
-          // @ts-ignore
-          if (error.message.includes('stream already running')) {
+          const err = error as Error;
+          if (err.message.includes('stream already running')) {
             ToastManager.addToast({
               title: 'Recording already running',
               variant: 'error',
             });
           } else {
             ToastManager.addToast({
-              // @ts-ignore
-              title: error.message,
+              title: err.message,
               variant: 'error',
             });
           }
