@@ -20,19 +20,19 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
+import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 import { getMetadata } from '../../common/utils';
 
 export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigate();
   const subscribedNotifications = useSubscribedNotifications() || {};
-  const isHeadless = useIsHeadless();
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
+  const isNotificationDisabled = useIsNotificationDisabled();
 
   useEffect(() => {
-    if (!notification) {
+    if (!notification || isNotificationDisabled) {
       return;
     }
     switch (notification.type) {
@@ -43,7 +43,7 @@ export function Notifications() {
         // Don't toast message when metadata is updated and raiseHand is false.
         // Don't toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless) return;
+        if (!metadata?.isHandRaised || notification.data.isLocal) return;
 
         console.debug('Metadata updated', notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
@@ -139,10 +139,14 @@ export function Notifications() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED]);
 
+  if (isNotificationDisabled) {
+    return null;
+  }
+
   return (
     <>
-      {!isHeadless && <TrackUnmuteModal />}
-      {!isHeadless && <TrackBulkUnmuteModal />}
+      <TrackUnmuteModal />
+      <TrackBulkUnmuteModal />
       <TrackNotifications />
       <PeerNotifications />
       <ReconnectNotifications />

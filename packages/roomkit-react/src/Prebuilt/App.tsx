@@ -13,8 +13,6 @@ import {
 // @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
-import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
-// @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -361,7 +359,6 @@ function AppRoutes({
         <FlyingEmoji />
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <BeamSpeakerLabelsLogging />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && (
           <Routes>

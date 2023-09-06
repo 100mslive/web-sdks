@@ -15,7 +15,7 @@ import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
-import { useIsHeadless, useUISettings } from './AppData/useUISettings';
+import { useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {
@@ -32,7 +32,6 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
-  const isHeadless = useIsHeadless();
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
   const label = getVideoTileLabel({
@@ -71,7 +70,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
         {showStatsOnTiles ? (
           <VideoTileStats audioTrackID={audioTrack?.id} videoTrackID={track?.id} peerID={peerId} isLocal={isLocal} />
         ) : null}
-        {isFullScreenSupported && !isHeadless ? (
+        {isFullScreenSupported && isMouseHovered ? (
           <StyledVideoTile.FullScreenButton onClick={() => setFullscreen(!fullscreen)}>
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
@@ -86,7 +85,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
           />
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
-        {isMouseHovered && !isHeadless && !peer?.isLocal ? (
+        {isMouseHovered && !peer?.isLocal ? (
           <TileMenu isScreenshare peerID={peer?.id} audioTrackID={audioTrack?.id} videoTrackID={track?.id} />
         ) : null}
       </StyledVideoTile.Container>
