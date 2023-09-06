@@ -22,7 +22,9 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   const secondaryPeers = useMemo(
     () =>
       isMobile
-        ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)] //keep active sharing peer as first tile
+        ? activeSharePeer
+          ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)]
+          : peers //keep active sharing peer as first tile
         : peers.filter(p => p.id !== activeSharePeer?.id),
     [activeSharePeer, peers, isMobile],
   );
@@ -36,7 +38,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   return (
     <ProminenceLayout.Root edgeToEdge={edgeToEdge}>
       <ProminenceLayout.ProminentSection>
-        <ScreenshareTile peerId={peersSharing[page].id} />
+        <ScreenshareTile peerId={peersSharing[page]?.id} />
         {!edgeToEdge && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
       </ProminenceLayout.ProminentSection>
       <SecondaryTiles
