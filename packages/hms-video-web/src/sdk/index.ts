@@ -408,6 +408,7 @@ export class HMSSdk implements HMSInterface {
     const tracks = await this.localTrackManager.getTracksToPublish(settings);
     tracks.forEach(track => this.setLocalPeerTrack(track));
     this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+    await this.initDeviceManagers();
 
     this.listener?.onPreview(this.store.getRoom()!, tracks);
   }

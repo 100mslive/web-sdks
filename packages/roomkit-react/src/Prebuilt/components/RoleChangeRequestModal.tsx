@@ -50,7 +50,7 @@ export const RoleChangeRequestModal = () => {
         }}
       >
         <PreviewTile name={name} />
-        <PreviewControls />
+        <PreviewControls hideSettings={true} />
       </Flex>
     </>
   );
