@@ -36,7 +36,6 @@ export const EmojiReaction = () => {
 
   const { sendEvent } = useCustomEvent({
     type: EMOJI_REACTION_TYPE,
-    onEvent: window.showFlyingEmoji,
   });
 
   const sendReaction = async emojiId => {
@@ -47,6 +46,7 @@ export const EmojiReaction = () => {
     };
     // TODO: RT find a way to figure out hls-viewer roles
     sendEvent(data, { roleNames: roles });
+    window.showFlyingEmoji?.({ emojiId, senderId: localPeerId });
     /* if (isStreamingOn) {
       try {
         await hmsActions.sendHLSTimedMetadata([

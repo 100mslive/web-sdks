@@ -105,13 +105,13 @@ export const MwebOptions = ({
   return (
     <>
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
-        <Sheet.Trigger asChild data-testid="more_settings_btn">
-          <IconButton>
-            <Tooltip title="More options">
+        <Tooltip title="More options">
+          <Sheet.Trigger asChild data-testid="more_settings_btn">
+            <IconButton>
               <DragHandleIcon />
-            </Tooltip>
-          </IconButton>
-        </Sheet.Trigger>
+            </IconButton>
+          </Sheet.Trigger>
+        </Tooltip>
         <Sheet.Content css={{ bg: '$surface_dim', pb: '$14' }}>
           <Sheet.Title
             css={{
