@@ -173,7 +173,7 @@ export const ChatFooter = ({
           {!isMobile ? (
             <EmojiPicker
               onSelect={(emoji: any) => {
-                if (inputRef?.current) {
+                if (inputRef.current) {
                   inputRef.current.value += ` ${emoji.native} `;
                 }
               }}
