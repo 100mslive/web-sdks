@@ -95,7 +95,7 @@ export const RecordingStatus = () => {
 
   return (
     <Tooltip
-      side={isMobile ? 'bottom' : 'left'}
+      boxCss={{ zIndex: 1 }}
       title={getRecordingText({
         isBrowserRecordingOn,
         isServerRecordingOn,
