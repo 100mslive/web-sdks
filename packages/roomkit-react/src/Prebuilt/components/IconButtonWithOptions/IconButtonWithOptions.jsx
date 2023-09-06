@@ -19,6 +19,9 @@ const IconSection = styled(IconButton, {
     borderTopRightRadius: '$1',
     borderBottomRightRadius: '$1',
   },
+  '&:not([disabled]):focus-visible': {
+    boxShadow: 'none',
+  },
 });
 
 const OptionsSection = styled(IconButton, {
