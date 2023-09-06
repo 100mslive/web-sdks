@@ -37,7 +37,8 @@ const SecondarySection = ({
       css={{
         display: 'grid',
         gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
-        gridTemplateColumns: `repeat(${tiles.length}, 1fr)`,
+        gridTemplateColumns: `repeat(${tiles.length}, minmax(20%, max-content))`,
+        margin: '0 auto',
         gap: '$2 $4',
         placeItems: 'center',
         '@md': { gap: edgeToEdge ? 0 : '$4' },

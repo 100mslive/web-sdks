@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
 import {
   HMSRoomState,
+  selectAppData,
   selectAvailableRoleNames,
+  selectFullAppData,
   selectHLSState,
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -64,6 +66,7 @@ const initialAppData = {
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
+  [APP_DATA.disableNotificiations]: false,
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
@@ -75,6 +78,7 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
     if (!isConnected && sidePane && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
@@ -83,12 +87,16 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   }, [isConnected, sidePane, resetSidePane]);
 
   useEffect(() => {
-    hmsActions.initAppData(initialAppData);
+    hmsActions.initAppData({
+      ...initialAppData,
+      ...appData,
+    });
     hmsActions.setFrameworkInfo({
       type: 'react-web',
       isPrebuilt: true,
       version: React.version,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hmsActions]);
 
   useEffect(() => {
