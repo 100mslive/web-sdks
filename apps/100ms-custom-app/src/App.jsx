@@ -22,9 +22,9 @@ const App = () => {
     // enable beam speaker logging for transcription
     if ((authToken || roomCode) && hmsPrebuiltRef.current && isHeadless) {
       const { hmsActions } = hmsPrebuiltRef.current;
-      hmsActions.enableBeamSpeakerLabelsLogging?.();
-      hmsActions.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
-      hmsActions.setAppData?.('notificationsDisabled', true);
+      hmsActions?.enableBeamSpeakerLabelsLogging?.();
+      hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
+      hmsActions?.setAppData?.('notificationsDisabled', true);
     }
   }, [authToken, roomCode, isHeadless]);
 
