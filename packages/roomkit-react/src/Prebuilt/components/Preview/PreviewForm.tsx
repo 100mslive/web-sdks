@@ -49,7 +49,7 @@ const PreviewForm = ({
           autoFocus
           autoComplete="name"
           onKeyDown={e => {
-            if (e.key === 'Enter' && name.trim().length > 0) {
+            if (e.key === 'Enter' && name.trim().length > 0 && !isMobile) {
               e.preventDefault();
               onJoin();
             }
