@@ -77,7 +77,7 @@ export const useTileLayout = ({
         return rowElements;
       });
 
-      const gap = edgeToEdge ? 0 : 8; // gap between flex items
+      const gap = edgeToEdge && isMobile ? 0 : 8; // gap between flex items
       const maxHeight = height - (maxRows - 1) * gap;
       const maxRowHeight = maxHeight / matrix.length;
       const aspectRatios =

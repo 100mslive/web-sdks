@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
@@ -6,6 +6,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
+import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -23,6 +24,8 @@ import { ScreenshareToggle } from '../ScreenShareToggle';
 import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
+// @ts-ignore: No implicit Any
+const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 export const Footer = ({
   screenType,
@@ -34,6 +37,7 @@ export const Footer = ({
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   return (
     <AppFooter.Root
@@ -59,6 +63,7 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
+        {isMobile ? null : <Suspense fallback={<></>}>{isVideoOn ? <VirtualBackground /> : null}</Suspense>}
       </AppFooter.Left>
       <AppFooter.Center
         css={{
@@ -77,14 +82,14 @@ export const Footer = ({
         ) : (
           <>
             <ScreenshareToggle />
-            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            <RaiseHand />
             {elements?.emoji_reactions && <EmojiReaction />}
             <LeaveRoom screenType={screenType} />
           </>
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {elements?.chat && <ChatToggle openByDefault={openByDefault} />}
+        {!isMobile && elements?.chat && <ChatToggle openByDefault={openByDefault} />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>

@@ -23,14 +23,13 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
-import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
+import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
   const navigate = useNavigate();
   const { roomId, role } = useParams();
-  const isHeadless = useIsHeadless();
-  const { userName } = useHMSPrebuiltContext();
+  const { userName, endpoints } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
@@ -90,9 +89,7 @@ const Conference = () => {
         .join({
           userName,
           authToken: authTokenInAppData,
-          initEndpoint: process.env.REACT_APP_ENV
-            ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
-            : undefined,
+          initEndpoint: endpoints?.init,
           initialSettings: {
             isAudioMuted: !isPreviewScreenEnabled,
             isVideoMuted: !isPreviewScreenEnabled,
@@ -101,14 +98,7 @@ const Conference = () => {
         })
         .catch(console.error);
     }
-  }, [authTokenInAppData, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
-
-  useEffect(() => {
-    // beam doesn't need to store messages, saves on unnecessary store updates in large calls
-    if (isHeadless) {
-      hmsActions.ignoreMessageTypes(['chat', EMOJI_REACTION_TYPE]);
-    }
-  }, [isHeadless, hmsActions]);
+  }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
   useEffect(() => {
     return () => {

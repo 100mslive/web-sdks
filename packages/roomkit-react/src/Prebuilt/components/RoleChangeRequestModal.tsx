@@ -11,15 +11,12 @@ import {
 import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
 import { Box, Button, Dialog, Flex, Text } from '../..';
 // @ts-ignore: No implicit Any
-import { useIsHeadless } from './AppData/useUISettings';
-// @ts-ignore: No implicit Any
 import { useMyMetadata } from './hooks/useMetadata';
 // @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../common/constants';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
-  const isHeadless = useIsHeadless();
   const { setPrevRole, toggleHandRaise } = useMyMetadata();
   const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
@@ -27,14 +24,14 @@ export const RoleChangeRequestModal = () => {
   const { sendEvent } = useCustomEvent({ type: ROLE_CHANGE_DECLINED });
 
   useEffect(() => {
-    if (!roleChangeRequest?.role || isHeadless) {
+    if (!roleChangeRequest?.role) {
       return;
     }
 
     hmsActions.preview({ asRole: roleChangeRequest.role.name });
-  }, [hmsActions, roleChangeRequest, isHeadless]);
+  }, [hmsActions, roleChangeRequest]);
 
-  if (!roleChangeRequest?.role || isHeadless) {
+  if (!roleChangeRequest?.role) {
     return null;
   }
 

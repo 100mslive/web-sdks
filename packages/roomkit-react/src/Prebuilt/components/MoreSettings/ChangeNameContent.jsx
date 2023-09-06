@@ -27,6 +27,7 @@ export const ChangeNameContent = ({
           color: '$on_surface_high',
           fontWeight: '$semiBold',
           display: 'flex',
+          pb: '$4',
           '@md': { px: '$8', borderBottom: '1px solid $border_default' },
         }}
       >
@@ -55,7 +56,7 @@ export const ChangeNameContent = ({
           required
           data-testid="change_name_field"
           onKeyDown={async e => {
-            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
+            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName && !isMobile) {
               e.preventDefault();
               changeName();
             }

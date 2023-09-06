@@ -6,7 +6,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, DragHandleIcon, HandIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
+import { BrbIcon, CheckIcon, DragHandleIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -58,7 +58,7 @@ export const DesktopOptions = ({
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const [openModals, setOpenModals] = useState(new Set());
-  const { isHandRaised, isBRBOn, toggleHandRaise, toggleBRB } = useMyMetadata();
+  const { isBRBOn, toggleBRB } = useMyMetadata();
   const isPipOn = PictureInPicture.isOn();
   const isBRBEnabled = !!elements?.brb;
 
@@ -85,13 +85,13 @@ export const DesktopOptions = ({
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
         modal={false}
       >
-        <Dropdown.Trigger asChild data-testid="more_settings_btn">
-          <IconButton>
-            <Tooltip title="More options">
+        <Tooltip title="More options">
+          <Dropdown.Trigger asChild data-testid="more_settings_btn">
+            <IconButton>
               <DragHandleIcon />
-            </Tooltip>
-          </IconButton>
-        </Dropdown.Trigger>
+            </IconButton>
+          </Dropdown.Trigger>
+        </Tooltip>
 
         <Dropdown.Content
           sideOffset={5}
@@ -105,19 +105,7 @@ export const DesktopOptions = ({
             },
           }}
         >
-          {screenType !== 'hls_live_streaming' ? (
-            <Dropdown.Item onClick={toggleHandRaise} data-testid="raise_hand_btn">
-              <HandIcon />
-              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
-                Raise Hand
-              </Text>
-              <Flex justify="end" css={{ color: '$on_surface_high', flexGrow: '1' }}>
-                {isHandRaised ? <CheckIcon /> : null}
-              </Flex>
-            </Dropdown.Item>
-          ) : null}
-
-          {isBRBEnabled && screenType === 'hls_live_streaming' ? (
+          {isBRBEnabled && screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />
               <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
@@ -128,8 +116,6 @@ export const DesktopOptions = ({
               </Flex>
             </Dropdown.Item>
           ) : null}
-
-          {isBRBEnabled && screenType === 'hls_live_streaming' ? <Dropdown.ItemSeparator css={{ mx: '0' }} /> : null}
 
           {screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item>

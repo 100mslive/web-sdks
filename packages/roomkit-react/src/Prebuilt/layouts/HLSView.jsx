@@ -26,8 +26,8 @@ const HLSView = () => {
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const hmsActions = useHMSActions();
+  const { themeType, theme } = useTheme();
   const [streamEnded, setStreamEnded] = useState(false);
-  const { themeType } = useTheme();
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLayers, setAvailableLayers] = useState([]);
@@ -92,7 +92,7 @@ const HLSView = () => {
       const parsedPayload = parsePayload(payload);
       switch (parsedPayload.type) {
         case EMOJI_REACTION_TYPE:
-          window.showFlyingEmoji(parsedPayload?.emojiId, parsedPayload?.senderId);
+          window.showFlyingEmoji({ emojiId: parsedPayload?.emojiId, senderId: parsedPayload?.senderId });
           break;
         default: {
           const toast = {
@@ -198,7 +198,6 @@ const HLSView = () => {
             width: '100%',
             margin: '0 auto',
             height: '100%',
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #000 100%)',
           }}
         >
           <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
@@ -219,10 +218,28 @@ const HLSView = () => {
               justify="flex-end"
               align="flex-start"
               css={{
-                background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #000 100%)',
+                position: 'absolute',
+                bottom: '0',
+                left: '0',
+                background: `linear-gradient(180deg, ${theme.colors.background_dim.value}00 29.46%, ${theme.colors.background_dim.value}A3 100%);`,
+                width: '100%',
+                pt: '$8',
+                flexShrink: 0,
               }}
             >
-              <HMSVideoPlayer.Controls.Root css={{ p: '$4 $8' }}>
+              {hlsPlayer && (
+                <HMSVideoPlayer.Progress
+                  onValueChange={currentTime => {
+                    hlsPlayer.seekTo(currentTime);
+                  }}
+                  hlsPlayer={hlsPlayer}
+                />
+              )}
+              <HMSVideoPlayer.Controls.Root
+                css={{
+                  p: '$4 $8',
+                }}
+              >
                 <HMSVideoPlayer.Controls.Left>
                   <HMSVideoPlayer.PlayButton
                     onClick={async () => {
@@ -257,7 +274,7 @@ const HLSView = () => {
                             '@sm': 'xs',
                           }}
                           css={{
-                            c: isVideoLive ? '$on_primary_high' : '$on_primary_medium',
+                            c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
                           }}
                         >
                           {isVideoLive ? 'LIVE' : 'GO LIVE'}

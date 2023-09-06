@@ -9,7 +9,7 @@ export const VolumeControl = ({ hlsPlayer }) => {
   return (
     <Flex
       align="center"
-      css={{ color: '$on_primary_high' }}
+      css={{ color: '$on_surface_high' }}
       onMouseOver={event => {
         event.stopPropagation();
         setShowSlider(true);

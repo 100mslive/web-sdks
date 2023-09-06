@@ -29,18 +29,21 @@ export const GridLayout = ({
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
-  let peers = useHMSStore(selectPeers);
+  const peers = useHMSStore(selectPeers);
   const isRoleProminence =
     (prominentRoles.length &&
       peers.some(
         peer => peer.roleName && prominentRoles.includes(peer.roleName) && (peer.videoTrack || peer.audioTrack),
       )) ||
     pinnedTrack;
-  if (isInsetEnabled && !isRoleProminence && !peerSharing) {
-    peers = peers.filter(peer => !peer.isLocal);
-  }
+  const updatedPeers = useMemo(() => {
+    if (isInsetEnabled && !isRoleProminence && !peerSharing) {
+      return peers.filter(peer => !peer.isLocal);
+    }
+    return peers;
+  }, [isInsetEnabled, isRoleProminence, peerSharing, peers]);
   const vanillaStore = useHMSVanillaStore();
-  const [sortedPeers, setSortedPeers] = useState(peers);
+  const [sortedPeers, setSortedPeers] = useState(updatedPeers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
@@ -57,11 +60,11 @@ export const GridLayout = ({
       return;
     }
     peersSorter.setPeersAndTilesPerPage({
-      peers,
+      peers: updatedPeers,
       tilesPerPage: pageSize,
     });
     peersSorter.onUpdate(setSortedPeers);
-  }, [mainPage, peersSorter, peers, pageSize]);
+  }, [mainPage, peersSorter, updatedPeers, pageSize]);
 
   if (peerSharing) {
     return (

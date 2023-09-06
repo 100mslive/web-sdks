@@ -36,7 +36,6 @@ export const getAppDetails = appDetails => {
 const initialAppData = {
   [APP_DATA.uiSettings]: {
     [UI_SETTINGS.isAudioOnly]: false,
-    [UI_SETTINGS.isHeadless]: false,
     [UI_SETTINGS.maxTileCount]: 9,
     [UI_SETTINGS.showStatsOnTiles]: false,
     [UI_SETTINGS.enableAmbientMusic]: false,
