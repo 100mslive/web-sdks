@@ -1,9 +1,23 @@
 import React from 'react';
 import { PinIcon, SpotlightIcon } from '@100mslive/react-icons';
-import { Flex, styled, Text, textEllipsis } from '../../../';
+import { Flex, styled, Text, textEllipsis } from '../../..';
 import { ConnectionIndicator } from './ConnectionIndicator';
 
-const TileConnection = ({ name, peerId, hideLabel, width, spotlighted, pinned }) => {
+const TileConnection = ({
+  name,
+  peerId,
+  hideLabel,
+  width,
+  spotlighted,
+  pinned,
+}: {
+  name: string;
+  peerId: string;
+  hideLabel: boolean;
+  width: number;
+  spotlighted: boolean;
+  pinned: boolean;
+}) => {
   return (
     <Wrapper>
       {!hideLabel ? (
@@ -11,12 +25,12 @@ const TileConnection = ({ name, peerId, hideLabel, width, spotlighted, pinned })
           <Flex align="center">
             {pinned && (
               <IconWrapper>
-                <PinIcon width="15" height="15" css={{ display: 'block' }} />
+                <PinIcon width="15" height="15" style={{ display: 'block' }} />
               </IconWrapper>
             )}
             {spotlighted && (
               <IconWrapper>
-                <SpotlightIcon width="15" height="15" css={{ display: 'block' }} />
+                <SpotlightIcon width="15" height="15" style={{ display: 'block' }} />
               </IconWrapper>
             )}
             <Text
@@ -30,7 +44,7 @@ const TileConnection = ({ name, peerId, hideLabel, width, spotlighted, pinned })
               {name}
             </Text>
           </Flex>
-          <ConnectionIndicator isTile peerId={peerId} />
+          <ConnectionIndicator isTile peerId={peerId} hideBg />
         </>
       ) : null}
     </Wrapper>
