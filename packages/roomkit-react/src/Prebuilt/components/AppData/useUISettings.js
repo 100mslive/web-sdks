@@ -86,7 +86,7 @@ export const useSubscribedNotifications = notificationKey => {
 };
 
 export const useIsNotificationDisabled = () => {
-  const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.notificationsDisabled));
+  const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.disableNotificiations));
   return notificationPreference;
 };
 

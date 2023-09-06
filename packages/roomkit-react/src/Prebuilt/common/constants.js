@@ -45,7 +45,7 @@ export const APP_DATA = {
   pdfConfig: 'pdfConfig',
   minimiseInset: 'minimiseInset',
   activeScreensharePeerId: 'activeScreensharePeerId',
-  notificationsDisabled: 'notificationsDisabled',
+  disableNotificiations: 'disableNotificiations',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
