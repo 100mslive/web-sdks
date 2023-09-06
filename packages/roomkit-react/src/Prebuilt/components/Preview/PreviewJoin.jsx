@@ -48,7 +48,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
-  const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
+  const { toggleAudio, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -77,7 +77,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     });
     join();
     onJoin && onJoin();
-  }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
+  }, [join, name, setPreviewPreference, onJoin]);
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
