@@ -14,13 +14,12 @@ const IconSection = styled(IconButton, {
   borderTopRightRadius: 0,
   borderColor: '$border_default',
   borderBottomRightRadius: 0,
+  position: 'relative',
+  zIndex: 1,
   '@md': {
     mx: 0,
     borderTopRightRadius: '$1',
     borderBottomRightRadius: '$1',
-  },
-  '&:not([disabled]):focus-visible': {
-    boxShadow: 'none',
   },
 });
 
