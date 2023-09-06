@@ -36,6 +36,7 @@ export const EmojiReaction = () => {
 
   const { sendEvent } = useCustomEvent({
     type: EMOJI_REACTION_TYPE,
+    onEvent: window.showFlyingEmoji,
   });
 
   const sendReaction = async emojiId => {
