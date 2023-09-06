@@ -1,13 +1,10 @@
 import { parsedUserAgent } from '@100mslive/react-sdk';
 
-export const DEFAULT_HLS_ROLE_KEY = 'HLS_VIEWER_ROLE';
-export const DEFAULT_HLS_VIEWER_ROLE = 'hls-viewer';
 export const DEFAULT_WAITING_VIEWER_ROLE = 'waiting-room';
 export const QUERY_PARAM_SKIP_PREVIEW = 'skip_preview';
 export const QUERY_PARAM_SKIP_PREVIEW_HEADFUL = 'skip_preview_headful';
 export const QUERY_PARAM_NAME = 'name';
 export const QUERY_PARAM_VIEW_MODE = 'ui_mode';
-export const QUERY_PARAM_AUTH_TOKEN = 'auth_token';
 export const QUERY_PARAM_PREVIEW_AS_ROLE = 'preview_as_role';
 export const UI_MODE_GRID = 'grid';
 export const MAX_TOASTS = 5;
@@ -97,5 +94,3 @@ export const SESSION_STORE_KEY = {
   PINNED_MESSAGE: 'pinnedMessage',
   SPOTLIGHT: 'spotlight',
 };
-
-export const ROLE_CHANGE_DECLINED = 'role_change_declined';

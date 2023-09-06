@@ -1,12 +1,22 @@
 import React from 'react';
 import { AlertTriangleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Button } from '../../Button';
-import { Box, Flex } from '../../Layout';
-import { Text } from '../../Text';
-import { useShowStreamingUI } from '../common/hooks';
+import { Button } from '../../../Button';
+import { Box, Flex } from '../../../Layout';
+import { Text } from '../../../Text';
 
-export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom, isModal = false }) => {
-  const showStreamingUI = useShowStreamingUI();
+export const EndSessionContent = ({
+  setShowEndStreamAlert,
+  stopStream,
+  leaveRoom,
+  isModal = false,
+  isStreamingOn = false,
+}: {
+  setShowEndStreamAlert: (value: boolean) => void;
+  stopStream: () => Promise<void>;
+  leaveRoom: () => void;
+  isModal?: boolean;
+  isStreamingOn: boolean;
+}) => {
   return (
     <Box>
       <Flex
@@ -18,7 +28,7 @@ export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
         <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
-          End {showStreamingUI ? 'Stream' : 'Session'}
+          End {isStreamingOn ? 'Stream' : 'Session'}
         </Text>
         {isModal ? null : (
           <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowEndStreamAlert(false)}>
@@ -27,7 +37,7 @@ export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom
         )}
       </Flex>
       <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-        The {showStreamingUI ? 'stream' : 'session'} will end for everyone. You can't undo this action.
+        The {isStreamingOn ? 'stream' : 'session'} will end for everyone. You can't undo this action.
       </Text>
       <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
         <Button
@@ -49,7 +59,7 @@ export const EndSessionContent = ({ setShowEndStreamAlert, stopStream, leaveRoom
           id="stopStream"
           data-testid="stop_stream_btn"
         >
-          End {showStreamingUI ? 'Stream' : 'Session'}
+          End {isStreamingOn ? 'Stream' : 'Session'}
         </Button>
       </Flex>
     </Box>

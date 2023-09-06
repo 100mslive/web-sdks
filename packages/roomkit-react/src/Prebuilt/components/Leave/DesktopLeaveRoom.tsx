@@ -1,21 +1,26 @@
 import React, { Fragment, useState } from 'react';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
-import { Dropdown } from '../../../../Dropdown';
-import { Box, Flex } from '../../../../Layout';
-import { Dialog } from '../../../../Modal';
-import { Tooltip } from '../../../../Tooltip';
-import { EndSessionContent } from '../../EndSessionContent';
-import { LeaveCard } from '../../LeaveCard';
-import { LeaveSessionContent } from '../../LeaveSessionContent';
-import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
+import { Dropdown } from '../../../Dropdown';
+import { Box, Flex } from '../../../Layout';
+import { Dialog } from '../../../Modal';
+import { Tooltip } from '../../../Tooltip';
+import { EndSessionContent } from './EndSessionContent';
+import { LeaveIconButton, MenuTriggerButton } from './LeaveAtoms';
+import { LeaveCard } from './LeaveCard';
+import { LeaveSessionContent } from './LeaveSessionContent';
+// @ts-ignore: No implicit Any
+import { useDropdownList } from '../hooks/useDropdownList';
 
 export const DesktopLeaveRoom = ({
-  menuTriggerButton: MenuTriggerButton,
-  leaveIconButton: LeaveIconButton,
   leaveRoom,
   stopStream,
+  screenType,
+}: {
+  leaveRoom: () => void;
+  stopStream: () => Promise<void>;
+  screenType: keyof ConferencingScreen;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -23,9 +28,7 @@ export const DesktopLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const showStreamingUI = useShowStreamingUI();
-  const isHLSViewer = useIsLocalPeerHLSViewer();
-  const showStream = showStreamingUI && isStreamingOn;
+  const showStream = permissions?.hlsStreaming && isStreamingOn;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
@@ -38,7 +41,6 @@ export const DesktopLeaveRoom = ({
       {permissions.hlsStreaming ? (
         <Flex>
           <LeaveIconButton
-            variant="danger"
             key="LeaveRoom"
             data-testid="leave_room_btn"
             css={{
@@ -46,7 +48,7 @@ export const DesktopLeaveRoom = ({
               borderBottomRightRadius: 0,
             }}
             onClick={() => {
-              if (isHLSViewer) {
+              if (screenType === 'hls_live_streaming') {
                 setShowLeaveRoomAlert(true);
               } else {
                 leaveRoom();
@@ -68,12 +70,20 @@ export const DesktopLeaveRoom = ({
                 },
               }}
             >
-              <MenuTriggerButton variant="danger" data-testid="leave_end_dropdown_trigger">
+              <MenuTriggerButton data-testid="leave_end_dropdown_trigger">
                 <VerticalMenuIcon />
               </MenuTriggerButton>
             </Dropdown.Trigger>
             <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
-              <Dropdown.Item css={{ bg: '$surface_default' }} onClick={leaveRoom} data-testid="just_leave_btn">
+              <Dropdown.Item
+                css={{
+                  bg: '$surface_dim',
+                  color: '$on_surface_low',
+                  '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
+                }}
+                onClick={leaveRoom}
+                data-testid="just_leave_btn"
+              >
                 <LeaveCard
                   title={showStream ? 'Leave Stream' : 'Leave Session'}
                   subtitle={`Others will continue after you leave. You can join the ${
@@ -81,14 +91,20 @@ export const DesktopLeaveRoom = ({
                   } again.`}
                   bg=""
                   titleColor="$on_surface_high"
-                  subtitleColor="$on_surface_low"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
                   onClick={leaveRoom}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
               {isStreamingOn && permissions?.hlsStreaming ? (
-                <Dropdown.Item css={{ bg: '$alert_error_dim' }} data-testid="end_room_btn">
+                <Dropdown.Item
+                  css={{
+                    bg: '$alert_error_dim',
+                    color: '$alert_error_bright',
+                    '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+                  }}
+                  data-testid="end_room_btn"
+                >
                   <LeaveCard
                     title={showStream ? 'End Stream' : 'End Session'}
                     subtitle={`The ${
@@ -96,7 +112,6 @@ export const DesktopLeaveRoom = ({
                     } will end for everyone. You can't undo this action.`}
                     bg=""
                     titleColor="$alert_error_brighter"
-                    subtitleColor="$alert_error_bright"
                     icon={<StopIcon height={24} width={24} />}
                     onClick={() => {
                       setOpen(false);
@@ -112,13 +127,12 @@ export const DesktopLeaveRoom = ({
       ) : (
         <LeaveIconButton
           onClick={() => {
-            if (isHLSViewer) {
+            if (screenType === 'hls_live_streaming') {
               setShowLeaveRoomAlert(true);
             } else {
               leaveRoom();
             }
           }}
-          variant="danger"
           key="LeaveRoom"
           data-testid="leave_room_btn"
         >
@@ -138,13 +152,14 @@ export const DesktopLeaveRoom = ({
               setShowEndStreamAlert={setShowEndStreamAlert}
               stopStream={stopStream}
               leaveRoom={leaveRoom}
+              isStreamingOn={isStreamingOn}
               isModal
             />
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
 
-      {isHLSViewer ? (
+      {screenType === 'hls_live_streaming' ? (
         <Dialog.Root open={showLeaveRoomAlert} modal={false}>
           <Dialog.Portal>
             <Dialog.Overlay />

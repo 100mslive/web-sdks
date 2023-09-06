@@ -1,20 +1,19 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { Flex } from '../../../';
 import { useHMSPrebuiltContext } from '../../AppContext';
-import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 import FullPageProgress from '../FullPageProgress';
 import PreviewJoin from './PreviewJoin';
+import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAuthToken } from '../AppData/useUISettings';
-import { useNavigation } from '../hooks/useNavigation';
-import { useSkipPreview } from '../hooks/useSkipPreview';
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
-  const navigate = useNavigation();
-  const skipPreview = useSkipPreview();
+  const navigate = useNavigate();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   const { userName } = useHMSPrebuiltContext();
   const initialName = userName || (skipPreview ? 'Beam' : '');
@@ -42,13 +41,6 @@ const PreviewContainer = () => {
         ) : (
           <FullPageProgress />
         )}
-        <SidePane
-          css={{
-            position: 'unset',
-            mr: '$10',
-            '@lg': { position: 'fixed', mr: '$0' },
-          }}
-        />
       </Flex>
     </Flex>
   );

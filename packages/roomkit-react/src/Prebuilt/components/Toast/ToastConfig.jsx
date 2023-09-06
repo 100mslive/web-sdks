@@ -34,8 +34,11 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
   const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const peer = useHMSStore(selectPeerByID(id));
   const layout = useRoomLayout();
-  const { bring_to_stage_label, on_stage_role, off_stage_roles } =
-    layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
+  const {
+    bring_to_stage_label,
+    on_stage_role,
+    off_stage_roles = [],
+  } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
 
   const onClickHandler = useCallback(() => {
     if (isSingleHandRaise) {

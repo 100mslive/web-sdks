@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
@@ -7,19 +7,18 @@ import {
   selectIsConnectedToRoom,
   selectLocalPeerID,
   useCustomEvent,
-  useHMSActions,
+  // useHMSActions,
   useHMSStore,
-  useRecordingStreaming,
+  // useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
-import { ToastManager } from './Toast/ToastManager';
+// import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
 import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
-import { useHLSViewerRole } from './AppData/useUISettings';
 import { useDropdownList } from './hooks/useDropdownList';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
@@ -29,12 +28,10 @@ export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   useDropdownList({ open: open, name: 'EmojiReaction' });
-  const hmsActions = useHMSActions();
+  // const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerId = useHMSStore(selectLocalPeerID);
-  const hlsViewerRole = useHLSViewerRole();
-  const { isStreamingOn } = useRecordingStreaming();
-  const filteredRoles = useMemo(() => roles.filter(role => role !== hlsViewerRole), [roles, hlsViewerRole]);
+  // const { isStreamingOn } = useRecordingStreaming();
   const isMobile = useMedia(cssConfig.media.md);
 
   const onEmojiEvent = useCallback(data => {
@@ -52,8 +49,9 @@ export const EmojiReaction = () => {
       emojiId: emojiId,
       senderId: localPeerId,
     };
-    sendEvent(data, { roleNames: filteredRoles });
-    if (isStreamingOn) {
+    // TODO: RT find a way to figure out hls-viewer roles
+    sendEvent(data, { roleNames: roles });
+    /* if (isStreamingOn) {
       try {
         await hmsActions.sendHLSTimedMetadata([
           {
@@ -65,7 +63,7 @@ export const EmojiReaction = () => {
         console.log(error);
         ToastManager.addToast({ title: error.message });
       }
-    }
+    } */
   };
 
   if (!isConnected) {

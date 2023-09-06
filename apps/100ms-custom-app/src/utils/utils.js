@@ -1,10 +1,28 @@
 import axios from 'axios';
 import cookies from 'js-cookies';
 
+function isRoomCode(str) {
+  const regex = /^[A-Za-z]{3}(-[A-Za-z]{3,4}){2}$/;
+  return regex.test(str);
+}
+
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
   const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
-  return path.match(regex)?.groups?.code || null;
+  const roomCode = path.match(regex)?.groups?.code || null;
+  return isRoomCode(roomCode) ? roomCode : null;
+};
+
+export const getRoomIdRoleFromUrl = () => {
+  const path = window.location.pathname;
+  const regex =
+    /(\/streaming)?\/(preview|meeting)\/(?<roomId>[^/]+)\/(?<role>[^/]+)/;
+  const roomId = path.match(regex)?.groups?.roomId || null;
+  const role = path.match(regex)?.groups?.role || null;
+  return {
+    roomId,
+    role,
+  };
 };
 
 export const getAuthInfo = () => {
@@ -32,14 +50,6 @@ const tileShapeMapping = {
 
 const env = process.env.REACT_APP_ENV || 'prod';
 export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
-const authTokenEndpointByRoomCode = {
-  qa: 'https://auth-nonprod.100ms.live/v2/token',
-  dev: 'https://auth-nonprod.100ms.live/v2/token',
-};
-
-export const getAuthTokenByRoomCodeEndpoint = () => {
-  return authTokenEndpointByRoomCode[env] || '';
-};
 
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
@@ -149,4 +159,27 @@ export const getWithRetry = async (url, headers) => {
   }
   console.error('max retry done for get-details', error);
   throw error;
+};
+
+export const getAuthTokenUsingRoomIdRole = async function ({
+  subdomain = '',
+  roomId = '',
+  role = '',
+  userId = '',
+}) {
+  try {
+    const resp = await fetch(`${apiBasePath}${subdomain}/api/token`, {
+      method: 'POST',
+      body: JSON.stringify({
+        room_id: roomId,
+        role,
+        user_id: userId,
+      }),
+    });
+    const { token = '' } = await resp.json();
+    return token;
+  } catch (e) {
+    console.error('failed to getAuthTokenUsingRoomIdRole', e);
+    throw Error('failed to get auth token using roomid and role');
+  }
 };

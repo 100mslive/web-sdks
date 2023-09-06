@@ -212,15 +212,6 @@ const HLSView = () => {
                 background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, #000 100%)',
               }}
             >
-              {hlsPlayer && (
-                <HMSVideoPlayer.Progress
-                  onValueChange={currentTime => {
-                    hlsPlayer.seekTo(currentTime);
-                  }}
-                  hlsPlayer={hlsPlayer}
-                />
-              )}
-
               <HMSVideoPlayer.Controls.Root css={{ p: '$4 $8' }}>
                 <HMSVideoPlayer.Controls.Left>
                   <HMSVideoPlayer.PlayButton

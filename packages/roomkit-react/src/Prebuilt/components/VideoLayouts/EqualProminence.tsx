@@ -7,21 +7,28 @@ import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
-import { useInsetEnabled } from '../../provider/roomLayoutProvider/hooks/useInsetEnabled';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
-export function EqualProminence({ peers, onPageChange, onPageSize }: LayoutProps) {
-  const isInsetEnabled = useInsetEnabled();
+export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize }: LayoutProps) {
   const localPeer = useHMSStore(selectLocalPeer);
   const isMobile = useMedia(cssConfig.media.md);
   let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
   maxTileCount = isMobile ? Math.min(maxTileCount, 6) : maxTileCount;
-  const inputPeers = useMemo(() => (peers.length === 0 ? (!localPeer ? [] : [localPeer]) : peers), [peers, localPeer]);
-  const pageList = usePagesWithTiles({
+  let pageList = usePagesWithTiles({
+    peers,
+    maxTileCount,
+  });
+  // useMemo is needed to prevent recursion as new array is created for localPeer
+  const inputPeers = useMemo(
+    () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
+    [pageList.length, peers, localPeer],
+  );
+  // Pass local peer to main grid if no other peer has tiles
+  pageList = usePagesWithTiles({
     peers: inputPeers,
     maxTileCount,
   });
@@ -33,7 +40,9 @@ export function EqualProminence({ peers, onPageChange, onPageSize }: LayoutProps
   const pageSize = pagesWithTiles[0]?.length || 0;
 
   useEffect(() => {
-    onPageSize?.(pageSize);
+    if (pageSize > 0) {
+      onPageSize?.(pageSize);
+    }
   }, [pageSize, onPageSize]);
 
   return (

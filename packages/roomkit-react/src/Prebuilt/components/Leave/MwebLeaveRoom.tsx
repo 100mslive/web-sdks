@@ -1,26 +1,34 @@
 import React, { Fragment, useState } from 'react';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { ExitIcon, StopIcon } from '@100mslive/react-icons';
-import { Box } from '../../../../Layout';
-import { Sheet } from '../../../../Sheet';
-import { Tooltip } from '../../../../Tooltip';
-import { EndSessionContent } from '../../EndSessionContent';
-import { LeaveCard } from '../../LeaveCard';
-import { LeaveSessionContent } from '../../LeaveSessionContent';
-import { useDropdownList } from '../../hooks/useDropdownList';
-import { useIsLocalPeerHLSViewer, useShowStreamingUI } from '../../../common/hooks';
+import { Box } from '../../../Layout';
+import { Sheet } from '../../../Sheet';
+import { Tooltip } from '../../../Tooltip';
+import { EndSessionContent } from './EndSessionContent';
+import { LeaveIconButton } from './LeaveAtoms';
+import { LeaveCard } from './LeaveCard';
+import { LeaveSessionContent } from './LeaveSessionContent';
+// @ts-ignore: No implicit Any
+import { useDropdownList } from '../hooks/useDropdownList';
 
-export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, stopStream }) => {
+export const MwebLeaveRoom = ({
+  leaveRoom,
+  stopStream,
+  screenType,
+}: {
+  leaveRoom: () => void;
+  stopStream: () => Promise<void>;
+  screenType: keyof ConferencingScreen;
+}) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const isHlsViewer = useIsLocalPeerHLSViewer();
-  const showStreamingUI = useShowStreamingUI();
 
-  const showStream = showStreamingUI && isStreamingOn;
+  const showStream = permissions?.hlsStreaming && isStreamingOn;
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -33,7 +41,6 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
-              variant="danger"
               key="LeaveRoom"
               data-testid="leave_room_btn"
               css={{
@@ -56,10 +63,9 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
               } again.`}
               bg="$surface_default"
               titleColor="$on_surface_high"
-              subtitleColor="$on_surface_low"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
               onClick={leaveRoom}
-              css={{ pt: 0, mt: '$10' }}
+              css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
             {isStreamingOn && permissions?.hlsStreaming ? (
               <LeaveCard
@@ -69,7 +75,7 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
                 } for everyone. You can't undo this action.`}
                 bg="$alert_error_dim"
                 titleColor="$alert_error_brighter"
-                subtitleColor="$alert_error_bright"
+                css={{ color: '$alert_error_bright', '&:hover': { color: '$alert_error_brighter' } }}
                 icon={<StopIcon height={24} width={24} />}
                 onClick={() => {
                   setOpen(false);
@@ -81,11 +87,10 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
         </Sheet.Root>
       ) : (
         <LeaveIconButton
-          variant="danger"
           key="LeaveRoom"
           data-testid="leave_room_btn"
           onClick={() => {
-            if (isHlsViewer) {
+            if (screenType === 'hls_live_streaming') {
               setShowLeaveRoomAlert(true);
             }
           }}
@@ -103,10 +108,11 @@ export const MwebLeaveRoom = ({ leaveIconButton: LeaveIconButton, leaveRoom, sto
             setShowEndStreamAlert={setShowEndStreamAlert}
             stopStream={stopStream}
             leaveRoom={leaveRoom}
+            isStreamingOn={isStreamingOn}
           />
         </Sheet.Content>
       </Sheet.Root>
-      {isHlsViewer ? (
+      {screenType === 'hls_live_streaming' ? (
         <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
           <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
             <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
