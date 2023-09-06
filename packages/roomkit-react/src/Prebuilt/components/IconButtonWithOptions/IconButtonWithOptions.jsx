@@ -15,7 +15,9 @@ const IconSection = styled(IconButton, {
   borderColor: '$border_default',
   borderBottomRightRadius: 0,
   position: 'relative',
-  zIndex: 1,
+  '&:not([disabled]):focus-visible': {
+    zIndex: 1,
+  },
   '@md': {
     mx: 0,
     borderTopRightRadius: '$1',
@@ -32,8 +34,9 @@ const OptionsSection = styled(IconButton, {
   borderColor: '$border_default',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
+  position: 'relative',
   '&:not([disabled]):focus-visible': {
-    boxShadow: 'none',
+    zIndex: 1,
   },
   '@md': {
     display: 'none',
