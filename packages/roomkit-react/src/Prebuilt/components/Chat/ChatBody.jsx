@@ -396,8 +396,9 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
   let messages = useHMSStore(storeMessageSelector);
   messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
 
-  if (messages.length === 0 && !isMobile) {
+  if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
       <Flex
         css={{
