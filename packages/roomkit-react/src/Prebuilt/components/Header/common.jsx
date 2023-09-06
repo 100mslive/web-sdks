@@ -117,6 +117,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
           {outputDevices.map(audioDevice => {
             return (
               <SelectWithLabel
+                key={audioDevice.deviceId}
                 label={audioDevice.label}
                 id={audioDevice.deviceId}
                 checked={audioDevice.deviceId === outputSelected}
