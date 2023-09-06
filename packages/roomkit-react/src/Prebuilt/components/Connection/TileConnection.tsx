@@ -25,12 +25,12 @@ const TileConnection = ({
           <Flex align="center">
             {pinned && (
               <IconWrapper>
-                <PinIcon width="15" height="15" style={{ display: 'block' }} />
+                <PinIcon width="15" height="15" />
               </IconWrapper>
             )}
             {spotlighted && (
               <IconWrapper>
-                <SpotlightIcon width="15" height="15" style={{ display: 'block' }} />
+                <SpotlightIcon width="15" height="15" />
               </IconWrapper>
             )}
             <Text
