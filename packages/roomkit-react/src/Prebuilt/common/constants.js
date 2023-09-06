@@ -29,7 +29,6 @@ export const APP_DATA = {
   appConfig: 'appConfig',
   sidePane: 'sidePane',
   hlsStats: 'hlsStats',
-  hlsViewerRole: 'hlsViewerRole',
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
