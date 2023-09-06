@@ -83,7 +83,6 @@ export const ChatFooter = ({
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const isOverlayChat = elements?.chat?.is_overlay;
-  const [chatHasContent, setChatHasContent] = useState(false);
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -148,11 +147,15 @@ export const ChatFooter = ({
         >
           {children}
           <TextArea
-            css={{ c: '$on_surface_high' }}
+            css={{
+              c: '$on_surface_high',
+              '&:valid ~ .send-msg': { color: '$on_surface_high' },
+              '& ~ .send-msg': { color: '$on_surface_low' },
+            }}
             placeholder="Send a message...."
             ref={inputRef}
-            onChange={e => setChatHasContent(e.target.value.trim().length > 0)}
             autoFocus
+            required
             onKeyPress={async event => {
               if (event.key === 'Enter') {
                 if (!event.shiftKey) {
@@ -172,19 +175,18 @@ export const ChatFooter = ({
               onSelect={(emoji: any) => {
                 if (inputRef?.current) {
                   inputRef.current.value += ` ${emoji.native} `;
-                  setChatHasContent(true);
                 }
               }}
             />
           ) : null}
           <BaseIconButton
+            className="send-msg"
             onClick={sendMessage}
             css={{
               ml: 'auto',
               height: 'max-content',
               mr: '$4',
-              color: chatHasContent ? '$on_surface_high' : '$on_surface_low',
-              '&:hover': { c: chatHasContent ? '$on_surface_medium' : '$on_surface_low' },
+              '&:hover': { c: '$on_surface_medium' },
             }}
             data-testid="send_msg_btn"
           >
