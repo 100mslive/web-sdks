@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   selectLocalPeerName,
   selectLocalPeerRoleName,
@@ -7,12 +7,13 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { PreviewControls, PreviewTile } from './Preview/PreviewJoin';
-import { ToastManager } from './Toast/ToastManager';
-import { Box, Button, Dialog, Flex, Text } from '../../';
+import { Box, Button, Dialog, Flex, Text } from '../..';
+// @ts-ignore: No implicit Any
 import { useMyMetadata } from './hooks/useMetadata';
-
-const ROLE_CHANGE_DECLINED = 'role_change_declined';
+// @ts-ignore: No implicit Any
+import { ROLE_CHANGE_DECLINED } from '../common/constants';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
@@ -20,18 +21,7 @@ export const RoleChangeRequestModal = () => {
   const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const name = useHMSStore(selectLocalPeerName);
-
-  const handleRoleChangeDenied = useCallback(request => {
-    ToastManager.addToast({
-      title: `${request.peerName} denied your request to join the ${request.role.name} role`,
-      variant: 'error',
-    });
-  }, []);
-
-  const { sendEvent } = useCustomEvent({
-    type: ROLE_CHANGE_DECLINED,
-    onEvent: handleRoleChangeDenied,
-  });
+  const { sendEvent } = useCustomEvent({ type: ROLE_CHANGE_DECLINED });
 
   useEffect(() => {
     if (!roleChangeRequest?.role) {
@@ -60,7 +50,7 @@ export const RoleChangeRequestModal = () => {
         }}
       >
         <PreviewTile name={name} />
-        <PreviewControls />
+        <PreviewControls hideSettings={true} />
       </Flex>
     </>
   );
@@ -87,13 +77,26 @@ export const RoleChangeRequestModal = () => {
   );
 };
 
-const RequestDialog = ({ open = true, onOpenChange, title, body, actionText = 'Accept', onAction, Icon }) => (
+const RequestDialog = ({
+  open = true,
+  onOpenChange,
+  title,
+  body,
+  actionText = 'Accept',
+  onAction,
+}: {
+  open?: boolean;
+  onOpenChange: (value: boolean) => void;
+  title: string;
+  body: React.ReactNode;
+  actionText?: string;
+  onAction: () => void;
+}) => (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
     <Dialog.Portal>
       <Dialog.Overlay />
       <Dialog.Content css={{ p: '$10' }}>
         <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>
-          {Icon ? Icon : null}
           <Text variant="h6">{title}</Text>
         </Dialog.Title>
         <Box css={{ mt: '$4', mb: '$10' }}>{body}</Box>

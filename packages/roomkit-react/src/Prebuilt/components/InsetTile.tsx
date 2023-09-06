@@ -22,7 +22,11 @@ const MinimisedTile = ({ setMinimised }: { setMinimised: (value: boolean) => voi
     <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
       <AudioVideoToggle hideOptions={true} />
       <Text>You</Text>
-      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
+      <IconButton
+        className="__cancel-drag-event"
+        onClick={() => setMinimised(false)}
+        css={{ bg: 'transparent', border: 'transparent' }}
+      >
         <ExpandIcon />
       </IconButton>
     </Flex>
@@ -82,7 +86,7 @@ export const InsetTile = () => {
   }
 
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef}>
+    <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
         css={{
@@ -114,6 +118,7 @@ export const InsetTile = () => {
             height={height}
             containerCSS={{ background: '$surface_default' }}
             canMinimise
+            isDragabble
           />
         )}
       </Box>

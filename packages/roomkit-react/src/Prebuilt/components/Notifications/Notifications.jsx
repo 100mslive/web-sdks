@@ -1,10 +1,11 @@
 /* eslint-disable no-case-declarations */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
   selectRoomState,
+  useCustomEvent,
   useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -22,6 +23,7 @@ import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 import { getMetadata } from '../../common/utils';
+import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 export function Notifications() {
   const notification = useHMSNotifications();
@@ -30,6 +32,15 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
+
+  const handleRoleChangeDenied = useCallback(request => {
+    ToastManager.addToast({
+      title: `${request.peerName} denied your request to join the ${request.role.name} role`,
+      variant: 'error',
+    });
+  }, []);
+
+  useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {

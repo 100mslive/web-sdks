@@ -2,7 +2,9 @@ import { useCallback } from 'react';
 import {
   DeviceType,
   selectDevices,
+  selectIsAllowedToPreviewMedia,
   selectIsAllowedToPublish,
+  selectIsInPreview,
   selectLocalMediaSettings,
 } from '@100mslive/hms-video-store';
 import { hooksErrHandler } from '../hooks/types';
@@ -45,7 +47,9 @@ export const useDevices = (handleError: hooksErrHandler = logErrorHandler): useD
   const actions = useHMSActions();
   const sdkAllDevices: DeviceTypeAndInfo<MediaDeviceInfo[]> = useHMSStore(selectDevices);
   const sdkSelectedDevices = useHMSStore(selectLocalMediaSettings);
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const isInPreview = useHMSStore(selectIsInPreview);
+  const selectAllowed = isInPreview ? selectIsAllowedToPreviewMedia : selectIsAllowedToPublish;
+  const isAllowedToPublish = useHMSStore(selectAllowed);
 
   const selectedDeviceIDs: DeviceTypeAndInfo<string> = {
     [DeviceType.audioOutput]: sdkSelectedDevices.audioOutputDeviceId,

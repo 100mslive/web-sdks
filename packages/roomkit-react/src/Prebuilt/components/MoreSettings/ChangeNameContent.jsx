@@ -56,8 +56,11 @@ export const ChangeNameContent = ({
           required
           data-testid="change_name_field"
           onKeyDown={async e => {
-            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName && !isMobile) {
+            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
+              if (isMobile) {
+                return;
+              }
               changeName();
             }
           }}

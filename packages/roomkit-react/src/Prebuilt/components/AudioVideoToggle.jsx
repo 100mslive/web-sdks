@@ -67,16 +67,17 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const roomState = useHMSStore(selectRoomState);
-  const isAudioPermitted = toggleAudio && audioInput?.length > 0;
-  const isVideoPermitted = toggleVideo && videoInput?.length > 0;
+  const hasAudioDevices = audioInput?.length > 0;
+  const hasVideoDevices = videoInput?.length > 0;
 
   return (
     <Fragment>
       {toggleAudio ? (
-        hideOptions ? (
+        hideOptions || !hasAudioDevices ? (
           <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
             <IconButton
               active={isLocalAudioEnabled}
+              disabled={!toggleAudio}
               onClick={toggleAudio}
               key="toggleAudio"
               data-testid="audio_btn"
@@ -92,7 +93,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         ) : (
           <IconButtonWithOptions
             options={formattedAudioInputList}
-            disabled={!isAudioPermitted}
+            disabled={!toggleAudio}
             onDisabledClick={toggleAudio}
             tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
             icon={
@@ -110,11 +111,12 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
       ) : null}
 
       {toggleVideo ? (
-        hideOptions ? (
+        hideOptions || !hasVideoDevices ? (
           <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
             <IconButton
               key="toggleVideo"
               active={isLocalVideoEnabled}
+              disabled={!toggleVideo}
               onClick={toggleVideo}
               data-testid="video_btn"
               className="__cancel-drag-event"
@@ -128,7 +130,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           </Tooltip>
         ) : (
           <IconButtonWithOptions
-            disabled={!isVideoPermitted}
+            disabled={!toggleVideo}
             onDisabledClick={toggleVideo}
             options={formattedVideoInputList}
             tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
