@@ -11,26 +11,31 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
-import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../../';
+import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
+// @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
+// @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+// @ts-ignore
 import { formatTime } from '../../common/utils';
+// @ts-ignore
 import { APP_DATA } from '../../common/constants';
 
 export const LiveStatus = () => {
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const hlsState = useHMSStore(selectHLSState);
   const isMobile = useMedia(cssConfig.media.md);
-  const intervalRef = useRef(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [liveTime, setLiveTime] = useState(0);
 
   const startTimer = useCallback(() => {
     intervalRef.current = setInterval(() => {
-      if (hlsState?.running) {
-        setLiveTime(Date.now() - hlsState?.variants[0]?.startedAt.getTime());
+      if (hlsState?.running && hlsState?.variants[0]?.startedAt) {
+        setLiveTime(Date.now() - hlsState.variants[0].startedAt.getTime());
       }
     }, 1000);
   }, [hlsState?.running, hlsState?.variants]);
@@ -90,6 +95,7 @@ export const RecordingStatus = () => {
 
   return (
     <Tooltip
+      side={isMobile ? 'bottom' : 'left'}
       title={getRecordingText({
         isBrowserRecordingOn,
         isServerRecordingOn,
@@ -130,7 +136,7 @@ const StartRecording = () => {
         </Popover.Trigger>
         <Popover.Portal>
           <Popover.Content align="end" sideOffset={8} css={{ w: '$64' }}>
-            <Text variant="body" css={{ color: '$on_surface_medium' }}>
+            <Text variant="body1" css={{ color: '$on_surface_medium' }}>
               Are you sure you want to end the recording?
             </Text>
             <Button
@@ -143,6 +149,7 @@ const StartRecording = () => {
                   await hmsActions.stopRTMPAndRecording();
                 } catch (error) {
                   ToastManager.addToast({
+                    // @ts-ignore
                     title: error.message,
                     variant: 'error',
                   });
@@ -170,6 +177,7 @@ const StartRecording = () => {
             record: true,
           });
         } catch (error) {
+          // @ts-ignore
           if (error.message.includes('stream already running')) {
             ToastManager.addToast({
               title: 'Recording already running',
@@ -177,6 +185,7 @@ const StartRecording = () => {
             });
           } else {
             ToastManager.addToast({
+              // @ts-ignore
               title: error.message,
               variant: 'error',
             });
@@ -215,7 +224,13 @@ export const StreamActions = () => {
   );
 };
 
-export const StopRecordingInSheet = ({ onStopRecording, onClose }) => {
+export const StopRecordingInSheet = ({
+  onStopRecording,
+  onClose,
+}: {
+  onStopRecording: () => void;
+  onClose: () => void;
+}) => {
   return (
     <Sheet.Root open={true}>
       <Sheet.Content>
