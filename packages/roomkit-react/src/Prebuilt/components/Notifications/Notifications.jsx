@@ -21,6 +21,7 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 import { getMetadata } from '../../common/utils';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
@@ -32,6 +33,7 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
 
   const handleRoleChangeDenied = useCallback(request => {
     ToastManager.addToast({
@@ -92,10 +94,10 @@ export function Notifications() {
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
           setTimeout(() => {
-            const previewLocation = window.location.pathname.replace('meeting', 'leave');
+            const previewLocation = window.location.pathname.replace('/meeting', isLeaveScreenEnabled ? '/leave' : '');
             ToastManager.clearAllToast();
             navigate(previewLocation);
-          }, 2000);
+          }, 1000);
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -134,10 +136,10 @@ export function Notifications() {
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
         setTimeout(() => {
-          const leaveLocation = window.location.pathname.replace('meeting', 'leave');
+          const leaveLocation = window.location.pathname.replace('/meeting', isLeaveScreenEnabled ? '/leave' : '');
           navigate(leaveLocation);
           ToastManager.clearAllToast();
-        }, 2000);
+        }, 1000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
