@@ -217,13 +217,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
 
   let messageOpacity = isOverlay ? 0.5 : 1;
   if (rowRef.current && isOverlay) {
-    // Subtract footer height
-    const windowHeight = window.screen.height - 5 * 16;
-    messageOpacity = Math.max(
-      0,
-      // 400 is the overlay chat height
-      mapToRange(rowRef.current.getBoundingClientRect().y, windowHeight - 400, windowHeight, 0.2, 1),
-    );
+    messageOpacity = Math.max(0, mapToRange(rowRef.current.getBoundingClientRect().y, 400, 700, 0.5, 1));
   }
 
   useEffect(() => {
