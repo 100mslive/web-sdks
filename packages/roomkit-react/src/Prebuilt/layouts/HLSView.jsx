@@ -188,9 +188,7 @@ const HLSView = () => {
   };
 
   const toggleControls = show => {
-    // if (dropdownListRef.current?.length === 0) {
     setControlsVisible(() => show);
-    // }
   };
 
   useEffect(() => {
