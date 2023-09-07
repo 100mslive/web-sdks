@@ -17,7 +17,7 @@ import { ROLE_CHANGE_DECLINED } from '../common/constants';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
-  const { setPrevRole, updateMetaData } = useMyMetadata();
+  const { updateMetaData } = useMyMetadata();
   const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const name = useHMSStore(selectLocalPeerName);
@@ -68,9 +68,8 @@ export const RoleChangeRequestModal = () => {
       }}
       body={body}
       onAction={async () => {
-        hmsActions.acceptChangeRole(roleChangeRequest);
-        setPrevRole(currentRole);
-        await updateMetaData({ isHandRaised: false });
+        await hmsActions.acceptChangeRole(roleChangeRequest);
+        await updateMetaData({ isHandRaised: false, prevRole: currentRole });
       }}
       actionText="Accept"
     />
