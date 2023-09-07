@@ -107,7 +107,7 @@ const Conference = () => {
   }, []);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress loadingText="Joining..." />;
+    return <FullPageProgress text="Joining..." />;
   }
 
   return (
@@ -115,8 +115,8 @@ const Conference = () => {
       {isHLSStarted ? (
         <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
           <FullPageProgress
-            loadingText="Starting live stream..."
-            loadingCSS={{ opacity: 0.8, bg: '$background_dim' }}
+            text="Starting live stream..."
+            css={{ opacity: 0.8, bg: '$background_dim' }}
           />
         </Box>
       ) : null}
