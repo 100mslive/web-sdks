@@ -49,7 +49,7 @@ export const RoleChangeRequestModal = () => {
           mt: '$6',
         }}
       >
-        <PreviewTile name={name} />
+        <PreviewTile name={name || ''} />
         <PreviewControls hideSettings={true} />
       </Flex>
     </>
