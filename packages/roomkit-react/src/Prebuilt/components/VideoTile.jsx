@@ -24,6 +24,7 @@ import { config as cssConfig, keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
+import { useRoomLayoutIsStreaming } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
@@ -62,6 +63,7 @@ const Tile = ({
     videoTrackID: track?.id,
     audioTrackID: audioTrack?.id,
   });
+  const isStreamingRoom = useRoomLayoutIsStreaming();
   const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const label = getVideoTileLabel({
     peerName,
@@ -180,7 +182,7 @@ const Tile = ({
             />
           ) : null}
           {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
-          {isMobile ? null : (
+          {isMobile && isStreamingRoom ? null : (
             <TileConnection
               hideLabel={hideParticipantNameOnTile}
               name={label}

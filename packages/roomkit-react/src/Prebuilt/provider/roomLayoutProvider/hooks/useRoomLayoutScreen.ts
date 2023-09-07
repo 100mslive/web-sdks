@@ -63,3 +63,8 @@ export function useRoomLayoutLeaveScreen() {
     isLeaveScreenEnabled,
   };
 }
+
+export function useRoomLayoutIsStreaming() {
+  const screenProps = useRoomLayoutScreen({ screen: 'conferencing' }) || {};
+  return !screenProps?.default;
+}
