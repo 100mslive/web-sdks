@@ -24,7 +24,6 @@ export const CHAT_SELECTOR = {
 export const APP_DATA = {
   uiSettings: 'uiSettings',
   chatOpen: 'chatOpen',
-  hideControls: 'hideControls',
   chatSelector: 'chatSelector',
   chatDraft: 'chatDraft',
   appConfig: 'appConfig',

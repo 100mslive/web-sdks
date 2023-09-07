@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
-  selectAppData,
   selectHMSMessagesCount,
   selectPeerNameByID,
   selectPermissions,
@@ -23,7 +22,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { APP_DATA, CHAT_SELECTOR, isAndroid, isIOS, isIPadOS, SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, isAndroid, isIOS, isIPadOS, SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 80;
 
@@ -68,11 +67,10 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ screenType }) => {
+export const Chat = ({ screenType, hideControls = false }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const hideControls = useHMSStore(selectAppData(APP_DATA.hideControls));
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',

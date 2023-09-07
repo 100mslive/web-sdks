@@ -16,7 +16,13 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
+const SidePane = ({
+  screenType,
+  hideControls = false,
+}: {
+  screenType: keyof ConferencingScreen;
+  hideControls: boolean;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
@@ -26,7 +32,7 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat screenType={screenType} />;
+    ViewComponent = <Chat screenType={screenType} hideControls={hideControls} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }

@@ -33,9 +33,11 @@ const HLSView = React.lazy(() => import('./HLSView'));
 export const VideoStreamingSection = ({
   screenType,
   elements,
+  hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
   elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+  hideControls: boolean;
 }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   // const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
@@ -82,7 +84,7 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane screenType={screenType} />
+        <SidePane screenType={screenType} hideControls={hideControls} />
       </Flex>
     </Suspense>
   );

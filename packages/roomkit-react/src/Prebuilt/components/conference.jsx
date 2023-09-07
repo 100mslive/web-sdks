@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePrevious } from 'react-use';
 import {
@@ -36,7 +36,7 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const [hideControls, setHideControls] = useSetAppDataByKey(APP_DATA.hideControls);
+  const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
@@ -46,7 +46,7 @@ const Conference = () => {
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
-      setHideControls(!hideControls);
+      setHideControls(value => !value);
     }
   };
 
@@ -64,7 +64,7 @@ const Conference = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [dropdownList, hideControls, setHideControls]);
+  }, [dropdownList, hideControls]);
 
   useEffect(() => {
     if (!roomId) {
@@ -147,7 +147,11 @@ const Conference = () => {
         data-testid="conferencing"
         onClick={toggleControls}
       >
-        <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
+        <VideoStreamingSection
+          screenType={screenProps.screenType}
+          elements={screenProps.elements}
+          hideControls={hideControls}
+        />
       </Box>
       {!screenProps.hideSections.includes('footer') && (
         <Box
