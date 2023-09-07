@@ -66,8 +66,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     onLeave?.();
   };
 
-  const leaveRoom = async () => {
-    if (hlsState.running && peersWithStreamingRights.length <= 1) {
+  const leaveRoom = async ({ endstream = false }) => {
+    if (endstream || (hlsState.running && peersWithStreamingRights.length <= 1)) {
       await stopStream();
     }
     hmsActions.leave();
@@ -78,8 +78,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveRoom={leaveRoom} stopStream={stopStream} screenType={screenType} />
+    <MwebLeaveRoom leaveRoom={leaveRoom} screenType={screenType} />
   ) : (
-    <DesktopLeaveRoom leaveRoom={leaveRoom} stopStream={stopStream} screenType={screenType} />
+    <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} />
   );
 };

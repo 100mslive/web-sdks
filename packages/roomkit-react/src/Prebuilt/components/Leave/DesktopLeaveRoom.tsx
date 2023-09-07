@@ -15,11 +15,9 @@ import { useDropdownList } from '../hooks/useDropdownList';
 
 export const DesktopLeaveRoom = ({
   leaveRoom,
-  stopStream,
   screenType,
 }: {
-  leaveRoom: () => void;
-  stopStream: () => Promise<void>;
+  leaveRoom: (args: { endstream: boolean }) => void;
   screenType: keyof ConferencingScreen;
 }) => {
   const [open, setOpen] = useState(false);
@@ -51,7 +49,7 @@ export const DesktopLeaveRoom = ({
               if (screenType === 'hls_live_streaming') {
                 setShowLeaveRoomAlert(true);
               } else {
-                leaveRoom();
+                leaveRoom({ endstream: false });
               }
             }}
           >
@@ -81,7 +79,7 @@ export const DesktopLeaveRoom = ({
                   color: '$on_surface_low',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
-                onClick={leaveRoom}
+                onClick={() => leaveRoom({ endstream: false })}
                 data-testid="just_leave_btn"
               >
                 <LeaveCard
@@ -92,7 +90,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                  onClick={leaveRoom}
+                  onClick={() => leaveRoom({ endstream: false })}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
@@ -130,7 +128,7 @@ export const DesktopLeaveRoom = ({
             if (screenType === 'hls_live_streaming') {
               setShowLeaveRoomAlert(true);
             } else {
-              leaveRoom();
+              leaveRoom({ endstream: false });
             }
           }}
           key="LeaveRoom"
@@ -150,7 +148,6 @@ export const DesktopLeaveRoom = ({
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              stopStream={stopStream}
               leaveRoom={leaveRoom}
               isStreamingOn={isStreamingOn}
               isModal
