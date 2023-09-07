@@ -188,7 +188,7 @@ const HLSView = () => {
   };
 
   useEffect(() => {
-    if (controlsVisible && isFullScreen) {
+    if (controlsVisible && isFullScreen && !qualityDropDownOpen) {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
@@ -204,7 +204,7 @@ const HLSView = () => {
         clearTimeout(controlsTimerRef.current);
       }
     };
-  }, [controlsVisible, isFullScreen]);
+  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
 
   const onHoverHandler = useCallback(
     event => {
