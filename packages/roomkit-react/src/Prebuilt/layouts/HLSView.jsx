@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFullscreen, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
+import { isMobile } from '@100mslive/hms-video';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ColoredHandIcon, ExpandIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
@@ -38,6 +39,11 @@ const HLSView = () => {
   const [isPaused, setIsPaused] = useState(false);
   const isFullScreenSupported = screenfull.isEnabled;
   const [show, toggle] = useToggle(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const controlsRef = useRef();
+  const controlsTimerRef = useRef();
+  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
@@ -181,6 +187,35 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
+  const toggleControls = show => {
+    // if (dropdownListRef.current?.length === 0) {
+    setControlsVisible(() => show);
+    // }
+  };
+
+  useEffect(() => {
+    if (controlsVisible && isMobile) {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+      controlsTimerRef.current = setTimeout(() => {
+        setControlsVisible(false);
+      }, 5000);
+    }
+    return () => {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+    };
+  }, [controlsVisible]);
+
+  const onHoverHandler = useCallback(
+    event => {
+      toggleControls(event.type === 'mouseenter' || event.type === 'touchstart' || qualityDropDownOpen);
+    },
+    [qualityDropDownOpen],
+  );
+
   return (
     <Flex
       key="hls-viewer"
@@ -216,8 +251,14 @@ const HLSView = () => {
               <Loading width={72} height={72} />
             </Flex>
           )}
-          <HMSVideoPlayer.Root ref={videoRef}>
+          <HMSVideoPlayer.Root
+            ref={videoRef}
+            onMouseEnter={onHoverHandler}
+            onMouseLeave={onHoverHandler}
+            onTouchStart={onHoverHandler}
+          >
             <Flex
+              ref={controlsRef}
               direction="column"
               justify="flex-end"
               align="flex-start"
@@ -229,6 +270,9 @@ const HLSView = () => {
                 width: '100%',
                 pt: '$8',
                 flexShrink: 0,
+                transition: 'visibility 0s 0.5s, opacity 0.5s linear',
+                visibility: controlsVisible ? `` : `hidden`,
+                opacity: controlsVisible ? `1` : '0',
               }}
             >
               {hlsPlayer && (
@@ -292,6 +336,8 @@ const HLSView = () => {
                   {availableLayers.length > 0 ? (
                     <HLSQualitySelector
                       layers={availableLayers}
+                      setQualityDropDownOpen={setQualityDropDownOpen}
+                      qualityDropDownOpen={qualityDropDownOpen}
                       selection={currentSelectedQuality}
                       onQualityChange={handleQuality}
                       isAuto={isUserSelectedAuto}
