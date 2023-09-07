@@ -2,16 +2,9 @@ import React from 'react';
 import { CheckIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
 
-export function HLSQualitySelector({
-  qualityDropDownOpen,
-  setQualityDropDownOpen,
-  layers,
-  onQualityChange,
-  selection,
-  isAuto,
-}) {
+export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
   return (
-    <Dropdown.Root open={qualityDropDownOpen} onOpenChange={value => setQualityDropDownOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => onOpen(value)}>
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{

@@ -187,10 +187,6 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  const toggleControls = show => {
-    setControlsVisible(() => show);
-  };
-
   useEffect(() => {
     if (controlsVisible && isFullScreen) {
       if (controlsTimerRef.current) {
@@ -213,13 +209,13 @@ const HLSView = () => {
   const onHoverHandler = useCallback(
     event => {
       if (event.type === 'mouseenter' || qualityDropDownOpen) {
-        toggleControls(true);
+        setControlsVisible(true);
         return;
       }
       if (event.type === 'mouseleave') {
-        toggleControls(false);
+        setControlsVisible(false);
       } else if (isFullScreen && !controlsVisible && event.type === 'mousemove') {
-        toggleControls(true);
+        setControlsVisible(true);
         if (controlsTimerRef.current) {
           clearTimeout(controlsTimerRef.current);
         }
@@ -287,14 +283,6 @@ const HLSView = () => {
                 opacity: controlsVisible ? `1` : '0',
               }}
             >
-              {hlsPlayer && !isMobile && (
-                <HMSVideoPlayer.Progress
-                  onValueChange={currentTime => {
-                    hlsPlayer.seekTo(currentTime);
-                  }}
-                  hlsPlayer={hlsPlayer}
-                />
-              )}
               {!isMobile && (
                 <HMSVideoPlayer.Controls.Root
                   css={{
@@ -349,8 +337,8 @@ const HLSView = () => {
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}
-                        setQualityDropDownOpen={setQualityDropDownOpen}
-                        qualityDropDownOpen={qualityDropDownOpen}
+                        onOpen={setQualityDropDownOpen}
+                        open={qualityDropDownOpen}
                         selection={currentSelectedQuality}
                         onQualityChange={handleQuality}
                         isAuto={isUserSelectedAuto}
