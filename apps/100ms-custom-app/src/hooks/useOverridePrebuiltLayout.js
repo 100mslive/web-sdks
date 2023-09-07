@@ -35,6 +35,7 @@ export const useOverridePrebuiltLayout = () => {
               hide_audio_mute_on_tile: true,
               video_object_fit: isMobile ? 'cover' : 'contain',
               edge_to_edge: true,
+              hide_metadata_on_tile: true,
             },
           },
         },

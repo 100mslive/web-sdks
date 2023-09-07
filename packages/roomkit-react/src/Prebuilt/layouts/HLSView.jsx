@@ -61,12 +61,16 @@ const HLSView = () => {
 
   useEffect(() => {
     const videoElem = videoRef.current;
-    const setStreamEndedCallback = () => setStreamEnded(true);
+    const setStreamEndedCallback = () => {
+      setStreamEnded(true);
+      // no point keeping the callback attached once the streaming is ended
+      videoElem?.removeEventListener('ended', setStreamEndedCallback);
+    };
     videoElem?.addEventListener('ended', setStreamEndedCallback);
     return () => {
       videoElem?.removeEventListener('ended', setStreamEndedCallback);
     };
-  }, []);
+  }, [hlsUrl]);
 
   /**
    * initialize HMSHLSPlayer and add event listeners.
@@ -92,7 +96,7 @@ const HLSView = () => {
       const parsedPayload = parsePayload(payload);
       switch (parsedPayload.type) {
         case EMOJI_REACTION_TYPE:
-          window.showFlyingEmoji({ emojiId: parsedPayload?.emojiId, senderId: parsedPayload?.senderId });
+          window.showFlyingEmoji?.({ emojiId: parsedPayload?.emojiId, senderId: parsedPayload?.senderId });
           break;
         default: {
           const toast = {

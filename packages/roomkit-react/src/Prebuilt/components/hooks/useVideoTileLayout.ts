@@ -7,6 +7,7 @@ type TileContextType = {
   hideAudioMuteOnTile?: boolean;
   hideAudioLevelOnTile?: boolean;
   objectFit?: 'cover' | 'contain';
+  hideMetadataOnTile?: boolean;
 };
 
 export const VideoTileContext = React.createContext<TileContextType>({
@@ -16,6 +17,7 @@ export const VideoTileContext = React.createContext<TileContextType>({
   hideAudioMuteOnTile: false,
   hideAudioLevelOnTile: false,
   objectFit: 'contain',
+  hideMetadataOnTile: false,
 });
 
 export const useVideoTileContext = () => {

@@ -38,6 +38,8 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+// @ts-ignore: No implicit Any
+import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
   useRoomLayoutLeaveScreen,
@@ -350,13 +352,14 @@ function AppRoutes({
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
+  const isNotificationsDisabled = useIsNotificationDisabled();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        <FlyingEmoji />
+        {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
