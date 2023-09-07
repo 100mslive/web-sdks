@@ -83,11 +83,6 @@ const Tile = ({
     return 'large';
   }, [width, height]);
 
-  // if there is no audio and video don't render. this can happen when native devices join with audio/video muted
-  if (!audioTrack && !track) {
-    return null;
-  }
-
   return (
     <StyledVideoTile.Root
       css={{
@@ -108,25 +103,23 @@ const Tile = ({
             <VideoTileStats audioTrackID={audioTrack?.id} videoTrackID={track?.id} peerID={peerId} isLocal={isLocal} />
           ) : null}
 
-          {track ? (
-            <Video
-              trackId={track?.id}
-              attach={isLocal ? undefined : !isAudioOnly}
-              mirror={
-                mirrorLocalVideo &&
-                peerId === localPeerID &&
-                track?.source === 'regular' &&
-                track?.facingMode !== 'environment'
-              }
-              noRadius={!roundedVideoTile}
-              data-testid="participant_video_tile"
-              css={{
-                objectFit,
-                filter: isVideoDegraded ? 'blur($space$2)' : undefined,
-                bg: 'transparent',
-              }}
-            />
-          ) : null}
+          <Video
+            trackId={track?.id}
+            attach={isLocal ? undefined : !isAudioOnly}
+            mirror={
+              mirrorLocalVideo &&
+              peerId === localPeerID &&
+              track?.source === 'regular' &&
+              track?.facingMode !== 'environment'
+            }
+            noRadius={!roundedVideoTile}
+            data-testid="participant_video_tile"
+            css={{
+              objectFit,
+              filter: isVideoDegraded ? 'blur($space$2)' : undefined,
+              bg: 'transparent',
+            }}
+          />
 
           {isVideoMuted || (!isLocal && isAudioOnly) ? (
             <StyledVideoTile.AvatarContainer>
