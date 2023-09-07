@@ -54,7 +54,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
     peerList.forEach(peer => {
       const prevRole = getMetadata(peer.metadata).prevRole;
       if (prevRole) {
-        hmsActions.changeRoleOfPeer(peer.id, getMetadata(peer.metadata).prevRole, true);
+        hmsActions.changeRoleOfPeer(peer.id, prevRole, true);
       }
     });
   };
