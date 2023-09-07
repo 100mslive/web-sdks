@@ -15,6 +15,7 @@ export type GridLayoutProps = GridVideoTileLayout & {
   hide_audio_mute_on_tile: boolean;
   video_object_fit: 'contain' | 'cover';
   edge_to_edge: boolean;
+  hide_metadata_on_tile: boolean;
 };
 
 export const GridLayout = ({
@@ -26,6 +27,7 @@ export const GridLayout = ({
   hide_audio_mute_on_tile = false,
   video_object_fit = 'contain',
   edge_to_edge = false,
+  hide_metadata_on_tile = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
@@ -52,6 +54,7 @@ export const GridLayout = ({
     hideParticipantNameOnTile: hide_participant_name_on_tile,
     roundedVideoTile: rounded_video_tile,
     hideAudioMuteOnTile: hide_audio_mute_on_tile,
+    hideMetadataOnTile: hide_metadata_on_tile,
     objectFit: video_object_fit,
   };
 

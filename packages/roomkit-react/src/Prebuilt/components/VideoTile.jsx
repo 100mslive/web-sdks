@@ -41,6 +41,7 @@ const Tile = ({
   hideParticipantNameOnTile = false,
   roundedVideoTile = true,
   hideAudioMuteOnTile = false,
+  hideMetadataOnTile = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -178,7 +179,7 @@ const Tile = ({
               enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
-          <PeerMetadata peerId={peerId} />
+          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
           {isMobile ? null : (
             <TileConnection
               hideLabel={hideParticipantNameOnTile}
