@@ -96,6 +96,12 @@ export const Chat = ({ screenType }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const isMobile = useMedia(cssConfig.media.md);
 
+  let isScrolledToBottom = false;
+  if (listRef.current) {
+    const currentRef = listRef.current._outerRef;
+    isScrolledToBottom = currentRef.scrollHeight - currentRef.clientHeight - currentRef.scrollTop < 10;
+  }
+
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
@@ -142,7 +148,7 @@ export const Chat = ({ screenType }) => {
         }}
         peerId={chatOptions.peerId}
       >
-        {!isSelectorOpen && (
+        {!isSelectorOpen && !isScrolledToBottom && (
           <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
         )}
       </ChatFooter>
