@@ -12,7 +12,6 @@ import {
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
-// @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';

@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
+// @ts-ignore: No implicit Any
 import { ErrorDialog } from '../primitives/DialogContent';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
+import { useRedirectOnPrebuiltChanges } from './hooks/useRedirectOnPrebuiltChanges';
+// @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
 
 /**
@@ -15,36 +19,45 @@ import { APP_DATA } from '../common/constants';
  * auth_token=123 => uses the passed in token to join instead of fetching from token endpoint
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
-const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken }) => {
-  const hmsActions = useHMSActions();
-  const tokenEndpoint = useTokenEndpoint();
-  const { roomCode, userId } = useHMSPrebuiltContext();
-  const [error, setError] = useState({ title: '', body: '' });
-  let authToken = defaultAuthToken;
-  const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
+const AuthToken = React.memo(
+  ({
+    authTokenByRoomCodeEndpoint,
+    defaultAuthToken,
+  }: {
+    authTokenByRoomCodeEndpoint: string;
+    defaultAuthToken?: string;
+  }) => {
+    const hmsActions = useHMSActions();
+    const tokenEndpoint = useTokenEndpoint();
+    const { roomCode, userId } = useHMSPrebuiltContext();
+    const [error, setError] = useState({ title: '', body: <></> });
+    const authToken = defaultAuthToken;
+    const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
+    useRedirectOnPrebuiltChanges();
 
-  useEffect(() => {
-    if (authToken) {
-      setAuthTokenInAppData(authToken);
-      return;
+    useEffect(() => {
+      if (authToken) {
+        setAuthTokenInAppData(authToken);
+        return;
+      }
+      if (!tokenEndpoint && !roomCode) {
+        return;
+      }
+
+      hmsActions
+        .getAuthTokenByRoomCode({ roomCode, userId }, { endpoint: authTokenByRoomCodeEndpoint })
+        .then(token => setAuthTokenInAppData(token))
+        .catch(error => setError(convertError(error)));
+    }, [hmsActions, tokenEndpoint, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId]);
+
+    if (error.title) {
+      return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;
     }
-    if (!tokenEndpoint && !roomCode) {
-      return;
-    }
+    return null;
+  },
+);
 
-    hmsActions
-      .getAuthTokenByRoomCode({ roomCode, userId }, { endpoint: authTokenByRoomCodeEndpoint })
-      .then(token => setAuthTokenInAppData(token))
-      .catch(error => setError(convertError(error)));
-  }, [hmsActions, tokenEndpoint, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId]);
-
-  if (error.title) {
-    return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;
-  }
-  return null;
-});
-
-const convertError = error => {
+const convertError = (error: any) => {
   console.error('[error]', { error });
   if (error.action === 'GET_TOKEN' && error.code === 403) {
     return {
@@ -86,7 +99,7 @@ const Link = styled('a', {
   color: '#2f80e1',
 });
 
-export const ErrorWithSupportLink = errorMessage => (
+export const ErrorWithSupportLink = (errorMessage: string) => (
   <div>
     {errorMessage} If you think this is a mistake on our side, please create{' '}
     <Link target="_blank" href="https://github.com/100mslive/100ms-web/issues" rel="noreferrer">
