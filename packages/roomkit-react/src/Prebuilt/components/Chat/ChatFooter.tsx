@@ -186,7 +186,7 @@ export const ChatFooter = ({
               ml: 'auto',
               height: 'max-content',
               mr: '$4',
-              '&:hover': { c: '$on_surface_medium' },
+              '&:hover': { c: isMobile ? '' : '$on_surface_medium' },
             }}
             data-testid="send_msg_btn"
           >
