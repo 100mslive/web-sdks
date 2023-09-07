@@ -1,5 +1,4 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -20,7 +19,7 @@ import { Avatar } from '../../Avatar';
 import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
 import { Text } from '../../Text';
-import { config as cssConfig, keyframes } from '../../Theme';
+import { keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
@@ -83,7 +82,6 @@ const Tile = ({
     }
     return 'large';
   }, [width, height]);
-  const isMobile = useMedia(cssConfig.media.md);
 
   return (
     <StyledVideoTile.Root
@@ -180,17 +178,16 @@ const Tile = ({
             />
           ) : null}
           {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
-          {isMobile ? null : (
-            <TileConnection
-              hideLabel={hideParticipantNameOnTile}
-              name={label}
-              isTile
-              peerId={peerId}
-              width={width}
-              pinned={pinned}
-              spotlighted={spotlighted}
-            />
-          )}
+
+          <TileConnection
+            hideLabel={hideParticipantNameOnTile}
+            name={label}
+            isTile
+            peerId={peerId}
+            width={width}
+            pinned={pinned}
+            spotlighted={spotlighted}
+          />
         </StyledVideoTile.Container>
       ) : null}
     </StyledVideoTile.Root>
