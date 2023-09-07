@@ -1447,15 +1447,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    if (
-      [
-        sdkTypes.HMSPeerUpdate.PEER_JOINED,
-        sdkTypes.HMSPeerUpdate.PEER_LEFT,
-        sdkTypes.HMSPeerUpdate.ROLE_UPDATED,
-      ].includes(type)
-    ) {
+    if (type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED) {
+      const isSameRole = peer?.roleName === sdkPeer.role?.name;
       this.syncRoomState(actionName);
       this.updateMidCallPreviewRoomState(type, sdkPeer);
+
+      // if role is not updated dont send notification
+      if (isSameRole) {
+        return;
+      }
+    } else if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
+      this.syncRoomState(actionName);
       // if peer wasn't available before sync(will happen if event is peer join)
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
