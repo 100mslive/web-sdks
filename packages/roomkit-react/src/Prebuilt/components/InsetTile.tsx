@@ -45,12 +45,10 @@ export const InsetTile = () => {
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height
-      ? videoTrack.width / videoTrack.height
-      : isMobile
-      ? defaultMobileAspectRatio
-      : desktopAspectRatio;
+  let aspectRatio = isMobile ? defaultMobileAspectRatio : desktopAspectRatio;
+  if (videoTrack?.width && videoTrack?.height && !isMobile) {
+    aspectRatio = videoTrack.width / videoTrack.height;
+  }
   let height = insetHeightPx;
   let width = height * aspectRatio;
   // Convert to 16/9 in landscape mode with a max width of 240
