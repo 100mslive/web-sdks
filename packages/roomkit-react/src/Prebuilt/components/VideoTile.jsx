@@ -83,6 +83,11 @@ const Tile = ({
     return 'large';
   }, [width, height]);
 
+  // if there is no audio and video don't render. this can happen when native devices join with audio/video muted
+  if (!audioTrack && !track) {
+    return null;
+  }
+
   return (
     <StyledVideoTile.Root
       css={{
