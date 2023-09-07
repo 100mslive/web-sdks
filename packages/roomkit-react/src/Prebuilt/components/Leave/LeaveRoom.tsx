@@ -70,7 +70,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     if (hlsState.running && peersWithStreamingRights.length <= 1) {
       await stopStream();
     }
-    await hmsActions.leave();
+    hmsActions.leave();
     redirectToLeavePage();
   };
 
