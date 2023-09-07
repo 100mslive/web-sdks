@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { usePrevious } from 'react-use';
 import {
@@ -36,7 +36,7 @@ const Conference = () => {
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
-  const [hideControls, setHideControls] = useState(false);
+  const [hideControls, setHideControls] = useSetAppDataByKey(APP_DATA.hideControls);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
@@ -46,7 +46,7 @@ const Conference = () => {
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
-      setHideControls(value => !value);
+      setHideControls(!hideControls);
     }
   };
 
@@ -64,7 +64,7 @@ const Conference = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [dropdownList, hideControls]);
+  }, [dropdownList, hideControls, setHideControls]);
 
   useEffect(() => {
     if (!roomId) {

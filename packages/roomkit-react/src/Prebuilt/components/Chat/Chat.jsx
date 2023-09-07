@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
+  selectAppData,
   selectHMSMessagesCount,
   selectPeerNameByID,
   selectPermissions,
@@ -22,7 +23,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, CHAT_SELECTOR, isAndroid, isIOS, isIPadOS, SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 80;
 
@@ -71,6 +72,7 @@ export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+  const hideControls = useHMSStore(selectAppData(APP_DATA.hideControls));
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
@@ -81,6 +83,8 @@ export const Chat = ({ screenType }) => {
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
+  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
+
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
@@ -117,7 +121,15 @@ export const Chat = ({ screenType }) => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
+    <Flex
+      direction="column"
+      css={{
+        size: '100%',
+        gap: '$4',
+        marginTop: performAutoHide && elements?.chat?.is_overlay ? '$17' : '0',
+        transition: 'margin 0.3s ease-in-out',
+      }}
+    >
       {isMobile && elements?.chat?.is_overlay ? null : (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
