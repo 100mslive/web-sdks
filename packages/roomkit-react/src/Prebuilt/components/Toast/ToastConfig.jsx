@@ -109,7 +109,7 @@ export const ToastConfig = {
       };
     },
   },
-  METADATA_UPDATED: {
+  RAISE_HAND: {
     single: notification => {
       return {
         title: `${notification.data?.name} raised hand`,
@@ -118,10 +118,11 @@ export const ToastConfig = {
       };
     },
     multiple: notifications => {
+      const count = new Set(notifications.map(notification => notification.data?.id)).size;
       return {
-        title: `${notifications[notifications.length - 1].data?.name} and ${
-          notifications.length - 1
-        } others raised hand`,
+        title: `${notifications[notifications.length - 1].data?.name} ${
+          count > 1 ? `${count} and others` : ''
+        } raised hand`,
         icon: <HandIcon />,
         action: <HandRaiseAction isSingleHandRaise={false} />,
       };

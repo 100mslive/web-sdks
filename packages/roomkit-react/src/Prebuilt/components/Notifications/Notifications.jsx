@@ -60,7 +60,7 @@ export function Notifications() {
 
         console.debug('Metadata updated', notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.showToast({ notification });
+        ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(notification.data.id + ' changed their name to ' + notification.data.name);
