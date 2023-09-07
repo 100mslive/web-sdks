@@ -13,19 +13,22 @@ export const useRedirectToLeave = () => {
   const params = useParams();
   const navigate = useNavigate();
 
-  const redirect = useCallback(() => {
-    setTimeout(() => {
-      const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
-      if (params.role) {
-        navigate(prefix + params.roomId + '/' + params.role);
-      } else {
-        navigate(prefix + params.roomId);
-      }
-      PictureInPicture.stop().catch(() => console.error('stopping pip'));
-      ToastManager.clearAllToast();
-      onLeave?.();
-    }, 1000);
-  }, [isLeaveScreenEnabled, navigate, onLeave, params.role, params.roomId]);
+  const redirect = useCallback(
+    (timeout = 0) => {
+      setTimeout(() => {
+        const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
+        if (params.role) {
+          navigate(prefix + params.roomId + '/' + params.role);
+        } else {
+          navigate(prefix + params.roomId);
+        }
+        PictureInPicture.stop().catch(() => console.error('stopping pip'));
+        ToastManager.clearAllToast();
+        onLeave?.();
+      }, timeout);
+    },
+    [isLeaveScreenEnabled, navigate, onLeave, params.role, params.roomId],
+  );
 
   return { redirectToLeave: redirect };
 };

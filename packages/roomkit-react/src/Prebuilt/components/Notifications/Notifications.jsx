@@ -93,7 +93,7 @@ export function Notifications() {
           }
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
-          redirectToLeave();
+          redirectToLeave(1000);
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -131,7 +131,7 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        redirectToLeave();
+        redirectToLeave(1000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
