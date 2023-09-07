@@ -100,7 +100,7 @@ export function Notifications() {
                 <Button
                   onClick={() => {
                     ToastManager.removeToast(toastId);
-                    navigate(`/${params.roomCode || params.roomId}${params.role ? `/${params.role}` : ''}`);
+                    navigate(`/${params.roomId}${params.role ? `/${params.role}` : ''}`);
                   }}
                 >
                   Rejoin
