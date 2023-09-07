@@ -197,7 +197,7 @@ const Tile = ({
   );
 };
 
-const metaStyles = { top: '$4', left: '$4' };
+const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
 
 const heightAnimation = value =>
   keyframes({
@@ -262,7 +262,7 @@ const PeerMetadata = ({ peerId }) => {
       ) : null}
       {isBRB ? (
         <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
-          <BrbTileIcon width={22} height={11} />
+          <BrbTileIcon width={22} height={22} />
         </StyledVideoTile.AttributeBox>
       ) : null}
     </Fragment>
