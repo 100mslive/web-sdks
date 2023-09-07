@@ -114,10 +114,7 @@ const Conference = () => {
     <>
       {isHLSStarted ? (
         <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
-          <FullPageProgress
-            text="Starting live stream..."
-            css={{ opacity: 0.8, bg: '$background_dim' }}
-          />
+          <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
         </Box>
       ) : null}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
