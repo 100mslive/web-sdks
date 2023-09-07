@@ -217,7 +217,10 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
 
   let messageOpacity = isOverlay ? 0.5 : 1;
   if (rowRef.current && isOverlay) {
-    messageOpacity = Math.max(0, mapToRange(rowRef.current.getBoundingClientRect().y, 400, 700, 0.5, 1));
+    // Convert distance to alpha value
+    // 600 should map to 0.4, 800 to 1 and generate opacity value for the message with the same mapping
+    // Numbers selected by testing for different devices
+    messageOpacity = Math.max(0, mapToRange(rowRef.current.getBoundingClientRect().bottom, 600, 800, 0.4, 1));
   }
 
   useEffect(() => {
