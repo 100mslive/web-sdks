@@ -38,6 +38,11 @@ const HLSView = () => {
   const [isPaused, setIsPaused] = useState(false);
   const isFullScreenSupported = screenfull.isEnabled;
   const [show, toggle] = useToggle(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const controlsRef = useRef();
+  const controlsTimerRef = useRef();
+  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+
   const isMobile = useMedia(config.media.md);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
@@ -182,6 +187,43 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
+  useEffect(() => {
+    if (controlsVisible && isFullScreen && !qualityDropDownOpen) {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+      controlsTimerRef.current = setTimeout(() => {
+        setControlsVisible(false);
+      }, 5000);
+    }
+    if (!isFullScreen && controlsTimerRef.current) {
+      clearTimeout(controlsTimerRef.current);
+    }
+    return () => {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+    };
+  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
+
+  const onHoverHandler = useCallback(
+    event => {
+      if (event.type === 'mouseenter' || qualityDropDownOpen) {
+        setControlsVisible(true);
+        return;
+      }
+      if (event.type === 'mouseleave') {
+        setControlsVisible(false);
+      } else if (isFullScreen && !controlsVisible && event.type === 'mousemove') {
+        setControlsVisible(true);
+        if (controlsTimerRef.current) {
+          clearTimeout(controlsTimerRef.current);
+        }
+      }
+    },
+    [controlsVisible, isFullScreen, qualityDropDownOpen],
+  );
+
   return (
     <Flex
       key="hls-viewer"
@@ -217,8 +259,14 @@ const HLSView = () => {
               <Loading width={72} height={72} />
             </Flex>
           )}
-          <HMSVideoPlayer.Root ref={videoRef}>
+          <HMSVideoPlayer.Root
+            ref={videoRef}
+            onMouseEnter={onHoverHandler}
+            onMouseMove={onHoverHandler}
+            onMouseLeave={onHoverHandler}
+          >
             <Flex
+              ref={controlsRef}
               direction="column"
               justify="flex-end"
               align="flex-start"
@@ -230,16 +278,11 @@ const HLSView = () => {
                 width: '100%',
                 pt: '$8',
                 flexShrink: 0,
+                transition: 'visibility 0s 0.5s, opacity 0.5s linear',
+                visibility: controlsVisible ? `` : `hidden`,
+                opacity: controlsVisible ? `1` : '0',
               }}
             >
-              {hlsPlayer && !isMobile && (
-                <HMSVideoPlayer.Progress
-                  onValueChange={currentTime => {
-                    hlsPlayer.seekTo(currentTime);
-                  }}
-                  hlsPlayer={hlsPlayer}
-                />
-              )}
               {!isMobile && (
                 <HMSVideoPlayer.Controls.Root
                   css={{
@@ -294,6 +337,8 @@ const HLSView = () => {
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}
+                        onOpen={setQualityDropDownOpen}
+                        open={qualityDropDownOpen}
                         selection={currentSelectedQuality}
                         onQualityChange={handleQuality}
                         isAuto={isUserSelectedAuto}
