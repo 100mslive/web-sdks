@@ -107,71 +107,74 @@ const Conference = () => {
   }, []);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress loadingText="Joining..." />;
-  }
-
-  if (isHLSStarted) {
-    return <FullPageProgress loadingText="Starting live stream..." />;
+    return <FullPageProgress text="Joining..." />;
   }
 
   return (
-    <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-      {!screenProps.hideSections.includes('header') && (
+    <>
+      {isHLSStarted ? (
+        <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
+          <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
+        </Box>
+      ) : null}
+      <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
+        {!screenProps.hideSections.includes('header') && (
+          <Box
+            ref={headerRef}
+            css={{
+              h: '$18',
+              transition: 'margin 0.3s ease-in-out',
+              marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
+              '@md': {
+                h: '$17',
+              },
+            }}
+            data-testid="header"
+          >
+            <Header elements={screenProps.elements} screenType={screenProps.screenType} />
+          </Box>
+        )}
         <Box
-          ref={headerRef}
           css={{
-            h: '$18',
-            transition: 'margin 0.3s ease-in-out',
-            marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
-            '@md': {
-              h: '$17',
+            w: '100%',
+            flex: '1 1 0',
+            minHeight: 0,
+            px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10', // TODO: padding to be controlled by section/element
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            '@lg': {
+              px: 0,
             },
           }}
-          data-testid="header"
+          id="conferencing"
+          data-testid="conferencing"
+          onClick={toggleControls}
         >
-          <Header elements={screenProps.elements} screenType={screenProps.screenType} />
+          <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
         </Box>
-      )}
-      <Box
-        css={{
-          w: '100%',
-          flex: '1 1 0',
-          minHeight: 0,
-          px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10', // TODO: padding to be controlled by section/element
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          '@lg': {
-            px: 0,
-          },
-        }}
-        id="conferencing"
-        data-testid="conferencing"
-        onClick={toggleControls}
-      >
-        <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
-      </Box>
-      {!screenProps.hideSections.includes('footer') && (
-        <Box
-          ref={footerRef}
-          css={{
-            flexShrink: 0,
-            maxHeight: '$24',
-            transition: 'margin 0.3s ease-in-out',
-            bg: '$background_dim',
-            marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
-            '@md': {
-              maxHeight: 'unset',
-              bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
-            },
-          }}
-          data-testid="footer"
-        >
-          <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
-        </Box>
-      )}
-      <RoleChangeRequestModal />
-      <HLSFailureModal />
-      <ActivatedPIP />
-    </Flex>
+        {!screenProps.hideSections.includes('footer') && (
+          <Box
+            ref={footerRef}
+            css={{
+              flexShrink: 0,
+              maxHeight: '$24',
+              transition: 'margin 0.3s ease-in-out',
+              bg: '$background_dim',
+              marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
+              '@md': {
+                maxHeight: 'unset',
+                bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
+              },
+            }}
+            data-testid="footer"
+          >
+            <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
+          </Box>
+        )}
+        <RoleChangeRequestModal />
+        <HLSFailureModal />
+        <ActivatedPIP />
+      </Flex>
+    </>
   );
 };
 
