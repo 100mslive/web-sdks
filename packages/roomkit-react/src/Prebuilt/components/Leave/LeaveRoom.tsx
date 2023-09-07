@@ -48,7 +48,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   };
 
   const leaveRoom = async ({ endstream = false }) => {
-    if (endstream || (hlsState.running && peersWithStreamingRights.length <= 1)) {
+    if (endstream || (hlsState.running && peersWithStreamingRights.length === 1)) {
       await stopStream();
     }
     hmsActions.leave();
