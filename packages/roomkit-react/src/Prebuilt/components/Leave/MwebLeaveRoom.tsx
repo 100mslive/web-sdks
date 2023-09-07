@@ -14,11 +14,9 @@ import { useDropdownList } from '../hooks/useDropdownList';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
-  stopStream,
   screenType,
 }: {
-  leaveRoom: () => void;
-  stopStream: () => Promise<void>;
+  leaveRoom: (args: { endstream: boolean }) => void;
   screenType: keyof ConferencingScreen;
 }) => {
   const [open, setOpen] = useState(false);
@@ -64,7 +62,7 @@ export const MwebLeaveRoom = ({
               bg="$surface_default"
               titleColor="$on_surface_high"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-              onClick={leaveRoom}
+              onClick={() => leaveRoom({ endstream: false })}
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
             {isStreamingOn && permissions?.hlsStreaming ? (
@@ -106,7 +104,6 @@ export const MwebLeaveRoom = ({
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
-            stopStream={stopStream}
             leaveRoom={leaveRoom}
             isStreamingOn={isStreamingOn}
           />

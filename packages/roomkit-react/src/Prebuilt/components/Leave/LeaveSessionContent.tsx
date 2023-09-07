@@ -10,7 +10,7 @@ export const LeaveSessionContent = ({
   isModal = false,
 }: {
   setShowLeaveRoomAlert: (value: boolean) => void;
-  leaveRoom: () => void;
+  leaveRoom: (args: { endstream: boolean }) => void;
   isModal?: boolean;
 }) => {
   return (
@@ -44,7 +44,13 @@ export const LeaveSessionContent = ({
         >
           Cancel
         </Button>
-        <Button variant="danger" css={{ w: '100%' }} onClick={leaveRoom} id="leaveRoom" data-testid="leave_room">
+        <Button
+          variant="danger"
+          css={{ w: '100%' }}
+          onClick={() => leaveRoom({ endstream: false })}
+          id="leaveRoom"
+          data-testid="leave_room"
+        >
           Leave Session
         </Button>
       </Flex>
