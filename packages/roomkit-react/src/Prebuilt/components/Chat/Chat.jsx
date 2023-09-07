@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
@@ -156,7 +156,7 @@ export const Chat = ({ screenType }) => {
   );
 };
 
-const NewMessageIndicator = memo(({ role, peerId, scrollToBottom }) => {
+const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
   const unreadCount = useUnreadCount({ role, peerId });
   if (!unreadCount) {
     return null;
@@ -195,4 +195,4 @@ const NewMessageIndicator = memo(({ role, peerId, scrollToBottom }) => {
       </Button>
     </Flex>
   );
-});
+};
