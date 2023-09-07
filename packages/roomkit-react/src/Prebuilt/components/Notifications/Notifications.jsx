@@ -1,6 +1,6 @@
 /* eslint-disable no-case-declarations */
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
@@ -10,7 +10,9 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
+import { PictureInPicture } from '../PIP/PIPManager';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -29,11 +31,13 @@ import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigate();
+  const params = useParams();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const { onLeave } = useHMSPrebuiltContext();
 
   const handleRoleChangeDenied = useCallback(request => {
     ToastManager.addToast({
@@ -43,6 +47,20 @@ export function Notifications() {
   }, []);
 
   useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
+
+  const redirectToLeavePage = () => {
+    setTimeout(() => {
+      const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
+      if (params.role) {
+        navigate(prefix + params.roomId + '/' + params.role);
+      } else {
+        navigate(prefix + params.roomId);
+      }
+      PictureInPicture.stop().catch(() => console.error('stopping pip'));
+      ToastManager.clearAllToast();
+      onLeave?.();
+    }, 1000);
+  };
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {
@@ -82,7 +100,7 @@ export function Notifications() {
                 <Button
                   onClick={() => {
                     ToastManager.removeToast(toastId);
-                    window.location.reload();
+                    navigate(`/${params.roomCode || params.roomId}${params.role ? `/${params.role}` : ''}`);
                   }}
                 >
                   Rejoin
@@ -93,11 +111,7 @@ export function Notifications() {
           }
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
-          setTimeout(() => {
-            const previewLocation = window.location.pathname.replace('/meeting', isLeaveScreenEnabled ? '/leave' : '');
-            ToastManager.clearAllToast();
-            navigate(previewLocation);
-          }, 1000);
+          redirectToLeavePage();
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -135,11 +149,7 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        setTimeout(() => {
-          const leaveLocation = window.location.pathname.replace('/meeting', isLeaveScreenEnabled ? '/leave' : '');
-          navigate(leaveLocation);
-          ToastManager.clearAllToast();
-        }, 1000);
+        redirectToLeavePage();
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
