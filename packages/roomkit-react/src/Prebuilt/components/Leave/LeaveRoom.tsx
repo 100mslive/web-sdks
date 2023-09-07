@@ -2,7 +2,17 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
-import { selectIsConnectedToRoom, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSPeer,
+  HMSRole,
+  selectHLSState,
+  selectIsConnectedToRoom,
+  selectPeersByCondition,
+  selectPermissions,
+  selectRolesMap,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore: No implicit Any
 import { useHMSPrebuiltContext } from '../../AppContext';
@@ -20,6 +30,15 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
+  const rolesMap: Record<string, HMSRole> = useHMSStore(selectRolesMap);
+  const streamingPermissionRoles = Object.keys(rolesMap).filter(roleName => {
+    const roleObj = rolesMap[roleName];
+    return roleObj.permissions.hlsStreaming;
+  });
+  const peersWithStreamingRights = useHMSStore(
+    selectPeersByCondition((peer: HMSPeer) => streamingPermissionRoles.includes(peer.roleName || '')),
+  );
+  const hlsState = useHMSStore(selectHLSState);
   const hmsActions = useHMSActions();
   const { onLeave } = useHMSPrebuiltContext();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
@@ -47,8 +66,11 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     onLeave?.();
   };
 
-  const leaveRoom = () => {
-    hmsActions.leave();
+  const leaveRoom = async () => {
+    if (hlsState.running && peersWithStreamingRights.length <= 1) {
+      await stopStream();
+    }
+    await hmsActions.leave();
     redirectToLeavePage();
   };
 
