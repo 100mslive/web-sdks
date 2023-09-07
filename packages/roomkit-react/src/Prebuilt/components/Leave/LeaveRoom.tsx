@@ -14,7 +14,6 @@ import {
 } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore: No implicit Any
-// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
@@ -48,7 +47,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   };
 
   const leaveRoom = async ({ endstream = false }) => {
-    if (endstream || (hlsState.running && peersWithStreamingRights.length <= 1)) {
+    if (endstream || (hlsState.running && peersWithStreamingRights.length === 1)) {
       await stopStream();
     }
     hmsActions.leave();
