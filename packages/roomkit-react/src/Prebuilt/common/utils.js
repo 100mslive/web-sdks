@@ -90,3 +90,12 @@ export const formatTime = timeInSeconds => {
   const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
   return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
+
+export function clamp(input, min, max) {
+  return input < min ? min : input > max ? max : input;
+}
+
+export function mapToRange(current, in_min, in_max, out_min, out_max) {
+  const mapped = ((current - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+  return clamp(mapped, out_min, out_max);
+}

@@ -25,6 +25,7 @@ import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { mapToRange } from '../../common/utils';
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -195,7 +196,7 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
+const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin, isOverlay }) => {
   const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
   const rowRef = useRef(null);
   useEffect(() => {
@@ -203,7 +204,6 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       setRowHeight(index, rowRef.current.clientHeight);
     }
   }, [index, setRowHeight]);
-  const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -214,6 +214,17 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   });
   // show pin action only if peer has remove others permission and the message is of broadcast type
   const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
+
+  let messageOpacity = isOverlay ? 0.5 : 1;
+  if (rowRef.current && isOverlay) {
+    // Subtract footer height
+    const windowHeight = window.screen.height - 5 * 16;
+    messageOpacity = Math.max(
+      0,
+      // 400 is the overlay chat height
+      mapToRange(rowRef.current.getBoundingClientRect().y, windowHeight - 400, windowHeight, 0.2, 1),
+    );
+  }
 
   useEffect(() => {
     if (message.id && !message.read && inView) {
@@ -234,11 +245,12 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         css={{
           flexWrap: 'wrap',
           // Theme independent color, token should not be used for transparent chat
-          bg: messageType ? (isMobile ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
+          bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
           userSelect: 'none',
+          opacity: messageOpacity,
         }}
         key={message.time}
         data-testid="chat_msg"
@@ -266,7 +278,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
                 </SenderName>
               </Tooltip>
             )}
-            {!isMobile ? (
+            {!isOverlay ? (
               <Text
                 as="span"
                 variant="xs"
@@ -285,7 +297,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {!isMobile ? (
+          {!isOverlay ? (
             <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
           ) : null}
         </Text>
@@ -307,7 +319,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   );
 });
 const ChatList = React.forwardRef(
-  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom }, listRef) => {
+  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom, isOverlay }, listRef) => {
     const { setPinnedMessage } = useSetPinnedMessage();
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
@@ -334,6 +346,7 @@ const ChatList = React.forwardRef(
             key={messages[index].id}
             message={messages[index]}
             setRowHeight={setRowHeight}
+            isOverlay={isOverlay}
             onPin={() => setPinnedMessage(messages[index])}
           />
         )}
@@ -341,7 +354,7 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom, isOverlay }, listRef) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
@@ -380,6 +393,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, 
             getRowHeight={getRowHeight}
             scrollToBottom={scrollToBottom}
             ref={listRef}
+            isOverlay={isOverlay}
           />
         )}
       </AutoSizer>
@@ -428,7 +442,12 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
 
   return (
     <Fragment>
-      <VirtualizedChatMessages messages={messages} scrollToBottom={scrollToBottom} ref={listRef} />
+      <VirtualizedChatMessages
+        messages={messages}
+        scrollToBottom={scrollToBottom}
+        ref={listRef}
+        isOverlay={elements?.chat?.is_overlay && isMobile}
+      />
     </Fragment>
   );
 });
