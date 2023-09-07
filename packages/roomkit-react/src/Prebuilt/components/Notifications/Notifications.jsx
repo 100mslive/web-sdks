@@ -10,9 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
-import { PictureInPicture } from '../PIP/PIPManager';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -23,11 +21,10 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
+import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 import { getMetadata } from '../../common/utils';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
-
 export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigate();
@@ -36,8 +33,7 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
-  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
-  const { onLeave } = useHMSPrebuiltContext();
+  const { redirectToLeave } = useRedirectToLeave();
 
   const handleRoleChangeDenied = useCallback(request => {
     ToastManager.addToast({
@@ -47,20 +43,6 @@ export function Notifications() {
   }, []);
 
   useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
-
-  const redirectToLeavePage = () => {
-    setTimeout(() => {
-      const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
-      if (params.role) {
-        navigate(prefix + params.roomId + '/' + params.role);
-      } else {
-        navigate(prefix + params.roomId);
-      }
-      PictureInPicture.stop().catch(() => console.error('stopping pip'));
-      ToastManager.clearAllToast();
-      onLeave?.();
-    }, 1000);
-  };
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {
@@ -111,7 +93,7 @@ export function Notifications() {
           }
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
-          redirectToLeavePage();
+          redirectToLeave();
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -149,7 +131,7 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        redirectToLeavePage();
+        redirectToLeave();
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
