@@ -14,6 +14,7 @@ import { AudioVideoToggle } from './AudioVideoToggle';
 import VideoTile from './VideoTile';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
+import { useVideoTileContext } from './hooks/useVideoTileLayout';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
 
@@ -45,6 +46,7 @@ export const InsetTile = () => {
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
+  const videoTileProps = useVideoTileContext();
   let aspectRatio = isMobile ? defaultMobileAspectRatio : desktopAspectRatio;
   if (videoTrack?.width && videoTrack?.height && !isMobile) {
     aspectRatio = videoTrack.width / videoTrack.height;
@@ -117,6 +119,7 @@ export const InsetTile = () => {
             containerCSS={{ background: '$surface_default' }}
             canMinimise
             isDragabble
+            {...videoTileProps}
           />
         )}
       </Box>
