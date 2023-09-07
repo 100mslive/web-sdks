@@ -61,12 +61,16 @@ const HLSView = () => {
 
   useEffect(() => {
     const videoElem = videoRef.current;
-    const setStreamEndedCallback = () => setStreamEnded(true);
+    const setStreamEndedCallback = () => {
+      setStreamEnded(true);
+      // no point keeping the callback attached once the streaming is ended
+      videoElem?.removeEventListener('ended', setStreamEndedCallback);
+    };
     videoElem?.addEventListener('ended', setStreamEndedCallback);
     return () => {
       videoElem?.removeEventListener('ended', setStreamEndedCallback);
     };
-  }, []);
+  }, [hlsUrl]);
 
   /**
    * initialize HMSHLSPlayer and add event listeners.
