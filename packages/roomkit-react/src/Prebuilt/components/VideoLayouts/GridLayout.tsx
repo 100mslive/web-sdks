@@ -16,6 +16,7 @@ export type GridLayoutProps = GridVideoTileLayout & {
   video_object_fit: 'contain' | 'cover';
   edge_to_edge: boolean;
   hide_metadata_on_tile: boolean;
+  hide_degradation_text: boolean;
 };
 
 export const GridLayout = ({
@@ -28,6 +29,7 @@ export const GridLayout = ({
   video_object_fit = 'contain',
   edge_to_edge = false,
   hide_metadata_on_tile = false,
+  hide_degradation_text = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
@@ -55,6 +57,7 @@ export const GridLayout = ({
     roundedVideoTile: rounded_video_tile,
     hideAudioMuteOnTile: hide_audio_mute_on_tile,
     hideMetadataOnTile: hide_metadata_on_tile,
+    hideDegradationText: hide_degradation_text,
     objectFit: video_object_fit,
   };
 

@@ -42,6 +42,7 @@ const Tile = ({
   roundedVideoTile = true,
   hideAudioMuteOnTile = false,
   hideMetadataOnTile = false,
+  hideDegradationText = false,
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
@@ -119,7 +120,7 @@ const Tile = ({
               data-testid="participant_video_tile"
               css={{
                 objectFit,
-                filter: isVideoDegraded ? 'blur($space$2)' : undefined,
+                filter: isVideoDegraded ? 'blur($space$4)' : undefined,
                 bg: 'transparent',
               }}
             />
@@ -131,29 +132,28 @@ const Tile = ({
             </StyledVideoTile.AvatarContainer>
           ) : null}
 
-          {isVideoDegraded ? (
+          {track && isVideoDegraded && !isVideoMuted && !hideDegradationText ? (
             <Flex
               direction="column"
-              gap="3"
+              gap="4"
               css={{
                 my: 'auto',
                 position: 'absolute',
                 zIndex: 2,
                 left: 0,
-                top: '50%',
                 w: '100%',
-                c: '$on_surface_high',
+                c: '#FFF',
               }}
             >
               <AlertTriangleSolidIcon height={32} width={32} style={{ margin: '0 auto' }} />
               <Text
-                variant="xs"
+                variant="body2"
                 css={{
                   textAlign: 'center',
+                  textShadow: '0 0 8px #000',
                 }}
               >
-                {isLocal ? 'Your' : `${peerName}${peerName?.[-1]?.toLowerCase() === 's' ? "'" : "'s"}`} network is
-                unstable
+                Experiencing unstable network
               </Text>
             </Flex>
           ) : null}
