@@ -37,6 +37,7 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -728,6 +729,22 @@ export default class HMSTransport implements ITransport {
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
     return this.signal.getPollResult(params);
+  }
+
+  async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.joinGroup(name);
+  }
+
+  async leaveGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.leaveGroup(name);
+  }
+
+  async addToGroup(peerId: string, name: string) {
+    this.signal.addToGroup(peerId, name);
+  }
+
+  async removeFromGroup(peerId: string, name: string): Promise<void> {
+    this.signal.removeFromGroup(peerId, name);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

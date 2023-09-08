@@ -63,6 +63,7 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { HAND_RAISE_GROUP_NAME } from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
@@ -959,6 +960,23 @@ export class HMSSdk implements HMSInterface {
       source,
       roles: roles?.map(role => role?.name),
     });
+  }
+
+  async raiseLocalPeerHand() {
+    this.validateJoined('raiseLocalPeerHand');
+    const { groups } = await this.transport.joinGroup(HAND_RAISE_GROUP_NAME);
+    this.localPeer!.groups = groups;
+  }
+  async lowerLocalPeerHand() {
+    this.validateJoined('lowerLocalPeerHand');
+    const { groups } = await this.transport.leaveGroup(HAND_RAISE_GROUP_NAME);
+    this.localPeer!.groups = groups;
+  }
+  async raiseRemotePeerHand(peerId: string) {
+    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+  }
+  async lowerRemotePeerHand(peerId: string) {
+    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
