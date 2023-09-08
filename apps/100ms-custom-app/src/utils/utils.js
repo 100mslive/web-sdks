@@ -2,7 +2,7 @@ import axios from 'axios';
 import cookies from 'js-cookies';
 
 function isRoomCode(str) {
-  const regex = /^[A-Za-z]{3}(-[A-Za-z]{3,4}){2}$/;
+  const regex = /^[A-Za-z]*(-[A-Za-z]*){2}$/;
   return regex.test(str);
 }
 
