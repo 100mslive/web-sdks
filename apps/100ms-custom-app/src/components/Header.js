@@ -48,85 +48,85 @@ export default function Header({
           height={40}
         />
         <Flex align="center">
-          {onlyEmail && (
-            <>
-              <a
-                rel="noreferrer"
-                target="_blank"
-                href="https://100ms.live/contact?referrer=prebuilt"
+          <>
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href="https://100ms.live/contact?referrer=prebuilt"
+            >
+              <Flex
+                align="center"
+                css={{
+                  color: '$on_surface_medium',
+                  borderRight: '1px solid $border_default',
+                  pr: '$md',
+                  mx: '$md',
+                  gap: '$4',
+                  '&:hover': { color: '$on_surface_high' },
+                }}
               >
-                <Flex
-                  align="center"
-                  css={{
-                    color: '$on_surface_medium',
-                    borderRight: '1px solid $border_default',
-                    pr: '$md',
-                    mx: '$md',
-                    gap: '$4',
-                    '&:hover': { color: '$on_surface_high' },
-                  }}
+                <PersonContactIcon />
+                <Text
+                  variant="sm"
+                  css={{ color: 'inherit', fontWeight: '$semiBold' }}
                 >
-                  <PersonContactIcon />
-                  <Text
-                    variant="sm"
-                    css={{ color: 'inherit', fontWeight: '$semiBold' }}
-                  >
-                    Talk to Sales
-                  </Text>
-                </Flex>
-              </a>
+                  Talk to Sales
+                </Text>
+              </Flex>
+            </a>
 
-              {roomLinks && Object.keys(roomLinks).length > 0 && (
-                <Flex
-                  onClick={() => togModal(true)}
-                  align="center"
-                  css={{
-                    color: '$on_surface_medium',
-                    borderRight: '1px solid $border_default',
-                    cursor: 'pointer',
-                    mr: '$md',
-                    px: '$md',
-                    gap: '$4',
-                    '&:hover': { color: '$on_surface_high' },
-                  }}
-                >
-                  <PeopleAddIcon />
-                  <Text
-                    variant="sm"
-                    css={{ color: 'inherit', fontWeight: '$semiBold' }}
-                  >
-                    Invite Others
-                  </Text>
-                </Flex>
-              )}
-              <a
-                target="_blank"
-                href={`https://dashboard.100ms.live/templates/${policyID}/prebuilt`}
-                rel="noreferrer"
+            {roomLinks && Object.keys(roomLinks).length > 0 && (
+              <Flex
+                onClick={() => togModal(true)}
+                align="center"
+                css={{
+                  color: '$on_surface_medium',
+                  borderRight: '1px solid $border_default',
+                  cursor: 'pointer',
+                  mr: '$md',
+                  px: '$md',
+                  gap: '$4',
+                  '&:hover': { color: '$on_surface_high' },
+                }}
               >
-                <Button
-                  variant=""
-                  icon
-                  css={{
-                    lineHeight: '1rem',
-                    fontSize: '$sm',
-                    p: '$2 $4',
-                    r: '$0',
-                    background:
-                      'linear-gradient(210deg, #6626ED 0%, #2672ED 100%)',
-                    color: '$on_primary_high',
-                    '&:hover': {
-                      background:
-                        'linear-gradient(210deg, #2672ED 0%, #6626ED 100%)',
-                    },
-                  }}
+                <PeopleAddIcon />
+                <Text
+                  variant="sm"
+                  css={{ color: 'inherit', fontWeight: '$semiBold' }}
                 >
-                  <BrushDesignIcon />
-                  Customise
-                </Button>
-              </a>
-            </>
-          )}
+                  Invite Others
+                </Text>
+              </Flex>
+            )}
+            <a
+              target="_blank"
+              href={`https://${
+                process.env.REACT_APP_ENV === 'prod' ? 'dashboard' : 'app-qa'
+              }.100ms.live/templates/${policyID}/prebuilt`}
+              rel="noreferrer"
+            >
+              <Button
+                variant=""
+                icon
+                css={{
+                  lineHeight: '1rem',
+                  fontSize: '$sm',
+                  p: '$2 $4',
+                  r: '$0',
+                  background:
+                    'linear-gradient(210deg, #6626ED 0%, #2672ED 100%)',
+                  color: '$on_primary_high',
+                  '&:hover': {
+                    background:
+                      'linear-gradient(210deg, #2672ED 0%, #6626ED 100%)',
+                  },
+                }}
+              >
+                <BrushDesignIcon />
+                Customise
+              </Button>
+            </a>
+          </>
         </Flex>
       </Flex>
 
