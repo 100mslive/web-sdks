@@ -1,6 +1,8 @@
 import React, { Fragment, useState } from 'react';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
+// @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { ExitIcon, StopIcon } from '@100mslive/react-icons';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -90,6 +92,8 @@ export const MwebLeaveRoom = ({
           onClick={() => {
             if (screenType === 'hls_live_streaming') {
               setShowLeaveRoomAlert(true);
+            } else {
+              leaveRoom({ endstream: false });
             }
           }}
         >
