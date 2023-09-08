@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import {
   selectAudioTrackByPeerID,
   selectIsPeerAudioEnabled,
@@ -6,21 +6,18 @@ import {
   selectPeerMetadata,
   selectPeerNameByID,
   selectSessionStore,
-  selectTrackAudioByID,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
-  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { Avatar } from '../../Avatar';
-import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
+import { AudioLevelAnimation } from './AudioLevelAnimation';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
@@ -165,52 +162,10 @@ const Tile = ({
 };
 
 const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
-
-const heightAnimation = value =>
-  keyframes({
-    '50%': {
-      transform: `scale3d(1,${value},1)`,
-    },
-    '100%': {
-      transform: `scale3d(1,1,1)`,
-    },
-  });
-
-const AudioLevelIndicator = ({ trackId, value, delay }) => {
-  const vanillaStore = useHMSVanillaStore();
-  const ref = useRef();
-
-  useEffect(() => {
-    const unsubscribe = vanillaStore.subscribe(audioLevel => {
-      if (ref.current) {
-        ref.current.style['animation'] = `${heightAnimation(
-          audioLevel ? value : 1,
-        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite ${delay}s`;
-      }
-    }, selectTrackAudioByID(trackId));
-    return unsubscribe;
-  }, [vanillaStore, trackId, value, delay]);
-  return (
-    <Box
-      ref={ref}
-      css={{
-        w: 4,
-        height: 6,
-        r: 2,
-        bg: '$on_primary_high',
-      }}
-    />
-  );
-};
-
 export const AudioLevel = ({ trackId }) => {
   return (
     <StyledVideoTile.AudioIndicator>
-      <Flex align="center" justify="center" css={{ gap: '$2' }}>
-        {[3, 2, 3].map((v, i) => (
-          <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
-        ))}
-      </Flex>
+      <AudioLevelAnimation trackId={trackId} />
     </StyledVideoTile.AudioIndicator>
   );
 };
