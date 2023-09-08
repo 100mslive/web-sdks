@@ -67,7 +67,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ screenType }) => {
+export const Chat = ({ screenType, hideControls = false }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -81,6 +81,7 @@ export const Chat = ({ screenType }) => {
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
+
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
@@ -117,7 +118,15 @@ export const Chat = ({ screenType }) => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
+    <Flex
+      direction="column"
+      css={{
+        size: '100%',
+        gap: '$4',
+        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
+        transition: 'margin 0.3s ease-in-out',
+      }}
+    >
       {isMobile && elements?.chat?.is_overlay ? null : (
         <>
           <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />

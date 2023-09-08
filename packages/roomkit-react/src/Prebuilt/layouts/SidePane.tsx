@@ -20,9 +20,11 @@ import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 const SidePane = ({
   screenType,
   tileProps,
+  hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
   tileProps: TileCustomisationProps;
+  hideControls: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
@@ -33,7 +35,7 @@ const SidePane = ({
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
     ViewComponent = <ParticipantList />;
   } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat screenType={screenType} />;
+    ViewComponent = <Chat screenType={screenType} hideControls={hideControls} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }

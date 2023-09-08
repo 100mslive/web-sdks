@@ -41,11 +41,11 @@ const Conference = () => {
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
+  const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef();
-  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0) {
+    if (dropdownListRef.current?.length === 0 && isMobileDevice) {
       setHideControls(value => !value);
     }
   };
@@ -57,14 +57,14 @@ const Conference = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         if (dropdownListRef.current.length === 0) {
-          setHideControls(true);
+          setHideControls(isMobileDevice);
         }
       }, 5000);
     }
     return () => {
       clearTimeout(timeout);
     };
-  }, [dropdownList, hideControls]);
+  }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
     if (!roomId) {
@@ -124,7 +124,7 @@ const Conference = () => {
             css={{
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
-              marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
+              marginTop: hideControls ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
                 h: '$17',
               },
@@ -149,7 +149,11 @@ const Conference = () => {
           data-testid="conferencing"
           onClick={toggleControls}
         >
-          <VideoStreamingSection screenType={screenProps.screenType} elements={screenProps.elements} />
+          <VideoStreamingSection
+            screenType={screenProps.screenType}
+            elements={screenProps.elements}
+            hideControls={hideControls}
+          />
         </Box>
         {!screenProps.hideSections.includes('footer') && (
           <Box
@@ -159,7 +163,7 @@ const Conference = () => {
               maxHeight: '$24',
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
-              marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
+              marginBottom: hideControls ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
