@@ -20,6 +20,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _volume: number;
   private _metaData: HMSHLSTimedMetadata;
   private readonly TAG = '[HMSHLSPlayer]';
+  private _intervalPointer?: ReturnType<typeof setTimeout> | null = null;
   /**
    * Initiliaze the player with hlsUrl and video element
    * @remarks If video element is not passed, we will create one and call a method getVideoElement get element
@@ -224,6 +225,23 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private volumeEventHandler = () => {
     this._volume = this._videoEl.volume;
   };
+
+  private retriesNetworkConnect = () => {
+    if (this._intervalPointer) {
+      // interval already running
+      return;
+    }
+    this._intervalPointer = setInterval(() => {
+      if (window.navigator.onLine) {
+        // reinitilze the hls
+        this._hls.startLoad();
+        if (this._intervalPointer) {
+          clearInterval(this._intervalPointer);
+          this._intervalPointer = null;
+        }
+      }
+    }, 1000);
+  };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
     console.error(this.TAG, `error type ${data.type} with details ${data.details} is fatal ${data.fatal}`);
@@ -262,6 +280,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        this.retriesNetworkConnect();
         break;
       }
       default: {
