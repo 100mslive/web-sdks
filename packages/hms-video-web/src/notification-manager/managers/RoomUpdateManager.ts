@@ -61,6 +61,9 @@ export class RoomUpdateManager {
       HMSLogger.w(this.TAG, 'on session info - room not present');
       return;
     }
+    room.description = notification.description;
+    room.large_room_optimization = notification.large_room_optimization;
+    room.max_size = notification.max_size;
     room.name = notification.name;
   }
 
