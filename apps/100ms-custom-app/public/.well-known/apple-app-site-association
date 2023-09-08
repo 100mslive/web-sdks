@@ -15,6 +15,12 @@
         "paths": [
           "*/meeting/*","*/preview/*"
         ]
+      },
+      {
+        "appID": "5N85PP82A9.live.100ms.videoapp.roomkit",
+        "paths": [
+          "*/meeting/*","*/preview/*"
+        ]
       }
     ]
   }
