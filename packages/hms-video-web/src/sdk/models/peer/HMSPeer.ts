@@ -11,6 +11,7 @@ export type HMSPeerInit = {
   role?: HMSRole;
   joinedAt?: Date;
   fromRoomState?: boolean;
+  groups?: string[];
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -24,14 +25,16 @@ export class HMSPeer implements IHMSPeer {
   auxiliaryTracks: HMSTrack[] = [];
   role?: HMSRole;
   joinedAt?: Date;
+  groups?: string[];
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
     this.customerUserId = customerUserId;
     this.metadata = metadata;
     this.joinedAt = joinedAt;
+    this.groups = groups;
 
     if (role) {
       this.role = role;
@@ -55,6 +58,10 @@ export class HMSPeer implements IHMSPeer {
    */
   updateMetadata(data: string) {
     this.metadata = data;
+  }
+
+  updateGroups(groups: string[]) {
+    this.groups = groups;
   }
 
   toString() {
