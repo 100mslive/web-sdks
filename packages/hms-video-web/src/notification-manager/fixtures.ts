@@ -7,6 +7,7 @@ export const fakePeer: PeerNotification = {
   info: { data: 'data', name: 'Sarvesh0', user_id: 'customer_user_id' },
   role: 'host',
   tracks: {},
+  groups: [],
 };
 
 export const fakePeerList: PeerListNotification = {
@@ -37,6 +38,7 @@ export const fakePeerList: PeerListNotification = {
           stream_id: 'stream_id_1',
         },
       },
+      groups: [],
     },
     peer_id_3: {
       info: {
@@ -56,6 +58,7 @@ export const fakePeerList: PeerListNotification = {
           stream_id: 'stream_id_3',
         },
       },
+      groups: [],
     },
   },
   room: {
@@ -103,6 +106,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
           stream_id: 'stream_id_1',
         },
       },
+      groups: [],
     },
     peer_id_2: {
       info: {
@@ -122,6 +126,7 @@ export const fakeReconnectPeerList: PeerListNotification = {
           stream_id: 'stream_id_2',
         },
       },
+      groups: [],
     },
   },
   room: {

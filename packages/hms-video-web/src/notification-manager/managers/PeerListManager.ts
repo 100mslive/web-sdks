@@ -101,6 +101,7 @@ export class PeerListManager {
           user_id: peer.customerUserId || '',
         },
         tracks: {},
+        groups: [],
       };
 
       this.peerManager.handlePeerLeave(peerNotification);

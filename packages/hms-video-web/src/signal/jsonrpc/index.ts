@@ -23,6 +23,7 @@ import {
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -279,18 +280,15 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   trackUpdate(tracks: Map<string, Track>) {
-    this.notify(HMSSignalMethod.TRACK_UPDATE, { version: '1.0', tracks: Object.fromEntries(tracks) });
+    this.notify(HMSSignalMethod.TRACK_UPDATE, { tracks: Object.fromEntries(tracks) });
   }
 
   async broadcast(message: Message) {
-    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, {
-      version: '1.0',
-      ...message.toSignalParams(),
-    });
+    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, message.toSignalParams());
   }
 
   leave() {
-    this.notify(HMSSignalMethod.LEAVE, { version: '1.0' });
+    this.notify(HMSSignalMethod.LEAVE, {});
   }
 
   async endRoom(lock: boolean, reason: string) {
@@ -343,31 +341,47 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   async startRTMPOrRecording(params: StartRTMPOrRecordingRequestParams) {
-    await this.call(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.START_RTMP_OR_RECORDING_REQUEST, { ...params });
   }
 
   async stopRTMPAndRecording() {
-    await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, { version: '1.0' });
+    await this.call(HMSSignalMethod.STOP_RTMP_AND_RECORDING_REQUEST, {});
   }
 
   async startHLSStreaming(params: HLSRequestParams): Promise<void> {
-    await this.call(HMSSignalMethod.START_HLS_STREAMING, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.START_HLS_STREAMING, { ...params });
   }
 
   async stopHLSStreaming(params?: HLSRequestParams): Promise<void> {
-    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.STOP_HLS_STREAMING, { ...params });
   }
 
   async sendHLSTimedMetadata(params?: HLSTimedMetadataParams): Promise<void> {
-    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.HLS_TIMED_METADATA, { ...params });
   }
 
   async updatePeer(params: UpdatePeerRequestParams) {
-    await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { ...params });
   }
 
   async getPeer(params: getPeerRequestParams) {
-    await this.call(HMSSignalMethod.GET_PEER, { version: '1.0', ...params });
+    await this.call(HMSSignalMethod.GET_PEER, { ...params });
+  }
+
+  async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return await this.call(HMSSignalMethod.GROUP_JOIN, { name });
+  }
+
+  async leaveGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return await this.call(HMSSignalMethod.GROUP_LEAVE, { name });
+  }
+
+  async addToGroup(peerId: string, name: string) {
+    await this.call(HMSSignalMethod.GROUP_ADD, { name, peer_id: peerId });
+  }
+
+  async removeFromGroup(peerId: string, name: string): Promise<void> {
+    await this.call(HMSSignalMethod.GROUP_REMOVE, { name, peer_id: peerId });
   }
 
   setSessionMetadata(params: SetSessionMetadataParams) {
@@ -377,7 +391,7 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to set session store value due to network disconnection',
       );
     }
-    return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { version: '1.1', ...params });
+    return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { ...params });
   }
 
   listenMetadataChange(keys: string[]): Promise<void> {
@@ -387,7 +401,7 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to observe session store key due to network disconnection',
       );
     }
-    return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { version: '1.1', keys });
+    return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { keys });
   }
 
   getSessionMetadata(key?: string) {
@@ -397,57 +411,57 @@ export default class JsonRpcSignal implements ISignal {
         'Failed to set session store value due to network disconnection',
       );
     }
-    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key, version: '1.1' });
+    return this.call<GetSessionMetadataResponse>(HMSSignalMethod.GET_METADATA, { key });
   }
 
   setPollInfo(params: PollInfoSetParams) {
     this.valiateConnection();
-    return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { version: '1.0', ...params });
+    return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { ...params });
   }
 
   getPollInfo(params: PollInfoGetParams) {
     this.valiateConnection();
-    return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { version: '1.0', ...params });
+    return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { ...params });
   }
 
   setPollQuestions(params: PollQuestionsSetParams) {
     this.valiateConnection();
-    return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { version: '1.0', ...params });
+    return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { ...params });
   }
 
   startPoll(params: PollStartParams) {
     this.valiateConnection();
-    return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { version: '1.0', ...params });
+    return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { ...params });
   }
 
   stopPoll(params: PollStopParams) {
     this.valiateConnection();
-    return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { version: '1.0', ...params });
+    return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { ...params });
   }
 
   getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
     this.valiateConnection();
-    return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { version: '1.0', ...params });
+    return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { ...params });
   }
 
   setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
     this.valiateConnection();
-    return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { version: '1.0', ...params });
+    return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { ...params });
   }
 
   getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
     this.valiateConnection();
-    return this.call<PollResponsesGetResponse>(HMSSignalMethod.POLL_RESPONSES, { version: '1.0', ...params });
+    return this.call<PollResponsesGetResponse>(HMSSignalMethod.POLL_RESPONSES, { ...params });
   }
 
   getPollsList(params: PollListParams): Promise<PollListResponse> {
     this.valiateConnection();
-    return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { version: '1.0', ...params });
+    return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { ...params });
   }
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
     this.valiateConnection();
-    return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { version: '1.0', ...params });
+    return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { ...params });
   }
 
   private valiateConnection() {

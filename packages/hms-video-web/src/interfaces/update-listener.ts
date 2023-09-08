@@ -33,6 +33,7 @@ export enum HMSPeerUpdate {
   PEER_LIST,
   NAME_UPDATED,
   METADATA_UPDATED,
+  HAND_RAISE_CHANGED,
 }
 
 export enum HMSTrackUpdate {
