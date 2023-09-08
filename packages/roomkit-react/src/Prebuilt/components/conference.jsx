@@ -41,11 +41,12 @@ const Conference = () => {
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
+  const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
-      setHideControls(value => !value && (isAndroid || isIOS || isIPadOS));
+      setHideControls(value => !value && isMobileDevice);
     }
   };
 
@@ -56,7 +57,7 @@ const Conference = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         if (dropdownListRef.current.length === 0) {
-          setHideControls(isAndroid || isIOS || isIPadOS);
+          setHideControls(isMobileDevice);
         }
       }, 5000);
     }
