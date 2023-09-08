@@ -51,3 +51,7 @@ export const HMSEvents = {
   AUTOPLAY_ERROR: 'autoplay-error',
   LEAVE: 'leave',
 };
+
+export const PROTOCOL_VERSION = '2.5';
+
+export const PROTOCOL_SPEC = '20230627';

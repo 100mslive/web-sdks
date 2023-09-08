@@ -67,6 +67,8 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
+  PROTOCOL_SPEC,
+  PROTOCOL_VERSION,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
@@ -1110,6 +1112,9 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent_v2', this.store.getUserAgent());
+    url.searchParams.set('protocol_version', PROTOCOL_VERSION);
+    url.searchParams.set('protocol_spec', PROTOCOL_SPEC);
+
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);

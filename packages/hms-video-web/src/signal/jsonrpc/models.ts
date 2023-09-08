@@ -53,6 +53,7 @@ export enum HMSSignalMethod {
   POLL_LIST = 'poll-list',
   POLL_RESPONSES = 'poll-responses',
   POLL_RESULT = 'poll-result',
+  GET_PEER = 'get-peer',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

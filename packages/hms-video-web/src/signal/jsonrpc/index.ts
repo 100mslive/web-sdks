@@ -19,6 +19,7 @@ import { sleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
+  getPeerRequestParams,
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -363,6 +364,10 @@ export default class JsonRpcSignal implements ISignal {
 
   async updatePeer(params: UpdatePeerRequestParams) {
     await this.call(HMSSignalMethod.UPDATE_PEER_METADATA, { version: '1.0', ...params });
+  }
+
+  async getPeer(params: getPeerRequestParams) {
+    await this.call(HMSSignalMethod.GET_PEER, { version: '1.0', ...params });
   }
 
   setSessionMetadata(params: SetSessionMetadataParams) {
