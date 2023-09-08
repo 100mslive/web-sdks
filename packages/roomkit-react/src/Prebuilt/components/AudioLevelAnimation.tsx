@@ -5,9 +5,11 @@ import { keyframes } from '../../Theme';
 //@ts-ignore
 import bg from '../images/audio-level.png';
 
-function getPosition(base: number, audioLevel: number) {
-  return base * (Math.round((audioLevel / 100) * 4) / 4);
-}
+// keep the calculated values before hand to avoid recalcuation everytime
+const positionValues = Array(101).reduce((acc, _, index) => {
+  acc[index] = Math.round((index / 100) * 4) / 4; // convert to 0.25 multiples
+  return acc;
+}, {});
 
 const barAnimation = keyframes({
   from: {
@@ -52,7 +54,7 @@ export const AudioLevelAnimation = ({ trackId }: { trackId?: string }) => {
         let index = 0;
         //@ts-ignore
         for (const child of ref.current.children) {
-          child.style['background-position-x'] = `-${getPosition(index === 1 ? 2.5 : 1.25, audioLevel)}em`;
+          child.style['background-position-x'] = `-${positionValues[audioLevel] * (index === 1 ? 2.5 : 1.25)}em`;
           index++;
         }
       }
