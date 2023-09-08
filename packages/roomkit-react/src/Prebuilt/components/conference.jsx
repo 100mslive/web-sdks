@@ -45,8 +45,8 @@ const Conference = () => {
   const dropdownListRef = useRef();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0) {
-      setHideControls(value => !value && isMobileDevice);
+    if (dropdownListRef.current?.length === 0 && isMobileDevice) {
+      setHideControls(value => !value);
     }
   };
 
@@ -64,7 +64,7 @@ const Conference = () => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [dropdownList, hideControls]);
+  }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
     if (!roomId) {
