@@ -266,7 +266,7 @@ export const MwebOptions = ({
           </Box>
         </Sheet.Content>
       </Sheet.Root>
-      <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} />
+      <SettingsModal open={openSettingsSheet} onOpenChange={setOpenSettingsSheet} screenType={screenType} />
       {openModals.has(MODALS.MUTE_ALL) && (
         <MuteAllModal onOpenChange={(value: boolean) => updateState(MODALS.MUTE_ALL, value)} isMobile />
       )}
