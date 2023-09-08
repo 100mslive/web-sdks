@@ -9,7 +9,7 @@ import { usePinnedTrack } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 
-export type GridLayoutProps = GridVideoTileLayout & {
+export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
   rounded_video_tile: boolean;
   hide_audio_mute_on_tile: boolean;
@@ -17,6 +17,8 @@ export type GridLayoutProps = GridVideoTileLayout & {
   edge_to_edge: boolean;
   hide_metadata_on_tile: boolean;
 };
+
+export type GridLayoutProps = GridVideoTileLayout & TileCustomisationProps;
 
 export const GridLayout = ({
   enable_local_tile_inset: isInsetEnabled = false,

@@ -12,13 +12,12 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { AlertTriangleSolidIcon, BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
+import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { Avatar } from '../../Avatar';
 import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { Text } from '../../Text';
 import { keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
@@ -83,11 +82,6 @@ const Tile = ({
     return 'large';
   }, [width, height]);
 
-  // if there is no audio and video don't render. this can happen when native devices join with audio/video muted
-  if (!audioTrack && !track) {
-    return null;
-  }
-
   return (
     <StyledVideoTile.Root
       css={{
@@ -108,57 +102,28 @@ const Tile = ({
             <VideoTileStats audioTrackID={audioTrack?.id} videoTrackID={track?.id} peerID={peerId} isLocal={isLocal} />
           ) : null}
 
-          {track ? (
-            <Video
-              trackId={track?.id}
-              attach={isLocal ? undefined : !isAudioOnly}
-              mirror={
-                mirrorLocalVideo &&
-                peerId === localPeerID &&
-                track?.source === 'regular' &&
-                track?.facingMode !== 'environment'
-              }
-              noRadius={!roundedVideoTile}
-              data-testid="participant_video_tile"
-              css={{
-                objectFit,
-                filter: isVideoDegraded ? 'blur($space$2)' : undefined,
-                bg: 'transparent',
-              }}
-            />
-          ) : null}
+          <Video
+            trackId={track?.id}
+            attach={isLocal ? undefined : !isAudioOnly}
+            mirror={
+              mirrorLocalVideo &&
+              peerId === localPeerID &&
+              track?.source === 'regular' &&
+              track?.facingMode !== 'environment'
+            }
+            noRadius={!roundedVideoTile}
+            data-testid="participant_video_tile"
+            css={{
+              objectFit,
+              filter: isVideoDegraded ? 'blur($space$2)' : undefined,
+              bg: 'transparent',
+            }}
+          />
 
           {isVideoMuted || (!isLocal && isAudioOnly) ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={peerName || ''} data-testid="participant_avatar_icon" size={avatarSize} />
             </StyledVideoTile.AvatarContainer>
-          ) : null}
-
-          {isVideoDegraded ? (
-            <Flex
-              direction="column"
-              gap="3"
-              css={{
-                my: 'auto',
-                position: 'absolute',
-                zIndex: 2,
-                left: 0,
-                top: '50%',
-                w: '100%',
-                c: '$on_surface_high',
-              }}
-            >
-              <AlertTriangleSolidIcon height={32} width={32} style={{ margin: '0 auto' }} />
-              <Text
-                variant="xs"
-                css={{
-                  textAlign: 'center',
-                }}
-              >
-                {isLocal ? 'Your' : `${peerName}${peerName?.[-1]?.toLowerCase() === 's' ? "'" : "'s"}`} network is
-                unstable
-              </Text>
-            </Flex>
           ) : null}
 
           {!hideAudioMuteOnTile ? (

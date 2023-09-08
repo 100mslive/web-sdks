@@ -8,6 +8,7 @@ import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Footer/ParticipantList';
 // @ts-ignore: No implicit Any
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
+import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
@@ -18,9 +19,11 @@ import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({
   screenType,
+  tileProps,
   hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
+  tileProps: TileCustomisationProps;
   hideControls: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
@@ -62,6 +65,7 @@ const SidePane = ({
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
           objectFit="contain"
+          {...tileProps}
         />
       )}
       {!!ViewComponent && (
