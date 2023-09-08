@@ -1,31 +1,20 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  selectLocalPeerRoleName,
-  selectPeers,
-  selectTracksMap,
-  useHMSActions,
-  useHMSStore,
-  useHMSVanillaStore,
-} from '@100mslive/react-sdk';
+import { selectPeers, selectTracksMap, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PipIcon } from '@100mslive/react-icons';
 import { Flex, Tooltip } from '../../../';
 import IconButton from '../../IconButton';
 import { PictureInPicture } from './PIPManager';
 import { MediaSession } from './SetupMediaSession';
 import { usePinnedTrack } from '../AppData/useUISettings';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { DEFAULT_HLS_VIEWER_ROLE, FEATURE_LIST } from '../../common/constants';
 
 /**
  * shows a button which when clicked shows some videos in PIP, clicking
  * again turns it off.
  */
 const PIPComponent = ({ content = null }) => {
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const [isPipOn, setIsPipOn] = useState(PictureInPicture.isOn());
   const hmsActions = useHMSActions();
   const store = useHMSVanillaStore();
-  const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
 
   const onPipToggle = useCallback(() => {
     if (!isPipOn) {
@@ -36,7 +25,7 @@ const PIPComponent = ({ content = null }) => {
     }
   }, [hmsActions, isPipOn, store]);
 
-  if (!PictureInPicture.isSupported() || localPeerRole === DEFAULT_HLS_VIEWER_ROLE || !isFeatureEnabled) {
+  if (!PictureInPicture.isSupported()) {
     return null;
   }
   return (
@@ -66,8 +55,8 @@ export const ActivatedPIP = () => {
   const pinnedTrack = usePinnedTrack();
 
   useEffect(() => {
-    PictureInPicture.listenToStateChange(isPipOn => {
-      if (!isPipOn) {
+    function updatePIP() {
+      if (!PictureInPicture.isOn()) {
         return;
       }
       let pipPeers = storePeers;
@@ -77,7 +66,9 @@ export const ActivatedPIP = () => {
       PictureInPicture.updatePeersAndTracks(pipPeers, tracksMap).catch(err => {
         console.error('error in updating pip', err);
       });
-    });
+    }
+    PictureInPicture.listenToStateChange(updatePIP);
+    updatePIP();
   }, [storePeers, tracksMap, pinnedTrack]);
 
   return <></>;

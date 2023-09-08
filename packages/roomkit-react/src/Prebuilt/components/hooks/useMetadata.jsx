@@ -1,19 +1,28 @@
 import { useCallback, useState } from 'react';
-import { selectLocalPeerID, selectPeerMetadata, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectLocalPeerID,
+  selectPeerMetadata,
+  useHMSActions,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 
 export const useMyMetadata = () => {
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
+  const vanillaStore = useHMSVanillaStore();
   const metaData = useHMSStore(selectPeerMetadata(localPeerId));
   const [isHandRaised, setHandRaised] = useState(metaData?.isHandRaised || false);
   const [isBRBOn, setBRBOn] = useState(metaData?.isBRBOn || false); // BRB = be right back
 
   const update = async updatedFields => {
     try {
-      await hmsActions.changeMetadata(Object.assign(metaData, updatedFields));
+      // get current state from store and merge updated fields
+      const currentMetadata = vanillaStore.getState(selectPeerMetadata(localPeerId));
+      await hmsActions.changeMetadata(Object.assign(currentMetadata, updatedFields));
       return true;
     } catch (error) {
-      console.error('failed to update metadata ', metaData, updatedFields);
+      console.error('failed to update metadata ', updatedFields);
     }
   };
 
@@ -41,6 +50,12 @@ export const useMyMetadata = () => {
     }
   }, [isHandRaised, isBRBOn]); //eslint-disable-line
 
+  const setPrevRole = async role => {
+    await update({
+      prevRole: role,
+    });
+  };
+
   return {
     isHandRaised,
     isBRBOn,
@@ -48,5 +63,6 @@ export const useMyMetadata = () => {
     updateMetaData: update,
     toggleHandRaise,
     toggleBRB,
+    setPrevRole,
   };
 };

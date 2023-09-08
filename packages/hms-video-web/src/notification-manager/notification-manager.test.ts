@@ -12,6 +12,7 @@ import { Store } from '../sdk/store';
 import HMSTransport from '../transport';
 
 let joinHandler: jest.Mock<any, any>;
+let previewHandler: jest.Mock<any, any>;
 let roomUpdateHandler: jest.Mock<any, any>;
 let peerUpdateHandler: jest.Mock<any, any>;
 let trackUpdateHandler: jest.Mock<any, any>;
@@ -37,6 +38,7 @@ let transport: HMSTransport;
 
 beforeEach(() => {
   joinHandler = jest.fn();
+  previewHandler = jest.fn();
   roomUpdateHandler = jest.fn();
   peerUpdateHandler = jest.fn();
   trackUpdateHandler = jest.fn();
@@ -96,6 +98,7 @@ beforeEach(() => {
 
   listener = {
     onJoin: joinHandler,
+    onPreview: previewHandler,
     onRoomUpdate: roomUpdateHandler,
     onPeerUpdate: peerUpdateHandler,
     onTrackUpdate: trackUpdateHandler,

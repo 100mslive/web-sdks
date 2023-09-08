@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
@@ -15,36 +15,37 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
-import { ConferenceMainView } from '../layouts/mainView';
+import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { RoleChangeRequestModal } from './RoleChangeRequestModal';
-import { useAuthToken, useIsHeadless, useSetAppDataByKey } from './AppData/useUISettings';
-import { useNavigation } from './hooks/useNavigation';
-import { useSkipPreview } from './hooks/useSkipPreview';
-import { APP_DATA, EMOJI_REACTION_TYPE, isAndroid, isIOS, isIPadOS } from '../common/constants';
+import {
+  useRoomLayoutConferencingScreen,
+  useRoomLayoutPreviewScreen,
+} from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
-  const navigate = useNavigation();
+  const navigate = useNavigate();
   const { roomId, role } = useParams();
-  const isHeadless = useIsHeadless();
+  const { userName, endpoints } = useHMSPrebuiltContext();
+  const screenProps = useRoomLayoutConferencingScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
   const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
-  const skipPreview = useSkipPreview();
-  const { showPreview } = useHMSPrebuiltContext();
   const authTokenInAppData = useAuthToken();
   const headerRef = useRef();
   const footerRef = useRef();
+  const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef();
-  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
-
   const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0) {
+    if (dropdownListRef.current?.length === 0 && isMobileDevice) {
       setHideControls(value => !value);
     }
   };
@@ -56,21 +57,21 @@ const Conference = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
         if (dropdownListRef.current.length === 0) {
-          setHideControls(true);
+          setHideControls(isMobileDevice);
         }
       }, 5000);
     }
     return () => {
       clearTimeout(timeout);
     };
-  }, [dropdownList, hideControls]);
+  }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
     if (!roomId) {
       navigate(`/`);
       return;
     }
-    if (!showPreview) {
+    if (!isPreviewScreenEnabled) {
       return;
     }
     if (
@@ -80,33 +81,24 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ''}/${role}`);
       else navigate(`/preview/${roomId || ''}`);
     }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, showPreview]);
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]);
 
   useEffect(() => {
-    if (authTokenInAppData && !isConnectedToRoom && !showPreview && roomState !== HMSRoomState.Connecting) {
+    if (authTokenInAppData && !isConnectedToRoom && !isPreviewScreenEnabled && roomState !== HMSRoomState.Connecting) {
       hmsActions
         .join({
-          userName: 'Test',
+          userName,
           authToken: authTokenInAppData,
-          initEndpoint: process.env.REACT_APP_ENV
-            ? `https://${process.env.REACT_APP_ENV}-init.100ms.live/init`
-            : undefined,
+          initEndpoint: endpoints?.init,
           initialSettings: {
-            isAudioMuted: skipPreview,
-            isVideoMuted: skipPreview,
+            isAudioMuted: !isPreviewScreenEnabled,
+            isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
         .catch(console.error);
     }
-  }, [authTokenInAppData, skipPreview, hmsActions, isConnectedToRoom, showPreview, roomState]);
-
-  useEffect(() => {
-    // beam doesn't need to store messages, saves on unnecessary store updates in large calls
-    if (isHeadless) {
-      hmsActions.ignoreMessageTypes(['chat', EMOJI_REACTION_TYPE]);
-    }
-  }, [isHeadless, hmsActions]);
+  }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
   useEffect(() => {
     return () => {
@@ -115,69 +107,78 @@ const Conference = () => {
   }, []);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress loadingText="Joining..." />;
-  }
-
-  if (isHLSStarted) {
-    return <FullPageProgress loadingText="Starting live stream..." />;
+    return <FullPageProgress text="Joining..." />;
   }
 
   return (
-    <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-      {!isHeadless && (
+    <>
+      {isHLSStarted ? (
+        <Box css={{ position: 'fixed', zIndex: 100, w: '100%', h: '100%', left: 0, top: 0 }}>
+          <FullPageProgress text="Starting live stream..." css={{ opacity: 0.8, bg: '$background_dim' }} />
+        </Box>
+      ) : null}
+      <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
+        {!screenProps.hideSections.includes('header') && (
+          <Box
+            ref={headerRef}
+            css={{
+              h: '$18',
+              transition: 'margin 0.3s ease-in-out',
+              marginTop: hideControls ? `-${headerRef.current?.clientHeight}px` : 'none',
+              '@md': {
+                h: '$17',
+              },
+            }}
+            data-testid="header"
+          >
+            <Header elements={screenProps.elements} screenType={screenProps.screenType} />
+          </Box>
+        )}
         <Box
-          ref={headerRef}
           css={{
-            h: '$18',
-            transition: 'margin 0.3s ease-in-out',
-            marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
-            '@md': {
-              h: '$17',
+            w: '100%',
+            flex: '1 1 0',
+            minHeight: 0,
+            px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10', // TODO: padding to be controlled by section/element
+            paddingBottom: 'env(safe-area-inset-bottom)',
+            '@lg': {
+              px: 0,
             },
           }}
-          data-testid="header"
+          id="conferencing"
+          data-testid="conferencing"
+          onClick={toggleControls}
         >
-          <Header />
+          <VideoStreamingSection
+            screenType={screenProps.screenType}
+            elements={screenProps.elements}
+            hideControls={hideControls}
+          />
         </Box>
-      )}
-      <Box
-        css={{
-          w: '100%',
-          flex: '1 1 0',
-          minHeight: 0,
-          px: '$10',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          '@lg': {
-            px: '$4',
-          },
-        }}
-        id="conferencing"
-        data-testid="conferencing"
-        onClick={toggleControls}
-      >
-        <ConferenceMainView />
-      </Box>
-      {!isHeadless && (
-        <Box
-          ref={footerRef}
-          css={{
-            flexShrink: 0,
-            maxHeight: '$24',
-            transition: 'margin 0.3s ease-in-out',
-            marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
-            '@md': {
-              maxHeight: 'unset',
-            },
-          }}
-          data-testid="footer"
-        >
-          <Footer />
-        </Box>
-      )}
-      <RoleChangeRequestModal />
-      <HLSFailureModal />
-      <ActivatedPIP />
-    </Flex>
+        {!screenProps.hideSections.includes('footer') && (
+          <Box
+            ref={footerRef}
+            css={{
+              flexShrink: 0,
+              maxHeight: '$24',
+              transition: 'margin 0.3s ease-in-out',
+              bg: '$background_dim',
+              marginBottom: hideControls ? `-${footerRef.current?.clientHeight}px` : undefined,
+              '@md': {
+                maxHeight: 'unset',
+                bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
+              },
+            }}
+            data-testid="footer"
+          >
+            <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
+          </Box>
+        )}
+        <RoleChangeRequestModal />
+        <HLSFailureModal />
+        <ActivatedPIP />
+      </Flex>
+    </>
   );
 };
 

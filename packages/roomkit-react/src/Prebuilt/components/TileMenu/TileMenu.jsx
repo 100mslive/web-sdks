@@ -4,7 +4,6 @@ import {
   selectLocalPeerID,
   selectPeerByID,
   selectPermissions,
-  selectTemplateAppData,
   selectTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
@@ -19,28 +18,29 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { FEATURE_LIST } from '../../common/constants';
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
  */
-const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, canMinimise }) => {
+const TileMenu = ({
+  audioTrackID,
+  videoTrackID,
+  peerID,
+  isScreenshare = false,
+  canMinimise,
+  enableSpotlightingPeer = true,
+}) => {
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
+  const { removeOthers } = useHMSStore(selectPermissions);
   const { setVolume, toggleAudio, toggleVideo } = useRemoteAVToggle(audioTrackID, videoTrackID);
-  const showSpotlight = changeRole;
+  const showSpotlight = enableSpotlightingPeer;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
-  const uiMode = useHMSStore(selectTemplateAppData).uiMode;
-  const isInset = uiMode === 'inset';
-
-  const isPinEnabled = useIsFeatureEnabled(FEATURE_LIST.PIN_TILE);
-  const showPinAction = isPinEnabled && (audioTrackID || (videoTrackID && isPrimaryVideoTrack)) && !isInset;
+  const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);
 
   const track = useHMSStore(selectTrackByID(videoTrackID));
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
@@ -53,9 +53,6 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     return null;
   }
 
-  if (isInset && isLocal) {
-    return null;
-  }
   const openNameChangeModal = () => setShowNameChangeModal(true);
 
   const props = {
@@ -76,7 +73,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
       <StyledMenuTile.Root open={open} onOpenChange={setOpen}>
         <StyledMenuTile.Trigger
           data-testid="participant_menu_btn"
-          css={{ bg: `${theme.colors.background_dim.value}A3` }}
+          css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
           onClick={e => e.stopPropagation()}
           className={isMobile ? '__cancel-drag-event' : ''}
         >
@@ -114,13 +111,13 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
                   <CrossIcon />
                 </Sheet.Close>
               </Flex>
-              <Box css={{ px: '$8', pb: '$10' }}>
+              <Box css={{ px: '$8', pb: '$8', maxHeight: '80vh', overflowY: 'auto' }}>
                 <TileMenuContent {...props} closeSheetOnClick={() => setOpen(false)} />
               </Box>
             </Sheet.Content>
           </Sheet.Root>
         ) : (
-          <StyledMenuTile.Content side="top" align="end">
+          <StyledMenuTile.Content side="top" align="end" css={{ maxHeight: '$80', overflowY: 'auto' }}>
             <TileMenuContent {...props} />
           </StyledMenuTile.Content>
         )}
@@ -129,5 +126,7 @@ const TileMenu = ({ audioTrackID, videoTrackID, peerID, isScreenshare = false, c
     </>
   );
 };
+
+export { isSameTile } from './TileMenuContent';
 
 export default TileMenu;

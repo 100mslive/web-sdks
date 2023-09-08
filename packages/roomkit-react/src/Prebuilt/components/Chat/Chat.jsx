@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -13,31 +14,37 @@ import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import IconButton from '../../IconButton';
+import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
-import { ChatHeader } from './ChatHeader';
+import { ChatParticipantHeader } from './ChatParticipantHeader';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
+const PINNED_MESSAGE_LENGTH = 80;
+
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
   const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
+  const formattedPinnedMessage =
+    pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
+      ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
+      : pinnedMessage;
 
   return pinnedMessage ? (
     <Flex
-      css={{ p: '$8', color: '$on_surface_medium', bg: '$surface_bright', r: '$1' }}
+      title={pinnedMessage}
+      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8', mt: '$8' }}
       align="center"
       justify="between"
     >
-      <Box>
-        <PinIcon />
-      </Box>
+      <PinIcon />
+
       <Box
         css={{
-          ml: '$8',
           color: '$on_surface_medium',
           w: '100%',
           maxHeight: '$18',
@@ -45,19 +52,22 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         }}
       >
         <Text variant="sm">
-          <AnnotisedMessage message={pinnedMessage} />
+          <AnnotisedMessage message={formattedPinnedMessage} />
         </Text>
       </Box>
       {permissions.removeOthers && (
-        <IconButton onClick={() => clearPinnedMessage()}>
+        <Flex
+          onClick={() => clearPinnedMessage()}
+          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+        >
           <CrossIcon />
-        </IconButton>
+        </Flex>
       )}
     </Flex>
   ) : null;
 };
 
-export const Chat = () => {
+export const Chat = ({ screenType, hideControls = false }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -71,6 +81,7 @@ export const Chat = () => {
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
+
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
@@ -83,6 +94,14 @@ export const Chat = () => {
   }, [notification, peerSelector, setPeerSelector]);
 
   const storeMessageSelector = selectHMSMessagesCount;
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isMobile = useMedia(cssConfig.media.md);
+
+  let isScrolledToBottom = false;
+  if (listRef.current) {
+    const currentRef = listRef.current._outerRef;
+    isScrolledToBottom = currentRef.scrollHeight - currentRef.clientHeight - currentRef.scrollTop < 10;
+  }
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -99,10 +118,34 @@ export const Chat = () => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%' }}>
-      <ChatHeader
-        selectorOpen={isSelectorOpen}
+    <Flex
+      direction="column"
+      css={{
+        size: '100%',
+        gap: '$4',
+        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
+        transition: 'margin 0.3s ease-in-out',
+      }}
+    >
+      {isMobile && elements?.chat?.is_overlay ? null : (
+        <>
+          <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
+          {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}
+        </>
+      )}
+
+      <ChatBody
+        role={chatOptions.role}
+        peerId={chatOptions.peerId}
+        ref={listRef}
+        scrollToBottom={scrollToBottom}
+        screenType={screenType}
+      />
+      <ChatFooter
+        role={chatOptions.role}
+        onSend={() => scrollToBottom(1)}
         selection={chatOptions.selection}
+        screenType={screenType}
         onSelect={({ role, peerId, selection }) => {
           setChatOptions({
             role,
@@ -112,17 +155,9 @@ export const Chat = () => {
           setPeerSelector(peerId);
           setRoleSelector(role);
         }}
-        role={chatOptions.role}
         peerId={chatOptions.peerId}
-        onToggle={() => {
-          setSelectorOpen(value => !value);
-        }}
-      />
-      <PinnedMessage clearPinnedMessage={setPinnedMessage} />
-
-      <ChatBody role={chatOptions.role} peerId={chatOptions.peerId} ref={listRef} scrollToBottom={scrollToBottom} />
-      <ChatFooter role={chatOptions.role} peerId={chatOptions.peerId} onSend={() => scrollToBottom(1)}>
-        {!isSelectorOpen && (
+      >
+        {!isSelectorOpen && !isScrolledToBottom && (
           <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
         )}
       </ChatFooter>
@@ -146,13 +181,26 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
       }}
     >
       <Button
+        variant="standard"
         onClick={() => {
           scrollToBottom(unreadCount);
         }}
-        css={{ p: '$2 $4', '& > svg': { ml: '$4' } }}
+        icon
+        css={{
+          p: '$4',
+          pl: '$8',
+          pr: '$6',
+          '& > svg': { ml: '$4' },
+          borderRadius: '$round',
+          position: 'relative',
+          bottom: '$16',
+          fontSize: '$xs',
+          fontWeight: '$semiBold',
+          c: '$on_secondary_high',
+        }}
       >
-        New Messages
-        <ChevronDownIcon width={16} height={16} />
+        New {unreadCount === 1 ? 'message' : 'messages'}
+        <ChevronDownIcon />
       </Button>
     </Flex>
   );

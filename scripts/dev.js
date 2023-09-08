@@ -19,6 +19,7 @@ async function main() {
     external,
     loader: {
       '.png': 'binary',
+      '.svg': 'text',
     },
     plugins: [
       {

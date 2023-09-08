@@ -20,14 +20,29 @@ export const defaultLayout: Layout = {
             sub_title: 'Setup your audio and video before joining',
           },
           join_form: {
-            join_btn_type: JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE,
+            join_btn_type: JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_ONLY,
             join_btn_label: 'Join Now',
             go_live_btn_label: 'Go Live',
           },
         },
       },
     },
-    conferencing: {},
+    conferencing: {
+      default: {
+        elements: {
+          chat: {},
+          participant_list: {},
+          video_tile_layout: {
+            grid: {
+              enable_local_tile_inset: true,
+              prominent_roles: [],
+              enable_spotlighting_peer: true,
+            },
+          },
+          emoji_reactions: {},
+        },
+      },
+    },
     leave: {},
   },
 };

@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerRoleName, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { IconButton } from '../../../IconButton';
@@ -10,16 +9,11 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { useHLSViewerRole } from '../AppData/useUISettings';
 import { settingContent, settingsList } from './common.js';
 
-const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
+const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
   const isMobile = useMedia(mediaQueryLg);
-
-  const hlsViewerRole = useHLSViewerRole();
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isHlsViewer = hlsViewerRole === localPeerRole;
 
   const [showSetting, setShowSetting] = useState(() =>
     settingsList.reduce((obj, { tabName }) => ({ ...obj, [tabName]: true }), {}),
@@ -31,10 +25,10 @@ const SettingsModal = ({ open, onOpenChange, children = <></> }) => {
   );
 
   useEffect(() => {
-    if (isHlsViewer) {
+    if (screenType === 'hls_live_streaming') {
       hideSettingByTabName('layout')(true);
     }
-  }, [isHlsViewer, hideSettingByTabName]);
+  }, [screenType, hideSettingByTabName]);
 
   const [selection, setSelection] = useState(() => Object.keys(showSetting).find(key => showSetting[key]) ?? '');
   const resetSelection = useCallback(() => {

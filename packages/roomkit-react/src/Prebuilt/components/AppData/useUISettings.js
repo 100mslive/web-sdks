@@ -11,7 +11,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
+import { APP_DATA, SESSION_STORE_KEY } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -44,15 +44,6 @@ export const useSetUiSettings = uiSettingKey => {
     key2: uiSettingKey,
   });
   return [value, setValue];
-};
-
-export const useIsHeadless = () => {
-  const isHeadless = useUISettings(UI_SETTINGS.isHeadless);
-  return isHeadless;
-};
-
-export const useHLSViewerRole = () => {
-  return useHMSStore(selectAppData(APP_DATA.hlsViewerRole));
 };
 
 export const useWaitingViewerRole = () => {
@@ -91,6 +82,11 @@ export const usePinnedTrack = () => {
 
 export const useSubscribedNotifications = notificationKey => {
   const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.subscribedNotifications, notificationKey));
+  return notificationPreference;
+};
+
+export const useIsNotificationDisabled = () => {
+  const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.disableNotificiations));
   return notificationPreference;
 };
 

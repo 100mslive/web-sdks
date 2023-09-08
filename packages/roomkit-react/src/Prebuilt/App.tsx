@@ -13,8 +13,6 @@ import {
 // @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
-import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
-// @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -32,17 +30,21 @@ import PostLeave from './components/PostLeave';
 import PreviewContainer from './components/Preview/PreviewContainer';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider';
+import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
-// @ts-ignore: No implicit Any
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
-import { getRoutePrefix } from './common/utils';
+import { useIsNotificationDisabled } from './components/AppData/useUISettings';
+import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 
@@ -62,6 +64,9 @@ export type HMSPrebuiltProps = {
   themes?: Theme[];
   options?: HMSPrebuiltOptions;
   screens?: Screens;
+  authToken?: string;
+  roomId?: string;
+  role?: string;
   onLeave?: () => void;
 };
 
@@ -72,20 +77,13 @@ export type HMSPrebuiltRefType = {
   hmsNotifications: IHMSNotifications;
 };
 
-// TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }: { width: number; height: number }) => {
-  const host = process.env.REACT_APP_HOST_NAME || '';
-  const portraitDomains = (process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || '').split(',');
-  if (portraitDomains.includes(host) && width > height) {
-    return { width: height, height: width };
-  }
-  return { width, height };
-};
-
 export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
   (
     {
       roomCode = '',
+      authToken = '',
+      roomId = '',
+      role = '',
       logo,
       typography,
       themes,
@@ -95,9 +93,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const aspectRatio = '1-1';
     const metadata = '';
-    const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
     const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
@@ -108,6 +104,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       const hmsActions = hms.getActions();
       const hmsNotifications = hms.getNotifications();
       const hmsStats = hms.getStats();
+      hms.triggerOnSubscribe();
 
       reactiveStore.current = {
         hmsActions,
@@ -152,6 +149,15 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
     };
 
+    if (!roomCode && !(authToken && roomId && role)) {
+      console.error(`
+          HMSPrebuilt can be initialised by providing: 
+          either just "roomCode" or "authToken" and "roomId" and "role".
+          Please check if you are providing the above values for initialising prebuilt.
+        `);
+      throw Error('Incorrect initializing params for HMSPrebuilt component');
+    }
+
     if (!hydrated) {
       return null;
     }
@@ -163,8 +169,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         <HMSPrebuiltContext.Provider
           value={{
             roomCode,
-            showPreview: true,
-            showLeave: true,
+            roomId,
+            role,
             onLeave,
             userName,
             userId,
@@ -185,7 +191,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           >
             <RoomLayoutProvider roomLayoutEndpoint={roomLayoutEndpoint} overrideLayout={overrideLayout}>
               <RoomLayoutContext.Consumer>
-                {layout => {
+                {data => {
+                  const layout = data?.layout;
                   const theme: Theme = layout?.themes?.[0] || ({} as Theme);
                   const { typography } = layout || {};
                   let fontFamily = ['sans-serif'];
@@ -199,7 +206,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       // no updates to the themes are fired if the name is same.
                       // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}
-                      aspectRatio={getAspectRatio({ width, height })}
                       theme={{
                         //@ts-ignore: Prebuilt theme to match stiches theme
                         colors: theme.palette,
@@ -219,7 +225,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           '-webkit-text-size-adjust': '100%',
                         }}
                       >
-                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} />
+                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />
                       </Box>
                     </HMSThemeProvider>
                   );
@@ -237,31 +243,21 @@ HMSPrebuilt.displayName = 'HMSPrebuilt';
 
 const Redirector = ({ showPreview }: { showPreview: boolean }) => {
   const { roomId, role } = useParams();
-
-  if (!roomId && !role) {
-    return <Navigate to="/" />;
-  }
-  if (!roomId) {
-    return <Navigate to="/" />;
-  }
-  if (['streaming', 'preview', 'meeting', 'leave'].includes(roomId) && !role) {
-    return <Navigate to="/" />;
-  }
-
-  return <Navigate to={`${getRoutePrefix()}/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
+  return <Navigate to={`/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
 };
 
 const RouteList = () => {
-  const { showPreview, showLeave } = useHMSPrebuiltContext();
-
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  useAutoStartStreaming();
   return (
     <Routes>
-      {showPreview && (
+      {isPreviewScreenEnabled ? (
         <Route path="preview">
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
+              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -269,18 +265,18 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
+              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
           />
         </Route>
-      )}
+      ) : null}
       <Route path="meeting">
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress text="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -288,21 +284,21 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress text="Joining..." />}>
               <Conference />
             </Suspense>
           }
         />
       </Route>
-      {showLeave && (
+      {isLeaveScreenEnabled ? (
         <Route path="leave">
           <Route path=":roomId/:role" element={<PostLeave />} />
           <Route path=":roomId" element={<PostLeave />} />
         </Route>
-      )}
+      ) : null}
 
-      <Route path="/:roomId/:role" element={<Redirector showPreview={showPreview} />} />
-      <Route path="/:roomId/" element={<Redirector showPreview={showPreview} />} />
+      <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
+      <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
     </Routes>
   );
 };
@@ -335,21 +331,30 @@ const Router = ({ children }: { children: ReactElement }) => {
   );
 };
 
-function AppRoutes({ authTokenByRoomCodeEndpoint }: { authTokenByRoomCodeEndpoint: string }) {
+function AppRoutes({
+  authTokenByRoomCodeEndpoint,
+  defaultAuthToken,
+}: {
+  authTokenByRoomCodeEndpoint: string;
+  defaultAuthToken?: string;
+}) {
+  const roomLayout = useRoomLayout();
+  const isNotificationsDisabled = useIsNotificationDisabled();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        <FlyingEmoji />
+        {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <BeamSpeakerLabelsLogging />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} />
-        <Routes>
-          <Route path="/*" element={<RouteList />} />
-        </Routes>
+        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+        {roomLayout && (
+          <Routes>
+            <Route path="/*" element={<RouteList />} />
+          </Routes>
+        )}
       </>
     </Router>
   );

@@ -1,5 +1,6 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
@@ -13,13 +14,15 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { HorizontalMenuIcon, PinIcon } from '@100mslive/react-icons';
+import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import { styled } from '../../../Theme';
+import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import emptyChat from '../../images/empty-chat.svg';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -46,7 +49,7 @@ const MessageTypeContainer = ({ left, right }) => {
         ml: 'auto',
         mr: '$4',
         p: '$2 $4',
-        border: '1px solid $on_surface_low',
+        border: '1px solid $border_bright',
         r: '$0',
       }}
     >
@@ -55,9 +58,9 @@ const MessageTypeContainer = ({ left, right }) => {
           {left}
         </SenderName>
       )}
-      {left && right && <Box css={{ borderLeft: '1px solid $on_surface_low', mx: '$4', h: '$8' }} />}
+      {left && right && <Box css={{ borderLeft: '1px solid $border_bright', mx: '$4', h: '$8' }} />}
       {right && (
-        <SenderName as="span" variant="tiny">
+        <SenderName as="span" variant="tiny" css={{ textTransform: 'uppercase' }}>
           {right}
         </SenderName>
       )}
@@ -123,16 +126,18 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-
-const ChatActions = ({ onPin }) => {
+const ChatActions = ({ onPin, showPinAction }) => {
   const [open, setOpen] = useState(false);
+  if (!showPinAction) {
+    return null;
+  }
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger asChild>
+      <Dropdown.Trigger className="chat_actions" css={{ opacity: open ? 1 : 0, '@md': { opacity: 1 } }} asChild>
         <IconButton>
           <Tooltip title="More options">
-            <HorizontalMenuIcon />
+            <VerticalMenuIcon />
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
@@ -140,7 +145,7 @@ const ChatActions = ({ onPin }) => {
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0' }}
+          css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
@@ -148,6 +153,29 @@ const ChatActions = ({ onPin }) => {
               Pin Message
             </Text>
           </Dropdown.Item>
+          {/* {isMobile ? (
+            <Dropdown.Item
+              data-testid="copy_message_btn"
+              onClick={() => {
+                try {
+                  navigator?.clipboard.writeText(messageContent);
+                  ToastManager.addToast({
+                    title: 'Message copied successfully',
+                  });
+                } catch (e) {
+                  console.log(e);
+                  ToastManager.addToast({
+                    title: 'Could not copy message',
+                  });
+                }
+              }}
+            >
+              <CopyIcon />
+              <Text variant="sm" css={{ ml: '$4' }}>
+                Copy Message
+              </Text>
+            </Dropdown.Item>
+          ) : null} */}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -160,6 +188,8 @@ const SenderName = styled(Text, {
   whiteSpace: 'nowrap',
   maxWidth: '24ch',
   minWidth: 0,
+  color: '$on_surface_high',
+  fontWeight: '$semiBold',
 });
 
 const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPin }) => {
@@ -170,7 +200,9 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       setRowHeight(index, rowRef.current.clientHeight);
     }
   }, [index, setRowHeight]);
-
+  const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isOverlay = elements?.chat?.is_overlay && isMobile;
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
   const permissions = useHMSStore(selectPermissions);
@@ -179,7 +211,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     receiver: message.recipientPeer,
   });
   // show pin action only if peer has remove others permission and the message is of broadcast type
-  const showPinAction = permissions.removeOthers && !messageType;
+  const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
 
   useEffect(() => {
     if (message.id && !message.read && inView) {
@@ -188,13 +220,19 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
   }, [message.read, hmsActions, inView, message.id]);
 
   return (
-    <Box ref={ref} as="div" css={{ mb: '$10', pr: '$10' }} style={style}>
+    <Box
+      ref={ref}
+      as="div"
+      css={{ mb: '$10', pr: '$10', mt: '$8', '&:hover .chat_actions': { opacity: 1 } }}
+      style={style}
+    >
       <Flex
         ref={rowRef}
         align="center"
         css={{
           flexWrap: 'wrap',
-          bg: messageType ? '$surface_bright' : undefined,
+          // Theme independent color, token should not be used for transparent chat
+          bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -205,7 +243,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       >
         <Text
           css={{
-            color: '$on_surface_high',
+            color: isOverlay ? '#FFF' : '$on_surface_high',
             fontWeight: '$semiBold',
             display: 'inline-flex',
             alignItems: 'center',
@@ -214,41 +252,48 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
           }}
           as="div"
         >
-          <Flex align="center">
+          <Flex align="baseline">
             {message.senderName === 'You' || !message.senderName ? (
-              <SenderName as="span">{message.senderName || 'Anonymous'}</SenderName>
+              <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                {message.senderName || 'Anonymous'}
+              </SenderName>
             ) : (
               <Tooltip title={message.senderName} side="top" align="start">
-                <SenderName as="span">{message.senderName}</SenderName>
+                <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                  {message.senderName}
+                </SenderName>
               </Tooltip>
             )}
-            <Text
-              as="span"
-              variant="sm"
-              css={{
-                ml: '$4',
-                color: '$on_primary_medium',
-                flexShrink: 0,
-              }}
-            >
-              {formatTime(message.time)}
-            </Text>
+            {!isOverlay ? (
+              <Text
+                as="span"
+                variant="xs"
+                css={{
+                  ml: '$4',
+                  color: '$on_surface_medium',
+                  flexShrink: 0,
+                }}
+              >
+                {formatTime(message.time)}
+              </Text>
+            ) : null}
           </Flex>
           <MessageType
             hasCurrentUserSent={message.sender === localPeerId}
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {showPinAction && <ChatActions onPin={onPin} />}
+          {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} /> : null}
         </Text>
         <Text
-          variant="body2"
+          variant="sm"
           css={{
             w: '100%',
             mt: '$2',
             wordBreak: 'break-word',
             whiteSpace: 'pre-wrap',
             userSelect: 'all',
+            color: isOverlay ? '#FFF' : '$on_surface_high',
           }}
           onClick={e => e.stopPropagation()}
         >
@@ -345,21 +390,35 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  const messages = useHMSStore(storeMessageSelector) || [];
+  let messages = useHMSStore(storeMessageSelector);
+  messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
+  const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
 
-  if (messages.length === 0) {
+  if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
       <Flex
         css={{
           width: '100%',
-          height: '100%',
+          flex: '1 1 0',
           textAlign: 'center',
           px: '$4',
         }}
         align="center"
         justify="center"
       >
-        <Text>There are no messages here</Text>
+        <Box>
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+          <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+            Start a conversation
+          </Text>
+          <Text
+            variant="sm"
+            css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
+          >
+            There are no messages here yet. Start a conversation by sending a message.
+          </Text>
+        </Box>
       </Flex>
     );
   }
