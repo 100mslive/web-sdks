@@ -8,6 +8,7 @@ import { Chat } from '../components/Chat/Chat';
 import { ParticipantList } from '../components/Footer/ParticipantList';
 // @ts-ignore: No implicit Any
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
+import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
@@ -16,7 +17,13 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
+const SidePane = ({
+  screenType,
+  tileProps,
+}: {
+  screenType: keyof ConferencingScreen;
+  tileProps: TileCustomisationProps;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
@@ -56,6 +63,7 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
           objectFit="contain"
+          {...tileProps}
         />
       )}
       {!!ViewComponent && (

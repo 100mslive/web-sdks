@@ -82,7 +82,11 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane screenType={screenType} />
+        <SidePane
+          screenType={screenType}
+          // @ts-ignore
+          tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+        />
       </Flex>
     </Suspense>
   );
