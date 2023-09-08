@@ -22,7 +22,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
-import { CHAT_SELECTOR, isAndroid, isIOS, isIPadOS, SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 80;
 
@@ -81,7 +81,6 @@ export const Chat = ({ screenType, hideControls = false }) => {
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
-  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
 
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
@@ -124,7 +123,7 @@ export const Chat = ({ screenType, hideControls = false }) => {
       css={{
         size: '100%',
         gap: '$4',
-        marginTop: performAutoHide && elements?.chat?.is_overlay ? '$17' : '0',
+        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
         transition: 'margin 0.3s ease-in-out',
       }}
     >
