@@ -42,7 +42,7 @@ export default function Header({
           onClick={() => {
             window.open(process.env.REACT_APP_DASHBOARD_LINK);
           }}
-          src={theme === 'DARK' ? darkLogo : logo}
+          src={theme !== 'DARK' ? darkLogo : logo}
           alt="100ms logo"
           width={132}
           height={40}
