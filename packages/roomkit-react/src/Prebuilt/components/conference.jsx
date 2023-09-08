@@ -42,7 +42,7 @@ const Conference = () => {
   const headerRef = useRef();
   const footerRef = useRef();
   const dropdownListRef = useRef();
-  const performAutoHide = hideControls && (isAndroid || isIOS || isIPadOS);
+  const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0) {
@@ -124,7 +124,7 @@ const Conference = () => {
             css={{
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
-              marginTop: performAutoHide ? `-${headerRef.current?.clientHeight}px` : 'none',
+              marginTop: hideControls && isMobileDevice ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
                 h: '$17',
               },
@@ -163,7 +163,7 @@ const Conference = () => {
               maxHeight: '$24',
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
-              marginBottom: performAutoHide ? `-${footerRef.current?.clientHeight}px` : undefined,
+              marginBottom: hideControls && isMobileDevice ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
