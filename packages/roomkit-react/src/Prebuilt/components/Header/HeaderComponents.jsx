@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
@@ -41,6 +41,12 @@ export const Logo = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [hideImage, setHideImage] = useState(false);
   // Hide logo for now as there is not enough space
+  useEffect(() => {
+    if (hideImage) {
+      setHideImage(false);
+    }
+  }, [hideImage, logo]);
+
   if (isConnected && isMobile) {
     return null;
   }
