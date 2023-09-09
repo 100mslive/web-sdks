@@ -9,7 +9,7 @@ import { ParticipantList } from './Footer/ParticipantList';
 import { Flex, IconButton, Tabs, Text } from '../..';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
-import { useSidepaneToggle } from './AppData/useSidepane';
+import { useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -29,6 +29,7 @@ export const SidePaneTabs = React.memo<{
 }>(({ active = SIDE_PANE_OPTIONS.CHAT, screenType, hideControls }) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const resetSidePane = useSidepaneReset();
   const [activeTab, setActiveTab] = useState(active);
   const peerCount = useHMSStore(selectPeerCount);
   const { elements } = useRoomLayoutConferencingScreen();
@@ -37,10 +38,14 @@ export const SidePaneTabs = React.memo<{
   const hideTabs = !(showChat && showParticipants);
 
   useEffect(() => {
-    if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat) {
+    if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat && showParticipants) {
       setActiveTab(SIDE_PANE_OPTIONS.PARTICIPANTS);
+    } else if (activeTab === SIDE_PANE_OPTIONS.PARTICIPANTS && showChat && !showParticipants) {
+      setActiveTab(SIDE_PANE_OPTIONS.CHAT);
+    } else if (!showChat && !showParticipants) {
+      resetSidePane();
     }
-  }, [showChat, activeTab]);
+  }, [showChat, activeTab, showParticipants, resetSidePane]);
 
   return (
     <Flex
