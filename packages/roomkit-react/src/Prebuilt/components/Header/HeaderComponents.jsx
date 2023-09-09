@@ -45,7 +45,8 @@ export const Logo = () => {
     if (hideImage) {
       setHideImage(false);
     }
-  }, [hideImage, logo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logo]);
 
   if (isConnected && isMobile) {
     return null;
