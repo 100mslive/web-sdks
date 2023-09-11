@@ -119,7 +119,7 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
       direction="column"
       css={{
         gap: '$8',
-        maxHeight: '100%',
+        maxHeight: 'calc(100% - 130px)',
         overflowY: 'auto',
         overflowX: 'hidden',
         pr: '$3',
@@ -316,7 +316,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
     <Flex
       align="center"
       css={{
-        p: isMobile ? '$0 $6' : '$2 0',
+        p: isMobile ? '0' : '$2 0',
         mb: '$2',
         position: 'relative',
         color: '$on_surface_medium',
