@@ -557,6 +557,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.removeRoleChangeRequest(request);
   }
 
+  async raiseLocalPeerHand() {
+    await this.sdk.raiseLocalPeerHand();
+  }
+  async lowerLocalPeerHand() {
+    await this.sdk.lowerLocalPeerHand();
+  }
+  async raiseRemotePeerHand(peerId: string) {
+    await this.sdk.raiseRemotePeerHand(peerId);
+  }
+  async lowerRemotePeerHand(peerId: string) {
+    await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
   initAppData(appData: Record<string, any>) {
     this.setState(store => {
       store.appData = appData;
