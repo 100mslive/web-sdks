@@ -6,7 +6,7 @@ import { keyframes } from '../../Theme';
 import bg from '../images/audio-level.png';
 
 // keep the calculated values before hand to avoid recalcuation everytime
-const positionValues = Array(101).reduce((acc, _, index) => {
+const positionValues = new Array(101).fill(0).reduce((acc, _, index) => {
   acc[index] = Math.round((index / 100) * 4) / 4; // convert to 0.25 multiples
   return acc;
 }, {});
