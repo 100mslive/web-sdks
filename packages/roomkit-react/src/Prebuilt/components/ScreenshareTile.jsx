@@ -88,7 +88,13 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
         {isMouseHovered && !peer.isLocal ? (
-          <TileMenu isScreenshare peerID={peer.id} audioTrackID={audioTrack?.id} videoTrackID={track?.id} />
+          <TileMenu
+            isScreenshare
+            peerID={peer.id}
+            audioTrackID={audioTrack?.id}
+            videoTrackID={track?.id}
+            enableSpotlightingPeer={false}
+          />
         ) : null}
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
