@@ -34,11 +34,6 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
-  const label = getVideoTileLabel({
-    peerName: peer.name,
-    isLocal: false,
-    track,
-  });
   const fullscreenRef = useRef(null);
   // fullscreen is for desired state
   const [fullscreen, setFullscreen] = useState(false);
@@ -56,6 +51,13 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   if (!peer) {
     return null;
   }
+
+  const label = getVideoTileLabel({
+    peerName: peer?.name,
+    isLocal: false,
+    track,
+  });
+
   return (
     <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0 }} data-testid="screenshare_tile">
       <StyledVideoTile.Container
@@ -85,8 +87,14 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
           />
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
-        {isMouseHovered && !peer?.isLocal ? (
-          <TileMenu isScreenshare peerID={peer?.id} audioTrackID={audioTrack?.id} videoTrackID={track?.id} />
+        {isMouseHovered && !peer.isLocal ? (
+          <TileMenu
+            isScreenshare
+            peerID={peer.id}
+            audioTrackID={audioTrack?.id}
+            videoTrackID={track?.id}
+            enableSpotlightingPeer={false}
+          />
         ) : null}
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
