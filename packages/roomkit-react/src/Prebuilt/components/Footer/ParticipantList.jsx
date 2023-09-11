@@ -1,11 +1,11 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
+  selectHandRaisedPeers,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
-  selectPeersByCondition,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -35,7 +35,7 @@ export const ParticipantList = () => {
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
 
-  const handRaisedPeers = useHMSStore(selectPeersByCondition(peer => JSON.parse(peer.metadata || '{}')?.isHandRaised));
+  const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {

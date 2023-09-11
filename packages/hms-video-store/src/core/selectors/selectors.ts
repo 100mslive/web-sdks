@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { HAND_RAISE_GROUP_NAME } from '@100mslive/hms-video';
 import {
   getScreenSharesByPeer,
   isAudioPlaylist,
@@ -442,3 +443,7 @@ export const selectPollsMap = (store: HMSStore) => store.polls;
 export const selectPolls = (store: HMSStore) => {
   return Object.values(store.polls);
 };
+
+export const selectHandRaisedPeers = createSelector(selectPeers, peers => {
+  return peers.filter(peer => !!peer.groups?.includes(HAND_RAISE_GROUP_NAME));
+});
