@@ -38,6 +38,14 @@ const SidePane = ({
     return null;
   }
 
+  const tileLayout = {
+    hideParticipantNameOnTile: tileProps.hide_participant_name_on_tile,
+    roundedVideoTile: tileProps.rounded_video_tile,
+    hideAudioMuteOnTile: tileProps.hide_audio_mute_on_tile,
+    hideMetadataOnTile: tileProps.hide_metadata_on_tile,
+    objectFit: tileProps.video_object_fit,
+  };
+
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (
@@ -59,8 +67,7 @@ const SidePane = ({
           width="100%"
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
-          objectFit="contain"
-          {...tileProps}
+          {...tileLayout}
         />
       )}
       {!!ViewComponent && (
