@@ -11,7 +11,7 @@ import { config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 // @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
-import { useSidepaneReset, useSidepaneToggle, useIsSidepaneTypeOpen } from './AppData/useSidepane';
+import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
