@@ -21,7 +21,6 @@ import {
 } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
-import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
@@ -61,7 +60,6 @@ export const ParticipantList = () => {
   return (
     <Fragment>
       <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
-        <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
         {participants.length === 0 ? (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
