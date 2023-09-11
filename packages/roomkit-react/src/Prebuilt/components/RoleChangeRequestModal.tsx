@@ -28,7 +28,6 @@ export const RoleChangeRequestModal = () => {
       return;
     }
     (async () => {
-      await updateMetaData({ prevRole: currentRole });
       await hmsActions.preview({ asRole: roleChangeRequest.role.name });
     })();
   }, [hmsActions, roleChangeRequest, currentRole, updateMetaData]);
@@ -71,7 +70,7 @@ export const RoleChangeRequestModal = () => {
       body={body}
       onAction={async () => {
         await hmsActions.acceptChangeRole(roleChangeRequest);
-        await updateMetaData({ isHandRaised: false });
+        await updateMetaData({ isHandRaised: false, prevRole: currentRole });
       }}
       actionText="Accept"
     />
