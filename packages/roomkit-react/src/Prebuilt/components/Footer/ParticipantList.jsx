@@ -119,10 +119,11 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
       direction="column"
       css={{
         gap: '$8',
-        maxHeight: 'calc(100% - 130px)',
         overflowY: 'auto',
         overflowX: 'hidden',
-        pr: '$3',
+        pr: '$10',
+        mr: '-$10',
+        flex: '1 1 0',
       }}
     >
       <RoleAccordion
