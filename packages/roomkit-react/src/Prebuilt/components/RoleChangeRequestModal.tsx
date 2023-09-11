@@ -27,9 +27,10 @@ export const RoleChangeRequestModal = () => {
     if (!roleChangeRequest?.role) {
       return;
     }
-
-    hmsActions.preview({ asRole: roleChangeRequest.role.name });
-  }, [hmsActions, roleChangeRequest]);
+    (async () => {
+      await hmsActions.preview({ asRole: roleChangeRequest.role.name });
+    })();
+  }, [hmsActions, roleChangeRequest, currentRole, updateMetaData]);
 
   if (!roleChangeRequest?.role) {
     return null;

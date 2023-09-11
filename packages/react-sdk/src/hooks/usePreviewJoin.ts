@@ -127,7 +127,9 @@ export const usePreviewJoin = ({
     }
     try {
       if (isConnected || roomState !== HMSRoomState.Disconnected) {
-        await actions.leave();
+        await actions.leave().catch(() => {
+          // Do nothing as this might lead to leave called before join
+        });
       }
       await actions.preview(config);
     } catch (err) {
