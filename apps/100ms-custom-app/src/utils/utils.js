@@ -183,3 +183,38 @@ export const getAuthTokenUsingRoomIdRole = async function ({
     throw Error('failed to get auth token using roomid and role');
   }
 };
+
+export const fetchData = async (
+  subdomain,
+  roomCode,
+  setOnlyEmail,
+  setData,
+  setShowHeader
+) => {
+  const jwt = getAuthInfo().token;
+
+  const url = `${apiBasePath}apps/get-details?domain=${subdomain}&room_id=${roomCode}`;
+  const headers = {};
+  if (jwt) {
+    headers['Authorization'] = `Bearer ${jwt}`;
+  }
+  headers['Content-Type'] = 'application/json';
+
+  getWithRetry(url, headers)
+    .then(res => {
+      if (res.data.success) {
+        setOnlyEmail(res.data.same_user);
+        setShowHeader(true);
+        setData({
+          roomLinks: res.data.room_link,
+          policyID: res.data.policy_id,
+          theme: res.data.theme,
+        });
+      }
+    })
+    .catch(err => {
+      setShowHeader(false);
+      const errorMessage = `[Get Details] ${err.message}`;
+      console.error(errorMessage);
+    });
+};
