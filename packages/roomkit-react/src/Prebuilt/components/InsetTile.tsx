@@ -120,6 +120,7 @@ export const InsetTile = () => {
             canMinimise
             isDragabble
             {...videoTileProps}
+            hideParticipantNameOnTile
           />
         )}
       </Box>
