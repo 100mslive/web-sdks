@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
-  selectPeerMetadata,
   selectRoomState,
   useCustomEvent,
   useHMSNotifications,
@@ -113,13 +112,10 @@ export function Notifications() {
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
         if (notification.data?.isLocal) {
-          const { prevRole } = vanillaStore.getState(selectPeerMetadata(notification.data?.id));
-          if (prevRole !== notification?.data?.roleName) {
-            ToastManager.addToast({
-              title: `You are now a ${notification.data.roleName}`,
-            });
-            updateRoomLayoutForRole(notification.data.roleName);
-          }
+          ToastManager.addToast({
+            title: `You are now a ${notification.data.roleName}`,
+          });
+          updateRoomLayoutForRole(notification.data.roleName);
         }
         break;
       }
