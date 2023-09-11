@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import {
-  selectIsAllowedToPublish,
+  selectIsLocalVideoEnabled,
   selectIsLocalVideoPluginPresent,
   selectLocalPeerRole,
   selectLocalVideoTrackID,
@@ -23,8 +23,8 @@ export const VirtualBackground = ({
 }) => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
-  const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
   const role = useHMSStore(selectLocalPeerRole);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const [isVBLoading, setIsVBLoading] = useState(false);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const [isVBOn, setIsVBOn] = useState(false);
@@ -69,7 +69,7 @@ export const VirtualBackground = ({
     }
   }
 
-  if (!isAllowedToPublish.video || !isVBSupported) {
+  if (!isVBSupported || !isVideoOn) {
     return null;
   }
   if (asActionTile) {
