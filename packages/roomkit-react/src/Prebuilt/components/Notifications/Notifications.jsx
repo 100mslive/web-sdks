@@ -4,10 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
+  selectPeerMetadata,
   selectRoomState,
   useCustomEvent,
   useHMSNotifications,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
@@ -29,6 +31,7 @@ export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigate();
   const params = useParams();
+  const vanillaStore = useHMSVanillaStore();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
@@ -53,8 +56,8 @@ export function Notifications() {
         if (roomState !== HMSRoomState.Connected) {
           return;
         }
-        // Don't toast message when metadata is updated and raiseHand is false.
-        // Don't toast message in case of local peer.
+        // Don't show toast message when metadata is updated and raiseHand is false.
+        // Don't show toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
         if (!metadata?.isHandRaised || notification.data.isLocal) return;
 
@@ -108,14 +111,18 @@ export function Notifications() {
           title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
         });
         break;
-      case HMSNotificationTypes.ROLE_UPDATED:
+      case HMSNotificationTypes.ROLE_UPDATED: {
         if (notification.data?.isLocal) {
-          ToastManager.addToast({
-            title: `You are now a ${notification.data.roleName}`,
-          });
-          updateRoomLayoutForRole(notification.data.roleName);
+          const { prevRole } = vanillaStore.getState(selectPeerMetadata(notification.data?.id));
+          if (prevRole !== notification?.data?.roleName) {
+            ToastManager.addToast({
+              title: `You are now a ${notification.data.roleName}`,
+            });
+            updateRoomLayoutForRole(notification.data.roleName);
+          }
         }
         break;
+      }
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
         const track = notification.data?.track;
         if (!notification.data.enabled) {
