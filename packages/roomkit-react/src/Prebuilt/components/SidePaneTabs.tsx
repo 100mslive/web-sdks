@@ -52,6 +52,10 @@ export const SidePaneTabs = React.memo<{
     }
   }, [showChat, activeTab, showParticipants, resetSidePane]);
 
+  useEffect(() => {
+    setActiveTab(active);
+  }, [active]);
+
   return (
     <Flex
       direction="column"

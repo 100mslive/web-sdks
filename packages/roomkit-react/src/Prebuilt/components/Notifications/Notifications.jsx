@@ -8,7 +8,6 @@ import {
   useCustomEvent,
   useHMSNotifications,
   useHMSStore,
-  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
@@ -30,7 +29,6 @@ export function Notifications() {
   const notification = useHMSNotifications();
   const navigate = useNavigate();
   const params = useParams();
-  const vanillaStore = useHMSVanillaStore();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
