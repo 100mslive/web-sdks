@@ -902,6 +902,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    const newNetworkQuality: Record<HMSPeerID, sdkTypes.HMSConnectionQuality> = {};
     let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
@@ -911,6 +912,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
+      newNetworkQuality[hmsPeer.id] = {
+        peerID: hmsPeer.id,
+        downlinkQuality: sdkPeer.networkQuality || -1,
+      };
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (const sdkTrack of sdkTracks) {
@@ -944,6 +949,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
+      Object.assign(draftStore.connectionQualities, newNetworkQuality);
       this.hmsSDKTracks = newHmsSDkTracks;
 
       /**
@@ -1123,26 +1129,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
    */
   protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
     this.setState(store => {
-      const currentPeerIDs = new Set();
       newQualities.forEach(sdkUpdate => {
         const peerID = sdkUpdate.peerID;
         if (!peerID) {
           return;
         }
-        currentPeerIDs.add(peerID);
         if (!store.connectionQualities[peerID]) {
           store.connectionQualities[peerID] = sdkUpdate;
         } else {
           Object.assign(store.connectionQualities[peerID], sdkUpdate);
         }
       });
-      const peerIDsStored = Object.keys(store.connectionQualities);
-      for (const storedPeerID of peerIDsStored) {
-        if (!currentPeerIDs.has(storedPeerID)) {
-          // peer is likely no longer there, it wasn't in the update sent by the server
-          delete store.connectionQualities[storedPeerID];
-        }
-      }
     }, 'connectionQuality');
   }
 

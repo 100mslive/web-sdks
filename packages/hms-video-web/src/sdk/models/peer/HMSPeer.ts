@@ -11,6 +11,7 @@ export type HMSPeerInit = {
   role?: HMSRole;
   joinedAt?: Date;
   fromRoomState?: boolean;
+  connectionQuality?: number;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -24,6 +25,7 @@ export class HMSPeer implements IHMSPeer {
   auxiliaryTracks: HMSTrack[] = [];
   role?: HMSRole;
   joinedAt?: Date;
+  networkQuality?: number;
 
   constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt }: HMSPeerInit) {
     this.name = name;
@@ -49,6 +51,10 @@ export class HMSPeer implements IHMSPeer {
    */
   updateName(newName: string) {
     this.name = newName;
+  }
+
+  updateNetworkQuality(quality: number) {
+    this.networkQuality = quality;
   }
   /**
    * @internal
