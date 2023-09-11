@@ -206,7 +206,7 @@ export const fetchData = async (
         setOnlyEmail(res.data.same_user);
         setShowHeader(true);
         setData({
-          roomLinks: res.data.room_link,
+          roomLinks: res.data.room_links,
           policyID: res.data.policy_id,
           theme: res.data.theme,
         });

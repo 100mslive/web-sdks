@@ -1,10 +1,17 @@
 import React, { Suspense, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   BrushDesignIcon,
   PeopleAddIcon,
   PersonContactIcon,
 } from '@100mslive/react-icons';
-import { Button, Flex, styled, Text } from '@100mslive/roomkit-react';
+import {
+  Button,
+  config as cssConfig,
+  Flex,
+  styled,
+  Text,
+} from '@100mslive/roomkit-react';
 import darkLogo from '../assets/images/100ms_dark.svg';
 import logo from '../assets/images/100ms_logo.svg';
 
@@ -21,11 +28,15 @@ const LogoImg = styled('img', {
 
 export default function Header({
   roomLinks = {},
-  onlyEmail,
   policyID = '',
   theme = 'DARK',
 }) {
   const [modal, togModal] = useState(false);
+  const isMobile = useMedia(cssConfig.media.md);
+
+  if (isMobile) {
+    return null;
+  }
 
   return (
     <>
