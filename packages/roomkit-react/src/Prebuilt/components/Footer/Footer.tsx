@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
@@ -25,6 +25,10 @@ import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
 // @ts-ignore: No implicit Any
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
+// @ts-ignore: No implicit Any
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 export const Footer = ({
@@ -38,6 +42,16 @@ export const Footer = ({
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+
+  useEffect(() => {
+    if (!isChatOpen && openByDefault) {
+      toggleChat();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toggleChat, openByDefault]);
 
   return (
     <AppFooter.Root
@@ -76,7 +90,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
-            {elements?.chat && <ChatToggle openByDefault={openByDefault} />}
+            {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
@@ -89,7 +103,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {!isMobile && elements?.chat && <ChatToggle openByDefault={openByDefault} />}
+        {!isMobile && elements?.chat && <ChatToggle />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>
