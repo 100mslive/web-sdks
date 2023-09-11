@@ -64,7 +64,6 @@ const App = () => {
         <Suspense fallback={null}>
           <Header
             roomLinks={data?.roomLinks}
-            onlyEmail={onlyEmail}
             policyID={data?.policyID}
             theme={data?.theme}
           />
