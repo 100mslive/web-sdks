@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
@@ -9,17 +9,10 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ChatToggle = ({ openByDefault }: { openByDefault: boolean }) => {
+export const ChatToggle = () => {
   const countUnreadMessages = useHMSStore(selectUnreadHMSMessagesCount);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
-
-  useEffect(() => {
-    if (!isChatOpen && openByDefault) {
-      toggleChat();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toggleChat, openByDefault]);
 
   return (
     <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
