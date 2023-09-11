@@ -103,6 +103,7 @@ export const makeFakeStore = (): HMSStore => {
         audioTrack: '102',
         auxiliaryTracks: [],
         metadata: '{}',
+        groups: [],
       },
       '2': {
         id: '2',
@@ -113,6 +114,7 @@ export const makeFakeStore = (): HMSStore => {
         audioTrack: '104',
         auxiliaryTracks: ['105', '106', '107'],
         metadata: '{"hello":"world"}',
+        groups: [],
       },
       '3': {
         id: '3',
@@ -122,6 +124,7 @@ export const makeFakeStore = (): HMSStore => {
         videoTrack: '105',
         audioTrack: '106',
         auxiliaryTracks: [],
+        groups: [],
       },
     },
     tracks: {

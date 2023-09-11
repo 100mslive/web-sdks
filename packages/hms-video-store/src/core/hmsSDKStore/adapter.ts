@@ -48,6 +48,7 @@ export class SDKToHMS {
       customerUserId: sdkPeer.customerUserId,
       metadata: sdkPeer.metadata,
       joinedAt: sdkPeer.joinedAt,
+      groups: sdkPeer.groups,
     };
   }
 

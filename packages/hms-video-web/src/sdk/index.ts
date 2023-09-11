@@ -964,13 +964,11 @@ export class HMSSdk implements HMSInterface {
 
   async raiseLocalPeerHand() {
     this.validateJoined('raiseLocalPeerHand');
-    const { groups } = await this.transport.joinGroup(HAND_RAISE_GROUP_NAME);
-    this.localPeer!.groups = groups;
+    await this.transport.joinGroup(HAND_RAISE_GROUP_NAME);
   }
   async lowerLocalPeerHand() {
     this.validateJoined('lowerLocalPeerHand');
-    const { groups } = await this.transport.leaveGroup(HAND_RAISE_GROUP_NAME);
-    this.localPeer!.groups = groups;
+    await this.transport.leaveGroup(HAND_RAISE_GROUP_NAME);
   }
   async raiseRemotePeerHand(peerId: string) {
     await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);

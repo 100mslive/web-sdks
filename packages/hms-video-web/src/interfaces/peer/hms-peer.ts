@@ -12,6 +12,7 @@ export interface HMSPeer {
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
   role?: HMSRole;
+  groups?: string[];
 
   updateRole(newRole: HMSRole): void;
   updateName(newName: string): void;
