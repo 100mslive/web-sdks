@@ -37,9 +37,9 @@ jobs:
       REACT_APP_ENV: ${{ github.event.inputs.buildEnvForDev }}
       REACT_APP_ZIPY_KEY: ${{ secrets.ZIPY_KEY }}
       REACT_APP_ENABLE_BEAM_SPEAKERS_LOGGING: 'true'
-      REACT_APP_INIT_ENDPOINT: https://qa-init.100ms.live/init
-      REACT_APP_ROOM_LAYOUT_ENDPOINT: https://api-nonprod.100ms.live/v2/layouts/ui
-      REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT: https://auth-nonprod.100ms.live/v2/token
+      REACT_APP_INIT_ENDPOINT: https://prod-in3.100ms.live/init
+      REACT_APP_ROOM_LAYOUT_ENDPOINT: https://api.100ms.live/v2/layouts/ui
+      REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT: https://auth.100ms.live/v2/token
     steps:
       - name: log inputs
         run: |
