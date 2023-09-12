@@ -97,6 +97,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
+    
     useEffect(() => {
       setHydrated(true);
       const hms = new HMSReactiveStore();
