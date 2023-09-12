@@ -16,9 +16,11 @@ import { useDropdownList } from '../hooks/useDropdownList';
 export const DesktopLeaveRoom = ({
   leaveRoom,
   screenType,
+  endRoom,
 }: {
   leaveRoom: (args: { endstream: boolean }) => void;
   screenType: keyof ConferencingScreen;
+  endRoom: () => void;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -26,7 +28,7 @@ export const DesktopLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const showStream = permissions?.hlsStreaming && isStreamingOn;
+  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
@@ -36,7 +38,7 @@ export const DesktopLeaveRoom = ({
 
   return (
     <Fragment>
-      {permissions.hlsStreaming ? (
+      {screenType !== 'hls_live_streaming' && (permissions?.hlsStreaming || permissions?.endRoom) ? (
         <Flex>
           <LeaveIconButton
             key="LeaveRoom"
@@ -46,11 +48,7 @@ export const DesktopLeaveRoom = ({
               borderBottomRightRadius: 0,
             }}
             onClick={() => {
-              if (screenType === 'hls_live_streaming') {
-                setShowLeaveRoomAlert(true);
-              } else {
-                leaveRoom({ endstream: false });
-              }
+              leaveRoom({ endstream: false });
             }}
           >
             <Tooltip title="Leave Room">
@@ -94,7 +92,7 @@ export const DesktopLeaveRoom = ({
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
-              {isStreamingOn && permissions?.hlsStreaming ? (
+              {permissions?.endRoom || permissions?.hlsStreaming ? (
                 <Dropdown.Item
                   css={{
                     bg: '$alert_error_dim',
@@ -148,7 +146,7 @@ export const DesktopLeaveRoom = ({
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              leaveRoom={leaveRoom}
+              leaveRoom={isStreamingOn ? leaveRoom : endRoom}
               isStreamingOn={isStreamingOn}
               isModal
             />
