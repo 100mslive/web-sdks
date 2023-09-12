@@ -99,10 +99,9 @@ export class PeerManager {
   };
 
   handlePeerUpdate(notification: PeerNotification) {
-    const peer = this.store.getPeerById(notification.peer_id);
-
+    let peer = this.store.getPeerById(notification.peer_id);
     if (!peer) {
-      return;
+      peer = this.makePeer(notification);
     }
 
     if (peer.role && peer.role.name !== notification.role) {

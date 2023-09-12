@@ -30,6 +30,8 @@ export interface OnTrackLayerUpdateNotification {
 
 export interface PeerNotificationInfo {
   peer_id: string;
+  role: string;
+  groups: string[];
   info: Info;
 }
 
@@ -183,6 +185,8 @@ export interface PeerLeaveRequestNotification {
 export interface MessageNotification {
   peer?: {
     peer_id: string;
+    groups: string[];
+    role: string;
     info: {
       name: string;
       data: any;
