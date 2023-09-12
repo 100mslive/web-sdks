@@ -4,10 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoomState,
+  selectHasPeerHandRaised,
   selectRoomState,
   useCustomEvent,
   useHMSNotifications,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
@@ -34,6 +36,7 @@ export function Notifications() {
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
   const { redirectToLeave } = useRedirectToLeave();
+  const vanillaStore = useHMSVanillaStore();
 
   const handleRoleChangeDenied = useCallback(request => {
     ToastManager.addToast({
@@ -49,6 +52,16 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
+      case HMSNotificationTypes.HAND_RAISE_CHANGED: {
+        if (roomState !== HMSRoomState.Connected || notification.data.isLocal) {
+          return;
+        }
+        const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
+        if (hasPeerHandRaised) {
+          ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
+        }
+        break;
+      }
       case HMSNotificationTypes.METADATA_UPDATED:
         if (roomState !== HMSRoomState.Connected) {
           return;

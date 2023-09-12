@@ -17,6 +17,7 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
+  HAND_RAISE_GROUP_NAME,
 } from './hmsSDKStore/sdkTypes';
 export * from './webrtc-stats';
 
