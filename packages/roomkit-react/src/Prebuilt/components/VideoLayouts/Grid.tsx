@@ -5,37 +5,39 @@ import { Box } from '../../../Layout';
 import VideoTile from '../VideoTile';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
 
-export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[] }>(({ tiles }, ref) => {
-  const videoTileProps = useVideoTileContext();
-  return (
-    <Box
-      ref={ref}
-      css={{
-        flex: '1 1 0',
-        gap: '$4',
-        py: '$4',
-        display: 'flex',
-        placeContent: 'center',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexFlow: 'row wrap',
-        minHeight: 0,
-      }}
-    >
-      {tiles?.map(tile => {
-        return (
-          <VideoTile
-            key={tile.track?.id || tile.peer?.id}
-            width={tile.width}
-            height={tile.height}
-            peerId={tile.peer?.id}
-            trackId={tile.track?.id}
-            rootCSS={{ padding: 0 }}
-            objectFit="contain"
-            {...videoTileProps}
-          />
-        );
-      })}
-    </Box>
-  );
-});
+export const Grid = React.forwardRef<HTMLDivElement, { tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>(
+  ({ tiles, edgeToEdge }, ref) => {
+    const videoTileProps = useVideoTileContext();
+    return (
+      <Box
+        ref={ref}
+        css={{
+          flex: '1 1 0',
+          gap: '$4',
+          display: 'flex',
+          placeContent: 'center',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexFlow: 'row wrap',
+          minHeight: 0,
+          '@md': { gap: edgeToEdge ? 0 : '$4' },
+        }}
+      >
+        {tiles?.map(tile => {
+          return (
+            <VideoTile
+              key={tile.track?.id || tile.peer?.id}
+              width={tile.width}
+              height={tile.height}
+              peerId={tile.peer?.id}
+              trackId={tile.track?.id}
+              rootCSS={{ padding: 0 }}
+              objectFit="contain"
+              {...videoTileProps}
+            />
+          );
+        })}
+      </Box>
+    );
+  },
+);

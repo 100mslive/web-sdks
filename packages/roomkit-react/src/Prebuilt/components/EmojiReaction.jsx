@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data/sets/14/apple.json';
 import { init } from 'emoji-mart';
@@ -34,13 +34,8 @@ export const EmojiReaction = () => {
   // const { isStreamingOn } = useRecordingStreaming();
   const isMobile = useMedia(cssConfig.media.md);
 
-  const onEmojiEvent = useCallback(data => {
-    window.showFlyingEmoji(data?.emojiId, data?.senderId);
-  }, []);
-
   const { sendEvent } = useCustomEvent({
     type: EMOJI_REACTION_TYPE,
-    onEvent: onEmojiEvent,
   });
 
   const sendReaction = async emojiId => {
@@ -51,6 +46,7 @@ export const EmojiReaction = () => {
     };
     // TODO: RT find a way to figure out hls-viewer roles
     sendEvent(data, { roleNames: roles });
+    window.showFlyingEmoji?.({ emojiId, senderId: localPeerId });
     /* if (isStreamingOn) {
       try {
         await hmsActions.sendHLSTimedMetadata([

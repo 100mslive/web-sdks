@@ -1,12 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import {
-  selectPeers,
-  selectPeerScreenSharing,
-  selectRemotePeers,
-  useHMSStore,
-  useHMSVanillaStore,
-} from '@100mslive/react-sdk';
+import { selectPeers, selectPeerScreenSharing, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
@@ -15,13 +9,16 @@ import { usePinnedTrack } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
 
-export type GridLayoutProps = GridVideoTileLayout & {
+export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
-  hide_audio_level_on_tile: boolean;
   rounded_video_tile: boolean;
   hide_audio_mute_on_tile: boolean;
   video_object_fit: 'contain' | 'cover';
+  edge_to_edge: boolean;
+  hide_metadata_on_tile: boolean;
 };
+
+export type GridLayoutProps = GridVideoTileLayout & TileCustomisationProps;
 
 export const GridLayout = ({
   enable_local_tile_inset: isInsetEnabled = false,
@@ -31,13 +28,26 @@ export const GridLayout = ({
   rounded_video_tile = true,
   hide_audio_mute_on_tile = false,
   video_object_fit = 'contain',
+  edge_to_edge = false,
+  hide_metadata_on_tile = false,
 }: GridLayoutProps) => {
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
-  const isRoleProminence = prominentRoles.length > 0 || pinnedTrack;
-  const peers = useHMSStore(isInsetEnabled && !isRoleProminence && !peerSharing ? selectRemotePeers : selectPeers);
+  const peers = useHMSStore(selectPeers);
+  const isRoleProminence =
+    (prominentRoles.length &&
+      peers.some(
+        peer => peer.roleName && prominentRoles.includes(peer.roleName) && (peer.videoTrack || peer.audioTrack),
+      )) ||
+    pinnedTrack;
+  const updatedPeers = useMemo(() => {
+    if (isInsetEnabled && !isRoleProminence && !peerSharing) {
+      return peers.filter(peer => !peer.isLocal);
+    }
+    return peers;
+  }, [isInsetEnabled, isRoleProminence, peerSharing, peers]);
   const vanillaStore = useHMSVanillaStore();
-  const [sortedPeers, setSortedPeers] = useState(peers);
+  const [sortedPeers, setSortedPeers] = useState(updatedPeers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
   const [pageSize, setPageSize] = useState(0);
   const [mainPage, setMainPage] = useState(0);
@@ -46,6 +56,7 @@ export const GridLayout = ({
     hideParticipantNameOnTile: hide_participant_name_on_tile,
     roundedVideoTile: rounded_video_tile,
     hideAudioMuteOnTile: hide_audio_mute_on_tile,
+    hideMetadataOnTile: hide_metadata_on_tile,
     objectFit: video_object_fit,
   };
 
@@ -54,16 +65,21 @@ export const GridLayout = ({
       return;
     }
     peersSorter.setPeersAndTilesPerPage({
-      peers,
+      peers: updatedPeers,
       tilesPerPage: pageSize,
     });
     peersSorter.onUpdate(setSortedPeers);
-  }, [mainPage, peersSorter, peers, pageSize]);
+  }, [mainPage, peersSorter, updatedPeers, pageSize]);
 
   if (peerSharing) {
     return (
       <VideoTileContext.Provider value={tileLayout}>
-        <ScreenshareLayout peers={sortedPeers} onPageSize={setPageSize} onPageChange={setMainPage} />
+        <ScreenshareLayout
+          peers={sortedPeers}
+          onPageSize={setPageSize}
+          onPageChange={setMainPage}
+          edgeToEdge={edge_to_edge}
+        />
       </VideoTileContext.Provider>
     );
   } else if (isRoleProminence) {
@@ -75,6 +91,7 @@ export const GridLayout = ({
           onPageChange={setMainPage}
           prominentRoles={prominentRoles}
           isInsetEnabled={isInsetEnabled}
+          edgeToEdge={edge_to_edge}
         />
       </VideoTileContext.Provider>
     );
@@ -86,6 +103,7 @@ export const GridLayout = ({
         onPageSize={setPageSize}
         onPageChange={setMainPage}
         isInsetEnabled={isInsetEnabled}
+        edgeToEdge={edge_to_edge}
       />
     </VideoTileContext.Provider>
   );

@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { useMedia } from 'react-use';
-import { selectDominantSpeaker, selectIsConnectedToRoom, useHMSStore } from '@100mslive/react-sdk';
+import React, { useEffect, useState } from 'react';
+import { selectDominantSpeaker, useHMSStore } from '@100mslive/react-sdk';
 import { VolumeOneIcon } from '@100mslive/react-icons';
-import { config as cssConfig, Flex, styled, Text, textEllipsis, VerticalDivider } from '../../../';
+import { Flex, styled, Text, textEllipsis, VerticalDivider } from '../../../';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 
 export const SpeakerTag = () => {
@@ -37,13 +36,15 @@ const LogoImg = styled('img', {
 export const Logo = () => {
   const roomLayout = useRoomLayout();
   const logo = roomLayout?.logo?.url;
-  const isMobile = useMedia(cssConfig.media.md);
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [hideImage, setHideImage] = useState(false);
   // Hide logo for now as there is not enough space
-  if (isConnected && isMobile) {
-    return null;
-  }
+  useEffect(() => {
+    if (hideImage) {
+      setHideImage(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [logo]);
+
   return logo && !hideImage ? (
     <LogoImg
       src={logo}

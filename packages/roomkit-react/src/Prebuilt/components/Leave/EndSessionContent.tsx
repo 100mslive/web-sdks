@@ -6,14 +6,12 @@ import { Text } from '../../../Text';
 
 export const EndSessionContent = ({
   setShowEndStreamAlert,
-  stopStream,
   leaveRoom,
   isModal = false,
   isStreamingOn = false,
 }: {
   setShowEndStreamAlert: (value: boolean) => void;
-  stopStream: () => Promise<void>;
-  leaveRoom: () => void;
+  leaveRoom: (args: { endstream: boolean }) => void;
   isModal?: boolean;
   isStreamingOn: boolean;
 }) => {
@@ -52,8 +50,7 @@ export const EndSessionContent = ({
           variant="danger"
           css={{ w: '100%' }}
           onClick={async () => {
-            await stopStream();
-            leaveRoom();
+            await leaveRoom({ endstream: true });
             setShowEndStreamAlert(false);
           }}
           id="stopStream"

@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  selectLocalPeerID,
-  selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
   throwErrorHandler,
@@ -25,21 +23,13 @@ export const EmbedView = () => {
 export const EmbebScreenShareView = ({ children }) => {
   const peers = useHMSStore(selectPeers);
 
-  const localPeerID = useHMSStore(selectLocalPeerID);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const peerPresenting = useHMSStore(selectPeerScreenSharing);
-  const isPresenterFromMyRole = peerPresenting?.roleName?.toLowerCase() === localPeerRole?.toLowerCase();
-  const amIPresenting = localPeerID === peerPresenting?.id;
-  const showPresenterInSmallTile = amIPresenting || isPresenterFromMyRole;
   const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
 
   const smallTilePeers = useMemo(() => {
     const smallTilePeers = peers.filter(peer => peer.id !== peerPresenting?.id);
-    if (showPresenterInSmallTile && peerPresenting) {
-      smallTilePeers.unshift(peerPresenting); // put presenter on first page
-    }
     return smallTilePeers;
-  }, [peers, peerPresenting, showPresenterInSmallTile]);
+  }, [peers, peerPresenting]);
 
   useEffect(() => {
     setActiveScreenSharePeer(peerPresenting?.id);

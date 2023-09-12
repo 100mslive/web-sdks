@@ -52,7 +52,10 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
 
   const removeAllFromStage = () => {
     peerList.forEach(peer => {
-      hmsActions.changeRoleOfPeer(peer.id, getMetadata(peer.metadata).prevRole || off_stage_roles?.[0]);
+      const prevRole = getMetadata(peer.metadata).prevRole;
+      if (prevRole) {
+        hmsActions.changeRoleOfPeer(peer.id, prevRole, true);
+      }
     });
   };
 

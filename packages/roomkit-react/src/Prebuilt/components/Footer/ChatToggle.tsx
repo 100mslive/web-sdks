@@ -1,9 +1,12 @@
 import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../../';
+import { Tooltip } from '../../..';
+// @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
+// @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ChatToggle = () => {

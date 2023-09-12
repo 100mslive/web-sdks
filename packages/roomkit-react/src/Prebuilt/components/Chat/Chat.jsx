@@ -17,7 +17,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
-import { ChatParticipantHeader } from './ChatParticipantHeader';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
@@ -66,7 +66,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ screenType }) => {
+export const Chat = ({ screenType, hideControls = false }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -76,10 +76,11 @@ export const Chat = ({ screenType }) => {
     peerId: peerSelector && peerName ? peerSelector : '',
     selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
   });
-  const [isSelectorOpen, setSelectorOpen] = useState(false);
+  const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
+
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
@@ -92,7 +93,14 @@ export const Chat = ({ screenType }) => {
   }, [notification, peerSelector, setPeerSelector]);
 
   const storeMessageSelector = selectHMSMessagesCount;
+  const { elements } = useRoomLayoutConferencingScreen();
   const isMobile = useMedia(cssConfig.media.md);
+
+  let isScrolledToBottom = false;
+  if (listRef.current) {
+    const currentRef = listRef.current._outerRef;
+    isScrolledToBottom = currentRef.scrollHeight - currentRef.clientHeight - currentRef.scrollTop < 10;
+  }
 
   const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
@@ -109,13 +117,18 @@ export const Chat = ({ screenType }) => {
   );
 
   return (
-    <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
-      {!isMobile ? (
-        <>
-          <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
-          <PinnedMessage clearPinnedMessage={setPinnedMessage} />
-        </>
-      ) : null}
+    <Flex
+      direction="column"
+      css={{
+        size: '100%',
+        gap: '$4',
+        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
+        transition: 'margin 0.3s ease-in-out',
+      }}
+    >
+      {isMobile && elements?.chat?.is_overlay ? null : (
+        <>{elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}</>
+      )}
 
       <ChatBody
         role={chatOptions.role}
@@ -140,7 +153,7 @@ export const Chat = ({ screenType }) => {
         }}
         peerId={chatOptions.peerId}
       >
-        {!isSelectorOpen && (
+        {!isSelectorOpen && !isScrolledToBottom && (
           <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
         )}
       </ChatFooter>

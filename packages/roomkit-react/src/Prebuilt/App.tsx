@@ -13,8 +13,6 @@ import {
 // @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
-import { BeamSpeakerLabelsLogging } from './components/AudioLevel/BeamSpeakerLabelsLogging';
-// @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -40,6 +38,8 @@ import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+// @ts-ignore: No implicit Any
+import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
   useRoomLayoutLeaveScreen,
@@ -77,16 +77,6 @@ export type HMSPrebuiltRefType = {
   hmsNotifications: IHMSNotifications;
 };
 
-// TODO: remove now that there are options to change to portrait
-const getAspectRatio = ({ width, height }: { width: number; height: number }) => {
-  const host = process.env.REACT_APP_HOST_NAME || '';
-  const portraitDomains = (process.env.REACT_APP_PORTRAIT_MODE_DOMAINS || '').split(',');
-  if (portraitDomains.includes(host) && width > height) {
-    return { width: height, height: width };
-  }
-  return { width, height };
-};
-
 export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps>(
   (
     {
@@ -103,9 +93,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const aspectRatio = '1-1';
     const metadata = '';
-    const { 0: width, 1: height } = aspectRatio.split('-').map(el => parseInt(el));
     const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
@@ -218,7 +206,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       // no updates to the themes are fired if the name is same.
                       // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}
-                      aspectRatio={getAspectRatio({ width, height })}
                       theme={{
                         //@ts-ignore: Prebuilt theme to match stiches theme
                         colors: theme.palette,
@@ -270,7 +257,7 @@ const RouteList = () => {
           <Route
             path=":roomId/:role"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
+              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -278,7 +265,7 @@ const RouteList = () => {
           <Route
             path=":roomId"
             element={
-              <Suspense fallback={<FullPageProgress loadingText="Loading preview..." />}>
+              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
                 <PreviewContainer />
               </Suspense>
             }
@@ -289,7 +276,7 @@ const RouteList = () => {
         <Route
           path=":roomId/:role"
           element={
-            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress text="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -297,7 +284,7 @@ const RouteList = () => {
         <Route
           path=":roomId"
           element={
-            <Suspense fallback={<FullPageProgress loadingText="Joining..." />}>
+            <Suspense fallback={<FullPageProgress text="Joining..." />}>
               <Conference />
             </Suspense>
           }
@@ -352,16 +339,16 @@ function AppRoutes({
   defaultAuthToken?: string;
 }) {
   const roomLayout = useRoomLayout();
+  const isNotificationsDisabled = useIsNotificationDisabled();
   return (
     <Router>
       <>
         <ToastContainer />
         <Notifications />
         <BackSwipe />
-        <FlyingEmoji />
+        {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
         <KeyboardHandler />
-        <BeamSpeakerLabelsLogging />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && (
           <Routes>

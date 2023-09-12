@@ -1,4 +1,5 @@
 import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -12,23 +13,37 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Avatar, Box, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../../';
+import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
+// @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
+// @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
+// @ts-ignore: No implicit Any
 import Chip from '../Chip';
+// @ts-ignore: No implicit Any
 import TileConnection from '../Connection/TileConnection';
+// @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
+// @ts-ignore: No implicit Any
 import { Logo } from '../Header/HeaderComponents';
+// @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
+// @ts-ignore: No implicit Any
 import { AudioLevel } from '../VideoTile';
+// @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
+// @ts-ignore: No implicit Any
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+// @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
+// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
+// @ts-ignore: No implicit Any
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 const getParticipantChipContent = (peerCount = 0) => {
@@ -39,7 +54,17 @@ const getParticipantChipContent = (peerCount = 0) => {
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
 };
 
-const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
+const PreviewJoin = ({
+  onJoin,
+  skipPreview,
+  initialName,
+  asRole,
+}: {
+  onJoin: () => void;
+  skipPreview?: boolean;
+  initialName?: string;
+  asRole?: string;
+}) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
@@ -47,7 +72,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
   const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
-  const { isLocalAudioEnabled, isLocalVideoEnabled, toggleAudio, toggleVideo } = useAVToggle();
+  const { toggleAudio, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
   const { peerCount } = useParticipants();
@@ -76,7 +101,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
     });
     join();
     onJoin && onJoin();
-  }, [join, isLocalAudioEnabled, isLocalVideoEnabled, name, setPreviewPreference, onJoin]);
+  }, [join, name, setPreviewPreference, onJoin]);
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
@@ -142,11 +167,7 @@ const PreviewJoin = ({ onJoin, skipPreview, initialName, asRole }) => {
         </Flex>
       ) : null}
       <Box css={{ w: '100%', maxWidth: '640px' }}>
-        <PreviewControls
-          enableJoin={enableJoin}
-          savePreferenceAndJoin={savePreferenceAndJoin}
-          hideSettings={!toggleVideo && !toggleAudio}
-        />
+        <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
         <PreviewForm
           name={name}
           onChange={setName}
@@ -169,7 +190,7 @@ const Container = styled('div', {
   px: '$10',
 });
 
-export const PreviewTile = ({ name, error }) => {
+export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -177,16 +198,19 @@ export const PreviewTile = ({ name, error }) => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
-        aspectRatio: 16 / 9,
-        width: 'min(640px, 80vw)',
+        aspectRatio,
+        height: 'min(640px, 40vh)',
+        maxWidth: '640px',
         overflow: 'clip',
         '@md': {
-          aspectRatio: 9 / 16,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
@@ -215,14 +239,15 @@ export const PreviewTile = ({ name, error }) => {
           <MicOffIcon />
         </StyledVideoTile.AudioIndicator>
       ) : (
-        <AudioLevel trackId={localPeer.audioTrack} />
+        <AudioLevel trackId={localPeer?.audioTrack} />
       )}
     </StyledVideoTile.Container>
   );
 };
 
-export const PreviewControls = ({ hideSettings }) => {
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => {
+  const isMobile = useMedia(cssConfig.media.md);
+
   return (
     <Flex
       justify="between"
@@ -232,8 +257,8 @@ export const PreviewControls = ({ hideSettings }) => {
       }}
     >
       <Flex css={{ gap: '$4' }}>
-        <AudioVideoToggle compact />
-        <Suspense fallback="">{isVideoOn ? <VirtualBackground /> : null}</Suspense>
+        <AudioVideoToggle />
+        <Suspense fallback="">{!isMobile ? <VirtualBackground /> : null}</Suspense>
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

@@ -29,7 +29,6 @@ export const APP_DATA = {
   appConfig: 'appConfig',
   sidePane: 'sidePane',
   hlsStats: 'hlsStats',
-  hlsViewerRole: 'hlsViewerRole',
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
@@ -45,10 +44,10 @@ export const APP_DATA = {
   pdfConfig: 'pdfConfig',
   minimiseInset: 'minimiseInset',
   activeScreensharePeerId: 'activeScreensharePeerId',
+  disableNotificiations: 'disableNotificiations',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
-  isHeadless: 'isHeadless',
   maxTileCount: 'maxTileCount',
   uiViewMode: 'uiViewMode',
   showStatsOnTiles: 'showStatsOnTiles',

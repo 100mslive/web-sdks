@@ -6,7 +6,7 @@ type HMSPrebuiltContextType = {
   role?: string;
   userName?: string;
   userId?: string;
-  endpoints?: object;
+  endpoints?: Record<string, string>;
   onLeave?: () => void;
 };
 

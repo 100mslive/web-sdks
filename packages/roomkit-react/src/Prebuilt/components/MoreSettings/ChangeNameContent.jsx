@@ -27,6 +27,7 @@ export const ChangeNameContent = ({
           color: '$on_surface_high',
           fontWeight: '$semiBold',
           display: 'flex',
+          pb: '$4',
           '@md': { px: '$8', borderBottom: '1px solid $border_default' },
         }}
       >
@@ -57,6 +58,9 @@ export const ChangeNameContent = ({
           onKeyDown={async e => {
             if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
+              if (isMobile) {
+                return;
+              }
               changeName();
             }
           }}

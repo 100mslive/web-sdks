@@ -1,20 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
+  fetchData,
   getAuthTokenUsingRoomIdRole,
   getRoomCodeFromUrl,
   getRoomIdRoleFromUrl,
 } from './utils/utils';
 
+const Header = React.lazy(() => import('./components/Header'));
+
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
+  const [onlyEmail, setOnlyEmail] = useState(false);
   const [authToken, setAuthToken] = useState(useSearchParam('auth_token'));
+  const [data, setData] = useState({});
+  const [showHeader, setShowHeader] = useState(false);
   // added subdomain in query param for easy testing in vercel links
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const hmsPrebuiltRef = useRef();
+
+  useEffect(() => {
+    if (roomCode) {
+      fetchData(subdomain, roomCode, setOnlyEmail, setData, setShowHeader);
+    }
+  }, []);
+
+  useEffect(() => {
+    // remove notifications and messages for beam
+    // enable beam speaker logging for transcription
+    if ((authToken || roomCode) && hmsPrebuiltRef.current && isHeadless) {
+      const { hmsActions } = hmsPrebuiltRef.current;
+      hmsActions?.enableBeamSpeakerLabelsLogging?.();
+      hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
+      hmsActions?.setAppData?.('disableNotificiations', true);
+    }
+  }, [authToken, roomCode, isHeadless]);
 
   useEffect(() => {
     if (!roomCode && !authToken) {
@@ -36,6 +60,15 @@ const App = () => {
       direction="column"
       css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
     >
+      {onlyEmail && showHeader && (
+        <Suspense fallback={null}>
+          <Header
+            roomLinks={data?.roomLinks}
+            policyID={data?.policyID}
+            theme={data?.theme}
+          />
+        </Suspense>
+      )}
       {(authToken || roomCode) && (
         <HMSPrebuilt
           roomCode={roomCode}
@@ -52,6 +85,7 @@ const App = () => {
               init: process.env.REACT_APP_INIT_ENDPOINT,
             },
           }}
+          ref={hmsPrebuiltRef}
         />
       )}
     </Flex>

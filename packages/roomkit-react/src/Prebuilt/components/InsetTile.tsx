@@ -14,6 +14,7 @@ import { AudioVideoToggle } from './AudioVideoToggle';
 import VideoTile from './VideoTile';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from './AppData/useUISettings';
+import { useVideoTileContext } from './hooks/useVideoTileLayout';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../common/constants';
 
@@ -22,7 +23,11 @@ const MinimisedTile = ({ setMinimised }: { setMinimised: (value: boolean) => voi
     <Flex align="center" css={{ gap: '$6', r: '$1', bg: '$surface_default', p: '$4', color: '$on_surface_high' }}>
       <AudioVideoToggle hideOptions={true} />
       <Text>You</Text>
-      <IconButton onClick={() => setMinimised(false)} css={{ bg: 'transparent', border: 'transparent' }}>
+      <IconButton
+        className="__cancel-drag-event"
+        onClick={() => setMinimised(false)}
+        css={{ bg: 'transparent', border: 'transparent' }}
+      >
         <ExpandIcon />
       </IconButton>
     </Flex>
@@ -41,12 +46,11 @@ export const InsetTile = () => {
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
   const isAllowedToPublish = useHMSStore(selectIsAllowedToPublish);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height
-      ? videoTrack.width / videoTrack.height
-      : isMobile
-      ? defaultMobileAspectRatio
-      : desktopAspectRatio;
+  const videoTileProps = useVideoTileContext();
+  let aspectRatio = isMobile ? defaultMobileAspectRatio : desktopAspectRatio;
+  if (videoTrack?.width && videoTrack?.height && !isMobile) {
+    aspectRatio = videoTrack.width / videoTrack.height;
+  }
   let height = insetHeightPx;
   let width = height * aspectRatio;
   // Convert to 16/9 in landscape mode with a max width of 240
@@ -82,7 +86,7 @@ export const InsetTile = () => {
   }
 
   return (
-    <Draggable bounds="parent" nodeRef={nodeRef}>
+    <Draggable bounds="parent" nodeRef={nodeRef} cancel=".__cancel-drag-event">
       <Box
         ref={nodeRef}
         css={{
@@ -114,6 +118,9 @@ export const InsetTile = () => {
             height={height}
             containerCSS={{ background: '$surface_default' }}
             canMinimise
+            isDragabble
+            {...videoTileProps}
+            hideParticipantNameOnTile
           />
         )}
       </Box>
