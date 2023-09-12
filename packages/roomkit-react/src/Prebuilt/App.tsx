@@ -1,10 +1,8 @@
 import React, { MutableRefObject, ReactElement, Suspense, useEffect, useRef } from 'react';
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
-import { useMedia } from 'react-use';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 // @ts-ignore: No implicit Any
-import orientation from 'o9n';
 import {
   HMSActions,
   HMSReactiveStore,
@@ -35,7 +33,7 @@ import PreviewContainer from './components/Preview/PreviewContainer';
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
-import { config as cssConfig, globalStyles, HMSThemeProvider } from '../Theme';
+import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
@@ -99,22 +97,11 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
     const [hydrated, setHydrated] = React.useState(false);
-    const isMobile = useMedia(cssConfig.media.md);
-    const lockToPortrait = async () => {
-      try {
-        if (isMobile) {
-          await orientation.lock('portrait');
-        }
-      } catch (e) {
-        console.log(e);
+
+    useEffect(() => {
+      if (window) {
+        screen.orientation.lock('natural');
       }
-    };
-
-    useEffect(() => {
-      lockToPortrait();
-    }, []);
-
-    useEffect(() => {
       setHydrated(true);
       const hms = new HMSReactiveStore();
       const hmsStore = hms.getStore();
