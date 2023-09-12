@@ -1,5 +1,6 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSFacingMode, HMSVideoCodec, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
+import { isMobile } from '../../utils/support';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width?: number = 320;
@@ -116,8 +117,8 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
       dimensionConstraintKey = 'max';
     }
     return {
-      width: { [dimensionConstraintKey]: this.width },
-      height: { [dimensionConstraintKey]: this.height },
+      width: { [dimensionConstraintKey]: isMobile() ? this.height : this.width },
+      height: { [dimensionConstraintKey]: isMobile() ? this.width : this.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
       facingMode: this.facingMode,
