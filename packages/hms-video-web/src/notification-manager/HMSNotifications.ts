@@ -83,6 +83,7 @@ export interface PeerNotification {
   tracks: {
     [track_id: string]: TrackState;
   };
+  groups: string[];
   is_from_room_state?: boolean;
 }
 
@@ -257,4 +258,19 @@ export interface PollStats extends PollResult {
 }
 export interface PollStatsNotification {
   polls: PollStats[];
+}
+
+export interface RoomInfo {
+  room_id: string;
+  name: string;
+  description: string;
+  max_size: number;
+  large_room_optimization: boolean;
+}
+
+export interface SessionInfo {
+  session_id: string;
+  room_id: string;
+  peer_count: number;
+  track_count: number;
 }

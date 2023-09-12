@@ -46,7 +46,7 @@ export const RoleAccordion = ({
   const height = ROW_HEIGHT * peerList.length;
 
   return (
-    <Flex direction="column" css={{ flexGrow: 1, '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
+    <Flex direction="column" css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
       <Accordion.Root
         type="single"
         collapsible

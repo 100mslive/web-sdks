@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect';
+import { HAND_RAISE_GROUP_NAME } from '@100mslive/hms-video';
 import { byIDCurry } from './common';
 import {
   selectFullAppData,
@@ -511,6 +512,11 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
       console.error('cannot parse peer metadata', error);
       return {};
     }
+  });
+
+export const selectHasPeerHandRaised = (peerId: HMSPeerID) =>
+  createSelector(selectPeerByID(peerId), peer => {
+    return !!peer?.groups?.includes(HAND_RAISE_GROUP_NAME);
   });
 
 export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);

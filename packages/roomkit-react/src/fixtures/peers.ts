@@ -9,6 +9,7 @@ export const makeFakeParticipant = (name: string, role = 'Student') => {
       role: role,
       auxiliaryTracks: [],
       isLocal: counter === 1,
+      groups: [],
     },
     isAudioEnabled: false,
   } as HMSPeerWithMuteStatus;

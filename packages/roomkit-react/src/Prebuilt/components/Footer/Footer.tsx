@@ -60,7 +60,7 @@ export const Footer = ({
           gap: '$10',
           position: 'relative',
           // To prevent it from showing over the sidepane if chat type is not overlay
-          zIndex: isOverlayChat ? 20 : 1,
+          zIndex: isOverlayChat && isChatOpen ? 20 : 1,
         },
       }}
     >

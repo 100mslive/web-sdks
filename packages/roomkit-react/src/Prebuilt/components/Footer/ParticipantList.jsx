@@ -1,11 +1,11 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
+  selectHandRaisedPeers,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
-  selectPeersByCondition,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -35,7 +35,7 @@ export const ParticipantList = () => {
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
 
-  const handRaisedPeers = useHMSStore(selectPeersByCondition(peer => JSON.parse(peer.metadata || '{}')?.isHandRaised));
+  const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
@@ -119,10 +119,11 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
       direction="column"
       css={{
         gap: '$8',
-        maxHeight: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
-        pr: '$3',
+        pr: '$10',
+        mr: '-$10',
+        flex: '1 1 0',
       }}
     >
       <RoleAccordion
@@ -316,7 +317,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
     <Flex
       align="center"
       css={{
-        p: isMobile ? '$0 $6' : '$2 0',
+        p: isMobile ? '0' : '$2 0',
         mb: '$2',
         position: 'relative',
         color: '$on_surface_medium',

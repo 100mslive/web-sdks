@@ -3,6 +3,7 @@ import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../..
 import { HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
+import { HAND_RAISE_GROUP_NAME } from '../../utils/constants';
 import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
@@ -110,6 +111,12 @@ export class PeerManager {
       this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
+    const wasHandRaised = peer.groups?.includes(HAND_RAISE_GROUP_NAME);
+    const isHandRaised = notification.groups?.includes(HAND_RAISE_GROUP_NAME);
+    if (wasHandRaised !== isHandRaised) {
+      peer.groups = notification.groups;
+      this.listener?.onPeerUpdate(HMSPeerUpdate.HAND_RAISE_CHANGED, peer);
+    }
     this.handlePeerInfoUpdate({ peer, ...notification.info });
   }
 
@@ -138,6 +145,7 @@ export class PeerManager {
         role: this.store.getPolicyForRole(peer.role),
         joinedAt: convertDateNumToDate(peer.joined_at),
         fromRoomState: !!peer.is_from_room_state,
+        groups: peer.groups,
       });
       this.store.addPeer(hmsPeer);
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
