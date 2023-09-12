@@ -3,11 +3,9 @@
 }
 
 @media (max-width: 768px) and (orientation: landscape) {
-  body {
-    transform: rotate(90deg);
+  html {
+    transform: rotate(-90deg);
     transform-origin: left top;
-    width: 100vh; /* Ensure content fits the rotated screen */
-    height: 100vw; /* Ensure content fits the rotated screen */
     position: fixed;
     top: 0;
     left: 0;
