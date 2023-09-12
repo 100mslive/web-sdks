@@ -145,6 +145,7 @@ export class PeerManager {
         joinedAt: convertDateNumToDate(peer.joined_at),
         fromRoomState: !!peer.is_from_room_state,
         groups: peer.groups,
+        realtime: peer.realtime,
       });
       this.store.addPeer(hmsPeer);
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);

@@ -86,6 +86,7 @@ export interface PeerNotification {
     [track_id: string]: TrackState;
   };
   groups: string[];
+  realtime?: boolean;
   is_from_room_state?: boolean;
 }
 

@@ -13,6 +13,7 @@ export type HMSPeerInit = {
   fromRoomState?: boolean;
   metworkQuality?: number;
   groups?: string[];
+  realtime?: boolean;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -28,8 +29,9 @@ export class HMSPeer implements IHMSPeer {
   joinedAt?: Date;
   networkQuality?: number;
   groups?: string[];
+  realtime?: boolean;
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups, realtime }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
@@ -37,6 +39,7 @@ export class HMSPeer implements IHMSPeer {
     this.metadata = metadata;
     this.joinedAt = joinedAt;
     this.groups = groups;
+    this.realtime = realtime;
 
     if (role) {
       this.role = role;
@@ -78,6 +81,7 @@ export class HMSPeer implements IHMSPeer {
       customerUserId: ${this.customerUserId};
       ${this.audioTrack ? `audioTrack: ${this.audioTrack?.trackId};` : ''}
       ${this.videoTrack ? `videoTrack: ${this.videoTrack?.trackId};` : ''}
+      groups: ${this.groups?.join()}
     }`;
   }
 }

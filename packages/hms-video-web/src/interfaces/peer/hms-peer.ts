@@ -14,6 +14,7 @@ export interface HMSPeer {
   role?: HMSRole;
   networkQuality?: number;
   groups?: string[];
+  realtime?: boolean;
 
   updateRole(newRole: HMSRole): void;
   updateName(newName: string): void;
