@@ -47,6 +47,8 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
+// @ts-ignore: No implicit Any
+import { orientation } from 'o9n';
 
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
@@ -95,7 +97,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
-
+    orientation.lock('portrait');
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
       setHydrated(true);
