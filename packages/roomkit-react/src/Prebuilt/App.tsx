@@ -2,6 +2,8 @@ import React, { MutableRefObject, ReactElement, Suspense, useEffect, useRef } fr
 import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
+// @ts-ignore: No implicit Any
+import { orientation } from 'o9n';
 import {
   HMSActions,
   HMSReactiveStore,
@@ -47,8 +49,6 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
-// @ts-ignore: No implicit Any
-import { orientation } from 'o9n';
 
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
@@ -97,9 +97,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
-    orientation.lock('portrait');
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
+      orientation.lock();
       setHydrated(true);
       const hms = new HMSReactiveStore();
       const hmsStore = hms.getStore();
