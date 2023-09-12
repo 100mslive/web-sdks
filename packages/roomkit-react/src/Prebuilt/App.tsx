@@ -99,9 +99,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     const [hydrated, setHydrated] = React.useState(false);
 
     useEffect(() => {
-      if (window) {
-        screen.orientation.lock('natural');
-      }
       setHydrated(true);
       const hms = new HMSReactiveStore();
       const hmsStore = hms.getStore();
