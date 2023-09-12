@@ -116,7 +116,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     if (isScreenShare) {
       dimensionConstraintKey = 'max';
     }
-    const aspectRatio = this.improviseContraintsAspect();
+    const aspectRatio = this.improviseConstraintsAspect();
     return {
       width: { [dimensionConstraintKey]: aspectRatio.width },
       height: { [dimensionConstraintKey]: aspectRatio.height },
@@ -137,7 +137,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     };
   }
 
-  private improviseContraintsAspect(): Partial<IHMSVideoTrackSettings> {
+  private improviseConstraintsAspect(): Partial<IHMSVideoTrackSettings> {
     if (isMobile() && this.height && this.width && this.height > this.width) {
       return {
         width: this.height,
