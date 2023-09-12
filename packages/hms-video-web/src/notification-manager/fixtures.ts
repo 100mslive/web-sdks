@@ -169,6 +169,8 @@ export const fakeMessage: MessageNotification = {
       data: 'data',
       user_id: 'customer_user_id',
     },
+    role: 'test',
+    groups: [],
   },
   private: false, // true if only sent to this peer
   roles: [], // empty for broadcast
