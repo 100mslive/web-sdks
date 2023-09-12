@@ -116,9 +116,10 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     if (isScreenShare) {
       dimensionConstraintKey = 'max';
     }
+    const aspectRatio = this.improviseContraintsAspect();
     return {
-      width: { [dimensionConstraintKey]: isMobile() ? this.height : this.width },
-      height: { [dimensionConstraintKey]: isMobile() ? this.width : this.height },
+      width: { [dimensionConstraintKey]: aspectRatio.width },
+      height: { [dimensionConstraintKey]: aspectRatio.height },
       frameRate: this.maxFramerate,
       deviceId: this.deviceId,
       facingMode: this.facingMode,
@@ -133,6 +134,19 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
       framerate: this.maxFramerate,
       video_codec: this.codec,
       facingMode: this.facingMode,
+    };
+  }
+
+  private improviseContraintsAspect(): Partial<IHMSVideoTrackSettings> {
+    if (isMobile() && this.height && this.width && this.height > this.width) {
+      return {
+        width: this.height,
+        height: this.width,
+      };
+    }
+    return {
+      width: this.width,
+      height: this.height,
     };
   }
 }
