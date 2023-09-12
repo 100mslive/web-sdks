@@ -2,7 +2,7 @@ import axios from 'axios';
 import cookies from 'js-cookies';
 
 function isRoomCode(str) {
-  const regex = /^[A-Za-z]{3}(-[A-Za-z]{3,4}){2}$/;
+  const regex = /^[A-Za-z]*(-[A-Za-z]*){2}$/;
   return regex.test(str);
 }
 
@@ -182,4 +182,39 @@ export const getAuthTokenUsingRoomIdRole = async function ({
     console.error('failed to getAuthTokenUsingRoomIdRole', e);
     throw Error('failed to get auth token using roomid and role');
   }
+};
+
+export const fetchData = async (
+  subdomain,
+  roomCode,
+  setOnlyEmail,
+  setData,
+  setShowHeader
+) => {
+  const jwt = getAuthInfo().token;
+
+  const url = `${apiBasePath}apps/get-details?domain=${subdomain}&room_id=${roomCode}`;
+  const headers = {};
+  if (jwt) {
+    headers['Authorization'] = `Bearer ${jwt}`;
+  }
+  headers['Content-Type'] = 'application/json';
+
+  getWithRetry(url, headers)
+    .then(res => {
+      if (res.data.success) {
+        setOnlyEmail(res.data.same_user);
+        setShowHeader(true);
+        setData({
+          roomLinks: res.data.room_links,
+          policyID: res.data.policy_id,
+          theme: res.data.theme,
+        });
+      }
+    })
+    .catch(err => {
+      setShowHeader(false);
+      const errorMessage = `[Get Details] ${err.message}`;
+      console.error(errorMessage);
+    });
 };

@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectPermissions,
   selectSessionStore,
@@ -24,6 +25,7 @@ import {
 import { Box, Flex } from '../../../Layout';
 import { Slider } from '../../../Slider';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
@@ -210,6 +212,8 @@ export const TileMenuContent = props => {
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
+  const isMobile = useMedia(cssConfig.media.md);
+
   return isLocal ? (
     (showPinAction || canMinimise) && (
       <>
@@ -278,7 +282,7 @@ export const TileMenuContent = props => {
         </>
       )}
 
-      <SimulcastLayers trackId={videoTrackID} />
+      {isMobile ? null : <SimulcastLayers trackId={videoTrackID} />}
 
       {removeOthers ? (
         <StyledMenuTile.RemoveItem

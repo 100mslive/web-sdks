@@ -2,29 +2,35 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
-import { Chat } from '../components/Chat/Chat';
-// @ts-ignore: No implicit Any
-import { ParticipantList } from '../components/Footer/ParticipantList';
+import { SidePaneTabs } from '../components/SidePaneTabs';
 // @ts-ignore: No implicit Any
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
+import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
-const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
+const SidePane = ({
+  screenType,
+  tileProps,
+  hideControls = false,
+}: {
+  screenType: keyof ConferencingScreen;
+  tileProps: TileCustomisationProps;
+  hideControls: boolean;
+}) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
+  const { elements } = useRoomLayoutConferencingScreen();
   let ViewComponent;
-  if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
-    ViewComponent = <ParticipantList />;
-  } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat screenType={screenType} />;
+  if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
+    ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }
@@ -32,7 +38,15 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
     return null;
   }
 
-  const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT;
+  const tileLayout = {
+    hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
+    roundedVideoTile: tileProps?.rounded_video_tile,
+    hideAudioMuteOnTile: tileProps?.hide_audio_mute_on_tile,
+    hideMetadataOnTile: tileProps?.hide_metadata_on_tile,
+    objectFit: tileProps?.video_object_fit,
+  };
+
+  const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (
     <Flex
@@ -53,7 +67,7 @@ const SidePane = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
           width="100%"
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
-          objectFit="contain"
+          {...tileLayout}
         />
       )}
       {!!ViewComponent && (

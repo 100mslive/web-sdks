@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { CheckCircleIcon, SettingsIcon } from '@100mslive/react-icons';
+import React from 'react';
+import { CheckIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
 
-export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto }) {
-  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
-
+export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
   return (
-    <Dropdown.Root open={qualityDropDownOpen} onOpenChange={value => setQualityDropDownOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => onOpen(value)}>
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{
@@ -24,6 +22,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                   h: '$9',
                   display: 'inline-flex',
                   alignItems: 'center',
+                  c: '$on_surface_high',
                 }}
               >
                 <SettingsIcon />
@@ -44,7 +43,7 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                         mx: '$2',
                         w: '$2',
                         h: '$2',
-                        background: '$on_primary_high',
+                        background: '$on_surface_medium',
                         r: '$1',
                       }}
                     />
@@ -60,7 +59,15 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
         <Dropdown.Content
           sideOffset={5}
           align="end"
-          css={{ height: 'auto', maxHeight: '$96', w: '$64', bg: '$surface_bright' }}
+          css={{
+            height: 'auto',
+            maxHeight: '$52',
+            w: '$40',
+            bg: '$surface_bright',
+            py: '$4',
+            gap: '$4',
+            display: 'grid',
+          }}
         >
           {layers.map(layer => {
             return (
@@ -73,14 +80,21 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
                       ? '$surface_default'
                       : '$surface_bright',
                   '&:hover': {
-                    bg: '$surface_default',
+                    bg: '$surface_brighter',
                   },
+                  p: '$2 $4 $2 $8',
+                  h: '$12',
+                  gap: '$2',
                 }}
               >
-                <Text>{getQualityText(layer)}</Text>
-                <Text css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>{getBitrateText(layer)}</Text>
+                <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                  {getQualityText(layer)}
+                </Text>
+                <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                  {getBitrateText(layer)}
+                </Text>
                 {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
-                  <CheckCircleIcon />
+                  <CheckIcon width="16px" height="16px" />
                 )}
               </Dropdown.Item>
             );
@@ -91,12 +105,17 @@ export function HLSQualitySelector({ layers, onQualityChange, selection, isAuto 
             css={{
               bg: !isAuto ? '$surface_bright' : '$surface_default',
               '&:hover': {
-                bg: '$surface_default',
+                bg: '$surface_brighter',
               },
+              p: '$2 $4 $2 $8',
+              h: '$12',
+              gap: '$2',
             }}
           >
-            <Text css={{ flex: '1 1 0' }}>Auto</Text>
-            {isAuto && <CheckCircleIcon />}
+            <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+              Auto
+            </Text>
+            {isAuto && <CheckIcon width="16px" height="16px" />}
           </Dropdown.Item>
         </Dropdown.Content>
       )}

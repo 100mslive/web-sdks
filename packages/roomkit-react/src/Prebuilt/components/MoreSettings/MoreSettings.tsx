@@ -20,7 +20,7 @@ export const MoreSettings = ({
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   return isMobile ? (
-    <MwebOptions elements={elements} streamType={screenType} />
+    <MwebOptions elements={elements} screenType={screenType} />
   ) : (
     <DesktopOptions elements={elements} screenType={screenType} />
   );

@@ -3,6 +3,7 @@ import { Flex, styled } from '../../../';
 export const VideoControls = styled(Flex, {
   justifyContent: 'center',
   alignItems: 'center',
+  alignSelf: 'stretch',
   width: '100%',
   gap: '$2',
 });

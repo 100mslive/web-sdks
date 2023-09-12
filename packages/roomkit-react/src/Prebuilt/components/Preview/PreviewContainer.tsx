@@ -1,13 +1,17 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
-import { Flex } from '../../../';
+import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
+// @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
+// @ts-ignore: No implicit Any
 import PreviewJoin from './PreviewJoin';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
 import { useAuthToken } from '../AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
@@ -37,7 +41,12 @@ const PreviewContainer = () => {
         align="center"
       >
         {authToken && Object.keys(previewHeader).length > 0 ? (
-          <PreviewJoin initialName={initialName} skipPreview={skipPreview} asRole={previewAsRole} onJoin={onJoin} />
+          <PreviewJoin
+            initialName={initialName}
+            skipPreview={skipPreview}
+            asRole={previewAsRole ?? undefined}
+            onJoin={onJoin}
+          />
         ) : (
           <FullPageProgress />
         )}

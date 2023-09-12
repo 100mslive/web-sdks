@@ -21,7 +21,6 @@ import {
 } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
-import { ChatParticipantHeader } from '../Chat/ChatParticipantHeader';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { ToastManager } from '../Toast/ToastManager';
 import { RoleAccordion } from './RoleAccordion';
@@ -61,7 +60,6 @@ export const ParticipantList = () => {
   return (
     <Fragment>
       <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
-        <ChatParticipantHeader activeTabValue={SIDE_PANE_OPTIONS.PARTICIPANTS} />
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
         {participants.length === 0 ? (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
@@ -121,10 +119,11 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
       direction="column"
       css={{
         gap: '$8',
-        maxHeight: '100%',
         overflowY: 'auto',
         overflowX: 'hidden',
-        pr: '$3',
+        pr: '$10',
+        mr: '-$10',
+        flex: '1 1 0',
       }}
     >
       <RoleAccordion
@@ -228,6 +227,9 @@ const ParticipantMoreActions = ({ peerId, role }) => {
     off_stage_roles = [],
   } = elements.on_stage_exp || {};
   const isInStage = role === on_stage_role;
+  const shouldShowStageRoleChange =
+    canChangeRole &&
+    ((isInStage && remove_from_stage_label) || (off_stage_roles?.includes(role) && bring_to_stage_label));
   const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
@@ -235,7 +237,7 @@ const ParticipantMoreActions = ({ peerId, role }) => {
 
   const handleStageAction = async () => {
     if (isInStage) {
-      hmsActions.changeRoleOfPeer(peerId, prevRole || off_stage_roles[0]);
+      prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
     } else {
       await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
     }
@@ -268,7 +270,7 @@ const ParticipantMoreActions = ({ peerId, role }) => {
       </Dropdown.Trigger>
       <Dropdown.Portal>
         <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
-          {canChangeRole ? (
+          {shouldShowStageRoleChange ? (
             <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
               <ChangeRoleIcon />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
@@ -315,7 +317,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
     <Flex
       align="center"
       css={{
-        p: isMobile ? '$0 $6' : '$2 0',
+        p: isMobile ? '0' : '$2 0',
         mb: '$2',
         position: 'relative',
         color: '$on_surface_medium',

@@ -25,11 +25,13 @@ export const CamaraFlipActions = () => {
 
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
-
+  if (!videoInput || !videoInput?.length || !localVideoTrack?.facingMode) {
+    return null;
+  }
   return (
     <Box>
       <IconButton
-        disabled={!videoInput?.length || !isVideoOn || !localVideoTrack?.facingMode}
+        disabled={!isVideoOn}
         onClick={async () => {
           try {
             await actions.switchCamera();
@@ -117,6 +119,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
           {outputDevices.map(audioDevice => {
             return (
               <SelectWithLabel
+                key={audioDevice.deviceId}
                 label={audioDevice.label}
                 id={audioDevice.deviceId}
                 checked={audioDevice.deviceId === outputSelected}

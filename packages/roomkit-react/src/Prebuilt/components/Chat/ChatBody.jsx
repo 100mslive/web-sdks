@@ -14,7 +14,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -22,7 +22,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
-import { ToastManager } from '../Toast/ToastManager';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 
 const formatTime = date => {
@@ -126,10 +126,9 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, messageContent }) => {
+const ChatActions = ({ onPin, showPinAction }) => {
   const [open, setOpen] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
-  if (!isMobile && !showPinAction) {
+  if (!showPinAction) {
     return null;
   }
 
@@ -154,8 +153,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
               Pin Message
             </Text>
           </Dropdown.Item>
-          {isMobile && showPinAction ? <Dropdown.ItemSeparator css={{ my: 0 }} /> : null}
-          {isMobile ? (
+          {/* {isMobile ? (
             <Dropdown.Item
               data-testid="copy_message_btn"
               onClick={() => {
@@ -177,7 +175,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
                 Copy Message
               </Text>
             </Dropdown.Item>
-          ) : null}
+          ) : null} */}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -203,7 +201,8 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     }
   }, [index, setRowHeight]);
   const isMobile = useMedia(cssConfig.media.md);
-
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isOverlay = elements?.chat?.is_overlay && isMobile;
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
   const permissions = useHMSStore(selectPermissions);
@@ -212,7 +211,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
     receiver: message.recipientPeer,
   });
   // show pin action only if peer has remove others permission and the message is of broadcast type
-  const showPinAction = permissions.removeOthers && !messageType;
+  const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
 
   useEffect(() => {
     if (message.id && !message.read && inView) {
@@ -233,7 +232,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         css={{
           flexWrap: 'wrap',
           // Theme independent color, token should not be used for transparent chat
-          bg: messageType ? (isMobile ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
+          bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
           r: messageType ? '$1' : undefined,
           px: messageType ? '$4' : '$2',
           py: messageType ? '$4' : 0,
@@ -244,7 +243,7 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
       >
         <Text
           css={{
-            color: '$on_surface_high',
+            color: isOverlay ? '#FFF' : '$on_surface_high',
             fontWeight: '$semiBold',
             display: 'inline-flex',
             alignItems: 'center',
@@ -255,17 +254,17 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
         >
           <Flex align="baseline">
             {message.senderName === 'You' || !message.senderName ? (
-              <SenderName as="span" variant="sm">
+              <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
                 {message.senderName || 'Anonymous'}
               </SenderName>
             ) : (
               <Tooltip title={message.senderName} side="top" align="start">
-                <SenderName as="span" variant="sm">
+                <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
                   {message.senderName}
                 </SenderName>
               </Tooltip>
             )}
-            {!isMobile ? (
+            {!isOverlay ? (
               <Text
                 as="span"
                 variant="xs"
@@ -284,18 +283,17 @@ const ChatMessage = React.memo(({ index, style = {}, message, setRowHeight, onPi
             receiver={message.recipientPeer}
             roles={message.recipientRoles}
           />
-          {!isMobile ? (
-            <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
-          ) : null}
+          {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} /> : null}
         </Text>
         <Text
-          variant="body2"
+          variant="sm"
           css={{
             w: '100%',
             mt: '$2',
             wordBreak: 'break-word',
             whiteSpace: 'pre-wrap',
             userSelect: 'all',
+            color: isOverlay ? '#FFF' : '$on_surface_high',
           }}
           onClick={e => e.stopPropagation()}
         >
@@ -395,8 +393,9 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
   let messages = useHMSStore(storeMessageSelector);
   messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
 
-  if (messages.length === 0 && !isMobile) {
+  if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
       <Flex
         css={{
