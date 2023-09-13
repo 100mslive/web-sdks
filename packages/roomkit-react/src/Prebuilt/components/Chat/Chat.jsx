@@ -17,7 +17,6 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
-import { ChatParticipantHeader } from './ChatParticipantHeader';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
@@ -67,7 +66,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ screenType, hideControls = false }) => {
+export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -77,7 +76,7 @@ export const Chat = ({ screenType, hideControls = false }) => {
     peerId: peerSelector && peerName ? peerSelector : '',
     selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
   });
-  const [isSelectorOpen, setSelectorOpen] = useState(false);
+  const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { setPinnedMessage } = useSetPinnedMessage();
@@ -123,15 +122,10 @@ export const Chat = ({ screenType, hideControls = false }) => {
       css={{
         size: '100%',
         gap: '$4',
-        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
-        transition: 'margin 0.3s ease-in-out',
       }}
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
-        <>
-          <ChatParticipantHeader selectorOpen={isSelectorOpen} onToggle={() => setSelectorOpen(value => !value)} />
-          {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}
-        </>
+        <>{elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}</>
       )}
 
       <ChatBody

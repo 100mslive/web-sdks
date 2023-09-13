@@ -246,7 +246,6 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 };
 
 export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => {
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const isMobile = useMedia(cssConfig.media.md);
 
   return (
@@ -258,8 +257,8 @@ export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => 
       }}
     >
       <Flex css={{ gap: '$4' }}>
-        <AudioVideoToggle compact />
-        <Suspense fallback="">{isVideoOn && !isMobile ? <VirtualBackground /> : null}</Suspense>
+        <AudioVideoToggle />
+        <Suspense fallback="">{!isMobile ? <VirtualBackground /> : null}</Suspense>
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

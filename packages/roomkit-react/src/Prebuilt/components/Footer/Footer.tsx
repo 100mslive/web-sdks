@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
@@ -6,7 +6,6 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
-import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -25,6 +24,10 @@ import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
 // @ts-ignore: No implicit Any
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
+// @ts-ignore: No implicit Any
 const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 export const Footer = ({
@@ -37,7 +40,16 @@ export const Footer = ({
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+
+  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+
+  useEffect(() => {
+    if (!isChatOpen && openByDefault) {
+      toggleChat();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toggleChat, openByDefault]);
 
   return (
     <AppFooter.Root
@@ -48,7 +60,7 @@ export const Footer = ({
           gap: '$10',
           position: 'relative',
           // To prevent it from showing over the sidepane if chat type is not overlay
-          zIndex: isOverlayChat ? 20 : 1,
+          zIndex: isOverlayChat && isChatOpen ? 20 : 1,
         },
       }}
     >
@@ -63,7 +75,11 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        {isMobile ? null : <Suspense fallback={<></>}>{isVideoOn ? <VirtualBackground /> : null}</Suspense>}
+        {isMobile ? null : (
+          <Suspense fallback={<></>}>
+            <VirtualBackground />
+          </Suspense>
+        )}
       </AppFooter.Left>
       <AppFooter.Center
         css={{
@@ -76,7 +92,7 @@ export const Footer = ({
         {isMobile ? (
           <>
             {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
-            {elements?.chat && <ChatToggle openByDefault={openByDefault} />}
+            {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
         ) : (
@@ -89,7 +105,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
-        {!isMobile && elements?.chat && <ChatToggle openByDefault={openByDefault} />}
+        {!isMobile && elements?.chat && <ChatToggle />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />
       </AppFooter.Right>

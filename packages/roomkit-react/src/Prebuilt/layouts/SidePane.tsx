@@ -2,10 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
-import { Chat } from '../components/Chat/Chat';
-// @ts-ignore: No implicit Any
-import { ParticipantList } from '../components/Footer/ParticipantList';
+import { SidePaneTabs } from '../components/SidePaneTabs';
 // @ts-ignore: No implicit Any
 import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
@@ -32,16 +29,22 @@ const SidePane = ({
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   let ViewComponent;
-  if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) {
-    ViewComponent = <ParticipantList />;
-  } else if (sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <Chat screenType={screenType} hideControls={hideControls} />;
+  if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
+    ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
   } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
     ViewComponent = <StreamingLanding />;
   }
   if (!ViewComponent && !trackId) {
     return null;
   }
+
+  const tileLayout = {
+    hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
+    roundedVideoTile: tileProps?.rounded_video_tile,
+    hideAudioMuteOnTile: tileProps?.hide_audio_mute_on_tile,
+    hideMetadataOnTile: tileProps?.hide_metadata_on_tile,
+    objectFit: tileProps?.video_object_fit,
+  };
 
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
@@ -64,8 +67,7 @@ const SidePane = ({
           width="100%"
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
-          objectFit="contain"
-          {...tileProps}
+          {...tileLayout}
         />
       )}
       {!!ViewComponent && (
