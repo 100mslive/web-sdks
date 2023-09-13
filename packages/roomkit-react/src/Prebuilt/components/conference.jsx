@@ -49,6 +49,7 @@ const Conference = () => {
       setHideControls(value => !value);
     }
   };
+  const autoRoomJoined = useRef(isPreviewScreenEnabled);
 
   useEffect(() => {
     let timeout = null;
@@ -84,7 +85,13 @@ const Conference = () => {
   }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]);
 
   useEffect(() => {
-    if (authTokenInAppData && !isConnectedToRoom && !isPreviewScreenEnabled && roomState !== HMSRoomState.Connecting) {
+    if (
+      authTokenInAppData &&
+      !isConnectedToRoom &&
+      !isPreviewScreenEnabled &&
+      roomState !== HMSRoomState.Connecting &&
+      !autoRoomJoined.current
+    ) {
       hmsActions
         .join({
           userName,
@@ -97,6 +104,7 @@ const Conference = () => {
           },
         })
         .catch(console.error);
+      autoRoomJoined.current = true;
     }
   }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
