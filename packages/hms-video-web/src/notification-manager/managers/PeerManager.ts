@@ -103,14 +103,14 @@ export class PeerManager {
     let peer = this.store.getPeerById(notification.peer_id);
     if (!peer && notification.realtime) {
       peer = this.makePeer(notification);
-    } else if (peer && !notification.realtime) {
+    } else if (peer && !peer.isLocal && !notification.realtime) {
       this.store.removePeer(peer.peerId);
       this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_REMOVED, peer);
       return;
     }
 
     if (!peer) {
-      console.log('peer not found');
+      HMSLogger.d(this.TAG, `peer ${notification.peer_id} not found`);
       return;
     }
 
