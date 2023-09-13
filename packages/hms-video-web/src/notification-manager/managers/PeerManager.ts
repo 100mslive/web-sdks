@@ -120,8 +120,8 @@ export class PeerManager {
       this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
-    peer.updateGroups(notification.groups);
     const wasHandRaised = peer.isHandRaised;
+    peer.updateGroups(notification.groups);
     const isHandRaised = notification.groups?.includes(HAND_RAISE_GROUP_NAME);
     if (wasHandRaised !== isHandRaised) {
       this.listener?.onPeerUpdate(HMSPeerUpdate.HAND_RAISE_CHANGED, peer);
