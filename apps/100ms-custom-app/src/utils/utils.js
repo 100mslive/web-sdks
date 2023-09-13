@@ -8,7 +8,7 @@ function isRoomCode(str) {
 
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
-  const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
+  const regex = /(\/streaming)?(\/(preview|meeting))?\/(?<code>[^/]+)/;
   const roomCode = path.match(regex)?.groups?.code || null;
   return isRoomCode(roomCode) ? roomCode : null;
 };
@@ -16,7 +16,7 @@ export const getRoomCodeFromUrl = () => {
 export const getRoomIdRoleFromUrl = () => {
   const path = window.location.pathname;
   const regex =
-    /(\/streaming)?\/(preview|meeting)\/(?<roomId>[^/]+)\/(?<role>[^/]+)/;
+    /(\/streaming)?(\/(preview|meeting))?\/(?<roomId>[^/]+)\/(?<role>[^/]+)/;
   const roomId = path.match(regex)?.groups?.roomId || null;
   const role = path.match(regex)?.groups?.role || null;
   return {
