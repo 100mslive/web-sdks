@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
   selectHandRaisedPeers,
+  selectHasPeerHandRaised,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
@@ -27,6 +28,7 @@ import { RoleAccordion } from './RoleAccordion';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useParticipants } from '../../common/hooks';
+import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
@@ -106,7 +108,7 @@ export const ParticipantCount = () => {
     >
       <PeopleIcon />
       <Text variant="sm" css={{ mx: '$4', c: 'inherit' }}>
-        {peerCount}
+        {getFormattedCount(peerCount)}
       </Text>
     </IconButton>
   );
@@ -175,7 +177,7 @@ export const Participant = ({ peer, isConnected }) => {
  * shows settings to change for a participant like changing their role
  */
 const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
-  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const shouldShowMoreActions = canChangeRole;
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
