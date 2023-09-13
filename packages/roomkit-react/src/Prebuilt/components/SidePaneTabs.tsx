@@ -13,6 +13,8 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
+import { getFormattedCount } from '../common/utils';
+// @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
@@ -104,7 +106,7 @@ export const SidePaneTabs = React.memo<{
                     color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
                   }}
                 >
-                  Participants ({peerCount})
+                  Participants ({getFormattedCount(peerCount)})
                 </Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
