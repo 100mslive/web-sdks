@@ -3,9 +3,9 @@ import { useDebounce, useMeasure } from "react-use";
 import { FixedSizeList } from "react-window";
 import {
   selectAudioTrackByPeerID,
+  selectHasPeerHandRaised,
   selectLocalPeerID,
   selectPeerCount,
-  selectPeerMetadata,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -237,7 +237,7 @@ const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
  * shows settings to change for a participant like changing their role
  */
 const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
-  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerId = useHMSStore(selectLocalPeerID);
