@@ -13,18 +13,18 @@ const positionValues = new Array(101).fill(0).reduce((acc, _, index) => {
 
 const barAnimation = keyframes({
   from: {
-    backgroundSize: '4em .8em',
-    backgroundPositionY: '.1em',
+    maskSize: '4em .8em',
+    '-webkit-mask-position-y': '.1em',
   },
 
   '50%': {
-    backgroundSize: '4em 1em',
-    backgroundPositionY: 0,
+    maskSize: '4em 1em',
+    '-webkit-mask-position-y': 0,
   },
 
   to: {
-    backgroundSize: '4em .8em',
-    backgroundPositionY: '.1em',
+    maskSize: '4em .8em',
+    '-webkit-mask-position-y': '.1em',
   },
 });
 
@@ -34,11 +34,12 @@ const AudioBar = () => {
       css={{
         width: '.25em',
         height: '1em',
-        background: `url(${bg})`,
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: '4em 1em',
+        maskImage: `url(${bg})`,
+        maskRepeat: 'no-repeat',
+        backgroundColor: '$on_primary_high',
+        maskSize: '4em 1em',
         animation: `${barAnimation} .6s steps(3,jump-none) 0s infinite`,
-        backgroundPositionX: 0,
+        maskPositionX: 0,
       }}
     />
   );
@@ -54,7 +55,7 @@ export const AudioLevelAnimation = ({ trackId }: { trackId?: string }) => {
         let index = 0;
         //@ts-ignore
         for (const child of ref.current.children) {
-          child.style['background-position-x'] = `-${positionValues[audioLevel] * (index === 1 ? 2.5 : 1.25)}em`;
+          child.style['-webkit-mask-position-x'] = `-${positionValues[audioLevel] * (index === 1 ? 2.5 : 1.25)}em`;
           index++;
         }
       }
