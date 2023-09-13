@@ -27,7 +27,6 @@ import { RoleAccordion } from './RoleAccordion';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useParticipants } from '../../common/hooks';
-import { isInternalRole } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
@@ -209,9 +208,7 @@ const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
         </Flex>
       ) : null}
 
-      {shouldShowMoreActions && !isInternalRole(role) && !isLocal ? (
-        <ParticipantMoreActions peerId={peerId} role={role} />
-      ) : null}
+      {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
     </Flex>
   );
 });

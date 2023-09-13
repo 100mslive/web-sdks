@@ -8,7 +8,6 @@ import {
 } from '@100mslive/react-sdk';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { useSubscribedNotifications } from '../AppData/useUISettings';
-import { isInternalRole } from '../../common/utils';
 import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
 const notificationTypes = [
@@ -26,7 +25,7 @@ export const PeerNotifications = () => {
     if (roomState !== HMSRoomState.Connected) {
       return;
     }
-    if (!notification || (notification?.data?.roleName && isInternalRole(notification.data.roleName))) {
+    if (!notification?.data) {
       return;
     }
 
