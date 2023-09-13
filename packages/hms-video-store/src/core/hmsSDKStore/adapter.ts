@@ -49,6 +49,7 @@ export class SDKToHMS {
       metadata: sdkPeer.metadata,
       joinedAt: sdkPeer.joinedAt,
       groups: sdkPeer.groups,
+      isHandRaised: sdkPeer.isHandRaised,
     };
   }
 

@@ -40,6 +40,7 @@ export interface HMSPeer {
   metadata?: string;
   joinedAt?: Date;
   groups?: string[];
+  isHandRaised: boolean;
 }
 
 /**

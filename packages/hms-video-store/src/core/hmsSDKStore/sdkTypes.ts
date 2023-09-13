@@ -1,7 +1,6 @@
 import {
   DeviceMap,
   DeviceType,
-  HAND_RAISE_GROUP_NAME,
   HLSConfig,
   HLSMeetingURLVariant,
   HLSTimedMetadata,
@@ -76,7 +75,6 @@ export {
   simulcastMapping,
   DeviceType,
   HMSPollQuestionType,
-  HAND_RAISE_GROUP_NAME,
 };
 
 export type {

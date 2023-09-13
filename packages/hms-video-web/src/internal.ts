@@ -16,4 +16,3 @@ export * from './interfaces';
 export * from './rtc-stats';
 export * from './plugins';
 export * from './utils/logger';
-export { HAND_RAISE_GROUP_NAME } from './utils/constants';

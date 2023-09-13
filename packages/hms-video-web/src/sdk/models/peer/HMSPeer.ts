@@ -1,6 +1,7 @@
 import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
+import { HAND_RAISE_GROUP_NAME } from '../../../utils/constants';
 
 export type HMSPeerInit = {
   peerId: string;
@@ -14,6 +15,7 @@ export type HMSPeerInit = {
   metworkQuality?: number;
   groups?: string[];
   realtime?: boolean;
+  isHandRaised?: boolean;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -44,6 +46,10 @@ export class HMSPeer implements IHMSPeer {
     if (role) {
       this.role = role;
     }
+  }
+
+  get isHandRaised() {
+    return !!this.groups?.includes(HAND_RAISE_GROUP_NAME);
   }
 
   /**

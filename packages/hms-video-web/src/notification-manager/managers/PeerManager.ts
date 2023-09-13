@@ -98,10 +98,19 @@ export class PeerManager {
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
   };
 
+  // eslint-disable-next-line complexity
   handlePeerUpdate(notification: PeerNotification) {
     let peer = this.store.getPeerById(notification.peer_id);
-    if (!peer) {
+    if (!peer && notification.realtime) {
       peer = this.makePeer(notification);
+    } else if (peer && !notification.realtime) {
+      this.store.removePeer(peer.peerId);
+      return;
+    }
+
+    if (!peer) {
+      console.log('peer not found');
+      return;
     }
 
     if (peer.role && peer.role.name !== notification.role) {
@@ -110,10 +119,10 @@ export class PeerManager {
       this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
     }
-    const wasHandRaised = peer.groups?.includes(HAND_RAISE_GROUP_NAME);
+    peer.updateGroups(notification.groups);
+    const wasHandRaised = peer.isHandRaised;
     const isHandRaised = notification.groups?.includes(HAND_RAISE_GROUP_NAME);
     if (wasHandRaised !== isHandRaised) {
-      peer.groups = notification.groups;
       this.listener?.onPeerUpdate(HMSPeerUpdate.HAND_RAISE_CHANGED, peer);
     }
     this.handlePeerInfoUpdate({ peer, ...notification.info });

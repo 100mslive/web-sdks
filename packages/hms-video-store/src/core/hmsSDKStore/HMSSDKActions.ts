@@ -1454,6 +1454,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, action);
   };
 
+  // eslint-disable-next-line complexity
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
@@ -1463,6 +1464,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     } else if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
       this.syncRoomState(actionName);
       // if peer wasn't available before sync(will happen if event is peer join)
+      if (!peer) {
+        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      }
+    } else if (
+      [
+        sdkTypes.HMSPeerUpdate.HAND_RAISE_CHANGED,
+        sdkTypes.HMSPeerUpdate.PEER_REMOVED,
+        sdkTypes.HMSPeerUpdate.PEER_ADDED,
+      ].includes(type)
+    ) {
+      this.syncRoomState(actionName);
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
       }
