@@ -30,6 +30,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    const path = /(\/streaing)?\/(preview|meeting)/;
+    if (!path.test(window.location.pathname)) {
+      const url = `${window.location.protocol}//${window.location.host}/meeting${window.location.pathname}`;
+      window.location.href = url;
+    }
+  }, []);
+
+  useEffect(() => {
     // remove notifications and messages for beam
     // enable beam speaker logging for transcription
     if ((authToken || roomCode) && hmsPrebuiltRef.current && isHeadless) {
