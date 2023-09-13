@@ -18,6 +18,7 @@ export const useEmojiPickerStyles = showing => {
             font-family: var(--hms-ui-fonts-sans);
           }
           .sticky {
+            top: 0.25rem;
             background-color: var(--hms-ui-colors-surface_bright);
             margin-top: 0.5rem;
           }

@@ -66,7 +66,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   ) : null;
 };
 
-export const Chat = ({ screenType, hideControls = false }) => {
+export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -122,8 +122,6 @@ export const Chat = ({ screenType, hideControls = false }) => {
       css={{
         size: '100%',
         gap: '$4',
-        marginTop: hideControls && elements?.chat?.is_overlay ? '$17' : '0',
-        transition: 'margin 0.3s ease-in-out',
       }}
     >
       {isMobile && elements?.chat?.is_overlay ? null : (

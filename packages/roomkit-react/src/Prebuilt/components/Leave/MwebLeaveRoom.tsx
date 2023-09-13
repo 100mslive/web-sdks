@@ -17,9 +17,11 @@ import { useDropdownList } from '../hooks/useDropdownList';
 export const MwebLeaveRoom = ({
   leaveRoom,
   screenType,
+  endRoom,
 }: {
   leaveRoom: (args: { endstream: boolean }) => void;
   screenType: keyof ConferencingScreen;
+  endRoom: () => void;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -27,8 +29,8 @@ export const MwebLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
+  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
 
-  const showStream = permissions?.hlsStreaming && isStreamingOn;
   useDropdownList({ open, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -37,7 +39,7 @@ export const MwebLeaveRoom = ({
 
   return (
     <Fragment>
-      {permissions?.hlsStreaming ? (
+      {screenType !== 'hls_live_streaming' ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
@@ -67,7 +69,8 @@ export const MwebLeaveRoom = ({
               onClick={() => leaveRoom({ endstream: false })}
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
-            {isStreamingOn && permissions?.hlsStreaming ? (
+
+            {permissions?.endRoom || permissions?.hlsStreaming ? (
               <LeaveCard
                 title={showStream ? 'End Stream' : 'End Session'}
                 subtitle={`The will end the ${
@@ -108,7 +111,7 @@ export const MwebLeaveRoom = ({
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
-            leaveRoom={leaveRoom}
+            leaveRoom={isStreamingOn ? leaveRoom : endRoom}
             isStreamingOn={isStreamingOn}
           />
         </Sheet.Content>

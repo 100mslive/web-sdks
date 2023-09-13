@@ -62,10 +62,12 @@ export const SidePaneTabs = React.memo<{
       css={{
         color: '$on_primary_high',
         h: '100%',
+        marginTop: hideControls && isOverlayChat ? '$17' : '0',
+        transition: 'margin 0.3s ease-in-out',
       }}
     >
       {isOverlayChat && isChatOpen && showChat ? (
-        <Chat screenType={screenType} hideControls={hideControls} />
+        <Chat screenType={screenType} />
       ) : (
         <>
           {hideTabs ? (
@@ -74,7 +76,7 @@ export const SidePaneTabs = React.memo<{
                 {showChat ? 'Chat' : `Participants (${peerCount})`}
               </Text>
 
-              {showChat ? <Chat screenType={screenType} hideControls={hideControls} /> : <ParticipantList />}
+              {showChat ? <Chat screenType={screenType} /> : <ParticipantList />}
             </>
           ) : (
             <Tabs.Root
@@ -111,7 +113,7 @@ export const SidePaneTabs = React.memo<{
                 <ParticipantList />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
-                <Chat screenType={screenType} hideControls={hideControls} />
+                <Chat screenType={screenType} />
               </Tabs.Content>
             </Tabs.Root>
           )}

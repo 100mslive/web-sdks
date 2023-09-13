@@ -46,6 +46,10 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
     }
   };
+  const endRoom = () => {
+    hmsActions.endRoom(false, 'End Room');
+    redirectToLeave();
+  };
 
   const leaveRoom = async ({ endstream = false }) => {
     if (endstream || (hlsState.running && peersWithStreamingRights.length === 1)) {
@@ -59,8 +63,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveRoom={leaveRoom} screenType={screenType} />
+    <MwebLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} />
   ) : (
-    <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} />
+    <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} />
   );
 };
