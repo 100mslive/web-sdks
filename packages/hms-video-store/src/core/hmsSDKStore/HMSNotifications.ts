@@ -91,6 +91,9 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
   }
 
   sendPeerList(peers: HMSPeer[]) {
+    if (peers.length === 0) {
+      return;
+    }
     const notification = this.createNotification(HMSNotificationTypes.PEER_LIST, peers, HMSNotificationSeverity.INFO);
     this.emitEvent(notification);
   }

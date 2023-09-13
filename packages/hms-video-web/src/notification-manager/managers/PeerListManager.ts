@@ -102,6 +102,7 @@ export class PeerListManager {
         },
         tracks: {},
         groups: [],
+        realtime: peer.realtime,
       };
 
       this.peerManager.handlePeerLeave(peerNotification);
