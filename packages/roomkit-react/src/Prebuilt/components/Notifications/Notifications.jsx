@@ -167,7 +167,7 @@ export function Notifications() {
       <TrackUnmuteModal />
       <TrackBulkUnmuteModal />
       <TrackNotifications />
-      <PeerNotifications />
+      {roomState === HMSRoomState.Connected ? <PeerNotifications /> : null}
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />

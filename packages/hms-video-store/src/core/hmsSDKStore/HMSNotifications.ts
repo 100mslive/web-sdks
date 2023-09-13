@@ -101,7 +101,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
   sendPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: HMSPeer | null) {
     const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
     const notificationType = PEER_NOTIFICATION_TYPES[type];
-    if (notificationType) {
+    if (notificationType && hmsPeer) {
       const notification = this.createNotification(notificationType, hmsPeer, HMSNotificationSeverity.INFO);
       this.emitEvent(notification);
     }
