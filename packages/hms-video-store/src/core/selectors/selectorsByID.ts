@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { HAND_RAISE_GROUP_NAME } from '@100mslive/hms-video';
 import { byIDCurry } from './common';
 import {
   selectFullAppData,
@@ -516,7 +515,7 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
 
 export const selectHasPeerHandRaised = (peerId: HMSPeerID) =>
   createSelector(selectPeerByID(peerId), peer => {
-    return !!peer?.groups?.includes(HAND_RAISE_GROUP_NAME);
+    return !!peer?.isHandRaised;
   });
 
 export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);

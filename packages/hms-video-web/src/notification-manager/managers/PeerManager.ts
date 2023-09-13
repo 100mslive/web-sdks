@@ -1,7 +1,7 @@
 import { TrackManager } from './TrackManager';
-import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteVideoTrack } from '../../media/tracks';
-import { HMSRemotePeer } from '../../sdk/models/peer';
+import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import { HAND_RAISE_GROUP_NAME } from '../../utils/constants';
 import { convertDateNumToDate } from '../../utils/date';
@@ -105,6 +105,7 @@ export class PeerManager {
       peer = this.makePeer(notification);
     } else if (peer && !notification.realtime) {
       this.store.removePeer(peer.peerId);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_REMOVED, peer);
       return;
     }
 
