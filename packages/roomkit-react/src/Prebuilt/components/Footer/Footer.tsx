@@ -6,6 +6,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
+import { useAVToggle } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -41,6 +42,8 @@ export const Footer = ({
   const isOverlayChat = !!elements?.chat?.is_overlay;
   const openByDefault = elements?.chat?.initial_state === Chat_ChatState.CHAT_STATE_OPEN;
 
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
 
@@ -91,7 +94,7 @@ export const Footer = ({
       >
         {isMobile ? (
           <>
-            {screenType === 'hls_live_streaming' ? <RaiseHand /> : null}
+            {screenType === 'hls_live_streaming' || noAVPermissions ? <RaiseHand /> : null}
             {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>
