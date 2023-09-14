@@ -94,7 +94,7 @@ export const Footer = ({
       >
         {isMobile ? (
           <>
-            {screenType === 'hls_live_streaming' || noAVPermissions ? <RaiseHand /> : null}
+            {noAVPermissions ? <RaiseHand /> : null}
             {elements?.chat && <ChatToggle />}
             <MoreSettings elements={elements} screenType={screenType} />
           </>

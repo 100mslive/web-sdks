@@ -161,7 +161,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
-            {screenType !== 'hls_live_streaming' && !noAVPermissions ? (
+            {!noAVPermissions ? (
               <ActionTile.Root
                 active={isHandRaised}
                 onClick={() => {
