@@ -167,7 +167,7 @@ const PreviewJoin = ({
             flexDirection: 'column',
           }}
         >
-          <PreviewTile name={name} error={previewError} aspectRatio={aspectRatio} />
+          <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
       <Box css={{ w: '100%', maxWidth: `${aspectRatio * 360}px` }}>
@@ -194,15 +194,7 @@ const Container = styled('div', {
   px: '$10',
 });
 
-export const PreviewTile = ({
-  name,
-  error,
-  aspectRatio,
-}: {
-  name: string;
-  error?: boolean;
-  aspectRatio: number | string;
-}) => {
+export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -210,6 +202,10 @@ export const PreviewTile = ({
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
 
   return (
     <StyledVideoTile.Container
