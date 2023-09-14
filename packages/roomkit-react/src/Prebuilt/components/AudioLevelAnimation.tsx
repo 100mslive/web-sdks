@@ -35,7 +35,7 @@ const AudioBar = () => {
         width: '.25em',
         height: '1em',
         maskImage: `url(${bg})`,
-        maskRepeat: 'no-repeat',
+        '-webkit-mask-repeat': 'no-repeat',
         backgroundColor: '$on_primary_high',
         maskSize: '4em 1em',
         animation: `${barAnimation} .6s steps(3,jump-none) 0s infinite`,
