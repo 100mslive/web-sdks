@@ -10,6 +10,7 @@ export const MwebLandscapePrompt = () => {
 
   useEffect(() => {
     const handleOrientationChange = e => {
+      alert(e.target.type);
       setShowMwebLandscapePrompt(e.target.type === 'landscape-secondary');
     };
     if (window) {
