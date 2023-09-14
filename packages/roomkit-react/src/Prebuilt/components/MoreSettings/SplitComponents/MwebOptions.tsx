@@ -279,7 +279,6 @@ export const MwebOptions = ({
 
       {showEmojiCard && (
         <Box
-          onClick={() => setShowEmojiCard(false)}
           ref={emojiCardRef}
           css={{
             maxWidth: '100%',
