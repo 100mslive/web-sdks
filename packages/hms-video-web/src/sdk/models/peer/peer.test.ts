@@ -83,6 +83,7 @@ describe('HMSRemotPeer', () => {
     },
     role: 'viewer',
     tracks: {},
+    groups: [],
   };
   const peer = new HMSRemotePeer({
     peerId: peerInfo.peer_id,

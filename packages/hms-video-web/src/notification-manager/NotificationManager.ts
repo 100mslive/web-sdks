@@ -65,7 +65,7 @@ export class NotificationManager {
     this.policyChangeManager = new PolicyChangeManager(this.store, eventBus);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);
-    this.connectionQualityManager = new ConnectionQualityManager(this.connectionQualityListener);
+    this.connectionQualityManager = new ConnectionQualityManager(this.store, this.connectionQualityListener);
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
     this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
     this.pollsManager = new PollsManager(this.store, this.transport, this.listener);

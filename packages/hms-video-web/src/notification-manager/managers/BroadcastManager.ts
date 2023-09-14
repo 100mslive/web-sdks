@@ -55,8 +55,10 @@ export class BroadcastManager {
         peerId: notifPeer.peer_id,
         name: notifPeer.info.name,
         isLocal: false,
+        role: this.store.getPolicyForRole(notifPeer.role),
         customerUserId: notifPeer.info.user_id,
         metadata: notifPeer.info.data,
+        groups: notifPeer.groups,
       });
     }
     return sender;

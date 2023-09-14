@@ -17,3 +17,7 @@ export interface SetSessionMetadataResponse {
   key: string;
   updated_at?: number;
 }
+
+export interface JoinLeaveGroupResponse {
+  groups: string[];
+}

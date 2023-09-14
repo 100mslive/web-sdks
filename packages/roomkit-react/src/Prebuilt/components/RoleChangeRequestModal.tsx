@@ -64,13 +64,14 @@ export const RoleChangeRequestModal = () => {
           await hmsActions.rejectChangeRole(roleChangeRequest);
           sendEvent({ ...roleChangeRequest, peerName: name }, { peerId: roleChangeRequest.requestedBy?.id });
           await hmsActions.cancelMidCallPreview();
-          await updateMetaData({ isHandRaised: false });
+          await hmsActions.lowerLocalPeerHand();
         }
       }}
       body={body}
       onAction={async () => {
         await hmsActions.acceptChangeRole(roleChangeRequest);
-        await updateMetaData({ isHandRaised: false, prevRole: currentRole });
+        await updateMetaData({ prevRole: currentRole });
+        await hmsActions.lowerLocalPeerHand();
       }}
       actionText="Accept"
     />

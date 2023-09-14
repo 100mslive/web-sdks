@@ -1,7 +1,8 @@
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
@@ -134,11 +135,25 @@ export class TrackManager {
     }
   };
 
+  // eslint-disable-next-line complexity
   handleTrackUpdate = (params: TrackStateNotification, callListener = true) => {
-    const hmsPeer = this.store.getPeerById(params.peer.peer_id);
-    if (!hmsPeer) {
+    let hmsPeer = this.store.getPeerById(params.peer.peer_id);
+    const notifPeer = params.peer;
+    if (!hmsPeer && !notifPeer) {
       HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
       return;
+    }
+    if (!hmsPeer) {
+      hmsPeer = new HMSPeer({
+        peerId: notifPeer.peer_id,
+        name: notifPeer.info.name,
+        isLocal: false,
+        role: this.store.getPolicyForRole(notifPeer.role),
+        customerUserId: notifPeer.info.user_id,
+        metadata: notifPeer.info.data,
+        groups: notifPeer.groups,
+      });
+      this.store.addPeer(hmsPeer);
     }
 
     for (const trackId in params.tracks) {

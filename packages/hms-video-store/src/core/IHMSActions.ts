@@ -505,4 +505,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 
   interactivityCenter: IHMSInteractivityCenter;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
 }

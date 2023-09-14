@@ -90,4 +90,9 @@ export interface HMSInterface {
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
 }
