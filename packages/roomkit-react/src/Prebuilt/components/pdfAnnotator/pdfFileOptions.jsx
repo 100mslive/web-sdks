@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
-import { Dialog, Flex, HorizontalDivider, Input, Text } from '../../../';
-import { DialogInputFile, DialogRow } from '../../primitives/DialogContent';
-import { PdfErrorView } from './pdfErrorView';
+import { Dialog, Flex } from '../../../';
+import { DialogInputFile } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
-import { PDFInfo } from './pdfInfo';
 import { SubmitPDF } from './submitPdf';
 import { UploadedFile } from './uploadedFile';
 
 export function PDFFileOptions({ onOpenChange }) {
-  const [isPDFUrlValid, setIsPDFUrlValid] = useState(true);
-  const [isValidateProgress, setIsValidateProgress] = useState(false);
   const [pdfFile, setPDFFile] = useState(null);
-  const [pdfURL, setPDFURL] = useState('');
 
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
@@ -22,6 +17,7 @@ export function PDFFileOptions({ onOpenChange }) {
             w: 'min(420px,80%)',
             overflow: 'auto',
             p: '$10',
+            bg: '$surface_dim',
           }}
         >
           <Flex direction="column">
@@ -34,75 +30,13 @@ export function PDFFileOptions({ onOpenChange }) {
               type="file"
               accept=".pdf"
             />
-            <DialogRow
-              css={{
-                m: '$10 0',
-              }}
-            >
-              <HorizontalDivider
-                css={{
-                  mr: '$4',
-                }}
-              />
-              <Text
-                variant="tiny"
-                css={{
-                  color: '$on_surface_low',
-                }}
-              >
-                OR
-              </Text>
-              <HorizontalDivider
-                css={{
-                  ml: '$4',
-                }}
-              />
-            </DialogRow>
-            <Text
-              variant="sm"
-              css={{
-                py: '$2',
-              }}
-            >
-              Import from URL
-            </Text>
-            <Input
-              css={{ w: '100%', mb: '$10' }}
-              value={pdfURL}
-              onFocus={() => {
-                setIsPDFUrlValid(true);
-                setIsValidateProgress(false);
-              }}
-              onChange={e => {
-                setPDFURL(e.target.value);
-              }}
-              placeholder="Add PDF URL"
-              type="text"
-              error={!isPDFUrlValid}
-            />
-            {!isPDFUrlValid && <PdfErrorView isPDFUrlValid={isPDFUrlValid} />}
-            <PDFInfo />
-            <SubmitPDF
-              pdfFile={pdfFile}
-              pdfURL={pdfURL}
-              isValidateProgress={isValidateProgress}
-              setIsPDFUrlValid={setIsPDFUrlValid}
-              setIsValidateProgress={setIsValidateProgress}
-              onOpenChange={onOpenChange}
-            />
+
+            <SubmitPDF pdfFile={pdfFile} onOpenChange={onOpenChange} />
           </Flex>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
   ) : (
-    <UploadedFile
-      pdfFile={pdfFile}
-      pdfURL={pdfURL}
-      isValidateProgress={isValidateProgress}
-      setPDFFile={setPDFFile}
-      setIsPDFUrlValid={setIsPDFUrlValid}
-      setIsValidateProgress={setIsValidateProgress}
-      onOpenChange={onOpenChange}
-    />
+    <UploadedFile pdfFile={pdfFile} setPDFFile={setPDFFile} onOpenChange={onOpenChange} />
   );
 }

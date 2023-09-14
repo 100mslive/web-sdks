@@ -1,14 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { matchPath, useLocation } from 'react-router-dom';
-import { useSearchParam } from 'react-use';
-import { v4 as uuid } from 'uuid';
+import React, { useEffect, useState } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ErrorDialog } from '../primitives/DialogContent';
 import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
-import getToken from '../services/tokenService';
-import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from '../common/constants';
+import { APP_DATA } from '../common/constants';
 
 /**
  * query params exposed -
@@ -19,20 +15,12 @@ import { APP_DATA, QUERY_PARAM_AUTH_TOKEN } from '../common/constants';
  * auth_token=123 => uses the passed in token to join instead of fetching from token endpoint
  * ui_mode=activespeaker => lands in active speaker mode after joining the room
  */
-const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
+const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken }) => {
   const hmsActions = useHMSActions();
   const tokenEndpoint = useTokenEndpoint();
-  const { showPreview, roomCode } = useHMSPrebuiltContext();
-  const location = useLocation();
-  const matches = useMemo(
-    () =>
-      matchPath(`${showPreview ? 'preview' : 'meeting'}/:roomId/:role`, location.pathname) ||
-      matchPath(`${showPreview ? 'preview' : 'meeting'}/:roomCode/`, location.pathname),
-    [location, showPreview],
-  );
-  const { roomCode: urlRoomCode, roomId: urlRoomId, role: userRole } = matches?.params || {};
+  const { roomCode, userId } = useHMSPrebuiltContext();
   const [error, setError] = useState({ title: '', body: '' });
-  let authToken = useSearchParam(QUERY_PARAM_AUTH_TOKEN);
+  let authToken = defaultAuthToken;
   const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
 
   useEffect(() => {
@@ -40,33 +28,15 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint }) => {
       setAuthTokenInAppData(authToken);
       return;
     }
-    if (!tokenEndpoint && !urlRoomId && !roomCode && !urlRoomCode) {
+    if (!tokenEndpoint && !roomCode) {
       return;
     }
-    const code = !userRole && (roomCode || urlRoomCode);
 
-    const getTokenFn = code
-      ? () => hmsActions.getAuthTokenByRoomCode({ roomCode: code }, { endpoint: authTokenByRoomCodeEndpoint })
-      : () => getToken(tokenEndpoint, uuid(), userRole, urlRoomId);
-
-    getTokenFn()
-      .then(token => {
-        setAuthTokenInAppData(token);
-      })
-      .catch(error => {
-        setError(convertError(error));
-      });
-  }, [
-    hmsActions,
-    tokenEndpoint,
-    urlRoomId,
-    urlRoomCode,
-    userRole,
-    authToken,
-    authTokenByRoomCodeEndpoint,
-    setAuthTokenInAppData,
-    roomCode,
-  ]);
+    hmsActions
+      .getAuthTokenByRoomCode({ roomCode, userId }, { endpoint: authTokenByRoomCodeEndpoint })
+      .then(token => setAuthTokenInAppData(token))
+      .catch(error => setError(convertError(error)));
+  }, [hmsActions, tokenEndpoint, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId]);
 
   if (error.title) {
     return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;

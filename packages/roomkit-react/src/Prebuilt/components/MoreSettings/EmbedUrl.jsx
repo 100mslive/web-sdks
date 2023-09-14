@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { ViewIcon } from '@100mslive/react-icons';
-import { Button, Dialog, Dropdown, Text } from '../../../';
-import { DialogContent, DialogInput, DialogRow } from '../../primitives/DialogContent';
+import { LinkIcon } from '@100mslive/react-icons';
+import { Button, Dialog, Dropdown, Flex, Input, Text } from '../../../';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
@@ -17,7 +16,7 @@ export const EmbedUrl = ({ setShowOpenUrl }) => {
       }}
       data-testid="embed_url_btn"
     >
-      <ViewIcon />
+      <LinkIcon />
       <Text variant="sm" css={{ ml: '$4' }}>
         Embed URL
       </Text>
@@ -29,78 +28,54 @@ export function EmbedUrlModal({ onOpenChange }) {
   const [embedConfig, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
   const [url, setUrl] = useState(embedConfig?.url || '');
 
-  const isAnythingEmbedded = !!embedConfig?.url;
-  const isModifying = isAnythingEmbedded && url && url !== embedConfig.url;
-
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <DialogContent title="Embed URL" Icon={ViewIcon}>
-        <DialogInput title="URL" value={url} onChange={setUrl} placeholder="https://www.tldraw.com/" type="url" />
-        <DialogRow>
-          <Text>
-            Embed a url and share with everyone in the room. Ensure that you're sharing the current tab when the prompt
-            opens. Note that not all websites support being embedded.
+      <Dialog.Portal>
+        <Dialog.Overlay />
+        <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+          <Dialog.Title
+            css={{
+              borderBottom: '1px solid $border_default',
+              color: '$on_surface_high',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            Embed URL
+          </Dialog.Title>
+          <Text variant="sm" css={{ color: '$on_surface_medium', mt: '$4', mb: '$8' }}>
+            Ensure that you're sharing the current tab when the prompt opens. Note that not all websites support being
+            embedded.
           </Text>
-        </DialogRow>
-        <DialogRow justify="end">
-          {isAnythingEmbedded ? (
-            <>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={!isModifying}
-                onClick={() => {
-                  setEmbedConfig({ url, shareScreen: embedConfig.shareScreen });
-                  onOpenChange(false);
-                }}
-                data-testid="embed_url_btn"
-                css={{ mr: '$4' }}
-              >
-                Update Embed
-              </Button>
-              <Button
-                variant="danger"
-                type="submit"
-                onClick={() => {
-                  setEmbedConfig({ url: '' });
-                  onOpenChange(false);
-                }}
-                data-testid="embed_url_btn"
-              >
-                Stop Embed
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={!url.trim()}
-                onClick={() => {
-                  setEmbedConfig({ url });
-                  onOpenChange(false);
-                }}
-                data-testid="embed_url_btn"
-                css={{ mr: '$4' }}
-              >
-                Just Embed
-              </Button>
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={!url.trim()}
-                onClick={() => {
-                  setEmbedConfig({ url, shareScreen: true });
-                  onOpenChange(false);
-                }}
-                data-testid="embed_url_btn"
-              >
-                Embed and Share
-              </Button>
-            </>
-          )}
-        </DialogRow>
-      </DialogContent>
+          <Text variant="sm" css={{ color: '$on_surface_high' }}>
+            URL
+          </Text>
+          <Input
+            css={{ w: '100%', mt: '$4' }}
+            placeholder="Enter your URL"
+            value={url}
+            onChange={e => setUrl(e.target.value)}
+            type="url"
+          />
+          <Flex justify="between" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+            <Button outlined variant="standard" css={{ w: '100%' }} onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              css={{ w: '100%' }}
+              type="submit"
+              disabled={!url.toString().trim()}
+              onClick={() => {
+                setEmbedConfig({ url, shareScreen: true });
+                onOpenChange(false);
+              }}
+              data-testid="embed_url_btn"
+            >
+              Embed and Share
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 }

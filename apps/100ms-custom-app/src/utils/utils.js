@@ -1,10 +1,28 @@
 import axios from 'axios';
 import cookies from 'js-cookies';
 
+function isRoomCode(str) {
+  const regex = /^[A-Za-z]*(-[A-Za-z]*){2}$/;
+  return regex.test(str);
+}
+
 export const getRoomCodeFromUrl = () => {
   const path = window.location.pathname;
   const regex = /(\/streaming)?\/(preview|meeting)\/(?<code>[^/]+)/;
-  return path.match(regex)?.groups?.code || null;
+  const roomCode = path.match(regex)?.groups?.code || null;
+  return isRoomCode(roomCode) ? roomCode : null;
+};
+
+export const getRoomIdRoleFromUrl = () => {
+  const path = window.location.pathname;
+  const regex =
+    /(\/streaming)?\/(preview|meeting)\/(?<roomId>[^/]+)\/(?<role>[^/]+)/;
+  const roomId = path.match(regex)?.groups?.roomId || null;
+  const role = path.match(regex)?.groups?.role || null;
+  return {
+    roomId,
+    role,
+  };
 };
 
 export const getAuthInfo = () => {
@@ -32,14 +50,6 @@ const tileShapeMapping = {
 
 const env = process.env.REACT_APP_ENV || 'prod';
 export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
-const authTokenEndpointByRoomCode = {
-  qa: 'https://auth-nonprod.100ms.live/v2/token',
-  dev: 'https://auth-nonprod.100ms.live/v2/token',
-};
-
-export const getAuthTokenByRoomCodeEndpoint = () => {
-  return authTokenEndpointByRoomCode[env] || '';
-};
 
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
@@ -149,4 +159,62 @@ export const getWithRetry = async (url, headers) => {
   }
   console.error('max retry done for get-details', error);
   throw error;
+};
+
+export const getAuthTokenUsingRoomIdRole = async function ({
+  subdomain = '',
+  roomId = '',
+  role = '',
+  userId = '',
+}) {
+  try {
+    const resp = await fetch(`${apiBasePath}${subdomain}/api/token`, {
+      method: 'POST',
+      body: JSON.stringify({
+        room_id: roomId,
+        role,
+        user_id: userId,
+      }),
+    });
+    const { token = '' } = await resp.json();
+    return token;
+  } catch (e) {
+    console.error('failed to getAuthTokenUsingRoomIdRole', e);
+    throw Error('failed to get auth token using roomid and role');
+  }
+};
+
+export const fetchData = async (
+  subdomain,
+  roomCode,
+  setOnlyEmail,
+  setData,
+  setShowHeader
+) => {
+  const jwt = getAuthInfo().token;
+
+  const url = `${apiBasePath}apps/get-details?domain=${subdomain}&room_id=${roomCode}`;
+  const headers = {};
+  if (jwt) {
+    headers['Authorization'] = `Bearer ${jwt}`;
+  }
+  headers['Content-Type'] = 'application/json';
+
+  getWithRetry(url, headers)
+    .then(res => {
+      if (res.data.success) {
+        setOnlyEmail(res.data.same_user);
+        setShowHeader(true);
+        setData({
+          roomLinks: res.data.room_links,
+          policyID: res.data.policy_id,
+          theme: res.data.theme,
+        });
+      }
+    })
+    .catch(err => {
+      setShowHeader(false);
+      const errorMessage = `[Get Details] ${err.message}`;
+      console.error(errorMessage);
+    });
 };

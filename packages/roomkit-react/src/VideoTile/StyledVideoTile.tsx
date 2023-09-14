@@ -14,6 +14,7 @@ const Container = styled('div', {
   width: '100%',
   height: '100%',
   position: 'relative',
+  overflow: 'hidden',
   borderRadius: '$2',
   display: 'flex',
   justifyContent: 'center',
@@ -57,6 +58,11 @@ const Info = styled('div', {
 const AttributeBox = styled('div', {
   position: 'absolute',
   color: '$on_primary_high',
+  w: '$12',
+  h: '$12',
+  bg: '$secondary_dim',
+  r: '$round',
+  ...flexCenter,
 });
 
 const AudioIndicator = styled('div', {

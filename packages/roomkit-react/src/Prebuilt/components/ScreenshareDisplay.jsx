@@ -14,16 +14,9 @@ export const ScreenshareDisplay = () => {
       align="center"
       justify="center"
       css={{
-        position: 'relative',
-        overflow: 'hidden',
-        w: '37.5rem',
-        maxWidth: '80%',
-        h: '100%',
-        r: '$3',
-        m: '0 auto',
+        size: '100%',
+        bg: '$background_default',
         color: '$on_surface_high',
-        bg: '$surface_default',
-        textAlign: 'center',
       }}
     >
       <ShareScreenIcon width={48} height={48} />
@@ -32,6 +25,7 @@ export const ScreenshareDisplay = () => {
       </Text>
       <Button
         variant="danger"
+        css={{ fontWeight: '$semiBold' }}
         onClick={async () => {
           await hmsActions.setScreenShareEnabled(false);
         }}

@@ -1,44 +1,66 @@
 /* eslint-disable no-case-declarations */
-import React, { useEffect } from 'react';
-import { logMessage } from 'zipyai';
-import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import React, { useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  HMSNotificationTypes,
+  HMSRoomState,
+  selectRoomState,
+  useCustomEvent,
+  useHMSNotifications,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { Button } from '../../../';
+import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { InitErrorModal } from './InitErrorModal';
-import { MessageNotifications } from './MessageNotifications';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
 import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { useHLSViewerRole, useIsHeadless, useSubscribedNotifications } from '../AppData/useUISettings';
-import { useNavigation } from '../hooks/useNavigation';
+import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
+import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 import { getMetadata } from '../../common/utils';
-
+import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
   const notification = useHMSNotifications();
-  const navigate = useNavigation();
-  const HLS_VIEWER_ROLE = useHLSViewerRole();
+  const navigate = useNavigate();
+  const params = useParams();
   const subscribedNotifications = useSubscribedNotifications() || {};
-  const isHeadless = useIsHeadless();
+  const roomState = useHMSStore(selectRoomState);
+  const updateRoomLayoutForRole = useUpdateRoomLayout();
+  const isNotificationDisabled = useIsNotificationDisabled();
+  const { redirectToLeave } = useRedirectToLeave();
+
+  const handleRoleChangeDenied = useCallback(request => {
+    ToastManager.addToast({
+      title: `${request.peerName} denied your request to join the ${request.role.name} role`,
+      variant: 'error',
+    });
+  }, []);
+
+  useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
 
   useEffect(() => {
-    if (!notification) {
+    if (!notification || isNotificationDisabled) {
       return;
     }
     switch (notification.type) {
       case HMSNotificationTypes.METADATA_UPDATED:
-        // Don't toast message when metadata is updated and raiseHand is false.
-        // Don't toast message in case of local peer.
+        if (roomState !== HMSRoomState.Connected) {
+          return;
+        }
+        // Don't show toast message when metadata is updated and raiseHand is false.
+        // Don't show toast message in case of local peer.
         const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal || isHeadless) return;
+        if (!metadata?.isHandRaised || notification.data.isLocal) return;
 
         console.debug('Metadata updated', notification.data);
         if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.showToast({ notification });
+        ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
         break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(notification.data.id + ' changed their name to ' + notification.data.name);
@@ -50,7 +72,6 @@ export function Notifications() {
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            logMessage('Disconnected');
             // show button action when the error is terminal
             const toastId = ToastManager.addToast({
               title:
@@ -61,7 +82,7 @@ export function Notifications() {
                 <Button
                   onClick={() => {
                     ToastManager.removeToast(toastId);
-                    window.location.reload();
+                    navigate(`/${params.roomId}${params.role ? `/${params.role}` : ''}`);
                   }}
                 >
                   Rejoin
@@ -72,11 +93,7 @@ export function Notifications() {
           }
           // goto leave for terminal if any action is not performed within 2secs
           // if network is still unavailable going to preview will throw an error
-          setTimeout(() => {
-            const previewLocation = window.location.pathname.replace('meeting', 'leave');
-            ToastManager.clearAllToast();
-            navigate(previewLocation);
-          }, 2000);
+          redirectToLeave(1000);
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -91,16 +108,15 @@ export function Notifications() {
           title: `Error: ${notification.data?.message} - ${notification.data?.description}`,
         });
         break;
-      case HMSNotificationTypes.ROLE_UPDATED:
-        if (notification.data.roleName === HLS_VIEWER_ROLE) {
-          return;
-        }
+      case HMSNotificationTypes.ROLE_UPDATED: {
         if (notification.data?.isLocal) {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
+          updateRoomLayoutForRole(notification.data.roleName);
         }
         break;
+      }
       case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
         const track = notification.data?.track;
         if (!notification.data.enabled) {
@@ -116,11 +132,7 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        setTimeout(() => {
-          const leaveLocation = window.location.pathname.replace('meeting', 'leave');
-          navigate(leaveLocation);
-          ToastManager.clearAllToast();
-        }, 2000);
+        redirectToLeave(1000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({
@@ -131,18 +143,21 @@ export function Notifications() {
         break;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED, HLS_VIEWER_ROLE]);
+  }, [notification, subscribedNotifications.ERROR, subscribedNotifications.METADATA_UPDATED]);
+
+  if (isNotificationDisabled) {
+    return null;
+  }
 
   return (
     <>
-      {!isHeadless && <TrackUnmuteModal />}
-      {!isHeadless && <TrackBulkUnmuteModal />}
+      <TrackUnmuteModal />
+      <TrackBulkUnmuteModal />
       <TrackNotifications />
       <PeerNotifications />
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
-      <MessageNotifications />
       <InitErrorModal notification={notification} />
     </>
   );

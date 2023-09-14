@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { logMessage } from 'zipyai';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Dialog, Flex, Loading, Text } from '../../../';
 import { ToastConfig } from '../Toast/ToastConfig';
@@ -12,32 +11,23 @@ const notificationTypes = [
 ];
 let notificationId = null;
 
-const isQA = process.env.REACT_APP_ENV === 'qa';
 export const ReconnectNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (notification?.type === HMSNotificationTypes.ERROR && notification?.data?.isTerminal) {
-      logMessage('Error ', notification.data?.description);
       setOpen(false);
     } else if (notification?.type === HMSNotificationTypes.RECONNECTED) {
-      logMessage('Reconnected');
       notificationId = ToastManager.replaceToast(notificationId, ToastConfig.RECONNECTED.single());
       setOpen(false);
     } else if (notification?.type === HMSNotificationTypes.RECONNECTING) {
-      logMessage('Reconnecting');
-      if (isQA) {
-        ToastManager.removeToast(notificationId);
-        setOpen(true);
-      } else {
-        notificationId = ToastManager.replaceToast(
-          notificationId,
-          ToastConfig.RECONNECTING.single(notification.data.message),
-        );
-      }
+      notificationId = ToastManager.replaceToast(
+        notificationId,
+        ToastConfig.RECONNECTING.single(notification.data.message),
+      );
     }
   }, [notification]);
-  if (!open || !isQA) return null;
+  if (!open) return null;
   return (
     <Dialog.Root open={open} modal={true}>
       <Dialog.Portal container={document.getElementById('conferencing')}>

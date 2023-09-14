@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
@@ -7,14 +7,14 @@ import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { Header } from './Header';
-import { useNavigation } from './hooks/useNavigation';
+import { useRoomLayoutPreviewScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
-import { getRoutePrefix } from '../common/utils';
 import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
-  const navigate = useNavigation();
-  const { showPreview, roomCode } = useHMSPrebuiltContext();
+  const navigate = useNavigate();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { roomCode } = useHMSPrebuiltContext();
   const { roomId, role } = useParams();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
@@ -32,7 +32,7 @@ const PostLeave = () => {
           👋
         </Text>
         <Text variant="h4" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mt: '$12' }}>
-          You left the {getRoutePrefix() ? 'stream' : 'room'}
+          You left the room
         </Text>
         <Text
           variant="body1"
@@ -57,7 +57,7 @@ const PostLeave = () => {
           </Text>
           <Button
             onClick={() => {
-              let redirectUrl = `${showPreview ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
+              let redirectUrl = `${isPreviewScreenEnabled ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
               if (role && roomId) redirectUrl += '/' + role;
               navigate(redirectUrl);
               ToastManager.clearAllToast();

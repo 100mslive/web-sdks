@@ -40,7 +40,7 @@ export const arrayIntersection = (a, b) => {
 
 export const getMetadata = metadataString => {
   try {
-    return metadataString === '' ? {} : JSON.parse(metadataString);
+    return !metadataString ? {} : JSON.parse(metadataString);
   } catch (error) {
     return {};
   }
@@ -54,14 +54,6 @@ export const metadataProps = function (peer) {
 
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
-};
-
-export const getRoutePrefix = () => {
-  return window.location.pathname.startsWith('/streaming') ? '/streaming' : '';
-};
-
-export const isStreamingKit = () => {
-  return window.location.pathname.startsWith('/streaming');
 };
 
 export const isInternalRole = role => role && role.startsWith('__internal');
@@ -82,4 +74,19 @@ export const getUpdatedHeight = (e, MINIMUM_HEIGHT) => {
   // Snap to top if height > 80%, should be at least 40vh
   const sheetHeightInVH = Math.max(MINIMUM_HEIGHT, heightToPercentage > 80 ? 100 : heightToPercentage);
   return `${sheetHeightInVH}vh`;
+};
+
+export const getFormattedCount = num => {
+  const formatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 });
+  const formattedNum = formatter.format(num);
+  return formattedNum;
+};
+
+export const formatTime = timeInSeconds => {
+  timeInSeconds = Math.floor(timeInSeconds / 1000);
+  const hours = Math.floor(timeInSeconds / 3600);
+  const minutes = Math.floor((timeInSeconds % 3600) / 60);
+  const seconds = timeInSeconds % 60;
+  const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
+  return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };

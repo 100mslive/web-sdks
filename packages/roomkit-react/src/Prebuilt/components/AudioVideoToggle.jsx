@@ -1,7 +1,9 @@
 import React, { Fragment } from 'react';
 import {
   DeviceType,
+  HMSRoomState,
   selectLocalVideoTrackID,
+  selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
   useDevices,
@@ -18,7 +20,7 @@ import { isMacOS } from '../common/constants';
 
 const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%', p: '$8' };
 
-export const AudioVideoToggle = () => {
+export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
 
@@ -64,40 +66,89 @@ export const AudioVideoToggle = () => {
   const actions = useHMSActions();
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
+  const roomState = useHMSStore(selectRoomState);
+  const hasAudioDevices = audioInput?.length > 0;
+  const hasVideoDevices = videoInput?.length > 0;
 
   return (
     <Fragment>
       {toggleAudio ? (
-        <IconButtonWithOptions
-          options={formattedAudioInputList}
-          tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
-          icon={
-            !isLocalAudioEnabled ? <MicOffIcon data-testid="audio_off_btn" /> : <MicOnIcon data-testid="audio_on_btn" />
-          }
-          active={isLocalAudioEnabled}
-          onClick={toggleAudio}
-          key="toggleAudio"
-        />
+        hideOptions || !hasAudioDevices ? (
+          <Tooltip title={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}>
+            <IconButton
+              active={isLocalAudioEnabled}
+              disabled={!toggleAudio}
+              onClick={toggleAudio}
+              key="toggleAudio"
+              data-testid="audio_btn"
+              className="__cancel-drag-event"
+            >
+              {!isLocalAudioEnabled ? (
+                <MicOffIcon data-testid="audio_off_btn" />
+              ) : (
+                <MicOnIcon data-testid="audio_on_btn" />
+              )}
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <IconButtonWithOptions
+            options={formattedAudioInputList}
+            disabled={!toggleAudio}
+            onDisabledClick={toggleAudio}
+            tooltipMessage={`Turn ${isLocalAudioEnabled ? 'off' : 'on'} audio (${isMacOS ? '⌘' : 'ctrl'} + d)`}
+            icon={
+              !isLocalAudioEnabled ? (
+                <MicOffIcon data-testid="audio_off_btn" />
+              ) : (
+                <MicOnIcon data-testid="audio_on_btn" />
+              )
+            }
+            active={isLocalAudioEnabled}
+            onClick={toggleAudio}
+            key="toggleAudio"
+          />
+        )
       ) : null}
 
       {toggleVideo ? (
-        <IconButtonWithOptions
-          options={formattedVideoInputList}
-          tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
-          icon={
-            !isLocalVideoEnabled ? (
-              <VideoOffIcon data-testid="video_off_btn" />
-            ) : (
-              <VideoOnIcon data-testid="video_on_btn" />
-            )
-          }
-          key="toggleVideo"
-          active={isLocalVideoEnabled}
-          onClick={toggleVideo}
-        />
+        hideOptions || !hasVideoDevices ? (
+          <Tooltip title={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}>
+            <IconButton
+              key="toggleVideo"
+              active={isLocalVideoEnabled}
+              disabled={!toggleVideo}
+              onClick={toggleVideo}
+              data-testid="video_btn"
+              className="__cancel-drag-event"
+            >
+              {!isLocalVideoEnabled ? (
+                <VideoOffIcon data-testid="video_off_btn" />
+              ) : (
+                <VideoOnIcon data-testid="video_on_btn" />
+              )}
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <IconButtonWithOptions
+            disabled={!toggleVideo}
+            onDisabledClick={toggleVideo}
+            options={formattedVideoInputList}
+            tooltipMessage={`Turn ${isLocalVideoEnabled ? 'off' : 'on'} video (${isMacOS ? '⌘' : 'ctrl'} + e)`}
+            icon={
+              !isLocalVideoEnabled ? (
+                <VideoOffIcon data-testid="video_off_btn" />
+              ) : (
+                <VideoOnIcon data-testid="video_on_btn" />
+              )
+            }
+            key="toggleVideo"
+            active={isLocalVideoEnabled}
+            onClick={toggleVideo}
+          />
+        )
       ) : null}
 
-      {localVideoTrack?.facingMode ? (
+      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {

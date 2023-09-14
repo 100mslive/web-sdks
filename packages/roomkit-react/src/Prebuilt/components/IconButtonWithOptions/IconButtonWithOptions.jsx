@@ -14,6 +14,10 @@ const IconSection = styled(IconButton, {
   borderTopRightRadius: 0,
   borderColor: '$border_default',
   borderBottomRightRadius: 0,
+  position: 'relative',
+  '&:not([disabled]):focus-visible': {
+    zIndex: 1,
+  },
   '@md': {
     mx: 0,
     borderTopRightRadius: '$1',
@@ -30,8 +34,9 @@ const OptionsSection = styled(IconButton, {
   borderColor: '$border_default',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
+  position: 'relative',
   '&:not([disabled]):focus-visible': {
-    boxShadow: 'none',
+    zIndex: 1,
   },
   '@md': {
     display: 'none',
@@ -39,6 +44,10 @@ const OptionsSection = styled(IconButton, {
 });
 
 export const IconButtonWithOptions = ({
+  disabled = false,
+  onDisabledClick = () => {
+    return;
+  },
   tooltipMessage = '',
   icon,
   options = [],
@@ -46,13 +55,13 @@ export const IconButtonWithOptions = ({
   onClick = () => {
     return;
   },
-  key = '',
 }) => {
-  const bgCss = { backgroundColor: active ? '$transparent' : '$secondary_dim' };
-  const iconCss = { color: active ? '$on_surface_high' : '$on_primary_high' };
+  const bgCss = { backgroundColor: disabled ? '$surface_brighter' : active ? '$transparent' : '$secondary_dim' };
+  const iconCss = { color: disabled ? '$on_surface_low' : active ? '$on_surface_high' : '$on_primary_high' };
+
   return (
     <Flex>
-      <IconSection css={bgCss} onClick={onClick} key={key}>
+      <IconSection css={bgCss} onClick={onClick}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Flex align="center" justify="center" css={iconCss}>
             {icon}
@@ -60,7 +69,16 @@ export const IconButtonWithOptions = ({
         </Tooltip>
       </IconSection>
       <Dropdown.Root>
-        <Dropdown.Trigger asChild>
+        <Dropdown.Trigger
+          asChild
+          // onClick does not work
+          onPointerDown={e => {
+            if (disabled) {
+              e.preventDefault();
+              onDisabledClick();
+            }
+          }}
+        >
           <OptionsSection css={bgCss}>
             <Tooltip title="View Options">
               <Box css={iconCss}>

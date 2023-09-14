@@ -77,18 +77,7 @@ export const PDFEmbedComponent = () => {
   }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
 
   return (
-    <Box
-      ref={iframeRef}
-      css={{
-        mx: '$8',
-        flex: '3 1 0',
-        '@lg': {
-          flex: '2 1 0',
-          display: 'flex',
-          alignItems: 'center',
-        },
-      }}
-    >
+    <Box ref={iframeRef} css={{ size: '100%' }}>
       <iframe
         src={pdfJSURL}
         title="PDF Annotator"
