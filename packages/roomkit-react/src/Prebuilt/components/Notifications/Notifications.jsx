@@ -13,6 +13,7 @@ import {
 } from '@100mslive/react-sdk';
 import { Button } from '../../../';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
+import { MwebLandscapePrompt } from '../MwebLandscapePrompt';
 import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -171,6 +172,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
+      <MwebLandscapePrompt />
       <InitErrorModal notification={notification} />
     </>
   );
