@@ -105,7 +105,11 @@ const PreviewJoin = ({
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
-
+  const localPeer = useHMSStore(selectLocalPeer);
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -163,10 +167,10 @@ const PreviewJoin = ({
             flexDirection: 'column',
           }}
         >
-          <PreviewTile name={name} error={previewError} />
+          <PreviewTile name={name} error={previewError} aspectRatio={aspectRatio} />
         </Flex>
       ) : null}
-      <Box css={{ w: '100%', maxWidth: '640px' }}>
+      <Box css={{ w: '100%', maxWidth: `${aspectRatio * 360}px` }}>
         <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
         <PreviewForm
           name={name}
@@ -190,7 +194,7 @@ const Container = styled('div', {
   px: '$10',
 });
 
-export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) => {
+export const PreviewTile = ({ name, error, aspectRatio }: { name: string; error?: boolean; aspectRatio: number }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -198,10 +202,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
-  const isMobile = useMedia(cssConfig.media.md);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
+
   return (
     <StyledVideoTile.Container
       css={{
