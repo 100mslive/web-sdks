@@ -3,7 +3,7 @@ import { useFullscreen, useMedia, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ColoredHandIcon, ExpandIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
@@ -265,6 +265,24 @@ const HLSView = () => {
             onMouseMove={onHoverHandler}
             onMouseLeave={onHoverHandler}
           >
+            {isMobile && isPaused && (
+              <Box
+                css={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: '50%',
+                  transform: 'translateY(-40%) translateX(-50%)',
+                  padding: '$4 $14',
+                  display: 'inline-flex',
+                  r: '$0',
+                  bg: '$primary_default',
+                }}
+              >
+                <IconButton onClick={async () => await hlsPlayer?.play()} data-testid="play_btn">
+                  <PlayIcon width="60px" height="60px" />
+                </IconButton>
+              </Box>
+            )}
             <Flex
               ref={controlsRef}
               direction="column"

@@ -2,6 +2,7 @@ import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } fr
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
+  selectHasPeerHandRaised,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerMetadata,
@@ -219,8 +220,8 @@ export const AudioLevel = ({ trackId }) => {
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
-  const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
 
   return (
     <Fragment>

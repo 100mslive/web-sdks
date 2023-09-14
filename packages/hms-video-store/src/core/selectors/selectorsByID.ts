@@ -513,6 +513,11 @@ export const selectPeerMetadata = (peerId: HMSPeerID) =>
     }
   });
 
+export const selectHasPeerHandRaised = (peerId: HMSPeerID) =>
+  createSelector(selectPeerByID(peerId), peer => {
+    return !!peer?.isHandRaised;
+  });
+
 export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);
 
 export const selectPollByID = byIDCurry(selectPollByIDBare);

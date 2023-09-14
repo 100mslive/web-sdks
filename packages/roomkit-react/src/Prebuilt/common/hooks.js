@@ -12,7 +12,6 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
-import { isInternalRole } from './utils';
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -53,7 +52,7 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 };
 
 export const useFilteredRoles = () => {
-  const roles = useHMSStore(selectAvailableRoleNames).filter(role => !isInternalRole(role));
+  const roles = useHMSStore(selectAvailableRoleNames);
   return roles;
 };
 

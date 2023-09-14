@@ -4,6 +4,7 @@ import {
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -123,4 +124,12 @@ export interface ISignal extends IAnalyticsTransportProvider {
   getPollsList(params: PollListParams): Promise<PollListResponse>;
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse>;
+
+  joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  leaveGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  addToGroup(peerId: string, name: string): Promise<void>;
+
+  removeFromGroup(peerId: string, name: string): Promise<void>;
 }
