@@ -5,6 +5,7 @@ import {
   selectIsConnectedToRoom,
   selectPeerCount,
   selectPermissions,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -84,6 +85,8 @@ export const MwebOptions = ({
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
   // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -158,7 +161,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             )}
 
-            {screenType !== 'hls_live_streaming' ? (
+            {screenType !== 'hls_live_streaming' && !noAVPermissions ? (
               <ActionTile.Root
                 active={isHandRaised}
                 onClick={() => {
