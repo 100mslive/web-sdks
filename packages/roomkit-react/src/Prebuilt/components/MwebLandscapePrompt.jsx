@@ -15,8 +15,9 @@ export const MwebLandscapePrompt = () => {
     const handleOrientationChange = e => {
       setShowMwebLandscapePrompt(e.target.type.includes('landscape') && isMobile);
     };
+
     if (window) {
-      setShowMwebLandscapePrompt(screen.orientation.type.includes('landscape') && isMobile);
+      setShowMwebLandscapePrompt(window.screen.orientation.type.includes('landscape') && isMobile);
       window.screen.orientation.addEventListener('change', handleOrientationChange);
     }
     return () => window.screen.orientation.removeEventListener(handleOrientationChange);
