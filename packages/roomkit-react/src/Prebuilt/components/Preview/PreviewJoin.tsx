@@ -194,7 +194,15 @@ const Container = styled('div', {
   px: '$10',
 });
 
-export const PreviewTile = ({ name, error, aspectRatio }: { name: string; error?: boolean; aspectRatio: number }) => {
+export const PreviewTile = ({
+  name,
+  error,
+  aspectRatio,
+}: {
+  name: string;
+  error?: boolean;
+  aspectRatio: number | string;
+}) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
