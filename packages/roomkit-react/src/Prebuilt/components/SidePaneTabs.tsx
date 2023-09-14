@@ -8,10 +8,13 @@ import { Chat } from './Chat/Chat';
 // @ts-ignore: No implicit Any
 import { ParticipantList } from './Footer/ParticipantList';
 import { config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
+import { Tooltip } from '../../Tooltip';
 // @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { getFormattedCount } from '../common/utils';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -22,6 +25,16 @@ const tabTriggerCSS = {
   fontSize: '$sm',
   w: '100%',
   justifyContent: 'center',
+};
+
+const ParticipantCount = ({ count }: { count: number }) => {
+  return count < 1000 ? (
+    <span>({count})</span>
+  ) : (
+    <Tooltip title={count}>
+      <span>({getFormattedCount(count)})</span>
+    </Tooltip>
+  );
 };
 
 export const SidePaneTabs = React.memo<{
@@ -73,7 +86,13 @@ export const SidePaneTabs = React.memo<{
           {hideTabs ? (
             <>
               <Text variant="sm" css={{ fontWeight: '$semiBold', p: '$4', c: '$on_surface_high', pr: '$12' }}>
-                {showChat ? 'Chat' : `Participants (${peerCount})`}
+                {showChat ? (
+                  'Chat'
+                ) : (
+                  <span>
+                    Participants <ParticipantCount count={peerCount} />
+                  </span>
+                )}
               </Text>
 
               {showChat ? <Chat screenType={screenType} /> : <ParticipantList />}
@@ -106,7 +125,7 @@ export const SidePaneTabs = React.memo<{
                     color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
                   }}
                 >
-                  Participants ({peerCount})
+                  Participants <ParticipantCount count={peerCount} />
                 </Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>

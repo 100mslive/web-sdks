@@ -12,6 +12,9 @@ export interface HMSRoom {
   hls: HMSHLS;
   peerCount?: number;
   templateId?: string;
+  description?: string;
+  max_size?: number;
+  large_room_optimization?: boolean;
 }
 
 export interface HMSRecording {

@@ -557,6 +557,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.removeRoleChangeRequest(request);
   }
 
+  async raiseLocalPeerHand() {
+    await this.sdk.raiseLocalPeerHand();
+  }
+  async lowerLocalPeerHand() {
+    await this.sdk.lowerLocalPeerHand();
+  }
+  async raiseRemotePeerHand(peerId: string) {
+    await this.sdk.raiseRemotePeerHand(peerId);
+  }
+  async lowerRemotePeerHand(peerId: string) {
+    await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
   initAppData(appData: Record<string, any>) {
     this.setState(store => {
       store.appData = appData;
@@ -902,6 +915,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    const newNetworkQuality: Record<HMSPeerID, sdkTypes.HMSConnectionQuality> = {};
     let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
@@ -911,6 +925,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
+      newNetworkQuality[hmsPeer.id] = {
+        peerID: hmsPeer.id,
+        downlinkQuality: sdkPeer.networkQuality || -1,
+      };
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (const sdkTrack of sdkTracks) {
@@ -944,6 +962,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
+      Object.assign(draftStore.connectionQualities, newNetworkQuality);
       this.hmsSDKTracks = newHmsSDkTracks;
 
       /**
@@ -1123,26 +1142,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
    */
   protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
     this.setState(store => {
-      const currentPeerIDs = new Set();
       newQualities.forEach(sdkUpdate => {
         const peerID = sdkUpdate.peerID;
         if (!peerID) {
           return;
         }
-        currentPeerIDs.add(peerID);
         if (!store.connectionQualities[peerID]) {
           store.connectionQualities[peerID] = sdkUpdate;
         } else {
           Object.assign(store.connectionQualities[peerID], sdkUpdate);
         }
       });
-      const peerIDsStored = Object.keys(store.connectionQualities);
-      for (const storedPeerID of peerIDsStored) {
-        if (!currentPeerIDs.has(storedPeerID)) {
-          // peer is likely no longer there, it wasn't in the update sent by the server
-          delete store.connectionQualities[storedPeerID];
-        }
-      }
     }, 'connectionQuality');
   }
 
@@ -1444,6 +1454,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, action);
   };
 
+  // eslint-disable-next-line complexity
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
@@ -1453,6 +1464,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     } else if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
       this.syncRoomState(actionName);
       // if peer wasn't available before sync(will happen if event is peer join)
+      if (!peer) {
+        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      }
+    } else if (
+      [
+        sdkTypes.HMSPeerUpdate.HAND_RAISE_CHANGED,
+        sdkTypes.HMSPeerUpdate.PEER_REMOVED,
+        sdkTypes.HMSPeerUpdate.PEER_ADDED,
+      ].includes(type)
+    ) {
+      this.syncRoomState(actionName);
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
       }

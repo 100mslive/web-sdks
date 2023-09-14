@@ -56,8 +56,6 @@ export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
 };
 
-export const isInternalRole = role => role && role.startsWith('__internal');
-
 export const metadataPayloadParser = payload => {
   try {
     const data = window.atob(payload);
