@@ -6,7 +6,7 @@ import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 
 export const MwebLandscapePrompt = () => {
-  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(true);
+  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {
     const handleOrientationChange = e => {
