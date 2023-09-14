@@ -60,7 +60,6 @@ export class BroadcastManager {
         metadata: notifPeer.info.data,
         groups: notifPeer.groups,
       });
-      this.store.addPeer(sender);
     }
     return sender;
   }
