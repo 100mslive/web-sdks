@@ -37,6 +37,7 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -67,6 +68,8 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
+  PROTOCOL_SPEC,
+  PROTOCOL_VERSION,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
@@ -728,6 +731,22 @@ export default class HMSTransport implements ITransport {
     return this.signal.getPollResult(params);
   }
 
+  async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.joinGroup(name);
+  }
+
+  async leaveGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.leaveGroup(name);
+  }
+
+  async addToGroup(peerId: string, name: string) {
+    this.signal.addToGroup(peerId, name);
+  }
+
+  async removeFromGroup(peerId: string, name: string): Promise<void> {
+    this.signal.removeFromGroup(peerId, name);
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }
@@ -1110,6 +1129,9 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent_v2', this.store.getUserAgent());
+    url.searchParams.set('protocol_version', PROTOCOL_VERSION);
+    url.searchParams.set('protocol_spec', PROTOCOL_SPEC);
+
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);

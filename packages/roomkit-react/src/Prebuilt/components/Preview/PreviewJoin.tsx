@@ -105,7 +105,11 @@ const PreviewJoin = ({
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
-
+  const localPeer = useHMSStore(selectLocalPeer);
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  const aspectRatio =
+    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -166,7 +170,7 @@ const PreviewJoin = ({
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-      <Box css={{ w: '100%', maxWidth: '640px' }}>
+      <Box css={{ w: '100%', maxWidth: `${aspectRatio * 360}px` }}>
         <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
         <PreviewForm
           name={name}
@@ -202,12 +206,13 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   const isMobile = useMedia(cssConfig.media.md);
   const aspectRatio =
     videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
+
   return (
     <StyledVideoTile.Container
       css={{
         bg: '$surface_default',
         aspectRatio,
-        height: 'min(640px, 40vh)',
+        height: 'min(360px, 70vh)',
         maxWidth: '640px',
         overflow: 'clip',
         '@md': {

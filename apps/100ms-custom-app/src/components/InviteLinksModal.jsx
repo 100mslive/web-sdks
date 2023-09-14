@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import {
+  CheckCircleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   CrossIcon,
@@ -19,8 +20,10 @@ import {
 const InviteLinksModal = ({ onClose, roomLinks }) => {
   const roles = Object.keys(roomLinks);
   const [selectedRole, setSelectedRole] = useState(roles[0]);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [open, setOpen] = useState(false);
   const ref = useRef();
+
   return (
     <Dialog.Root defaultOpen onOpenChange={value => !value && onClose()}>
       <Dialog.Portal>
@@ -90,12 +93,29 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                   variant="standard"
                   css={{ mt: 'auto' }}
                   onClick={() => {
-                    navigator.clipboard?.writeText(
-                      getRoomUrl(roomLinks[selectedRole])
-                    );
+                    try {
+                      if (!linkCopied) {
+                        navigator.clipboard?.writeText(
+                          getRoomUrl(roomLinks[selectedRole])
+                        );
+                        setLinkCopied(true);
+                        setTimeout(() => setLinkCopied(false), 2000);
+                      }
+                    } catch (e) {
+                      console.log(err);
+                    }
                   }}
                 >
-                  <LinkIcon /> Copy Invite Link
+                  {linkCopied ? (
+                    <>
+                      <CheckCircleIcon />
+                      Link Copied!
+                    </>
+                  ) : (
+                    <>
+                      <LinkIcon /> Copy Invite Link
+                    </>
+                  )}
                 </Button>
               </LeftContainer>
               <RightContainer>
