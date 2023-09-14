@@ -1,6 +1,8 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
+  selectHasPeerHandRaised,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerMetadata,
@@ -15,6 +17,7 @@ import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
+import { config as cssConfig, keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { AudioLevelAnimation } from './AudioLevelAnimation';
@@ -40,6 +43,7 @@ const Tile = ({
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
+  const isMobile = useMedia(cssConfig.media.md);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -135,7 +139,7 @@ const Tile = ({
               <AudioLevel trackId={audioTrack?.id} />
             )
           ) : null}
-          {isMouseHovered || isDragabble ? (
+          {isMouseHovered || (isDragabble && isMobile) ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}
@@ -172,8 +176,8 @@ export const AudioLevel = ({ trackId }) => {
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
-  const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
 
   return (
     <Fragment>

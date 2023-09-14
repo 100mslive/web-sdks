@@ -12,6 +12,7 @@ import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
  * @param newHmsTracks this will be update if required
  * @param newHmsSDkTracks this is future value of local hms tacks map
  */
+// eslint-disable-next-line complexity
 export const mergeNewPeersInDraft = (
   draftPeers: Record<HMSPeerID, HMSPeer>,
   newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
@@ -23,6 +24,9 @@ export const mergeNewPeersInDraft = (
     if (isEntityUpdated(oldPeer, newPeer)) {
       if (areArraysEqual(oldPeer.auxiliaryTracks, newPeer.auxiliaryTracks)) {
         newPeer.auxiliaryTracks = oldPeer.auxiliaryTracks;
+      }
+      if (oldPeer.groups && areArraysEqual(oldPeer.groups, newPeer.groups)) {
+        newPeer.groups = oldPeer.groups;
       }
       Object.assign(oldPeer, newPeer);
     } else if (isEntityRemoved(oldPeer, newPeer)) {

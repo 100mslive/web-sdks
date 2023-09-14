@@ -9,6 +9,7 @@ export const PEER_NOTIFICATION_TYPES: PeerNotificationMap = {
   [sdkTypes.HMSPeerUpdate.ROLE_UPDATED]: HMSNotificationTypes.ROLE_UPDATED,
   [sdkTypes.HMSPeerUpdate.NAME_UPDATED]: HMSNotificationTypes.NAME_UPDATED,
   [sdkTypes.HMSPeerUpdate.METADATA_UPDATED]: HMSNotificationTypes.METADATA_UPDATED,
+  [sdkTypes.HMSPeerUpdate.HAND_RAISE_CHANGED]: HMSNotificationTypes.HAND_RAISE_CHANGED,
 };
 
 type TrackNotificationMap = { [key in sdkTypes.HMSTrackUpdate]: HMSNotificationTypes };

@@ -442,3 +442,7 @@ export const selectPollsMap = (store: HMSStore) => store.polls;
 export const selectPolls = (store: HMSStore) => {
   return Object.values(store.polls);
 };
+
+export const selectHandRaisedPeers = createSelector(selectPeers, peers => {
+  return peers.filter(peer => peer.isHandRaised);
+});

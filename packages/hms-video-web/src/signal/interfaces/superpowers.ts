@@ -80,3 +80,7 @@ export interface HLSVariant {
   meeting_url: string;
   metadata?: string;
 }
+
+export interface getPeerRequestParams {
+  peerId: string;
+}

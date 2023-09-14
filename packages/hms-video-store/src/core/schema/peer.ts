@@ -39,6 +39,8 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
+  groups?: string[];
+  isHandRaised: boolean;
 }
 
 /**
