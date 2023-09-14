@@ -29,6 +29,7 @@ export const DesktopLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
@@ -38,7 +39,7 @@ export const DesktopLeaveRoom = ({
 
   return (
     <Fragment>
-      {screenType !== 'hls_live_streaming' && (permissions?.hlsStreaming || permissions?.endRoom) ? (
+      {showLeaveOptions ? (
         <Flex>
           <LeaveIconButton
             key="LeaveRoom"
@@ -47,9 +48,7 @@ export const DesktopLeaveRoom = ({
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
             }}
-            onClick={() => {
-              leaveRoom({ endstream: false });
-            }}
+            onClick={() => setShowLeaveRoomAlert(true)}
           >
             <Tooltip title="Leave Room">
               <Box>
@@ -92,42 +91,37 @@ export const DesktopLeaveRoom = ({
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
-              {permissions?.endRoom || permissions?.hlsStreaming ? (
-                <Dropdown.Item
-                  css={{
-                    bg: '$alert_error_dim',
-                    color: '$alert_error_bright',
-                    '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+
+              <Dropdown.Item
+                css={{
+                  bg: '$alert_error_dim',
+                  color: '$alert_error_bright',
+                  '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+                }}
+                data-testid="end_room_btn"
+              >
+                <LeaveCard
+                  title={showStream ? 'End Stream' : 'End Session'}
+                  subtitle={`The ${
+                    showStream ? 'stream' : 'session'
+                  } will end for everyone. You can't undo this action.`}
+                  bg=""
+                  titleColor="$alert_error_brighter"
+                  icon={<StopIcon height={24} width={24} />}
+                  onClick={() => {
+                    setOpen(false);
+                    setShowEndStreamAlert(true);
                   }}
-                  data-testid="end_room_btn"
-                >
-                  <LeaveCard
-                    title={showStream ? 'End Stream' : 'End Session'}
-                    subtitle={`The ${
-                      showStream ? 'stream' : 'session'
-                    } will end for everyone. You can't undo this action.`}
-                    bg=""
-                    titleColor="$alert_error_brighter"
-                    icon={<StopIcon height={24} width={24} />}
-                    onClick={() => {
-                      setOpen(false);
-                      setShowEndStreamAlert(true);
-                    }}
-                    css={{ p: 0 }}
-                  />
-                </Dropdown.Item>
-              ) : null}
+                  css={{ p: 0 }}
+                />
+              </Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>
         </Flex>
       ) : (
         <LeaveIconButton
           onClick={() => {
-            if (screenType === 'hls_live_streaming') {
-              setShowLeaveRoomAlert(true);
-            } else {
-              leaveRoom({ endstream: false });
-            }
+            setShowLeaveRoomAlert(true);
           }}
           key="LeaveRoom"
           data-testid="leave_room_btn"
@@ -154,16 +148,14 @@ export const DesktopLeaveRoom = ({
         </Dialog.Portal>
       </Dialog.Root>
 
-      {screenType === 'hls_live_streaming' ? (
-        <Dialog.Root open={showLeaveRoomAlert} modal={false}>
-          <Dialog.Portal>
-            <Dialog.Overlay />
-            <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
-              <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-      ) : null}
+      <Dialog.Root open={showLeaveRoomAlert} modal={false}>
+        <Dialog.Portal>
+          <Dialog.Overlay />
+          <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+            <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </Fragment>
   );
 };
