@@ -170,7 +170,7 @@ const PreviewJoin = ({
           <PreviewTile name={name} error={previewError} />
         </Flex>
       ) : null}
-      <Box css={{ w: '100%', maxWidth: `${aspectRatio * 360}px` }}>
+      <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
         <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
         <PreviewForm
           name={name}
