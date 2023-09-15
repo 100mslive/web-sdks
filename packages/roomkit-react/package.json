@@ -10,7 +10,11 @@
     "prebuilt",
     "roomkit"
   ],
+<<<<<<< HEAD
   "version": "0.1.7-alpha.0",
+=======
+  "version": "0.1.4",
+>>>>>>> 50ff108ed62a148f6d8e3d10f717b32ca60fb400
   "author": "100ms",
   "license": "MIT",
   "files": [
