@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { useSearchParam } from 'react-use';
 import {
   HMSRoomState,
   selectAvailableRoleNames,
+  selectFullAppData,
   selectHLSState,
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -17,16 +17,11 @@ import { normalizeAppPolicyConfig } from '../init/initUtils';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneState, useSidepaneToggle } from './useSidepane';
 import { useSetAppDataByKey } from './useUISettings';
-import { getMetadata } from '../../common/utils';
 import {
   APP_DATA,
   CHAT_SELECTOR,
-  DEFAULT_HLS_ROLE_KEY,
-  DEFAULT_HLS_VIEWER_ROLE,
   DEFAULT_WAITING_VIEWER_ROLE,
-  QUERY_PARAM_VIEW_MODE,
   SIDE_PANE_OPTIONS,
-  UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
@@ -42,7 +37,6 @@ export const getAppDetails = appDetails => {
 const initialAppData = {
   [APP_DATA.uiSettings]: {
     [UI_SETTINGS.isAudioOnly]: false,
-    [UI_SETTINGS.isHeadless]: false,
     [UI_SETTINGS.maxTileCount]: 9,
     [UI_SETTINGS.showStatsOnTiles]: false,
     [UI_SETTINGS.enableAmbientMusic]: false,
@@ -66,11 +60,12 @@ const initialAppData = {
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,
-  [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
+  [APP_DATA.activeScreensharePeerId]: '',
+  [APP_DATA.disableNotificiations]: false,
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
@@ -82,7 +77,7 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  const isDefaultModeActiveSpeaker = useSearchParam(QUERY_PARAM_VIEW_MODE) === UI_MODE_ACTIVE_SPEAKER;
+  const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
     if (!isConnected && sidePane && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
@@ -91,29 +86,30 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   }, [isConnected, sidePane, resetSidePane]);
 
   useEffect(() => {
-    hmsActions.initAppData(initialAppData);
+    hmsActions.initAppData({
+      ...initialAppData,
+      ...appData,
+    });
     hmsActions.setFrameworkInfo({
       type: 'react-web',
       isPrebuilt: true,
       version: React.version,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hmsActions]);
 
   useEffect(() => {
     const uiSettings = preferences || {};
     const updatedSettings = {
       ...uiSettings,
-      [UI_SETTINGS.uiViewMode]: isDefaultModeActiveSpeaker
-        ? UI_MODE_ACTIVE_SPEAKER
-        : uiSettings.uiViewMode || UI_MODE_GRID,
+      [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
-  }, [preferences, isDefaultModeActiveSpeaker, hmsActions]);
+  }, [preferences, hmsActions]);
 
   useEffect(() => {
     const appData = {
       [APP_DATA.tokenEndpoint]: tokenEndpoint,
-      [APP_DATA.hlsViewerRole]: getMetadata(appDetails)[DEFAULT_HLS_ROLE_KEY] || DEFAULT_HLS_VIEWER_ROLE,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     for (const key in appData) {

@@ -24,6 +24,7 @@ export interface HMSInterface {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
+  cancelMidCallPreview(): Promise<void>;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
@@ -89,4 +90,9 @@ export interface HMSInterface {
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
 }

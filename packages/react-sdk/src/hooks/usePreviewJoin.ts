@@ -125,18 +125,17 @@ export const usePreviewJoin = ({
     if (!token) {
       return;
     }
-    if (roomState !== HMSRoomState.Disconnected) {
-      return;
-    }
-    if (isConnected) {
-      await actions.leave();
-    }
     try {
+      if (isConnected || roomState !== HMSRoomState.Disconnected) {
+        await actions.leave().catch(() => {
+          // Do nothing as this might lead to leave called before join
+        });
+      }
       await actions.preview(config);
     } catch (err) {
       handleError(err as Error, 'preview');
     }
-  }, [actions, handleError, token, roomState, config, isConnected]);
+  }, [token, isConnected, roomState, actions, config, handleError]);
 
   const join = useCallback(async () => {
     if (!token) {

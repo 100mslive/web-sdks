@@ -11,6 +11,9 @@ export default class Room implements HMSRoom {
   hls: HMSHLS = { running: false, variants: [] };
   name?: string;
   peerCount?: number;
+  description?: string;
+  max_size?: number;
+  large_room_optimization?: boolean;
 
   constructor(id: string) {
     this.id = id;

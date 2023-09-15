@@ -9,6 +9,7 @@ import {
 import { HMSLocalTrack } from '../media/tracks';
 import {
   GetSessionMetadataResponse,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
@@ -68,4 +69,12 @@ export default interface ITransport {
   changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams): Promise<void>;
 
   handleLocalRoleUpdate({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }): Promise<void>;
+
+  joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  leaveGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  addToGroup(peerId: string, name: string): Promise<void>;
+
+  removeFromGroup(peerId: string, name: string): Promise<void>;
 }

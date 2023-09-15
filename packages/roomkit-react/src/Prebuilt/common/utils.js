@@ -40,7 +40,7 @@ export const arrayIntersection = (a, b) => {
 
 export const getMetadata = metadataString => {
   try {
-    return metadataString === '' ? {} : JSON.parse(metadataString);
+    return !metadataString ? {} : JSON.parse(metadataString);
   } catch (error) {
     return {};
   }
@@ -55,16 +55,6 @@ export const metadataProps = function (peer) {
 export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
 };
-
-export const getRoutePrefix = () => {
-  return window.location.pathname.startsWith('/streaming') ? '/streaming' : '';
-};
-
-export const isStreamingKit = () => {
-  return window.location.pathname.startsWith('/streaming');
-};
-
-export const isInternalRole = role => role && role.startsWith('__internal');
 
 export const metadataPayloadParser = payload => {
   try {

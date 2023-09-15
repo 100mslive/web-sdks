@@ -59,13 +59,21 @@ export interface HMSConfig {
   autoManageWakeLock?: boolean;
 }
 
+export interface HMSMidCallPreviewConfig {
+  /** the role that would be used for preview, note that the role from token would be used to join  */
+  asRole?: string;
+  /**
+   * initial settings for audio/video and device to be used. Please don't pass
+   * this field while joining if you're using preview, the state changes in preview will be remembered
+   * across to join.
+   */
+  settings?: InitialSettings;
+}
+
 /**
  * the config object tells the SDK options you want to preview with(use if you want preview and join with different roles)
  * @link https://docs.100ms.live/javascript/v2/features/preview
  */
-export interface HMSPreviewConfig extends HMSConfig {
-  /** the role that would be used for preview, note that the role from token would be used to join  */
-  asRole?: string;
-}
+export interface HMSPreviewConfig extends HMSConfig, HMSMidCallPreviewConfig {}
 
 export type { InitialSettings as HMSConfigInitialSettings };

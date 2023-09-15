@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectPermissions,
   selectSessionStore,
@@ -24,14 +25,14 @@ import {
 import { Box, Flex } from '../../../Layout';
 import { Slider } from '../../../Slider';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
-import { useIsFeatureEnabled } from '../hooks/useFeatures';
-import { APP_DATA, FEATURE_LIST, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
-const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
+export const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
@@ -63,7 +64,7 @@ const SpotlightActions = ({
         onSpotLightClick();
       }}
     >
-      <StarIcon />
+      <StarIcon height={20} width={20} />
       <span>{isTileSpotlighted ? 'Remove from Spotlight' : 'Spotlight Tile for everyone'}</span>
     </StyledMenuTile.ItemButton>
   );
@@ -84,7 +85,7 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         css={spacingCSS}
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
-        <PinIcon />
+        <PinIcon height={20} width={20} />
         <span>{isTilePinned ? 'Unpin' : 'Pin'} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
@@ -97,7 +98,7 @@ const MinimiseInset = () => {
   return (
     <>
       <StyledMenuTile.ItemButton css={spacingCSS} onClick={() => setMinimised(!minimised)}>
-        <ShrinkIcon />
+        <ShrinkIcon height={20} width={20} />
         <span>{minimised ? 'Show' : 'Minimise'} your video</span>
       </StyledMenuTile.ItemButton>
     </>
@@ -138,11 +139,18 @@ const SimulcastLayers = ({ trackId }) => {
                 textTransform: 'capitalize',
                 mr: '$2',
                 fontWeight: track.preferredLayer === layer.layer ? '$semiBold' : '$regular',
+                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
               }}
             >
               {layer.layer}
             </Text>
-            <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
+            <Text
+              as="span"
+              variant="xs"
+              css={{
+                color: track.preferredLayer === layer.layer ? '$on_primary_high' : '$on_surface_high',
+              }}
+            >
               {layer.resolution.width}x{layer.resolution.height}
             </Text>
           </StyledMenuTile.ItemButton>
@@ -204,7 +212,7 @@ export const TileMenuContent = props => {
     type: REMOTE_STOP_SCREENSHARE_TYPE,
   });
 
-  const isChangeNameEnabled = useIsFeatureEnabled(FEATURE_LIST.CHANGE_NAME);
+  const isMobile = useMedia(cssConfig.media.md);
 
   return isLocal ? (
     (showPinAction || canMinimise) && (
@@ -212,19 +220,17 @@ export const TileMenuContent = props => {
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         {canMinimise && <MinimiseInset />}
-        {isChangeNameEnabled ? (
-          <StyledMenuTile.ItemButton
-            onClick={() => {
-              openNameChangeModal();
-              closeSheetOnClick();
-            }}
-          >
-            <PencilIcon />
-            <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
-              Change Name
-            </Text>
-          </StyledMenuTile.ItemButton>
-        ) : null}
+        <StyledMenuTile.ItemButton
+          onClick={() => {
+            openNameChangeModal();
+            closeSheetOnClick();
+          }}
+        >
+          <PencilIcon height={20} width={20} />
+          <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+            Change Name
+          </Text>
+        </StyledMenuTile.ItemButton>
       </>
     )
   ) : (
@@ -238,7 +244,7 @@ export const TileMenuContent = props => {
           }}
           data-testid={isVideoEnabled ? 'mute_video_participant_btn' : 'unmute_video_participant_btn'}
         >
-          {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
+          {isVideoEnabled ? <VideoOnIcon height={20} width={20} /> : <VideoOffIcon height={20} width={20} />}
           <span>{isVideoEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
@@ -252,7 +258,7 @@ export const TileMenuContent = props => {
           }}
           data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
-          {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
+          {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
           <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
         </StyledMenuTile.ItemButton>
       ) : null}
@@ -260,7 +266,7 @@ export const TileMenuContent = props => {
       {audioTrackID ? (
         <StyledMenuTile.VolumeItem data-testid="participant_volume_slider" css={{ ...spacingCSS, mb: '$0' }}>
           <Flex align="center" gap={1}>
-            <SpeakerIcon />
+            <SpeakerIcon height={20} width={20} />
             <Box as="span" css={{ ml: '$4' }}>
               Volume ({volume})
             </Box>
@@ -276,7 +282,7 @@ export const TileMenuContent = props => {
         </>
       )}
 
-      <SimulcastLayers trackId={videoTrackID} />
+      {isMobile ? null : <SimulcastLayers trackId={videoTrackID} />}
 
       {removeOthers ? (
         <StyledMenuTile.RemoveItem
@@ -291,7 +297,7 @@ export const TileMenuContent = props => {
           }}
           data-testid="remove_participant_btn"
         >
-          <RemoveUserIcon />
+          <RemoveUserIcon height={20} width={20} />
           <span>Remove Participant</span>
         </StyledMenuTile.RemoveItem>
       ) : null}
@@ -304,7 +310,7 @@ export const TileMenuContent = props => {
           }}
           css={spacingCSS}
         >
-          <ShareScreenIcon />
+          <ShareScreenIcon height={20} width={20} />
           <span>Stop Screenshare</span>
         </StyledMenuTile.RemoveItem>
       ) : null}

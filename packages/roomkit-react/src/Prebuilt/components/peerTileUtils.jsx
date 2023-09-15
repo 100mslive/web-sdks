@@ -22,6 +22,6 @@ export const getVideoTileLabel = ({ peerName, isLocal, track }) => {
   } else {
     label = `${peerName} ${track.source}`;
   }
-  label = `${label}${track.degraded ? '(Degraded)' : ''}`;
+  // label = `${label}${track.degraded ? '(Degraded)' : ''}`;
   return `${label}${isLocallyMuted ? ' (Muted for you)' : ''}`;
 };

@@ -1,46 +1,56 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
-import { useDebounce, useMeasure } from 'react-use';
-import { FixedSizeList } from 'react-window';
+import { useDebounce, useMedia } from 'react-use';
 import {
-  selectAudioTrackByPeerID,
+  selectHandRaisedPeers,
+  selectHasPeerHandRaised,
+  selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
   selectPermissions,
   useHMSActions,
   useHMSStore,
-  useParticipants,
 } from '@100mslive/react-sdk';
 import {
   ChangeRoleIcon,
-  CrossIcon,
-  HandRaiseIcon,
+  HandIcon,
+  MicOffIcon,
   PeopleIcon,
-  RemoveUserIcon,
+  PeopleRemoveIcon,
   SearchIcon,
-  SpeakerIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Avatar, Box, Dropdown, Flex, Input, Slider, Text, textEllipsis } from '../../..';
+import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
-import { ParticipantFilter } from '../Header/ParticipantFilter';
-import { RoleChangeModal } from '../RoleChangeModal';
+import { ToastManager } from '../Toast/ToastManager';
+import { RoleAccordion } from './RoleAccordion';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { isInternalRole } from '../../common/utils';
+import { useParticipants } from '../../common/hooks';
+import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
   const [filter, setFilter] = useState();
-  const { participants, isConnected, peerCount, rolesWithParticipants } = useParticipants(filter);
-  const [selectedPeerId, setSelectedPeerId] = useState(null);
-  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const { participants, isConnected, peerCount } = useParticipants(filter);
+  const peersOrderedByRoles = {};
+
+  const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
+
+  participants.forEach(participant => {
+    if (peersOrderedByRoles[participant.roleName] === undefined) {
+      peersOrderedByRoles[participant.roleName] = [];
+    }
+    peersOrderedByRoles[participant.roleName].push(participant);
+  });
+
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
       if (!filterValue) {
         filterValue = {};
       }
-      filterValue.search = value;
+      filterValue.search = value.toLowerCase();
       return { ...filterValue };
     });
   }, []);
@@ -50,39 +60,20 @@ export const ParticipantList = () => {
 
   return (
     <Fragment>
-      <Flex direction="column" css={{ size: '100%' }}>
-        <Flex align="center" css={{ w: '100%', mb: '$10' }}>
-          <Text css={{ fontWeight: '$semiBold', mr: '$4' }}>Participants</Text>
-          <ParticipantFilter
-            selection={filter}
-            onSelection={setFilter}
-            isConnected={isConnected}
-            roles={rolesWithParticipants}
-          />
-          <IconButton onClick={toggleSidepane} css={{ w: '$11', h: '$11', ml: 'auto' }}>
-            <CrossIcon />
-          </IconButton>
-        </Flex>
-        {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} />}
-        {participants.length === 0 && (
+      <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
+        {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
+        {participants.length === 0 ? (
           <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
             <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
           </Flex>
-        )}
+        ) : null}
         <VirtualizedParticipants
-          participants={participants}
+          peersOrderedByRoles={peersOrderedByRoles}
+          handRaisedList={handRaisedPeers}
           isConnected={isConnected}
-          setSelectedPeerId={setSelectedPeerId}
+          filter={filter}
         />
       </Flex>
-      {selectedPeerId && (
-        <RoleChangeModal
-          peerId={selectedPeerId}
-          onOpenChange={value => {
-            !value && setSelectedPeerId(null);
-          }}
-        />
-      )}
     </Fragment>
   );
 };
@@ -117,148 +108,191 @@ export const ParticipantCount = () => {
     >
       <PeopleIcon />
       <Text variant="sm" css={{ mx: '$4', c: 'inherit' }}>
-        {peerCount}
+        {getFormattedCount(peerCount)}
       </Text>
     </IconButton>
   );
 };
 
-function itemKey(index, data) {
-  return data.participants[index].id;
-}
-
-const VirtualizedParticipants = ({ participants, isConnected, setSelectedPeerId }) => {
-  const [ref, { width, height }] = useMeasure();
+const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter, handRaisedList = [] }) => {
   return (
-    <Box
-      ref={ref}
+    <Flex
+      direction="column"
       css={{
-        flex: '1 1 0',
+        gap: '$8',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        pr: '$10',
         mr: '-$10',
+        flex: '1 1 0',
       }}
     >
-      <FixedSizeList
-        itemSize={68}
-        itemData={{ participants, isConnected, setSelectedPeerId }}
-        itemKey={itemKey}
-        itemCount={participants.length}
-        width={width}
-        height={height}
-      >
-        {VirtualisedParticipantListItem}
-      </FixedSizeList>
-    </Box>
+      <RoleAccordion
+        peerList={handRaisedList}
+        roleName="Hand Raised"
+        filter={filter}
+        isConnected={isConnected}
+        isHandRaisedAccordion
+      />
+      {Object.keys(peersOrderedByRoles).map(role => (
+        <RoleAccordion
+          key={role}
+          peerList={peersOrderedByRoles[role]}
+          roleName={role}
+          isConnected={isConnected}
+          filter={filter}
+        />
+      ))}
+    </Flex>
   );
 };
 
-const VirtualisedParticipantListItem = React.memo(({ style, index, data }) => {
+export const Participant = ({ peer, isConnected }) => {
+  const localPeerId = useHMSStore(selectLocalPeerID);
   return (
-    <div style={style} key={data.participants[index].id}>
-      <Participant
-        peer={data.participants[index]}
-        isConnected={data.isConnected}
-        setSelectedPeerId={data.setSelectedPeerId}
-      />
-    </div>
-  );
-});
-
-const Participant = ({ peer, isConnected, setSelectedPeerId }) => {
-  return (
-    <Fragment>
-      <Flex
-        key={peer.id}
-        css={{ w: '100%', py: '$4', pr: '$10' }}
-        align="center"
-        data-testid={'participant_' + peer.name}
-      >
-        <Avatar
-          name={peer.name}
-          css={{
-            position: 'unset',
-            transform: 'unset',
-            mr: '$8',
-            fontSize: '$sm',
-            size: '$12',
-            p: '$4',
-          }}
-        />
-        <Flex direction="column" css={{ flex: '1 1 0' }}>
-          <Text variant="md" css={{ ...textEllipsis(150), fontWeight: '$semiBold' }}>
-            {peer.name}
-          </Text>
-          <Text variant="sub2">{peer.roleName}</Text>
-        </Flex>
-        {isConnected && (
-          <ParticipantActions
-            peerId={peer.id}
-            role={peer.roleName}
-            onSettings={() => {
-              setSelectedPeerId(peer.id);
-            }}
-          />
-        )}
-      </Flex>
-    </Fragment>
+    <Flex
+      key={peer.id}
+      css={{
+        w: '100%',
+        p: '$4 $8',
+        pr: '$6',
+        h: '$16',
+        '&:hover .participant_item': { display: 'flex' },
+      }}
+      align="center"
+      justify="between"
+      data-testid={'participant_' + peer.name}
+    >
+      <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
+        {peer.name} {localPeerId === peer.id ? '(You)' : ''}
+      </Text>
+      {isConnected ? (
+        <ParticipantActions peerId={peer.id} isLocal={peer.id === localPeerId} role={peer.roleName} />
+      ) : null}
+    </Flex>
   );
 };
 
 /**
  * shows settings to change for a participant like changing their role
  */
-const ParticipantActions = React.memo(({ onSettings, peerId, role }) => {
-  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const localPeerId = useHMSStore(selectLocalPeerID);
-  const canChangeVolume = peerId !== localPeerId && audioTrack;
-  const shouldShowMoreActions = canChangeRole || canChangeVolume;
+  const shouldShowMoreActions = canChangeRole;
+  const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
-    <Flex align="center" css={{ flexShrink: 0 }}>
+    <Flex
+      align="center"
+      css={{
+        flexShrink: 0,
+        gap: '$8',
+      }}
+    >
       <ConnectionIndicator peerId={peerId} />
-      {isHandRaised && <HandRaiseIcon />}
-      {shouldShowMoreActions && !isInternalRole(role) && (
-        <ParticipantMoreActions onRoleChange={onSettings} peerId={peerId} role={role} />
+      {isHandRaised && (
+        <Flex
+          align="center"
+          justify="center"
+          css={{ p: '$1', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+        >
+          <HandIcon height={19} width={19} />
+        </Flex>
       )}
+      {isAudioMuted ? (
+        <Flex
+          align="center"
+          justify="center"
+          css={{ p: '$2', c: '$on_surface_high', bg: '$surface_bright', borderRadius: '$round' }}
+        >
+          <MicOffIcon height={19} width={19} />
+        </Flex>
+      ) : null}
+
+      {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
+const ParticipantMoreActions = ({ peerId, role }) => {
+  const hmsActions = useHMSActions();
   const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const {
+    bring_to_stage_label,
+    remove_from_stage_label,
+    on_stage_role,
+    off_stage_roles = [],
+  } = elements.on_stage_exp || {};
+  const isInStage = role === on_stage_role;
+  const shouldShowStageRoleChange =
+    canChangeRole &&
+    ((isInStage && remove_from_stage_label) || (off_stage_roles?.includes(role) && bring_to_stage_label));
+  const prevRole = useHMSStore(selectPeerMetadata(peerId))?.prevRole;
   const localPeerId = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerId === peerId;
-  const actions = useHMSActions();
   const [open, setOpen] = useState(false);
+
+  const handleStageAction = async () => {
+    if (isInStage) {
+      prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
+    } else {
+      await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
+    }
+    setOpen(false);
+  };
+
   return (
     <Dropdown.Root open={open} onOpenChange={value => setOpen(value)} modal={false}>
-      <Dropdown.Trigger asChild data-testid="participant_more_actions" css={{ p: '$2', r: '$0' }} tabIndex={0}>
-        <Text>
+      <Dropdown.Trigger
+        asChild
+        data-testid="participant_more_actions"
+        className="participant_item"
+        css={{
+          p: '$1',
+          r: '$0',
+          c: '$on_surface_high',
+          display: open ? 'flex' : 'none',
+          '&:hover': {
+            bg: '$surface_bright',
+          },
+          '@md': {
+            display: 'flex',
+          },
+        }}
+        tabIndex={0}
+      >
+        <Box css={{ my: 'auto' }}>
           <VerticalMenuIcon />
-        </Text>
+        </Box>
       </Dropdown.Trigger>
       <Dropdown.Portal>
-        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64' }}>
-          {canChangeRole && (
-            <Dropdown.Item onClick={() => onRoleChange(peerId)}>
+        <Dropdown.Content align="end" sideOffset={8} css={{ w: '$64', bg: '$surface_default' }}>
+          {shouldShowStageRoleChange ? (
+            <Dropdown.Item css={{ bg: '$surface_default' }} onClick={() => handleStageAction()}>
               <ChangeRoleIcon />
-              <Text css={{ ml: '$4' }}>Change Role</Text>
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold', c: '$on_surface_high' }}>
+                {isInStage ? remove_from_stage_label : bring_to_stage_label}
+              </Text>
             </Dropdown.Item>
-          )}
-          <ParticipantVolume peerId={peerId} />
+          ) : null}
+
           {!isLocal && canRemoveOthers && (
             <Dropdown.Item
+              css={{ color: '$alert_error_default', bg: '$surface_default' }}
               onClick={async () => {
                 try {
-                  await actions.removePeer(peerId, '');
+                  await hmsActions.removePeer(peerId, '');
                 } catch (error) {
-                  // TODO: Toast here
+                  ToastManager.addToast({ title: error.message, variant: 'error' });
                 }
               }}
             >
-              <RemoveUserIcon />
-              <Text css={{ ml: '$4', color: '$alert_error_default' }}>Remove Participant</Text>
+              <PeopleRemoveIcon />
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                Remove Participant
+              </Text>
             </Dropdown.Item>
           )}
         </Dropdown.Content>
@@ -267,37 +301,10 @@ const ParticipantMoreActions = ({ onRoleChange, peerId }) => {
   );
 };
 
-const ParticipantVolume = ({ peerId }) => {
-  const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
-  const localPeerId = useHMSStore(selectLocalPeerID);
-  const hmsActions = useHMSActions();
-  // No volume control for local peer or non audio publishing role
-  if (peerId === localPeerId || !audioTrack) {
-    return null;
-  }
-
-  return (
-    <Dropdown.Item css={{ h: 'auto' }}>
-      <Flex direction="column" css={{ w: '100%' }}>
-        <Flex align="center">
-          <SpeakerIcon />
-          <Text css={{ ml: '$4' }}>Volume{audioTrack.volume ? `(${audioTrack.volume})` : ''}</Text>
-        </Flex>
-        <Slider
-          css={{ my: '0.5rem' }}
-          step={5}
-          value={[audioTrack.volume]}
-          onValueChange={e => {
-            hmsActions.setVolume(e[0], audioTrack?.id);
-          }}
-        />
-      </Flex>
-    </Dropdown.Item>
-  );
-};
-
-export const ParticipantSearch = ({ onSearch, placeholder }) => {
+export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false }) => {
   const [value, setValue] = React.useState('');
+  const isMobile = useMedia(cssConfig.media.md);
+
   useDebounce(
     () => {
       onSearch(value);
@@ -306,22 +313,21 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
     [value, onSearch],
   );
   return (
-    <Box css={{ p: '$4 0', my: '$8', position: 'relative' }}>
-      <Box
-        css={{
-          position: 'absolute',
-          left: '$4',
-          top: '$2',
-          transform: 'translateY(50%)',
-          color: '$on_surface_medium',
-        }}
-      >
-        <SearchIcon />
-      </Box>
+    <Flex
+      align="center"
+      css={{
+        p: isMobile ? '0' : '$2 0',
+        mb: '$2',
+        position: 'relative',
+        color: '$on_surface_medium',
+        mt: inSidePane ? '$4' : '',
+      }}
+    >
+      <SearchIcon style={{ position: 'absolute', left: isMobile ? '1.25rem' : '0.5rem' }} />
       <Input
         type="text"
-        placeholder={placeholder || 'Search among participants'}
-        css={{ w: '100%', pl: '$14', bg: '$surface_bright' }}
+        placeholder={placeholder || 'Search for participants'}
+        css={{ w: '100%', p: '$6', pl: '$14', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();
@@ -332,6 +338,6 @@ export const ParticipantSearch = ({ onSearch, placeholder }) => {
         autoComplete="off"
         aria-autocomplete="none"
       />
-    </Box>
+    </Flex>
   );
 };

@@ -1,52 +1,60 @@
-import { useCallback, useState } from 'react';
-import { selectLocalPeerID, selectPeerMetadata, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { useCallback } from 'react';
+import {
+  selectHasPeerHandRaised,
+  selectLocalPeerID,
+  selectPeerMetadata,
+  useHMSActions,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 
 export const useMyMetadata = () => {
   const hmsActions = useHMSActions();
   const localPeerId = useHMSStore(selectLocalPeerID);
+  const vanillaStore = useHMSVanillaStore();
   const metaData = useHMSStore(selectPeerMetadata(localPeerId));
-  const [isHandRaised, setHandRaised] = useState(metaData?.isHandRaised || false);
-  const [isBRBOn, setBRBOn] = useState(metaData?.isBRBOn || false); // BRB = be right back
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(localPeerId));
 
   const update = async updatedFields => {
     try {
-      await hmsActions.changeMetadata(Object.assign(metaData, updatedFields));
+      // get current state from store and merge updated fields
+      const currentMetadata = vanillaStore.getState(selectPeerMetadata(localPeerId));
+      await hmsActions.changeMetadata(Object.assign(currentMetadata, updatedFields));
       return true;
     } catch (error) {
-      console.error('failed to update metadata ', metaData, updatedFields);
+      console.error('failed to update metadata ', updatedFields);
     }
   };
 
   const toggleHandRaise = useCallback(async () => {
-    const brbUpdate = !isHandRaised ? false : isBRBOn;
-    const success = await update({
-      isHandRaised: !isHandRaised,
-      isBRBOn: brbUpdate,
-    });
-    if (success) {
-      setBRBOn(brbUpdate);
-      setHandRaised(!isHandRaised);
+    if (isHandRaised) {
+      await hmsActions.lowerLocalPeerHand();
+    } else {
+      await hmsActions.raiseLocalPeerHand();
     }
-  }, [isHandRaised, isBRBOn]); //eslint-disable-line
+  }, [isHandRaised]); //eslint-disable-line
 
   const toggleBRB = useCallback(async () => {
-    const handRaiseUpdate = !isBRBOn ? false : isHandRaised;
-    const success = await update({
-      isHandRaised: handRaiseUpdate,
-      isBRBOn: !isBRBOn,
-    });
-    if (success) {
-      setBRBOn(!isBRBOn);
-      setHandRaised(handRaiseUpdate);
+    const newValue = !metaData?.isBRBOn;
+    await update({ isBRBOn: !metaData?.isBRBOn });
+    if (newValue) {
+      await hmsActions.lowerLocalPeerHand();
     }
-  }, [isHandRaised, isBRBOn]); //eslint-disable-line
+  }, [metaData?.isBRBOn]); //eslint-disable-line
+
+  const setPrevRole = async role => {
+    await update({
+      prevRole: role,
+    });
+  };
 
   return {
     isHandRaised,
-    isBRBOn,
+    isBRBOn: !!metaData?.isBRBOn,
     metaData,
     updateMetaData: update,
     toggleHandRaise,
     toggleBRB,
+    setPrevRole,
   };
 };

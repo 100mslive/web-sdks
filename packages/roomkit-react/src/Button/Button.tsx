@@ -139,20 +139,20 @@ const StyledButton = styled('button', {
   variants: {
     variant: {
       standard: getButtonVariants(
-        '$secondary_default',
-        '$secondary_bright',
-        '$secondary_dim',
-        '$secondary_disabled',
-        '$on_secondary_high',
-        '$on_secondary_low',
+        '$surface_brighter',
+        '$surface_bright',
+        '$surface_default',
+        '$surface_dim',
+        '$on_surface_high',
+        '$on_surface_low',
       ),
       danger: getButtonVariants(
         '$alert_error_default',
         '$alert_error_bright',
         '$alert_error_dim',
         '$alert_error_dim',
-        '$on_surface_high',
-        '$on_surface_low',
+        '$alert_error_brighter',
+        '$on_primary_low',
       ),
       primary: getButtonVariants(
         '$primary_default',

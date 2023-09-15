@@ -43,7 +43,7 @@ import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
-import { HMSAudioListener, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
+import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -63,6 +63,7 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
+import { HAND_RAISE_GROUP_NAME } from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
@@ -320,6 +321,10 @@ export class HMSSdk implements HMSInterface {
       );
     }
 
+    if ([TransportState.Joined, TransportState.Reconnecting].includes(this.transportState)) {
+      return this.midCallPreview(config.asRole, config.settings);
+    }
+
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
 
@@ -388,6 +393,43 @@ export class HMSSdk implements HMSInterface {
         })
         .catch(errorHandler);
     });
+  }
+
+  private async midCallPreview(asRole?: string, settings?: InitialSettings): Promise<void> {
+    if (!this.localPeer || this.transportState !== TransportState.Joined) {
+      throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'Not connected - midCallPreview');
+    }
+
+    const newRole = asRole && this.store.getPolicyForRole(asRole);
+    if (!newRole) {
+      throw ErrorFactory.GenericErrors.InvalidRole(HMSAction.PREVIEW, `role ${asRole} does not exist in policy`);
+    }
+    this.localPeer.asRole = newRole;
+
+    const tracks = await this.localTrackManager.getTracksToPublish(settings);
+    tracks.forEach(track => this.setLocalPeerTrack(track));
+    this.localPeer?.audioTrack && this.initPreviewTrackAudioLevelMonitor();
+    await this.initDeviceManagers();
+
+    this.listener?.onPreview(this.store.getRoom()!, tracks);
+  }
+
+  async cancelMidCallPreview() {
+    if (!this.localPeer || !this.localPeer.isInPreview()) {
+      HMSLogger.w(this.TAG, 'Cannot cancel mid call preview as preview is not in progress');
+    }
+
+    if (this.localPeer?.asRole && this.localPeer.role) {
+      const oldRole = this.localPeer.asRole;
+      const newRole = this.localPeer.role;
+      delete this.localPeer.asRole;
+      await this.roleChangeManager?.diffRolesAndPublishTracks({
+        oldRole,
+        newRole,
+      });
+
+      this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, this.localPeer);
+    }
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
@@ -918,6 +960,21 @@ export class HMSSdk implements HMSInterface {
       source,
       roles: roles?.map(role => role?.name),
     });
+  }
+
+  async raiseLocalPeerHand() {
+    this.validateJoined('raiseLocalPeerHand');
+    await this.transport.joinGroup(HAND_RAISE_GROUP_NAME);
+  }
+  async lowerLocalPeerHand() {
+    this.validateJoined('lowerLocalPeerHand');
+    await this.transport.leaveGroup(HAND_RAISE_GROUP_NAME);
+  }
+  async raiseRemotePeerHand(peerId: string) {
+    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+  }
+  async lowerRemotePeerHand(peerId: string) {
+    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {

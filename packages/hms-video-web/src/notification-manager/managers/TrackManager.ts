@@ -1,7 +1,8 @@
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
-import { HMSPeer, HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
+import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
@@ -85,7 +86,7 @@ export class TrackManager {
   /**
    * Sets the track of corresponding peer to null and returns the peer
    */
-  handleTrackRemove(track: HMSRemoteTrack) {
+  handleTrackRemove(track: HMSRemoteTrack, remove = true) {
     HMSLogger.d(this.TAG, `ONTRACKREMOVE`, `${track}`);
 
     const trackStateEntry = this.store.getTrackState(track.trackId);
@@ -100,8 +101,19 @@ export class TrackManager {
       return;
     }
 
-    // emit this event here as peer will already be removed(if left the room) by the time this event is received
-    track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+    // remove tracks only when onDemandTracks flag is false
+    if (remove) {
+      this.store.removeTrack(track);
+      const hmsPeer = this.store.getPeerById(trackStateEntry.peerId);
+      if (!hmsPeer) {
+        return;
+      }
+      this.removePeerTracks(hmsPeer, track);
+      this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_REMOVED, track, hmsPeer);
+
+      // emit this event here as peer will already be removed(if left the room) by the time this event is received
+      track.type === HMSTrackType.AUDIO && this.eventBus.audioTrackRemoved.publish(track as HMSRemoteAudioTrack);
+    }
   }
 
   handleTrackLayerUpdate = (params: OnTrackLayerUpdateNotification) => {
@@ -123,11 +135,25 @@ export class TrackManager {
     }
   };
 
+  // eslint-disable-next-line complexity
   handleTrackUpdate = (params: TrackStateNotification, callListener = true) => {
-    const hmsPeer = this.store.getPeerById(params.peer.peer_id);
-    if (!hmsPeer) {
+    let hmsPeer = this.store.getPeerById(params.peer.peer_id);
+    const notifPeer = params.peer;
+    if (!hmsPeer && !notifPeer) {
       HMSLogger.d(this.TAG, 'Track Update ignored - Peer not added to store');
       return;
+    }
+    if (!hmsPeer) {
+      hmsPeer = new HMSPeer({
+        peerId: notifPeer.peer_id,
+        name: notifPeer.info.name,
+        isLocal: false,
+        role: this.store.getPolicyForRole(notifPeer.role),
+        customerUserId: notifPeer.info.user_id,
+        metadata: notifPeer.info.data,
+        groups: notifPeer.groups,
+      });
+      this.store.addPeer(hmsPeer);
     }
 
     for (const trackId in params.tracks) {
