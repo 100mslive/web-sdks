@@ -41,11 +41,7 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-<<<<<<< HEAD
     "@100mslive/hms-video": "0.9.16-alpha.0",
-=======
-    "@100mslive/hms-video": "0.9.13",
->>>>>>> 50ff108ed62a148f6d8e3d10f717b32ca60fb400
     "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
