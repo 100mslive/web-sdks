@@ -167,7 +167,7 @@ const Tile = ({
   );
 };
 
-const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
+const metaStyles = { top: '$4', left: '$4', width: '$13', height: '$13' };
 
 const heightAnimation = value =>
   keyframes({
