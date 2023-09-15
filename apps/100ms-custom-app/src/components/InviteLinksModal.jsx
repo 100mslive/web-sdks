@@ -101,8 +101,8 @@ const InviteLinksModal = ({ onClose, roomLinks }) => {
                         setLinkCopied(true);
                         setTimeout(() => setLinkCopied(false), 2000);
                       }
-                    } catch (err) {
-                      console.log(err);
+                    } catch (e) {
+                      console.log(e);
                     }
                   }}
                 >
