@@ -29,6 +29,7 @@ export const DesktopLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const endSessionOrStreamAllowed = (permissions?.hlsStreaming && showStream) || permissions?.endRoom;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
@@ -38,7 +39,7 @@ export const DesktopLeaveRoom = ({
 
   return (
     <Fragment>
-      {screenType !== 'hls_live_streaming' && (permissions?.hlsStreaming || permissions?.endRoom) ? (
+      {screenType !== 'hls_live_streaming' && endSessionOrStreamAllowed ? (
         <Flex>
           <LeaveIconButton
             key="LeaveRoom"
@@ -92,7 +93,7 @@ export const DesktopLeaveRoom = ({
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
-              {permissions?.endRoom || permissions?.hlsStreaming ? (
+              {endSessionOrStreamAllowed ? (
                 <Dropdown.Item
                   css={{
                     bg: '$alert_error_dim',
@@ -147,7 +148,7 @@ export const DesktopLeaveRoom = ({
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
               leaveRoom={isStreamingOn ? leaveRoom : endRoom}
-              isStreamingOn={isStreamingOn}
+              showStream={showStream}
               isModal
             />
           </Dialog.Content>

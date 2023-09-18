@@ -8,12 +8,12 @@ export const EndSessionContent = ({
   setShowEndStreamAlert,
   leaveRoom,
   isModal = false,
-  isStreamingOn = false,
+  showStream = false,
 }: {
   setShowEndStreamAlert: (value: boolean) => void;
   leaveRoom: (args: { endstream: boolean }) => void;
   isModal?: boolean;
-  isStreamingOn: boolean;
+  showStream: boolean;
 }) => {
   return (
     <Box>
@@ -26,7 +26,7 @@ export const EndSessionContent = ({
       >
         <AlertTriangleIcon style={{ marginRight: '0.5rem' }} />
         <Text variant="lg" css={{ color: 'inherit', fontWeight: '$semiBold' }}>
-          End {isStreamingOn ? 'Stream' : 'Session'}
+          End {showStream ? 'Stream' : 'Session'}
         </Text>
         {isModal ? null : (
           <Box css={{ color: '$on_surface_high', ml: 'auto' }} onClick={() => setShowEndStreamAlert(false)}>
@@ -35,7 +35,7 @@ export const EndSessionContent = ({
         )}
       </Flex>
       <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
-        The {isStreamingOn ? 'stream' : 'session'} will end for everyone. You can't undo this action.
+        The {showStream ? 'stream' : 'session'} will end for everyone. You can't undo this action.
       </Text>
       <Flex align="center" justify="between" css={{ w: '100%', gap: '$8' }}>
         <Button
@@ -56,7 +56,7 @@ export const EndSessionContent = ({
           id="stopStream"
           data-testid="stop_stream_btn"
         >
-          End {isStreamingOn ? 'Stream' : 'Session'}
+          End {showStream ? 'Stream' : 'Session'}
         </Button>
       </Flex>
     </Box>

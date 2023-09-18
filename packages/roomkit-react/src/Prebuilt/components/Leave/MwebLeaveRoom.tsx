@@ -30,6 +30,7 @@ export const MwebLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const endSessionOrStreamAllowed = (permissions?.hlsStreaming && showStream) || permissions?.endRoom;
 
   useDropdownList({ open, name: 'LeaveRoom' });
 
@@ -70,7 +71,7 @@ export const MwebLeaveRoom = ({
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
 
-            {permissions?.endRoom || permissions?.hlsStreaming ? (
+            {endSessionOrStreamAllowed ? (
               <LeaveCard
                 title={showStream ? 'End Stream' : 'End Session'}
                 subtitle={`The will end the ${
@@ -111,8 +112,8 @@ export const MwebLeaveRoom = ({
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
-            leaveRoom={isStreamingOn ? leaveRoom : endRoom}
-            isStreamingOn={isStreamingOn}
+            leaveRoom={showStream ? leaveRoom : endRoom}
+            showStream={showStream}
           />
         </Sheet.Content>
       </Sheet.Root>
