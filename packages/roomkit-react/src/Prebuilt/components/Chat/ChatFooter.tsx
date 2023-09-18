@@ -151,7 +151,6 @@ export const ChatFooter = ({
               c: '$on_surface_high',
               '&:valid ~ .send-msg': { color: '$on_surface_high' },
               '& ~ .send-msg': { color: '$on_surface_low' },
-              '&::placeholder': { color: '$on_surface_medium' },
             }}
             placeholder="Send a message...."
             ref={inputRef}
