@@ -19,7 +19,7 @@ export const Input = styled('input', {
     boxShadow: '0 0 0 1px $colors$primary_default',
     border: '1px solid transparent',
   },
-  '&:placeholder': {
+  '&::placeholder': {
     color: '$on_surface_medium',
   },
   variants: {
