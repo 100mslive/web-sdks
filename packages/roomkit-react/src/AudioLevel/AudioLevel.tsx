@@ -38,7 +38,6 @@ const AudioBar = () => {
         '-webkit-mask-repeat': 'no-repeat',
         backgroundColor: '$on_primary_high',
         maskSize: '4em 1em',
-        maskPosition: '0 0.1em',
       }}
     />
   );
