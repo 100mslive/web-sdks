@@ -46,7 +46,7 @@ const AudioBar = () => {
   );
 };
 
-export const AudioLevel = ({ trackId }: { trackId?: string }) => {
+export const AudioLevel = ({ trackId, size }: { trackId?: string; size?: 'small' | 'medium' }) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const vanillaStore = useHMSVanillaStore();
 
@@ -68,7 +68,13 @@ export const AudioLevel = ({ trackId }: { trackId?: string }) => {
     return unsubscribe;
   }, [vanillaStore, trackId]);
   return (
-    <Flex ref={ref} css={{ fontSize: '1rem', gap: '$2' }}>
+    <Flex
+      ref={ref}
+      css={{
+        fontSize: size === 'small' ? '0.75rem' : '1rem',
+        gap: size === 'small' ? '$1' : '$2',
+      }}
+    >
       <AudioBar />
       <AudioBar />
       <AudioBar />

@@ -147,7 +147,7 @@ const Tile = ({
               </StyledVideoTile.AudioIndicator>
             ) : (
               <StyledVideoTile.AudioIndicator size={attribBoxSize}>
-                <AudioLevel trackId={audioTrack?.id} />
+                <AudioLevel trackId={audioTrack?.id} size={attribBoxSize} />
               </StyledVideoTile.AudioIndicator>
             )
           ) : null}
