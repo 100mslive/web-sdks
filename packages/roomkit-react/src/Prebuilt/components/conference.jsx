@@ -18,7 +18,7 @@ import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
-import { RoleChangeRequestModal } from './RoleChangeRequestModal';
+import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
