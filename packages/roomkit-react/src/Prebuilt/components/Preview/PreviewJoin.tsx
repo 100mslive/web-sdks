@@ -257,7 +257,7 @@ export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => 
 
   return (
     <Flex
-      justify="between"
+      justify={hideSettings && isMobile ? 'center' : 'between'}
       css={{
         width: '100%',
         mt: '$8',
