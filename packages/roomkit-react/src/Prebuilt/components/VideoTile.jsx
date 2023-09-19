@@ -23,7 +23,6 @@ import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
-import { getAttributeBoxSize } from '../common/utils';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -79,18 +78,21 @@ const Tile = ({
   const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
 
   const [avatarSize, attribBoxSize] = useMemo(() => {
-    let size;
     if (!calculatedWidth || !calculatedHeight) {
-      size = undefined;
+      return [undefined, undefined];
     }
+    let avatarSize = 'large';
     if (calculatedWidth <= 150 || calculatedHeight <= 150) {
-      size = 'small';
+      avatarSize = 'small';
     } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
-      size = 'medium';
-    } else {
-      size = 'large';
+      avatarSize = 'medium';
     }
-    return [size, getAttributeBoxSize(calculatedWidth, calculatedHeight)];
+    let attribBoxSize = 'medium';
+    if (calculatedWidth <= 180 || calculatedHeight <= 180) {
+      attribBoxSize = 'small';
+    }
+
+    return [avatarSize, attribBoxSize];
   }, [calculatedWidth, calculatedHeight]);
 
   return (
