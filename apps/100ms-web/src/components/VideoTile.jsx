@@ -27,7 +27,6 @@ import TileMenu from "./TileMenu";
 import { useAppConfig } from "./AppData/useAppConfig";
 import { useIsHeadless, useUISettings } from "./AppData/useUISettings";
 import { UI_SETTINGS } from "../common/constants";
-import { getAttributeBoxSize } from "@100mslive/roomkit-react/src/Prebuilt/common/utils";
 
 const Tile = ({
   peerId,
@@ -146,12 +145,16 @@ const Tile = ({
             isHeadless,
             isAudioMuted,
           }) ? (
-            <StyledVideoTile.AttributeBox
+            <StyledVideoTile.AudioIndicator
               data-testid="participant_audio_mute_icon"
-              size={getAttributeBoxSize(width, height)}
+              size={
+                width && height && (width < 180 || height < 180)
+                  ? "small"
+                  : "medium"
+              }
             >
               <MicOffIcon />
-            </StyledVideoTile.AttributeBox>
+            </StyledVideoTile.AudioIndicator>
           ) : null}
           {isMouseHovered && !isHeadless ? (
             <TileMenu
@@ -160,7 +163,7 @@ const Tile = ({
               videoTrackID={track?.id}
             />
           ) : null}
-          <PeerMetadata peerId={peerId} height={height} width={width} />
+          <PeerMetadata peerId={peerId} />
           <TileConnection
             hideLabel={hideLabel}
             name={label}

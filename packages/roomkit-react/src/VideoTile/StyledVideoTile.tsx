@@ -91,6 +91,8 @@ const AttributeBox = styled('div', {
   },
 });
 
+const AudioIndicator = AttributeBox;
+
 const FullScreenButton = styled('button', {
   width: '2.25rem',
   height: '2.25rem',
@@ -132,6 +134,7 @@ interface VideoTileType {
   Info: typeof Info;
   AvatarContainer: typeof AvatarContainer;
   AttributeBox: typeof AttributeBox;
+  AudioIndicator: typeof AudioIndicator;
   FullScreenButton: typeof FullScreenButton;
 }
 
@@ -142,5 +145,6 @@ export const StyledVideoTile: VideoTileType = {
   Info,
   AvatarContainer,
   AttributeBox,
+  AudioIndicator,
   FullScreenButton,
 };
