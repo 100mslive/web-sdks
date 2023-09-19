@@ -21,9 +21,9 @@ const VideoTileStory = () => {
       <StyledVideoTile.Container>
         <Video trackId="1" />
         <StyledVideoTile.Info>Deepankar</StyledVideoTile.Info>
-        <StyledVideoTile.AttributeBox position="right">
+        <StyledVideoTile.AudioIndicator>
           <MicOffIcon />
-        </StyledVideoTile.AttributeBox>
+        </StyledVideoTile.AudioIndicator>
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
   );

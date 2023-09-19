@@ -208,13 +208,13 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
 
 export const AudioLevel = ({ trackId }) => {
   return (
-    <StyledVideoTile.AttributeBox position="right">
+    <StyledVideoTile.AudioIndicator>
       <Flex align="center" justify="center" css={{ gap: '$2' }}>
         {[3, 2, 3].map((v, i) => (
           <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
         ))}
       </Flex>
-    </StyledVideoTile.AttributeBox>
+    </StyledVideoTile.AudioIndicator>
   );
 };
 
