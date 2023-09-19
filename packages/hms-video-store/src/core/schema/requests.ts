@@ -1,4 +1,4 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackSource } from './peer';
+import { HMSGroupName, HMSPeer, HMSPeerID, HMSTrack, HMSTrackSource } from './peer';
 import { HMSRoleName } from './role';
 
 export interface HMSRoleChangeStoreRequest {
@@ -32,4 +32,11 @@ export interface HMSLeaveRoomRequest {
   requestedBy?: HMSPeer;
   reason: string;
   roomEnded: boolean;
+}
+
+export interface HMSPeerListIteratorOptions {
+  role?: HMSRoleName;
+  group?: HMSGroupName;
+  peerIds?: string[];
+  limit: number;
 }

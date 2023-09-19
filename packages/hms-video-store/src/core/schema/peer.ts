@@ -10,6 +10,7 @@ export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
+export type HMSGroupName = string;
 export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 /**
  * Use this to identify what is being screenshared, not all browsers will support
@@ -39,7 +40,7 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
-  groups?: string[];
+  groups?: HMSGroupName[];
   isHandRaised: boolean;
 }
 

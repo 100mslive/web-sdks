@@ -21,6 +21,7 @@ import {
   HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
+  HMSPeerListIteratorOptions,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
@@ -510,4 +511,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   lowerLocalPeerHand(): Promise<void>;
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
+
+  populateNextPeers(options?: HMSPeerListIteratorOptions): Promise<void>;
 }
