@@ -30,6 +30,7 @@ export const MwebLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
 
   useDropdownList({ open, name: 'LeaveRoom' });
 
@@ -39,7 +40,7 @@ export const MwebLeaveRoom = ({
 
   return (
     <Fragment>
-      {screenType !== 'hls_live_streaming' ? (
+      {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
             <LeaveIconButton
@@ -70,36 +71,24 @@ export const MwebLeaveRoom = ({
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
 
-            {permissions?.endRoom || permissions?.hlsStreaming ? (
-              <LeaveCard
-                title={showStream ? 'End Stream' : 'End Session'}
-                subtitle={`The will end the ${
-                  showStream ? 'stream' : 'session'
-                } for everyone. You can't undo this action.`}
-                bg="$alert_error_dim"
-                titleColor="$alert_error_brighter"
-                css={{ color: '$alert_error_bright', '&:hover': { color: '$alert_error_brighter' } }}
-                icon={<StopIcon height={24} width={24} />}
-                onClick={() => {
-                  setOpen(false);
-                  setShowEndStreamAlert(true);
-                }}
-              />
-            ) : null}
+            <LeaveCard
+              title={showStream ? 'End Stream' : 'End Session'}
+              subtitle={`The will end the ${
+                showStream ? 'stream' : 'session'
+              } for everyone. You can't undo this action.`}
+              bg="$alert_error_dim"
+              titleColor="$alert_error_brighter"
+              css={{ color: '$alert_error_bright', '&:hover': { color: '$alert_error_brighter' } }}
+              icon={<StopIcon height={24} width={24} />}
+              onClick={() => {
+                setOpen(false);
+                setShowEndStreamAlert(true);
+              }}
+            />
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton
-          key="LeaveRoom"
-          data-testid="leave_room_btn"
-          onClick={() => {
-            if (screenType === 'hls_live_streaming') {
-              setShowLeaveRoomAlert(true);
-            } else {
-              leaveRoom({ endstream: false });
-            }
-          }}
-        >
+        <LeaveIconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => setShowLeaveRoomAlert(true)}>
           <Tooltip title="Leave Room">
             <Box>
               <ExitIcon style={{ transform: 'rotate(180deg)' }} />
@@ -116,13 +105,12 @@ export const MwebLeaveRoom = ({
           />
         </Sheet.Content>
       </Sheet.Root>
-      {screenType === 'hls_live_streaming' ? (
-        <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
-          <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
-            <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
-          </Sheet.Content>
-        </Sheet.Root>
-      ) : null}
+
+      <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+          <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
+        </Sheet.Content>
+      </Sheet.Root>
     </Fragment>
   );
 };
