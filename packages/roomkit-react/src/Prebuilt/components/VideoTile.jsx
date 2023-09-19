@@ -166,6 +166,7 @@ const Tile = ({
 };
 
 const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
+
 export const AudioLevel = ({ trackId }) => {
   return (
     <StyledVideoTile.AudioIndicator>
