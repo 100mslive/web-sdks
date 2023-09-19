@@ -39,7 +39,7 @@ export class PolicyChangeManager {
     const localPeer = this.store.getLocalPeer();
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
-      const oldRole = localPeer.role;
+      const oldRole = localPeer.asRole || localPeer.role;
       localPeer.updateRole(newRole);
       if (newRole.name === localPeer.asRole?.name) {
         delete localPeer.asRole;
