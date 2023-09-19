@@ -240,9 +240,9 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
         <FullPageProgress />
       ) : null}
       {showMuteIcon ? (
-        <StyledVideoTile.AudioIndicator size="medium">
+        <StyledVideoTile.AttributeBox size="medium" position="right">
           <MicOffIcon />
-        </StyledVideoTile.AudioIndicator>
+        </StyledVideoTile.AttributeBox>
       ) : (
         <AudioLevel trackId={localPeer?.audioTrack} />
       )}

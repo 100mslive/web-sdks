@@ -57,18 +57,7 @@ const Info = styled('div', {
 
 const AttributeBox = styled('div', {
   position: 'absolute',
-  color: '$on_primary_high',
-  w: '$12',
-  h: '$12',
-  bg: '$secondary_dim',
-  r: '$round',
-  ...flexCenter,
-});
-
-const AudioIndicator = styled('div', {
-  position: 'absolute',
   top: '$4',
-  right: '$4',
   color: '$on_primary_high',
   bg: '$secondary_dim',
   borderRadius: '$round',
@@ -91,9 +80,14 @@ const AudioIndicator = styled('div', {
         height: '$13',
       },
     },
+    position: {
+      left: { left: '$4' },
+      right: { right: '$4' },
+    },
   },
   defaultVariants: {
     size: 'medium',
+    position: 'left',
   },
 });
 
@@ -136,7 +130,6 @@ interface VideoTileType {
   Container: typeof Container;
   Overlay: typeof Overlay;
   Info: typeof Info;
-  AudioIndicator: typeof AudioIndicator;
   AvatarContainer: typeof AvatarContainer;
   AttributeBox: typeof AttributeBox;
   FullScreenButton: typeof FullScreenButton;
@@ -147,7 +140,6 @@ export const StyledVideoTile: VideoTileType = {
   Container,
   Overlay,
   Info,
-  AudioIndicator,
   AvatarContainer,
   AttributeBox,
   FullScreenButton,

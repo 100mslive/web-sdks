@@ -24,9 +24,9 @@ const VideoTile: React.FC<{ width: number; height: number; trackId: string; name
       <StyledVideoTile.Container>
         <Video trackId={trackId} />
         <StyledVideoTile.Info>{name}</StyledVideoTile.Info>
-        <StyledVideoTile.AudioIndicator>
+        <StyledVideoTile.AttributeBox position="right">
           <MicOffIcon />
-        </StyledVideoTile.AudioIndicator>
+        </StyledVideoTile.AttributeBox>
       </StyledVideoTile.Container>
     </StyledVideoTile.Root>
   );

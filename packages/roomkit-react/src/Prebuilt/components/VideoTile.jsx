@@ -25,6 +25,7 @@ import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
+import { getAttributeBoxSize } from '../common/utils';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -131,12 +132,13 @@ const Tile = ({
 
           {!hideAudioMuteOnTile ? (
             isAudioMuted ? (
-              <StyledVideoTile.AudioIndicator
+              <StyledVideoTile.AttributeBox
                 data-testid="participant_audio_mute_icon"
-                size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
+                size={getAttributeBoxSize(width, height)}
+                position="right"
               >
                 <MicOffIcon />
-              </StyledVideoTile.AudioIndicator>
+              </StyledVideoTile.AttributeBox>
             ) : (
               <AudioLevel trackId={audioTrack?.id} />
             )
@@ -150,7 +152,7 @@ const Tile = ({
               enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
-          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
+          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} height={height} width={width} />}
 
           <TileConnection
             hideLabel={hideParticipantNameOnTile}
@@ -166,8 +168,6 @@ const Tile = ({
     </StyledVideoTile.Root>
   );
 };
-
-const metaStyles = { top: '$4', left: '$4', width: '$13', height: '$13' };
 
 const heightAnimation = value =>
   keyframes({
@@ -208,17 +208,17 @@ const AudioLevelIndicator = ({ trackId, value, delay }) => {
 
 export const AudioLevel = ({ trackId }) => {
   return (
-    <StyledVideoTile.AudioIndicator>
+    <StyledVideoTile.AttributeBox position="right">
       <Flex align="center" justify="center" css={{ gap: '$2' }}>
         {[3, 2, 3].map((v, i) => (
           <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
         ))}
       </Flex>
-    </StyledVideoTile.AudioIndicator>
+    </StyledVideoTile.AttributeBox>
   );
 };
 
-const PeerMetadata = ({ peerId }) => {
+const PeerMetadata = ({ peerId, height, width }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
   const isBRB = metaData?.isBRBOn || false;
   const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
@@ -226,12 +226,12 @@ const PeerMetadata = ({ peerId }) => {
   return (
     <Fragment>
       {isHandRaised ? (
-        <StyledVideoTile.AttributeBox css={metaStyles} data-testid="raiseHand_icon_onTile">
+        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="raiseHand_icon_onTile">
           <HandIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
       {isBRB ? (
-        <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
+        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="brb_icon_onTile">
           <BrbTileIcon width={22} height={22} />
         </StyledVideoTile.AttributeBox>
       ) : null}
