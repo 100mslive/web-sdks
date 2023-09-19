@@ -99,10 +99,6 @@ export default class HMSSubscribeConnection extends HMSConnection {
       const remote = this.remoteStreams.get(streamId)!;
       const TrackCls = e.track.kind === 'audio' ? HMSRemoteAudioTrack : HMSRemoteVideoTrack;
       const track = new TrackCls(remote, e.track);
-      // reset the simulcast layer to none when new video tracks are added, UI will subscribe when required
-      if (e.track.kind === 'video') {
-        remote.setVideoLayerLocally(HMSSimulcastLayer.NONE, 'addTrack', 'subscribeConnection');
-      }
       track.transceiver = e.transceiver;
       const trackId = getSdpTrackIdForMid(this.remoteDescription, e.transceiver?.mid);
       trackId && track.setSdpTrackId(trackId);
