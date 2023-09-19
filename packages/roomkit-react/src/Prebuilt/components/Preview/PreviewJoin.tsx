@@ -14,6 +14,7 @@ import {
 } from '@100mslive/react-sdk';
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
+import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
@@ -30,8 +31,6 @@ import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
-// @ts-ignore: No implicit Any
-import { AudioLevel } from '../VideoTile';
 // @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
 // @ts-ignore: No implicit Any
@@ -244,7 +243,9 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
           <MicOffIcon />
         </StyledVideoTile.AudioIndicator>
       ) : (
-        <AudioLevel trackId={localPeer?.audioTrack} />
+        <StyledVideoTile.AudioIndicator size="medium">
+          <AudioLevel trackId={localPeer?.audioTrack} />
+        </StyledVideoTile.AudioIndicator>
       )}
     </StyledVideoTile.Container>
   );

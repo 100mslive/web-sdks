@@ -15,12 +15,12 @@ import {
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
+import { AudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
 import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
-import { AudioLevelAnimation } from './AudioLevelAnimation';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
@@ -136,7 +136,9 @@ const Tile = ({
                 <MicOffIcon />
               </StyledVideoTile.AudioIndicator>
             ) : (
-              <AudioLevel trackId={audioTrack?.id} />
+              <StyledVideoTile.AudioIndicator>
+                <AudioLevel trackId={audioTrack?.id} />
+              </StyledVideoTile.AudioIndicator>
             )
           ) : null}
           {isMouseHovered || (isDragabble && isMobile) ? (
@@ -166,14 +168,6 @@ const Tile = ({
 };
 
 const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
-
-export const AudioLevel = ({ trackId }) => {
-  return (
-    <StyledVideoTile.AudioIndicator>
-      <AudioLevelAnimation trackId={trackId} />
-    </StyledVideoTile.AudioIndicator>
-  );
-};
 
 const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
