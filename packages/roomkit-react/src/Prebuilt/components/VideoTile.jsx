@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -71,24 +71,31 @@ const Tile = ({
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === 'mouseenter');
   }, []);
-  const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
+
+  const ref = useRef(null);
+  const calculatedHeight = ref.current?.clientHeight || '';
+  const calculatedWidth = ref.current?.clientWidth || '';
+
+  const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
+
   const [avatarSize, attribBoxSize] = useMemo(() => {
     let size;
-    if (!width || !height) {
+    if (!calculatedWidth || !calculatedHeight) {
       size = undefined;
     }
-    if (width <= 150 || height <= 150) {
+    if (calculatedWidth <= 150 || calculatedHeight <= 150) {
       size = 'small';
-    } else if (width <= 300 || height <= 300) {
+    } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
       size = 'medium';
     } else {
       size = 'large';
     }
-    return [size, getAttributeBoxSize(width, height)];
-  }, [width, height]);
+    return [size, getAttributeBoxSize(calculatedWidth, calculatedHeight)];
+  }, [calculatedWidth, calculatedHeight]);
 
   return (
     <StyledVideoTile.Root
+      ref={ref}
       css={{
         width,
         height,
