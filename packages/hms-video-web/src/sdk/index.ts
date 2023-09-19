@@ -1,6 +1,7 @@
 import Message from './models/HMSMessage';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
+import { HMSPeerListIterator } from './HMSPeerListIterator';
 import { LocalTrackManager } from './LocalTrackManager';
 import { NetworkTestManager } from './NetworkTestManager';
 import RoleChangeManager from './RoleChangeManager';
@@ -40,6 +41,7 @@ import { IErrorListener } from '../interfaces/error-listener';
 import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { HMSInterface } from '../interfaces/hms';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
+import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
@@ -106,6 +108,7 @@ export class HMSSdk implements HMSInterface {
   private interactivityCenter!: InteractivityCenter;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private peerListIterator!: HMSPeerListIterator;
 
   private initNotificationManager() {
     if (!this.notificationManager) {
@@ -215,6 +218,13 @@ export class HMSSdk implements HMSInterface {
 
   getInteractivityCenter() {
     return this.interactivityCenter;
+  }
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+    if (!this.peerListIterator) {
+      this.peerListIterator = new HMSPeerListIterator(this.transport, this.store, options);
+    }
+    return this.peerListIterator;
   }
 
   private handleAutoplayError = (error: HMSException) => {

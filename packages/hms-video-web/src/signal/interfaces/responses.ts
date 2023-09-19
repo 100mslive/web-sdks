@@ -1,3 +1,5 @@
+import { PeerNotificationInfo } from '../../notification-manager';
+
 export interface BroadcastResponse {
   timestamp: number;
   message_id: string;
@@ -20,4 +22,11 @@ export interface SetSessionMetadataResponse {
 
 export interface JoinLeaveGroupResponse {
   groups: string[];
+}
+
+export interface PeersIterationResponse {
+  iterator: string;
+  limit: number;
+  eof: boolean;
+  peers: PeerNotificationInfo[];
 }

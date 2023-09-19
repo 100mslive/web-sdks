@@ -84,3 +84,15 @@ export interface HLSVariant {
 export interface getPeerRequestParams {
   peerId: string;
 }
+
+export interface findPeerRequestParams {
+  peerIds?: string[];
+  role?: string;
+  group?: string;
+  limit: number;
+}
+
+export interface peerIterNextRequestParams {
+  iterator: string;
+  limit: number;
+}
