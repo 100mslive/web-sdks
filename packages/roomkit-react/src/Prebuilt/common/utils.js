@@ -93,6 +93,5 @@ export const getAttributeBoxSize = (width, height) => {
   if (!width || !height) {
     return '';
   }
-  console.log('ollo', height, width, !!(width < 180 || height < 180));
   return width < 180 || height < 180 ? 'small' : 'medium';
 };
