@@ -31,12 +31,13 @@ export const useMyMetadata = () => {
       await hmsActions.lowerLocalPeerHand();
     } else {
       await hmsActions.raiseLocalPeerHand();
+      await update({ isBRBOn: false });
     }
   }, [isHandRaised]); //eslint-disable-line
 
   const toggleBRB = useCallback(async () => {
     const newValue = !metaData?.isBRBOn;
-    await update({ isBRBOn: !metaData?.isBRBOn });
+    await update({ isBRBOn: newValue });
     if (newValue) {
       await hmsActions.lowerLocalPeerHand();
     }
