@@ -73,21 +73,28 @@ const Tile = ({
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === 'mouseenter');
   }, []);
-  const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
+
+  const ref = useRef(null);
+  const calculatedHeight = ref.current?.clientHeight || '';
+  const calculatedWidth = ref.current?.clientWidth || '';
+
+  const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
+
   const avatarSize = useMemo(() => {
-    if (!width || !height) {
+    if (!calculatedWidth || !calculatedHeight) {
       return undefined;
     }
-    if (width <= 150 || height <= 150) {
+    if (calculatedWidth <= 150 || calculatedHeight <= 150) {
       return 'small';
-    } else if (width <= 300 || height <= 300) {
+    } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
       return 'medium';
     }
     return 'large';
-  }, [width, height]);
+  }, [calculatedWidth, calculatedHeight]);
 
   return (
     <StyledVideoTile.Root
+      ref={ref}
       css={{
         width,
         height,
@@ -134,7 +141,7 @@ const Tile = ({
             isAudioMuted ? (
               <StyledVideoTile.AudioIndicator
                 data-testid="participant_audio_mute_icon"
-                size={getAttributeBoxSize(width, height)}
+                size={getAttributeBoxSize(calculatedWidth, calculatedHeight)}
               >
                 <MicOffIcon />
               </StyledVideoTile.AudioIndicator>
@@ -151,7 +158,7 @@ const Tile = ({
               enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
-          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} height={height} width={width} />}
+          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} height={calculatedHeight} width={calculatedWidth} />}
 
           <TileConnection
             hideLabel={hideParticipantNameOnTile}
