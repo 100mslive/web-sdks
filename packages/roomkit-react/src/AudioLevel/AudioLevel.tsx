@@ -15,16 +15,19 @@ const barAnimation = keyframes({
   from: {
     maskSize: '4em .8em',
     '-webkit-mask-position-y': '.1em',
+    maskPosition: 'initial .1em',
   },
 
   '50%': {
     maskSize: '4em 1em',
     '-webkit-mask-position-y': 0,
+    maskPosition: 'initial 0',
   },
 
   to: {
     maskSize: '4em .8em',
     '-webkit-mask-position-y': '.1em',
+    maskPosition: 'initial 0',
   },
 });
 
@@ -55,6 +58,7 @@ export const AudioLevel = ({ trackId }: { trackId?: string }) => {
         for (const child of ref.current.children) {
           const positionX = `-${positionValues[audioLevel] * (index === 1 ? 2.5 : 1.25)}em`;
           child.style['-webkit-mask-position-x'] = positionX;
+          child.style['mask-position'] = `${positionX} 0`;
           child.style['animation'] =
             positionValues[audioLevel] > 0 ? `${barAnimation} 0.6s steps(3,jump-none) 0s infinite` : 'none';
           index++;
