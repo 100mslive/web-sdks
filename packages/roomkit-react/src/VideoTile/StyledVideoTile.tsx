@@ -91,10 +91,7 @@ const AttributeBox = styled('div', {
   },
 });
 
-const AudioIndicator = styled(AttributeBox, {
-  left: 'unset',
-  right: '$4',
-});
+const AudioIndicator = styled(AttributeBox, { defaultVariants: { position: 'right' } });
 
 const FullScreenButton = styled('button', {
   width: '2.25rem',
