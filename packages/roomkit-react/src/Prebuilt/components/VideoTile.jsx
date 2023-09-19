@@ -132,13 +132,12 @@ const Tile = ({
 
           {!hideAudioMuteOnTile ? (
             isAudioMuted ? (
-              <StyledVideoTile.AttributeBox
+              <StyledVideoTile.AudioIndicator
                 data-testid="participant_audio_mute_icon"
                 size={getAttributeBoxSize(width, height)}
-                position="right"
               >
                 <MicOffIcon />
-              </StyledVideoTile.AttributeBox>
+              </StyledVideoTile.AudioIndicator>
             ) : (
               <AudioLevel trackId={audioTrack?.id} />
             )

@@ -230,6 +230,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />
+
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={name} data-testid="preview_avatar_tile" />
@@ -239,10 +240,11 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       ) : !error ? (
         <FullPageProgress />
       ) : null}
+
       {showMuteIcon ? (
-        <StyledVideoTile.AttributeBox size="medium" position="right">
+        <StyledVideoTile.AudioIndicator>
           <MicOffIcon />
-        </StyledVideoTile.AttributeBox>
+        </StyledVideoTile.AudioIndicator>
       ) : (
         <AudioLevel trackId={localPeer?.audioTrack} />
       )}
