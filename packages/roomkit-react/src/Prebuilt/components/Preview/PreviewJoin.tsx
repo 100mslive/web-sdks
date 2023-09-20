@@ -230,6 +230,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
             trackId={localPeer.videoTrack}
             data-testid="preview_tile"
           />
+
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
               <Avatar name={name} data-testid="preview_avatar_tile" />
@@ -239,8 +240,9 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       ) : !error ? (
         <FullPageProgress />
       ) : null}
+
       {showMuteIcon ? (
-        <StyledVideoTile.AudioIndicator size="medium">
+        <StyledVideoTile.AudioIndicator>
           <MicOffIcon />
         </StyledVideoTile.AudioIndicator>
       ) : (
@@ -255,7 +257,7 @@ export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => 
 
   return (
     <Flex
-      justify="between"
+      justify={hideSettings && isMobile ? 'center' : 'between'}
       css={{
         width: '100%',
         mt: '$8',
