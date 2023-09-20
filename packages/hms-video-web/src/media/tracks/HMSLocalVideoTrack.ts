@@ -310,7 +310,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   private async replaceTrackWithBlank() {
     const prevTrack = this.nativeTrack;
-    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack);
+    const newTrack = LocalTrackManager.getEmptyVideoTrack(prevTrack, true);
     prevTrack?.stop();
     HMSLogger.d(this.TAG, 'replaceTrackWithBlank, Previous track stopped', prevTrack, 'newTrack', newTrack);
     return newTrack;
