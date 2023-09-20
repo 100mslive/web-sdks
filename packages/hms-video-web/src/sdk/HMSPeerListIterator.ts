@@ -41,9 +41,12 @@ export class HMSPeerListIterator {
       if (this.store.getLocalPeer()?.peerId === peer.peer_id) {
         return;
       }
-      const hmsPeer = createRemotePeer(peer, this.store);
-      hmsPeers.push(hmsPeer);
-      this.store.addPeer(hmsPeer);
+      const storeHasPeer = this.store.getPeerById(peer.peer_id);
+      if (!storeHasPeer) {
+        const hmsPeer = createRemotePeer(peer, this.store);
+        hmsPeers.push(hmsPeer);
+        this.store.addPeer(hmsPeer);
+      }
     });
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_ITERATOR_UPDATED, hmsPeers);
   }
