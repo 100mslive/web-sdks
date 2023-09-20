@@ -38,9 +38,6 @@ export class HMSPeerListIterator {
     this.iteratorID = response.iterator;
     const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
-      if (this.store.getLocalPeer()?.peerId === peer.peer_id) {
-        return;
-      }
       const storeHasPeer = this.store.getPeerById(peer.peer_id);
       if (!storeHasPeer) {
         const hmsPeer = createRemotePeer(peer, this.store);
