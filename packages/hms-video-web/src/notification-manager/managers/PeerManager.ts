@@ -1,4 +1,5 @@
 import { TrackManager } from './TrackManager';
+import { createRemotePeer } from './utils';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
@@ -155,17 +156,10 @@ export class PeerManager {
   private makePeer(peer: PeerNotification) {
     let hmsPeer = this.store.getPeerById(peer.peer_id) as HMSRemotePeer;
     if (!hmsPeer) {
-      hmsPeer = new HMSRemotePeer({
-        peerId: peer.peer_id,
-        name: peer.info.name,
-        customerUserId: peer.info.user_id,
-        metadata: peer.info.data,
-        role: this.store.getPolicyForRole(peer.role),
-        joinedAt: convertDateNumToDate(peer.joined_at),
-        fromRoomState: !!peer.is_from_room_state,
-        groups: peer.groups,
-        realtime: peer.realtime,
-      });
+      hmsPeer = createRemotePeer(peer, this.store);
+      hmsPeer.realtime = peer.realtime;
+      hmsPeer.joinedAt = convertDateNumToDate(peer.joined_at);
+      hmsPeer.fromRoomState = !!peer.is_from_room_state;
       this.store.addPeer(hmsPeer);
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
     }

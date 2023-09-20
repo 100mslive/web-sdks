@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
-import { HMSPeer } from '@100mslive/react-sdk';
+import { HMSPeer, HMSPeerListIterator, useHMSActions } from '@100mslive/react-sdk';
+import { AddCircleIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import Chip from '../Chip';
 // @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
@@ -38,11 +40,34 @@ export const RoleAccordion = ({
   filter?: { search: string };
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
+  const [hasNext, setHasNext] = useState(false);
+  const iteratorRef = useRef<HMSPeerListIterator | null>(null);
 
-  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
+  const loadNext = useCallback(() => {
+    if (!roleName || roleName === 'Hand Raised') {
+      return;
+    }
+    if (!iteratorRef.current) {
+      iteratorRef.current = actions.getPeerListIterator({ role: roleName, limit: 2 });
+    }
+    iteratorRef.current
+      .next()
+      .catch(console.error)
+      .finally(() => {
+        setHasNext(iteratorRef.current ? iteratorRef.current.hasNext() : false);
+      });
+  }, [actions, roleName]);
+
+  useEffect(() => {
+    loadNext();
+  }, [loadNext]);
+
+  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
   }
+
   const height = ROW_HEIGHT * peerList.length;
 
   return (
@@ -86,6 +111,21 @@ export const RoleAccordion = ({
             >
               {VirtualizedParticipantItem}
             </FixedSizeList>
+            {hasNext ? (
+              <Chip
+                icon={<AddCircleIcon />}
+                content="Load More"
+                onClick={loadNext}
+                backgroundColor="$secodary_default"
+                css={{
+                  w: 'max-content',
+                  borderRadius: '$size$9',
+                  m: '$2 auto',
+                  p: '$4',
+                  cursor: 'pointer',
+                }}
+              />
+            ) : null}
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>

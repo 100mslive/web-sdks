@@ -1,3 +1,4 @@
+import { createRemotePeer } from './utils';
 import { VideoTrackLayerUpdate } from '../../connection/channel-messages';
 import { EventBus } from '../../events/EventBus';
 import { HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
@@ -144,15 +145,7 @@ export class TrackManager {
       return;
     }
     if (!hmsPeer) {
-      hmsPeer = new HMSPeer({
-        peerId: notifPeer.peer_id,
-        name: notifPeer.info.name,
-        isLocal: false,
-        role: this.store.getPolicyForRole(notifPeer.role),
-        customerUserId: notifPeer.info.user_id,
-        metadata: notifPeer.info.data,
-        groups: notifPeer.groups,
-      });
+      hmsPeer = createRemotePeer(notifPeer, this.store);
       this.store.addPeer(hmsPeer);
     }
 

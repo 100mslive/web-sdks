@@ -34,11 +34,14 @@ import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  findPeerRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
+  peerIterNextRequestParams,
+  PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
   PollInfoSetParams,
@@ -745,6 +748,13 @@ export default class HMSTransport implements ITransport {
 
   async removeFromGroup(peerId: string, name: string): Promise<void> {
     this.signal.removeFromGroup(peerId, name);
+  }
+
+  findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.findPeer(params);
+  }
+  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.peerIterNext(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

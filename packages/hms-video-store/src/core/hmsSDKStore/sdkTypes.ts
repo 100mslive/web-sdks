@@ -19,6 +19,7 @@ import {
   HMSLogLevel,
   HMSMessage,
   HMSPeer,
+  HMSPeerListIterator,
   HMSPeerStats,
   HMSPeerUpdate,
   HMSPlaylistItem,
@@ -75,6 +76,7 @@ export {
   simulcastMapping,
   DeviceType,
   HMSPollQuestionType,
+  HMSPeerListIterator,
 };
 
 export type {

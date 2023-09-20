@@ -52,6 +52,7 @@ import {
   HMSMessageInput,
   HMSPeer,
   HMSPeerID,
+  HMSPeerListIteratorOptions,
   HMSPlaylistType,
   HMSRoleName,
   HMSRoomState,
@@ -568,6 +569,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
   async lowerRemotePeerHand(peerId: string) {
     await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+    return this.sdk.getPeerListIterator(options);
   }
 
   initAppData(appData: Record<string, any>) {
