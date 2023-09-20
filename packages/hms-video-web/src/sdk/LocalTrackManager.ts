@@ -275,7 +275,7 @@ export class LocalTrackManager {
       blankCanvas.height = height;
       blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
     }
-    if (!intervalID) {
+    /* if (!intervalID) {
       // This is needed to send some data so the track is received on sfu
       intervalID = setInterval(() => {
         const ctx = blankCanvas?.getContext('2d');
@@ -283,7 +283,7 @@ export class LocalTrackManager {
           ctx.fillRect(0, 0, 1, 1);
         }
       }, 1000 / frameRate);
-    }
+    } */
 
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
