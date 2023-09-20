@@ -13,12 +13,12 @@ import { Footer } from './Footer/Footer';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
+import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
-import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
