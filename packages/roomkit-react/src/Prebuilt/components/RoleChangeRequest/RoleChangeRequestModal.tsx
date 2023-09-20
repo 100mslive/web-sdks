@@ -7,14 +7,14 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
+import { Flex, Text } from '../../..';
 // @ts-ignore: No implicit Any
 import { PreviewControls, PreviewTile } from '../Preview/PreviewJoin';
-import { Flex, Text } from '../../..';
+import { RequestPrompt } from './RequestPrompt';
 // @ts-ignore: No implicit Any
 import { useMyMetadata } from '../hooks/useMetadata';
 // @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
-import { RequestPrompt } from './RequestPrompt';
 
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
