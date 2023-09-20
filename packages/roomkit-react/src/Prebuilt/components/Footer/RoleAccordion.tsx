@@ -50,7 +50,7 @@ export const RoleAccordion = ({
       return;
     }
     if (!iteratorRef.current) {
-      iteratorRef.current = actions.getPeerListIterator({ role: roleName });
+      iteratorRef.current = actions.getPeerListIterator({ role: roleName, limit: 2 });
     }
     iteratorRef.current
       .next()
@@ -64,7 +64,7 @@ export const RoleAccordion = ({
     loadNext();
   }, [loadNext]);
 
-  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
+  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
   }
 

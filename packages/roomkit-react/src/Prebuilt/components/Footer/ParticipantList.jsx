@@ -127,13 +127,15 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
         flex: '1 1 0',
       }}
     >
-      <RoleAccordion
-        peerList={handRaisedList}
-        roleName="Hand Raised"
-        filter={filter}
-        isConnected={isConnected}
-        isHandRaisedAccordion
-      />
+      {handRaisedList.length > 0 ? (
+        <RoleAccordion
+          peerList={handRaisedList}
+          roleName="Hand Raised"
+          filter={filter}
+          isConnected={isConnected}
+          isHandRaisedAccordion
+        />
+      ) : null}
       {Object.keys(peersOrderedByRoles).map(role => (
         <RoleAccordion
           key={role}
