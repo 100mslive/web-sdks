@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
-import { HMSPeer, HMSPeerListIterator, useHMSActions } from '@100mslive/react-sdk';
+import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
@@ -34,19 +34,22 @@ export const RoleAccordion = ({
   isConnected,
   filter,
   isHandRaisedAccordion = false,
+  offStageRoles,
 }: ItemData & {
   roleName: string;
   isHandRaisedAccordion?: boolean;
   filter?: { search: string };
+  offStageRoles: string[];
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const [hasNext, setHasNext] = useState(false);
   const iteratorRef = useRef<HMSPeerListIterator | null>(null);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   const loadNext = useCallback(() => {
-    if (!roleName || roleName === 'Hand Raised') {
+    if (!roleName || roleName === 'Hand Raised' || !offStageRoles.includes(roleName)) {
       return;
     }
     if (!iteratorRef.current) {
@@ -58,7 +61,7 @@ export const RoleAccordion = ({
       .finally(() => {
         setHasNext(iteratorRef.current ? iteratorRef.current.hasNext() : false);
       });
-  }, [actions, roleName]);
+  }, [actions, roleName, offStageRoles]);
 
   useEffect(() => {
     loadNext();
@@ -94,7 +97,7 @@ export const RoleAccordion = ({
                 variant="sm"
                 css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
               >
-                {roleName} {`(${getFormattedCount(peerList.length)})`}
+                {roleName} {isLargeRoom ? '' : `(${getFormattedCount(peerList.length)})`}
               </Text>
               <RoleOptions roleName={roleName} peerList={peerList} />
             </Flex>
@@ -111,7 +114,7 @@ export const RoleAccordion = ({
             >
               {VirtualizedParticipantItem}
             </FixedSizeList>
-            {hasNext ? (
+            {hasNext && offStageRoles?.includes(roleName) ? (
               <Chip
                 icon={<AddCircleIcon />}
                 content="Load More"

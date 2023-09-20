@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
+import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
@@ -53,6 +53,7 @@ export const SidePaneTabs = React.memo<{
   const hideTabs = !(showChat && showParticipants);
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
+  const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export const SidePaneTabs = React.memo<{
                 )}
               </Text>
 
-              {showChat ? <Chat screenType={screenType} /> : <ParticipantList />}
+              {showChat ? <Chat screenType={screenType} /> : <ParticipantList offStageRoles={off_stage_roles} />}
             </>
           ) : (
             <Tabs.Root
@@ -129,7 +130,7 @@ export const SidePaneTabs = React.memo<{
                 </Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
-                <ParticipantList />
+                <ParticipantList offStageRoles={off_stage_roles} />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
                 <Chat screenType={screenType} />

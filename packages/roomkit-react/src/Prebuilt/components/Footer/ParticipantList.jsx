@@ -31,12 +31,15 @@ import { useParticipants } from '../../common/hooks';
 import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ParticipantList = () => {
+export const ParticipantList = ({ offStageRoles = [] }) => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
 
   const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
+  offStageRoles.forEach(role => {
+    peersOrderedByRoles[role] = [];
+  });
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
@@ -72,6 +75,7 @@ export const ParticipantList = () => {
           handRaisedList={handRaisedPeers}
           isConnected={isConnected}
           filter={filter}
+          offStageRoles={offStageRoles}
         />
       </Flex>
     </Fragment>
@@ -114,7 +118,13 @@ export const ParticipantCount = () => {
   );
 };
 
-const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter, handRaisedList = [] }) => {
+const VirtualizedParticipants = ({
+  peersOrderedByRoles = {},
+  isConnected,
+  filter,
+  handRaisedList = [],
+  offStageRoles,
+}) => {
   return (
     <Flex
       direction="column"
@@ -134,6 +144,7 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
           filter={filter}
           isConnected={isConnected}
           isHandRaisedAccordion
+          offStageRoles={offStageRoles}
         />
       ) : null}
       {Object.keys(peersOrderedByRoles).map(role => (
@@ -143,6 +154,7 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
           roleName={role}
           isConnected={isConnected}
           filter={filter}
+          offStageRoles={offStageRoles}
         />
       ))}
     </Flex>
