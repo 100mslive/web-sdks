@@ -1,4 +1,6 @@
+import { HMSRemotePeer } from './models/peer';
 import { IStore } from './store';
+import { HMSPeerUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { PeersIterationResponse } from '../signal/interfaces';
@@ -8,7 +10,12 @@ export class HMSPeerListIterator {
   private isEnd = false;
   private iteratorID: string | null = null;
   private DEFAULT_LIMIT = 10;
-  constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
+  constructor(
+    private transport: ITransport,
+    private store: IStore,
+    private listener?: HMSUpdateListener,
+    private options?: HMSPeerListIteratorOptions,
+  ) {}
 
   hasNext(): boolean {
     return this.isEnd;
@@ -29,9 +36,12 @@ export class HMSPeerListIterator {
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
     }
+    const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
       const hmsPeer = createRemotePeer(peer, this.store);
+      hmsPeers.push(hmsPeer);
       this.store.addPeer(hmsPeer);
     });
+    this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_ITERATOR_UPDATED, hmsPeers);
   }
 }

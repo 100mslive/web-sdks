@@ -5,6 +5,7 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSMidCallPreviewConfig,
+  HMSPeerListIterator,
   HMSPluginSupportResult,
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
@@ -512,5 +513,5 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
 
-  populateNextPeers(options?: HMSPeerListIteratorOptions): Promise<void>;
+  getPeerListIterator(options?: HMSPeerListIteratorOptions): Promise<HMSPeerListIterator>;
 }

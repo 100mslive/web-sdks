@@ -16,3 +16,4 @@ export * from './interfaces';
 export * from './rtc-stats';
 export * from './plugins';
 export * from './utils/logger';
+export * from './sdk/HMSPeerListIterator';

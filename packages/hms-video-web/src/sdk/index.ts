@@ -108,7 +108,6 @@ export class HMSSdk implements HMSInterface {
   private interactivityCenter!: InteractivityCenter;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
-  private peerListIterator!: HMSPeerListIterator;
 
   private initNotificationManager() {
     if (!this.notificationManager) {
@@ -221,10 +220,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
-    if (!this.peerListIterator) {
-      this.peerListIterator = new HMSPeerListIterator(this.transport, this.store, options);
-    }
-    return this.peerListIterator;
+    return new HMSPeerListIterator(this.transport, this.store, this.listener, options);
   }
 
   private handleAutoplayError = (error: HMSException) => {
