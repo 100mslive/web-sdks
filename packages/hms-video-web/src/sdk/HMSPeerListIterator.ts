@@ -18,7 +18,7 @@ export class HMSPeerListIterator {
   ) {}
 
   hasNext(): boolean {
-    return this.isEnd;
+    return !this.isEnd;
   }
 
   async next() {
@@ -28,16 +28,19 @@ export class HMSPeerListIterator {
         ...(this.options || {}),
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
-      this.isEnd = response.eof;
-      this.iteratorID = response.iterator;
     } else {
       response = await this.transport.peerIterNext({
         iterator: this.iteratorID,
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
     }
+    this.isEnd = response.eof;
+    this.iteratorID = response.iterator;
     const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
+      if (this.store.getLocalPeer()?.peerId === peer.peer_id) {
+        return;
+      }
       const hmsPeer = createRemotePeer(peer, this.store);
       hmsPeers.push(hmsPeer);
       this.store.addPeer(hmsPeer);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
+import { CSS } from '../../Theme';
 
 const Chip = ({
   icon = <></>,
@@ -8,12 +9,22 @@ const Chip = ({
   backgroundColor = '$surface_default',
   textColor = '$on_surface_high',
   hideIfNoContent = false,
+  onClick,
+  css = {},
+}: {
+  icon?: React.JSX.Element;
+  content: string;
+  backgroundColor?: string;
+  textColor?: string;
+  hideIfNoContent?: boolean;
+  onClick?: () => void | Promise<void>;
+  css?: CSS;
 }) => {
   if (hideIfNoContent && !content) {
-    return;
+    return null;
   }
   return (
-    <Flex align="center" css={{ backgroundColor, p: '$4 $6', borderRadius: '$4' }}>
+    <Flex align="center" css={{ backgroundColor, p: '$4 $6', borderRadius: '$4', ...css }} onClick={() => onClick?.()}>
       {icon}
       <Text variant="sm" css={{ fontWeight: '$semiBold', color: textColor, ml: '$2' }}>
         {content}

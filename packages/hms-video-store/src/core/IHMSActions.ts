@@ -513,5 +513,5 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
 
-  getPeerListIterator(options?: HMSPeerListIteratorOptions): Promise<HMSPeerListIterator>;
+  getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 }

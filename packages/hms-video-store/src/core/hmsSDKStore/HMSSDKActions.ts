@@ -571,7 +571,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.lowerRemotePeerHand(peerId);
   }
 
-  async getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+  getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     return this.sdk.getPeerListIterator(options);
   }
 

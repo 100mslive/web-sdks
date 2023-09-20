@@ -38,5 +38,5 @@ export interface HMSPeerListIteratorOptions {
   role?: HMSRoleName;
   group?: HMSGroupName;
   peerIds?: string[];
-  limit: number;
+  limit?: number;
 }
