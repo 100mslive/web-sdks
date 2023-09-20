@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
-import { HMSPeer, useHMSActions } from '@100mslive/react-sdk';
+import { HMSPeer, HMSPeerListIterator, useHMSActions } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
@@ -43,17 +43,20 @@ export const RoleAccordion = ({
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const [hasNext, setHasNext] = useState(false);
+  const iteratorRef = useRef<HMSPeerListIterator | null>(null);
 
   const loadNext = useCallback(() => {
     if (!roleName || roleName === 'Hand Raised') {
       return;
     }
-    const iterator = actions.getPeerListIterator({ role: roleName !== 'Hand Raised' ? roleName : undefined });
-    iterator
+    if (!iteratorRef.current) {
+      iteratorRef.current = actions.getPeerListIterator({ role: roleName });
+    }
+    iteratorRef.current
       .next()
       .catch(console.error)
       .finally(() => {
-        setHasNext(iterator.hasNext());
+        setHasNext(iteratorRef.current ? iteratorRef.current.hasNext() : false);
       });
   }, [actions, roleName]);
 
