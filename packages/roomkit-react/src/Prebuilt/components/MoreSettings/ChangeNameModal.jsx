@@ -5,8 +5,8 @@ import { config as cssConfig, Dialog } from '../../../';
 import { Sheet } from '../../../Sheet';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChangeNameContent } from './ChangeNameContent';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { usePortalContainer } from '../../common/hooks';
 
 export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW);

@@ -11,7 +11,6 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { useHMSPrebuiltContext } from '../AppContext';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 
 /**
@@ -85,9 +84,4 @@ export const useParticipants = params => {
     participantList = participantList.filter(peer => peer.name.toLowerCase().includes(search));
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
-};
-
-export const usePortalContainer = () => {
-  const { containerID } = useHMSPrebuiltContext();
-  return containerID ? document.getElementById(`#${containerID}`) : undefined;
 };

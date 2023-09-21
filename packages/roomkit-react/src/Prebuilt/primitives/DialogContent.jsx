@@ -11,7 +11,7 @@ import { Dialog } from '../../Modal';
 import { Select } from '../../Select';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
-import { usePortalContainer } from '../common/hooks';
+import { usePortalContainer } from '../components/hooks/usePortalContainer';
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   const portalContainer = usePortalContainer();

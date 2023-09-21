@@ -10,7 +10,8 @@ import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
-import { useFilteredRoles, usePortalContainer } from '../common/hooks';
+import { usePortalContainer } from './hooks/usePortalContainer';
+import { useFilteredRoles } from '../common/hooks';
 import { textEllipsis } from '../../utils';
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (

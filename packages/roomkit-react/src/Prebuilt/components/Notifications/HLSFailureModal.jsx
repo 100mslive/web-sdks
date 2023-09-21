@@ -5,7 +5,7 @@ import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 import { APP_DATA } from '../../common/constants';
 
 export function HLSFailureModal() {

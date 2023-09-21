@@ -9,7 +9,7 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 import { settingContent, settingsList } from './common.js';
 
 const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {

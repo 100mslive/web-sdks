@@ -4,7 +4,7 @@ import { DialogInputFile } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { SubmitPDF } from './submitPdf';
 import { UploadedFile } from './uploadedFile';
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 
 export function PDFFileOptions({ onOpenChange }) {
   const [pdfFile, setPDFFile] = useState(null);

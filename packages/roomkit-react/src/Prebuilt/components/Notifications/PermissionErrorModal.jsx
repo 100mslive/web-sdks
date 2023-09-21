@@ -4,7 +4,7 @@ import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk'
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
 import androidPermissionAlert from '../../images/android-perm-1.png';
 import iosPermissions from '../../images/ios-perm-0.png';
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorModal() {

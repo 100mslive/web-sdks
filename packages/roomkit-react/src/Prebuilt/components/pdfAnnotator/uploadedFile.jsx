@@ -5,7 +5,7 @@ import { DialogRow } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';
 import { SubmitPDF } from './submitPdf';
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 
 export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
   const [fileName, ext] = pdfFile.name.split('.');

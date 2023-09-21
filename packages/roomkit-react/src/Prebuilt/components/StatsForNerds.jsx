@@ -17,7 +17,7 @@ import { Text } from '../../Text';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
-import { usePortalContainer } from '../common/hooks';
+import { usePortalContainer } from './hooks/usePortalContainer';
 import { UI_SETTINGS } from '../common/constants';
 
 export const StatsForNerds = ({ onOpenChange }) => {

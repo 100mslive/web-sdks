@@ -4,7 +4,7 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { usePortalContainer } from '../common/hooks';
+import { usePortalContainer } from './hooks/usePortalContainer';
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {

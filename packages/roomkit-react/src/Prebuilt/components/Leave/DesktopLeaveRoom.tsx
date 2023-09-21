@@ -12,8 +12,7 @@ import { LeaveCard } from './LeaveCard';
 import { LeaveSessionContent } from './LeaveSessionContent';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
-// @ts-ignore
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 
 export const DesktopLeaveRoom = ({
   leaveRoom,

@@ -2,8 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
-// @ts-ignore
-import { usePortalContainer } from '../../common/hooks';
+import { usePortalContainer } from '../hooks/usePortalContainer';
 
 export const RequestPrompt = ({
   open = true,
