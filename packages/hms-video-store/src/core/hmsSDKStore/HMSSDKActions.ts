@@ -1034,6 +1034,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, type);
   }
 
+  // eslint-disable-next-line complexity
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
     if (
       [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
@@ -1044,6 +1045,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const storePeers = this.store.getState(selectPeersMap);
       const newPeerIds = sdkPeer.filter(peer => !storePeers[peer.peerId]);
       this.syncRoomState('peersJoined');
+      // show notification only for peer list
+      if (type !== sdkTypes.HMSPeerUpdate.PEER_LIST) {
+        return;
+      }
       const connected = this.store.getState(selectIsConnectedToRoom);
       // This is not send unnecessary notifications while in preview
       // now room state also call peer list to handle large peers
