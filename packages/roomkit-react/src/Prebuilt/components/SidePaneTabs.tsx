@@ -142,7 +142,7 @@ export const SidePaneTabs = React.memo<{
 
       {isOverlayChat && isChatOpen ? null : (
         <IconButton
-          css={{ position: 'absolute', right: '$10', top: '$11', '@md': { top: '$8', right: '$8' } }}
+          css={{ position: 'absolute', p: '$4 0', right: '$9', top: '$11', '@md': { top: '$8', right: '$6' } }}
           onClick={e => {
             e.stopPropagation();
             if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
