@@ -33,6 +33,6 @@
   "dependencies": {
     "@100mslive/hls-stats": "0.2.16-alpha.0",
     "eventemitter2": "^6.4.7",
-    "hls.js": "1.4.3"
+    "hls.js": "1.4.12"
   }
 }
