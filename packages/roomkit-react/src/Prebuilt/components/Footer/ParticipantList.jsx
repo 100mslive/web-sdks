@@ -3,6 +3,7 @@ import { useDebounce, useMedia } from 'react-use';
 import {
   selectHandRaisedPeers,
   selectHasPeerHandRaised,
+  selectIsLargeRoom,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
@@ -34,12 +35,16 @@ import { SIDE_PANE_OPTIONS } from '../../common/constants';
 export const ParticipantList = ({ offStageRoles = [] }) => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const peersOrderedByRoles = {};
 
   const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
-  offStageRoles.forEach(role => {
-    peersOrderedByRoles[role] = [];
-  });
+  // prefill off_stage roles of large rooms to load more peers
+  if (isLargeRoom) {
+    offStageRoles.forEach(role => {
+      peersOrderedByRoles[role] = [];
+    });
+  }
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
