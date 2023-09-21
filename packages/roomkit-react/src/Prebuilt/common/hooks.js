@@ -89,5 +89,5 @@ export const useParticipants = params => {
 
 export const usePortalContainer = () => {
   const { containerID } = useHMSPrebuiltContext();
-  return containerID ? document.getElementById(containerID) : document.body;
+  return containerID ? document.getElementById(`#${containerID}`) : undefined;
 };

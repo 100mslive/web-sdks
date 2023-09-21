@@ -68,7 +68,7 @@ export type HMSPrebuiltProps = {
   roomId?: string;
   role?: string;
   onLeave?: () => void;
-  containerID?: any;
+  containerID?: string;
 };
 
 export type HMSPrebuiltRefType = {
