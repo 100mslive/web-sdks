@@ -2,7 +2,8 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
-import { useHMSPrebuiltContext } from '../../AppContext';
+// @ts-ignore
+import { usePortalContainer } from '../../common/hooks';
 
 export const RequestPrompt = ({
   open = true,
@@ -20,7 +21,7 @@ export const RequestPrompt = ({
   onAction: () => void;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
 
   if (isMobile) {
     return (
@@ -36,7 +37,7 @@ export const RequestPrompt = ({
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content css={{ p: '$10' }}>
           <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>

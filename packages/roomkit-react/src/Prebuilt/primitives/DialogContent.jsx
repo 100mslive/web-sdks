@@ -11,12 +11,12 @@ import { Dialog } from '../../Modal';
 import { Select } from '../../Select';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
-import { useHMSPrebuiltContext } from '../AppContext';
+import { usePortalContainer } from '../common/hooks';
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
   return (
-    <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+    <Dialog.Portal container={portalContainer}>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: 'min(600px, 100%)', ...css }} {...props}>
         <Dialog.Title>

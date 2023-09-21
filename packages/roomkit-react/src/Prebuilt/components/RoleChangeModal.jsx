@@ -9,9 +9,8 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
-import { useHMSPrebuiltContext } from '../AppContext';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
-import { useFilteredRoles } from '../common/hooks';
+import { useFilteredRoles, usePortalContainer } from '../common/hooks';
 import { textEllipsis } from '../../utils';
 
 const PeerName = forwardRef(({ children, maxWidth, ...rest }, ref) => (
@@ -41,7 +40,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const selectionBg = useDropdownSelection();
   const [peerNameRef, setPeerNameRef] = useState();
   const ref = useRef();
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
   if (!peer) {
     return null;
   }
@@ -49,7 +48,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
           <Dialog.Title css={{ p: 0 }} asChild>

@@ -4,13 +4,13 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { useHMSPrebuiltContext } from '../AppContext';
+import { usePortalContainer } from '../common/hooks';
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
   const isMobile = isAndroid || isIOS;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,7 +26,7 @@ export const MwebLandscapePrompt = () => {
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>

@@ -1,18 +1,18 @@
 import React from 'react';
 import { TrashIcon } from '@100mslive/react-icons';
 import { Dialog, Flex, Text } from '../../../';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import { DialogRow } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';
 import { SubmitPDF } from './submitPdf';
+import { usePortalContainer } from '../../common/hooks';
 
 export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
   const [fileName, ext] = pdfFile.name.split('.');
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content
           css={{

@@ -14,10 +14,10 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
-import { useHMSPrebuiltContext } from '../AppContext';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
+import { usePortalContainer } from '../common/hooks';
 import { UI_SETTINGS } from '../common/constants';
 
 export const StatsForNerds = ({ onOpenChange }) => {
@@ -31,7 +31,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef();
   const selectionBg = useDropdownSelection();
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
 
   useEffect(() => {
     if (selectedStat.id !== 'local-peer' && !tracksWithLabels.find(track => track.id === selectedStat.id)) {
@@ -41,7 +41,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content
           css={{

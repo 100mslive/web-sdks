@@ -9,7 +9,7 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { useHMSPrebuiltContext } from '../../AppContext';
+import { usePortalContainer } from '../../common/hooks';
 import { settingContent, settingsList } from './common.js';
 
 const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
@@ -184,11 +184,11 @@ const DesktopSettingModal = ({
   resetSelection,
   children = <></>,
 }) => {
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content
           css={{

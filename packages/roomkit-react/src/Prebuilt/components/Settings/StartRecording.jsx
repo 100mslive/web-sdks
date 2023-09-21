@@ -2,17 +2,17 @@ import React, { useState } from 'react';
 import { selectPermissions, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { usePortalContainer } from '../../common/hooks';
 import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
   const [resolution, setResolution] = useState(RTMP_RECORD_DEFAULT_RESOLUTION);
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
   const [recordingStarted, setRecordingState] = useSetAppDataByKey(APP_DATA.recordingStarted);
   const { isBrowserRecordingOn, isStreamingOn, isHLSRunning } = useRecordingStreaming();
   const hmsActions = useHMSActions();
@@ -22,7 +22,7 @@ const StartRecording = ({ open, onOpenChange }) => {
   if (isBrowserRecordingOn) {
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
-        <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+        <Dialog.Portal container={portalContainer}>
           <Dialog.Content
             css={{
               width: 'min(400px,80%)',

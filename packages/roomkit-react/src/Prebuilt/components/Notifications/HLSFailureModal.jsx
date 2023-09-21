@@ -4,8 +4,8 @@ import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { usePortalContainer } from '../../common/hooks';
 import { APP_DATA } from '../../common/constants';
 
 export function HLSFailureModal() {
@@ -28,7 +28,7 @@ export function HLSFailureModal() {
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted]);
-  const { containerID } = useHMSPrebuiltContext();
+  const portalContainer = usePortalContainer();
 
   return hlsError ? (
     <Dialog.Root
@@ -39,7 +39,7 @@ export function HLSFailureModal() {
         }
       }}
     >
-      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
+      <Dialog.Portal container={portalContainer}>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(360px, 90%)' }}>
           <Dialog.Title
