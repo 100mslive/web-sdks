@@ -83,6 +83,7 @@ export const RoleAccordion = ({
   const iterator = peerlistIterators.get(roleName);
   const hasPrevious = iterator?.hasPrevious();
   const hasNext = iterator?.hasNext();
+  const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
 
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
@@ -103,16 +104,16 @@ export const RoleAccordion = ({
           >
             {roleName} {`(${getFormattedCount(isLargeRoom && isOffStageRole ? total : peerList.length)})`}
           </Text>
-          <RoleOptions roleName={roleName} peerList={peerList} />
+          <RoleOptions roleName={roleName} peerList={peersInAccordion} />
         </Flex>
       </Accordion.Header>
       <Accordion.Content>
         <Box css={{ borderTop: '1px solid $border_default' }} />
         <FixedSizeList
           itemSize={ROW_HEIGHT}
-          itemData={{ peerList: isOffStageRole && isLargeRoom ? peers : peerList, isConnected }}
+          itemData={{ peerList: peersInAccordion, isConnected }}
           itemKey={itemKey}
-          itemCount={isOffStageRole && isLargeRoom ? peers.length : peerList.length}
+          itemCount={peersInAccordion.length}
           width={width}
           height={height}
         >
