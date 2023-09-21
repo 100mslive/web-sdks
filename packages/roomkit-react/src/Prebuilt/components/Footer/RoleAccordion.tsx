@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -13,6 +13,7 @@ import { RoleOptions } from './RoleOptions';
 import { getFormattedCount } from '../../common/utils';
 
 const ROW_HEIGHT = 50;
+const ITER_TIMER = 5000;
 
 interface ItemData {
   peerList: HMSPeer[];
@@ -44,6 +45,7 @@ export const RoleAccordion = ({
   offStageRoles: string[];
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
@@ -75,6 +77,41 @@ export const RoleAccordion = ({
     loadData('next');
   }, [loadData]);
 
+  useEffect(() => {
+    if (!containerRef.current) {
+      return;
+    }
+    const container = containerRef.current;
+    let timeout: ReturnType<typeof setInterval> | undefined;
+    const requstUpdates = () => {
+      timeout = setInterval(() => {
+        loadData('next');
+      }, ITER_TIMER);
+    };
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(record => {
+        if (record.type === 'attributes') {
+          const changedAttrName = record.attributeName;
+          // @ts-ignore
+          const newValue = record.target.getAttribute(changedAttrName);
+          if (changedAttrName === 'data-state') {
+            if (newValue === 'open' && !timeout) {
+              requstUpdates();
+            } else if (newValue !== 'open') {
+              clearInterval(timeout);
+              timeout = undefined;
+            }
+          }
+        }
+      });
+    });
+    observer.observe(container, { attributes: true });
+    return () => {
+      clearInterval(timeout);
+      observer.disconnect();
+    };
+  }, [loadData]);
+
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
   }
@@ -86,7 +123,16 @@ export const RoleAccordion = ({
   const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
 
   return (
-    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
+    <Accordion.Item
+      value={roleName}
+      css={{ '&:hover .role_actions': { visibility: 'visible' } }}
+      ref={node => {
+        if (node) {
+          ref(node);
+          containerRef.current = node;
+        }
+      }}
+    >
       <Accordion.Header
         iconStyles={{ c: '$on_surface_high' }}
         css={{
