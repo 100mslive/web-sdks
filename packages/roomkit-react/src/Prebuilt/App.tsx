@@ -91,7 +91,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
-      containerID = null,
+      containerID = '',
     },
     ref,
   ) => {
