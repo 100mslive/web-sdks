@@ -39,12 +39,6 @@ export const ParticipantList = ({ offStageRoles = [] }) => {
   const peersOrderedByRoles = {};
 
   const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
-  // prefill off_stage roles of large rooms to load more peers
-  if (isLargeRoom) {
-    offStageRoles.forEach(role => {
-      peersOrderedByRoles[role] = [];
-    });
-  }
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
@@ -52,6 +46,15 @@ export const ParticipantList = ({ offStageRoles = [] }) => {
     }
     peersOrderedByRoles[participant.roleName].push(participant);
   });
+
+  // prefill off_stage roles of large rooms to load more peers
+  if (isLargeRoom) {
+    offStageRoles.forEach(role => {
+      if (!peersOrderedByRoles[role]) {
+        peersOrderedByRoles[role] = [];
+      }
+    });
+  }
 
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
