@@ -68,6 +68,7 @@ export type HMSPrebuiltProps = {
   roomId?: string;
   role?: string;
   onLeave?: () => void;
+  containerID?: any;
 };
 
 export type HMSPrebuiltRefType = {
@@ -90,6 +91,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
+      containerID = null,
     },
     ref,
   ) => {
@@ -180,6 +182,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
+            containerID,
           }}
         >
           <HMSRoomProvider
@@ -202,7 +205,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
                   return (
                     <HMSThemeProvider
-                      // issue is with stichtes caching the theme using the theme name / class
+                      // issue is with stitches caching the theme using the theme name / class
                       // no updates to the themes are fired if the name is same.
                       // TODO: cache the theme and do deep check to trigger name change in the theme
                       themeType={`${theme.name}-${Date.now()}`}

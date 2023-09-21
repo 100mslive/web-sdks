@@ -6,6 +6,7 @@ import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Tooltip } from '../../../Tooltip';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton, MenuTriggerButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
@@ -30,7 +31,7 @@ export const DesktopLeaveRoom = ({
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
   const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
-
+  const { containerID } = useHMSPrebuiltContext();
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
   if (!permissions || !isConnected) {
@@ -135,7 +136,7 @@ export const DesktopLeaveRoom = ({
       )}
 
       <Dialog.Root open={showEndStreamAlert} modal={false}>
-        <Dialog.Portal>
+        <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent

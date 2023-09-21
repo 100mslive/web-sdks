@@ -6,11 +6,12 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import { useHMSPrebuiltContext } from '../AppContext';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
-
+  const { containerID } = useHMSPrebuiltContext();
   useEffect(() => {
     const handleOrientationChange = e => {
       setShowMwebLandscapePrompt(e.target.type.includes('landscape') && isMobile);
@@ -25,7 +26,7 @@ export const MwebLandscapePrompt = () => {
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>

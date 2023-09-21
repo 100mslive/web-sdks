@@ -9,6 +9,7 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
+import { useHMSPrebuiltContext } from '../AppContext';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
 import { textEllipsis } from '../../utils';
@@ -40,6 +41,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const selectionBg = useDropdownSelection();
   const [peerNameRef, setPeerNameRef] = useState();
   const ref = useRef();
+  const { containerID } = useHMSPrebuiltContext();
   if (!peer) {
     return null;
   }
@@ -47,7 +49,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
           <Dialog.Title css={{ p: 0 }} asChild>

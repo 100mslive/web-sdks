@@ -3,6 +3,7 @@ import { useMedia } from 'react-use';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Dialog } from '../../../';
 import { Sheet } from '../../../Sheet';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChangeNameContent } from './ChangeNameContent';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
@@ -45,6 +46,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
       openParentSheet();
     },
   };
+  const { containerID } = useHMSPrebuiltContext();
 
   if (isMobile) {
     return (
@@ -58,7 +60,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
           <ChangeNameContent {...props} />

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import androidPermissionAlert from '../../images/android-perm-1.png';
 import iosPermissions from '../../images/ios-perm-0.png';
 import { isAndroid, isIOS } from '../../common/constants';
@@ -37,9 +38,11 @@ export function PermissionErrorModal() {
     setIsSystemError(notification.data.code === 3011);
   }, [notification]);
 
+  const { containerID } = useHMSPrebuiltContext();
+
   return deviceType ? (
     <Dialog.Root open={!!deviceType}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(380px, 90%)', p: '$8' }}>
           <Dialog.Title

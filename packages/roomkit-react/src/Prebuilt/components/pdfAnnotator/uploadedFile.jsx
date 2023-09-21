@@ -1,6 +1,7 @@
 import React from 'react';
 import { TrashIcon } from '@100mslive/react-icons';
 import { Dialog, Flex, Text } from '../../../';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { DialogRow } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';
@@ -8,9 +9,10 @@ import { SubmitPDF } from './submitPdf';
 
 export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
   const [fileName, ext] = pdfFile.name.split('.');
+  const { containerID } = useHMSPrebuiltContext();
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content
           css={{

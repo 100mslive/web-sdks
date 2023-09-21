@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, Flex } from '../../../';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { DialogInputFile } from '../../primitives/DialogContent';
 import { PDFHeader } from './pdfHeader';
 import { SubmitPDF } from './submitPdf';
@@ -7,10 +8,10 @@ import { UploadedFile } from './uploadedFile';
 
 export function PDFFileOptions({ onOpenChange }) {
   const [pdfFile, setPDFFile] = useState(null);
-
+  const { containerID } = useHMSPrebuiltContext();
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <Dialog.Portal container={containerID ? document.getElementById(containerID) : document.body}>
         <Dialog.Overlay />
         <Dialog.Content
           css={{

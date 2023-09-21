@@ -29,7 +29,7 @@ export const ReconnectNotifications = () => {
   }, [notification]);
   if (!open) return null;
   return (
-    <Dialog.Root open={open} modal={true}>
+    <Dialog.Root defaultOpen modal={true}>
       <Dialog.Portal container={document.getElementById('conferencing')}>
         <Dialog.Overlay />
         <Dialog.Content
