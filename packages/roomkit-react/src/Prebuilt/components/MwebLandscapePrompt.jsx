@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
@@ -11,7 +11,8 @@ export const MwebLandscapePrompt = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
-  alert(`${!!isMobile}, ${isLandscape}`);
+
+  useEffect(() => alert(`${!!isMobile}, ${isLandscape}`), []);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
