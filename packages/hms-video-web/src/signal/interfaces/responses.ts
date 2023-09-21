@@ -26,7 +26,7 @@ export interface JoinLeaveGroupResponse {
 
 export interface PeersIterationResponse {
   iterator: string;
-  limit: number;
+  total: number;
   eof: boolean;
   peers: PeerNotificationInfo[];
 }

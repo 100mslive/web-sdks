@@ -7,9 +7,10 @@ import ITransport from '../transport/ITransport';
 
 export class HMSPeerListIterator {
   private isEnd = false;
-  private isBeginning = false;
+  private isBeginning = true;
   private nextIterator: string | null = null;
   private prevIterator: string | null = null;
+  private total = 0;
   private DEFAULT_LIMIT = 10;
   constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
 
@@ -19,6 +20,10 @@ export class HMSPeerListIterator {
 
   hasPrevious(): boolean {
     return !this.isBeginning;
+  }
+
+  getTotal(): number {
+    return this.total;
   }
 
   async next() {
@@ -35,6 +40,7 @@ export class HMSPeerListIterator {
       });
     }
     this.isEnd = response.eof;
+    this.total = response.total;
     this.nextIterator = response.iterator;
     const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
@@ -62,6 +68,7 @@ export class HMSPeerListIterator {
     }
     this.isBeginning = response.eof;
     this.prevIterator = response.iterator;
+    this.total = response.total;
     const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
       const storeHasPeer = this.store.getPeerById(peer.peer_id);

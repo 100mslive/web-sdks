@@ -584,6 +584,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         const sdkPeers = await iterator.previous.bind(iterator)();
         return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
       },
+      getTotal: iterator.getTotal.bind(iterator),
     };
   }
 

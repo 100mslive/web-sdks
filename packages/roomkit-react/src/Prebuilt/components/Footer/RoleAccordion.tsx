@@ -1,12 +1,11 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { AddCircleIcon } from '@100mslive/react-icons';
+import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-import Chip from '../Chip';
 // @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
@@ -19,6 +18,8 @@ interface ItemData {
   peerList: HMSPeer[];
   isConnected: boolean;
 }
+
+type ActionType = 'previous' | 'next';
 
 function itemKey(index: number, data: ItemData) {
   return data.peerList[index].id;
@@ -46,26 +47,42 @@ export const RoleAccordion = ({
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
+  const [peers, setPeers] = useState<HMSPeer[]>([]);
+  const [total, setTotal] = useState(0);
+  const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
-  const loadNext = useCallback(() => {
-    if (!roleName || roleName === 'Hand Raised' || !offStageRoles.includes(roleName)) {
-      return;
-    }
-    if (!peerlistIterators.get(roleName)) {
-      peerlistIterators.set(roleName, actions.getPeerListIterator({ role: roleName }));
-    }
-    peerlistIterators.get(roleName)?.next().catch(console.error);
-  }, [actions, roleName, offStageRoles]);
+  const loadData = useCallback(
+    (type: ActionType) => {
+      if (roleName === 'Hand Raised' || !isOffStageRole) {
+        return;
+      }
+      let iterator = peerlistIterators.get(roleName);
+      if (!iterator) {
+        iterator = actions.getPeerListIterator({ role: roleName });
+        peerlistIterators.set(roleName, iterator);
+      }
+      iterator?.[type]()
+        .then(peers => {
+          setPeers(peers);
+          setTotal(iterator?.getTotal() || 0);
+        })
+        .catch(console.error);
+    },
+    [actions, roleName, isOffStageRole],
+  );
 
   useEffect(() => {
-    loadNext();
-  }, [loadNext]);
+    loadData('next');
+  }, [loadData]);
 
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
   }
 
-  const height = ROW_HEIGHT * peerList.length;
+  const height = ROW_HEIGHT * (peers.length || peerList.length);
+  const iterator = peerlistIterators.get(roleName);
+  const hasPrevious = iterator?.hasPrevious();
+  const hasNext = iterator?.hasNext();
 
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
@@ -84,7 +101,7 @@ export const RoleAccordion = ({
             variant="sm"
             css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
           >
-            {roleName} {isLargeRoom ? '' : `(${getFormattedCount(peerList.length)})`}
+            {roleName} {`(${getFormattedCount(isLargeRoom && isOffStageRole ? total : peerList.length)})`}
           </Text>
           <RoleOptions roleName={roleName} peerList={peerList} />
         </Flex>
@@ -93,27 +110,47 @@ export const RoleAccordion = ({
         <Box css={{ borderTop: '1px solid $border_default' }} />
         <FixedSizeList
           itemSize={ROW_HEIGHT}
-          itemData={{ peerList, isConnected }}
+          itemData={{ peerList: isOffStageRole && isLargeRoom ? peers : peerList, isConnected }}
           itemKey={itemKey}
-          itemCount={peerList.length}
+          itemCount={isOffStageRole && isLargeRoom ? peers.length : peerList.length}
           width={width}
           height={height}
         >
           {VirtualizedParticipantItem}
         </FixedSizeList>
         {offStageRoles?.includes(roleName) ? (
-          <Chip
-            icon={<AddCircleIcon />}
-            content="Load More"
-            onClick={loadNext}
-            backgroundColor="$secondary_default"
-            css={{
-              w: 'max-content',
-              borderRadius: '$space$9',
-              m: '$2 auto',
-              cursor: 'pointer',
-            }}
-          />
+          <Flex justify="between" align="center" css={{ p: '$4' }}>
+            <Flex
+              align="center"
+              css={{
+                gap: '$1',
+                pointerEvents: hasPrevious ? 'auto' : 'none',
+                cursor: hasPrevious ? 'pointer' : 'not-allowed',
+                color: hasPrevious ? '$on_surface_high' : '$on_surface_low',
+              }}
+              onClick={() => loadData('next')}
+            >
+              <ChevronLeftIcon />
+              <Text variant="sm" css={{ color: 'inherit' }}>
+                Previous
+              </Text>
+            </Flex>
+            <Flex
+              align="center"
+              css={{
+                gap: '$1',
+                pointerEvents: hasNext ? 'auto' : 'none',
+                cursor: hasNext ? 'pointer' : 'not-allowed',
+                color: hasNext ? '$on_surface_high' : '$on_surface_low',
+              }}
+              onClick={() => loadData('previous')}
+            >
+              <Text variant="sm" css={{ color: 'inherit' }}>
+                Next
+              </Text>
+              <ChevronRightIcon />
+            </Flex>
+          </Flex>
         ) : null}
       </Accordion.Content>
     </Accordion.Item>

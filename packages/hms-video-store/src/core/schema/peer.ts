@@ -123,4 +123,5 @@ export interface HMSPeerListIterator {
   hasNext(): boolean;
   next(): Promise<HMSPeer[]>;
   previous(): Promise<HMSPeer[]>;
+  getTotal(): number;
 }
