@@ -68,7 +68,7 @@ export type HMSPrebuiltProps = {
   roomId?: string;
   role?: string;
   onLeave?: () => void;
-  containerID?: string;
+  containerSelector?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -91,7 +91,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
-      containerID = '',
+      containerSelector = '',
     },
     ref,
   ) => {
@@ -182,7 +182,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
-            containerID,
+            containerSelector,
           }}
         >
           <HMSRoomProvider

@@ -1,6 +1,6 @@
 import { useHMSPrebuiltContext } from '../../AppContext';
 
 export const usePortalContainer = () => {
-  const { containerID } = useHMSPrebuiltContext();
-  return containerID ? document.getElementById(`#${containerID}`) : undefined;
+  const { containerSelector } = useHMSPrebuiltContext();
+  return containerSelector ? document.querySelector(containerSelector) : undefined;
 };

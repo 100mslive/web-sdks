@@ -8,7 +8,7 @@ type HMSPrebuiltContextType = {
   userId?: string;
   endpoints?: Record<string, string>;
   onLeave?: () => void;
-  containerID?: string;
+  containerSelector?: string;
 };
 
 export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
@@ -17,7 +17,7 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   userId: '',
   endpoints: {},
   onLeave: undefined,
-  containerID: '',
+  containerSelector: '',
 });
 
 HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';
