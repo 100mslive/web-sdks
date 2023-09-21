@@ -6,9 +6,10 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobile = isAndroid || isIOS;
   const isLandscape = useMedia(cssConfig.media.ls);
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
 
