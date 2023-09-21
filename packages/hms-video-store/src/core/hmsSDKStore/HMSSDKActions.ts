@@ -572,7 +572,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
-    return this.sdk.getPeerListIterator(options);
+    const iterator = this.sdk.getPeerListIterator(options);
+    return {
+      hasNext: iterator.hasNext.bind(iterator),
+      hasPrevious: iterator.hasPrevious.bind(iterator),
+      next: async () => {
+        const sdkPeers = await iterator.next.bind(iterator)();
+        return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
+      },
+      previous: async () => {
+        const sdkPeers = await iterator.previous.bind(iterator)();
+        return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
+      },
+    };
   }
 
   initAppData(appData: Record<string, any>) {
@@ -1045,10 +1057,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const storePeers = this.store.getState(selectPeersMap);
       const newPeerIds = sdkPeer.filter(peer => !storePeers[peer.peerId]);
       this.syncRoomState('peersJoined');
-      // show notification only for peer list
-      if (type !== sdkTypes.HMSPeerUpdate.PEER_LIST) {
-        return;
-      }
       const connected = this.store.getState(selectIsConnectedToRoom);
       // This is not send unnecessary notifications while in preview
       // now room state also call peer list to handle large peers
