@@ -36,7 +36,6 @@ export enum HMSPeerUpdate {
   HAND_RAISE_CHANGED,
   PEER_REMOVED,
   PEER_ADDED,
-  PEER_ITERATOR_UPDATED,
 }
 
 export enum HMSTrackUpdate {

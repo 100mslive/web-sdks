@@ -92,7 +92,7 @@ export interface findPeerRequestParams {
   limit: number;
 }
 
-export interface peerIterNextRequestParams {
+export interface peerIterRequestParams {
   iterator: string;
   limit: number;
 }

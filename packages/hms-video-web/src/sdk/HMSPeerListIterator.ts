@@ -1,6 +1,5 @@
 import { HMSRemotePeer } from './models/peer';
 import { IStore } from './store';
-import { HMSPeerUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { PeersIterationResponse } from '../signal/interfaces';
@@ -8,43 +7,69 @@ import ITransport from '../transport/ITransport';
 
 export class HMSPeerListIterator {
   private isEnd = false;
-  private iteratorID: string | null = null;
+  private isBeginning = false;
+  private nextIterator: string | null = null;
+  private prevIterator: string | null = null;
   private DEFAULT_LIMIT = 10;
-  constructor(
-    private transport: ITransport,
-    private store: IStore,
-    private listener?: HMSUpdateListener,
-    private options?: HMSPeerListIteratorOptions,
-  ) {}
+  constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
 
   hasNext(): boolean {
     return !this.isEnd;
   }
 
+  hasPrevious(): boolean {
+    return !this.isBeginning;
+  }
+
   async next() {
     let response: PeersIterationResponse;
-    if (!this.iteratorID) {
+    if (!this.nextIterator) {
       response = await this.transport.findPeer({
         ...(this.options || {}),
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
     } else {
       response = await this.transport.peerIterNext({
-        iterator: this.iteratorID,
+        iterator: this.nextIterator,
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
     }
     this.isEnd = response.eof;
-    this.iteratorID = response.iterator;
+    this.nextIterator = response.iterator;
     const hmsPeers: HMSRemotePeer[] = [];
     response.peers.forEach(peer => {
       const storeHasPeer = this.store.getPeerById(peer.peer_id);
       if (!storeHasPeer) {
         const hmsPeer = createRemotePeer(peer, this.store);
         hmsPeers.push(hmsPeer);
-        this.store.addPeer(hmsPeer);
       }
     });
-    this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_ITERATOR_UPDATED, hmsPeers);
+    return hmsPeers;
+  }
+
+  async previous() {
+    let response: PeersIterationResponse;
+    if (!this.prevIterator) {
+      response = await this.transport.findPeer({
+        ...(this.options || {}),
+        limit: this.options?.limit || this.DEFAULT_LIMIT,
+      });
+    } else {
+      response = await this.transport.peerIterPrev({
+        iterator: this.prevIterator,
+        limit: this.options?.limit || this.DEFAULT_LIMIT,
+      });
+    }
+    this.isBeginning = response.eof;
+    this.prevIterator = response.iterator;
+    const hmsPeers: HMSRemotePeer[] = [];
+    response.peers.forEach(peer => {
+      const storeHasPeer = this.store.getPeerById(peer.peer_id);
+      if (!storeHasPeer) {
+        const hmsPeer = createRemotePeer(peer, this.store);
+        hmsPeers.push(hmsPeer);
+      }
+    });
+    return hmsPeers;
   }
 }

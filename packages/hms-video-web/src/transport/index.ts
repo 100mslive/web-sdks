@@ -40,7 +40,7 @@ import {
   HLSVariant,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -753,8 +753,12 @@ export default class HMSTransport implements ITransport {
   findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
     return this.signal.findPeer(params);
   }
-  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse> {
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
     return this.signal.peerIterNext(params);
+  }
+
+  peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.peerIterPrev(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

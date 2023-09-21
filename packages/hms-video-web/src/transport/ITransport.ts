@@ -12,7 +12,7 @@ import {
   GetSessionMetadataResponse,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
@@ -83,5 +83,7 @@ export default interface ITransport {
 
   findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse>;
 
-  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse>;
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
+
+  peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }

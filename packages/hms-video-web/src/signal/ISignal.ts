@@ -7,7 +7,7 @@ import {
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -138,5 +138,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse>;
 
-  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse>;
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
+
+  peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }
