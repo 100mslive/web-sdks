@@ -68,63 +68,54 @@ export const RoleAccordion = ({
   const height = ROW_HEIGHT * peerList.length;
 
   return (
-    <Flex direction="column" css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
-      <Accordion.Root
-        type="single"
-        collapsible
-        defaultValue={roleName}
-        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
+    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
+      <Accordion.Header
+        iconStyles={{ c: '$on_surface_high' }}
+        css={{
+          textTransform: 'capitalize',
+          p: '$6 $8',
+          fontSize: '$sm',
+          fontWeight: '$semiBold',
+          c: '$on_surface_medium',
+        }}
       >
-        <Accordion.Item value={roleName}>
-          <Accordion.Header
-            iconStyles={{ c: '$on_surface_high' }}
-            css={{
-              textTransform: 'capitalize',
-              p: '$6 $8',
-              fontSize: '$sm',
-              fontWeight: '$semiBold',
-              c: '$on_surface_medium',
-            }}
+        <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
+          <Text
+            variant="sm"
+            css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
           >
-            <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
-              <Text
-                variant="sm"
-                css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
-              >
-                {roleName} {isLargeRoom ? '' : `(${getFormattedCount(peerList.length)})`}
-              </Text>
-              <RoleOptions roleName={roleName} peerList={peerList} />
-            </Flex>
-          </Accordion.Header>
-          <Accordion.Content>
-            <Box css={{ borderTop: '1px solid $border_default' }} />
-            <FixedSizeList
-              itemSize={ROW_HEIGHT}
-              itemData={{ peerList, isConnected }}
-              itemKey={itemKey}
-              itemCount={peerList.length}
-              width={width}
-              height={height}
-            >
-              {VirtualizedParticipantItem}
-            </FixedSizeList>
-            {offStageRoles?.includes(roleName) ? (
-              <Chip
-                icon={<AddCircleIcon />}
-                content="Load More"
-                onClick={loadNext}
-                backgroundColor="$secondary_default"
-                css={{
-                  w: 'max-content',
-                  borderRadius: '$space$9',
-                  m: '$2 auto',
-                  cursor: 'pointer',
-                }}
-              />
-            ) : null}
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
-    </Flex>
+            {roleName} {isLargeRoom ? '' : `(${getFormattedCount(peerList.length)})`}
+          </Text>
+          <RoleOptions roleName={roleName} peerList={peerList} />
+        </Flex>
+      </Accordion.Header>
+      <Accordion.Content>
+        <Box css={{ borderTop: '1px solid $border_default' }} />
+        <FixedSizeList
+          itemSize={ROW_HEIGHT}
+          itemData={{ peerList, isConnected }}
+          itemKey={itemKey}
+          itemCount={peerList.length}
+          width={width}
+          height={height}
+        >
+          {VirtualizedParticipantItem}
+        </FixedSizeList>
+        {offStageRoles?.includes(roleName) ? (
+          <Chip
+            icon={<AddCircleIcon />}
+            content="Load More"
+            onClick={loadNext}
+            backgroundColor="$secondary_default"
+            css={{
+              w: 'max-content',
+              borderRadius: '$space$9',
+              m: '$2 auto',
+              cursor: 'pointer',
+            }}
+          />
+        ) : null}
+      </Accordion.Content>
+    </Accordion.Item>
   );
 };

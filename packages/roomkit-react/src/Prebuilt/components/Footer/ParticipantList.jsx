@@ -21,7 +21,7 @@ import {
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import { Accordion, Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { ToastManager } from '../Toast/ToastManager';
@@ -84,6 +84,7 @@ export const ParticipantList = ({ offStageRoles = [] }) => {
           isConnected={isConnected}
           filter={filter}
           offStageRoles={offStageRoles}
+          isLargeRoom={isLargeRoom}
         />
       </Flex>
     </Fragment>
@@ -132,6 +133,7 @@ const VirtualizedParticipants = ({
   filter,
   handRaisedList = [],
   offStageRoles,
+  isLargeRoom,
 }) => {
   return (
     <Flex
@@ -145,26 +147,32 @@ const VirtualizedParticipants = ({
         flex: '1 1 0',
       }}
     >
-      {handRaisedList.length > 0 ? (
-        <RoleAccordion
-          peerList={handRaisedList}
-          roleName="Hand Raised"
-          filter={filter}
-          isConnected={isConnected}
-          isHandRaisedAccordion
-          offStageRoles={offStageRoles}
-        />
-      ) : null}
-      {Object.keys(peersOrderedByRoles).map(role => (
-        <RoleAccordion
-          key={role}
-          peerList={peersOrderedByRoles[role]}
-          roleName={role}
-          isConnected={isConnected}
-          filter={filter}
-          offStageRoles={offStageRoles}
-        />
-      ))}
+      <Accordion.Root
+        type={isLargeRoom ? 'single' : 'multiple'}
+        collapsible
+        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
+      >
+        {handRaisedList.length > 0 ? (
+          <RoleAccordion
+            peerList={handRaisedList}
+            roleName="Hand Raised"
+            filter={filter}
+            isConnected={isConnected}
+            isHandRaisedAccordion
+            offStageRoles={offStageRoles}
+          />
+        ) : null}
+        {Object.keys(peersOrderedByRoles).map(role => (
+          <RoleAccordion
+            key={role}
+            peerList={peersOrderedByRoles[role]}
+            roleName={role}
+            isConnected={isConnected}
+            filter={filter}
+            offStageRoles={offStageRoles}
+          />
+        ))}
+      </Accordion.Root>
     </Flex>
   );
 };
