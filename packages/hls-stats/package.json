@@ -34,6 +34,6 @@
     "hls.js": "1.4.3"
   },
   "peerDependencies": {
-    "hls.js": "1.4.3"
+    "hls.js": "1.4.12"
   }
 }
