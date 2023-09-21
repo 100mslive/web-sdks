@@ -10,6 +10,7 @@ import {
   selectRemotePeers,
   useHMSStore,
   useHMSVanillaStore,
+  useParticipantsParams,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 
@@ -19,7 +20,7 @@ import { useRoomLayout } from '../provider/roomLayoutProvider';
  * starting from the instant when alone in room.
  * note: the cb is not called when another peer joins during this period.
  */
-export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
+export const useWhenAloneInRoom = (thresholdMs: number = 5 * 60 * 1000) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const [aloneForLong, setAloneForLong] = useState(false);
@@ -63,7 +64,7 @@ export const useShowStreamingUI = () => {
 };
 
 // The search results should not have role name matches
-export const useParticipants = params => {
+export const useParticipants = (params: useParticipantsParams) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);
