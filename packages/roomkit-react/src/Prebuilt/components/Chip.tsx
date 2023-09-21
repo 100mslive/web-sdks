@@ -24,9 +24,13 @@ const Chip = ({
     return null;
   }
   return (
-    <Flex align="center" css={{ backgroundColor, p: '$4 $6', borderRadius: '$4', ...css }} onClick={() => onClick?.()}>
+    <Flex
+      align="center"
+      css={{ backgroundColor, p: '$4 $6', gap: '$2', borderRadius: '$4', ...css }}
+      onClick={() => onClick?.()}
+    >
       {icon}
-      <Text variant="sm" css={{ fontWeight: '$semiBold', color: textColor, ml: '$2' }}>
+      <Text variant="sm" css={{ fontWeight: '$semiBold', color: textColor }}>
         {content}
       </Text>
     </Flex>
