@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -28,6 +28,7 @@ const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number;
   return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
 });
 
+const peerlistIterators = new Map<string, HMSPeerListIterator>();
 export const RoleAccordion = ({
   peerList = [],
   roleName,
@@ -44,17 +45,16 @@ export const RoleAccordion = ({
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
-  const iteratorRef = useRef<HMSPeerListIterator | null>(null);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   const loadNext = useCallback(() => {
     if (!roleName || roleName === 'Hand Raised' || !offStageRoles.includes(roleName)) {
       return;
     }
-    if (!iteratorRef.current) {
-      iteratorRef.current = actions.getPeerListIterator({ role: roleName });
+    if (!peerlistIterators.get(roleName)) {
+      peerlistIterators.set(roleName, actions.getPeerListIterator({ role: roleName }));
     }
-    iteratorRef.current.next().catch(console.error);
+    peerlistIterators.get(roleName)?.next().catch(console.error);
   }, [actions, roleName, offStageRoles]);
 
   useEffect(() => {
@@ -118,7 +118,6 @@ export const RoleAccordion = ({
                   w: 'max-content',
                   borderRadius: '$space$9',
                   m: '$2 auto',
-                  p: '$4',
                   cursor: 'pointer',
                 }}
               />
