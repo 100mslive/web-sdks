@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
@@ -8,20 +8,9 @@ import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
 
 export const MwebLandscapePrompt = () => {
-  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
-
-  useEffect(() => {
-    const handleOrientationChange = e => {
-      setShowMwebLandscapePrompt(e.target.type.includes('landscape') && isMobile);
-    };
-
-    if (window) {
-      setShowMwebLandscapePrompt(window.screen.orientation.type.includes('landscape') && isMobile);
-      window.screen.orientation.addEventListener('change', handleOrientationChange);
-    }
-    return () => window.screen.orientation.removeEventListener('change', handleOrientationChange);
-  }, []);
+  const isLandscape = useMedia(cssConfig.media.ls);
+  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
