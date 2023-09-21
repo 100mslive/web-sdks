@@ -11,6 +11,7 @@ export const MwebLandscapePrompt = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
+  alert(`${!!isMobile}, ${isLandscape}`);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
