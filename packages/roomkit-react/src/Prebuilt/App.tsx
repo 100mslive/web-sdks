@@ -68,7 +68,11 @@ export type HMSPrebuiltProps = {
   roomId?: string;
   role?: string;
   onLeave?: () => void;
-  containerSelector?: string;
+  /*
+Specify the dialog box container using a query selector (e.g., '#id', '.some-class'). 
+This determines the centering location for dialog boxes. Defaults to document body if not specified.
+   */
+  dialogContainerSelector?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -91,7 +95,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
-      containerSelector = '',
+      dialogContainerSelector = '',
     },
     ref,
   ) => {
@@ -182,7 +186,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
-            containerSelector,
+            dialogContainerSelector,
           }}
         >
           <HMSRoomProvider

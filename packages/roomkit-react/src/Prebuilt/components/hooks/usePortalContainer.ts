@@ -1,6 +1,6 @@
 import { useHMSPrebuiltContext } from '../../AppContext';
 
 export const usePortalContainer = () => {
-  const { containerSelector } = useHMSPrebuiltContext();
-  return containerSelector ? (document.querySelector(containerSelector) as HTMLElement) : undefined;
+  const { dialogContainerSelector } = useHMSPrebuiltContext();
+  return dialogContainerSelector ? (document.querySelector(dialogContainerSelector) as HTMLElement) : undefined;
 };
