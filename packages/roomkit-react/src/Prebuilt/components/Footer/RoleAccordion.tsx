@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -44,7 +44,6 @@ export const RoleAccordion = ({
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const actions = useHMSActions();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
-  const [hasNext, setHasNext] = useState(false);
   const iteratorRef = useRef<HMSPeerListIterator | null>(null);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
@@ -55,12 +54,7 @@ export const RoleAccordion = ({
     if (!iteratorRef.current) {
       iteratorRef.current = actions.getPeerListIterator({ role: roleName });
     }
-    iteratorRef.current
-      .next()
-      .catch(console.error)
-      .finally(() => {
-        setHasNext(iteratorRef.current ? iteratorRef.current.hasNext() : false);
-      });
+    iteratorRef.current.next().catch(console.error);
   }, [actions, roleName, offStageRoles]);
 
   useEffect(() => {
@@ -114,15 +108,15 @@ export const RoleAccordion = ({
             >
               {VirtualizedParticipantItem}
             </FixedSizeList>
-            {hasNext && offStageRoles?.includes(roleName) ? (
+            {offStageRoles?.includes(roleName) ? (
               <Chip
                 icon={<AddCircleIcon />}
                 content="Load More"
                 onClick={loadNext}
-                backgroundColor="$secodary_default"
+                backgroundColor="$secondary_default"
                 css={{
                   w: 'max-content',
-                  borderRadius: '$size$9',
+                  borderRadius: '$space$9',
                   m: '$2 auto',
                   p: '$4',
                   cursor: 'pointer',
