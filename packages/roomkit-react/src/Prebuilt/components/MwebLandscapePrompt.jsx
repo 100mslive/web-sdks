@@ -13,7 +13,18 @@ export const MwebLandscapePrompt = () => {
   const isLandscape = useMedia(cssConfig.media.ls);
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
 
-  useEffect(() => alert(`${!!isMobile}, ${isLandscape}`), []);
+  useEffect(() => {
+    const handleResize = () => {
+      setShowMwebLandscapePrompt(isMobile && window.innerWidth < window.innerHeight);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
