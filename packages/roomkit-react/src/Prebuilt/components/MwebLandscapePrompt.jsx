@@ -1,27 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
+import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
+  const isMobile = isAndroid || isIOS;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
-  const isMobile = useMedia(cssConfig.media.md);
   const { containerID } = useHMSPrebuiltContext();
-  useEffect(() => {
-    const handleOrientationChange = e => {
-      setShowMwebLandscapePrompt(e.target.type.includes('landscape') && isMobile);
-    };
 
-    if (window) {
-      setShowMwebLandscapePrompt(window.screen.orientation.type.includes('landscape') && isMobile);
-      window.screen.orientation.addEventListener('change', handleOrientationChange);
-    }
-    return () => window.screen.orientation.removeEventListener('change', handleOrientationChange);
+  useEffect(() => {
+    const handleResize = () => {
+      setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
