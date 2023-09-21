@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, useTheme } from "@100mslive/react-ui";
+import { Box, Flex, Text, useTheme } from "@100mslive/roomkit-react";
 import { CREATE_ROOM_DOC_URL } from "../common/constants";
 
 function ErrorPage({ error }) {
@@ -10,8 +10,8 @@ function ErrorPage({ error }) {
       justify="center"
       css={{
         size: "100%",
-        color: "$textPrimary",
-        backgroundColor: "$bgPrimary",
+        color: "$on_surface_high",
+        backgroundColor: "$background_default",
       }}
     >
       <Box css={{ position: "relative", overflow: "hidden", r: "$3" }}>

@@ -1,9 +1,10 @@
 import { IStore, KnownRoles, TrackStateEntry } from './IStore';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
-import { SelectedDevices } from '../../device-manager';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
-import { HMSConfig, HMSFrameworkInfo, HMSSpeaker } from '../../interfaces';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
+import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
   HMSSimulcastLayerDefinition,
@@ -47,6 +48,7 @@ class Store implements IStore {
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
+  private polls = new Map<string, HMSPoll>();
 
   getConfig() {
     return this.config;
@@ -95,6 +97,10 @@ class Store implements IStore {
 
   getPeers(): HMSPeer[] {
     return Object.values(this.peers);
+  }
+
+  getPeerMap() {
+    return this.peers;
   }
 
   getPeerById(peerId: string) {
@@ -342,8 +348,8 @@ class Store implements IStore {
       simulcastLayers?.layers?.map(value => {
         const layer = simulcastMapping[value.rid as RID];
         const resolution = {
-          width: width / value.scaleResolutionDownBy,
-          height: height / value.scaleResolutionDownBy,
+          width: Math.floor(width / value.scaleResolutionDownBy),
+          height: Math.floor(height / value.scaleResolutionDownBy),
         };
         return {
           layer,
@@ -353,11 +359,19 @@ class Store implements IStore {
     );
   }
 
+  setPoll(poll: HMSPoll) {
+    this.polls.set(poll.id, poll);
+  }
+
+  getPoll(id: string): HMSPoll | undefined {
+    return this.polls.get(id);
+  }
+
   getErrorListener() {
     return this.errorListener;
   }
 
-  cleanUp() {
+  cleanup() {
     const tracks = this.getTracks();
     for (const track of tracks) {
       track.cleanup();

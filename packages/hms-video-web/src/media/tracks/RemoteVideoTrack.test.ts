@@ -1,7 +1,7 @@
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const streamId = '123';
 const trackId = '456';
@@ -112,40 +112,6 @@ describe('remoteVideoTrack', () => {
     await track.setPreferredLayer(HMSSimulcastLayer.MEDIUM);
     expectDegradationLayerAndSink(false, HMSSimulcastLayer.MEDIUM, true);
     expectLayersSent([HMSSimulcastLayer.LOW, HMSSimulcastLayer.MEDIUM]);
-  });
-
-  test('sdk degradation', async () => {
-    await track.addSink(videoElement);
-    expectNonDegradedVisible();
-    track.setDegradedFromSdk(true);
-    expectDegradedVisible();
-    track.setDegradedFromSdk(false); // recover
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.HIGH, true);
-    track.setDegradedFromSdk(true);
-
-    await track.removeSink(videoElement);
-    expectDegradationLayerAndSink(false, HMSSimulcastLayer.NONE, false);
-    expectLayersSent([
-      HMSSimulcastLayer.HIGH,
-      HMSSimulcastLayer.NONE,
-      HMSSimulcastLayer.HIGH,
-      HMSSimulcastLayer.NONE,
-      HMSSimulcastLayer.NONE,
-    ]);
-  });
-
-  test('sdk degradation + track mute', async () => {
-    expect(track.enabled).toBe(true);
-    await track.addSink(videoElement);
-    expectNonDegradedVisible();
-    track.setDegradedFromSdk(true);
-    expectDegradedVisible();
-    track.setEnabled(false);
-    expectDegradationLayerAndSink(true, HMSSimulcastLayer.NONE, true);
-    // video goes out of view
-    await track.removeSink(videoElement);
-    expectNonDegradedNotVisible();
-    expectLayersSent([HMSSimulcastLayer.HIGH, HMSSimulcastLayer.NONE, HMSSimulcastLayer.NONE]);
   });
 
   /**

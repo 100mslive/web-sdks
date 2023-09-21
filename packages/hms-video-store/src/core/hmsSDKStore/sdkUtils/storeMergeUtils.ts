@@ -1,4 +1,4 @@
-import { HMSLocalTrack as SDKHMSLocalTrack } from '@100mslive/hms-video';
+import { HMSLocalTrack as SDKHMSLocalTrack, HMSPoll } from '@100mslive/hms-video';
 import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 
@@ -12,6 +12,7 @@ import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
  * @param newHmsTracks this will be update if required
  * @param newHmsSDkTracks this is future value of local hms tacks map
  */
+// eslint-disable-next-line complexity
 export const mergeNewPeersInDraft = (
   draftPeers: Record<HMSPeerID, HMSPeer>,
   newPeers: Record<HMSPeerID, Partial<HMSPeer>>,
@@ -23,6 +24,9 @@ export const mergeNewPeersInDraft = (
     if (isEntityUpdated(oldPeer, newPeer)) {
       if (areArraysEqual(oldPeer.auxiliaryTracks, newPeer.auxiliaryTracks)) {
         newPeer.auxiliaryTracks = oldPeer.auxiliaryTracks;
+      }
+      if (oldPeer.groups && areArraysEqual(oldPeer.groups, newPeer.groups)) {
+        newPeer.groups = oldPeer.groups;
       }
       Object.assign(oldPeer, newPeer);
     } else if (isEntityRemoved(oldPeer, newPeer)) {
@@ -48,6 +52,25 @@ export const mergeNewTracksInDraft = (
       delete draftTracks[trackID];
     } else if (isEntityAdded(oldTrack, newTrack)) {
       draftTracks[trackID] = newTrack as HMSTrack;
+    }
+  }
+};
+
+export const mergeNewPollsInDraft = (
+  draftPolls: Record<string, HMSPoll>,
+  newPolls: Record<string, Partial<HMSPoll>>,
+) => {
+  const pollIDs = union(Object.keys(draftPolls), Object.keys(newPolls));
+  for (const pollID of pollIDs) {
+    const oldPoll = draftPolls[pollID];
+    const newPoll = newPolls[pollID];
+    if (isEntityUpdated(oldPoll, newPoll)) {
+      if (oldPoll.questions && areArraysEqual(oldPoll.questions, newPoll.questions)) {
+        newPoll.questions = oldPoll.questions;
+      }
+      Object.assign(oldPoll, newPoll);
+    } else if (isEntityAdded(oldPoll, newPoll)) {
+      draftPolls[pollID] = newPoll as HMSPoll;
     }
   }
 };

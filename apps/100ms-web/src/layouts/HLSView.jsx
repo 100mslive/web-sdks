@@ -21,7 +21,7 @@ import {
   Text,
   Tooltip,
   useTheme,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { HlsStatsOverlay } from "../components/HlsStatsOverlay";
 import { HMSVideoPlayer } from "../components/HMSVideo";
 import { FullScreenButton } from "../components/HMSVideo/FullscreenButton";
@@ -282,7 +282,9 @@ const HLSView = () => {
                             css={{
                               height: "$4",
                               width: "$4",
-                              background: isVideoLive ? "$error" : "$white",
+                              background: isVideoLive
+                                ? "$alert_error_default"
+                                : "$on_primary_high",
                               r: "$1",
                             }}
                           />

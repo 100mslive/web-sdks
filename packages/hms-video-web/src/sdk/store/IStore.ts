@@ -1,4 +1,4 @@
-import { HMSConfig, HMSFrameworkInfo, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
 import {
@@ -36,6 +36,7 @@ export interface IStore {
   getLocalPeer(): HMSLocalPeer | undefined;
   getRemotePeers(): HMSRemotePeer[];
   getPeers(): HMSPeer[];
+  getPeerMap(): Record<string, HMSPeer>;
 
   getTracksMap(): Map<HMSTrack, HMSTrack>;
   getTracks(): HMSTrack[];
@@ -76,5 +77,8 @@ export interface IStore {
 
   hasRoleDetailsArrived(): boolean;
 
-  cleanUp(): void;
+  setPoll(poll: HMSPoll): void;
+  getPoll(id: string): HMSPoll | undefined;
+
+  cleanup(): void;
 }

@@ -2,7 +2,7 @@ import { VideoTrackLayerUpdate } from '../connection/channel-messages';
 import { HMSRole } from '../interfaces/role';
 import { HMSLocalTrack } from '../media/tracks';
 import { HMSTrack, HMSTrackSource } from '../media/tracks/HMSTrack';
-import { Track } from '../signal/interfaces';
+import { PollInfoParams, PollResult, Track } from '../signal/interfaces';
 
 /**
  * Interfaces for message received from BIZ Signal through Websocket.
@@ -30,6 +30,8 @@ export interface OnTrackLayerUpdateNotification {
 
 export interface PeerNotificationInfo {
   peer_id: string;
+  role: string;
+  groups: string[];
   info: Info;
 }
 
@@ -83,6 +85,8 @@ export interface PeerNotification {
   tracks: {
     [track_id: string]: TrackState;
   };
+  groups: string[];
+  realtime?: boolean;
   is_from_room_state?: boolean;
 }
 
@@ -182,6 +186,8 @@ export interface PeerLeaveRequestNotification {
 export interface MessageNotification {
   peer?: {
     peer_id: string;
+    groups: string[];
+    role: string;
     info: {
       name: string;
       data: any;
@@ -244,4 +250,32 @@ export interface MetadataChangeNotification {
     key: string;
     updated_at?: number;
   }[];
+}
+
+export interface PollStartNotification {
+  polls: PollInfoParams[];
+}
+
+export type PollStopNotification = PollStartNotification;
+
+export interface PollStats extends PollResult {
+  poll_id: string;
+}
+export interface PollStatsNotification {
+  polls: PollStats[];
+}
+
+export interface RoomInfo {
+  room_id: string;
+  name: string;
+  description: string;
+  max_size: number;
+  large_room_optimization: boolean;
+}
+
+export interface SessionInfo {
+  session_id: string;
+  room_id: string;
+  peer_count: number;
+  track_count: number;
 }

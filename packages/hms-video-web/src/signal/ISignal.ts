@@ -4,7 +4,28 @@ import {
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
+  PollInfoGetParams,
+  PollInfoGetResponse,
+  PollInfoSetParams,
+  PollInfoSetResponse,
+  PollListParams,
+  PollListResponse,
+  PollQuestionsGetParams,
+  PollQuestionsGetResponse,
+  PollQuestionsSetParams,
+  PollQuestionsSetResponse,
+  PollResponseSetParams,
+  PollResponseSetResponse,
+  PollResponsesGetParams,
+  PollResponsesGetResponse,
+  PollResultParams,
+  PollResultResponse,
+  PollStartParams,
+  PollStartResponse,
+  PollStopParams,
+  PollStopResponse,
   RemovePeerRequest,
   RequestForBulkRoleChangeParams,
   RequestForRoleChangeParams,
@@ -32,6 +53,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
     disableVidAutoSub: boolean,
     serverSubDegrade: boolean,
     simulcast: boolean,
+    onDemandTracks: boolean,
     offer?: RTCSessionDescriptionInit,
   ): Promise<RTCSessionDescriptionInit>;
 
@@ -82,4 +104,32 @@ export interface ISignal extends IAnalyticsTransportProvider {
   listenMetadataChange(keys: string[]): Promise<void>;
 
   close(): Promise<void>;
+
+  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse>;
+
+  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse>;
+
+  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse>;
+
+  startPoll(params: PollStartParams): Promise<PollStartResponse>;
+
+  stopPoll(params: PollStopParams): Promise<PollStopResponse>;
+
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse>;
+
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse>;
+
+  getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse>;
+
+  getPollsList(params: PollListParams): Promise<PollListResponse>;
+
+  getPollResult(params: PollResultParams): Promise<PollResultResponse>;
+
+  joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  leaveGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  addToGroup(peerId: string, name: string): Promise<void>;
+
+  removeFromGroup(peerId: string, name: string): Promise<void>;
 }

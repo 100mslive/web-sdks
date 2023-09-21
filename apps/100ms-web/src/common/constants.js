@@ -118,7 +118,6 @@ export const APP_DATA = {
   chatSelector: "chatSelector",
   chatDraft: "chatDraft",
   appConfig: "appConfig",
-  recordingUrl: "recordingUrl",
   sidePane: "sidePane",
   hlsStats: "hlsStats",
   hlsViewerRole: "hlsViewerRole",
@@ -131,9 +130,12 @@ export const APP_DATA = {
   rtmpStarted: "rtmpStarted",
   recordingStarted: "recordingStarted",
   embedConfig: "embedConfig",
+  pdfConfig: "pdfConfig",
   pinnedTrackId: "pinnedTrackId",
   dropdownList: "dropdownList",
+  widgetState: "widgetState",
 };
+
 export const UI_SETTINGS = {
   isAudioOnly: "isAudioOnly",
   isHeadless: "isHeadless",
@@ -146,12 +148,26 @@ export const UI_SETTINGS = {
   hideLocalVideo: "hideLocalVideo",
 };
 
+export const WIDGET_STATE = {
+  pollInView: "pollInView",
+  view: "view",
+};
+
+export const WIDGET_VIEWS = {
+  LANDING: "LANDING",
+  CREATE_POLL_QUIZ: "CREATE_POLL_QUIZ",
+  CREATE_QUESTIONS: "CREATE_QUESTIONS",
+  VOTE: "VOTE",
+  RESULTS: "RESULTS",
+};
+
 export const SIDE_PANE_OPTIONS = {
   PARTICIPANTS: "Participants",
   CHAT: "Chat",
   STREAMING: "STREAMING",
   TILES: "TILES",
   SCREEN_TILES: "SCREEN_TILES",
+  WIDGET: "WIDGET",
 };
 
 export const SUBSCRIBED_NOTIFICATIONS = {
@@ -169,6 +185,10 @@ export const HLS_TIMED_METADATA_DOC_URL =
 
 export const REMOTE_STOP_SCREENSHARE_TYPE = "REMOTE_STOP_SCREENSHARE";
 
+export const isChrome =
+  parsedUserAgent.getBrowser()?.name?.toLowerCase() === "chrome";
+export const isFirefox =
+  parsedUserAgent.getBrowser()?.name?.toLowerCase() === "firefox";
 export const isSafari =
   parsedUserAgent.getBrowser()?.name?.toLowerCase() === "safari";
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === "ios";
@@ -204,4 +224,28 @@ export const SESSION_STORE_KEY = {
   TRANSCRIPTION_STATE: "transcriptionState",
   PINNED_MESSAGE: "pinnedMessage",
   SPOTLIGHT: "spotlight",
+};
+
+export const INTERACTION_TYPE = {
+  POLL: "Poll",
+  QUIZ: "Quiz",
+};
+
+export const QUESTION_TYPE_TITLE = {
+  "single-choice": "Single Choice",
+  "multiple-choice": "Multiple Choice",
+  // "short-answer": "Short Answer",
+  // "long-answer": "Long Answer",
+};
+
+export const QUESTION_TYPE = {
+  SINGLE_CHOICE: "single-choice",
+  MULTIPLE_CHOICE: "multiple-choice",
+  // SHORT_ANSWER: "short-answer",
+  // LONG_ANSWER: "long-answer",
+};
+
+export const PDF_SHARING_OPTIONS = {
+  FROM_YOUR_COMPUTER: "From your Computer",
+  FROM_A_URL: "From a URL",
 };

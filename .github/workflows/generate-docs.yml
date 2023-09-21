@@ -68,5 +68,4 @@ jobs:
           labels: automated pr
           branch: web-api-reference
           base: main
-          reviewers: triptu
           delete-branch: true

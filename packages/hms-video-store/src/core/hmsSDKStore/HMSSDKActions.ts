@@ -22,16 +22,18 @@ import {
   HMSVideoTrack as SDKHMSVideoTrack,
   SessionStoreUpdate,
 } from '@100mslive/hms-video';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
   isEntityUpdated,
   mergeNewPeersInDraft,
+  mergeNewPollsInDraft,
   mergeNewTracksInDraft,
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
+import { HMSInteractivityCenter } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -58,12 +60,14 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrack,
+  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from '../schema';
 import {
   HMSRoleChangeRequest,
   selectIsConnectedToRoom,
+  selectIsInPreview,
   selectIsLocalScreenShared,
   selectIsLocalVideoDisplayEnabled,
   selectIsLocalVideoEnabled,
@@ -115,7 +119,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   implements IHMSActions<T>
 {
   private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
-  private hmsSDKPeers: Record<string, sdkTypes.HMSPeer> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
@@ -126,6 +129,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+  interactivityCenter: IHMSInteractivityCenter;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
@@ -134,7 +138,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications = notificationManager;
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
-
+    this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
   }
 
@@ -201,10 +205,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async preview(config: sdkTypes.HMSPreviewConfig) {
-    if (this.isRoomJoinCalled) {
-      this.logPossibleInconsistency('attempting to call preview after join was called');
-      return; // ignore
-    }
     const roomState = this.store.getState(selectRoomState);
     if (roomState === HMSRoomState.Preview || roomState === HMSRoomState.Connecting) {
       this.logPossibleInconsistency('attempting to call preview while room is in preview/connecting');
@@ -212,14 +212,20 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
 
     try {
-      this.setState(store => {
-        store.room.roomState = HMSRoomState.Connecting;
-      }, 'connecting');
+      if (roomState !== HMSRoomState.Connected) {
+        this.setState(store => {
+          store.room.roomState = HMSRoomState.Connecting;
+        }, 'connecting');
+      }
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
       HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
       throw err;
     }
+  }
+
+  async cancelMidCallPreview() {
+    return this.sdk.cancelMidCallPreview();
   }
 
   async join(config: sdkTypes.HMSConfig) {
@@ -386,7 +392,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const hmsPeer = this.hmsSDKPeers[peerID];
+    const hmsPeer = this.getSDKHMSPeer(peerID);
+    if (!hmsPeer) {
+      HMSLogger.w('sendMessage', 'Failed to send message');
+      throw Error(`sendMessage Failed - peer ${peerID} not found`);
+    }
     const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
@@ -514,7 +524,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
-    const peer = this.hmsSDKPeers[forPeerId];
+    const peer = this.getSDKHMSPeer(forPeerId);
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
       return;
@@ -524,7 +534,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
-    const peer = this.hmsSDKPeers[forPeerId];
+    const peer = this.getSDKHMSPeer(forPeerId);
     if (!peer) {
       this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
       return;
@@ -541,7 +551,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   // TODO: separate out role related things in another file
   async acceptChangeRole(request: HMSRoleChangeRequest) {
     const sdkPeer: sdkTypes.HMSPeer | undefined = request.requestedBy
-      ? this.hmsSDKPeers[request.requestedBy.id]
+      ? this.getSDKHMSPeer(request.requestedBy.id)
       : undefined;
     if (!sdkPeer) {
       HMSLogger.w(`peer for which role change is requested no longer available - ${request.requestedBy}`);
@@ -554,6 +564,19 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     // TODO: hotfix for HMS-3639. Needs a better solution
     await this.sdk.acceptChangeRole(sdkRequest);
     this.removeRoleChangeRequest(request);
+  }
+
+  async raiseLocalPeerHand() {
+    await this.sdk.raiseLocalPeerHand();
+  }
+  async lowerLocalPeerHand() {
+    await this.sdk.lowerLocalPeerHand();
+  }
+  async raiseRemotePeerHand(peerId: string) {
+    await this.sdk.raiseRemotePeerHand(peerId);
+  }
+  async lowerRemotePeerHand(peerId: string) {
+    await this.sdk.lowerRemotePeerHand(peerId);
   }
 
   initAppData(appData: Record<string, any>) {
@@ -611,7 +634,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async removePeer(peerID: string, reason: string) {
-    const peer = this.hmsSDKPeers[peerID];
+    const peer = this.getSDKHMSPeer(peerID);
     if (peer && !peer.isLocal) {
       await this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
     } else {
@@ -724,7 +747,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
     this.hmsSDKTracks = {};
-    HMSLogger.cleanUp();
+    HMSLogger.cleanup();
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
     }, reason);
@@ -733,6 +756,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private async sdkJoinWithListeners(config: sdkTypes.HMSConfig) {
     await this.sdk.join(config, {
       onJoin: this.onJoin.bind(this),
+      onPreview: this.onPreview.bind(this),
       onRoomUpdate: this.onRoomUpdate.bind(this),
       onPeerUpdate: this.onPeerUpdate.bind(this),
       onTrackUpdate: this.onTrackUpdate.bind(this),
@@ -748,6 +772,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onRemovedFromRoom: this.onRemovedFromRoom.bind(this),
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
+      onPollsUpdate: this.onPollsUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -784,8 +809,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       if (!areArraysEqual(store.devices.audioOutput, devices.audioOutput)) {
         store.devices.audioOutput = devices.audioOutput;
       }
-      if (localPeer?.id && this.hmsSDKPeers[localPeer.id]) {
-        Object.assign(store.settings, this.getMediaSettings(this.hmsSDKPeers[localPeer.id]));
+      const sdkLocalPeer = this.sdk.getLocalPeer();
+      if (localPeer?.id && sdkLocalPeer) {
+        Object.assign(store.settings, this.getMediaSettings(sdkLocalPeer));
       }
     }, 'deviceChange');
     // send notification only on device change - selection is present
@@ -826,6 +852,27 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private onSessionStoreUpdate(updates: SessionStoreUpdate[]) {
     this.setSessionStoreValueLocally(updates, 'sessionStoreUpdate');
+  }
+
+  private onPollsUpdate(actionType: sdkTypes.HMSPollsUpdate, polls: sdkTypes.HMSPoll[]) {
+    const actionName = POLL_NOTIFICATION_TYPES[actionType];
+    this.setState(draftStore => {
+      const pollsObject = polls.reduce((acc, poll) => {
+        acc[poll.id] = {
+          ...poll,
+          questions: poll.questions?.map(question => ({
+            ...question,
+            answer: question.answer ? { ...question.answer } : undefined,
+            options: question.options?.map(option => ({ ...option })),
+            responses: question.responses?.map(response => ({ ...response })),
+          })),
+        };
+        return acc;
+      }, {} as { [key: string]: sdkTypes.HMSPoll });
+      mergeNewPollsInDraft(draftStore.polls, pollsObject);
+    }, actionName);
+
+    polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {
@@ -877,6 +924,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
     const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
+    const newNetworkQuality: Record<HMSPeerID, sdkTypes.HMSConnectionQuality> = {};
     let newPreview: HMSStore['preview'];
 
     const sdkPeers: sdkTypes.HMSPeer[] = this.sdk.getPeers();
@@ -886,7 +934,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = SDKToHMS.convertPeer(sdkPeer);
       newHmsPeers[hmsPeer.id] = hmsPeer;
       newHmsPeerIDs.push(hmsPeer.id);
-      this.hmsSDKPeers[hmsPeer.id] = sdkPeer;
+      newNetworkQuality[hmsPeer.id] = {
+        peerID: hmsPeer.id,
+        downlinkQuality: sdkPeer.networkQuality || -1,
+      };
 
       const sdkTracks = [sdkPeer.audioTrack, sdkPeer.videoTrack, ...sdkPeer.auxiliaryTracks];
       for (const sdkTrack of sdkTracks) {
@@ -920,6 +971,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
+      Object.assign(draftStore.connectionQualities, newNetworkQuality);
       this.hmsSDKTracks = newHmsSDkTracks;
 
       /**
@@ -941,7 +993,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.roomState = HMSRoomState.Preview;
     }, 'previewStart');
     this.syncRoomState('previewSync');
@@ -963,7 +1015,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     );
     this.syncRoomState('joinSync');
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom));
+      Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
@@ -982,7 +1034,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   protected onRoomUpdate(type: sdkTypes.HMSRoomUpdate, room: sdkTypes.HMSRoom) {
     this.setState(store => {
-      Object.assign(store.room, SDKToHMS.convertRoom(room));
+      Object.assign(store.room, SDKToHMS.convertRoom(room, this.sdk.getLocalPeer()?.peerId));
     }, type);
   }
 
@@ -1099,26 +1151,17 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
    */
   protected onConnectionQualityUpdate(newQualities: sdkTypes.HMSConnectionQuality[]) {
     this.setState(store => {
-      const currentPeerIDs = new Set();
       newQualities.forEach(sdkUpdate => {
         const peerID = sdkUpdate.peerID;
         if (!peerID) {
           return;
         }
-        currentPeerIDs.add(peerID);
         if (!store.connectionQualities[peerID]) {
           store.connectionQualities[peerID] = sdkUpdate;
         } else {
           Object.assign(store.connectionQualities[peerID], sdkUpdate);
         }
       });
-      const peerIDsStored = Object.keys(store.connectionQualities);
-      for (const storedPeerID of peerIDsStored) {
-        if (!currentPeerIDs.has(storedPeerID)) {
-          // peer is likely no longer there, it wasn't in the update sent by the server
-          delete store.connectionQualities[storedPeerID];
-        }
-      }
     }, 'connectionQuality');
   }
 
@@ -1473,12 +1516,27 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, action);
   };
 
+  // eslint-disable-next-line complexity
   private sendPeerUpdateNotification = (type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) => {
     let peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
     const actionName = PEER_NOTIFICATION_TYPES[type] || 'peerUpdate';
-    if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
+    if (type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED) {
+      this.syncRoomState(actionName);
+      this.updateMidCallPreviewRoomState(type, sdkPeer);
+    } else if ([sdkTypes.HMSPeerUpdate.PEER_JOINED, sdkTypes.HMSPeerUpdate.PEER_LEFT].includes(type)) {
       this.syncRoomState(actionName);
       // if peer wasn't available before sync(will happen if event is peer join)
+      if (!peer) {
+        peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
+      }
+    } else if (
+      [
+        sdkTypes.HMSPeerUpdate.HAND_RAISE_CHANGED,
+        sdkTypes.HMSPeerUpdate.PEER_REMOVED,
+        sdkTypes.HMSPeerUpdate.PEER_ADDED,
+      ].includes(type)
+    ) {
+      this.syncRoomState(actionName);
       if (!peer) {
         peer = this.store.getState(selectPeerByID(sdkPeer.peerId));
       }
@@ -1498,6 +1556,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications.sendPeerUpdate(type, peer);
   };
 
+  private updateMidCallPreviewRoomState(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer) {
+    if (sdkPeer.isLocal && type === sdkTypes.HMSPeerUpdate.ROLE_UPDATED && this.store.getState(selectIsInPreview)) {
+      this.setState(store => {
+        store.room.roomState = HMSRoomState.Connected;
+      }, 'midCallPreviewCompleted');
+    }
+  }
+
   private setSessionStoreValueLocally(
     updates: SessionStoreUpdate | SessionStoreUpdate[],
     actionName = 'setSessionStore',
@@ -1509,6 +1575,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       });
     }, actionName);
   }
+
+  private getSDKHMSPeer = (peerID: HMSPeerID) => {
+    return this.sdk.getPeerMap()[peerID];
+  };
 
   /**
    * setState is separate so any future changes to how state change can be done from one place.

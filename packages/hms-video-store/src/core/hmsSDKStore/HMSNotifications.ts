@@ -1,5 +1,5 @@
 import { EventEmitter2 as EventEmitter } from 'eventemitter2';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
 import * as sdkTypes from './sdkTypes';
 import { IHMSStore } from '../IHMSStore';
 import {
@@ -24,7 +24,7 @@ import {
   HMSNotificationTypeParam,
   IHMSNotifications,
 } from '../schema/notification';
-import { selectPeerByID, selectTrackByID } from '../selectors';
+import { selectPeerByID, selectPollByID, selectTrackByID } from '../selectors';
 
 const HMS_NOTIFICATION_EVENT = 'hmsNotification';
 
@@ -91,6 +91,9 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
   }
 
   sendPeerList(peers: HMSPeer[]) {
+    if (peers.length === 0) {
+      return;
+    }
     const notification = this.createNotification(HMSNotificationTypes.PEER_LIST, peers, HMSNotificationSeverity.INFO);
     this.emitEvent(notification);
   }
@@ -98,7 +101,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
   sendPeerUpdate(type: sdkTypes.HMSPeerUpdate, peer: HMSPeer | null) {
     const hmsPeer = this.store.getState(selectPeerByID(peer?.id)) || peer;
     const notificationType = PEER_NOTIFICATION_TYPES[type];
-    if (notificationType) {
+    if (notificationType && hmsPeer) {
       const notification = this.createNotification(notificationType, hmsPeer, HMSNotificationSeverity.INFO);
       this.emitEvent(notification);
     }
@@ -159,6 +162,16 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
     this.emitEvent(notification);
   }
 
+  sendPollUpdate(type: sdkTypes.HMSPollsUpdate, pollID: string) {
+    const notificationType = POLL_NOTIFICATION_TYPES[type];
+    const poll = this.store.getState(selectPollByID(pollID));
+
+    if (notificationType) {
+      const notification = this.createNotification(notificationType, poll, HMSNotificationSeverity.INFO);
+      this.emitEvent(notification);
+    }
+  }
+
   private emitEvent(notification: HMSNotification) {
     this.eventEmitter.emit(HMS_NOTIFICATION_EVENT, notification);
   }
@@ -176,6 +189,7 @@ export class HMSNotifications<T extends HMSGenericTypes = { sessionStore: Record
       | HMSLeaveRoomRequest
       | HMSDeviceChangeEvent
       | HMSPlaylistItem<T>
+      | sdkTypes.HMSPoll
       | null,
     severity?: HMSNotificationSeverity,
     message = '',

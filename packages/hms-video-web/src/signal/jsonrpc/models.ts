@@ -1,4 +1,4 @@
-import { HMSAction } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 
 export interface JsonRpcRequest {
   id: string;
@@ -43,6 +43,21 @@ export enum HMSSignalMethod {
   SET_METADATA = 'set-metadata',
   GET_METADATA = 'get-metadata',
   LISTEN_METADATA_CHANGE = 'listen-metadata-change',
+  POLL_INFO_SET = 'poll-info-set',
+  POLL_INFO_GET = 'poll-info-get',
+  POLL_QUESTIONS_SET = 'poll-questions-set',
+  POLL_QUESTIONS_GET = 'poll-questions-get',
+  POLL_START = 'poll-start',
+  POLL_STOP = 'poll-stop',
+  POLL_RESPONSE_SET = 'poll-response',
+  POLL_LIST = 'poll-list',
+  POLL_RESPONSES = 'poll-responses',
+  POLL_RESULT = 'poll-result',
+  GET_PEER = 'get-peer',
+  GROUP_JOIN = 'group-join',
+  GROUP_LEAVE = 'group-leave',
+  GROUP_ADD = 'group-add',
+  GROUP_REMOVE = 'group-leave',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {

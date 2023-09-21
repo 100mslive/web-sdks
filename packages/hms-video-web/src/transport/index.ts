@@ -19,12 +19,13 @@ import ISubscribeConnectionObserver from '../connection/subscribe/ISubscribeConn
 import HMSSubscribeConnection from '../connection/subscribe/subscribeConnection';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
@@ -36,7 +37,27 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
+  PollInfoGetParams,
+  PollInfoGetResponse,
+  PollInfoSetParams,
+  PollInfoSetResponse,
+  PollListParams,
+  PollListResponse,
+  PollQuestionsGetParams,
+  PollQuestionsGetResponse,
+  PollQuestionsSetParams,
+  PollQuestionsSetResponse,
+  PollResponseSetParams,
+  PollResponseSetResponse,
+  PollResponsesGetParams,
+  PollResponsesGetResponse,
+  PollResultParams,
+  PollResultResponse,
+  PollStartParams,
+  PollStartResponse,
+  PollStopParams,
   SetSessionMetadataParams,
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
@@ -47,6 +68,8 @@ import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
   MAX_TRANSPORT_RETRIES,
+  PROTOCOL_SPEC,
+  PROTOCOL_VERSION,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
   SUBSCRIBE_TIMEOUT,
@@ -390,7 +413,7 @@ export default class HMSTransport implements ITransport {
       throw ex;
     }
 
-    HMSLogger.i(TAG, '✅ join: successful');
+    HMSLogger.d(TAG, '✅ join: successful');
     this.state = TransportState.Joined;
     this.observer.onStateChange(this.state);
   }
@@ -453,7 +476,7 @@ export default class HMSTransport implements ITransport {
     try {
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
-      this.webrtcInternals?.cleanUp();
+      this.webrtcInternals?.cleanup();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
       if (notifyServer) {
@@ -668,6 +691,62 @@ export default class HMSTransport implements ITransport {
     return this.signal.listenMetadataChange(keys);
   }
 
+  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
+    return this.signal.setPollInfo(params);
+  }
+
+  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
+    return this.signal.getPollInfo(params);
+  }
+
+  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse> {
+    return this.signal.setPollQuestions(params);
+  }
+
+  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
+    return this.signal.getPollQuestions(params);
+  }
+
+  startPoll(params: PollStartParams): Promise<PollStartResponse> {
+    return this.signal.startPoll(params);
+  }
+
+  stopPoll(params: PollStopParams): Promise<PollStartResponse> {
+    return this.signal.stopPoll(params);
+  }
+
+  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
+    return this.signal.setPollResponses(params);
+  }
+
+  getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
+    return this.signal.getPollResponses(params);
+  }
+
+  getPollsList(params: PollListParams): Promise<PollListResponse> {
+    return this.signal.getPollsList(params);
+  }
+
+  getPollResult(params: PollResultParams): Promise<PollResultResponse> {
+    return this.signal.getPollResult(params);
+  }
+
+  async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.joinGroup(name);
+  }
+
+  async leaveGroup(name: string): Promise<JoinLeaveGroupResponse> {
+    return this.signal.leaveGroup(name);
+  }
+
+  async addToGroup(peerId: string, name: string) {
+    this.signal.addToGroup(peerId, name);
+  }
+
+  async removeFromGroup(peerId: string, name: string): Promise<void> {
+    this.signal.removeFromGroup(peerId, name);
+  }
+
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }
@@ -793,6 +872,7 @@ export default class HMSTransport implements ITransport {
         this.subscribeConnection = new HMSSubscribeConnection(
           this.signal,
           this.initConfig.rtcConfiguration,
+          this.isFlagEnabled.bind(this),
           this.subscribeConnectionObserver,
         );
       }
@@ -870,7 +950,16 @@ export default class HMSTransport implements ITransport {
     await this.publishConnection.setLocalDescription(offer);
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const answer = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast, offer);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const answer = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+      offer,
+    );
     await this.publishConnection.setRemoteDescription(answer);
     for (const candidate of this.publishConnection.candidates) {
       await this.publishConnection.addIceCandidate(candidate);
@@ -884,7 +973,15 @@ export default class HMSTransport implements ITransport {
     HMSLogger.d(TAG, '⏳ join: Negotiating Non-WebRTC');
     const serverSubDegrade = this.isFlagEnabled(InitFlags.FLAG_SERVER_SUB_DEGRADATION);
     const simulcast = this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST);
-    const response = await this.signal.join(name, data, !autoSubscribeVideo, serverSubDegrade, simulcast);
+    const onDemandTracks = this.isFlagEnabled(InitFlags.FLAG_ON_DEMAND_TRACKS);
+    const response = await this.signal.join(
+      name,
+      data,
+      !autoSubscribeVideo,
+      serverSubDegrade,
+      simulcast,
+      onDemandTracks,
+    );
     return !!response;
   }
 
@@ -990,6 +1087,7 @@ export default class HMSTransport implements ITransport {
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
       await this.openSignal(token, peerId);
+      this.observer.onConnected();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
       this.analyticsEventsService.setTransport(this.analyticsSignalTransport);
@@ -1031,6 +1129,9 @@ export default class HMSTransport implements ITransport {
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
     url.searchParams.set('user_agent_v2', this.store.getUserAgent());
+    url.searchParams.set('protocol_version', PROTOCOL_VERSION);
+    url.searchParams.set('protocol_spec', PROTOCOL_SPEC);
+
     this.endpoint = url.toString();
     this.analyticsTimer.start(TimedEvent.WEBSOCKET_CONNECT);
     await this.signal.open(this.endpoint);
@@ -1053,6 +1154,8 @@ export default class HMSTransport implements ITransport {
         this.initConfig?.config.publishStats?.maxSampleWindowSize,
         this.initConfig?.config.publishStats?.maxSamplePushInterval,
       );
+
+      this.getWebrtcInternals()?.start();
     }
   }
 
@@ -1204,6 +1307,10 @@ export default class HMSTransport implements ITransport {
         break;
     }
     this.eventBus.analytics.publish(event!);
+  }
+
+  getSubscribeConnection() {
+    return this.subscribeConnection;
   }
 
   getAdditionalAnalyticsProperties(): AdditionalAnalyticsProperties {

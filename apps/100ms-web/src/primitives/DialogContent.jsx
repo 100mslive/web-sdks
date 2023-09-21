@@ -1,5 +1,5 @@
-import React from "react";
-import { CheckIcon, CrossIcon } from "@100mslive/react-icons";
+import React, { useRef } from "react";
+import { CheckIcon, CloudUploadIcon, CrossIcon } from "@100mslive/react-icons";
 import {
   Box,
   Button,
@@ -7,12 +7,13 @@ import {
   Dialog,
   Flex,
   HorizontalDivider,
+  IconButton,
   Input,
   Label,
   Select,
   Switch,
   Text,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 
 export const DialogContent = ({
   Icon,
@@ -31,7 +32,7 @@ export const DialogContent = ({
           <Flex justify="between">
             <Flex align="center" css={{ mb: "$1" }}>
               {Icon ? (
-                <Box css={{ mr: "$2", color: "$textPrimary", ...iconCSS }}>
+                <Box css={{ mr: "$2", color: "$on_surface_high", ...iconCSS }}>
                   <Icon />
                 </Box>
               ) : null}
@@ -67,7 +68,7 @@ export const ErrorDialog = ({
         onEscapeKeyDown={e => e.preventDefault()}
         onPointerDownOutside={e => e.preventDefault()}
         closeable={false}
-        iconCSS={{ color: "$error" }}
+        iconCSS={{ color: "$alert_error_default" }}
         {...props}
       >
         <Box css={{ mt: "$lg" }}>{children}</Box>
@@ -95,17 +96,21 @@ export const RequestDialog = ({
           {Icon ? Icon : null}
           <Text variant="h6">{title}</Text>
         </Dialog.Title>
-        <Text
-          variant="md"
-          css={{
-            fontWeight: 400,
-            mt: "$4",
-            mb: "$10",
-            c: "$textMedEmp",
-          }}
-        >
-          {body}
-        </Text>
+        {typeof body === "string" ? (
+          <Text
+            variant="md"
+            css={{
+              mt: "$4",
+              mb: "$10",
+              fontWeight: 400,
+              c: "$on_surface_medium",
+            }}
+          >
+            {body}
+          </Text>
+        ) : (
+          <Box css={{ mt: "$4", mb: "$10" }}>{body}</Box>
+        )}
         <Flex
           justify="center"
           align="center"
@@ -158,6 +163,39 @@ export const DialogRow = ({
   }
   return (
     <Flex align="center" justify={justify} css={finalCSS}>
+      {children}
+    </Flex>
+  );
+};
+
+export const DialogCol = ({
+  children,
+  breakSm = false,
+  css,
+  align = "center",
+  justify = "between",
+  ...props
+}) => {
+  let finalCSS = {
+    margin: "$10 0",
+    w: "100%",
+  };
+  if (breakSm) {
+    finalCSS["@sm"] = {
+      alignItems: "flex-start",
+    };
+  }
+  if (css) {
+    finalCSS = Object.assign(finalCSS, css);
+  }
+  return (
+    <Flex
+      direction="column"
+      align={align}
+      justify={justify}
+      css={finalCSS}
+      {...props}
+    >
       {children}
     </Flex>
   );
@@ -226,6 +264,88 @@ export const DialogInput = ({
         {...props}
       />
     </DialogRow>
+  );
+};
+
+export const DialogInputFile = ({
+  title,
+  value,
+  onChange,
+  placeholder,
+  disabled,
+  type,
+  ...props
+}) => {
+  const inputRef = useRef();
+  return (
+    <DialogCol
+      breakSm
+      onClick={() => inputRef.current?.click()}
+      css={{
+        justifyContent: "center",
+        position: "relative",
+        cursor: "pointer",
+        py: "$12",
+        border: "1px dashed $border_bright",
+        r: "$1",
+        height: "max(140px, 30%)",
+        alignItems: "center",
+        m: "$6 0",
+      }}
+      gap="8"
+    >
+      <IconButton
+        variant="standard"
+        css={{
+          border: "none",
+          background: "none",
+          "&:hover": {
+            border: "none",
+            background: "none",
+            bg: "$transparent !important",
+          },
+        }}
+      >
+        <CloudUploadIcon
+          style={{
+            width: "3rem",
+            height: "3rem",
+          }}
+        />
+      </IconButton>
+      <Flex direction="row">
+        <Input
+          ref={inputRef}
+          css={{ width: "70%", "@sm": { width: "100%" } }}
+          value={value}
+          onChange={e => onChange(e.target)}
+          placeholder={placeholder}
+          disabled={disabled}
+          type={type}
+          hidden={true}
+          {...props}
+        />
+        <IconButton
+          variant="standard"
+          css={{
+            background: "none",
+            border: "none",
+            textDecoration: "underline",
+            "&:hover": {
+              background: "none !important",
+              border: "none !important",
+            },
+          }}
+        >
+          <Text
+            variant="md"
+            css={{ fontWeight: "$semiBold", color: "$on_surface_high" }}
+          >
+            {placeholder}
+          </Text>
+        </IconButton>
+      </Flex>
+    </DialogCol>
   );
 };
 

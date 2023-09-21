@@ -1,4 +1,4 @@
-import { HMSAction } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';
@@ -11,8 +11,10 @@ import {
   PeerListNotification,
   PeriodicRoomState,
   RecordingNotification,
+  RoomInfo,
   RoomState,
   RTMPNotification,
+  SessionInfo,
 } from '../HMSNotifications';
 
 export class RoomUpdateManager {
@@ -41,9 +43,40 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.ROOM_STATE:
         this.handlePreviewRoomState(notification as PeriodicRoomState);
         break;
+      case HMSNotificationMethod.ROOM_INFO:
+        this.handleRoomInfo(notification as RoomInfo);
+        break;
+      case HMSNotificationMethod.SESSION_INFO:
+        this.handleSessionInfo(notification as SessionInfo);
+        break;
       default:
         this.onHLS(method, notification as HLSNotification);
         break;
+    }
+  }
+
+  private handleRoomInfo(notification: RoomInfo) {
+    const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on session info - room not present');
+      return;
+    }
+    room.description = notification.description;
+    room.large_room_optimization = notification.large_room_optimization;
+    room.max_size = notification.max_size;
+    room.name = notification.name;
+  }
+
+  private handleSessionInfo(notification: SessionInfo) {
+    const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on session info - room not present');
+      return;
+    }
+    room.sessionId = notification.session_id;
+    if (room.peerCount !== notification.peer_count) {
+      room.peerCount = notification.peer_count;
+      this.listener?.onRoomUpdate(HMSRoomUpdate.ROOM_PEER_COUNT_UPDATED, room);
     }
   }
 

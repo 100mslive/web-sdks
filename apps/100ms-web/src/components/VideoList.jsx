@@ -4,7 +4,7 @@ import {
   useHMSStore,
   useVideoList,
 } from "@100mslive/react-sdk";
-import { StyledVideoList, useTheme } from "@100mslive/react-ui";
+import { StyledVideoList, useTheme } from "@100mslive/roomkit-react";
 import { Pagination } from "./Pagination";
 import ScreenshareTile from "./ScreenshareTile";
 import VideoTile from "./VideoTile";
@@ -52,6 +52,9 @@ const List = ({
       >
         {pagesWithTiles && pagesWithTiles.length > 0
           ? pagesWithTiles[page]?.map(tile => {
+              if (tile.width === 0 || tile.height === 0) {
+                return null;
+              }
               return (
                 <Fragment key={tile.track?.id || tile.peer.id}>
                   {tile.track?.source === "screen" ? (

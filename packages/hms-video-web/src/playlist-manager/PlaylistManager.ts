@@ -1,10 +1,11 @@
 import { PlaylistAudioManager } from './PlaylistAudioManager';
 import { PlaylistVideoManager } from './PlaylistVideoManager';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
+import { HMSSdk } from '../index';
 import { HMSPlaylistItem, HMSPlaylistManager, HMSPlaylistProgressEvent, HMSPlaylistType } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';
-import { HMSSdk } from '../sdk';
 import { stringifyMediaStreamTrack } from '../utils/json';
 import HMSLogger from '../utils/logger';
 import { TypedEventEmitter } from '../utils/typed-event-emitter';
@@ -65,7 +66,7 @@ export class PlaylistManager
       return;
     }
     list.forEach((item: HMSPlaylistItem<T>) => {
-      if (!this.state[item.type].list.includes(item)) {
+      if (!this.state[item.type].list.find(_item => _item.id === item.id)) {
         this.state[item.type].list.push(item);
       }
     });
@@ -131,7 +132,7 @@ export class PlaylistManager
   getVolume(type: HMSPlaylistType = HMSPlaylistType.audio): number {
     const element = this.getElement(type);
     if (element) {
-      return element.volume * 100;
+      return Math.floor(element.volume * 100);
     }
     return 0;
   }

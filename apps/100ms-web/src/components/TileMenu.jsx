@@ -23,7 +23,13 @@ import {
   VideoOffIcon,
   VideoOnIcon,
 } from "@100mslive/react-icons";
-import { Box, Flex, Slider, StyledMenuTile, Text } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  Slider,
+  StyledMenuTile,
+  Text,
+} from "@100mslive/roomkit-react";
 import { ToastManager } from "./Toast/ToastManager";
 import { useSetAppDataByKey } from "./AppData/useUISettings";
 import { useDropdownList } from "./hooks/useDropdownList";
@@ -41,28 +47,22 @@ const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
   ((videoTrackID && videoTrackID === trackId) ||
     (audioTrackID && audioTrackID === trackId));
 
-const SpotlightActions = ({ audioTrackID, videoTrackID }) => {
+const SpotlightActions = ({ peerId }) => {
   const hmsActions = useHMSActions();
-  const spotlightTrackId = useHMSStore(
+  const spotlightPeerId = useHMSStore(
     selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)
   );
-  const isTileSpotlighted = isSameTile({
-    trackId: spotlightTrackId,
-    videoTrackID,
-    audioTrackID,
-  });
+  const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightTrackId = trackId =>
+  const setSpotlightPeerId = peer =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, trackId)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
       .catch(err => ToastManager.addToast({ title: err.description }));
 
   return (
     <StyledMenuTile.ItemButton
       onClick={() =>
-        isTileSpotlighted
-          ? setSpotlightTrackId()
-          : setSpotlightTrackId(videoTrackID || audioTrackID)
+        isTileSpotlighted ? setSpotlightPeerId() : setSpotlightPeerId(peerId)
       }
     >
       <StarIcon />
@@ -96,13 +96,11 @@ const PinActions = ({ audioTrackID, videoTrackID }) => {
         }
       >
         <PinIcon />
-        <span>{`${isTilePinned ? "Unpin" : "Pin"}`} Tile for myself</span>
+        <span>{isTilePinned ? "Unpin" : "Pin"} Tile for myself</span>
       </StyledMenuTile.ItemButton>
     </>
   );
 };
-
-const showSpotlight = process.env.REACT_APP_ENV === "qa";
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -117,7 +115,9 @@ const TileMenu = ({
   const actions = useHMSActions();
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers } = useHMSStore(selectPermissions);
+  const { removeOthers, changeRole } = useHMSStore(selectPermissions);
+  const showSpotlight = changeRole;
+
   const {
     isAudioEnabled,
     isVideoEnabled,
@@ -180,12 +180,7 @@ const TileMenu = ({
                 audioTrackID={audioTrackID}
                 videoTrackID={videoTrackID}
               />
-              {showSpotlight && (
-                <SpotlightActions
-                  audioTrackID={audioTrackID}
-                  videoTrackID={videoTrackID}
-                />
-              )}
+              {showSpotlight && <SpotlightActions peerId={peerID} />}
             </>
           )
         ) : (
@@ -200,7 +195,7 @@ const TileMenu = ({
                 }
               >
                 {isVideoEnabled ? <VideoOnIcon /> : <VideoOffIcon />}
-                <span>{`${isVideoEnabled ? "Mute" : "Request Unmute"}`}</span>
+                <span>{isVideoEnabled ? "Mute" : "Request Unmute"}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {toggleAudio ? (
@@ -213,7 +208,7 @@ const TileMenu = ({
                 }
               >
                 {isAudioEnabled ? <MicOnIcon /> : <MicOffIcon />}
-                <span>{`${isAudioEnabled ? "Mute" : "Request Unmute"}`}</span>
+                <span>{isAudioEnabled ? "Mute" : "Request Unmute"}</span>
               </StyledMenuTile.ItemButton>
             ) : null}
             {audioTrackID ? (
@@ -238,12 +233,7 @@ const TileMenu = ({
                   audioTrackID={audioTrackID}
                   videoTrackID={videoTrackID}
                 />
-                {showSpotlight && (
-                  <SpotlightActions
-                    audioTrackID={audioTrackID}
-                    videoTrackID={videoTrackID}
-                  />
-                )}
+                {showSpotlight && <SpotlightActions peerId={peerID} />}
               </>
             )}
             <SimulcastLayers trackId={videoTrackID} />
@@ -289,7 +279,7 @@ const SimulcastLayers = ({ trackId }) => {
   return (
     <Fragment>
       <StyledMenuTile.ItemButton
-        css={{ color: "$textMedEmp", cursor: "default" }}
+        css={{ color: "$on_surface_medium", cursor: "default" }}
       >
         Select maximum resolution
       </StyledMenuTile.ItemButton>
@@ -321,14 +311,14 @@ const SimulcastLayers = ({ trackId }) => {
             >
               {layer.layer}
             </Text>
-            <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
+            <Text as="span" variant="xs" css={{ color: "$on_surface_medium" }}>
               {layer.resolution.width}x{layer.resolution.height}
             </Text>
           </StyledMenuTile.ItemButton>
         );
       })}
       <StyledMenuTile.ItemButton>
-        <Text as="span" variant="xs" css={{ color: "$textMedEmp" }}>
+        <Text as="span" variant="xs" css={{ color: "$on_surface_medium" }}>
           Currently streaming:
           <Text
             as="span"
@@ -336,7 +326,7 @@ const SimulcastLayers = ({ trackId }) => {
             css={{
               fontWeight: "$semiBold",
               textTransform: "capitalize",
-              color: "$textMedEmp",
+              color: "$on_surface_medium",
               ml: "$2",
             }}
           >

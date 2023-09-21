@@ -1,7 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { DeviceManager } from '../device-manager';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteAudioTrack } from '../media/tracks';
@@ -89,7 +90,7 @@ export class AudioSinkManager {
     HMSLogger.d(this.TAG, 'audio sink created', this.audioSink);
   }
 
-  cleanUp() {
+  cleanup() {
     this.audioSink?.remove();
     this.audioSink = undefined;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);

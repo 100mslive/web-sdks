@@ -5,7 +5,7 @@ import { AnalyticsTimer } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSTrack } from '../media/tracks';
 import { PolicyParams } from '../notification-manager';
 import ITransportObserver from '../transport/ITransportObserver';
@@ -22,6 +22,8 @@ const testObserver: ITransportObserver = {
   onFailure(_: HMSException): void {
     // console.log('sdk Failure Callback', _s);
   },
+
+  onConnected(): void {},
 
   async onStateChange(_: TransportState, __?: HMSException): Promise<void> {},
 };
@@ -49,6 +51,8 @@ const policyParams: PolicyParams = {
         hlsStreaming: false,
         rtmpStreaming: false,
         browserRecording: false,
+        pollRead: false,
+        pollWrite: false,
       },
       publishParams: {
         allowed: ['audio', 'video', 'screen'],
@@ -95,10 +99,20 @@ testStore.addPeer(localPeer);
 const mockMediaStream = {
   id: 'native-stream-id',
   getVideoTracks: jest.fn(() => [
-    { id: 'video-id', kind: 'video', getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })) },
+    {
+      id: 'video-id',
+      kind: 'video',
+      getSettings: jest.fn(() => ({ deviceId: 'video-device-id' })),
+      addEventListener: jest.fn(() => {}),
+    },
   ]),
   getAudioTracks: jest.fn(() => [
-    { id: 'audio-id', kind: 'audio', getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })) },
+    {
+      id: 'audio-id',
+      kind: 'audio',
+      getSettings: jest.fn(() => ({ deviceId: 'audio-device-id' })),
+      addEventListener: jest.fn(() => {}),
+    },
   ]),
   addTrack: jest.fn(() => {}),
 };

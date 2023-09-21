@@ -37,6 +37,7 @@ import {
   UI_MODE_ACTIVE_SPEAKER,
   UI_MODE_GRID,
   UI_SETTINGS,
+  WIDGET_STATE,
 } from "../../common/constants";
 
 export const getAppDetails = appDetails => {
@@ -79,10 +80,14 @@ const initialAppData = {
   [APP_DATA.hlsViewerRole]: DEFAULT_HLS_VIEWER_ROLE,
   [APP_DATA.waitingViewerRole]: DEFAULT_WAITING_VIEWER_ROLE,
   [APP_DATA.dropdownList]: [],
+  [APP_DATA.widgetState]: {
+    [WIDGET_STATE.pollInView]: "",
+    [WIDGET_STATE.view]: "",
+  },
 };
 
 export const AppData = React.memo(
-  ({ appDetails, logo, recordingUrl, tokenEndpoint, policyConfig, uiMode }) => {
+  ({ appDetails, logo, tokenEndpoint, policyConfig, uiMode }) => {
     const hmsActions = useHMSActions();
     const isConnected = useHMSStore(selectIsConnectedToRoom);
     const sidePane = useSidepaneState();
@@ -123,7 +128,6 @@ export const AppData = React.memo(
 
     useEffect(() => {
       const appData = {
-        [APP_DATA.recordingUrl]: recordingUrl,
         [APP_DATA.tokenEndpoint]: tokenEndpoint,
         [APP_DATA.logo]: logo,
         [APP_DATA.hlsViewerRole]:
@@ -135,7 +139,7 @@ export const AppData = React.memo(
       for (const key in appData) {
         hmsActions.setAppData([key], appData[key]);
       }
-    }, [appDetails, logo, recordingUrl, tokenEndpoint, uiMode, hmsActions]);
+    }, [appDetails, logo, tokenEndpoint, uiMode, hmsActions]);
 
     useEffect(() => {
       if (!preferences.subscribedNotifications) {

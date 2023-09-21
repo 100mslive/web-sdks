@@ -11,6 +11,7 @@ export enum HMSNotificationMethod {
   PEER_LIST = 'peer-list',
   TRACK_METADATA_ADD = 'on-track-add',
   TRACK_UPDATE = 'on-track-update',
+  TRACK_REMOVE = 'on-track-remove',
   CHANGE_TRACK_MUTE_STATE_UPDATE = 'on-change-track-mute-state-request',
   ACTIVE_SPEAKERS = 'active-speakers',
   CONNECTION_QUALITY = 'on-connection-quality-update',
@@ -31,4 +32,9 @@ export enum HMSNotificationMethod {
   HLS_START = 'on-hls-start',
   HLS_STOP = 'on-hls-stop',
   METADATA_CHANGE = 'on-metadata-change',
+  POLL_START = 'on-poll-start',
+  POLL_STOP = 'on-poll-stop',
+  POLL_STATS = 'on-poll-stats',
+  ROOM_INFO = 'room-info',
+  SESSION_INFO = 'session-info',
 }

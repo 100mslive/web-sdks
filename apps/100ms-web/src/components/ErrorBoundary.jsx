@@ -8,7 +8,7 @@ import {
   Text,
   ThemeContext,
   Tooltip,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import { ErrorWithSupportLink } from "./PreviewScreen";
 
 export class ErrorBoundary extends Component {
@@ -43,8 +43,8 @@ export class ErrorBoundary extends Component {
           justify="center"
           css={{
             size: "100%",
-            color: "$textPrimary",
-            backgroundColor: "$bgPrimary",
+            color: "$on_surface_high",
+            backgroundColor: "$background_default",
           }}
         >
           <Box css={{ position: "relative", overflow: "hidden", r: "$3" }}>

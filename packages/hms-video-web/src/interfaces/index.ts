@@ -13,7 +13,6 @@ export { HMSSimulcastLayer, simulcastMapping } from './simulcast-layers';
 export * from './track-settings';
 export * from './devices';
 export * from './playlist';
-export * from './hms';
 export * from './rtmp-recording-config';
 export * from './hls-config';
 export * from './webrtc-stats';

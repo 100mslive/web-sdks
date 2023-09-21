@@ -1,8 +1,23 @@
 import React, { Fragment } from 'react';
 import { UploadIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, HorizontalDivider, Select, styled, Text } from '@100mslive/react-ui';
+import {
+  Box,
+  Button,
+  Flex,
+  HorizontalDivider,
+  Select,
+  styled,
+  Text,
+} from '@100mslive/roomkit-react';
 
-const Fonts = ['Inter', 'Roboto', 'Lato', 'Montserrat', 'Open Sans', 'IBM Plex Sans'];
+const Fonts = [
+  'Inter',
+  'Roboto',
+  'Lato',
+  'Montserrat',
+  'Open Sans',
+  'IBM Plex Sans',
+];
 
 const ItemRoot = React.memo(({ title, children }) => (
   <Fragment>
@@ -15,9 +30,9 @@ const ItemRoot = React.memo(({ title, children }) => (
 ));
 
 const TextArea = styled('textarea', {
-  bg: '$bgSecondary',
+  bg: '$surface_bright',
   p: '$4 $8',
-  color: '$textPrimary',
+  color: '$on_primary_high',
   resize: 'none',
 });
 
@@ -41,7 +56,7 @@ const TileType = ({ type, active, value, change }) => {
       css={{
         height: '$20',
         aspectRatio: `${multiplier}/${divider}`,
-        border: `1px solid ${active ? '$brandDefault' : '$bgSecondary'}`,
+        border: `1px solid ${active ? '$primary_default' : '$surface_bright'}`,
         m: '$2',
         cursor: 'pointer',
       }}
@@ -57,7 +72,14 @@ const TileType = ({ type, active, value, change }) => {
 const ThemeType = ({ title, active, onClick }) => {
   return (
     <Box
-      css={{ w: '$20', m: '$2', p: '$2 $8', r: '$1', bg: active ? '$menuBg' : '', cursor: 'pointer' }}
+      css={{
+        w: '$20',
+        m: '$2',
+        p: '$2 $8',
+        r: '$1',
+        bg: active ? '$surface_default' : '',
+        cursor: 'pointer',
+      }}
       onClick={onClick}
     >
       <Text>{title}</Text>
@@ -73,7 +95,12 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           as="label"
           htmlFor="logoInput"
           variant="standard"
-          css={{ bg: '$bgSecondary', cursor: 'pointer', color: '$textPrimary', display: 'flex' }}
+          css={{
+            bg: '$surface_bright',
+            cursor: 'pointer',
+            color: '$on_primary_high',
+            display: 'flex',
+          }}
         >
           <UploadIcon />
           &nbsp; Upload
@@ -88,7 +115,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
         />
       </ItemRoot>
       <ItemRoot title="Appearance">
-        <Flex align="center" css={{ bg: '$bgSecondary', r: '$1' }}>
+        <Flex align="center" css={{ bg: '$surface_bright', r: '$1' }}>
           <ThemeType
             title="Dark"
             active={settings.theme === 'dark'}
@@ -110,7 +137,13 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           as="label"
           htmlFor="brandColorPicker"
           align="center"
-          css={{ bg: '$bgSecondary', p: '$4', r: '$1', cursor: 'pointer', overflow: 'hidden' }}
+          css={{
+            bg: '$surface_bright',
+            p: '$4',
+            r: '$1',
+            cursor: 'pointer',
+            overflow: 'hidden',
+          }}
         >
           <ColorPicker
             type="color"
@@ -127,11 +160,36 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
       </ItemRoot>
       <ItemRoot title="Tile Aspect Ratio">
         <Flex justify="end" css={{ flexWrap: 'wrap', ml: '$8' }}>
-          <TileType type="4:3" value="4-3" active={settings.tile_shape === '4-3'} change={change} />
-          <TileType type="16:9" value="16-9" active={settings.tile_shape === '16-9'} change={change} />
-          <TileType type="1:1" value="1-1" active={settings.tile_shape === '1-1'} change={change} />
-          <TileType type="3:4" value="3-4" active={settings.tile_shape === '3-4'} change={change} />
-          <TileType type="9:16" value="9-16" active={settings.tile_shape === '9-16'} change={change} />
+          <TileType
+            type="4:3"
+            value="4-3"
+            active={settings.tile_shape === '4-3'}
+            change={change}
+          />
+          <TileType
+            type="16:9"
+            value="16-9"
+            active={settings.tile_shape === '16-9'}
+            change={change}
+          />
+          <TileType
+            type="1:1"
+            value="1-1"
+            active={settings.tile_shape === '1-1'}
+            change={change}
+          />
+          <TileType
+            type="3:4"
+            value="3-4"
+            active={settings.tile_shape === '3-4'}
+            change={change}
+          />
+          <TileType
+            type="9:16"
+            value="9-16"
+            active={settings.tile_shape === '9-16'}
+            change={change}
+          />
         </Flex>
       </ItemRoot>
       <ItemRoot title="Font Family">
@@ -140,7 +198,10 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
           <Select.Select
             onChange={e => {
               change('font', e.target.value);
-              document.documentElement.style.setProperty('--hms-ui-fonts-sans', e.target.value);
+              document.documentElement.style.setProperty(
+                '--hms-ui-fonts-sans',
+                e.target.value
+              );
             }}
             value={settings.font}
           >
@@ -164,7 +225,7 @@ const ThemeSettings = ({ handleLogoChange, change, settings }) => {
               });
             }}
             value={settings.metadataFields.metadata}
-          ></TextArea>
+          />
         </ItemRoot>
       )}
     </Fragment>

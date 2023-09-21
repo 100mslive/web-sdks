@@ -4,12 +4,14 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
 import { ErrorCodes } from '../error/ErrorCodes';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { BuildGetMediaError, HMSGetMediaActions } from '../error/utils';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioCodec, HMSScreenShareConfig, HMSVideoCodec, ScreenCaptureHandleConfig } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../internal';
 import {
   HMSAudioTrackSettings,
   HMSAudioTrackSettingsBuilder,
@@ -18,8 +20,7 @@ import {
   HMSVideoTrackSettings,
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
-import HMSLocalStream from '../media/streams/HMSLocalStream';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack, HMSTrackType } from '../media/tracks';
+import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { IFetchAVTrackOptions } from '../transport/ITransport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
@@ -33,7 +34,8 @@ const defaultSettings = {
   videoDeviceId: 'default',
 };
 
-let blankCanvas: HTMLCanvasElement;
+let blankCanvas: HTMLCanvasElement | undefined;
+let intervalID: ReturnType<typeof setInterval> | undefined;
 
 export class LocalTrackManager {
   readonly TAG: string = '[LocalTrackManager]';
@@ -266,31 +268,25 @@ export class LocalTrackManager {
   static getEmptyVideoTrack(prevTrack?: MediaStreamTrack): MediaStreamTrack {
     const width = prevTrack?.getSettings()?.width || 320;
     const height = prevTrack?.getSettings()?.height || 240;
-    const frameRate = 10; // fps TODO: experiment, see if this can be reduced
+    const frameRate = 1; // fps TODO: experiment, see if this can be reduced
     if (!blankCanvas) {
       blankCanvas = document.createElement('canvas');
       blankCanvas.width = width;
       blankCanvas.height = height;
-      blankCanvas.getContext('2d', { willReadFrequently: true })?.fillRect(0, 0, width, height);
+      blankCanvas.getContext('2d')?.fillRect(0, 0, width, height);
     }
+    if (!intervalID) {
+      // This is needed to send some data so the track is received on sfu
+      intervalID = setInterval(() => {
+        const ctx = blankCanvas?.getContext('2d');
+        if (ctx) {
+          ctx.fillRect(0, 0, 1, 1);
+        }
+      }, 1000 / frameRate);
+    }
+
     const stream = blankCanvas.captureStream(frameRate);
     const emptyTrack = stream.getVideoTracks()[0];
-    const intervalID = setInterval(() => {
-      if (emptyTrack.readyState === 'ended') {
-        clearInterval(intervalID);
-        return;
-      }
-      const ctx = blankCanvas.getContext('2d');
-      if (ctx) {
-        const pixel = ctx.getImageData(0, 0, 1, 1).data;
-        const red = pixel[0] === 0 ? 1 : 0; // toggle red in pixel
-        ctx.fillStyle = `rgb(${red}, 0, 0)`;
-        ctx.fillRect(0, 0, 1, 1);
-      }
-    }, 1000 / frameRate);
-    emptyTrack.onended = () => {
-      clearInterval(intervalID);
-    };
     emptyTrack.enabled = false;
     return emptyTrack;
   }
@@ -304,6 +300,12 @@ export class LocalTrackManager {
     const emptyTrack = dst.stream.getAudioTracks()[0];
     emptyTrack.enabled = false;
     return emptyTrack;
+  }
+
+  static cleanup() {
+    clearInterval(intervalID);
+    intervalID = undefined;
+    blankCanvas = undefined;
   }
 
   /**

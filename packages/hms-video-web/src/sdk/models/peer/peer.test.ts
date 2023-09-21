@@ -32,6 +32,8 @@ const getParamsForRole = (roleName: string) => ({
     hlsStreaming: false,
     rtmpStreaming: false,
     browserRecording: false,
+    pollRead: false,
+    pollWrite: false,
   },
   priority: 0,
 });
@@ -81,6 +83,7 @@ describe('HMSRemotPeer', () => {
     },
     role: 'viewer',
     tracks: {},
+    groups: [],
   };
   const peer = new HMSRemotePeer({
     peerId: peerInfo.peer_id,

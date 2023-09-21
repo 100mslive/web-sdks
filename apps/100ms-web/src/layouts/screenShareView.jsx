@@ -9,7 +9,7 @@ import {
   selectScreenShareByPeerID,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/roomkit-react";
 import { VideoPlayer } from "../components/Playlist/VideoPlayer";
 import { ScreenshareDisplay } from "../components/ScreenshareDisplay";
 import ScreenshareTile from "../components/ScreenshareTile";
@@ -167,7 +167,7 @@ const SmallTilePeersView = ({
       {smallTilePeers && smallTilePeers.length > 0 && (
         <VideoList
           peers={smallTilePeers}
-          maxColCount={showSidebarInBottom ? undefined : 2}
+          maxColCount={showSidebarInBottom ? undefined : 1}
           maxRowCount={showSidebarInBottom ? 1 : undefined}
           includeScreenShareForPeer={shouldShowScreenFn}
         />

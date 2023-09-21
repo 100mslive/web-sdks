@@ -15,7 +15,7 @@
     "concurrently": "^6.4.0",
     "cypress": "^9.5.2",
     "dotenv": "^14.2.0",
-    "esbuild": "^0.13.15",
+    "esbuild": "^0.18.13",
     "esbuild-plugin-postcss2": "0.1.1",
     "eslint": "^8.9.0",
     "eslint-config-react-app": "^7.0.0",
@@ -23,7 +23,7 @@
     "eslint-plugin-simple-import-sort": "^8.0.0",
     "husky": "^6.0.0",
     "jest": "26.6.0",
-    "lerna": "^5.5.2",
+    "lerna": "^5.6.2",
     "lint-staged": "^12.0.3",
     "nx": "^14.5.1",
     "postcss": "^8.4.5",
@@ -33,34 +33,35 @@
     "ts-jest": "26.5.6",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0",
-    "typedoc": "^0.23.15",
-    "typedoc-plugin-markdown": "^3.13.6",
+    "typedoc": "^0.24.8",
+    "typedoc-plugin-markdown": "^3.14.0",
     "typescript": "~4.7.4",
-    "webpack": "^5.69.1",
+    "webpack": "^5.76.0",
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.9.2",
     "webpack-dev-server": "^4.7.4",
     "webpack-manifest-plugin": "^4.1.1"
   },
   "scripts": {
-    "lint": "lerna run lint --stream",
-    "lint:fix": "lerna run lint:fix --stream",
-    "format": "lerna run format --stream",
-    "test": "yarn build --no-private && lerna run test --stream",
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "format": "lerna run format",
+    "test": "yarn build --no-private && lerna run test",
     "start": "lerna run start --stream",
-    "build": "lerna run build --stream --ignore 100ms_edtech_template",
+    "build": "lerna run build --stream",
+    "lerna:publish": "lerna publish from-package --dist-tag $PUBLISH_FLAG --yes --no-verify-access",
     "size": "size-limit",
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
     "cypress:open": "cypress open",
     "app": "cd apps/100ms-web && yarn start",
+    "app:custom": "cd apps/100ms-custom-app && yarn start",
     "sdk": "cd packages/hms-video-web && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
-    "reactui": "cd packages/react-ui && yarn start",
-    "storybook": "cd packages/react-ui && yarn storybook",
-    "build-storybook": "cd packages/react-ui && build-storybook"
+    "storybook": "cd packages/roomkit-react && yarn storybook",
+    "build-storybook": "cd packages/roomkit-react && yarn build-storybook"
   },
   "resolutions": {
     "loader-utils": "^2.0.4"
@@ -89,7 +90,7 @@
     },
     {
       "path": "packages/hms-video-web/dist/index.js",
-      "limit": "200 KB"
+      "limit": "80 KB"
     },
     {
       "path": "packages/hms-video-store/dist/index.cjs.js",
@@ -100,11 +101,11 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.cjs.js",
-      "limit": "20 KB"
+      "path": "packages/roomkit-react/dist/index.cjs.js",
+      "limit": "400 KB"
     },
     {
-      "path": "packages/react-ui/dist/index.js",
+      "path": "packages/roomkit-react/dist/index.js",
       "limit": "20 KB"
     },
     {
@@ -116,12 +117,12 @@
       "limit": "20 KB"
     },
     {
-      "path": "packages/hms-noise-suppression/dist/index.cjs.js",
-      "limit": "200 KB"
+      "path": "packages/react-icons/dist/index.cjs.js",
+      "limit": "100 KB"
     },
     {
-      "path": "packages/hms-noise-suppression/dist/index.js",
-      "limit": "200 KB"
+      "path": "packages/react-icons/dist/index.js",
+      "limit": "100 KB"
     }
   ]
 }

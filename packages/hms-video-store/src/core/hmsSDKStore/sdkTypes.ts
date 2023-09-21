@@ -24,6 +24,12 @@ import {
   HMSPlaylistItem,
   HMSPlaylistManager,
   HMSPlaylistProgressEvent,
+  HMSPoll,
+  HMSPollCreateParams,
+  HMSPollQuestionAnswer,
+  HMSPollQuestionCreateParams,
+  HMSPollQuestionType,
+  HMSPollsUpdate,
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
   HMSRecording,
@@ -60,6 +66,7 @@ export {
   HMSRoomUpdate,
   HMSPeerUpdate,
   HMSTrackUpdate,
+  HMSPollsUpdate,
   HMSLogLevel,
   HMSAudioPluginType,
   HMSVideoPluginType,
@@ -67,6 +74,7 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
+  HMSPollQuestionType,
 };
 
 export type {
@@ -111,4 +119,8 @@ export type {
   HMSPreferredSimulcastLayer,
   TokenRequest,
   TokenRequestOptions,
+  HMSPoll,
+  HMSPollCreateParams,
+  HMSPollQuestionAnswer,
+  HMSPollQuestionCreateParams,
 };

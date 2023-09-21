@@ -1,6 +1,21 @@
-import { Box, Dialog, Flex, HorizontalDivider, Text } from '@100mslive/react-ui';
+import React from 'react';
+import {
+  Box,
+  Dialog,
+  Flex,
+  HorizontalDivider,
+  Text,
+} from '@100mslive/roomkit-react';
 
-export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
+export const DialogContent = ({
+  Icon,
+  title,
+  closeable = true,
+  children,
+  css,
+  iconCSS = {},
+  ...props
+}) => {
   return (
     <Dialog.Portal>
       <Dialog.Overlay />
@@ -9,7 +24,7 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
           <Flex justify="between">
             <Flex align="center" css={{ mb: '$1' }}>
               {Icon ? (
-                <Box css={{ mr: '$2', color: '$textPrimary', ...iconCSS }}>
+                <Box css={{ mr: '$2', color: '$on_primary_high', ...iconCSS }}>
                   <Icon />
                 </Box>
               ) : null}
@@ -17,7 +32,9 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
                 {title}
               </Text>
             </Flex>
-            {closeable && <Dialog.DefaultClose data-testid="dialoge_cross_icon" />}
+            {closeable && (
+              <Dialog.DefaultClose data-testid="dialoge_cross_icon" />
+            )}
           </Flex>
         </Dialog.Title>
         <HorizontalDivider css={{ mt: '$6' }} />
