@@ -10,12 +10,12 @@ import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
   const isMobile = isAndroid || isIOS;
-  const isLandscape = useMedia(cssConfig.media.ls);
-  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(isMobile && isLandscape);
+  const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setShowMwebLandscapePrompt(isMobile && window.innerWidth < window.innerHeight);
+      const isLandscape = useMedia(cssConfig.media.ls);
+      setShowMwebLandscapePrompt(isMobile && isLandscape);
     };
 
     handleResize();
