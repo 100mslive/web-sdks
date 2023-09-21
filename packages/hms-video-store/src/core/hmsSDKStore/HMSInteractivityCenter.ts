@@ -4,14 +4,7 @@ import {
   HMSPollQuestionResponseCreateParams,
   HMSSdk,
 } from '@100mslive/hms-video';
-
-export interface IHMSInteractivityCenter {
-  createPoll(poll: HMSPollCreateParams): Promise<void>;
-  startPoll(poll: string | HMSPollCreateParams): Promise<void>;
-  stopPoll(poll: string): Promise<void>;
-  addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void>;
-  addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
-}
+import { IHMSInteractivityCenter } from '../schema';
 
 export class HMSInteractivityCenter implements IHMSInteractivityCenter {
   constructor(private sdk: HMSSdk) {}
