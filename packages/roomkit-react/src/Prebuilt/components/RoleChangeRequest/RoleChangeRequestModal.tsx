@@ -68,7 +68,7 @@ export const RoleChangeRequestModal = () => {
 
   return (
     <RequestPrompt
-      title={`You're invited to join the ${roleChangeRequest.role.name} role`}
+      title={`You're invited to join the stage`}
       onOpenChange={async value => {
         if (!value) {
           hmsActions.rejectChangeRole(roleChangeRequest);
