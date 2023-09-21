@@ -73,7 +73,7 @@ export const DesktopLeaveRoom = ({
               <Dropdown.Item
                 css={{
                   bg: '$surface_dim',
-                  color: '$on_surface_low',
+                  color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
                 onClick={() => leaveRoom({ endstream: false })}
