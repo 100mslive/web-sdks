@@ -115,7 +115,7 @@ const Conference = () => {
   }, []);
 
   if (!isConnectedToRoom) {
-    return <FullPageProgress text={roomState === HMSRoomState.Connecting? "Joining...":""}/>;
+    return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
   return (

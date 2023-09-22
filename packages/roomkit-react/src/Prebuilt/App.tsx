@@ -24,6 +24,7 @@ import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 // @ts-ignore: No implicit Any
 import { Notifications } from './components/Notifications';
+import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 // @ts-ignore: No implicit Any
 import PostLeave from './components/PostLeave';
 // @ts-ignore: No implicit Any
@@ -47,7 +48,6 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
-import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
