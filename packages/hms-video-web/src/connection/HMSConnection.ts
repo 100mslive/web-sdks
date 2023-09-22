@@ -169,7 +169,8 @@ export default abstract class HMSConnection {
 
     if (sender) {
       const params = sender.getParameters();
-      if (params.encodings.length > 0) {
+      // modify only for non-simulcast encodings
+      if (params.encodings.length === 1) {
         if (maxBitrate) {
           params.encodings[0].maxBitrate = maxBitrate * 1000;
         }

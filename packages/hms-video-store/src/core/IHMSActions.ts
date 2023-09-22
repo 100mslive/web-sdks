@@ -14,7 +14,6 @@ import {
   TokenRequest,
   TokenRequestOptions,
 } from '@100mslive/hms-video';
-import { IHMSInteractivityCenter } from './hmsSDKStore/HMSInteractivityCenter';
 import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
 import {
   HMSChangeMultiTrackStateParams,
@@ -24,6 +23,7 @@ import {
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
+  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from './schema';
@@ -505,4 +505,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
 
   interactivityCenter: IHMSInteractivityCenter;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
 }

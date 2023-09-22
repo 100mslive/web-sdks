@@ -1,6 +1,8 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
+  selectHasPeerHandRaised,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerMetadata,
@@ -18,11 +20,12 @@ import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { Avatar } from '../../Avatar';
 import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { keyframes } from '../../Theme';
+import { config as cssConfig, keyframes } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
+import { getAttributeBoxSize } from '../common/utils';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
@@ -43,6 +46,7 @@ const Tile = ({
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
+  const isMobile = useMedia(cssConfig.media.md);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -69,21 +73,28 @@ const Tile = ({
   const onHoverHandler = useCallback(event => {
     setIsMouseHovered(event.type === 'mouseenter');
   }, []);
-  const isTileBigEnoughToShowStats = height >= 180 && width >= 180;
+
+  const ref = useRef(null);
+  const calculatedHeight = ref.current?.clientHeight || '';
+  const calculatedWidth = ref.current?.clientWidth || '';
+
+  const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
+
   const avatarSize = useMemo(() => {
-    if (!width || !height) {
+    if (!calculatedWidth || !calculatedHeight) {
       return undefined;
     }
-    if (width <= 150 || height <= 150) {
+    if (calculatedWidth <= 150 || calculatedHeight <= 150) {
       return 'small';
-    } else if (width <= 300 || height <= 300) {
+    } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
       return 'medium';
     }
     return 'large';
-  }, [width, height]);
+  }, [calculatedWidth, calculatedHeight]);
 
   return (
     <StyledVideoTile.Root
+      ref={ref}
       css={{
         width,
         height,
@@ -130,7 +141,7 @@ const Tile = ({
             isAudioMuted ? (
               <StyledVideoTile.AudioIndicator
                 data-testid="participant_audio_mute_icon"
-                size={width && height && (width < 180 || height < 180) ? 'small' : 'medium'}
+                size={getAttributeBoxSize(calculatedWidth, calculatedHeight)}
               >
                 <MicOffIcon />
               </StyledVideoTile.AudioIndicator>
@@ -138,7 +149,7 @@ const Tile = ({
               <AudioLevel trackId={audioTrack?.id} />
             )
           ) : null}
-          {isMouseHovered || isDragabble ? (
+          {isMouseHovered || (isDragabble && isMobile) ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}
@@ -147,7 +158,7 @@ const Tile = ({
               enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
-          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
+          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} height={calculatedHeight} width={calculatedWidth} />}
 
           <TileConnection
             hideLabel={hideParticipantNameOnTile}
@@ -163,8 +174,6 @@ const Tile = ({
     </StyledVideoTile.Root>
   );
 };
-
-const metaStyles = { top: '$4', left: '$4', width: '$14', height: '$14' };
 
 const heightAnimation = value =>
   keyframes({
@@ -215,20 +224,20 @@ export const AudioLevel = ({ trackId }) => {
   );
 };
 
-const PeerMetadata = ({ peerId }) => {
+const PeerMetadata = ({ peerId, height, width }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
-  const isHandRaised = metaData?.isHandRaised || false;
   const isBRB = metaData?.isBRBOn || false;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
 
   return (
     <Fragment>
       {isHandRaised ? (
-        <StyledVideoTile.AttributeBox css={metaStyles} data-testid="raiseHand_icon_onTile">
+        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="raiseHand_icon_onTile">
           <HandIcon width={24} height={24} />
         </StyledVideoTile.AttributeBox>
       ) : null}
       {isBRB ? (
-        <StyledVideoTile.AttributeBox css={metaStyles} data-testid="brb_icon_onTile">
+        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="brb_icon_onTile">
           <BrbTileIcon width={22} height={22} />
         </StyledVideoTile.AttributeBox>
       ) : null}

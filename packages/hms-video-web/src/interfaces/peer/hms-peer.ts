@@ -12,8 +12,14 @@ export interface HMSPeer {
   videoTrack?: HMSVideoTrack;
   auxiliaryTracks: HMSTrack[];
   role?: HMSRole;
+  networkQuality?: number;
+  groups?: string[];
+  realtime?: boolean;
+  isHandRaised: boolean;
 
   updateRole(newRole: HMSRole): void;
   updateName(newName: string): void;
   updateMetadata(data: string): void;
+  updateNetworkQuality(value: number): void;
+  updateGroups(groups: string[]): void;
 }

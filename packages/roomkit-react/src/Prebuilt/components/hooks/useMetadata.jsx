@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import {
+  selectHasPeerHandRaised,
   selectLocalPeerID,
   selectPeerMetadata,
   useHMSActions,
@@ -12,6 +13,7 @@ export const useMyMetadata = () => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   const vanillaStore = useHMSVanillaStore();
   const metaData = useHMSStore(selectPeerMetadata(localPeerId));
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(localPeerId));
 
   const update = async updatedFields => {
     try {
@@ -25,11 +27,20 @@ export const useMyMetadata = () => {
   };
 
   const toggleHandRaise = useCallback(async () => {
-    await update({ isHandRaised: !metaData?.isHandRaised, isBRBOn: false });
-  }, [metaData?.isHandRaised]); //eslint-disable-line
+    if (isHandRaised) {
+      await hmsActions.lowerLocalPeerHand();
+    } else {
+      await hmsActions.raiseLocalPeerHand();
+      await update({ isBRBOn: false });
+    }
+  }, [isHandRaised]); //eslint-disable-line
 
   const toggleBRB = useCallback(async () => {
-    await update({ isBRBOn: !metaData?.isBRBOn, isHandRaised: false });
+    const newValue = !metaData?.isBRBOn;
+    await update({ isBRBOn: newValue });
+    if (newValue) {
+      await hmsActions.lowerLocalPeerHand();
+    }
   }, [metaData?.isBRBOn]); //eslint-disable-line
 
   const setPrevRole = async role => {
@@ -39,7 +50,7 @@ export const useMyMetadata = () => {
   };
 
   return {
-    isHandRaised: !!metaData?.isHandRaised,
+    isHandRaised,
     isBRBOn: !!metaData?.isBRBOn,
     metaData,
     updateMetaData: update,

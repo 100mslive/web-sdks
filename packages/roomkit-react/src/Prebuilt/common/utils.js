@@ -56,8 +56,6 @@ export const isScreenshareSupported = () => {
   return typeof navigator.mediaDevices.getDisplayMedia !== 'undefined';
 };
 
-export const isInternalRole = role => role && role.startsWith('__internal');
-
 export const metadataPayloadParser = payload => {
   try {
     const data = window.atob(payload);
@@ -89,4 +87,11 @@ export const formatTime = timeInSeconds => {
   const seconds = timeInSeconds % 60;
   const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
   return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
+export const getAttributeBoxSize = (width, height) => {
+  if (!width || !height) {
+    return '';
+  }
+  return width < 180 || height < 180 ? 'small' : 'medium';
 };

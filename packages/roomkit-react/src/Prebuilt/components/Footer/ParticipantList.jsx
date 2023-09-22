@@ -1,11 +1,12 @@
 import React, { Fragment, useCallback, useEffect, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
+  selectHandRaisedPeers,
+  selectHasPeerHandRaised,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
   selectPeerMetadata,
-  selectPeersByCondition,
   selectPermissions,
   useHMSActions,
   useHMSStore,
@@ -27,7 +28,7 @@ import { RoleAccordion } from './RoleAccordion';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { useParticipants } from '../../common/hooks';
-import { isInternalRole } from '../../common/utils';
+import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const ParticipantList = () => {
@@ -35,7 +36,7 @@ export const ParticipantList = () => {
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const peersOrderedByRoles = {};
 
-  const handRaisedPeers = useHMSStore(selectPeersByCondition(peer => JSON.parse(peer.metadata || '{}')?.isHandRaised));
+  const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
 
   participants.forEach(participant => {
     if (peersOrderedByRoles[participant.roleName] === undefined) {
@@ -107,7 +108,7 @@ export const ParticipantCount = () => {
     >
       <PeopleIcon />
       <Text variant="sm" css={{ mx: '$4', c: 'inherit' }}>
-        {peerCount}
+        {getFormattedCount(peerCount)}
       </Text>
     </IconButton>
   );
@@ -176,7 +177,7 @@ export const Participant = ({ peer, isConnected }) => {
  * shows settings to change for a participant like changing their role
  */
 const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
-  const isHandRaised = useHMSStore(selectPeerMetadata(peerId))?.isHandRaised;
+  const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
   const shouldShowMoreActions = canChangeRole;
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
@@ -209,9 +210,7 @@ const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
         </Flex>
       ) : null}
 
-      {shouldShowMoreActions && !isInternalRole(role) && !isLocal ? (
-        <ParticipantMoreActions peerId={peerId} role={role} />
-      ) : null}
+      {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
     </Flex>
   );
 });
@@ -328,7 +327,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
       <Input
         type="text"
         placeholder={placeholder || 'Search for participants'}
-        css={{ w: '100%', p: '$6', pl: '$14', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '$6', pl: '$16', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();
