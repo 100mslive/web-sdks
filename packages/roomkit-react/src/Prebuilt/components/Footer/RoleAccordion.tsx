@@ -20,7 +20,7 @@ interface ItemData {
   isConnected: boolean;
 }
 
-type ActionType = 'previous' | 'next';
+type ActionType = 'previous' | 'next' | 'findPeers';
 
 function itemKey(index: number, data: ItemData) {
   return data.peerList[index].id;
@@ -74,7 +74,7 @@ export const RoleAccordion = ({
   );
 
   useEffect(() => {
-    loadData('next');
+    loadData('findPeers');
   }, [loadData]);
 
   useEffect(() => {
@@ -85,7 +85,7 @@ export const RoleAccordion = ({
     let timeout: ReturnType<typeof setInterval> | undefined;
     const requstUpdates = () => {
       timeout = setInterval(() => {
-        loadData('next');
+        loadData('findPeers');
       }, ITER_TIMER);
     };
     const observer = new MutationObserver(mutations => {
