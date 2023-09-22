@@ -47,6 +47,7 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
+import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
@@ -348,6 +349,7 @@ function AppRoutes({
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
+        <HeadlessEndRoomListener />
         <KeyboardHandler />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && (
