@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 import React, { useEffect } from 'react';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
 // @ts-ignore
