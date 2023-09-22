@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { selectPermissions, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
+import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
@@ -21,7 +22,7 @@ const StartRecording = ({ open, onOpenChange }) => {
   if (isBrowserRecordingOn) {
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
-        <Dialog.Portal>
+        <PrebuiltDialogPortal>
           <Dialog.Content
             css={{
               width: 'min(400px,80%)',
@@ -66,7 +67,7 @@ const StartRecording = ({ open, onOpenChange }) => {
               </Button>
             </Flex>
           </Dialog.Content>
-        </Dialog.Portal>
+        </PrebuiltDialogPortal>
       </Dialog.Root>
     );
   }

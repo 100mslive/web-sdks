@@ -218,6 +218,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
                       <Init />
                       <Box
+                        id="prebuilt-container"
                         css={{
                           bg: '$background_dim',
                           size: '100%',

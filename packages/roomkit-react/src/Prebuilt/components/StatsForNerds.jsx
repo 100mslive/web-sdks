@@ -15,6 +15,7 @@ import { Dialog } from '../../Modal';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
 import { DialogDropdownTrigger } from '../primitives/DropdownTrigger';
+import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
 import { useSetUiSettings } from './AppData/useUISettings';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { UI_SETTINGS } from '../common/constants';
@@ -39,7 +40,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <PrebuiltDialogPortal>
         <Dialog.Overlay />
         <Dialog.Content
           css={{
@@ -118,7 +119,7 @@ export const StatsForNerds = ({ onOpenChange }) => {
             <TrackStats trackID={selectedStat.id} layer={selectedStat.layer} local={selectedStat.local} />
           )}
         </Dialog.Content>
-      </Dialog.Portal>
+      </PrebuiltDialogPortal>
     </Dialog.Root>
   );
 };

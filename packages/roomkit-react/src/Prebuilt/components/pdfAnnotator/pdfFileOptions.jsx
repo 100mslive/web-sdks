@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, Flex } from '../../../';
 import { DialogInputFile } from '../../primitives/DialogContent';
+import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { PDFHeader } from './pdfHeader';
 import { SubmitPDF } from './submitPdf';
 import { UploadedFile } from './uploadedFile';
@@ -10,7 +11,7 @@ export function PDFFileOptions({ onOpenChange }) {
 
   return !pdfFile ? (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <Dialog.Portal>
+      <PrebuiltDialogPortal>
         <Dialog.Overlay />
         <Dialog.Content
           css={{
@@ -34,7 +35,7 @@ export function PDFFileOptions({ onOpenChange }) {
             <SubmitPDF pdfFile={pdfFile} onOpenChange={onOpenChange} />
           </Flex>
         </Dialog.Content>
-      </Dialog.Portal>
+      </PrebuiltDialogPortal>
     </Dialog.Root>
   ) : (
     <UploadedFile pdfFile={pdfFile} setPDFFile={setPDFFile} onOpenChange={onOpenChange} />
