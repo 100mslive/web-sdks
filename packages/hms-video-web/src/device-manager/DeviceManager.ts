@@ -259,8 +259,8 @@ export class DeviceManager implements HMSDeviceManager {
             ErrorCodes.TracksErrors.SELECTED_AUDIO_DEVICE_MISSING,
             'SelectedAudioDeviceMissing',
             HMSAction.PUBLISH,
-            'No audio device found',
             'Could not detect selected audio device',
+            'Please check connection to the audio device',
             false,
           ),
           devices: this.getDevices(),
@@ -268,7 +268,7 @@ export class DeviceManager implements HMSDeviceManager {
         }),
       );
 
-      HMSLogger.w(this.TAG, 'Audio device not found');
+      HMSLogger.w(this.TAG, 'Could not detect selected audio device');
       return;
     }
     const { settings } = audioTrack;
