@@ -181,7 +181,10 @@ export const Participant = ({ peer, isConnected }) => {
 const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
   const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
-  const shouldShowMoreActions = canChangeRole;
+  const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { on_stage_exp } = elements || {};
+  const shouldShowMoreActions = (on_stage_exp && canChangeRole) || canRemoveOthers;
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
@@ -212,15 +215,21 @@ const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
         </Flex>
       ) : null}
 
-      {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
+      {shouldShowMoreActions && !isLocal ? (
+        <ParticipantMoreActions
+          peerId={peerId}
+          role={role}
+          elements={elements}
+          canChangeRole={canChangeRole}
+          canRemoveOthers={canRemoveOthers}
+        />
+      ) : null}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ peerId, role }) => {
+const ParticipantMoreActions = ({ peerId, role, elements, canChangeRole, canRemoveOthers }) => {
   const hmsActions = useHMSActions();
-  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
-  const { elements } = useRoomLayoutConferencingScreen();
   const {
     bring_to_stage_label,
     remove_from_stage_label,

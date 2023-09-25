@@ -116,7 +116,7 @@ export const RoleAccordion = ({
                 icon={<AddCircleIcon />}
                 content="Load More"
                 onClick={loadNext}
-                backgroundColor="$secodary_default"
+                backgroundColor="$secondary_default"
                 css={{
                   w: 'max-content',
                   borderRadius: '$size$9',
