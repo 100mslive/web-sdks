@@ -256,8 +256,8 @@ export class DeviceManager implements HMSDeviceManager {
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
           error: new HMSException(
-            ErrorCodes.TracksErrors.NO_AUDIO_DEVICE_FOUND,
-            'NoAudioDeviceFound',
+            ErrorCodes.TracksErrors.SELECTED_AUDIO_DEVICE_MISSING,
+            'SelectedAudioDeviceMissing',
             HMSAction.PUBLISH,
             'No audio device found',
             'Could not detect selected audio device',
