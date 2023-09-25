@@ -73,6 +73,8 @@ export const ErrorCodes = {
 
     // any error that occurs while playing audio of remote audio tracks
     AUDIO_PLAYBACK_ERROR: 3013,
+
+    NO_AUDIO_DEVICE_FOUND: 3014,
   },
 
   WebrtcErrors: {

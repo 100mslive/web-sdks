@@ -1,5 +1,7 @@
 import { DeviceStorageManager } from './DeviceStorage';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorCodes } from '../error/ErrorCodes';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
@@ -253,11 +255,19 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
-          error: new Error('Audio device not found') as HMSException,
+          error: new HMSException(
+            ErrorCodes.TracksErrors.NO_AUDIO_DEVICE_FOUND,
+            'NoAudioDeviceFound',
+            HMSAction.PUBLISH,
+            'No audio device found',
+            'Could not detect selected audio device',
+            false,
+          ),
           devices: this.getDevices(),
           type: 'audioInput',
         }),
       );
+
       HMSLogger.w(this.TAG, 'Audio device not found');
       return;
     }
