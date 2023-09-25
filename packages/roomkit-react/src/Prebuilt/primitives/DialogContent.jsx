@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { CheckIcon, CloudUploadIcon, CrossIcon } from '@100mslive/react-icons';
+import { PrebuiltDialogPortal } from '../components/PrebuiltDialogPortal';
 import { Button } from '../../Button';
 import { Checkbox } from '../../Checkbox';
 import { HorizontalDivider } from '../../Divider';
@@ -14,7 +15,7 @@ import { Text } from '../../Text';
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   return (
-    <Dialog.Portal>
+    <PrebuiltDialogPortal>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: 'min(600px, 100%)', ...css }} {...props}>
         <Dialog.Title>
@@ -35,7 +36,7 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
         <HorizontalDivider css={{ mt: '0.8rem' }} />
         <Box>{children}</Box>
       </Dialog.Content>
-    </Dialog.Portal>
+    </PrebuiltDialogPortal>
   );
 };
 
@@ -60,7 +61,7 @@ export const ErrorDialog = ({ open = true, onOpenChange, title, children, ...pro
 
 export const RequestDialog = ({ open = true, onOpenChange, title, body, actionText = 'Accept', onAction, Icon }) => (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
-    <Dialog.Portal>
+    <PrebuiltDialogPortal>
       <Dialog.Overlay />
       <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
         <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md' }}>
@@ -97,7 +98,7 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
           </Box>
         </Flex>
       </Dialog.Content>
-    </Dialog.Portal>
+    </PrebuiltDialogPortal>
   </Dialog.Root>
 );
 
