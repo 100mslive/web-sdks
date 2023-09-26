@@ -240,6 +240,17 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    SelectedAudioDeviceMissing() {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SELECTED_AUDIO_DEVICE_MISSING,
+        'SelectedAudioDeviceMissing',
+        HMSAction.PUBLISH,
+        'Could not detect selected audio device',
+        'Please check connection to the audio device',
+        false,
+      );
+    },
   },
 
   WebrtcErrors: {

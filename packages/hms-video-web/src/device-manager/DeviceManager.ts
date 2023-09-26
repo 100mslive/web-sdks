@@ -1,7 +1,6 @@
 import { DeviceStorageManager } from './DeviceStorage';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { ErrorCodes } from '../error/ErrorCodes';
-import { HMSAction } from '../error/HMSAction';
+import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
@@ -255,20 +254,13 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
-          error: new HMSException(
-            ErrorCodes.TracksErrors.SELECTED_AUDIO_DEVICE_MISSING,
-            'SelectedAudioDeviceMissing',
-            HMSAction.PUBLISH,
-            'Could not detect selected audio device',
-            'Please check connection to the audio device',
-            false,
-          ),
+          error: ErrorFactory.TracksErrors.SelectedAudioDeviceMissing(),
           devices: this.getDevices(),
           type: 'audioInput',
         }),
       );
 
-      HMSLogger.w(this.TAG, 'Could not detect selected audio device');
+      HMSLogger.e(this.TAG, 'Could not detect selected audio device');
       return;
     }
     const { settings } = audioTrack;
