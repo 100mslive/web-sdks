@@ -321,6 +321,24 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       maxBufferLength: 20,
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
+      playlistLoadPolicy: {
+        default: {
+          maxTimeToFirstByteMs: 8000,
+          maxLoadTimeMs: 20000,
+          timeoutRetry: {
+            maxNumRetry: 1000,
+            retryDelayMs: 1000,
+            maxRetryDelayMs: 20000,
+            backoff: 'linear',
+          },
+          errorRetry: {
+            maxNumRetry: 1000,
+            retryDelayMs: 1000,
+            maxRetryDelayMs: 20000,
+            backoff: 'linear',
+          },
+        },
+      },
     };
   }
 
