@@ -20,7 +20,7 @@ export const Input = styled('input', {
     border: '1px solid transparent',
   },
   '&::placeholder': {
-    color: '$on_surface_low',
+    color: '$on_surface_medium',
   },
   variants: {
     alert_error_default: {

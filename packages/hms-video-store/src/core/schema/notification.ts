@@ -158,7 +158,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
 }[T];
 
-type MappedNotifications<Type extends HMSNotificationTypes[]> = {
+export type MappedNotifications<Type extends HMSNotificationTypes[]> = {
   [index in keyof Type]: HMSNotificationMapping<Type[index]>;
 };
 
