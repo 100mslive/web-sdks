@@ -108,14 +108,13 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
 
     return providerProps;
   }, [actions, store, notifications, stats, isHMSStatsOn]);
-
+  
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      const beforeUnloadCallback = () => providerProps.actions.leave();
-      window.addEventListener('beforeunload', beforeUnloadCallback);
-
+      const unloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('unload', unloadCallback);
       return () => {
-        window.removeEventListener('beforeunload', beforeUnloadCallback);
+        window.removeEventListener('unload', unloadCallback);
       };
     }
 
