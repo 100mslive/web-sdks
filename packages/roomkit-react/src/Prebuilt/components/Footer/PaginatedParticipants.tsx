@@ -47,7 +47,9 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         </IconButton>
       </Flex>
       <ParticipantSearch onSearch={(search: string) => setSearch(search)} placeholder={`Search for ${roleName}`} />
-      <Text css={{ fontSize: '$space$7', height: ROW_HEIGHT }}>{roleName}</Text>
+      <Flex align="center" css={{ height: ROW_HEIGHT, border: '1px solid $border_default', px: '$8' }}>
+        <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
+      </Flex>
       <InfiniteLoader
         isItemLoaded={(index: number) => !!filteredPeers[index]}
         itemCount={total}
