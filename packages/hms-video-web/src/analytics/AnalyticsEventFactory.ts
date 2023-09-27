@@ -5,8 +5,8 @@ import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
 import { HMSException } from '../error/HMSException';
 import { DeviceMap, SelectedDevices } from '../interfaces';
+import { HMSRemoteVideoTrack } from '../media//tracks/HMSRemoteVideoTrack';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
-import { HMSRemoteVideoTrack } from '../media/tracks';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';

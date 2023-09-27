@@ -42,9 +42,10 @@ jobs:
       REACT_APP_DYNAMIC_STT_TOKEN_GENERATION_ENDPOINT: ${{ secrets.ASSEMBLY_AI_TOKEN_ENDPOINT }}
       REACT_APP_TRANSCRIPTION_ROOM_ID: '644df1027cebfa471fcc52fd'
       REACT_APP_PDFJS_IFRAME_URL: 'https://pdf-annotation-qa.100ms.live/generic/web/viewer.html'
-      REACT_APP_INIT_ENDPOINT: https://qa-init.100ms.live/init
+      REACT_APP_INIT_ENDPOINT: https://qa-in2-ipv6.100ms.live/init
       REACT_APP_ROOM_LAYOUT_ENDPOINT: https://api-nonprod.100ms.live/v2/layouts/ui
       REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT: https://auth-nonprod.100ms.live/v2/token
+      REACT_APP_DASHBOARD_BASE_ENDPOINT: https://qa-in2-ipv6.100ms.live/hmsapi/
 
     steps:
       - name: log inputs

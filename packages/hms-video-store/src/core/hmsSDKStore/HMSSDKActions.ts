@@ -33,7 +33,7 @@ import {
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
-import { HMSInteractivityCenter, IHMSInteractivityCenter } from './HMSInteractivityCenter';
+import { HMSInteractivityCenter } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -61,6 +61,7 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrack,
+  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from '../schema';

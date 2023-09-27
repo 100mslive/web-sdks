@@ -272,9 +272,10 @@ const HLSView = () => {
                   top: '40%',
                   left: '50%',
                   transform: 'translateY(-40%) translateX(-50%)',
-                  padding: '$4 $14',
+                  padding: '$8 14px $8 18px',
                   display: 'inline-flex',
-                  r: '$0',
+                  r: '50%',
+                  gap: '$1',
                   bg: '$primary_default',
                 }}
               >
