@@ -6,21 +6,34 @@ import { selectIsConnectedToRoom, useHMSStore, usePaginatedParticipants } from '
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
+import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
-import { ParticipantSearch } from './ParticipantList';
-import { itemKey, ROW_HEIGHT, VirtualizedParticipantItem } from './RoleAccordion';
+import { Participant, ParticipantSearch } from './ParticipantList';
+import { ItemData, itemKey, ROW_HEIGHT } from './RoleAccordion';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../AppData/useSidepane';
 
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
-  const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName });
+  const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const [search, setSearch] = useState<string>('');
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const height = ROW_HEIGHT * peers.length;
   const resetSidePane = useSidepaneReset();
+  const isItemLoaded = (index: number) => !!filteredPeers[index];
+
+  const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
+    if (!isItemLoaded(index)) {
+      return (
+        <Flex align="center" justify="center" css={{ w: '100%', h: ROW_HEIGHT }}>
+          <Loading />
+        </Flex>
+      );
+    }
+    return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
+  });
 
   useEffect(() => {
     loadPeers();
@@ -52,11 +65,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
         </Flex>
         <Box css={{ flex: '1 1 0' }}>
-          <InfiniteLoader
-            isItemLoaded={(index: number) => !!filteredPeers[index]}
-            itemCount={total}
-            loadMoreItems={loadMorePeers}
-          >
+          <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={total} loadMoreItems={loadMorePeers}>
             {({ onItemsRendered, ref }) => (
               <FixedSizeList
                 itemSize={ROW_HEIGHT}

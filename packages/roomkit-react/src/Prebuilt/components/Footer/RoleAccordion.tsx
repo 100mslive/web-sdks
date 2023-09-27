@@ -15,7 +15,7 @@ import { getFormattedCount } from '../../common/utils';
 export const ROW_HEIGHT = 50;
 const ITER_TIMER = 5000;
 
-interface ItemData {
+export interface ItemData {
   peerList: HMSPeer[];
   isConnected: boolean;
 }
@@ -46,7 +46,7 @@ export const RoleAccordion = ({
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName });
+  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
   useEffect(() => {
