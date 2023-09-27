@@ -11,7 +11,9 @@ import {
   useParticipants,
   usePreviewJoin,
   useRecordingStreaming,
+  // @ts-ignore: No implicit Any
 } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
@@ -232,7 +234,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
-              <Avatar name={name} data-testid="preview_avatar_tile" />
+              <Avatar name={name} data-testid="preview_avatar_tile" size="medium" />
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
@@ -242,10 +244,10 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
       {showMuteIcon ? (
         <StyledVideoTile.AudioIndicator>
-          <MicOffIcon />
+          <MicOffIcon height={16} width={16} />
         </StyledVideoTile.AudioIndicator>
       ) : (
-        <StyledVideoTile.AudioIndicator size="medium">
+        <StyledVideoTile.AudioIndicator>
           <AudioLevel trackId={localPeer?.audioTrack} />
         </StyledVideoTile.AudioIndicator>
       )}
