@@ -15,6 +15,7 @@ export const MwebLandscapePrompt = () => {
     const handleResize = () => {
       setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
     };
+
     handleResize();
     window.addEventListener('resize', handleResize);
 

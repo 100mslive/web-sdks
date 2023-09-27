@@ -49,7 +49,9 @@ const tileShapeMapping = {
 };
 
 const env = process.env.REACT_APP_ENV || 'prod';
-export const apiBasePath = `https://${env}-in2.100ms.live/hmsapi/`;
+export const apiBasePath =
+  process.env.REACT_APP_DASHBOARD_BASE_ENDPOINT ||
+  `https://${env}-in2.100ms.live/hmsapi/`;
 
 export const storeRoomSettings = async ({ hostname, settings, appInfo }) => {
   const jwt = getAuthInfo().token;
