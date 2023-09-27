@@ -46,7 +46,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           <CrossIcon />
         </IconButton>
       </Flex>
-      <ParticipantSearch onSearch={(search: string) => setSearch(search)} />
+      <ParticipantSearch onSearch={(search: string) => setSearch(search)} placeholder={`Search for ${roleName}`} />
       <Text css={{ fontSize: '$space$7', height: ROW_HEIGHT }}>{roleName}</Text>
       <InfiniteLoader
         isItemLoaded={(index: number) => !!filteredPeers[index]}
