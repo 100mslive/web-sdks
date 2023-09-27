@@ -277,6 +277,7 @@ const HLSView = () => {
                   r: '50%',
                   gap: '$1',
                   bg: '$primary_default',
+                  zIndex: 21,
                 }}
               >
                 <IconButton onClick={async () => await hlsPlayer?.play()} data-testid="play_btn">
