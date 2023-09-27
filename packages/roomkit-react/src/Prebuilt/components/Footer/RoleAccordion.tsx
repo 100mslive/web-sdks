@@ -110,6 +110,7 @@ export const RoleAccordion = ({
               gap: '$1',
               cursor: 'pointer',
               color: '$on_surface_high',
+              px: '$4',
             }}
             onClick={() => onActive?.(roleName)}
           >

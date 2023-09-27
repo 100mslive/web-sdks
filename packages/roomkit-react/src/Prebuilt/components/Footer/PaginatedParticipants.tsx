@@ -5,7 +5,7 @@ import InfiniteLoader from 'react-window-infinite-loader';
 import { selectIsConnectedToRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
-import { Flex } from '../../../Layout';
+import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
 import { ParticipantSearch } from './ParticipantList';
@@ -47,29 +47,33 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         </IconButton>
       </Flex>
       <ParticipantSearch onSearch={(search: string) => setSearch(search)} placeholder={`Search for ${roleName}`} />
-      <Flex align="center" css={{ height: ROW_HEIGHT, border: '1px solid $border_default', px: '$8' }}>
-        <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
-      </Flex>
-      <InfiniteLoader
-        isItemLoaded={(index: number) => !!filteredPeers[index]}
-        itemCount={total}
-        loadMoreItems={loadMorePeers}
-      >
-        {({ onItemsRendered, ref }) => (
-          <FixedSizeList
-            itemSize={ROW_HEIGHT}
-            itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
-            itemKey={itemKey}
-            onItemsRendered={onItemsRendered}
-            itemCount={filteredPeers.length}
-            width={width}
-            height={height}
-            ref={ref}
+      <Flex direction="column" css={{ border: '1px solid $border_default', borderRadius: '$1' }}>
+        <Flex align="center" css={{ height: ROW_HEIGHT, borderBottom: '1px solid $border_default', px: '$8' }}>
+          <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
+        </Flex>
+        <Box css={{ flex: '1 1 0' }}>
+          <InfiniteLoader
+            isItemLoaded={(index: number) => !!filteredPeers[index]}
+            itemCount={total}
+            loadMoreItems={loadMorePeers}
           >
-            {VirtualizedParticipantItem}
-          </FixedSizeList>
-        )}
-      </InfiniteLoader>
+            {({ onItemsRendered, ref }) => (
+              <FixedSizeList
+                itemSize={ROW_HEIGHT}
+                itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
+                itemKey={itemKey}
+                onItemsRendered={onItemsRendered}
+                itemCount={filteredPeers.length}
+                width={width}
+                height={height}
+                ref={ref}
+              >
+                {VirtualizedParticipantItem}
+              </FixedSizeList>
+            )}
+          </InfiniteLoader>
+        </Box>
+      </Flex>
     </Flex>
   );
 };
