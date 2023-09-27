@@ -1047,7 +1047,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, type);
   }
 
-  // eslint-disable-next-line complexity
   protected onPeerUpdate(type: sdkTypes.HMSPeerUpdate, sdkPeer: sdkTypes.HMSPeer | sdkTypes.HMSPeer[]) {
     if (
       [sdkTypes.HMSPeerUpdate.BECAME_DOMINANT_SPEAKER, sdkTypes.HMSPeerUpdate.RESIGNED_DOMINANT_SPEAKER].includes(type)
