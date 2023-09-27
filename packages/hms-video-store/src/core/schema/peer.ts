@@ -119,10 +119,8 @@ export interface HMSSpeaker {
 }
 
 export interface HMSPeerListIterator {
-  hasPrevious(): boolean;
   hasNext(): boolean;
   next(): Promise<HMSPeer[]>;
-  previous(): Promise<HMSPeer[]>;
   getTotal(): number;
   findPeers(): Promise<HMSPeer[]>;
 }

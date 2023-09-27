@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
 import { HMSPeer, HMSPeerListIterator, selectIsLargeRoom, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
+import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -20,7 +20,7 @@ interface ItemData {
   isConnected: boolean;
 }
 
-type ActionType = 'previous' | 'next' | 'findPeers';
+type ActionType = 'next' | 'findPeers';
 
 function itemKey(index: number, data: ItemData) {
   return data.peerList[index].id;
@@ -118,7 +118,6 @@ export const RoleAccordion = ({
 
   const height = ROW_HEIGHT * (peers.length || peerList.length);
   const iterator = peerlistIterators.get(roleName);
-  const hasPrevious = iterator?.hasPrevious();
   const hasNext = iterator?.hasNext();
   const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
 
@@ -166,37 +165,21 @@ export const RoleAccordion = ({
           {VirtualizedParticipantItem}
         </FixedSizeList>
         {offStageRoles?.includes(roleName) ? (
-          <Flex justify="between" align="center" css={{ p: '$4' }}>
-            <Flex
-              align="center"
-              css={{
-                gap: '$1',
-                pointerEvents: hasPrevious ? 'auto' : 'none',
-                cursor: hasPrevious ? 'pointer' : 'not-allowed',
-                color: hasPrevious ? '$on_surface_high' : '$on_surface_low',
-              }}
-              onClick={() => loadData('next')}
-            >
-              <ChevronLeftIcon />
-              <Text variant="sm" css={{ color: 'inherit' }}>
-                Previous
-              </Text>
-            </Flex>
-            <Flex
-              align="center"
-              css={{
-                gap: '$1',
-                pointerEvents: hasNext ? 'auto' : 'none',
-                cursor: hasNext ? 'pointer' : 'not-allowed',
-                color: hasNext ? '$on_surface_high' : '$on_surface_low',
-              }}
-              onClick={() => loadData('previous')}
-            >
-              <Text variant="sm" css={{ color: 'inherit' }}>
-                Next
-              </Text>
-              <ChevronRightIcon />
-            </Flex>
+          <Flex
+            align="center"
+            justify="end"
+            css={{
+              gap: '$1',
+              pointerEvents: hasNext ? 'auto' : 'none',
+              cursor: hasNext ? 'pointer' : 'not-allowed',
+              color: hasNext ? '$on_surface_high' : '$on_surface_low',
+            }}
+            onClick={() => loadData('next')}
+          >
+            <Text variant="sm" css={{ color: 'inherit' }}>
+              View All
+            </Text>
+            <ChevronRightIcon />
           </Flex>
         ) : null}
       </Accordion.Content>

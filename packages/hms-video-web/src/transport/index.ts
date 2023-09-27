@@ -757,10 +757,6 @@ export default class HMSTransport implements ITransport {
     return this.signal.peerIterNext(params);
   }
 
-  peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse> {
-    return this.signal.peerIterPrev(params);
-  }
-
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
     await this.signal.requestTrackStateChange(trackUpdateRequest);
   }

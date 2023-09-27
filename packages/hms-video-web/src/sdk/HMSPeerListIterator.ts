@@ -8,7 +8,6 @@ import ITransport from '../transport/ITransport';
 
 export class HMSPeerListIterator {
   private isEnd = false;
-  private isBeginning = true;
   private iterator: string | null = null;
   private total = 0;
   private DEFAULT_LIMIT = 10;
@@ -16,10 +15,6 @@ export class HMSPeerListIterator {
 
   hasNext(): boolean {
     return !this.isEnd;
-  }
-
-  hasPrevious(): boolean {
-    return !this.isBeginning;
   }
 
   getTotal(): number {
@@ -33,6 +28,7 @@ export class HMSPeerListIterator {
     });
     this.total = response.total;
     this.iterator = response.iterator;
+    this.isEnd = response.eof;
     return this.processPeers(response.peers);
   }
 
@@ -55,33 +51,11 @@ export class HMSPeerListIterator {
     return this.processPeers(response.peers);
   }
 
-  async previous() {
-    let response: PeersIterationResponse;
-    if (!this.iterator) {
-      response = await this.transport.findPeers({
-        ...(this.options || {}),
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
-      });
-    } else {
-      response = await this.transport.peerIterPrev({
-        iterator: this.iterator,
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
-      });
-    }
-    this.isBeginning = response.eof;
-    this.iterator = response.iterator;
-    this.total = response.total;
-    return this.processPeers(response.peers);
-  }
-
   private processPeers(peers: PeerNotificationInfo[]) {
     const hmsPeers: HMSRemotePeer[] = [];
     peers.forEach(peer => {
-      const storeHasPeer = this.store.getPeerById(peer.peer_id);
-      if (!storeHasPeer) {
-        const hmsPeer = createRemotePeer(peer, this.store);
-        hmsPeers.push(hmsPeer);
-      }
+      const hmsPeer = createRemotePeer(peer, this.store);
+      hmsPeers.push(hmsPeer);
     });
     return hmsPeers;
   }

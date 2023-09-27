@@ -84,6 +84,4 @@ export default interface ITransport {
   findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse>;
 
   peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
-
-  peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }
