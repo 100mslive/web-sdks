@@ -35,11 +35,13 @@ export const RoleAccordion = ({
   filter,
   isHandRaisedAccordion = false,
   offStageRoles,
+  onActive,
 }: ItemData & {
   roleName: string;
   isHandRaisedAccordion?: boolean;
   filter?: { search: string };
   offStageRoles: string[];
+  onActive?: (role: string) => void;
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
@@ -48,12 +50,15 @@ export const RoleAccordion = ({
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
   useEffect(() => {
+    if (!isOffStageRole) {
+      return;
+    }
     loadPeers();
     const interval = setInterval(() => {
       loadPeers();
     }, ITER_TIMER);
     return () => clearInterval(interval);
-  }, []); //eslint-disable-line
+  }, [isOffStageRole]); //eslint-disable-line
 
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
@@ -106,6 +111,7 @@ export const RoleAccordion = ({
               cursor: 'pointer',
               color: '$on_surface_high',
             }}
+            onClick={() => onActive?.(roleName)}
           >
             <Text variant="sm" css={{ color: 'inherit' }}>
               View All

@@ -32,7 +32,7 @@ import { useParticipants } from '../../common/hooks';
 import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ParticipantList = ({ offStageRoles = [] }) => {
+export const ParticipantList = ({ offStageRoles = [], onActive }) => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
@@ -85,6 +85,7 @@ export const ParticipantList = ({ offStageRoles = [] }) => {
           filter={filter}
           offStageRoles={offStageRoles}
           isLargeRoom={isLargeRoom}
+          onActive={onActive}
         />
       </Flex>
     </Fragment>
@@ -134,6 +135,7 @@ const VirtualizedParticipants = ({
   handRaisedList = [],
   offStageRoles,
   isLargeRoom,
+  onActive,
 }) => {
   return (
     <Flex
@@ -170,6 +172,7 @@ const VirtualizedParticipants = ({
             isConnected={isConnected}
             filter={filter}
             offStageRoles={offStageRoles}
+            onActive={onActive}
           />
         ))}
       </Accordion.Root>

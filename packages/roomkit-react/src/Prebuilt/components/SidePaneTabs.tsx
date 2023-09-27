@@ -5,9 +5,10 @@ import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { Chat } from './Chat/Chat';
+import { PaginatedParticipants } from './Footer/PaginatedParticipants';
 // @ts-ignore: No implicit Any
 import { ParticipantList } from './Footer/ParticipantList';
-import { config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
+import { Box, config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 import { Tooltip } from '../../Tooltip';
 // @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -46,6 +47,7 @@ export const SidePaneTabs = React.memo<{
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const resetSidePane = useSidepaneReset();
   const [activeTab, setActiveTab] = useState(active);
+  const [activeRole, setActiveRole] = useState('');
   const peerCount = useHMSStore(selectPeerCount);
   const { elements } = useRoomLayoutConferencingScreen();
   const showChat = !!elements?.chat;
@@ -78,8 +80,14 @@ export const SidePaneTabs = React.memo<{
         h: '100%',
         marginTop: hideControls && isOverlayChat ? '$17' : '0',
         transition: 'margin 0.3s ease-in-out',
+        position: activeRole ? 'relative' : '',
       }}
     >
+      {activeRole ? (
+        <Box css={{ position: 'absolute', left: 0, top: 0, size: '100%', zIndex: 21, bg: '$surface_dim' }}>
+          <PaginatedParticipants roleName={activeRole} onBack={() => setActiveRole('')} />
+        </Box>
+      ) : null}
       {isOverlayChat && isChatOpen && showChat ? (
         <Chat screenType={screenType} />
       ) : (
@@ -96,7 +104,11 @@ export const SidePaneTabs = React.memo<{
                 )}
               </Text>
 
-              {showChat ? <Chat screenType={screenType} /> : <ParticipantList offStageRoles={off_stage_roles} />}
+              {showChat ? (
+                <Chat screenType={screenType} />
+              ) : (
+                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
+              )}
             </>
           ) : (
             <Tabs.Root
@@ -130,7 +142,7 @@ export const SidePaneTabs = React.memo<{
                 </Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
-                <ParticipantList offStageRoles={off_stage_roles} />
+                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
                 <Chat screenType={screenType} />
@@ -142,7 +154,7 @@ export const SidePaneTabs = React.memo<{
 
       {isOverlayChat && isChatOpen ? null : (
         <IconButton
-          css={{ position: 'absolute', p: '$4 0', right: '$9', top: '$11', '@md': { top: '$8', right: '$6' } }}
+          css={{ position: 'absolute', right: '$9', top: '$11', '@md': { top: '$8', right: '$6' } }}
           onClick={e => {
             e.stopPropagation();
             if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
