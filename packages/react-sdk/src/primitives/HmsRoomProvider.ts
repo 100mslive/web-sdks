@@ -108,7 +108,7 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
 
     return providerProps;
   }, [actions, store, notifications, stats, isHMSStatsOn]);
-  
+
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
       const unloadCallback = () => providerProps.actions.leave();
