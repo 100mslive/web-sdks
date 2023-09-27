@@ -394,7 +394,7 @@ export default class JsonRpcSignal implements ISignal {
   async peerIterPrev(params: peerIterRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.PEER_ITER_PREV, params);
   }
-  async findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+  async findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
   }
 

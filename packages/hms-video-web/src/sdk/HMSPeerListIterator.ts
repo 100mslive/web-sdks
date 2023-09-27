@@ -27,7 +27,7 @@ export class HMSPeerListIterator {
   }
 
   async findPeers() {
-    const response = await this.transport.findPeer({
+    const response = await this.transport.findPeers({
       ...(this.options || {}),
       limit: this.options?.limit || this.DEFAULT_LIMIT,
     });
@@ -39,7 +39,7 @@ export class HMSPeerListIterator {
   async next() {
     let response: PeersIterationResponse;
     if (!this.iterator) {
-      response = await this.transport.findPeer({
+      response = await this.transport.findPeers({
         ...(this.options || {}),
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
@@ -58,7 +58,7 @@ export class HMSPeerListIterator {
   async previous() {
     let response: PeersIterationResponse;
     if (!this.iterator) {
-      response = await this.transport.findPeer({
+      response = await this.transport.findPeers({
         ...(this.options || {}),
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });

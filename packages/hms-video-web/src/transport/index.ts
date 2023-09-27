@@ -750,8 +750,8 @@ export default class HMSTransport implements ITransport {
     this.signal.removeFromGroup(peerId, name);
   }
 
-  findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
-    return this.signal.findPeer(params);
+  findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.findPeers(params);
   }
   peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
     return this.signal.peerIterNext(params);

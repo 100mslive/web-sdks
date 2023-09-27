@@ -81,7 +81,7 @@ export default interface ITransport {
 
   removeFromGroup(peerId: string, name: string): Promise<void>;
 
-  findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse>;
+  findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse>;
 
   peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 
