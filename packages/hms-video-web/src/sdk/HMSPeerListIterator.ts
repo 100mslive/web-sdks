@@ -10,7 +10,7 @@ export class HMSPeerListIterator {
   private isEnd = false;
   private iterator: string | null = null;
   private total = 0;
-  private DEFAULT_LIMIT = 10;
+  private defaultPaginationLimit = 10;
   constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
 
   hasNext(): boolean {
