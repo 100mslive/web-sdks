@@ -31,6 +31,7 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 // @ts-ignore: No implicit Any
 import { Logo } from '../Header/HeaderComponents';
+import { PrebuiltAudioIndicator } from '../PrebuiltTileElements';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
 // @ts-ignore: No implicit Any
@@ -243,13 +244,13 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       ) : null}
 
       {showMuteIcon ? (
-        <StyledVideoTile.AudioIndicator>
+        <PrebuiltAudioIndicator>
           <MicOffIcon height={16} width={16} />
-        </StyledVideoTile.AudioIndicator>
+        </PrebuiltAudioIndicator>
       ) : (
-        <StyledVideoTile.AudioIndicator>
+        <PrebuiltAudioIndicator>
           <AudioLevel trackId={localPeer?.audioTrack} />
-        </StyledVideoTile.AudioIndicator>
+        </PrebuiltAudioIndicator>
       )}
     </StyledVideoTile.Container>
   );

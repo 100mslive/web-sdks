@@ -22,6 +22,7 @@ import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
+import { PrebuiltAttributeBox, PrebuiltAudioIndicator } from './PrebuiltTileElements';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
@@ -126,13 +127,13 @@ const Tile = ({
 
           {!hideAudioMuteOnTile ? (
             isAudioMuted ? (
-              <StyledVideoTile.AudioIndicator data-testid="participant_audio_mute_icon">
+              <PrebuiltAudioIndicator data-testid="participant_audio_mute_icon">
                 <MicOffIcon style={iconDims} />
-              </StyledVideoTile.AudioIndicator>
+              </PrebuiltAudioIndicator>
             ) : (
-              <StyledVideoTile.AudioIndicator>
+              <PrebuiltAudioIndicator>
                 <AudioLevel trackId={audioTrack?.id} />
-              </StyledVideoTile.AudioIndicator>
+              </PrebuiltAudioIndicator>
             )
           ) : null}
           {isMouseHovered || (isDragabble && isMobile) ? (
@@ -169,14 +170,14 @@ const PeerMetadata = ({ peerId }) => {
   return (
     <Fragment>
       {isHandRaised ? (
-        <StyledVideoTile.AttributeBox data-testid="raiseHand_icon_onTile">
+        <PrebuiltAttributeBox data-testid="raiseHand_icon_onTile">
           <HandIcon style={iconDims} />
-        </StyledVideoTile.AttributeBox>
+        </PrebuiltAttributeBox>
       ) : null}
       {isBRB ? (
-        <StyledVideoTile.AttributeBox data-testid="brb_icon_onTile">
+        <PrebuiltAttributeBox data-testid="brb_icon_onTile">
           <BrbTileIcon style={iconDims} />
-        </StyledVideoTile.AttributeBox>
+        </PrebuiltAttributeBox>
       ) : null}
     </Fragment>
   );

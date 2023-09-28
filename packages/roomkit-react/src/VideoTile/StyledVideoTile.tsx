@@ -61,8 +61,8 @@ const AttributeBox = styled('div', {
   color: '$on_secondary_high',
   bg: '$secondary_dim',
   borderRadius: '$round',
-  width: '$12',
-  height: '$12',
+  width: '$14',
+  height: '$14',
   mb: '5px',
   ...flexCenter,
   variants: {
