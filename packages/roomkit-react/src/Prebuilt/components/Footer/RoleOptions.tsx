@@ -46,7 +46,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const canRemoveRoleFromRoom =
     permissions?.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
-  if (!(canMuteRole || canRemoveRoleFromStage || canRemoveRoleFromRoom)) {
+  if (!(canMuteRole || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0) {
     return null;
   }
 

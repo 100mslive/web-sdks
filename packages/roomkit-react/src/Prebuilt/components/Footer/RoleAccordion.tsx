@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
-import { HMSPeer } from '@100mslive/react-sdk';
+import { HMSPeer, selectIsLargeRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
+import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -11,18 +12,19 @@ import { RoleOptions } from './RoleOptions';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
 
-const ROW_HEIGHT = 50;
+export const ROW_HEIGHT = 50;
+const ITER_TIMER = 5000;
 
-interface ItemData {
+export interface ItemData {
   peerList: HMSPeer[];
   isConnected: boolean;
 }
 
-function itemKey(index: number, data: ItemData) {
+export function itemKey(index: number, data: ItemData) {
   return data.peerList[index].id;
 }
 
-const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
+export const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
   return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
 });
 
@@ -32,63 +34,93 @@ export const RoleAccordion = ({
   isConnected,
   filter,
   isHandRaisedAccordion = false,
+  offStageRoles,
+  onActive,
 }: ItemData & {
   roleName: string;
   isHandRaisedAccordion?: boolean;
   filter?: { search: string };
+  offStageRoles: string[];
+  onActive?: (role: string) => void;
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
+  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 10 });
+  const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
-  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || peerList.length === 0) {
+  useEffect(() => {
+    if (!isOffStageRole) {
+      return;
+    }
+    loadPeers();
+    const interval = setInterval(() => {
+      loadPeers();
+    }, ITER_TIMER);
+    return () => clearInterval(interval);
+  }, [isOffStageRole]); //eslint-disable-line
+
+  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
   }
-  const height = ROW_HEIGHT * peerList.length;
+
+  const height = ROW_HEIGHT * (peers.length || peerList.length);
+  const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
+  const hasNext = total > peersInAccordion.length;
 
   return (
-    <Flex direction="column" css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
-      <Accordion.Root
-        type="single"
-        collapsible
-        defaultValue={roleName}
-        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
+    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
+      <Accordion.Header
+        iconStyles={{ c: '$on_surface_high' }}
+        css={{
+          textTransform: 'capitalize',
+          p: '$6 $8',
+          fontSize: '$sm',
+          fontWeight: '$semiBold',
+          c: '$on_surface_medium',
+        }}
       >
-        <Accordion.Item value={roleName}>
-          <Accordion.Header
-            iconStyles={{ c: '$on_surface_high' }}
-            css={{
-              textTransform: 'capitalize',
-              p: '$6 $8',
-              fontSize: '$sm',
-              fontWeight: '$semiBold',
-              c: '$on_surface_medium',
-            }}
+        <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
+          <Text
+            variant="sm"
+            css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
           >
-            <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
-              <Text
-                variant="sm"
-                css={{ fontWeight: '$semiBold', textTransform: 'capitalize', color: '$on_surface_medium' }}
-              >
-                {roleName} {`(${getFormattedCount(peerList.length)})`}
-              </Text>
-              <RoleOptions roleName={roleName} peerList={peerList} />
-            </Flex>
-          </Accordion.Header>
-          <Accordion.Content>
-            <Box css={{ borderTop: '1px solid $border_default' }} />
-            <FixedSizeList
-              itemSize={ROW_HEIGHT}
-              itemData={{ peerList, isConnected }}
-              itemKey={itemKey}
-              itemCount={peerList.length}
-              width={width}
-              height={height}
-            >
-              {VirtualizedParticipantItem}
-            </FixedSizeList>
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
-    </Flex>
+            {roleName} {`(${getFormattedCount(isLargeRoom && isOffStageRole ? total : peerList.length)})`}
+          </Text>
+          <RoleOptions roleName={roleName} peerList={peersInAccordion} />
+        </Flex>
+      </Accordion.Header>
+      <Accordion.Content>
+        <Box css={{ borderTop: '1px solid $border_default' }} />
+        <FixedSizeList
+          itemSize={ROW_HEIGHT}
+          itemData={{ peerList: peersInAccordion, isConnected }}
+          itemKey={itemKey}
+          itemCount={peersInAccordion.length}
+          width={width}
+          height={height}
+        >
+          {VirtualizedParticipantItem}
+        </FixedSizeList>
+        {offStageRoles?.includes(roleName) && hasNext ? (
+          <Flex
+            align="center"
+            justify="end"
+            css={{
+              gap: '$1',
+              cursor: 'pointer',
+              color: '$on_surface_high',
+              px: '$4',
+            }}
+            onClick={() => onActive?.(roleName)}
+          >
+            <Text variant="sm" css={{ color: 'inherit' }}>
+              View All
+            </Text>
+            <ChevronRightIcon />
+          </Flex>
+        ) : null}
+      </Accordion.Content>
+    </Accordion.Item>
   );
 };

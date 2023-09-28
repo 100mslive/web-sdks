@@ -1,6 +1,6 @@
+import { createRemotePeer } from './utils';
 import { HMSUpdateListener } from '../../interfaces';
 import Message from '../../sdk/models/HMSMessage';
-import { HMSPeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
@@ -51,15 +51,7 @@ export class BroadcastManager {
     // If not available in store, use peer data from received broadcast message from Biz
     // notifPeer can be undefined when message is sent via api
     if (!sender && notifPeer) {
-      sender = new HMSPeer({
-        peerId: notifPeer.peer_id,
-        name: notifPeer.info.name,
-        isLocal: false,
-        role: this.store.getPolicyForRole(notifPeer.role),
-        customerUserId: notifPeer.info.user_id,
-        metadata: notifPeer.info.data,
-        groups: notifPeer.groups,
-      });
+      sender = createRemotePeer(notifPeer, this.store);
     }
     return sender;
   }

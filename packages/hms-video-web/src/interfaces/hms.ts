@@ -5,6 +5,7 @@ import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager } from './playlist';
 import { HMSPreviewListener } from './preview-listener';
 import { HMSRole } from './role';
@@ -18,6 +19,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSPeerListIterator } from '../sdk/HMSPeerListIterator';
 import { HMSLogLevel } from '../utils/logger';
 
 export interface HMSInterface {
@@ -95,4 +97,6 @@ export interface HMSInterface {
   lowerLocalPeerHand(): Promise<void>;
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 }

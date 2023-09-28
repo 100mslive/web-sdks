@@ -3,6 +3,7 @@ import { useDebounce, useMedia } from 'react-use';
 import {
   selectHandRaisedPeers,
   selectHasPeerHandRaised,
+  selectIsLargeRoom,
   selectIsPeerAudioEnabled,
   selectLocalPeerID,
   selectPeerCount,
@@ -20,7 +21,7 @@ import {
   SearchIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
+import { Accordion, Box, config as cssConfig, Dropdown, Flex, Input, Text, textEllipsis } from '../../..';
 import IconButton from '../../IconButton';
 import { ConnectionIndicator } from '../Connection/ConnectionIndicator';
 import { ToastManager } from '../Toast/ToastManager';
@@ -31,9 +32,10 @@ import { useParticipants } from '../../common/hooks';
 import { getFormattedCount } from '../../common/utils';
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
-export const ParticipantList = () => {
+export const ParticipantList = ({ offStageRoles = [], onActive }) => {
   const [filter, setFilter] = useState();
   const { participants, isConnected, peerCount } = useParticipants(filter);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const peersOrderedByRoles = {};
 
   const handRaisedPeers = useHMSStore(selectHandRaisedPeers);
@@ -44,6 +46,15 @@ export const ParticipantList = () => {
     }
     peersOrderedByRoles[participant.roleName].push(participant);
   });
+
+  // prefill off_stage roles of large rooms to load more peers
+  if (isLargeRoom) {
+    offStageRoles.forEach(role => {
+      if (!peersOrderedByRoles[role]) {
+        peersOrderedByRoles[role] = [];
+      }
+    });
+  }
 
   const onSearch = useCallback(value => {
     setFilter(filterValue => {
@@ -72,6 +83,9 @@ export const ParticipantList = () => {
           handRaisedList={handRaisedPeers}
           isConnected={isConnected}
           filter={filter}
+          offStageRoles={offStageRoles}
+          isLargeRoom={isLargeRoom}
+          onActive={onActive}
         />
       </Flex>
     </Fragment>
@@ -114,7 +128,15 @@ export const ParticipantCount = () => {
   );
 };
 
-const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter, handRaisedList = [] }) => {
+const VirtualizedParticipants = ({
+  peersOrderedByRoles = {},
+  isConnected,
+  filter,
+  handRaisedList = [],
+  offStageRoles,
+  isLargeRoom,
+  onActive,
+}) => {
   return (
     <Flex
       direction="column"
@@ -127,22 +149,33 @@ const VirtualizedParticipants = ({ peersOrderedByRoles = {}, isConnected, filter
         flex: '1 1 0',
       }}
     >
-      <RoleAccordion
-        peerList={handRaisedList}
-        roleName="Hand Raised"
-        filter={filter}
-        isConnected={isConnected}
-        isHandRaisedAccordion
-      />
-      {Object.keys(peersOrderedByRoles).map(role => (
-        <RoleAccordion
-          key={role}
-          peerList={peersOrderedByRoles[role]}
-          roleName={role}
-          isConnected={isConnected}
-          filter={filter}
-        />
-      ))}
+      <Accordion.Root
+        type={isLargeRoom ? 'single' : 'multiple'}
+        collapsible
+        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
+      >
+        {handRaisedList.length > 0 ? (
+          <RoleAccordion
+            peerList={handRaisedList}
+            roleName="Hand Raised"
+            filter={filter}
+            isConnected={isConnected}
+            isHandRaisedAccordion
+            offStageRoles={offStageRoles}
+          />
+        ) : null}
+        {Object.keys(peersOrderedByRoles).map(role => (
+          <RoleAccordion
+            key={role}
+            peerList={peersOrderedByRoles[role]}
+            roleName={role}
+            isConnected={isConnected}
+            filter={filter}
+            offStageRoles={offStageRoles}
+            onActive={onActive}
+          />
+        ))}
+      </Accordion.Root>
     </Flex>
   );
 };
@@ -179,7 +212,10 @@ export const Participant = ({ peer, isConnected }) => {
 const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
   const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
-  const shouldShowMoreActions = canChangeRole;
+  const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { on_stage_exp } = elements || {};
+  const shouldShowMoreActions = (on_stage_exp && canChangeRole) || canRemoveOthers;
   const isAudioMuted = !useHMSStore(selectIsPeerAudioEnabled(peerId));
 
   return (
@@ -210,15 +246,21 @@ const ParticipantActions = React.memo(({ peerId, role, isLocal }) => {
         </Flex>
       ) : null}
 
-      {shouldShowMoreActions && !isLocal ? <ParticipantMoreActions peerId={peerId} role={role} /> : null}
+      {shouldShowMoreActions && !isLocal ? (
+        <ParticipantMoreActions
+          peerId={peerId}
+          role={role}
+          elements={elements}
+          canChangeRole={canChangeRole}
+          canRemoveOthers={canRemoveOthers}
+        />
+      ) : null}
     </Flex>
   );
 });
 
-const ParticipantMoreActions = ({ peerId, role }) => {
+const ParticipantMoreActions = ({ peerId, role, elements, canChangeRole, canRemoveOthers }) => {
   const hmsActions = useHMSActions();
-  const { changeRole: canChangeRole, removeOthers: canRemoveOthers } = useHMSStore(selectPermissions);
-  const { elements } = useRoomLayoutConferencingScreen();
   const {
     bring_to_stage_label,
     remove_from_stage_label,
@@ -327,7 +369,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
       <Input
         type="text"
         placeholder={placeholder || 'Search for participants'}
-        css={{ w: '100%', p: '$6', pl: '$16', mr: '$4', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
+        css={{ w: '100%', p: '$6', pl: '$14', bg: inSidePane ? '$surface_default' : '$surface_dim' }}
         value={value}
         onKeyDown={event => {
           event.stopPropagation();
