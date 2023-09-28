@@ -57,6 +57,9 @@ export class HMSPeerListIterator {
   private updateState(response: PeersIterationResponse) {
     this.isEnd = response.eof;
     this.total = response.total;
-    this.iterator = response.iterator;
+    // iterator is only received once in findpeer -  reuse the same iterator
+    if (response.iterator) {
+      this.iterator = response.iterator;
+    }
   }
 }
