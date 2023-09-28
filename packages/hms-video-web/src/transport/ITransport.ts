@@ -8,7 +8,7 @@ import {
 } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';
 import {
-  findPeerRequestParams,
+  findPeersRequestParams,
   GetSessionMetadataResponse,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
@@ -81,7 +81,7 @@ export default interface ITransport {
 
   removeFromGroup(peerId: string, name: string): Promise<void>;
 
-  findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse>;
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse>;
 
   peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }

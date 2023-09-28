@@ -19,7 +19,7 @@ import { sleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
-  findPeerRequestParams,
+  findPeersRequestParams,
   getPeerRequestParams,
   GetSessionMetadataResponse,
   HLSRequestParams,
@@ -391,7 +391,7 @@ export default class JsonRpcSignal implements ISignal {
     return await this.call(HMSSignalMethod.PEER_ITER_NEXT, params);
   }
 
-  async findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+  async findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
   }
 

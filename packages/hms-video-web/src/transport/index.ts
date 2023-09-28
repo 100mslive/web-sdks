@@ -34,7 +34,7 @@ import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
-  findPeerRequestParams,
+  findPeersRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
@@ -750,7 +750,7 @@ export default class HMSTransport implements ITransport {
     this.signal.removeFromGroup(peerId, name);
   }
 
-  findPeers(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
     return this.signal.findPeers(params);
   }
   peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
