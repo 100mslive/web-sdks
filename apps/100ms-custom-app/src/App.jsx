@@ -36,7 +36,7 @@ const App = () => {
       const { hmsActions } = hmsPrebuiltRef.current;
       hmsActions?.enableBeamSpeakerLabelsLogging?.();
       hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
-      hmsActions?.setAppData?.('disableNotificiations', true);
+      hmsActions?.setAppData?.('disableNotifications', true);
     }
   }, [authToken, roomCode, isHeadless]);
 
@@ -53,6 +53,19 @@ const App = () => {
       })();
     }
   }, [authToken, role, roomCode, roomId, subdomain]);
+
+  // Prompt for page refresh/tab close
+  useEffect(() => {
+    const confirmLeave = e => {
+      e.returnValue = 'Are you sure you want to leave?';
+    };
+
+    window.addEventListener('beforeunload', confirmLeave);
+
+    return () => {
+      window.removeEventListener('beforeunload', confirmLeave);
+    };
+  }, []);
 
   return (
     <Flex

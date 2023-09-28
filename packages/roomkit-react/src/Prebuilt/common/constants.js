@@ -44,7 +44,7 @@ export const APP_DATA = {
   pdfConfig: 'pdfConfig',
   minimiseInset: 'minimiseInset',
   activeScreensharePeerId: 'activeScreensharePeerId',
-  disableNotificiations: 'disableNotificiations',
+  disableNotifications: 'disableNotifications',
   pollState: 'pollState',
 };
 export const UI_SETTINGS = {

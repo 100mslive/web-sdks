@@ -1,13 +1,13 @@
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
-  findPeerRequestParams,
+  findPeersRequestParams,
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -136,7 +136,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   removeFromGroup(peerId: string, name: string): Promise<void>;
 
-  findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse>;
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse>;
 
-  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse>;
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }

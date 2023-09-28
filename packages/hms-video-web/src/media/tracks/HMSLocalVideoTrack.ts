@@ -1,5 +1,6 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
@@ -294,13 +295,24 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * Note: Do not change the order of this.
      */
     prevTrack?.stop();
-    const newTrack = await getVideoTrack(settings);
-    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-    // Replace deviceId with actual deviceId when it is default
-    if (this.settings.deviceId === 'default') {
-      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+    try {
+      const newTrack = await getVideoTrack(settings);
+      HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
+      // Replace deviceId with actual deviceId when it is default
+      if (this.settings.deviceId === 'default') {
+        this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+      }
+      return newTrack;
+    } catch (error) {
+      if (this.isPublished) {
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            error: error as Error,
+          }),
+        );
+      }
+      throw error;
     }
-    return newTrack;
   }
 
   /**

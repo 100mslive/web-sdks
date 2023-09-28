@@ -153,6 +153,7 @@ export class SDKToHMS {
       startedAt: sdkRoom.startedAt,
       joinedAt: sdkRoom.joinedAt,
       peerCount: sdkRoom.peerCount,
+      isLargeRoom: sdkRoom.large_room_optimization,
     };
   }
 

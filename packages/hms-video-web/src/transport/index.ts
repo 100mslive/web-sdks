@@ -34,13 +34,13 @@ import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
-  findPeerRequestParams,
+  findPeersRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -750,10 +750,10 @@ export default class HMSTransport implements ITransport {
     this.signal.removeFromGroup(peerId, name);
   }
 
-  findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
-    return this.signal.findPeer(params);
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.findPeers(params);
   }
-  peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse> {
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
     return this.signal.peerIterNext(params);
   }
 

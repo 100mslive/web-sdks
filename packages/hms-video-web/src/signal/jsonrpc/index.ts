@@ -19,14 +19,14 @@ import { sleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
-  findPeerRequestParams,
+  findPeersRequestParams,
   getPeerRequestParams,
   GetSessionMetadataResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
-  peerIterNextRequestParams,
+  peerIterRequestParams,
   PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
@@ -387,10 +387,11 @@ export default class JsonRpcSignal implements ISignal {
     await this.call(HMSSignalMethod.GROUP_REMOVE, { name, peer_id: peerId });
   }
 
-  async peerIterNext(params: peerIterNextRequestParams): Promise<PeersIterationResponse> {
+  async peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.PEER_ITER_NEXT, params);
   }
-  async findPeer(params: findPeerRequestParams): Promise<PeersIterationResponse> {
+
+  async findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
     return await this.call(HMSSignalMethod.FIND_PEER, params);
   }
 
