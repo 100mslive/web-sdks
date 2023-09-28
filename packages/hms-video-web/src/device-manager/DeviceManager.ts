@@ -260,7 +260,7 @@ export class DeviceManager implements HMSDeviceManager {
         }),
       );
 
-      HMSLogger.e(this.TAG, 'Could not detect selected audio device');
+      HMSLogger.e(this.TAG, 'Audio device not found');
       return;
     }
     const { settings } = audioTrack;
@@ -316,7 +316,7 @@ export class DeviceManager implements HMSDeviceManager {
           type: 'video',
         }),
       );
-      HMSLogger.e(this.TAG, 'Could not detect selected video device');
+      HMSLogger.e(this.TAG, 'Video device not found');
       return;
     }
     const { settings } = videoTrack;
