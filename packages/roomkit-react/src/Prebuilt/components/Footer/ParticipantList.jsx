@@ -149,11 +149,7 @@ const VirtualizedParticipants = ({
         flex: '1 1 0',
       }}
     >
-      <Accordion.Root
-        type={isLargeRoom ? 'single' : 'multiple'}
-        collapsible
-        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
-      >
+      <Accordion.Root type={isLargeRoom ? 'single' : 'multiple'} collapsible>
         {handRaisedList.length > 0 ? (
           <RoleAccordion
             peerList={handRaisedList}
