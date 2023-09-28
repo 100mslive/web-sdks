@@ -241,13 +241,13 @@ export const ErrorFactory = {
       );
     },
 
-    SelectedAudioDeviceMissing() {
+    SelectedDeviceMissing(deviceType: string) {
       return new HMSException(
-        ErrorCodes.TracksErrors.SELECTED_AUDIO_DEVICE_MISSING,
-        'SelectedAudioDeviceMissing',
+        ErrorCodes.TracksErrors.SELECTED_DEVICE_MISSING,
+        'SelectedDeviceMissing',
         HMSAction.TRACK,
-        'Could not detect selected audio device',
-        'Please check connection to the audio device',
+        `Could not detect selected ${deviceType} device`,
+        `Please check connection to the ${deviceType} device`,
         false,
       );
     },

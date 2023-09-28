@@ -254,7 +254,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
-          error: ErrorFactory.TracksErrors.SelectedAudioDeviceMissing(),
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('audio'),
           devices: this.getDevices(),
           type: 'audioInput',
         }),
@@ -311,7 +311,7 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
-          error: new Error('Video device not found') as HMSException,
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('video'),
           devices: this.getDevices(),
           type: 'video',
         }),
