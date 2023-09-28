@@ -86,11 +86,12 @@ const AttributeBox = styled('div', {
     },
   },
   defaultVariants: {
+    size: 'medium',
     position: 'left',
   },
 });
 
-const AudioIndicator = styled(AttributeBox, { defaultVariants: { size: 'medium', position: 'right' } });
+const AudioIndicator = styled(AttributeBox, { defaultVariants: { position: 'right' } });
 
 const FullScreenButton = styled('button', {
   width: '2.25rem',
