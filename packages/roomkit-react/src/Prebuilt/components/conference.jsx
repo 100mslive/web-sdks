@@ -114,7 +114,7 @@ const Conference = () => {
     };
   }, []);
 
-  if (!isConnectedToRoom && roomState !== HMSRoomState.Reconnecting) {
+  if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
