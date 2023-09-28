@@ -50,7 +50,7 @@ export const RoleAccordion = ({
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
   useEffect(() => {
-    if (!isOffStageRole) {
+    if (!isOffStageRole || !isLargeRoom) {
       return;
     }
     loadPeers();
@@ -58,7 +58,7 @@ export const RoleAccordion = ({
       loadPeers();
     }, ITER_TIMER);
     return () => clearInterval(interval);
-  }, [isOffStageRole]); //eslint-disable-line
+  }, [isOffStageRole, isLargeRoom]); //eslint-disable-line
 
   if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
     return null;
