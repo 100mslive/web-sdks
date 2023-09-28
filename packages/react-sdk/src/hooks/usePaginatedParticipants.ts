@@ -19,6 +19,13 @@ export interface usePaginatedParticipantsResult {
 
 export type usePaginatedParticipantsInput = HMSPeerListIteratorOptions;
 
+const processPeers = (peers: HMSPeer[]) => {
+  return peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
+    acc[peer.id] = peer;
+    return acc;
+  }, {});
+};
+
 export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) => {
   const actions = useHMSActions();
   const iterator = useRef(actions.getPeerListIterator(options));
@@ -27,24 +34,16 @@ export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) =>
 
   return {
     loadPeers: () =>
-      iterator.current.findPeers.call(iterator.current).then(peers => {
-        setPeers(
-          peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
-            acc[peer.id] = peer;
-            return acc;
-          }, {}),
-        );
+      iterator.current.findPeers().then(peers => {
+        setPeers(processPeers(peers));
         setTotal(iterator.current.getTotal());
       }),
     loadMorePeers: () =>
-      iterator.current.next.call(iterator.current).then(peers => {
+      iterator.current.next().then(peers => {
         setPeers(prevPeers => {
           return {
             ...prevPeers,
-            ...peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
-              acc[peer.id] = peer;
-              return acc;
-            }, {}),
+            ...processPeers(peers),
           };
         });
         setTotal(iterator.current.getTotal());

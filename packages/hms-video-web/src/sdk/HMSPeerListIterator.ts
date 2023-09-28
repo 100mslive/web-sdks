@@ -24,7 +24,7 @@ export class HMSPeerListIterator {
   async findPeers() {
     const response = await this.transport.findPeers({
       ...(this.options || {}),
-      limit: this.options?.limit || this.DEFAULT_LIMIT,
+      limit: this.options?.limit || this.defaultPaginationLimit,
     });
     this.updateState(response);
     return this.processPeers(response.peers);
@@ -32,19 +32,17 @@ export class HMSPeerListIterator {
 
   async next() {
     let response: PeersIterationResponse;
-    if (!this.iterator) {
-      response = await this.transport.findPeers({
-        ...(this.options || {}),
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
-      });
-    } else {
+    if (!this.iterator && !this.isEnd) {
+      return await this.findPeers();
+    } else if (this.iterator) {
       response = await this.transport.peerIterNext({
         iterator: this.iterator,
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
+        limit: this.options?.limit || this.defaultPaginationLimit,
       });
+      this.updateState(response);
+      return this.processPeers(response.peers);
     }
-    this.updateState(response);
-    return this.processPeers(response.peers);
+    return [];
   }
 
   private processPeers(peers: PeerNotificationInfo[]) {
