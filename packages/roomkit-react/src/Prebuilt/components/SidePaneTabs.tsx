@@ -72,6 +72,25 @@ export const SidePaneTabs = React.memo<{
     setActiveTab(active);
   }, [active]);
 
+  if (activeRole) {
+    return (
+      <Flex
+        direction="column"
+        css={{
+          color: '$on_primary_high',
+          h: '100%',
+          marginTop: hideControls && isOverlayChat ? '$17' : '0',
+          transition: 'margin 0.3s ease-in-out',
+          position: 'relative',
+        }}
+      >
+        <Box css={{ position: 'absolute', left: 0, top: 0, size: '100%', zIndex: 21, bg: '$surface_dim' }}>
+          <PaginatedParticipants roleName={activeRole} onBack={() => setActiveRole('')} />
+        </Box>
+      </Flex>
+    );
+  }
+
   return (
     <Flex
       direction="column"
@@ -80,14 +99,8 @@ export const SidePaneTabs = React.memo<{
         h: '100%',
         marginTop: hideControls && isOverlayChat ? '$17' : '0',
         transition: 'margin 0.3s ease-in-out',
-        position: activeRole ? 'relative' : '',
       }}
     >
-      {activeRole ? (
-        <Box css={{ position: 'absolute', left: 0, top: 0, size: '100%', zIndex: 21, bg: '$surface_dim' }}>
-          <PaginatedParticipants roleName={activeRole} onBack={() => setActiveRole('')} />
-        </Box>
-      ) : null}
       {isOverlayChat && isChatOpen && showChat ? (
         <Chat screenType={screenType} />
       ) : (
