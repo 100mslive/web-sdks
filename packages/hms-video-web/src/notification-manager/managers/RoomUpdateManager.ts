@@ -139,7 +139,7 @@ export class RoomUpdateManager {
     }
 
     notification.enabled =
-      (method === HMSNotificationMethod.HLS_START || method === HMSNotificationMethod.HLS_INIT) &&
+      [HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START].includes(method as HMSNotificationMethod) &&
       !notification.error?.code;
     room.hls = this.convertHls(notification);
     room.recording.hls = this.getHLSRecording(notification);
