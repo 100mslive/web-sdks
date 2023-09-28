@@ -18,6 +18,7 @@ import {
   HandIcon,
   HandRaiseSlashedIcon,
   PeopleIcon,
+  QuizIcon,
   RecordIcon,
   SettingsIcon,
 } from '@100mslive/react-icons';
@@ -40,7 +41,9 @@ import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
-import { useSidepaneToggle } from '../../AppData/useSidepane';
+import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { useShowPolls } from '../../AppData/useUISettings';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
 // @ts-ignore: No implicit any
@@ -82,6 +85,8 @@ export const MwebOptions = ({
   const [showRecordingOn, setShowRecordingOn] = useState(false);
   const [isRecordingLoading, setIsRecordingLoading] = useState(false);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
+  const { showPolls } = useShowPolls();
+  const togglePollView = usePollViewToggle();
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
@@ -189,6 +194,18 @@ export const MwebOptions = ({
               >
                 <EmojiIcon />
                 <ActionTile.Title>Emoji Reactions</ActionTile.Title>
+              </ActionTile.Root>
+            )}
+
+            {showPolls && (
+              <ActionTile.Root
+                onClick={() => {
+                  togglePollView();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <QuizIcon />
+                <ActionTile.Title>Polls and Quizzes</ActionTile.Title>
               </ActionTile.Root>
             )}
 

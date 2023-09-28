@@ -37,36 +37,47 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
   );
 };
 
-export const ContentHeader = ({ onBack, title, content }) => {
+export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
   return (
     <Flex css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer' }}>
-      <Text
-        css={{ p: '$2', bg: '$surface_bright', r: '$round', alignSelf: 'center' }}
-        onClick={onBack}
-        data-testid="go_back"
-      >
-        <ChevronLeftIcon width={16} height={16} />
-      </Text>
-      <Box css={{ flex: '1 1 0', mx: '$8' }}>
+      {onBack ? (
         <Text
-          variant="tiny"
           css={{
-            textTransform: 'uppercase',
-            fontWeight: '$semiBold',
-            color: '$on_surface_medium',
+            p: '$2',
+            bg: '$surface_bright',
+            r: '$round',
+            alignSelf: 'center',
+            mr: '$8',
           }}
+          onClick={onBack}
+          data-testid="go_back"
         >
-          {title}
+          <ChevronLeftIcon width={16} height={16} />
         </Text>
+      ) : null}
+      <Box css={{ flex: '1 1 0' }}>
+        {title ? (
+          <Text
+            variant="tiny"
+            css={{
+              textTransform: 'uppercase',
+              fontWeight: '$semiBold',
+              color: '$on_surface_medium',
+            }}
+          >
+            {title}
+          </Text>
+        ) : null}
         <Text variant="h6">{content}</Text>
       </Box>
-      <IconButton onClick={onBack} css={{ alignSelf: 'flex-start' }} data-testid="close_stream_section">
-        <CrossIcon width={16} height={16} />
-      </IconButton>
+      {onClose ? (
+        <IconButton onClick={onClose} css={{ alignSelf: 'flex-start' }} data-testid="close_stream_section">
+          <CrossIcon width={16} height={16} />
+        </IconButton>
+      ) : null}
     </Flex>
   );
 };
-
 export const Container = ({ children, rounded = false }) => {
   return (
     <Box
@@ -76,7 +87,7 @@ export const Container = ({ children, rounded = false }) => {
         position: 'absolute',
         top: 0,
         left: 0,
-        bg: '$surface_default',
+        bg: '$surface_dim',
         transform: 'translateX(10%)',
         animation: `${slideLeftAndFade('10%')} 100ms ease-out forwards`,
         display: 'flex',
