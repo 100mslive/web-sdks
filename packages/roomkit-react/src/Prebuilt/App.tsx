@@ -129,19 +129,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       [],
     );
 
-    // Prompt for page refresh/tab close
-    useEffect(() => {
-      const confirmLeave = (e: BeforeUnloadEvent) => {
-        e.returnValue = 'Are you sure you want to leave?';
-      };
-
-      window.addEventListener('beforeunload', confirmLeave);
-
-      return () => {
-        window.removeEventListener('beforeunload', confirmLeave);
-      };
-    }, []);
-
     const endpointsObj = endpoints as
       | {
           init: string;
