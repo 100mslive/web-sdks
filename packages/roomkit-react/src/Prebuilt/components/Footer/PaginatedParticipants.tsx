@@ -65,7 +65,12 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
         </Flex>
         <Box css={{ flex: '1 1 0' }}>
-          <InfiniteLoader isItemLoaded={isItemLoaded} itemCount={total} loadMoreItems={loadMorePeers}>
+          <InfiniteLoader
+            isItemLoaded={isItemLoaded}
+            itemCount={total}
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            loadMoreItems={peers.length < total ? loadMorePeers : () => {}}
+          >
             {({ onItemsRendered, ref }) => (
               <FixedSizeList
                 itemSize={ROW_HEIGHT}
