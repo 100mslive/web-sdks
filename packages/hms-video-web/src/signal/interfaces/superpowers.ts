@@ -85,14 +85,14 @@ export interface getPeerRequestParams {
   peerId: string;
 }
 
-export interface findPeerRequestParams {
+export interface findPeersRequestParams {
   peerIds?: string[];
   role?: string;
   group?: string;
   limit: number;
 }
 
-export interface peerIterNextRequestParams {
+export interface peerIterRequestParams {
   iterator: string;
   limit: number;
 }

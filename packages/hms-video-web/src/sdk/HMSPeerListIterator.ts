@@ -1,50 +1,62 @@
 import { HMSRemotePeer } from './models/peer';
 import { IStore } from './store';
-import { HMSPeerUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
+import { PeerNotificationInfo } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { PeersIterationResponse } from '../signal/interfaces';
 import ITransport from '../transport/ITransport';
 
 export class HMSPeerListIterator {
   private isEnd = false;
-  private iteratorID: string | null = null;
-  private DEFAULT_LIMIT = 10;
-  constructor(
-    private transport: ITransport,
-    private store: IStore,
-    private listener?: HMSUpdateListener,
-    private options?: HMSPeerListIteratorOptions,
-  ) {}
+  private iterator: string | null = null;
+  private total = 0;
+  private defaultPaginationLimit = 10;
+  constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
 
   hasNext(): boolean {
     return !this.isEnd;
   }
 
+  getTotal(): number {
+    return this.total;
+  }
+
+  async findPeers() {
+    const response = await this.transport.findPeers({
+      ...(this.options || {}),
+      limit: this.options?.limit || this.defaultPaginationLimit,
+    });
+    this.updateState(response);
+    return this.processPeers(response.peers);
+  }
+
   async next() {
     let response: PeersIterationResponse;
-    if (!this.iteratorID) {
-      response = await this.transport.findPeer({
-        ...(this.options || {}),
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
-      });
-    } else {
+    if (!this.iterator && !this.isEnd) {
+      return await this.findPeers();
+    } else if (this.iterator) {
       response = await this.transport.peerIterNext({
-        iterator: this.iteratorID,
-        limit: this.options?.limit || this.DEFAULT_LIMIT,
+        iterator: this.iterator,
+        limit: this.options?.limit || this.defaultPaginationLimit,
       });
+      this.updateState(response);
+      return this.processPeers(response.peers);
     }
-    this.isEnd = response.eof;
-    this.iteratorID = response.iterator;
+    return [];
+  }
+
+  private processPeers(peers: PeerNotificationInfo[]) {
     const hmsPeers: HMSRemotePeer[] = [];
-    response.peers.forEach(peer => {
-      const storeHasPeer = this.store.getPeerById(peer.peer_id);
-      if (!storeHasPeer) {
-        const hmsPeer = createRemotePeer(peer, this.store);
-        hmsPeers.push(hmsPeer);
-        this.store.addPeer(hmsPeer);
-      }
+    peers.forEach(peer => {
+      const hmsPeer = createRemotePeer(peer, this.store);
+      hmsPeers.push(hmsPeer);
     });
-    this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_ITERATOR_UPDATED, hmsPeers);
+    return hmsPeers;
+  }
+
+  private updateState(response: PeersIterationResponse) {
+    this.isEnd = response.eof;
+    this.total = response.total;
+    this.iterator = response.iterator;
   }
 }

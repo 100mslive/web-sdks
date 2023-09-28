@@ -22,6 +22,7 @@ export { useCustomEvent } from './hooks/useCustomEvent';
 export { useParticipants } from './hooks/useParticipants';
 export { useEmbedShare } from './hooks/useEmbedShare';
 export { usePDFShare } from './hooks/usePDFShare';
+export { usePaginatedParticipants } from './hooks/usePaginatedParticipants';
 
 // types
 export type { hooksErrHandler } from './hooks/types';
@@ -40,6 +41,7 @@ export type { useCustomEventInput, useCustomEventResult } from './hooks/useCusto
 export type { useEmbedShareResult } from './hooks/useEmbedShare';
 export type { usePDFShareResult } from './hooks/usePDFShare';
 export type { TrackWithPeerAndDimensions } from './utils/layout';
+export type { usePaginatedParticipantsResult, usePaginatedParticipantsInput } from './hooks/usePaginatedParticipants';
 
 // helpers
 export { throwErrorHandler } from './utils/commons';

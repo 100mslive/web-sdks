@@ -117,3 +117,10 @@ export interface HMSSpeaker {
   trackID: HMSTrackID;
   audioLevel: number;
 }
+
+export interface HMSPeerListIterator {
+  hasNext(): boolean;
+  next(): Promise<HMSPeer[]>;
+  getTotal(): number;
+  findPeers(): Promise<HMSPeer[]>;
+}

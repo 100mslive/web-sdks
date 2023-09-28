@@ -220,7 +220,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
-    return new HMSPeerListIterator(this.transport, this.store, this.listener, options);
+    return new HMSPeerListIterator(this.transport, this.store, options);
   }
 
   private handleAutoplayError = (error: HMSException) => {
