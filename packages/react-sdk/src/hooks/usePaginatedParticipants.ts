@@ -22,21 +22,34 @@ export type usePaginatedParticipantsInput = HMSPeerListIteratorOptions;
 export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) => {
   const actions = useHMSActions();
   const iterator = actions.getPeerListIterator(options);
-  const [peers, setPeers] = useState<HMSPeer[]>([]);
+  const [peers, setPeers] = useState<Record<string, HMSPeer>>({});
   const [total, setTotal] = useState(0);
 
   return {
     loadPeers: () =>
       iterator.findPeers.call(iterator).then(peers => {
-        setPeers(peers);
+        setPeers(
+          peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
+            acc[peer.id] = peer;
+            return acc;
+          }, {}),
+        );
         setTotal(iterator.getTotal());
       }),
     loadMorePeers: () =>
       iterator.next.call(iterator).then(peers => {
-        setPeers(prevPeers => prevPeers.concat(peers));
+        setPeers(prevPeers => {
+          return {
+            ...prevPeers,
+            ...peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
+              acc[peer.id] = peer;
+              return acc;
+            }, {}),
+          };
+        });
         setTotal(iterator.getTotal());
       }),
     total,
-    peers,
+    peers: Object.values(peers),
   };
 };
