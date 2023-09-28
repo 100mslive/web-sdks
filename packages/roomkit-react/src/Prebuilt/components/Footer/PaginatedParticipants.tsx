@@ -1,39 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
 import { FixedSizeList } from 'react-window';
-import InfiniteLoader from 'react-window-infinite-loader';
 import { selectIsConnectedToRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import { Button } from '../../../Button';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
-import { Participant, ParticipantSearch } from './ParticipantList';
-import { ItemData, itemKey, ROW_HEIGHT } from './RoleAccordion';
+import { ParticipantSearch } from './ParticipantList';
+import { itemKey, ROW_HEIGHT, VirtualizedParticipantItem } from './RoleAccordion';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { getFormattedCount } from '../../common/utils';
 
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
   const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const [search, setSearch] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const height = ROW_HEIGHT * peers.length;
   const resetSidePane = useSidepaneReset();
-  const isItemLoaded = (index: number) => !!filteredPeers[index];
-
-  const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
-    if (!isItemLoaded(index)) {
-      return (
-        <Flex align="center" justify="center" css={{ w: '100%', h: ROW_HEIGHT }}>
-          <Loading />
-        </Flex>
-      );
-    }
-    return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
-  });
+  const hasNext = total > peers.length;
 
   useEffect(() => {
     loadPeers();
@@ -60,32 +53,40 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         </IconButton>
       </Flex>
       <ParticipantSearch onSearch={(search: string) => setSearch(search)} placeholder={`Search for ${roleName}`} />
-      <Flex direction="column" css={{ border: '1px solid $border_default', borderRadius: '$1' }}>
+      <Flex direction="column" css={{ border: '1px solid $border_default', borderRadius: '$1', flex: '1 1 0' }}>
         <Flex align="center" css={{ height: ROW_HEIGHT, borderBottom: '1px solid $border_default', px: '$8' }}>
-          <Text css={{ fontSize: '$space$7' }}>{roleName}</Text>
+          <Text css={{ fontSize: '$space$7' }}>
+            {roleName}({getFormattedCount(peers.length)}/{getFormattedCount(total)})
+          </Text>
         </Flex>
-        <Box css={{ flex: '1 1 0' }}>
-          <InfiniteLoader
-            isItemLoaded={isItemLoaded}
-            itemCount={total}
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            loadMoreItems={peers.length < total ? loadMorePeers : () => {}}
+        <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
+          <FixedSizeList
+            itemSize={ROW_HEIGHT}
+            itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
+            itemKey={itemKey}
+            itemCount={filteredPeers.length}
+            width={width}
+            height={height}
+            outerRef={containerRef}
           >
-            {({ onItemsRendered, ref }) => (
-              <FixedSizeList
-                itemSize={ROW_HEIGHT}
-                itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
-                itemKey={itemKey}
-                onItemsRendered={onItemsRendered}
-                itemCount={filteredPeers.length}
-                width={width}
-                height={height}
-                ref={ref}
+            {VirtualizedParticipantItem}
+          </FixedSizeList>
+          {hasNext ? (
+            <Flex justify="center" css={{ w: '100%' }}>
+              <Button
+                css={{ w: 'max-content', p: '$4' }}
+                onClick={() => {
+                  setIsLoading(true);
+                  loadMorePeers()
+                    .catch(console.error)
+                    .finally(() => setIsLoading(false));
+                }}
+                disabled={isLoading}
               >
-                {VirtualizedParticipantItem}
-              </FixedSizeList>
-            )}
-          </InfiniteLoader>
+                {isLoading ? <Loading size={16} /> : 'Load More'}
+              </Button>
+            </Flex>
+          ) : null}
         </Box>
       </Flex>
     </Flex>

@@ -46,7 +46,7 @@ export const RoleAccordion = ({
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
+  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 10 });
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
   useEffect(() => {

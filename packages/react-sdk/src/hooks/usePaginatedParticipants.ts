@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { HMSPeer, HMSPeerListIteratorOptions } from '@100mslive/hms-video-store';
 import { useHMSActions } from '../primitives/HmsRoomProvider';
 
@@ -21,23 +21,23 @@ export type usePaginatedParticipantsInput = HMSPeerListIteratorOptions;
 
 export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) => {
   const actions = useHMSActions();
-  const iterator = actions.getPeerListIterator(options);
+  const iterator = useRef(actions.getPeerListIterator(options));
   const [peers, setPeers] = useState<Record<string, HMSPeer>>({});
   const [total, setTotal] = useState(0);
 
   return {
     loadPeers: () =>
-      iterator.findPeers.call(iterator).then(peers => {
+      iterator.current.findPeers.call(iterator.current).then(peers => {
         setPeers(
           peers.reduce<Record<string, HMSPeer>>((acc, peer) => {
             acc[peer.id] = peer;
             return acc;
           }, {}),
         );
-        setTotal(iterator.getTotal());
+        setTotal(iterator.current.getTotal());
       }),
     loadMorePeers: () =>
-      iterator.next.call(iterator).then(peers => {
+      iterator.current.next.call(iterator.current).then(peers => {
         setPeers(prevPeers => {
           return {
             ...prevPeers,
@@ -47,7 +47,7 @@ export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) =>
             }, {}),
           };
         });
-        setTotal(iterator.getTotal());
+        setTotal(iterator.current.getTotal());
       }),
     total,
     peers: Object.values(peers),
