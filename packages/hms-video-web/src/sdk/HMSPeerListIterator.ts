@@ -26,9 +26,7 @@ export class HMSPeerListIterator {
       ...(this.options || {}),
       limit: this.options?.limit || this.DEFAULT_LIMIT,
     });
-    this.total = response.total;
-    this.iterator = response.iterator;
-    this.isEnd = response.eof;
+    this.updateState(response);
     return this.processPeers(response.peers);
   }
 
@@ -45,9 +43,7 @@ export class HMSPeerListIterator {
         limit: this.options?.limit || this.DEFAULT_LIMIT,
       });
     }
-    this.isEnd = response.eof;
-    this.total = response.total;
-    this.iterator = response.iterator;
+    this.updateState(response);
     return this.processPeers(response.peers);
   }
 
@@ -58,5 +54,11 @@ export class HMSPeerListIterator {
       hmsPeers.push(hmsPeer);
     });
     return hmsPeers;
+  }
+
+  private updateState(response: PeersIterationResponse) {
+    this.isEnd = response.eof;
+    this.total = response.total;
+    this.iterator = response.iterator;
   }
 }
