@@ -224,6 +224,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                           size: '100%',
                           lineHeight: '1.5',
                           '-webkit-text-size-adjust': '100%',
+                          position: 'relative',
                         }}
                       >
                         <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />

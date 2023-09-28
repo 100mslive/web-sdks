@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { selectPermissions, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
 import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
@@ -23,7 +23,7 @@ const StartRecording = ({ open, onOpenChange }) => {
     return (
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <PrebuiltDialogPortal>
-          <Dialog.Content
+          <PrebuiltDialogContent
             css={{
               width: 'min(400px,80%)',
               p: '$10',
@@ -66,14 +66,14 @@ const StartRecording = ({ open, onOpenChange }) => {
                 End recording
               </Button>
             </Flex>
-          </Dialog.Content>
+          </PrebuiltDialogContent>
         </PrebuiltDialogPortal>
       </Dialog.Root>
     );
   }
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
+      <PrebuiltDialogContent css={{ width: 'min(400px,80%)', p: '$10' }}>
         <Dialog.Title>
           <Text variant="h6">Start Recording</Text>
         </Dialog.Title>
@@ -115,7 +115,7 @@ const StartRecording = ({ open, onOpenChange }) => {
         >
           Start
         </Button>
-      </Dialog.Content>
+      </PrebuiltDialogContent>
     </Dialog.Root>
   );
 };

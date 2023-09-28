@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig, Dialog } from '../../../';
 import { Sheet } from '../../../Sheet';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChangeNameContent } from './ChangeNameContent';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
@@ -60,10 +60,10 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent css={{ bg: '$surface_dim', width: 'min(400px,80%)', p: '$10' }}>
           <ChangeNameContent {...props} />
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LinkIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Flex, Input, Text } from '../../../';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
@@ -32,8 +32,8 @@ export function EmbedUrlModal({ onOpenChange }) {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Dialog.Title
             css={{
               borderBottom: '1px solid $border_default',
@@ -75,7 +75,7 @@ export function EmbedUrlModal({ onOpenChange }) {
               Embed and Share
             </Button>
           </Flex>
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   );

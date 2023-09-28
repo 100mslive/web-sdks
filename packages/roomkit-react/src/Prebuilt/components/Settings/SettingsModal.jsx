@@ -9,7 +9,7 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { settingContent, settingsList } from './common.js';
 
 const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
@@ -188,8 +188,8 @@ const DesktopSettingModal = ({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent
           css={{
             w: 'min(800px, 90%)',
             height: 'min(656px, 90%)',
@@ -256,7 +256,7 @@ const DesktopSettingModal = ({
               <CrossIcon />
             </IconButton>
           </Dialog.Close>
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   );

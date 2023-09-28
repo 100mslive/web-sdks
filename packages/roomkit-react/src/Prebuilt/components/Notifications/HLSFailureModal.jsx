@@ -4,7 +4,7 @@ import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
@@ -39,8 +39,8 @@ export function HLSFailureModal() {
       }}
     >
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(360px, 90%)' }}>
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent css={{ w: 'min(360px, 90%)' }}>
           <Dialog.Title
             css={{
               display: 'flex',
@@ -65,7 +65,7 @@ export function HLSFailureModal() {
               Go Live
             </Button>
           </Flex>
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   ) : null;

@@ -1,6 +1,10 @@
 import React, { useRef } from 'react';
 import { CheckIcon, CloudUploadIcon, CrossIcon } from '@100mslive/react-icons';
-import { PrebuiltDialogPortal } from '../components/PrebuiltDialogPortal';
+import {
+  PrebuiltDialogContent,
+  PrebuiltDialogOverlay,
+  PrebuiltDialogPortal,
+} from '../components/PrebuiltDialogElements';
 import { Button } from '../../Button';
 import { Checkbox } from '../../Checkbox';
 import { HorizontalDivider } from '../../Divider';
@@ -16,8 +20,8 @@ import { Text } from '../../Text';
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   return (
     <PrebuiltDialogPortal>
-      <Dialog.Overlay />
-      <Dialog.Content css={{ width: 'min(600px, 100%)', ...css }} {...props}>
+      <PrebuiltDialogOverlay />
+      <PrebuiltDialogContent css={{ width: 'min(600px, 100%)', ...css }} {...props}>
         <Dialog.Title>
           <Flex justify="between">
             <Flex align="center" css={{ mb: '$1' }}>
@@ -35,7 +39,7 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
         </Dialog.Title>
         <HorizontalDivider css={{ mt: '0.8rem' }} />
         <Box>{children}</Box>
-      </Dialog.Content>
+      </PrebuiltDialogContent>
     </PrebuiltDialogPortal>
   );
 };
@@ -62,8 +66,8 @@ export const ErrorDialog = ({ open = true, onOpenChange, title, children, ...pro
 export const RequestDialog = ({ open = true, onOpenChange, title, body, actionText = 'Accept', onAction, Icon }) => (
   <Dialog.Root open={open} onOpenChange={onOpenChange}>
     <PrebuiltDialogPortal>
-      <Dialog.Overlay />
-      <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
+      <PrebuiltDialogOverlay />
+      <PrebuiltDialogContent css={{ width: 'min(400px,80%)', p: '$10' }}>
         <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md' }}>
           {Icon ? Icon : null}
           <Text variant="h6">{title}</Text>
@@ -97,7 +101,7 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
             </Button>
           </Box>
         </Flex>
-      </Dialog.Content>
+      </PrebuiltDialogContent>
     </PrebuiltDialogPortal>
   </Dialog.Root>
 );

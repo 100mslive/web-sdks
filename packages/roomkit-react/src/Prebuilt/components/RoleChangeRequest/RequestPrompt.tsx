@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 
 export const RequestPrompt = ({
   open = true,

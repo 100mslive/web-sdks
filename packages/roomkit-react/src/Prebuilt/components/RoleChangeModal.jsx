@@ -9,7 +9,7 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from './PrebuiltDialogElements';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
 import { textEllipsis } from '../../utils';
@@ -49,8 +49,8 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent css={{ width: 'min(400px,80%)', p: '$10' }}>
           <Dialog.Title css={{ p: 0 }} asChild>
             <Text as="h6" variant="h6">
               Change Role
@@ -179,7 +179,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
               </Button>
             </Box>
           </Flex>
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   );

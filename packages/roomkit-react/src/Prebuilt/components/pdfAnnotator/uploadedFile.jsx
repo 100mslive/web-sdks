@@ -2,7 +2,7 @@ import React from 'react';
 import { TrashIcon } from '@100mslive/react-icons';
 import { Dialog, Flex, Text } from '../../../';
 import { DialogRow } from '../../primitives/DialogContent';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+import { PrebuiltDialogContent, PrebuiltDialogOverlay, PrebuiltDialogPortal } from '../PrebuiltDialogElements';
 import { PDFHeader } from './pdfHeader';
 import { PDFInfo } from './pdfInfo';
 import { SubmitPDF } from './submitPdf';
@@ -12,8 +12,8 @@ export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
       <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content
+        <PrebuiltDialogOverlay />
+        <PrebuiltDialogContent
           css={{
             w: 'min(420px,80%)',
             overflow: 'auto',
@@ -65,7 +65,7 @@ export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
             <PDFInfo />
             <SubmitPDF pdfFile={pdfFile} onOpenChange={onOpenChange} />
           </Flex>
-        </Dialog.Content>
+        </PrebuiltDialogContent>
       </PrebuiltDialogPortal>
     </Dialog.Root>
   );
