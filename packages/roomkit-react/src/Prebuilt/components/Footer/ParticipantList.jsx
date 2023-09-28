@@ -192,7 +192,10 @@ export const Participant = ({ peer, isConnected }) => {
       justify="between"
       data-testid={'participant_' + peer.name}
     >
-      <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
+      <Text
+        variant="sm"
+        css={{ ...textEllipsis('95%'), flex: '1 1 0', fontWeight: '$semiBold', color: '$on_surface_high' }}
+      >
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
       {isConnected ? (
