@@ -194,7 +194,7 @@ export const Participant = ({ peer, isConnected }) => {
     >
       <Text
         variant="sm"
-        css={{ ...textEllipsis('95%'), flex: '1 1 0', fontWeight: '$semiBold', color: '$on_surface_high' }}
+        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '$8', fontWeight: '$semiBold', color: '$on_surface_high' }}
       >
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
