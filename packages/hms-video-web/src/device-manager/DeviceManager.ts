@@ -316,7 +316,7 @@ export class DeviceManager implements HMSDeviceManager {
           type: 'video',
         }),
       );
-      HMSLogger.w(this.TAG, 'Video device not found');
+      HMSLogger.e(this.TAG, 'Could not detect selected video device');
       return;
     }
     const { settings } = videoTrack;
