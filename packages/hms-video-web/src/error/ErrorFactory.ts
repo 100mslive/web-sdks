@@ -240,6 +240,17 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    SelectedDeviceMissing(deviceType: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SELECTED_DEVICE_MISSING,
+        'SelectedDeviceMissing',
+        HMSAction.TRACK,
+        `Could not detect selected ${deviceType} device`,
+        `Please check connection to the ${deviceType} device`,
+        false,
+      );
+    },
   },
 
   WebrtcErrors: {

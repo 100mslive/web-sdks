@@ -1,5 +1,6 @@
 import { DeviceStorageManager } from './DeviceStorage';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
@@ -253,12 +254,13 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { audioInput: newSelection },
-          error: new Error('Audio device not found') as HMSException,
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('audio'),
           devices: this.getDevices(),
           type: 'audioInput',
         }),
       );
-      HMSLogger.w(this.TAG, 'Audio device not found');
+
+      HMSLogger.e(this.TAG, 'Audio device not found');
       return;
     }
     const { settings } = audioTrack;
@@ -309,12 +311,12 @@ export class DeviceManager implements HMSDeviceManager {
       this.eventBus.analytics.publish(
         AnalyticsEventFactory.deviceChange({
           selection: { videoInput: newSelection },
-          error: new Error('Video device not found') as HMSException,
+          error: ErrorFactory.TracksErrors.SelectedDeviceMissing('video'),
           devices: this.getDevices(),
           type: 'video',
         }),
       );
-      HMSLogger.w(this.TAG, 'Video device not found');
+      HMSLogger.e(this.TAG, 'Video device not found');
       return;
     }
     const { settings } = videoTrack;

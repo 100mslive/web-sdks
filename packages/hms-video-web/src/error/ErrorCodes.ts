@@ -73,6 +73,9 @@ export const ErrorCodes = {
 
     // any error that occurs while playing audio of remote audio tracks
     AUDIO_PLAYBACK_ERROR: 3013,
+
+    // Selected device not detected on change
+    SELECTED_DEVICE_MISSING: 3014,
   },
 
   WebrtcErrors: {
