@@ -8,7 +8,7 @@ export const PrebuiltDialogPortal = ({ children }: { children: ReactNode }) => (
 
 export const PrebuiltDialogContent = ({
   children,
-  css={},
+  css = {},
   props = {},
 }: {
   children: ReactNode;
