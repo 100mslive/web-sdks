@@ -114,8 +114,8 @@ const Conference = () => {
     };
   }, []);
 
-  if (!isConnectedToRoom) {
-    return <FullPageProgress text="Joining..." />;
+  if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
+    return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
   return (

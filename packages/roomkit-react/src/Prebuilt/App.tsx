@@ -24,6 +24,7 @@ import { Init } from './components/init/Init';
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 // @ts-ignore: No implicit Any
 import { Notifications } from './components/Notifications';
+import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 // @ts-ignore: No implicit Any
 import PostLeave from './components/PostLeave';
 // @ts-ignore: No implicit Any
@@ -349,6 +350,7 @@ function AppRoutes({
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
+        <HeadlessEndRoomListener />
         <KeyboardHandler />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && (
