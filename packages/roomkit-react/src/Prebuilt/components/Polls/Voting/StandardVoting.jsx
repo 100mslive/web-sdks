@@ -29,7 +29,9 @@ export const StandardView = ({ poll }) => {
           skippable={question.skippable}
           responses={question.responses}
           answer={question.answer}
-          setCurrentIndex={() => {}}
+          setCurrentIndex={() => {
+            return;
+          }}
           rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
         />
       ))}
