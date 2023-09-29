@@ -19,7 +19,9 @@ const CustomDialogContent = ({ children, props = {}, css = {} }: { children: Rea
     {children}
   </StyledDialogContent>
 );
-const CustomDialogOverlay = () => <StyledDialogOverlay css={{ position: 'absolute' }} />;
+const CustomDialogOverlay = ({ css = {} }: { css?: CSS }) => (
+  <StyledDialogOverlay css={{ ...css, position: 'absolute' }} />
+);
 const PrebuiltDialogPortal = ({ children }: { children: ReactNode }) => (
   <StyledDialogPortal container={document.getElementById('prebuilt-container')}>{children}</StyledDialogPortal>
 );
