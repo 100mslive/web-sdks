@@ -1,4 +1,10 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
@@ -22,6 +28,13 @@ const App = () => {
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
+  const confirmLeave = useCallback(e => {
+    e.returnValue = 'Are you sure you want to leave?';
+  }, []);
+  const removeExitListener = useCallback(
+    () => window.removeEventListener('beforeunload', confirmLeave),
+    []
+  );
 
   useEffect(() => {
     if (roomCode) {
@@ -56,16 +69,14 @@ const App = () => {
 
   // Prompt for page refresh/tab close
   useEffect(() => {
-    const confirmLeave = e => {
-      e.returnValue = 'Are you sure you want to leave?';
-    };
-
-    window.addEventListener('beforeunload', confirmLeave);
+    if (!isHeadless) {
+      window.addEventListener('beforeunload', confirmLeave);
+    }
 
     return () => {
-      window.removeEventListener('beforeunload', confirmLeave);
+      removeExitListener();
     };
-  }, []);
+  }, [isHeadless]);
 
   return (
     <Flex
@@ -88,6 +99,7 @@ const App = () => {
           authToken={authToken}
           roomId={roomId}
           role={role}
+          onLeave={removeExitListener}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : undefined,
