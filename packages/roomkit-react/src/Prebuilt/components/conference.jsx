@@ -29,7 +29,7 @@ import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 const Conference = () => {
   const navigate = useNavigate();
   const { roomId, role } = useParams();
-  const { userName, endpoints, onJoinFunc } = useHMSPrebuiltContext();
+  const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
