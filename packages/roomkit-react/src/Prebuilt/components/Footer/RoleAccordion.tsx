@@ -68,6 +68,10 @@ export const RoleAccordion = ({
   const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
   const hasNext = total > peersInAccordion.length;
 
+  if (peersInAccordion.length === 0) {
+    return null;
+  }
+
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>
       <Accordion.Header
