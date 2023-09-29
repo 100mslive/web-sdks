@@ -25,7 +25,6 @@ const PreviewContainer = () => {
   const authToken = useAuthToken();
   const roomLayout = useRoomLayout();
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
-  const { onJoin: onJoinFunc } = useHMSPrebuiltContext();
 
   const onJoin = () => {
     let meetingURL = `/meeting/${urlRoomId}`;
@@ -33,7 +32,6 @@ const PreviewContainer = () => {
       meetingURL += `/${userRole}`;
     }
     navigate(meetingURL);
-    onJoinFunc?.();
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>

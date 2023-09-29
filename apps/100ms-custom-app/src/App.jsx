@@ -89,7 +89,10 @@ const App = () => {
           roomId={roomId}
           role={role}
           onLeave={removeExitListener}
-          onJoin={() => window.addEventListener('beforeunload', confirmLeave)}
+          onJoin={() => {
+            if (!isHeadless)
+              window.addEventListener('beforeunload', confirmLeave);
+          }}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : undefined,
