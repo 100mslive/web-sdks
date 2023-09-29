@@ -224,6 +224,18 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private volumeEventHandler = () => {
     this._volume = this._videoEl.volume;
   };
+
+  private reConnectToStream = () => {
+    window.addEventListener(
+      'online',
+      () => {
+        this._hls.startLoad();
+      },
+      {
+        once: true,
+      },
+    );
+  };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
     console.error(this.TAG, `error type ${data.type} with details ${data.details} is fatal ${data.fatal}`);
@@ -262,6 +274,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
         this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        if (detail.fatal) {
+          // added reconnection for making player work standalone as well
+          this.reConnectToStream();
+        }
         break;
       }
       default: {
@@ -314,7 +330,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl.addEventListener('pause', this.pauseEventHandler);
     this._videoEl.addEventListener('volumechange', this.volumeEventHandler);
   }
-
+  /**
+   * 1 min retries before user came online, reason room automatically disconnected if user is offline for more than 1mins
+   * Retries logic will run exponential like (1, 2, 4, 8, 8, 8, 8, 8, 8, 8secs)
+   * there will be total 10 retries
+   */
   private getPlayerConfig(): Partial<HlsConfig> {
     return {
       enableWorker: true,
@@ -326,16 +346,16 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
           maxTimeToFirstByteMs: 8000,
           maxLoadTimeMs: 20000,
           timeoutRetry: {
-            maxNumRetry: 1000,
+            maxNumRetry: 10,
             retryDelayMs: 1000,
-            maxRetryDelayMs: 20000,
-            backoff: 'linear',
+            maxRetryDelayMs: 8000,
+            backoff: 'exponential',
           },
           errorRetry: {
-            maxNumRetry: 1000,
+            maxNumRetry: 10,
             retryDelayMs: 1000,
-            maxRetryDelayMs: 20000,
-            backoff: 'linear',
+            maxRetryDelayMs: 8000,
+            backoff: 'exponential',
           },
         },
       },
