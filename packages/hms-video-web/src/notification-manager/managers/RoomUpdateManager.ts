@@ -125,7 +125,11 @@ export class RoomUpdateManager {
   }
 
   private onHLS(method: string, notification: HLSNotification) {
-    if (![HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(method as HMSNotificationMethod)) {
+    if (
+      ![HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(
+        method as HMSNotificationMethod,
+      )
+    ) {
       return;
     }
     const room = this.store.getRoom();
@@ -134,7 +138,9 @@ export class RoomUpdateManager {
       return;
     }
 
-    notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error?.code;
+    notification.enabled =
+      [HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START].includes(method as HMSNotificationMethod) &&
+      !notification.error?.code;
     room.hls = this.convertHls(notification);
     room.recording.hls = this.getHLSRecording(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
