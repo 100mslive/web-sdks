@@ -67,17 +67,6 @@ const App = () => {
     }
   }, [authToken, role, roomCode, roomId, subdomain]);
 
-  // Prompt for page refresh/tab close
-  useEffect(() => {
-    if (!isHeadless) {
-      window.addEventListener('beforeunload', confirmLeave);
-    }
-
-    return () => {
-      removeExitListener();
-    };
-  }, [isHeadless]);
-
   return (
     <Flex
       className="prebuilt-wrapper"
@@ -100,6 +89,7 @@ const App = () => {
           roomId={roomId}
           role={role}
           onLeave={removeExitListener}
+          onJoin={() => window.addEventListener('beforeunload', confirmLeave)}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : undefined,
