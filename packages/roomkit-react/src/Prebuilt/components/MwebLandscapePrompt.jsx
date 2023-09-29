@@ -4,7 +4,6 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
@@ -26,7 +25,7 @@ export const MwebLandscapePrompt = () => {
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>
@@ -52,7 +51,7 @@ export const MwebLandscapePrompt = () => {
             </Flex>
           </Box>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };
