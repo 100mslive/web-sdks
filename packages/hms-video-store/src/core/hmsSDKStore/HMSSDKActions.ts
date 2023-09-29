@@ -517,23 +517,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
-    const peer = this.getSDKHMSPeer(forPeerId);
-    if (!peer) {
-      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
-      return;
-    }
-
-    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
   async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
-    const peer = this.getSDKHMSPeer(forPeerId);
-    if (!peer) {
-      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
-      return;
-    }
-
-    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
   async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName) {
@@ -643,12 +631,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async removePeer(peerID: string, reason: string) {
-    const peer = this.getSDKHMSPeer(peerID);
-    if (peer && !peer.isLocal) {
-      await this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
-    } else {
-      this.logPossibleInconsistency(`No remote peer found for peerID - ${peerID}`);
-      return;
+    const localPeerId = this.sdk.getLocalPeer()?.peerId;
+    if (peerID !== localPeerId) {
+      await this.sdk.removePeer(peerID, reason);
     }
   }
 
