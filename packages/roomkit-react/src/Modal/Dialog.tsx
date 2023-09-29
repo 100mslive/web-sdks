@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
-import { ReactNode } from 'react';
+import { CSS } from '../Theme';
 import {
   DialogClose,
   DialogDefaultCloseIcon,
@@ -12,10 +12,9 @@ import {
   StyledDialogPortal,
   StyledDialogTrigger,
 } from './DialogContent';
-import { CSS } from '../Theme';
 
 const StyledDialog = styled(Root, {});
-const CustomDialogContent = ({ children, props, css }: { children: ReactNode; props: any; css: CSS }) => (
+const CustomDialogContent = ({ children, props = {}, css = {} }: { children: ReactNode; props?: any; css?: CSS }) => (
   <StyledDialogContent css={{ ...css, position: 'absolute' }} {...props}>
     {children}
   </StyledDialogContent>
