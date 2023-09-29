@@ -22,7 +22,7 @@ const CustomDialogContent = ({ children, props = {}, css = {} }: { children: Rea
 const CustomDialogOverlay = ({ css = {} }: { css?: CSS }) => (
   <StyledDialogOverlay css={{ ...css, position: 'absolute' }} />
 );
-const PrebuiltDialogPortal = ({ children }: { children: ReactNode }) => (
+const CustomDialogPortal = ({ children }: { children: ReactNode }) => (
   <StyledDialogPortal container={document.getElementById('prebuilt-container')}>{children}</StyledDialogPortal>
 );
 
@@ -35,5 +35,5 @@ export const Dialog = {
   Description: DialogDescription,
   Close: DialogClose,
   DefaultClose: DialogDefaultCloseIcon,
-  Portal: PrebuiltDialogPortal,
+  Portal: CustomDialogPortal,
 };
