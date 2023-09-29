@@ -4,7 +4,7 @@ import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSLocalPeer, HMSPeer } from './peer';
 import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager } from './playlist';
 import { HMSPreviewListener } from './preview-listener';
@@ -43,9 +43,9 @@ export interface HMSInterface {
   /**
    * @deprecated Use `changeRoleOfPeer` instead
    */
-  changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+  changeRole(forPeerId: string, toRole: string, force?: boolean): void;
 
-  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+  changeRoleOfPeer(forPeerId: string, toRole: string, force?: boolean): void;
 
   changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string): void;
 
@@ -53,7 +53,7 @@ export interface HMSInterface {
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
   changeMultiTrackState(params: HMSChangeMultiTrackStateParams): Promise<void>;
-  removePeer(peer: HMSRemotePeer, reason: string): Promise<void>;
+  removePeer(peerId: string, reason: string): Promise<void>;
   endRoom(lock: boolean, reason: string): Promise<void>;
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
   stopRTMPAndRecording(): Promise<void>;
