@@ -104,7 +104,7 @@ export function Notifications() {
               close: false,
             });
           }
-          // goto leave for terminal if any action is not performed within 2secs
+          // goto leave for terminal if any action is not performed within 1s
           // if network is still unavailable going to preview will throw an error
           redirectToLeave(1000);
           return;
