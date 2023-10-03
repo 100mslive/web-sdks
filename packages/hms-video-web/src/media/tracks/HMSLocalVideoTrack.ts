@@ -77,14 +77,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
-    if (isMobile() && isBrowser) {
+    if (isBrowser && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
 
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden' && this.enabled) {
-      this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+      await this.setEnabled(false);
     }
   };
 
