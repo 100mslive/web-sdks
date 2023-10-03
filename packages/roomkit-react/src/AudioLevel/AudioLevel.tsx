@@ -27,7 +27,7 @@ const barAnimation = keyframes({
   to: {
     maskSize: '4em .8em',
     '-webkit-mask-position-y': '.1em',
-    maskPosition: 'initial 0',
+    maskPosition: 'initial 0.1em',
   },
 });
 
