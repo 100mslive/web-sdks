@@ -69,6 +69,7 @@ export type HMSPrebuiltProps = {
   roomId?: string;
   role?: string;
   onLeave?: () => void;
+  onJoin?: () => void;
 };
 
 export type HMSPrebuiltRefType = {
@@ -91,6 +92,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
+      onJoin,
     },
     ref,
   ) => {
@@ -173,6 +175,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             roomId,
             role,
             onLeave,
+            onJoin,
             userName,
             userId,
             endpoints: {
