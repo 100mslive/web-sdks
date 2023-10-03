@@ -72,7 +72,7 @@ const VirtualizedParticipantItem = React.memo(
 );
 
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
-  const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 1 });
+  const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const [search, setSearch] = useState<string>('');
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
