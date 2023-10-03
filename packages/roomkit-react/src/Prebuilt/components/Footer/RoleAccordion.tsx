@@ -21,7 +21,7 @@ export interface ItemData {
 }
 
 export function itemKey(index: number, data: ItemData) {
-  return data.peerList[index].id;
+  return data.peerList[index]?.id;
 }
 
 export const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
@@ -46,7 +46,7 @@ export const RoleAccordion = ({
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 10 });
+  const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 2 });
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
 
   useEffect(() => {
