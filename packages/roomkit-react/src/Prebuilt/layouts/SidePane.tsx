@@ -64,6 +64,7 @@ const SidePane = ({
         <VideoTile
           peerId={activeScreensharePeerId}
           trackId={trackId}
+          width="100%"
           height={225}
           rootCSS={{ p: 0, alignSelf: 'start', flexShrink: 0 }}
           {...tileLayout}
