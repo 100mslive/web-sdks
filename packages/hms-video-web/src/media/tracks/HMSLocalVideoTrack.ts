@@ -15,6 +15,7 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
+import { isBrowser, isMobile } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -76,7 +77,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
+    if (isMobile() && isBrowser) {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'hidden' && this.enabled) {
+      // disable local video
+      this.eventBus.localVideoEnabled.publish({ enabled: false, track: this });
+    }
+  };
 
   /** @internal */
   setSimulcastDefinitons(definitions: HMSSimulcastLayerDefinition[]) {
@@ -189,6 +200,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    if (isMobile() && isBrowser) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**

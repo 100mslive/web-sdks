@@ -84,7 +84,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const localStream = this.stream as HMSLocalStream;
       // change nativeTrack so plugin can start its work
       await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
-      await localStream.replaceStreamTrack(prevTrack, newTrack);
+      localStream.replaceStreamTrack(prevTrack, newTrack);
       this.nativeTrack = newTrack;
       isLevelMonitored && this.initAudioLevelMonitor();
     } catch (e) {
