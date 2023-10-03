@@ -64,8 +64,8 @@ export const RoleAccordion = ({
     return null;
   }
 
-  const height = ROW_HEIGHT * (peers.length || peerList.length);
   const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
+  const height = ROW_HEIGHT * peersInAccordion.length;
   const hasNext = total > peersInAccordion.length;
 
   if (peersInAccordion.length === 0) {
