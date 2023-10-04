@@ -47,8 +47,6 @@ export const VideoStreamingSection = ({
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
 
-  console.log('use pdf annotator ', pdfAnnotatorActive);
-
   useEffect(() => {
     if (!isConnected) {
       return;
