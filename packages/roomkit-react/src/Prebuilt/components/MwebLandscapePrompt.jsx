@@ -13,8 +13,10 @@ export const MwebLandscapePrompt = () => {
 
   useEffect(() => {
     const handleResize = () => {
+      const loggedString = `ismob: ${isMobile}, show: ${showMwebLandscapePrompt}, h,w: ${window.innerHeight} ${window.innerWidth}`;
       setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
-      alert(`ismob: ${isMobile}, show: ${showMwebLandscapePrompt}, h,w: ${window.innerHeight} ${window.innerWidth}`);
+      alert(loggedString);
+      console.log(loggedString, 'ollo');
     };
 
     handleResize();
