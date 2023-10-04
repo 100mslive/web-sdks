@@ -244,48 +244,49 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       details: details,
       fatal: data.fatal,
     };
-    if (detail.fatal) {
-      switch (data.details) {
-        case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
-          const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
+    if (!detail.fatal) {
+      return;
+    }
+    switch (data.details) {
+      case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
+        const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
+        const error = HMSHLSErrorFactory.HLSMediaError.fragDecryptError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
+        const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      // Below one are network related errors
+      case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
+      }
+      case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
+        const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        if (detail.fatal) {
+          // added reconnection for making player work standalone as well
+          this.reConnectToStream();
         }
-        case Hls.ErrorDetails.FRAG_DECRYPT_ERROR: {
-          const error = HMSHLSErrorFactory.HLSMediaError.fragDecryptError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
-        }
-        case Hls.ErrorDetails.BUFFER_INCOMPATIBLE_CODECS_ERROR: {
-          const error = HMSHLSErrorFactory.HLSMediaError.bufferIncompatibleCodecsError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
-        }
-        // Below one are network related errors
-        case Hls.ErrorDetails.MANIFEST_LOAD_ERROR: {
-          const error = HMSHLSErrorFactory.HLSNetworkError.manifestLoadError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
-        }
-        case Hls.ErrorDetails.MANIFEST_PARSING_ERROR: {
-          const error = HMSHLSErrorFactory.HLSNetworkError.manifestParsingError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
-        }
-        case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
-          const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          if (detail.fatal) {
-            // added reconnection for making player work standalone as well
-            this.reConnectToStream();
-          }
-          break;
-        }
-        default: {
-          const error = HMSHLSErrorFactory.HLSError(detail, data.type, data.details);
-          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-          break;
-        }
+        break;
+      }
+      default: {
+        const error = HMSHLSErrorFactory.HLSError(detail, data.type, data.details);
+        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        break;
       }
     }
   };
