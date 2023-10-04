@@ -176,7 +176,7 @@ const VirtualizedParticipants = ({
   );
 };
 
-export const Participant = ({ peer, isConnected }) => {
+export const Participant = ({ peer, isConnected, style }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
     <Flex
@@ -191,6 +191,7 @@ export const Participant = ({ peer, isConnected }) => {
       align="center"
       justify="between"
       data-testid={'participant_' + peer.name}
+      style={style}
     >
       <Text
         variant="sm"
