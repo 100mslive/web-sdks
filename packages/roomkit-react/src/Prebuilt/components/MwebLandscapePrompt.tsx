@@ -5,6 +5,7 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
+// @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
@@ -13,10 +14,7 @@ export const MwebLandscapePrompt = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      const loggedString = `ismob: ${isMobile}, show: ${showMwebLandscapePrompt}, h,w: ${window.innerHeight} ${window.innerWidth}`;
       setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
-      alert(loggedString);
-      console.log(loggedString, 'ollo');
     };
 
     handleResize();
