@@ -47,18 +47,14 @@ const VirtualizedParticipantItem = React.memo(
   ({
     index,
     data,
-    hasNext,
-    loadMore,
     style,
   }: {
     index: number;
-    data: ItemData;
-    hasNext: boolean;
-    loadMore: () => Promise<void>;
+    data: ItemData & { hasNext: boolean; loadMorePeers: () => Promise<void> };
     style: React.CSSProperties;
   }) => {
     if (!data.peerList[index]) {
-      return <LoadMoreParticipants hasNext={hasNext} loadMore={loadMore} style={style} />;
+      return <LoadMoreParticipants hasNext={data.hasNext} loadMore={data.loadMorePeers} style={style} />;
     }
     return (
       <Participant
@@ -115,21 +111,13 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
           <VariableSizeList
             itemSize={index => (index === filteredPeers.length + 1 ? 16 : ROW_HEIGHT)}
-            itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
+            itemData={{ peerList: filteredPeers, hasNext, loadMorePeers, isConnected: isConnected === true }}
             itemKey={itemKey}
             itemCount={filteredPeers.length + 1}
             width={width}
             height={height}
           >
-            {({ index, data, style }) => (
-              <VirtualizedParticipantItem
-                index={index}
-                data={data}
-                style={style}
-                hasNext={hasNext}
-                loadMore={loadMorePeers}
-              />
-            )}
+            {VirtualizedParticipantItem}
           </VariableSizeList>
         </Box>
       </Flex>
