@@ -14,6 +14,7 @@ export const MwebLandscapePrompt = () => {
   useEffect(() => {
     const handleResize = () => {
       setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
+      alert(`ismob: ${isMobile}, show: ${showMwebLandscapePrompt}, h,w: ${window.innerHeight} ${window.innerWidth}`);
     };
 
     handleResize();
