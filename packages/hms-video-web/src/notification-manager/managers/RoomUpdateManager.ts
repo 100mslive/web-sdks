@@ -82,10 +82,10 @@ export class RoomUpdateManager {
 
   private handlePreviewRoomState(notification: PeriodicRoomState) {
     const { room } = notification;
-    this.onRoomState(room, notification.peer_count);
+    this.onRoomState(room);
   }
 
-  private onRoomState(roomNotification: RoomState, peerCount?: number) {
+  private onRoomState(roomNotification: RoomState) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     if (!room) {
@@ -93,7 +93,6 @@ export class RoomUpdateManager {
       return;
     }
 
-    room.peerCount = peerCount;
     room.name = name;
     room.recording.server.running = !!recording?.sfu.enabled;
     room.recording.browser.running = !!recording?.browser.enabled;
