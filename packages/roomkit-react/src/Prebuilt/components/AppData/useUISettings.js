@@ -69,8 +69,18 @@ export const useUrlToEmbed = () => {
   return useHMSStore(selectAppData(APP_DATA.embedConfig))?.url;
 };
 
-export const usePDFAnnotator = () => {
-  return useHMSStore(selectAppData(APP_DATA.pdfConfig))?.state;
+export const usePDFConfig = () => {
+  return useHMSStore(selectAppData(APP_DATA.pdfConfig));
+};
+
+export const useResetPDFConfig = () => {
+  const [, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
+  return useCallback(() => setPDFConfig(), [setPDFConfig]);
+};
+
+export const useResetEmbedConfig = () => {
+  const [, setEmbedConfig] = useSetAppDataByKey(APP_DATA.embedConfig);
+  return () => setEmbedConfig();
 };
 export const usePinnedTrack = () => {
   const pinnedTrackId = useHMSStore(selectAppData(APP_DATA.pinnedTrackId));

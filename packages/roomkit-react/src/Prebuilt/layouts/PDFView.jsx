@@ -1,111 +1,61 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { throwErrorHandler, useScreenShare } from '@100mslive/react-sdk';
+import React, { useEffect } from 'react';
+import { usePDFShare } from '@100mslive/react-sdk';
+import { ToastManager } from '../components/Toast/ToastManager';
 import { Box } from '../../Layout';
-import { ThemeTypes, useTheme } from '../../Theme';
-import { EmbebScreenShareView } from './EmbedView';
-import { useSetAppDataByKey } from '../components/AppData/useUISettings';
-import { APP_DATA, isChrome } from '../common/constants';
+import { EmbedScreenShareView } from './EmbedView';
+import { usePDFConfig, useResetPDFConfig } from '../components/AppData/useUISettings';
 
+/**
+ * PDFView is responsible for rendering the PDF iframe and managing the screen sharing functionality.
+ */
 export const PDFView = () => {
-  return (
-    <EmbebScreenShareView>
-      <PDFEmbedComponent />
-    </EmbebScreenShareView>
-  );
-};
+  const pdfConfig = usePDFConfig();
+  const resetConfig = useResetPDFConfig();
 
-export const PDFEmbedComponent = () => {
-  const ref = useRef();
-  const themeType = useTheme().themeType;
-  const [isPDFLoaded, setIsPDFLoaded] = useState(false);
-  let pdfJSURL = process.env.REACT_APP_PDFJS_IFRAME_URL;
-  const { amIScreenSharing, toggleScreenShare } = useScreenShare(throwErrorHandler);
-  const [pdfConfig, setPDFConfig] = useSetAppDataByKey(APP_DATA.pdfConfig);
-  if (pdfConfig.url && !pdfConfig.file) {
-    pdfJSURL = pdfJSURL + '?file=' + encodeURIComponent(pdfConfig.url);
-  }
-  const [wasScreenShared, setWasScreenShared] = useState(false);
-  // to handle - https://github.com/facebook/react/issues/24502
-  const screenShareAttemptInProgress = useRef(false);
-  const iframeRef = useRef();
+  // need to send resetConfig to clear configuration, if stop screenshare occurs.
+  const { iframeRef, startPDFShare, isPDFShareInProgress } = usePDFShare(resetConfig);
 
-  const resetEmbedConfig = useCallback(() => {
-    setPDFConfig({ state: false });
-  }, [setPDFConfig]);
   useEffect(() => {
-    if (isPDFLoaded && ref.current) {
-      ref.current.contentWindow.postMessage(
-        {
-          theme: themeType === ThemeTypes.dark ? 2 : 1,
-        },
-        '*',
-      );
-    }
-  }, [isPDFLoaded, themeType]);
-  useEffect(() => {
-    if (!amIScreenSharing && !wasScreenShared && !screenShareAttemptInProgress.current) {
-      screenShareAttemptInProgress.current = true;
-      // start screenshare on load for others in the room to see
-      toggleScreenShare({
-        forceCurrentTab: isChrome,
-        cropElement: iframeRef.current,
-        preferCurrentTab: isChrome,
-      })
-        .then(() => {
-          setWasScreenShared(true);
-        })
-        .catch(resetEmbedConfig)
-        .finally(() => {
-          screenShareAttemptInProgress.current = false;
+    (async () => {
+      try {
+        if (!isPDFShareInProgress && pdfConfig) {
+          await startPDFShare(pdfConfig);
+        }
+      } catch (err) {
+        resetConfig();
+        ToastManager.addToast({
+          title: `Error while sharing annotator ${err.message || ''}`,
+          variant: 'error',
         });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    // reset embed when screenshare is closed from anywhere
-    if (wasScreenShared && !amIScreenSharing) {
-      resetEmbedConfig();
-    }
-    return () => {
-      // close screenshare when this component is being unmounted
-      if (wasScreenShared && amIScreenSharing) {
-        resetEmbedConfig();
-        toggleScreenShare(); // stop
       }
-    };
-  }, [wasScreenShared, amIScreenSharing, resetEmbedConfig, toggleScreenShare]);
-
+    })();
+  }, [isPDFShareInProgress, pdfConfig, resetConfig, startPDFShare]);
   return (
-    <Box ref={iframeRef} css={{ size: '100%' }}>
-      <iframe
-        src={pdfJSURL}
-        title="PDF Annotator"
-        ref={ref}
-        style={{
-          width: '100%',
-          height: '100%',
-          border: 0,
-          borderRadius: '0.75rem',
+    <EmbedScreenShareView>
+      <Box
+        css={{
+          mx: '$8',
+          flex: '3 1 0',
+          '@lg': {
+            flex: '2 1 0',
+            display: 'flex',
+            alignItems: 'center',
+          },
         }}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture fullscreen"
-        referrerPolicy="no-referrer"
-        onLoad={() => {
-          if (ref.current && pdfConfig.file) {
-            // setting theme dark -> 2 and light -> 1
-            requestAnimationFrame(() => {
-              ref.current.contentWindow.postMessage(
-                {
-                  file: pdfConfig.file,
-                  theme: themeType === ThemeTypes.dark ? 2 : 1,
-                },
-                '*',
-              );
-              setIsPDFLoaded(true);
-            }, 1000);
-          }
-        }}
-      />
-    </Box>
+      >
+        <iframe
+          title="Embed View"
+          ref={iframeRef}
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 0,
+            borderRadius: '0.75rem',
+          }}
+          allow="autoplay; clipboard-write;"
+          referrerPolicy="no-referrer"
+        />
+      </Box>
+    </EmbedScreenShareView>
   );
 };

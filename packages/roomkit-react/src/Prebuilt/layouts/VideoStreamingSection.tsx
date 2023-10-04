@@ -18,7 +18,7 @@ import SidePane from './SidePane';
 import { WaitingView } from './WaitingView';
 // import { useWhiteboardMetadata } from '../plugins/whiteboard';
 import {
-  usePDFAnnotator,
+  usePDFConfig,
   useUrlToEmbed,
   useWaitingViewerRole,
   // @ts-ignore: No implicit Any
@@ -45,7 +45,9 @@ export const VideoStreamingSection = ({
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
-  const pdfAnnotatorActive = usePDFAnnotator();
+  const pdfAnnotatorActive = usePDFConfig();
+
+  console.log('use pdf annotator ', pdfAnnotatorActive);
 
   useEffect(() => {
     if (!isConnected) {
