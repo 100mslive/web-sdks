@@ -12,6 +12,7 @@ import {
   StyledDialogPortal,
   StyledDialogTrigger,
 } from './DialogContent';
+import { useDialogContainerSelector } from '../hooks/useDialogContainerSelector';
 
 const StyledDialog = styled(Root, {});
 const CustomDialogContent = ({ children, props = {}, css = {} }: { children: ReactNode; props?: any; css?: CSS }) => (
@@ -22,9 +23,16 @@ const CustomDialogContent = ({ children, props = {}, css = {} }: { children: Rea
 const CustomDialogOverlay = ({ css = {} }: { css?: CSS }) => (
   <StyledDialogOverlay css={{ ...css, position: 'absolute' }} />
 );
-const CustomDialogPortal = ({ children }: { children: ReactNode }) => (
-  <StyledDialogPortal container={document.getElementById('prebuilt-container')}>{children}</StyledDialogPortal>
-);
+const CustomDialogPortal = ({ children }: { children: ReactNode }) => {
+  const dialogContainerSelector = useDialogContainerSelector();
+  return (
+    <StyledDialogPortal
+      container={dialogContainerSelector ? (document.querySelector(dialogContainerSelector) as HTMLElement) : undefined}
+    >
+      {children}
+    </StyledDialogPortal>
+  );
+};
 
 export const Dialog = {
   Root: StyledDialog,
