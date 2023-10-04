@@ -86,10 +86,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (document.visibilityState === 'hidden' && this.enabled) {
       this.nativeTrack.enabled = false;
       this.appInBackgroundVideoDisabled = true;
-    }
-    else if(document.visibilityState === 'visible' && this.appInBackgroundVideoDisabled){
+    } else if (document.visibilityState === 'visible' && this.appInBackgroundVideoDisabled) {
       this.nativeTrack.enabled = true;
-      this.appInBackgroundVideoDisabled = false
+      this.appInBackgroundVideoDisabled = false;
     }
   };
 
