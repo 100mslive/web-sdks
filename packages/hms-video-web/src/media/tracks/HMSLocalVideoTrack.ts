@@ -40,7 +40,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * at the point of writing this comment.
    */
   isCurrentTab = false;
-
+  appInBackgroundVideoDisabled = false;
   /**
    * @internal
    * This is required for handling remote mute/unmute as the published track will not necessarily be same as
@@ -84,7 +84,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden' && this.enabled) {
-      await this.setEnabled(false);
+      this.nativeTrack.enabled = false;
+      this.appInBackgroundVideoDisabled = true;
+    }
+    else if(document.visibilityState === 'visible' && this.appInBackgroundVideoDisabled){
+      this.nativeTrack.enabled = true;
+      this.appInBackgroundVideoDisabled = false
     }
   };
 
