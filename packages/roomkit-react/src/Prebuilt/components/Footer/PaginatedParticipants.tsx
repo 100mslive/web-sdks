@@ -1,79 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import React, { useEffect, useRef, useState } from 'react';
 import { useMeasure } from 'react-use';
-import { VariableSizeList } from 'react-window';
+import { FixedSizeList } from 'react-window';
 import { selectIsConnectedToRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import { Button } from '../../../Button';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
-import { Participant, ParticipantSearch } from './ParticipantList';
-import { ItemData, itemKey, ROW_HEIGHT } from './RoleAccordion';
+import { ParticipantSearch } from './ParticipantList';
+import { itemKey, ROW_HEIGHT, VirtualizedParticipantItem } from './RoleAccordion';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
 
-const LoadMoreParticipants = ({
-  hasNext,
-  loadMore,
-  style,
-}: {
-  hasNext: boolean;
-  loadMore: () => Promise<void>;
-  style: React.CSSProperties;
-}) => {
-  const { ref, inView } = useInView();
-  const [inProgress, setInProgress] = useState(false);
-
-  useEffect(() => {
-    if (hasNext && inView && !inProgress) {
-      setInProgress(true);
-      loadMore()
-        .catch(console.error)
-        .finally(() => setInProgress(false));
-    }
-  }, [hasNext, loadMore, inView, inProgress]);
-  return (
-    <Flex ref={ref} style={style} align="center" justify="center">
-      {inProgress ? <Loading size={16} /> : null}
-    </Flex>
-  );
-};
-
-const VirtualizedParticipantItem = React.memo(
-  ({
-    index,
-    data,
-    style,
-  }: {
-    index: number;
-    data: ItemData & { hasNext: boolean; loadMorePeers: () => Promise<void> };
-    style: React.CSSProperties;
-  }) => {
-    if (!data.peerList[index]) {
-      return <LoadMoreParticipants hasNext={data.hasNext} loadMore={data.loadMorePeers} style={style} />;
-    }
-    return (
-      <Participant
-        key={data.peerList[index].id}
-        peer={data.peerList[index]}
-        isConnected={data.isConnected}
-        style={style}
-      />
-    );
-  },
-);
-
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
   const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const [search, setSearch] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-  const height = ROW_HEIGHT * (filteredPeers.length + 1);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const height = ROW_HEIGHT * peers.length;
   const resetSidePane = useSidepaneReset();
   const hasNext = total > peers.length;
 
@@ -109,16 +60,33 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
           </Text>
         </Flex>
         <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
-          <VariableSizeList
-            itemSize={index => (index === filteredPeers.length + 1 ? 16 : ROW_HEIGHT)}
-            itemData={{ peerList: filteredPeers, hasNext, loadMorePeers, isConnected: isConnected === true }}
+          <FixedSizeList
+            itemSize={ROW_HEIGHT}
+            itemData={{ peerList: filteredPeers, isConnected: isConnected === true }}
             itemKey={itemKey}
-            itemCount={filteredPeers.length + 1}
+            itemCount={filteredPeers.length}
             width={width}
             height={height}
+            outerRef={containerRef}
           >
             {VirtualizedParticipantItem}
-          </VariableSizeList>
+          </FixedSizeList>
+          {hasNext ? (
+            <Flex justify="center" css={{ w: '100%' }}>
+              <Button
+                css={{ w: 'max-content', p: '$4' }}
+                onClick={() => {
+                  setIsLoading(true);
+                  loadMorePeers()
+                    .catch(console.error)
+                    .finally(() => setIsLoading(false));
+                }}
+                disabled={isLoading}
+              >
+                {isLoading ? <Loading size={16} /> : 'Load More'}
+              </Button>
+            </Flex>
+          ) : null}
         </Box>
       </Flex>
     </Flex>
