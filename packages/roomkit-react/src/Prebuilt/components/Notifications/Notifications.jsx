@@ -5,6 +5,7 @@ import {
   HMSNotificationTypes,
   HMSRoomState,
   selectHasPeerHandRaised,
+  selectLocalPeerID,
   selectRoomState,
   useCustomEvent,
   useHMSNotifications,
@@ -23,11 +24,13 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { usePollViewToggle } from '../AppData/useSidepane';
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 import { getMetadata } from '../../common/utils';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
+  const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
   const navigate = useNavigate();
   const params = useParams();
@@ -37,6 +40,7 @@ export function Notifications() {
   const isNotificationDisabled = useIsNotificationDisabled();
   const { redirectToLeave } = useRedirectToLeave();
   const vanillaStore = useHMSVanillaStore();
+  const togglePollView = usePollViewToggle();
 
   const handleRoleChangeDenied = useCallback(request => {
     ToastManager.addToast({
@@ -151,6 +155,28 @@ export function Notifications() {
         ToastManager.addToast({
           title: notification.message,
         });
+        break;
+
+      case HMSNotificationTypes.POLL_STARTED:
+        if (notification.data.startedBy !== localPeerID) {
+          ToastManager.addToast({
+            title: `A poll was started: ${notification.data.title}`,
+            action: (
+              <Button
+                onClick={() => togglePollView(notification.data.id)}
+                variant="standard"
+                css={{
+                  backgroundColor: '$surfaceLight',
+                  fontWeight: '$semiBold',
+                  color: '$textHighEmp',
+                  p: '$xs $md',
+                }}
+              >
+                Vote
+              </Button>
+            ),
+          });
+        }
         break;
       default:
         break;

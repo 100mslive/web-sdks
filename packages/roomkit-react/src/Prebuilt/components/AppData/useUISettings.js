@@ -1,8 +1,10 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   selectAppData,
   selectAppDataByPath,
   selectAudioTrackByPeerID,
+  selectPermissions,
+  selectPolls,
   selectSessionStore,
   selectTrackByID,
   selectVideoTrackByPeerID,
@@ -11,7 +13,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { APP_DATA, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, POLL_STATE, SESSION_STORE_KEY } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -162,4 +164,36 @@ const useSetAppData = ({ key1, key2 }) => {
     [actions, key1, key2, store, setPreferences],
   );
   return setValue;
+};
+
+export const useShowPolls = () => {
+  const permissions = useHMSStore(selectPermissions);
+  const polls = useHMSStore(selectPolls)?.filter(poll => poll.state === 'started' || poll.state === 'stopped');
+
+  const showPolls = useMemo(() => {
+    return permissions?.pollWrite || (permissions?.pollRead && polls?.length > 0);
+  }, [permissions?.pollRead, permissions?.pollWrite, polls?.length]);
+
+  return { showPolls };
+};
+
+export const usePollViewState = () => {
+  const [pollState, setPollState] = useSetAppDataByKey(APP_DATA.pollState);
+
+  const setPollView = useCallback(
+    view => {
+      setPollState({
+        [POLL_STATE.pollInView]: pollState?.pollInView,
+        [POLL_STATE.view]: view,
+      });
+    },
+    [pollState?.pollInView, setPollState],
+  );
+
+  return {
+    setPollState,
+    setPollView,
+    pollInView: pollState?.pollInView,
+    view: pollState?.view,
+  };
 };
