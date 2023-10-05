@@ -85,14 +85,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'hidden' && this.enabled) {
       this.nativeTrack.enabled = false;
-      this.setEnabled(false);
-
+      await this.setEnabled(false);
       this.appInBackgroundVideoDisabled = true;
     } else if (document.visibilityState === 'visible' && this.appInBackgroundVideoDisabled) {
       this.nativeTrack.enabled = true;
-      this.setEnabled(true);
+      await this.setEnabled(true);
       this.appInBackgroundVideoDisabled = false;
     }
+    console.log('ollo', this.nativeTrack, this.setEnabled);
   };
 
   /** @internal */
