@@ -15,7 +15,8 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { isBrowser, isMobile } from '../../utils/support';
+// import { isBrowser, isMobile } from '../../utils/support';
+import { isBrowser } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -77,7 +78,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.setFirstTrackId(this.trackId);
-    if (isBrowser && isMobile()) {
+    if (isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -92,7 +93,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await this.setEnabled(true);
       this.appInBackgroundVideoDisabled = false;
     }
-    console.log('ollo', this.nativeTrack, this.setEnabled);
+    console.log('fired', this.appInBackgroundVideoDisabled);
   };
 
   /** @internal */
@@ -206,7 +207,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
-    if (isMobile() && isBrowser) {
+    if (isBrowser) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
