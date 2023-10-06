@@ -26,7 +26,10 @@ export const ReconnectNotifications = () => {
       notificationId = ToastManager.replaceToast(notificationId, ToastConfig.RECONNECTED.single());
       setOpen(false);
     } else if (notification.type === HMSNotificationTypes.RECONNECTING) {
-      notificationId = ToastManager.replaceToast(notificationId, ToastConfig.RECONNECTING.single());
+      notificationId = ToastManager.replaceToast(
+        notificationId,
+        ToastConfig.RECONNECTING.single(notification.data?.message),
+      );
     }
   }, [notification]);
   if (!open) return null;

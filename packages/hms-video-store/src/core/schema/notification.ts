@@ -70,7 +70,7 @@ export interface HMSPlaylistItemNotification<T> extends BaseNotification {
 
 export interface HMSReconnectionNotification extends BaseNotification {
   type: HMSNotificationTypes.RECONNECTED | HMSNotificationTypes.RECONNECTING;
-  data: null;
+  data: HMSException | null;
 }
 
 export interface HMSPollNotification extends BaseNotification {
