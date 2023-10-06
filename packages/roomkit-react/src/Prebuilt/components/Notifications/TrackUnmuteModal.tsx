@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { HMSNotificationTypes, useHMSActions, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSChangeTrackStateRequest,
+  HMSNotificationTypes,
+  useHMSActions,
+  useHMSNotifications,
+} from '@100mslive/react-sdk';
 import { MicOnIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import { RequestDialog } from '../../primitives/DialogContent';
 
 export const TrackUnmuteModal = () => {
@@ -10,7 +16,7 @@ export const TrackUnmuteModal = () => {
     HMSNotificationTypes.ROOM_ENDED,
     HMSNotificationTypes.REMOVED_FROM_ROOM,
   ]);
-  const [muteNotification, setMuteNotification] = useState(null);
+  const [muteNotification, setMuteNotification] = useState<HMSChangeTrackStateRequest | null>(null);
 
   useEffect(() => {
     switch (notification?.type) {
@@ -37,7 +43,7 @@ export const TrackUnmuteModal = () => {
   return (
     <RequestDialog
       title="Track Unmute Request"
-      onOpenChange={value => !value && setMuteNotification(null)}
+      onOpenChange={(value: boolean) => !value && setMuteNotification(null)}
       body={`${peer?.name} has requested you to unmute your ${track?.source} ${track?.type}.`}
       onAction={() => {
         hmsActions.setEnabledTrack(track.id, enabled);

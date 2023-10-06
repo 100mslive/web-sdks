@@ -3,6 +3,7 @@ import React, { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
+  HMSRoleChangeRequest,
   HMSRoomState,
   selectHasPeerHandRaised,
   selectLocalPeerID,
@@ -12,9 +13,11 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { Button } from '../../../';
+import { Button } from '../../..';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
+// @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
+// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { InitErrorModal } from './InitErrorModal';
@@ -24,10 +27,14 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+// @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
+// @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
+// @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -42,7 +49,7 @@ export function Notifications() {
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
-  const handleRoleChangeDenied = useCallback(request => {
+  const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
       title: `${request.peerName} denied your request to join the ${request.role.name} role`,
       variant: 'error',
@@ -126,11 +133,11 @@ export function Notifications() {
         });
         break;
       case HMSNotificationTypes.ROLE_UPDATED: {
-        if (notification.data?.isLocal) {
+        if (notification.data?.isLocal && notification.data?.roleName) {
           ToastManager.addToast({
             title: `You are now a ${notification.data.roleName}`,
           });
-          updateRoomLayoutForRole(notification.data.roleName);
+          updateRoomLayoutForRole?.(notification.data.roleName);
         }
         break;
       }
@@ -197,7 +204,7 @@ export function Notifications() {
       <ReconnectNotifications />
       <AutoplayBlockedModal />
       <PermissionErrorModal />
-      <InitErrorModal notification={notification} />
+      <InitErrorModal />
     </>
   );
 }
