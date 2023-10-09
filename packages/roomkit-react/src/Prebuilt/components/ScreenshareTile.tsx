@@ -13,11 +13,9 @@ import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import TileMenu from './TileMenu/TileMenu';
 import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
-// @ts-ignore: No implicit Any
 import { StyledVideoTile } from '../../VideoTile';
 // @ts-ignore: No implicit Any
 import { getVideoTileLabel } from './peerTileUtils';
-// @ts-ignore: No implicit Any
 import { ScreenshareDisplay } from './ScreenshareDisplay';
 // @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
