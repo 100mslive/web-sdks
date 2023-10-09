@@ -18,7 +18,8 @@ export interface HMSPeerNotification extends BaseNotification {
     | HMSNotificationTypes.PEER_LEFT
     | HMSNotificationTypes.NAME_UPDATED
     | HMSNotificationTypes.METADATA_UPDATED
-    | HMSNotificationTypes.ROLE_UPDATED;
+    | HMSNotificationTypes.ROLE_UPDATED
+    | HMSNotificationTypes.HAND_RAISE_CHANGED;
   data: HMSPeer;
 }
 
@@ -69,7 +70,7 @@ export interface HMSPlaylistItemNotification<T> extends BaseNotification {
 
 export interface HMSReconnectionNotification extends BaseNotification {
   type: HMSNotificationTypes.RECONNECTED | HMSNotificationTypes.RECONNECTING;
-  data: null;
+  data: HMSException | null;
 }
 
 export interface HMSPollNotification extends BaseNotification {

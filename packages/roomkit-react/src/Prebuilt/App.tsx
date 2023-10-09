@@ -22,7 +22,6 @@ import FullPageProgress from './components/FullPageProgress';
 import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
-// @ts-ignore: No implicit Any
 import { Notifications } from './components/Notifications';
 import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 // @ts-ignore: No implicit Any
