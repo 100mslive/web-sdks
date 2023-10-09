@@ -65,7 +65,7 @@ const initialAppData = {
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
-  [APP_DATA.disableNotificiations]: false,
+  [APP_DATA.disableNotifications]: false,
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {

@@ -1,6 +1,7 @@
 import Message from './models/HMSMessage';
 import HMSRoom from './models/HMSRoom';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './models/peer';
+import { HMSLocalPeer, HMSPeer } from './models/peer';
+import { HMSPeerListIterator } from './HMSPeerListIterator';
 import { LocalTrackManager } from './LocalTrackManager';
 import { NetworkTestManager } from './NetworkTestManager';
 import RoleChangeManager from './RoleChangeManager';
@@ -40,6 +41,7 @@ import { IErrorListener } from '../interfaces/error-listener';
 import { HLSConfig, HLSTimedMetadata } from '../interfaces/hls-config';
 import { HMSInterface } from '../interfaces/hms';
 import { HMSLeaveRoomRequest } from '../interfaces/leave-room-request';
+import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { HMSPreviewListener } from '../interfaces/preview-listener';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
@@ -215,6 +217,10 @@ export class HMSSdk implements HMSInterface {
 
   getInteractivityCenter() {
     return this.interactivityCenter;
+  }
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+    return new HMSPeerListIterator(this.transport, this.store, options);
   }
 
   private handleAutoplayError = (error: HMSException) => {
@@ -803,20 +809,12 @@ export class HMSSdk implements HMSInterface {
     this.notificationManager?.setConnectionQualityListener(qualityListener);
   }
 
-  async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
-    if (!forPeer.role || forPeer.role.name === toRole) {
-      return;
-    }
-
-    await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
+  async changeRole(forPeerId: string, toRole: string, force = false) {
+    await this.transport?.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
-  async changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force = false) {
-    if (!forPeer.role || forPeer.role.name === toRole) {
-      return;
-    }
-
-    await this.transport?.changeRoleOfPeer(forPeer, toRole, force);
+  async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
+    await this.transport?.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
   async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
@@ -839,15 +837,11 @@ export class HMSSdk implements HMSInterface {
     await this.leave();
   }
 
-  async removePeer(peer: HMSRemotePeer, reason: string) {
+  async removePeer(peerId: string, reason: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot remove peer');
     }
-
-    if (!this.store.getPeerById(peer.peerId)) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer, given peer not present in room', peer);
-    }
-    await this.transport?.removePeer(peer.peerId, reason);
+    await this.transport?.removePeer(peerId, reason);
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {

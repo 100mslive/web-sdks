@@ -1,4 +1,10 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
@@ -22,6 +28,13 @@ const App = () => {
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
+  const confirmLeave = useCallback(e => {
+    e.returnValue = 'Are you sure you want to leave?';
+  }, []);
+  const removeExitListener = useCallback(
+    () => window.removeEventListener('beforeunload', confirmLeave),
+    []
+  );
 
   useEffect(() => {
     if (roomCode) {
@@ -36,7 +49,7 @@ const App = () => {
       const { hmsActions } = hmsPrebuiltRef.current;
       hmsActions?.enableBeamSpeakerLabelsLogging?.();
       hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
-      hmsActions?.setAppData?.('disableNotificiations', true);
+      hmsActions?.setAppData?.('disableNotifications', true);
     }
   }, [authToken, roomCode, isHeadless]);
 
@@ -75,6 +88,11 @@ const App = () => {
           authToken={authToken}
           roomId={roomId}
           role={role}
+          onLeave={removeExitListener}
+          onJoin={() => {
+            if (!isHeadless)
+              window.addEventListener('beforeunload', confirmLeave);
+          }}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : undefined,

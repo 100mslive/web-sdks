@@ -435,6 +435,7 @@ export const selectRTMPState = createSelector(selectRoom, room => room.rtmp);
 export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
+export const selectIsLargeRoom = createSelector(selectRoom, room => !!room.isLargeRoom);
 export const selectTemplateAppData = (store: HMSStore) => store.templateAppData;
 /** @deprecated - use `selectSessionStore` instead */
 export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;
