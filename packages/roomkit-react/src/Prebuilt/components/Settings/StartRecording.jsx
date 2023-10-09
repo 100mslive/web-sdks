@@ -4,10 +4,22 @@ import { AlertTriangleIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Flex, Text } from '../../../';
 import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { ResolutionInput } from '../Streaming/ResolutionInput';
-import { getResolution } from '../Streaming/RTMPStreaming';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA, RTMP_RECORD_DEFAULT_RESOLUTION } from '../../common/constants';
+
+export function getResolution(recordingResolution) {
+  const resolution = {};
+  if (recordingResolution.width) {
+    resolution.width = recordingResolution.width;
+  }
+  if (recordingResolution.height) {
+    resolution.height = recordingResolution.height;
+  }
+  if (Object.keys(resolution).length > 0) {
+    return resolution;
+  }
+}
 
 const StartRecording = ({ open, onOpenChange }) => {
   const permissions = useHMSStore(selectPermissions);
