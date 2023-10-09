@@ -11,6 +11,7 @@ export interface usePaginatedParticipantsResult {
    * this function is to be called when loadPeers is called atleast once. This will fetch the next batch of peers
    */
   loadMorePeers: Promise<void>;
+  hasNext: () => boolean;
   // list of peers loaded
   peers: HMSPeer[];
   // total number of peers matching the input options at the time of the request
@@ -48,6 +49,7 @@ export const usePaginatedParticipants = (options: HMSPeerListIteratorOptions) =>
         });
         setTotal(iterator.current.getTotal());
       }),
+    hasNext: () => iterator.current.hasNext(),
     total,
     peers: Object.values(peers),
   };
