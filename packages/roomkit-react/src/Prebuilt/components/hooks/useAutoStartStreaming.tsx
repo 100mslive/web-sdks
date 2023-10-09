@@ -25,7 +25,7 @@ export const useAutoStartStreaming = () => {
 
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted || !showStreamingUI || isHLSRunning) {
+      if (isHLSStarted || !showStreamingUI || isHLSRunning || isRTMPRunning) {
         return;
       }
       setHLSStarted(true);
@@ -47,7 +47,7 @@ export const useAutoStartStreaming = () => {
   }, [isHLSStarted, isHLSRunning]);
 
   useEffect(() => {
-    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming || isRTMPRunning) {
+    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming) {
       return;
     }
     // Is a streaming kit and broadcaster joins

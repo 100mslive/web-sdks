@@ -127,11 +127,12 @@ const StartHLS = () => {
   const [record, setRecord] = useState(false);
   const [error, setError] = useState(false);
   const hmsActions = useHMSActions();
+  const { isRTMPRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(
     async variants => {
       try {
-        if (isHLSStarted) {
+        if (isHLSStarted || isRTMPRunning) {
           return;
         }
         setHLSStarted(true);
