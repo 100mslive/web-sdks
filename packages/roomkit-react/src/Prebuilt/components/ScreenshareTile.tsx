@@ -9,13 +9,19 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import TileMenu from './TileMenu/TileMenu';
 import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
+// @ts-ignore: No implicit Any
 import { StyledVideoTile } from '../../VideoTile';
+// @ts-ignore: No implicit Any
 import { getVideoTileLabel } from './peerTileUtils';
+// @ts-ignore: No implicit Any
 import { ScreenshareDisplay } from './ScreenshareDisplay';
+// @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../common/constants';
 
 const labelStyles = {
@@ -27,7 +33,15 @@ const labelStyles = {
   flexShrink: 0,
 };
 
-const Tile = ({ peerId, width = '100%', height = '100%' }) => {
+const Tile = ({
+  peerId,
+  width = '100%',
+  height = 'max-content',
+}: {
+  peerId: string;
+  width?: string | number;
+  height?: string | number;
+}) => {
   const isLocal = useHMSStore(selectLocalPeerID) === peerId;
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -44,7 +58,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
 
-  if (isLocal && !['browser', 'window', 'application'].includes(track?.displaySurface)) {
+  if (isLocal && track?.displaySurface && !['browser', 'window', 'application'].includes(track.displaySurface)) {
     return <ScreenshareDisplay />;
   }
 
@@ -59,11 +73,11 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   });
 
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0 }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0, margin: 'auto 0' }} data-testid="screenshare_tile">
       <StyledVideoTile.Container
         transparentBg
         ref={fullscreenRef}
-        css={{ flexDirection: 'column', gap: '$2' }}
+        css={{ flexDirection: 'column', gap: '$6' }}
         onMouseEnter={() => setIsMouseHovered(true)}
         onMouseLeave={() => {
           setIsMouseHovered(false);
@@ -80,10 +94,10 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
         {track ? (
           <Video
             screenShare={true}
-            mirror={peer.isLocal && track?.source === 'regular'}
+            mirror={false}
             attach={!isAudioOnly}
             trackId={track.id}
-            css={{ minHeight: 0 }}
+            css={{ minHeight: 0, height: 'max-content', maxHeight: '100%' }}
           />
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
