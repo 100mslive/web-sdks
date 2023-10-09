@@ -20,7 +20,7 @@ export const useAutoStartStreaming = () => {
   const showStreamingUI = useShowStreamingUI();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const { isHLSRunning } = useRecordingStreaming();
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const streamStartedRef = useRef(false);
 
   const startHLS = useCallback(async () => {
@@ -47,7 +47,7 @@ export const useAutoStartStreaming = () => {
   }, [isHLSStarted, isHLSRunning]);
 
   useEffect(() => {
-    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming) {
+    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming || isRTMPRunning) {
       return;
     }
     // Is a streaming kit and broadcaster joins
