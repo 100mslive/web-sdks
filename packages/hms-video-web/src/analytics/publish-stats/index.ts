@@ -1,4 +1,11 @@
-import { BaseSample, PublishAnalyticPayload, TrackAnalytics, VideoSample } from './interfaces';
+import {
+  BaseSample,
+  LocalAudioTrackAnalytics,
+  LocalVideoTrackAnalytics,
+  PublishAnalyticPayload,
+  SubscribeAnalyticPayload,
+  VideoSample,
+} from './interfaces';
 import { EventBus } from '../../events/EventBus';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSLocalTrack } from '../../media/tracks';
@@ -9,16 +16,15 @@ import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
-export class PublishStatsAnalytics {
+export abstract class BaseStatsAnalytics {
   private shouldSendEvent = false;
-  private sequenceNum = 1;
-  private trackAnalytics: Map<string, RunningTrackAnalytics> = new Map();
+  protected sequenceNum = 1;
 
   constructor(
-    private store: IStore,
-    private eventBus: EventBus,
-    private readonly sampleWindowSize = PUBLISH_STATS_SAMPLE_WINDOW,
-    private readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
+    protected store: IStore,
+    protected eventBus: EventBus,
+    protected readonly sampleWindowSize = PUBLISH_STATS_SAMPLE_WINDOW,
+    protected readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
   ) {
     this.start();
   }
@@ -48,9 +54,19 @@ export class PublishStatsAnalytics {
     }
   }
 
-  private toAnalytics(): PublishAnalyticPayload {
-    const audio: TrackAnalytics[] = [];
-    const video: TrackAnalytics[] = [];
+  protected abstract sendEvent: () => void;
+
+  protected abstract toAnalytics: () => PublishAnalyticPayload | SubscribeAnalyticPayload;
+
+  protected abstract handleStatsUpdate: (hmsStats: HMSWebrtcStats) => void;
+}
+
+export class PublishStatsAnalytics extends BaseStatsAnalytics {
+  protected trackAnalytics: Map<string, RunningLocalTrackAnalytics> = new Map();
+
+  protected toAnalytics = (): PublishAnalyticPayload => {
+    const audio: LocalAudioTrackAnalytics[] = [];
+    const video: LocalVideoTrackAnalytics[] = [];
     this.trackAnalytics.forEach(trackAnalytic => {
       if (trackAnalytic.track.type === 'audio') {
         audio.push(trackAnalytic.toAnalytics());
@@ -65,13 +81,13 @@ export class PublishStatsAnalytics {
       sequence_num: this.sequenceNum++,
       max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
     };
-  }
+  };
 
-  private sendEvent = () => {
+  protected sendEvent = () => {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
   };
 
-  private handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
+  protected handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
     const localTracksStats = hmsStats.getLocalTrackStats();
     Object.keys(localTracksStats).forEach(trackIDBeingSent => {
       const trackStats = localTracksStats[trackIDBeingSent];
@@ -86,7 +102,7 @@ export class PublishStatsAnalytics {
           });
         } else {
           if (track) {
-            const trackAnalytics = new RunningTrackAnalytics({
+            const trackAnalytics = new RunningLocalTrackAnalytics({
               track,
               sampleWindowSize: this.sampleWindowSize,
               rid: layerStats.rid,
@@ -111,7 +127,7 @@ export class PublishStatsAnalytics {
 
 type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
 
-class RunningTrackAnalytics {
+abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;
   track: HMSLocalTrack;
   track_id: string;
@@ -154,7 +170,7 @@ class RunningTrackAnalytics {
     }
   }
 
-  toAnalytics(): TrackAnalytics {
+  toAnalytics(): LocalVideoTrackAnalytics {
     return {
       track_id: this.track_id,
       ssrc: this.ssrc,
@@ -164,7 +180,50 @@ class RunningTrackAnalytics {
     };
   }
 
-  private createSample(): BaseSample | VideoSample {
+  protected abstract createSample: () => BaseSample | VideoSample;
+
+  protected getLatestStat() {
+    return this.tempStats[this.tempStats.length - 1];
+  }
+
+  protected shouldCreateSample() {
+    const length = this.tempStats.length;
+    const newStat = this.tempStats[length - 1];
+    const prevStat = this.tempStats[length - 2];
+
+    return (
+      length === PUBLISH_STATS_SAMPLE_WINDOW ||
+      hasEnabledStateChanged(newStat, prevStat) ||
+      (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
+    );
+  }
+
+  protected calculateSum(key: keyof TempPublishStats) {
+    const checkStat = this.getLatestStat()[key];
+    if (typeof checkStat !== 'number') {
+      return;
+    }
+    return this.tempStats.reduce((partialSum, stat) => {
+      return partialSum + ((stat[key] || 0) as number);
+    }, 0);
+  }
+
+  protected calculateAverage(key: keyof TempPublishStats, round = true) {
+    const sum = this.calculateSum(key);
+    const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
+    return avg ? (round ? Math.round(avg) : avg) : undefined;
+  }
+
+  protected calculateDifferenceForSample(key: keyof TempPublishStats) {
+    const firstValue = Number(this.tempStats[0][key]) || 0;
+    const latestValue = Number(this.getLatestStat()[key]) || 0;
+
+    return latestValue - firstValue;
+  }
+}
+
+class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
+  protected createSample = (): BaseSample | VideoSample => {
     const latestStat = this.getLatestStat();
 
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
@@ -202,46 +261,7 @@ class RunningTrackAnalytics {
       total_quality_limitation,
       resolution,
     });
-  }
-
-  private getLatestStat() {
-    return this.tempStats[this.tempStats.length - 1];
-  }
-
-  private shouldCreateSample() {
-    const length = this.tempStats.length;
-    const newStat = this.tempStats[length - 1];
-    const prevStat = this.tempStats[length - 2];
-
-    return (
-      length === PUBLISH_STATS_SAMPLE_WINDOW ||
-      hasEnabledStateChanged(newStat, prevStat) ||
-      (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
-    );
-  }
-
-  private calculateSum(key: keyof TempPublishStats) {
-    const checkStat = this.getLatestStat()[key];
-    if (typeof checkStat !== 'number') {
-      return;
-    }
-    return this.tempStats.reduce((partialSum, stat) => {
-      return partialSum + ((stat[key] || 0) as number);
-    }, 0);
-  }
-
-  private calculateAverage(key: keyof TempPublishStats, round = true) {
-    const sum = this.calculateSum(key);
-    const avg = sum !== undefined ? sum / this.tempStats.length : undefined;
-    return avg ? (round ? Math.round(avg) : avg) : undefined;
-  }
-
-  private calculateDifferenceForSample(key: keyof TempPublishStats) {
-    const firstValue = Number(this.tempStats[0][key]) || 0;
-    const latestValue = Number(this.getLatestStat()[key]) || 0;
-
-    return latestValue - firstValue;
-  }
+  };
 }
 
 const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
