@@ -63,7 +63,7 @@ export abstract class BaseStatsAnalytics {
   protected abstract handleStatsUpdate: (hmsStats: HMSWebrtcStats) => void;
 }
 
-export type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
+type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
 
 export abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;

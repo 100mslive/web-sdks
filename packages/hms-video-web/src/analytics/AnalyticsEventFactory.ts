@@ -1,4 +1,4 @@
-import { PublishAnalyticPayload } from './publish-stats/interfaces';
+import { PublishAnalyticPayload, SubscribeAnalyticPayload } from './stats/interfaces';
 import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
@@ -225,7 +225,7 @@ export default class AnalyticsEventFactory {
     });
   }
 
-  static subscribeStats(properties: PublishAnalyticPayload) {
+  static subscribeStats(properties: SubscribeAnalyticPayload) {
     return new AnalyticsEvent({
       name: 'subscriber.stats',
       level: AnalyticsEventLevel.INFO,

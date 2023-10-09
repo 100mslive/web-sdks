@@ -10,8 +10,8 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
-import { PublishStatsAnalytics } from '../analytics/publish-stats';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
+import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -73,8 +73,12 @@ import {
   MAX_TRANSPORT_RETRIES,
   PROTOCOL_SPEC,
   PROTOCOL_VERSION,
+  PUBLISH_STATS_PUSH_INTERVAL,
+  PUBLISH_STATS_SAMPLE_WINDOW,
   RENEGOTIATION_CALLBACK_ID,
   SUBSCRIBE_ICE_CONNECTION_CALLBACK_ID,
+  SUBSCRIBE_STATS_PUSH_INTERVAL,
+  SUBSCRIBE_STATS_SAMPLE_WINDOW,
   SUBSCRIBE_TIMEOUT,
 } from '../utils/constants';
 import HMSLogger from '../utils/logger';
@@ -107,6 +111,7 @@ export default class HMSTransport implements ITransport {
   private retryScheduler: RetryScheduler;
   private webrtcInternals?: HMSWebrtcInternals;
   private publishStatsAnalytics?: PublishStatsAnalytics;
+  private subscribeStatsAnalytics?: SubscribeStatsAnalytics;
   private maxSubscribeBitrate = 0;
   joinRetryCount = 0;
 
@@ -479,6 +484,7 @@ export default class HMSTransport implements ITransport {
     try {
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
+      this.subscribeStatsAnalytics?.stop();
       this.webrtcInternals?.cleanup();
       await this.publishConnection?.close();
       await this.subscribeConnection?.close();
@@ -1157,16 +1163,44 @@ export default class HMSTransport implements ITransport {
       subscribe: this.subscribeConnection?.nativeConnection,
     });
 
+    this.initStatsAnalytics();
+  }
+
+  private initStatsAnalytics() {
+    const { publishWindowSize, publishPushInterval, subscribeWindowSize, subscribePushInterval } =
+      this.getStatsAnalyticsIntervals();
+
     if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
       this.publishStatsAnalytics = new PublishStatsAnalytics(
         this.store,
         this.eventBus,
-        this.initConfig?.config.publishStats?.maxSampleWindowSize,
-        this.initConfig?.config.publishStats?.maxSamplePushInterval,
+        publishWindowSize,
+        publishPushInterval,
       );
 
       this.getWebrtcInternals()?.start();
     }
+
+    if (this.isFlagEnabled(InitFlags.FLAG_SUBSCRIBE_STATS)) {
+      this.subscribeStatsAnalytics = new SubscribeStatsAnalytics(
+        this.store,
+        this.eventBus,
+        subscribeWindowSize,
+        subscribePushInterval,
+      );
+
+      this.getWebrtcInternals()?.start();
+    }
+  }
+
+  private getStatsAnalyticsIntervals() {
+    return {
+      publishWindowSize: this.initConfig?.config.publishStats?.maxSampleWindowSize || PUBLISH_STATS_SAMPLE_WINDOW,
+      publishPushInterval: this.initConfig?.config.publishStats?.maxSamplePushInterval || PUBLISH_STATS_PUSH_INTERVAL,
+      subscribeWindowSize: this.initConfig?.config.subscribeStats?.maxSampleWindowSize || SUBSCRIBE_STATS_SAMPLE_WINDOW,
+      subscribePushInterval:
+        this.initConfig?.config.subscribeStats?.maxSamplePushInterval || SUBSCRIBE_STATS_PUSH_INTERVAL,
+    };
   }
 
   /**

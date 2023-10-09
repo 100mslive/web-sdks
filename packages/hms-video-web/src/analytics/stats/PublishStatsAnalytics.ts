@@ -1,17 +1,17 @@
 import {
+  BaseStatsAnalytics,
+  hasEnabledStateChanged,
+  hasResolutionChanged,
+  removeUndefinedFromObject,
+  RunningTrackAnalytics,
+} from './BaseStatsAnalytics';
+import {
   LocalAudioTrackAnalytics,
   LocalBaseSample,
   LocalVideoSample,
   LocalVideoTrackAnalytics,
   PublishAnalyticPayload,
 } from './interfaces';
-import {
-  BaseStatsAnalytics,
-  hasEnabledStateChanged,
-  hasResolutionChanged,
-  removeUndefinedFromObject,
-  RunningTrackAnalytics,
-} from '.';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';

@@ -1,17 +1,17 @@
 import {
+  BaseStatsAnalytics,
+  hasEnabledStateChanged,
+  hasResolutionChanged,
+  removeUndefinedFromObject,
+  RunningTrackAnalytics,
+} from './BaseStatsAnalytics';
+import {
   RemoteAudioSample,
   RemoteAudioTrackAnalytis,
   RemoteVideoSample,
   RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
 } from './interfaces';
-import {
-  BaseStatsAnalytics,
-  hasEnabledStateChanged,
-  hasResolutionChanged,
-  removeUndefinedFromObject,
-  RunningTrackAnalytics,
-} from '.';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
