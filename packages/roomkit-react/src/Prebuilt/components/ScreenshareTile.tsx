@@ -85,7 +85,6 @@ export const ScreenshareTile = ({
         minHeight: 0,
         margin: 'auto',
         maxWidth: '100%',
-        maxHeight: '100%',
         opacity: showContent ? 1 : 0,
       }}
       data-testid="screenshare_tile"
@@ -107,14 +106,16 @@ export const ScreenshareTile = ({
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
-        <Video
-          screenShare={true}
-          mirror={false}
-          attach={!isAudioOnly}
-          trackId={track?.id}
-          css={{ minHeight: 0 }}
-          onLoadedData={() => setShowContent(true)}
-        />
+        {track ? (
+          <Video
+            screenShare={true}
+            mirror={false}
+            attach={!isAudioOnly}
+            trackId={track?.id}
+            css={{ minHeight: 0, width: 'max-content', maxWidth: '100%' }}
+            onCanPlayThrough={() => setShowContent(true)}
+          />
+        ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
         {isMouseHovered && !peer.isLocal ? (
           <TileMenu
