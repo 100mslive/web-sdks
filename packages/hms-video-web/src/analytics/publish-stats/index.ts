@@ -1,20 +1,22 @@
 import {
-  BaseSample,
   LocalAudioTrackAnalytics,
+  LocalBaseSample,
+  LocalVideoSample,
   LocalVideoTrackAnalytics,
   PublishAnalyticPayload,
+  RemoteAudioSample,
+  RemoteAudioTrackAnalytis,
+  RemoteVideoSample,
+  RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
-  VideoSample,
 } from './interfaces';
 import { EventBus } from '../../events/EventBus';
 import { HMSTrackStats } from '../../interfaces';
-import { HMSLocalTrack } from '../../media/tracks';
+import { HMSTrack } from '../../internal';
 import { HMSWebrtcStats } from '../../rtc-stats';
 import { IStore } from '../../sdk/store';
-import { PUBLISH_STATS_PUSH_INTERVAL, PUBLISH_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
-import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export abstract class BaseStatsAnalytics {
   private shouldSendEvent = false;
@@ -23,8 +25,8 @@ export abstract class BaseStatsAnalytics {
   constructor(
     protected store: IStore,
     protected eventBus: EventBus,
-    protected readonly sampleWindowSize = PUBLISH_STATS_SAMPLE_WINDOW,
-    protected readonly pushInterval = PUBLISH_STATS_PUSH_INTERVAL,
+    protected readonly sampleWindowSize: number,
+    protected readonly pushInterval: number,
   ) {
     this.start();
   }
@@ -61,83 +63,19 @@ export abstract class BaseStatsAnalytics {
   protected abstract handleStatsUpdate: (hmsStats: HMSWebrtcStats) => void;
 }
 
-export class PublishStatsAnalytics extends BaseStatsAnalytics {
-  protected trackAnalytics: Map<string, RunningLocalTrackAnalytics> = new Map();
+export type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
 
-  protected toAnalytics = (): PublishAnalyticPayload => {
-    const audio: LocalAudioTrackAnalytics[] = [];
-    const video: LocalVideoTrackAnalytics[] = [];
-    this.trackAnalytics.forEach(trackAnalytic => {
-      if (trackAnalytic.track.type === 'audio') {
-        audio.push(trackAnalytic.toAnalytics());
-      } else if (trackAnalytic.track.type === 'video') {
-        video.push(trackAnalytic.toAnalytics());
-      }
-    });
-    return {
-      audio,
-      video,
-      joined_at: this.store.getRoom()?.joinedAt?.getTime()!,
-      sequence_num: this.sequenceNum++,
-      max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
-    };
-  };
-
-  protected sendEvent = () => {
-    this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
-  };
-
-  protected handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
-    const localTracksStats = hmsStats.getLocalTrackStats();
-    Object.keys(localTracksStats).forEach(trackIDBeingSent => {
-      const trackStats = localTracksStats[trackIDBeingSent];
-      const track = this.store.getLocalPeerTracks().find(track => track.getTrackIDBeingSent() === trackIDBeingSent);
-      Object.keys(trackStats).forEach(statId => {
-        const layerStats = trackStats[statId];
-        const identifier = track && this.getTrackIdentifier(track?.trackId, layerStats);
-        if (identifier && this.trackAnalytics.has(identifier)) {
-          this.trackAnalytics.get(identifier)?.push({
-            ...layerStats,
-            availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
-          });
-        } else {
-          if (track) {
-            const trackAnalytics = new RunningLocalTrackAnalytics({
-              track,
-              sampleWindowSize: this.sampleWindowSize,
-              rid: layerStats.rid,
-              ssrc: layerStats.ssrc.toString(),
-              kind: layerStats.kind,
-            });
-            trackAnalytics.push({
-              ...layerStats,
-              availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
-            });
-            this.trackAnalytics.set(this.getTrackIdentifier(track?.trackId, layerStats), trackAnalytics);
-          }
-        }
-      });
-    });
-  };
-
-  private getTrackIdentifier(trackId: string, stats: HMSTrackStats) {
-    return stats.rid ? `${trackId}:${stats.rid}` : trackId;
-  }
-}
-
-type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
-
-abstract class RunningTrackAnalytics {
+export abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;
-  track: HMSLocalTrack;
+  track: HMSTrack;
   track_id: string;
   source: string;
   ssrc: string;
   kind: string;
   rid?: string;
-  samples: BaseSample[] = [];
+  samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
 
-  private tempStats: TempPublishStats[] = [];
+  protected tempStats: TempPublishStats[] = [];
 
   constructor({
     track,
@@ -146,7 +84,7 @@ abstract class RunningTrackAnalytics {
     kind,
     sampleWindowSize,
   }: {
-    track: HMSLocalTrack;
+    track: HMSTrack;
     ssrc: string;
     kind: string;
     rid?: string;
@@ -170,33 +108,23 @@ abstract class RunningTrackAnalytics {
     }
   }
 
-  toAnalytics(): LocalVideoTrackAnalytics {
-    return {
-      track_id: this.track_id,
-      ssrc: this.ssrc,
-      source: this.source,
-      rid: this.rid,
-      samples: this.samples,
-    };
-  }
+  protected abstract toAnalytics: () =>
+    | LocalAudioTrackAnalytics
+    | LocalVideoTrackAnalytics
+    | RemoteAudioTrackAnalytis
+    | RemoteVideoTrackAnalytics;
 
-  protected abstract createSample: () => BaseSample | VideoSample;
+  protected abstract createSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
 
   protected getLatestStat() {
     return this.tempStats[this.tempStats.length - 1];
   }
 
-  protected shouldCreateSample() {
-    const length = this.tempStats.length;
-    const newStat = this.tempStats[length - 1];
-    const prevStat = this.tempStats[length - 2];
-
-    return (
-      length === PUBLISH_STATS_SAMPLE_WINDOW ||
-      hasEnabledStateChanged(newStat, prevStat) ||
-      (newStat.kind === 'video' && hasResolutionChanged(newStat, prevStat))
-    );
+  protected getFirstStat() {
+    return this.tempStats[0];
   }
+
+  protected abstract shouldCreateSample: () => boolean;
 
   protected calculateSum(key: keyof TempPublishStats) {
     const checkStat = this.getLatestStat()[key];
@@ -220,57 +148,26 @@ abstract class RunningTrackAnalytics {
 
     return latestValue - firstValue;
   }
+
+  protected calculateInstancesOfHigh(key: keyof TempPublishStats, threshold: number) {
+    const checkStat = this.getLatestStat()[key];
+    if (typeof checkStat !== 'number') {
+      return;
+    }
+
+    return this.tempStats.reduce((partialSum, stat) => {
+      return partialSum + (((stat[key] || 0) as number) > threshold ? 1 : 0);
+    }, 0);
+  }
 }
 
-class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
-  protected createSample = (): BaseSample | VideoSample => {
-    const latestStat = this.getLatestStat();
-
-    const qualityLimitationDurations = latestStat.qualityLimitationDurations;
-    const total_quality_limitation = qualityLimitationDurations && {
-      bandwidth_sec: qualityLimitationDurations.bandwidth,
-      cpu_sec: qualityLimitationDurations.cpu,
-      other_sec: qualityLimitationDurations.other,
-    };
-
-    const resolution = latestStat.frameHeight
-      ? {
-          height_px: this.getLatestStat().frameHeight,
-          width_px: this.getLatestStat().frameWidth,
-        }
-      : undefined;
-    const avg_jitter = this.calculateAverage('jitter', false);
-    const avg_jitter_ms = avg_jitter ? Math.round(avg_jitter * 1000) : undefined;
-
-    const avg_round_trip_time = this.calculateAverage('roundTripTime', false);
-    const avg_round_trip_time_ms = avg_round_trip_time ? Math.round(avg_round_trip_time * 1000) : undefined;
-
-    return removeUndefinedFromObject({
-      timestamp: Date.now(),
-      avg_available_outgoing_bitrate_bps: this.calculateAverage('availableOutgoingBitrate'),
-      avg_bitrate_bps: this.calculateAverage('bitrate'),
-      avg_fps: this.calculateAverage('framesPerSecond'),
-      total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
-      total_packets_sent: this.calculateDifferenceForSample('packetsSent'),
-      total_packet_sent_delay_sec: parseFloat(this.calculateDifferenceForSample('totalPacketSendDelay').toFixed(4)),
-      total_fir_count: this.calculateDifferenceForSample('firCount'),
-      total_pli_count: this.calculateDifferenceForSample('pliCount'),
-      total_nack_count: this.calculateDifferenceForSample('nackCount'),
-      avg_jitter_ms,
-      avg_round_trip_time_ms,
-      total_quality_limitation,
-      resolution,
-    });
-  };
-}
-
-const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasResolutionChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
   newStat && prevStat && (newStat.frameWidth !== prevStat.frameWidth || newStat.frameHeight !== prevStat.frameHeight);
 
-const hasEnabledStateChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
+export const hasEnabledStateChanged = (newStat: TempPublishStats, prevStat: TempPublishStats) =>
   newStat && prevStat && newStat.enabled !== prevStat.enabled;
 
-const removeUndefinedFromObject = <T extends Record<string, any>>(data: T) => {
+export const removeUndefinedFromObject = <T extends Record<string, any>>(data: T) => {
   return Object.entries(data)
     .filter(([, value]) => value !== undefined)
     .reduce((obj, [key, value]) => {

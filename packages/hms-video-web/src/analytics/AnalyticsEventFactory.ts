@@ -225,6 +225,14 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static subscribeStats(properties: PublishAnalyticPayload) {
+    return new AnalyticsEvent({
+      name: 'subscriber.stats',
+      level: AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;
