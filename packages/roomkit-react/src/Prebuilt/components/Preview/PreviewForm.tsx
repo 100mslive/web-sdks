@@ -33,6 +33,7 @@ const PreviewForm = ({
   const showGoLive =
     joinForm?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning && !isRTMPRunning;
 
+  console.log('ollo', showGoLive, isRTMPRunning);
   return (
     <Form
       css={{ flexDirection: cannotPublishVideo ? 'column' : 'row', '@md': { flexDirection: 'row' } }}

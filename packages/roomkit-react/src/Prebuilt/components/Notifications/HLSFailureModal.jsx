@@ -28,7 +28,7 @@ export function HLSFailureModal() {
       }
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSStarted, setHLSStarted]);
+  }, [hmsActions, isHLSStarted, setHLSStarted, isRTMPRunning]);
 
   return hlsError ? (
     <Dialog.Root

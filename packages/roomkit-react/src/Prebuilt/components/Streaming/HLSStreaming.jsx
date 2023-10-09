@@ -146,7 +146,7 @@ const StartHLS = () => {
         setError(error.message);
       }
     },
-    [hmsActions, record, isHLSStarted, setHLSStarted],
+    [hmsActions, record, isHLSStarted, setHLSStarted, isRTMPRunning],
   );
 
   return (
