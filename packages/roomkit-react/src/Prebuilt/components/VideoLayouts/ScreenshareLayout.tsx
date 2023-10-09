@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import { selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 import { Pagination } from '../Pagination';
-import ScreenshareTile from '../ScreenshareTile';
+import { ScreenshareTile } from '../ScreenshareTile';
 import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';

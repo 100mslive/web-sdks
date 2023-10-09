@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useFullscreen } from 'react-use';
 import screenfull from 'screenfull';
 import {
@@ -33,9 +33,9 @@ const labelStyles = {
   flexShrink: 0,
 };
 
-const Tile = ({
+export const ScreenshareTile = ({
   peerId,
-  width = '100%',
+  width = 'max-content',
   height = 'max-content',
 }: {
   peerId: string;
@@ -57,6 +57,12 @@ const Tile = ({
   });
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
+  const [showContent, setShowContent] = useState<boolean>(false); // to avoid small size video showing up before video has loaded
+  useEffect(() => {
+    if (peerId) {
+      setShowContent(false);
+    }
+  }, [peerId]);
 
   if (isLocal && track?.displaySurface && !['browser', 'window', 'application'].includes(track.displaySurface)) {
     return <ScreenshareDisplay />;
@@ -73,7 +79,19 @@ const Tile = ({
   });
 
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0, margin: 'auto 0' }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root
+      css={{
+        width,
+        height,
+        p: 0,
+        minHeight: 0,
+        margin: 'auto',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        opacity: showContent ? 1 : 0,
+      }}
+      data-testid="screenshare_tile"
+    >
       <StyledVideoTile.Container
         transparentBg
         ref={fullscreenRef}
@@ -91,15 +109,14 @@ const Tile = ({
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
-        {track ? (
-          <Video
-            screenShare={true}
-            mirror={false}
-            attach={!isAudioOnly}
-            trackId={track.id}
-            css={{ minHeight: 0, height: 'max-content', maxHeight: '100%' }}
-          />
-        ) : null}
+        <Video
+          screenShare={true}
+          mirror={false}
+          attach={!isAudioOnly}
+          trackId={track?.id}
+          css={{ minHeight: 0 }}
+          onLoadedData={() => setShowContent(true)}
+        />
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
         {isMouseHovered && !peer.isLocal ? (
           <TileMenu
@@ -114,7 +131,3 @@ const Tile = ({
     </StyledVideoTile.Root>
   );
 };
-
-const ScreenshareTile = React.memo(Tile);
-
-export default ScreenshareTile;
