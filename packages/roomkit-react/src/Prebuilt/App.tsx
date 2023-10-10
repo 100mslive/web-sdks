@@ -303,7 +303,6 @@ function AppRoutes({
     if (!roomLayout) {
       return;
     }
-    console.log({ roomState, prevRoomState });
     if (roomState === HMSRoomState.Connected) {
       setActiveState(PrebuiltStates.MEETING);
     } else if (roomState === HMSRoomState.Disconnecting) {
