@@ -5,6 +5,7 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
+// @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
