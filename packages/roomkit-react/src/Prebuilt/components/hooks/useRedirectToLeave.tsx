@@ -20,13 +20,8 @@ export const useRedirectToLeave = () => {
     (timeout = 0) => {
       setTimeout(() => {
         PictureInPicture.stop().catch(() => console.error('stopping pip'));
-        setActiveState(
-          isLeaveScreenEnabled
-            ? PrebuiltStates.LEAVE
-            : isPreviewScreenEnabled
-            ? PrebuiltStates.PREVIEW
-            : PrebuiltStates.MEETING,
-        );
+        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
+        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
         ToastManager.clearAllToast();
         onLeave?.();
       }, timeout);
