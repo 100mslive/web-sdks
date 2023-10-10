@@ -13,7 +13,6 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../..';
-import { PrebuiltStates, useHMSAppStateContext } from '../../AppStateContext';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -27,12 +26,10 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
-import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 // @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
 // @ts-ignore: No implicit Any
@@ -44,9 +41,6 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
-  const { redirectToLeave } = useRedirectToLeave();
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { setActiveState } = useHMSAppStateContext();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
@@ -97,28 +91,16 @@ export function Notifications() {
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            // show button action when the error is terminal
-            const toastId = ToastManager.addToast({
+            ToastManager.addToast({
               title:
                 notification.data?.message ||
                 'We couldn’t reconnect you. When you’re back online, try joining the room.',
-              inlineAction: true,
-              action: (
-                <Button
-                  onClick={() => {
-                    ToastManager.removeToast(toastId);
-                    setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
-                  }}
-                >
-                  Rejoin
-                </Button>
-              ),
               close: false,
             });
           }
           // goto leave for terminal if any action is not performed within 1s
           // if network is still unavailable going to preview will throw an error
-          redirectToLeave(1000);
+          // redirectToLeave(1000);
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -157,7 +139,7 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        redirectToLeave(1000);
+        // redirectToLeave(1000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({

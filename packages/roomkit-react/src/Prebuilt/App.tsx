@@ -29,7 +29,6 @@ import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
 import { Notifications } from './components/Notifications';
-import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 // @ts-ignore: No implicit Any
 import PostLeave from './components/PostLeave';
 // @ts-ignore: No implicit Any
@@ -48,6 +47,7 @@ import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
+import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
 import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
@@ -298,6 +298,7 @@ function AppRoutes({
   const prevRoomState = usePreviousDistinct(roomState);
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { redirectToLeave } = useRedirectToLeave();
 
   useEffect(() => {
     if (!roomLayout) {
@@ -305,16 +306,19 @@ function AppRoutes({
     }
     if (roomState === HMSRoomState.Connected) {
       setActiveState(PrebuiltStates.MEETING);
-    } else if (roomState === HMSRoomState.Disconnecting) {
-      const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
-      setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
     } else if (
-      (!prevRoomState || prevRoomState === HMSRoomState.Disconnected) &&
-      roomState === HMSRoomState.Disconnected
+      prevRoomState &&
+      [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
+      [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
     ) {
+      redirectToLeave().then(() => {
+        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
+        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
+      });
+    } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
       setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
     }
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState]);
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
   return (
     <AppStateContext.Provider value={{ activeState, setActiveState }}>
       <>
@@ -323,7 +327,6 @@ function AppRoutes({
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
-        <HeadlessEndRoomListener />
         <KeyboardHandler />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
         {roomLayout && activeState && <AppStates activeState={activeState} />}
