@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-// import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
@@ -30,7 +29,6 @@ const Conference = () => {
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
-  // const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
@@ -64,23 +62,6 @@ const Conference = () => {
     };
   }, [dropdownList, hideControls, isMobileDevice]);
 
-  /* useEffect(() => {
-    if (!roomId) {
-      navigate(`/`);
-      return;
-    }
-    if (!isPreviewScreenEnabled) {
-      return;
-    }
-    if (
-      !prevState &&
-      !(roomState === HMSRoomState.Connecting || roomState === HMSRoomState.Reconnecting || isConnectedToRoom)
-    ) {
-      if (role) navigate(`/preview/${roomId || ''}/${role}`);
-      else navigate(`/preview/${roomId || ''}`);
-    }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]); */
-
   useEffect(() => {
     console.log({ authTokenInAppData, isConnectedToRoom, isPreviewScreenEnabled, roomState, autoRoomJoined });
     if (
@@ -111,6 +92,7 @@ const Conference = () => {
     return () => {
       PictureInPicture.stop().catch(error => console.error('stopping pip', error));
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
