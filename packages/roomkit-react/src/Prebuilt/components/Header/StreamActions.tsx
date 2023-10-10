@@ -9,7 +9,9 @@ import {
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
+  // @ts-ignore
 } from '@100mslive/react-sdk';
+// @ts-ignore
 import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
@@ -34,8 +36,8 @@ export const LiveStatus = () => {
 
   const startTimer = useCallback(() => {
     intervalRef.current = setInterval(() => {
-      if (hlsState?.running && hlsState?.variants[0]?.startedAt) {
-        setLiveTime(Date.now() - hlsState.variants[0].startedAt.getTime());
+      if (hlsState?.running && hlsState?.variants[0]?.initialisedAt) {
+        setLiveTime(Date.now() - hlsState.variants[0].initialisedAt.getTime());
       }
     }, 1000);
   }, [hlsState?.running, hlsState?.variants]);

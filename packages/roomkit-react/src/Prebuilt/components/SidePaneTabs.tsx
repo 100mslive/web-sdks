@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+// @ts-ignore: No implicit Any
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { Chat } from './Chat/Chat';
@@ -112,7 +114,7 @@ export const SidePaneTabs = React.memo<{
                   'Chat'
                 ) : (
                   <span>
-                    Participants <ParticipantCount count={peerCount} />
+                    Participants&nbsp;<ParticipantCount count={peerCount} />
                   </span>
                 )}
               </Text>

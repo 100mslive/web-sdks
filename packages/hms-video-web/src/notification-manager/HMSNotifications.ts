@@ -105,6 +105,7 @@ export interface RoomState {
     };
     hls: {
       started_at?: number;
+      initialised_at?: number;
       enabled: boolean;
       config?: {
         hls_vod: boolean;
@@ -225,14 +226,26 @@ export interface RTMPNotification {
   error?: ServerError;
 }
 
+export interface HLSRecording {
+  hls_vod: boolean;
+  single_file_per_layer: boolean;
+}
+
 export interface HLSNotification {
   enabled: boolean;
   variants?: Array<HLSVariantInfo>;
   error?: ServerError;
-  hls_recording?: {
-    hls_vod: boolean;
-    single_file_per_layer: boolean;
-  };
+  hls_recording?: HLSRecording;
+}
+
+export interface HLSINITVariantInfo {
+  initialised_at?: number;
+}
+
+export interface HLSINITNotification {
+  error?: ServerError;
+  variants?: Array<HLSINITVariantInfo>;
+  hls_recording?: HLSRecording;
 }
 
 export interface HLSVariantInfo {
