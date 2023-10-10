@@ -20,7 +20,7 @@ import AnalyticsEventFactory from '../AnalyticsEventFactory';
 export class PublishStatsAnalytics extends BaseStatsAnalytics {
   protected trackAnalytics: Map<string, RunningLocalTrackAnalytics> = new Map();
 
-  protected toAnalytics = (): PublishAnalyticPayload => {
+  protected toAnalytics(): PublishAnalyticPayload {
     const audio: LocalAudioTrackAnalytics[] = [];
     const video: LocalVideoTrackAnalytics[] = [];
     this.trackAnalytics.forEach(trackAnalytic => {
@@ -37,13 +37,13 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
       sequence_num: this.sequenceNum++,
       max_window_sec: PUBLISH_STATS_SAMPLE_WINDOW,
     };
-  };
+  }
 
-  protected sendEvent = () => {
+  protected sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
-  };
+  }
 
-  protected handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
+  protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     const localTracksStats = hmsStats.getLocalTrackStats();
     Object.keys(localTracksStats).forEach(trackIDBeingSent => {
       const trackStats = localTracksStats[trackIDBeingSent];
@@ -74,7 +74,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
         }
       });
     });
-  };
+  }
 
   private getTrackIdentifier(trackId: string, stats: HMSTrackStats) {
     return stats.rid ? `${trackId}:${stats.rid}` : trackId;

@@ -19,7 +19,7 @@ import AnalyticsEventFactory from '../AnalyticsEventFactory';
 export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
   protected trackAnalytics: Map<string, RunningRemoteTrackAnalytics> = new Map();
 
-  protected toAnalytics = (): SubscribeAnalyticPayload => {
+  protected toAnalytics(): SubscribeAnalyticPayload {
     const audio: RemoteAudioTrackAnalytis[] = [];
     const video: RemoteVideoTrackAnalytics[] = [];
     this.trackAnalytics.forEach(trackAnalytic => {
@@ -36,13 +36,13 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
       sequence_num: this.sequenceNum++,
       max_window_sec: SUBSCRIBE_STATS_SAMPLE_WINDOW,
     };
-  };
+  }
 
-  protected sendEvent = () => {
+  protected sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeStats(this.toAnalytics()));
-  };
+  }
 
-  protected handleStatsUpdate = (hmsStats: HMSWebrtcStats) => {
+  protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     const remoteTracksStats = hmsStats.getAllRemoteTracksStats();
     Object.keys(remoteTracksStats).forEach(trackID => {
       const trackStats = remoteTracksStats[trackID];
@@ -62,7 +62,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
         }
       }
     });
-  };
+  }
 }
 
 class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {

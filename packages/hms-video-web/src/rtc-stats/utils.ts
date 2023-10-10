@@ -4,6 +4,7 @@ import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { RID } from '../interfaces';
 import {
+  HMSLocalTrackStats,
   HMSPeerStats,
   HMSTrackStats,
   MissingInboundStats,
@@ -53,7 +54,7 @@ export const getLocalTrackStats = async (
       if (mimeType) {
         codec = mimeType.substring(mimeType.indexOf('/') + 1);
       }
-      const out = { ...outbound[stat], rid: outbound[stat]?.rid as RID | undefined };
+      const out = { ...outbound[stat], rid: (outbound[stat] as HMSLocalTrackStats)?.rid as RID | undefined };
       const inStats = inbound[out.ssrc];
       trackStats[stat] = {
         ...out,

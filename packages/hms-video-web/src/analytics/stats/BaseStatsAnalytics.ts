@@ -37,15 +37,15 @@ export abstract class BaseStatsAnalytics {
     }
     this.stop();
     this.shouldSendEvent = true;
-    this.eventBus.statsUpdate.subscribe(this.handleStatsUpdate);
-    this.startLoop().catch(e => HMSLogger.e('[PublishStatsAnalytics]', e.message));
+    this.eventBus.statsUpdate.subscribe(this.handleStatsUpdate.bind(this));
+    this.startLoop().catch(e => HMSLogger.e('[StatsAnanlytics]', e.message));
   }
 
   stop = () => {
     if (this.shouldSendEvent) {
       this.sendEvent();
     }
-    this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate);
+    this.eventBus.statsUpdate.unsubscribe(this.handleStatsUpdate.bind(this));
     this.shouldSendEvent = false;
   };
 
@@ -56,11 +56,11 @@ export abstract class BaseStatsAnalytics {
     }
   }
 
-  protected abstract sendEvent: () => void;
+  protected abstract sendEvent(): void;
 
-  protected abstract toAnalytics: () => PublishAnalyticPayload | SubscribeAnalyticPayload;
+  protected abstract toAnalytics(): PublishAnalyticPayload | SubscribeAnalyticPayload;
 
-  protected abstract handleStatsUpdate: (hmsStats: HMSWebrtcStats) => void;
+  protected abstract handleStatsUpdate(hmsStats: HMSWebrtcStats): void;
 }
 
 type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
