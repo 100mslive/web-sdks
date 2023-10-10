@@ -7,7 +7,7 @@ import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
-  HLSINITNotification,
+  HLSInitNotification,
   HLSNotification,
   PeerListNotification,
   PeriodicRoomState,
@@ -51,7 +51,7 @@ export class RoomUpdateManager {
         this.handleSessionInfo(notification as SessionInfo);
         break;
       case HMSNotificationMethod.HLS_INIT:
-        this.InitHLS(notification as HLSINITNotification);
+        this.InitHLS(notification as HLSInitNotification);
         break;
       default:
         this.onHLS(method, notification as HLSNotification);
@@ -127,7 +127,7 @@ export class RoomUpdateManager {
     this.setRecordingStatus(false, notification);
   }
 
-  private InitHLS(notification: HLSINITNotification) {
+  private InitHLS(notification: HLSInitNotification) {
     const room = this.store.getRoom();
     if (!room) {
       HMSLogger.w(this.TAG, 'on hls - room not present');

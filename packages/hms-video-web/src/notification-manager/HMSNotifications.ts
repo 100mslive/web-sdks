@@ -238,13 +238,13 @@ export interface HLSNotification {
   hls_recording?: HLSRecording;
 }
 
-export interface HLSINITVariantInfo {
+export interface HLSInitVariantInfo {
   initialised_at?: number;
 }
 
-export interface HLSINITNotification {
+export interface HLSInitNotification {
   error?: ServerError;
-  variants?: Array<HLSINITVariantInfo>;
+  variants?: Array<HLSInitVariantInfo>;
   hls_recording?: HLSRecording;
 }
 
