@@ -57,12 +57,10 @@ const getParticipantChipContent = (peerCount = 0) => {
 };
 
 const PreviewJoin = ({
-  onJoin,
   skipPreview,
   initialName,
   asRole,
 }: {
-  onJoin: () => void;
   skipPreview?: boolean;
   initialName?: string;
   asRole?: string;
@@ -102,16 +100,19 @@ const PreviewJoin = ({
       name,
     });
     join();
-    onJoin && onJoin();
-  }, [join, name, setPreviewPreference, onJoin]);
+  }, [join, name, setPreviewPreference]);
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
   const localPeer = useHMSStore(selectLocalPeer);
   const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
   const isMobile = useMedia(cssConfig.media.md);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
+  let aspectRatio = 0;
+  if (videoTrack?.width && videoTrack?.height) {
+    aspectRatio = videoTrack.width / videoTrack.height;
+  } else {
+    aspectRatio = isMobile ? 9 / 16 : 16 / 9;
+  }
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -169,7 +170,7 @@ const PreviewJoin = ({
             flexDirection: 'column',
           }}
         >
-          <PreviewTile name={name} error={previewError} />
+          <PreviewTile name={name} error={previewError} aspectRatio={aspectRatio} />
         </Flex>
       ) : null}
       <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
@@ -196,7 +197,7 @@ const Container = styled('div', {
   px: '$10',
 });
 
-export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) => {
+export const PreviewTile = ({ name, error, aspectRatio }: { name: string; error?: boolean; aspectRatio: number }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const { isLocalAudioEnabled, toggleAudio } = useAVToggle();
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -204,10 +205,6 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
-  const isMobile = useMedia(cssConfig.media.md);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
 
   return (
     <StyledVideoTile.Container
@@ -239,9 +236,8 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
-      ) : !error ? (
-        <FullPageProgress />
       ) : null}
+      {!localPeer && !error ? <FullPageProgress /> : null}
 
       {showMuteIcon ? (
         <PrebuiltAudioIndicator>

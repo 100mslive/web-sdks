@@ -2,7 +2,6 @@ import React from 'react';
 import { useSearchParam } from 'react-use';
 import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
-import { PrebuiltStates, useHMSAppStateContext } from '../../AppStateContext';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
@@ -22,17 +21,8 @@ const PreviewContainer = () => {
   const initialName = userName || (skipPreview ? 'Beam' : '');
   const authToken = useAuthToken();
   const roomLayout = useRoomLayout();
-  const { setActiveState } = useHMSAppStateContext();
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
 
-  const onJoin = () => {
-    // let meetingURL = `/meeting/${urlRoomId}`;
-    // if (userRole) {
-    //   meetingURL += `/${userRole}`;
-    // }
-    // navigate(meetingURL);
-    setActiveState(PrebuiltStates.MEETING);
-  };
   return (
     <Flex direction="column" css={{ size: '100%' }}>
       <Flex
@@ -41,12 +31,7 @@ const PreviewContainer = () => {
         align="center"
       >
         {authToken && Object.keys(previewHeader).length > 0 ? (
-          <PreviewJoin
-            initialName={initialName}
-            skipPreview={skipPreview}
-            asRole={previewAsRole ?? undefined}
-            onJoin={onJoin}
-          />
+          <PreviewJoin initialName={initialName} skipPreview={skipPreview} asRole={previewAsRole ?? undefined} />
         ) : (
           <FullPageProgress />
         )}

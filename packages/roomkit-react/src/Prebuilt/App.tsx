@@ -1,5 +1,12 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import { usePreviousDistinct } from 'react-use';
+import {
+  HMSRoomState,
+  HMSStatsStoreWrapper,
+  HMSStoreWrapper,
+  IHMSNotifications,
+  selectRoomState,
+} from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
   HMSActions,
@@ -287,12 +294,28 @@ function AppRoutes({
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
   const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
+  const roomState = useHMSStore(selectRoomState);
+  const prevRoomState = usePreviousDistinct(roomState);
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
 
   useEffect(() => {
-    if (roomLayout) {
-      setActiveState(roomLayout.screens?.preview ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    if (!roomLayout) {
+      return;
     }
-  }, [roomLayout]);
+    console.log({ roomState, prevRoomState });
+    if (roomState === HMSRoomState.Connected) {
+      setActiveState(PrebuiltStates.MEETING);
+    } else if (roomState === HMSRoomState.Disconnecting) {
+      const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
+      setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
+    } else if (
+      (!prevRoomState || prevRoomState === HMSRoomState.Disconnected) &&
+      roomState === HMSRoomState.Disconnected
+    ) {
+      setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    }
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState]);
   return (
     <AppStateContext.Provider value={{ activeState, setActiveState }}>
       <>
