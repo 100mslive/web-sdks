@@ -24,8 +24,11 @@ import { ScreenshareToggle } from '../ScreenShareToggle';
 import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
+import { PollsToggle } from './PollsToggle';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { useShowPolls } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
 // @ts-ignore: No implicit Any
@@ -46,6 +49,7 @@ export const Footer = ({
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const { showPolls } = useShowPolls();
 
   useEffect(() => {
     if (!isChatOpen && openByDefault) {
@@ -108,6 +112,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
+        {showPolls && <PollsToggle />}
         {!isMobile && elements?.chat && <ChatToggle />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />

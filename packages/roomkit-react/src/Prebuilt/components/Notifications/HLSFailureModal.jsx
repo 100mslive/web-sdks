@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectHLSState, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
@@ -11,10 +11,11 @@ export function HLSFailureModal() {
   const { hlsError } = useHMSStore(selectHLSState).error || false;
   const [openModal, setOpenModal] = useState(!!hlsError);
   const hmsActions = useHMSActions();
+  const { isRTMPRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted) {
+      if (isHLSStarted || isRTMPRunning) {
         return;
       }
       setHLSStarted(true);
@@ -26,7 +27,7 @@ export function HLSFailureModal() {
       }
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSStarted, setHLSStarted]);
+  }, [hmsActions, isHLSStarted, setHLSStarted, isRTMPRunning]);
 
   return hlsError ? (
     <Dialog.Root

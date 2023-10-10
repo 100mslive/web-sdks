@@ -82,10 +82,10 @@ export class RoomUpdateManager {
 
   private handlePreviewRoomState(notification: PeriodicRoomState) {
     const { room } = notification;
-    this.onRoomState(room, notification.peer_count);
+    this.onRoomState(room);
   }
 
-  private onRoomState(roomNotification: RoomState, peerCount?: number) {
+  private onRoomState(roomNotification: RoomState) {
     const { recording, streaming, session_id, started_at, name } = roomNotification;
     const room = this.store.getRoom();
     if (!room) {
@@ -93,7 +93,6 @@ export class RoomUpdateManager {
       return;
     }
 
-    room.peerCount = peerCount;
     room.name = name;
     room.recording.server.running = !!recording?.sfu.enabled;
     room.recording.browser.running = !!recording?.browser.enabled;
@@ -125,7 +124,11 @@ export class RoomUpdateManager {
   }
 
   private onHLS(method: string, notification: HLSNotification) {
-    if (![HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(method as HMSNotificationMethod)) {
+    if (
+      ![HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(
+        method as HMSNotificationMethod,
+      )
+    ) {
       return;
     }
     const room = this.store.getRoom();
@@ -134,7 +137,9 @@ export class RoomUpdateManager {
       return;
     }
 
-    notification.enabled = method === HMSNotificationMethod.HLS_START && !notification.error?.code;
+    notification.enabled =
+      [HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START].includes(method as HMSNotificationMethod) &&
+      !notification.error?.code;
     room.hls = this.convertHls(notification);
     room.recording.hls = this.getHLSRecording(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);

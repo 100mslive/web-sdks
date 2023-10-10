@@ -149,11 +149,7 @@ const VirtualizedParticipants = ({
         flex: '1 1 0',
       }}
     >
-      <Accordion.Root
-        type={isLargeRoom ? 'single' : 'multiple'}
-        collapsible
-        css={{ borderRadius: '$1', border: '1px solid $border_bright' }}
-      >
+      <Accordion.Root type={isLargeRoom ? 'single' : 'multiple'} collapsible>
         {handRaisedList.length > 0 ? (
           <RoleAccordion
             peerList={handRaisedList}
@@ -180,7 +176,7 @@ const VirtualizedParticipants = ({
   );
 };
 
-export const Participant = ({ peer, isConnected }) => {
+export const Participant = ({ peer, isConnected, style }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
     <Flex
@@ -195,8 +191,12 @@ export const Participant = ({ peer, isConnected }) => {
       align="center"
       justify="between"
       data-testid={'participant_' + peer.name}
+      style={style}
     >
-      <Text variant="sm" css={{ ...textEllipsis(150), fontWeight: '$semiBold', color: '$on_surface_high' }}>
+      <Text
+        variant="sm"
+        css={{ ...textEllipsis('100%'), flex: '1 1 0', mr: '$8', fontWeight: '$semiBold', color: '$on_surface_high' }}
+      >
         {peer.name} {localPeerId === peer.id ? '(You)' : ''}
       </Text>
       {isConnected ? (

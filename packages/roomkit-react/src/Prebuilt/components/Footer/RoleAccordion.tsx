@@ -4,7 +4,7 @@ import { FixedSizeList } from 'react-window';
 import { HMSPeer, selectIsLargeRoom, useHMSStore, usePaginatedParticipants } from '@100mslive/react-sdk';
 import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
-import { Box, Flex } from '../../../Layout';
+import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
@@ -21,7 +21,7 @@ export interface ItemData {
 }
 
 export function itemKey(index: number, data: ItemData) {
-  return data.peerList[index].id;
+  return data.peerList[index]?.id;
 }
 
 export const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
@@ -64,12 +64,16 @@ export const RoleAccordion = ({
     return null;
   }
 
-  const height = ROW_HEIGHT * (peers.length || peerList.length);
   const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
+  const height = ROW_HEIGHT * peersInAccordion.length;
   const hasNext = total > peersInAccordion.length;
 
+  if (peersInAccordion.length === 0) {
+    return null;
+  }
+
   return (
-    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' } }} ref={ref}>
+    <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>
       <Accordion.Header
         iconStyles={{ c: '$on_surface_high' }}
         css={{
@@ -78,6 +82,12 @@ export const RoleAccordion = ({
           fontSize: '$sm',
           fontWeight: '$semiBold',
           c: '$on_surface_medium',
+          borderRadius: '$1',
+          border: '1px solid $border_default',
+          '&[data-state="open"]': {
+            borderBottomLeftRadius: 0,
+            borderBottomRightRadius: 0,
+          },
         }}
       >
         <Flex justify="between" css={{ flexGrow: 1, pr: '$6' }}>
@@ -90,8 +100,7 @@ export const RoleAccordion = ({
           <RoleOptions roleName={roleName} peerList={peersInAccordion} />
         </Flex>
       </Accordion.Header>
-      <Accordion.Content>
-        <Box css={{ borderTop: '1px solid $border_default' }} />
+      <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
         <FixedSizeList
           itemSize={ROW_HEIGHT}
           itemData={{ peerList: peersInAccordion, isConnected }}
@@ -110,7 +119,8 @@ export const RoleAccordion = ({
               gap: '$1',
               cursor: 'pointer',
               color: '$on_surface_high',
-              px: '$4',
+              p: '$6',
+              borderTop: '1px solid $border_default',
             }}
             onClick={() => onActive?.(roleName)}
           >
