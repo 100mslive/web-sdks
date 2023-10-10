@@ -1,5 +1,4 @@
-import React, { MutableRefObject, ReactElement, Suspense, useEffect, useRef } from 'react';
-import { BrowserRouter, MemoryRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
+import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
@@ -15,9 +14,9 @@ import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
 // @ts-ignore: No implicit Any
-import { ErrorBoundary } from './components/ErrorBoundary';
+import Conference from './components/Conference';
 // @ts-ignore: No implicit Any
-import FullPageProgress from './components/FullPageProgress';
+import { ErrorBoundary } from './components/ErrorBoundary';
 // @ts-ignore: No implicit Any
 import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
@@ -33,7 +32,8 @@ import { ToastContainer } from './components/Toast/ToastContainer';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
-import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
+import { HMSPrebuiltContext } from './AppContext';
+import { AppStateContext, PrebuiltStates } from './AppStateContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
@@ -47,9 +47,6 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
-
-// @ts-ignore: No implicit Any
-const Conference = React.lazy(() => import('./components/conference'));
 
 export type HMSPrebuiltOptions = {
   userName?: string;
@@ -245,66 +242,22 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
-const Redirector = ({ showPreview }: { showPreview: boolean }) => {
-  const { roomId, role } = useParams();
-  return <Navigate to={`/${showPreview ? 'preview' : 'meeting'}/${roomId}/${role || ''}`} />;
-};
-
-const RouteList = () => {
+const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
-  return (
-    <Routes>
-      {isPreviewScreenEnabled ? (
-        <Route path="preview">
-          <Route
-            path=":roomId/:role"
-            element={
-              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
-                <PreviewContainer />
-              </Suspense>
-            }
-          />
-          <Route
-            path=":roomId"
-            element={
-              <Suspense fallback={<FullPageProgress text="Loading preview..." />}>
-                <PreviewContainer />
-              </Suspense>
-            }
-          />
-        </Route>
-      ) : null}
-      <Route path="meeting">
-        <Route
-          path=":roomId/:role"
-          element={
-            <Suspense fallback={<FullPageProgress text="Joining..." />}>
-              <Conference />
-            </Suspense>
-          }
-        />
-        <Route
-          path=":roomId"
-          element={
-            <Suspense fallback={<FullPageProgress text="Joining..." />}>
-              <Conference />
-            </Suspense>
-          }
-        />
-      </Route>
-      {isLeaveScreenEnabled ? (
-        <Route path="leave">
-          <Route path=":roomId/:role" element={<PostLeave />} />
-          <Route path=":roomId" element={<PostLeave />} />
-        </Route>
-      ) : null}
 
-      <Route path="/:roomId/:role" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
-      <Route path="/:roomId/" element={<Redirector showPreview={isPreviewScreenEnabled} />} />
-    </Routes>
-  );
+  function renderContent(state: PrebuiltStates) {
+    switch (state) {
+      case PrebuiltStates.PREVIEW:
+        return isPreviewScreenEnabled ? <PreviewContainer /> : null;
+      case PrebuiltStates.MEETING:
+        return <Conference />;
+      case PrebuiltStates.LEAVE:
+        return isLeaveScreenEnabled ? <PostLeave /> : null;
+    }
+  }
+  return <>{renderContent(activeState)}</>;
 };
 
 const BackSwipe = () => {
@@ -324,17 +277,6 @@ const BackSwipe = () => {
   return null;
 };
 
-const Router = ({ children }: { children: ReactElement }) => {
-  const { roomId, role, roomCode } = useHMSPrebuiltContext();
-  return [roomId, role, roomCode].every(value => !value) ? (
-    <BrowserRouter>{children}</BrowserRouter>
-  ) : (
-    <MemoryRouter initialEntries={[`/${roomCode ? roomCode : `${roomId}/${role || ''}`}`]} initialIndex={0}>
-      {children}
-    </MemoryRouter>
-  );
-};
-
 function AppRoutes({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
@@ -344,8 +286,15 @@ function AppRoutes({
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
+  const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
+
+  useEffect(() => {
+    if (roomLayout) {
+      setActiveState(roomLayout.screens?.preview ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    }
+  }, [roomLayout]);
   return (
-    <Router>
+    <AppStateContext.Provider value={{ activeState, setActiveState }}>
       <>
         <ToastContainer />
         <Notifications />
@@ -355,12 +304,8 @@ function AppRoutes({
         <HeadlessEndRoomListener />
         <KeyboardHandler />
         <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
-        {roomLayout && (
-          <Routes>
-            <Route path="/*" element={<RouteList />} />
-          </Routes>
-        )}
+        {roomLayout && activeState && <AppStates activeState={activeState} />}
       </>
-    </Router>
+    </AppStateContext.Provider>
   );
 }

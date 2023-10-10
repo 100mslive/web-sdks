@@ -1,8 +1,8 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useSearchParam } from 'react-use';
 import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
+import { PrebuiltStates, useHMSAppStateContext } from '../../AppStateContext';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../FullPageProgress';
@@ -15,23 +15,23 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 const PreviewContainer = () => {
-  const navigate = useNavigate();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   const { userName } = useHMSPrebuiltContext();
   const initialName = userName || (skipPreview ? 'Beam' : '');
-  const { roomId: urlRoomId, role: userRole } = useParams(); // from the url
   const authToken = useAuthToken();
   const roomLayout = useRoomLayout();
+  const { setActiveState } = useHMSAppStateContext();
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
 
   const onJoin = () => {
-    let meetingURL = `/meeting/${urlRoomId}`;
-    if (userRole) {
-      meetingURL += `/${userRole}`;
-    }
-    navigate(meetingURL);
+    // let meetingURL = `/meeting/${urlRoomId}`;
+    // if (userRole) {
+    //   meetingURL += `/${userRole}`;
+    // }
+    // navigate(meetingURL);
+    setActiveState(PrebuiltStates.MEETING);
   };
   return (
     <Flex direction="column" css={{ size: '100%' }}>

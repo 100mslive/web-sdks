@@ -1,33 +1,37 @@
 import { useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { useHMSPrebuiltContext } from '../../AppContext';
+import { PrebuiltStates, useHMSAppStateContext } from '../../AppStateContext';
 // @ts-ignore: No implicit Any
 import { PictureInPicture } from '../PIP/PIPManager';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
-import { useRoomLayoutLeaveScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export const useRedirectToLeave = () => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { onLeave } = useHMSPrebuiltContext();
-  const params = useParams();
-  const navigate = useNavigate();
+  const { setActiveState } = useHMSAppStateContext();
 
   const redirect = useCallback(
     (timeout = 0) => {
       setTimeout(() => {
-        const prefix = isLeaveScreenEnabled ? '/leave/' : '/';
-        if (params.role) {
-          navigate(prefix + params.roomId + '/' + params.role);
-        } else {
-          navigate(prefix + params.roomId);
-        }
         PictureInPicture.stop().catch(() => console.error('stopping pip'));
+        setActiveState(
+          isLeaveScreenEnabled
+            ? PrebuiltStates.LEAVE
+            : isPreviewScreenEnabled
+            ? PrebuiltStates.PREVIEW
+            : PrebuiltStates.MEETING,
+        );
         ToastManager.clearAllToast();
         onLeave?.();
       }, timeout);
     },
-    [isLeaveScreenEnabled, navigate, onLeave, params.role, params.roomId],
+    [isLeaveScreenEnabled, isPreviewScreenEnabled, onLeave, setActiveState],
   );
 
   return { redirectToLeave: redirect };

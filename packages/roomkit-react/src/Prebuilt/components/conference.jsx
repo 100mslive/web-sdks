@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { usePrevious } from 'react-use';
+// import { usePrevious } from 'react-use';
 import {
   HMSRoomState,
   selectAppData,
@@ -27,13 +26,11 @@ import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 const Conference = () => {
-  const navigate = useNavigate();
-  const { roomId, role } = useParams();
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
-  const prevState = usePrevious(roomState);
+  // const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
@@ -67,7 +64,7 @@ const Conference = () => {
     };
   }, [dropdownList, hideControls, isMobileDevice]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (!roomId) {
       navigate(`/`);
       return;
@@ -82,9 +79,10 @@ const Conference = () => {
       if (role) navigate(`/preview/${roomId || ''}/${role}`);
       else navigate(`/preview/${roomId || ''}`);
     }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]);
+  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]); */
 
   useEffect(() => {
+    console.log({ authTokenInAppData, isConnectedToRoom, isPreviewScreenEnabled, roomState, autoRoomJoined });
     if (
       authTokenInAppData &&
       !isConnectedToRoom &&

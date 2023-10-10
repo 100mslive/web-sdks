@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
@@ -14,6 +13,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Button } from '../../..';
+import { PrebuiltStates, useHMSAppStateContext } from '../../AppStateContext';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -27,6 +27,7 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -39,13 +40,13 @@ import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
-  const navigate = useNavigate();
-  const params = useParams();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
   const { redirectToLeave } = useRedirectToLeave();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { setActiveState } = useHMSAppStateContext();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
@@ -106,7 +107,7 @@ export function Notifications() {
                 <Button
                   onClick={() => {
                     ToastManager.removeToast(toastId);
-                    navigate(`/${params.roomId}${params.role ? `/${params.role}` : ''}`);
+                    setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
                   }}
                 >
                   Rejoin
