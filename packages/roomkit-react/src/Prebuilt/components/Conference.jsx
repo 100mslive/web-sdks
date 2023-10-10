@@ -63,7 +63,6 @@ const Conference = () => {
   }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
-    console.log({ authTokenInAppData, isConnectedToRoom, isPreviewScreenEnabled, roomState, autoRoomJoined });
     if (
       authTokenInAppData &&
       !isConnectedToRoom &&
