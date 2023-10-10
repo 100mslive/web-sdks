@@ -114,7 +114,7 @@ export const SidePaneTabs = React.memo<{
                   'Chat'
                 ) : (
                   <span>
-                    Participants&nbsp;<ParticipantCount count={peerCount} />
+                    Participants <ParticipantCount count={peerCount} />
                   </span>
                 )}
               </Text>
@@ -153,7 +153,7 @@ export const SidePaneTabs = React.memo<{
                     color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
                   }}
                 >
-                  Participants <ParticipantCount count={peerCount} />
+                  Participants &nbsp; <ParticipantCount count={peerCount} />
                 </Tabs.Trigger>
               </Tabs.List>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
