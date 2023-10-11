@@ -6,6 +6,7 @@ import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import androidPermissionAlert from '../../images/android-perm-1.png';
 // @ts-ignore: No implicit Any
 import iosPermissions from '../../images/ios-perm-0.png';
+// @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorModal() {
