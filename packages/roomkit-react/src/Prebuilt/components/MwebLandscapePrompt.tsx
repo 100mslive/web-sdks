@@ -4,6 +4,7 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
+// @ts-ignore
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
