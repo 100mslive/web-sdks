@@ -9,7 +9,6 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
   HLSInitNotification,
   HLSNotification,
-  HLSVariantInfo,
   PeerListNotification,
   PeriodicRoomState,
   RecordingNotification,
@@ -106,7 +105,11 @@ export class RoomUpdateManager {
     room.recording.server.startedAt = convertDateNumToDate(recording?.sfu.started_at);
     room.recording.browser.startedAt = convertDateNumToDate(recording?.browser.started_at);
     room.recording.hls = this.getPeerListHLSRecording(recording);
-    room.hls = this.convertHls(streaming?.hls, streaming?.hls?.variants);
+    const streamVariants =
+      streaming?.hls?.variants?.map(variant => {
+        return { ...variant, initialisedAt: convertDateNumToDate(variant.initialised_at) };
+      }) || [];
+    room.hls = this.convertHls(streaming?.hls, streamVariants);
     room.sessionId = session_id;
     room.startedAt = convertDateNumToDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
@@ -168,15 +171,14 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
-  private convertHls(hlsNotification?: HLSNotification, variants?: HLSVariant[] | HLSVariantInfo[]) {
+  private convertHls(hlsNotification?: HLSNotification, variants?: HLSVariant[]) {
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
     hlsNotification?.variants?.forEach((variant, index) => {
-      // @ts-ignore
-      const initialisedAt = variants?.[index]?.initialisedAt || convertDateNumToDate(variants?.[index]?.initialised_at);
+      const initialisedAt = variants?.[index]?.initialisedAt;
       hls.variants.push({
         meetingURL: variant.meeting_url,
         url: variant.url,
