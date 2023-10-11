@@ -9,6 +9,7 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import {
   HLSInitNotification,
   HLSNotification,
+  HLSVariantInfo,
   PeerListNotification,
   PeriodicRoomState,
   RecordingNotification,
@@ -167,14 +168,15 @@ export class RoomUpdateManager {
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
-  private convertHls(hlsNotification?: HLSNotification, variants?: HLSVariant[]) {
+  private convertHls(hlsNotification?: HLSNotification, variants?: HLSVariant[] | HLSVariantInfo[]) {
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
     hlsNotification?.variants?.forEach((variant, index) => {
-      const initialisedAt = variants?.[index].initialisedAt;
+      // @ts-ignore
+      const initialisedAt = variants?.[index]?.initialisedAt || convertDateNumToDate(variants?.[index]?.initialised_at);
       hls.variants.push({
         meetingURL: variant.meeting_url,
         url: variant.url,

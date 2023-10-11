@@ -19,6 +19,7 @@ import { Sheet } from '../../../Sheet';
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
 import { AdditionalRoomState, getRecordingText } from './AdditionalRoomState';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore
@@ -31,13 +32,14 @@ export const LiveStatus = () => {
   const hlsState = useHMSStore(selectHLSState);
   const isMobile = useMedia(cssConfig.media.md);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
+  const { screenType } = useRoomLayoutConferencingScreen();
   const [liveTime, setLiveTime] = useState(0);
 
   const startTimer = useCallback(() => {
     intervalRef.current = setInterval(() => {
-      if (hlsState?.running && hlsState?.variants[0]?.initialisedAt) {
-        setLiveTime(Date.now() - hlsState.variants[0].initialisedAt.getTime());
+      const timeStamp = hlsState?.variants[0]?.[screenType === 'hls_live_streaming' ? 'startedAt' : 'initialisedAt'];
+      if (hlsState?.running && timeStamp) {
+        setLiveTime(Date.now() - timeStamp.getTime());
       }
     }, 1000);
   }, [hlsState?.running, hlsState?.variants]);

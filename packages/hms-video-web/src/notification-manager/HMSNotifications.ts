@@ -253,6 +253,7 @@ export interface HLSVariantInfo {
   meeting_url?: string;
   metadata?: string;
   started_at?: number;
+  initialised_at?: number;
 }
 
 export interface MetadataChangeNotification {
