@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useRef } from 'react';
 import { Root } from '@radix-ui/react-dialog';
 import { styled } from '@stitches/react';
 import { CSS } from '../Theme';
@@ -25,19 +25,15 @@ const CustomDialogOverlay = ({ css = {} }: { css?: CSS }) => (
 );
 const CustomDialogPortal = ({ children, container }: { children: ReactNode; container?: HTMLElement | null }) => {
   const dialogContainerSelector = useDialogContainerSelector();
-  return (
-    <StyledDialogPortal
-      container={
-        container
-          ? container
-          : dialogContainerSelector
-          ? (document.querySelector(dialogContainerSelector) as HTMLElement)
-          : undefined
-      }
-    >
-      {children}
-    </StyledDialogPortal>
-  );
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  if (container) {
+    containerRef.current = container;
+  } else if (dialogContainerSelector && !containerRef.current) {
+    containerRef.current = document.querySelector(dialogContainerSelector) as HTMLElement;
+  }
+
+  return <StyledDialogPortal container={containerRef.current}>{children}</StyledDialogPortal>;
 };
 
 export const Dialog = {
