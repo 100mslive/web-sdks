@@ -40,7 +40,7 @@ import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
-import { getFormattedCount, calculateAvatarAndAttribBoxSize } from '../../common/utils';
+import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 

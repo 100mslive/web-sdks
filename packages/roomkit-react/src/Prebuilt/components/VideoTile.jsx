@@ -23,8 +23,8 @@ import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 import { calculateAvatarAndAttribBoxSize } from '../common/utils';
+import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
 
 const Tile = ({
   peerId,
