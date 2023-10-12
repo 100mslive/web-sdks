@@ -24,6 +24,7 @@ import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
+import { calculateAvatarAndAttribBoxSize } from '../common/utils';
 
 const Tile = ({
   peerId,
@@ -75,23 +76,10 @@ const Tile = ({
 
   const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
 
-  const [avatarSize, attribBoxSize] = useMemo(() => {
-    if (!calculatedWidth || !calculatedHeight) {
-      return [undefined, undefined];
-    }
-    let avatarSize = 'large';
-    if (calculatedWidth <= 150 || calculatedHeight <= 150) {
-      avatarSize = 'small';
-    } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
-      avatarSize = 'medium';
-    }
-    let attribBoxSize = 'medium';
-    if (calculatedWidth <= 180 || calculatedHeight <= 180) {
-      attribBoxSize = 'small';
-    }
-
-    return [avatarSize, attribBoxSize];
-  }, [calculatedWidth, calculatedHeight]);
+  const [avatarSize, attribBoxSize] = useMemo(
+    () => calculateAvatarAndAttribBoxSize(calculatedWidth, calculatedHeight),
+    [calculatedWidth, calculatedHeight],
+  );
 
   return (
     <StyledVideoTile.Root
