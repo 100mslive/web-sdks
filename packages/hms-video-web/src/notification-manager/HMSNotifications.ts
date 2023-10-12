@@ -237,16 +237,6 @@ export interface HLSNotification {
   hls_recording?: HLSRecording;
 }
 
-export interface HLSInitVariantInfo {
-  initialised_at?: number;
-}
-
-export interface HLSInitNotification {
-  error?: ServerError;
-  variants?: Array<HLSInitVariantInfo>;
-  hls_recording?: HLSRecording;
-}
-
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;

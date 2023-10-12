@@ -9,9 +9,7 @@ import {
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
-  // @ts-ignore
 } from '@100mslive/react-sdk';
-// @ts-ignore
 import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
