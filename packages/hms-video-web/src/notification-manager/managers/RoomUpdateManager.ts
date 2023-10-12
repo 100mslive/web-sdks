@@ -1,6 +1,6 @@
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
-import { HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
+import { HLSVariant, HMSHLS, HMSHLSRecording, HMSRoomUpdate, HMSUpdateListener } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';
 import { IStore } from '../../sdk/store';
 import { convertDateNumToDate } from '../../utils/date';
@@ -48,6 +48,9 @@ export class RoomUpdateManager {
         break;
       case HMSNotificationMethod.SESSION_INFO:
         this.handleSessionInfo(notification as SessionInfo);
+        break;
+      case HMSNotificationMethod.HLS_INIT:
+        this.InitHLS(notification as HLSNotification);
         break;
       default:
         this.onHLS(method, notification as HLSNotification);
@@ -101,7 +104,11 @@ export class RoomUpdateManager {
     room.recording.server.startedAt = convertDateNumToDate(recording?.sfu.started_at);
     room.recording.browser.startedAt = convertDateNumToDate(recording?.browser.started_at);
     room.recording.hls = this.getPeerListHLSRecording(recording);
-    room.hls = this.convertHls(streaming?.hls);
+    const streamVariants =
+      streaming?.hls?.variants?.map(variant => {
+        return { ...variant, initialisedAt: convertDateNumToDate(variant.initialised_at) };
+      }) || [];
+    room.hls = this.convertHls(streaming?.hls, streamVariants);
     room.sessionId = session_id;
     room.startedAt = convertDateNumToDate(started_at);
     this.listener?.onRoomUpdate(HMSRoomUpdate.RECORDING_STATE_UPDATED, room);
@@ -123,6 +130,25 @@ export class RoomUpdateManager {
     this.setRecordingStatus(false, notification);
   }
 
+  private InitHLS(notification: HLSNotification) {
+    const room = this.store.getRoom();
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on hls - room not present');
+      return;
+    }
+    if (!notification?.variants) {
+      return;
+    }
+    room.hls.variants = [];
+    notification.variants.forEach((_: HLSVariant, index: number) => {
+      room.hls.variants.push({
+        initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+        url: '',
+      });
+    });
+    this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
+  }
+
   private onHLS(method: string, notification: HLSNotification) {
     if (
       ![HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START, HMSNotificationMethod.HLS_STOP].includes(
@@ -140,25 +166,28 @@ export class RoomUpdateManager {
     notification.enabled =
       [HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START].includes(method as HMSNotificationMethod) &&
       !notification.error?.code;
-    room.hls = this.convertHls(notification);
+    room.hls = this.convertHls(notification, room.hls.variants);
     room.recording.hls = this.getHLSRecording(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
-  private convertHls(hlsNotification?: HLSNotification) {
+  private convertHls(hlsNotification?: HLSNotification, variants?: HLSVariant[]) {
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
-    hlsNotification?.variants?.forEach(variant => {
+    hlsNotification?.variants?.forEach((variant, index) => {
+      const initialisedAt = variants?.[index]?.initialisedAt;
       hls.variants.push({
         meetingURL: variant.meeting_url,
         url: variant.url,
         metadata: variant.metadata,
         startedAt: convertDateNumToDate(variant.started_at),
+        initialisedAt,
       });
     });
+
     return hls;
   }
 

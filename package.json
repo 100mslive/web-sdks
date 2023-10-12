@@ -61,7 +61,8 @@
     "reactsdk": "cd packages/react-sdk && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
     "storybook": "cd packages/roomkit-react && yarn storybook",
-    "build-storybook": "cd packages/roomkit-react && yarn build-storybook"
+    "build-storybook": "cd packages/roomkit-react && yarn build-storybook",
+    "ybys": "yarn && yarn build && yarn storybook"
   },
   "resolutions": {
     "loader-utils": "^2.0.4"
