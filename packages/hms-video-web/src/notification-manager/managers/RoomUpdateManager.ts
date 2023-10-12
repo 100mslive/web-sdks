@@ -164,7 +164,8 @@ export class RoomUpdateManager {
     }
 
     notification.enabled =
-      HMSNotificationMethod.HLS_START === (method as HMSNotificationMethod) && !notification.error?.code;
+      [HMSNotificationMethod.HLS_INIT, HMSNotificationMethod.HLS_START].includes(method as HMSNotificationMethod) &&
+      !notification.error?.code;
     room.hls = this.convertHls(notification, room.hls.variants);
     room.recording.hls = this.getHLSRecording(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
