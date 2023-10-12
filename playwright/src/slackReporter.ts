@@ -97,7 +97,7 @@ const slackPayload = {
           type: 'section',
           text: {
             type: 'mrkdwn',
-            text: '*Web-Automation results for ${{env.REGION}}: ${{jobStatus}} ${{emoji}}*',
+            text: '*Pre-built Web app automation results for ${{env.REGION}}: ${{jobStatus}} ${{emoji}}*',
           },
         },
         {
