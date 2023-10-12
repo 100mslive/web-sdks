@@ -105,7 +105,6 @@ export interface RoomState {
     };
     hls: {
       started_at?: number;
-      initialised_at?: number;
       enabled: boolean;
       config?: {
         hls_vod: boolean;
