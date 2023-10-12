@@ -74,14 +74,8 @@
   "engines": {
     "node": ">=16"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "lint-staged"
-    }
-  },
   "lint-staged": {
-    "*": "format && lint:fix"
+    "*.(js|ts|jsx|tsx)": "eslint"
   },
   "size-limit": [
     {
