@@ -43,12 +43,13 @@ export class PageWrapper {
   /**
    * open n number of pages and goto meeting room in all of them
    */
-  static async openPages(context: BrowserContext, n: number, joinConfig?: JoinConfig) {
+  static async openPages(context: BrowserContext, roles: string[], joinConfig?: JoinConfig) {
     const pages = [];
     const promises = [];
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < roles.length; i++) {
       joinConfig = joinConfig || {};
       joinConfig.name = process.env.peer_name + i;
+      joinConfig.role = roles[i];
       pages[i] = new PageWrapper(await context.newPage());
       promises.push(pages[i].gotoMeetingRoom(joinConfig));
     }
@@ -63,8 +64,25 @@ export class PageWrapper {
     });
   }
 
-  async gotoMeetingRoom({ url, name, mic, cam }: JoinConfig = {}) {
-    url = url || process.env.audio_video_screenshare_url;
+  async gotoMeetingRoom({ url, name, mic, cam, role }: JoinConfig = {}) {
+    console.log(role);
+    switch(role) {
+      case 'co-broadcaster':
+        url = url || process.env.co_broadcaster;
+        break;
+      case 'viewer-near-realtime':
+        url = url || process.env.viewer_near_realtime;
+        break;
+      case 'viewer-realtime':
+        url = url || process.env.viewer_realtime;
+        break;
+      case 'viewer-on-stage':
+        url = url || process.env.viewer_on_stage;
+        break;
+      default:
+        url = url || process.env.broadcaster;
+    }
+    
     name = name || `${process.env.peer_name}0`;
     if (mic === undefined) {
       mic = false;
@@ -122,7 +140,7 @@ export class PageWrapper {
 
   async assertNotVisible(elementId: string) {
     console.log('going to assert non visibility', elementId);
-    await expect(this.page.locator(elementId)).not.toBeVisible();
+    await expect(this.page.locator(elementId)).toBeHidden();
     console.log('asserted non visibility for', elementId);
   }
 
@@ -166,7 +184,7 @@ export class PageWrapper {
   }
 
   async goto({ url }: { url?: string } = {}) {
-    url = url || process.env.audio_video_screenshare_url;
+    url = url || process.env.broadcaster;
     await this.page.goto(url);
   }
 
@@ -214,7 +232,7 @@ export class PageWrapper {
    */
   async clickOnce(elementId: string) {
     // await expect(this.page.locator(elementId)).toBeEnabled();
-    await this.page.locator(elementId).click();
+    await this.page.locator(elementId).nth(0).click();
     console.log('Clicked: ', elementId);
   }
 
@@ -265,14 +283,8 @@ export class PageWrapper {
    * peers with specific role. Pass msg and "all", or "peername" or "roleName" for sending
    * message to all or particular peer or peers with specific role.
    */
-  async sendMessage(msg: string, to: string) {
-    await this.page.click(this.footer.chat_btn);
-    if (to == 'all') {
-      await this.sendText(this.footer.chat_placeholder, msg);
-    } else {
-      await this.selectPeerOrRole(to);
-      await this.sendText(this.footer.chat_placeholder, msg);
-    }
+  async sendMessage(msg: string) {
+    await this.sendText(this.footer.chat_placeholder, msg);
     await this.pressKey('Enter');
   }
 
@@ -284,6 +296,38 @@ export class PageWrapper {
     await this.page.click(this.footer.chat_peer_selector);
     await this.page.click(`text=${name}`);
   }
+
+  async interceptAndMockLayoutApi(data: any) {
+    await this.page.route('*/**/v2/layouts/ui', async route => {
+      if(route.request().method() == "GET") {
+      const response = await route.fetch();
+      let json = require('./../../test-data/layouts.json');
+      if(data.feature == 'chatPanel')
+      json.data[0].screens.conferencing.default.elements.chat = data.value
+      if((data.feature == 'participantList') && (data.state == 'hidden')) {
+        console.log('deleting... ', data.feature);
+      delete json.data[0].screens.conferencing.default.elements.participant_list;
+      }
+      if((data.feature == 'emojiReactions') && (data.state == 'hidden')) {
+        console.log('deleting... ', data.feature);
+        delete json.data[0].screens.conferencing.default.elements.emoji_reactions;
+        }
+      if(data.feature == 'title')
+        json.data[0].screens.preview.default.elements.preview_header.title = data.value;
+      if(data.feature == 'subTitle')
+        json.data[0].screens.preview.default.elements.preview_header.sub_title = data.value
+      if(data.feature == 'joinButton')
+        json.data[0].screens.preview.default.elements.join_form.join_btn_type = data.value
+
+      await route.fulfill({ response, json });
+      }
+    });
+  }
+
+  async openMessageOptions() {
+    await this.page.click(this.footer.chat_msg);
+    await this.page.click(this.footer.chat_msg_options);
+  }
 }
 
 export interface JoinConfig {
@@ -291,4 +335,5 @@ export interface JoinConfig {
   name?: string;
   cam?: boolean;
   mic?: boolean;
+  role?: string;
 }

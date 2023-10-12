@@ -8,7 +8,7 @@ require('dotenv').config({ path: envPath });
  */
 // require('dotenv').config();
 
-let workers = 1;
+let workers = 2;
 if (process.env.room_ids) {
   // number of workers will be equal to number of room ids given
   // find number of commas and add 1
@@ -43,7 +43,7 @@ const config: PlaywrightTestConfig = {
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   // forbidOnly: isCI,
   /* Retry on CI only */
-  retries: 2,
+  retries: 0,
   /* Opt out of parallel tests on CI. */
   workers: workers,
   fullyParallel: true,
@@ -154,13 +154,11 @@ const setupEnv = () => {
 
     console.log('env setup before all tests for worker - ', workerIndex, baseUrl, roomId);
 
-    process.env.audio_url = getUrl('audio');
-    process.env.audio_video_url = getUrl('audio-video');
-    process.env.audio_video_screenshare_url = getUrl('audio-video-sshare');
-    process.env.screen_share_url = getUrl('screenshare');
-    process.env.video_url = getUrl('video');
-    process.env.viewer_url = getUrl('viewer');
-    process.env.hls_viewer_url = getUrl('hls-viewer');
+    process.env.broadcaster = getUrl('broadcaster');
+    process.env.co_broadcaster = getUrl('co-broadcaster');
+    process.env.viewer_near_realtime = getUrl('viewer-near-realtime');
+    process.env.viewer_realtime = getUrl('viewer-realtime');
+    process.env.viewer_on_stage = getUrl('viewer-on-stage');
 
     const randomNumber = Math.floor(Math.random() * 10000);
     process.env.peer_name = `peer_${randomNumber}_`;
