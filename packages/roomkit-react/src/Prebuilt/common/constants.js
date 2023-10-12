@@ -45,6 +45,7 @@ export const APP_DATA = {
   minimiseInset: 'minimiseInset',
   activeScreensharePeerId: 'activeScreensharePeerId',
   disableNotifications: 'disableNotifications',
+  pollState: 'pollState',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
@@ -59,6 +60,19 @@ export const SIDE_PANE_OPTIONS = {
   PARTICIPANTS: 'Participants',
   CHAT: 'Chat',
   STREAMING: 'STREAMING',
+  POLLS: 'POLLS',
+};
+
+export const POLL_STATE = {
+  pollInView: 'pollInView',
+  view: 'view',
+};
+
+export const POLL_VIEWS = {
+  CREATE_POLL_QUIZ: 'CREATE_POLL_QUIZ',
+  CREATE_QUESTIONS: 'CREATE_QUESTIONS',
+  VOTE: 'VOTE',
+  RESULTS: 'RESULTS',
 };
 
 export const SUBSCRIBED_NOTIFICATIONS = {
@@ -91,6 +105,25 @@ export const SESSION_STORE_KEY = {
   TRANSCRIPTION_STATE: 'transcriptionState',
   PINNED_MESSAGE: 'pinnedMessage',
   SPOTLIGHT: 'spotlight',
+};
+
+export const INTERACTION_TYPE = {
+  POLL: 'Poll',
+  QUIZ: 'Quiz',
+};
+
+export const QUESTION_TYPE_TITLE = {
+  'single-choice': 'Single Choice',
+  'multiple-choice': 'Multiple Choice',
+  // "short-answer": "Short Answer",
+  // "long-answer": "Long Answer",
+};
+
+export const QUESTION_TYPE = {
+  SINGLE_CHOICE: 'single-choice',
+  MULTIPLE_CHOICE: 'multiple-choice',
+  // SHORT_ANSWER: "short-answer",
+  // LONG_ANSWER: "long-answer",
 };
 
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';

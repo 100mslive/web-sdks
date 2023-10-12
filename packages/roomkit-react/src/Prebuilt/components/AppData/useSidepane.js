@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { selectAppData, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { APP_DATA } from '../../common/constants';
+import { usePollViewState } from './useUISettings';
+import { APP_DATA, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 /**
  * Gives a boolean value if the sidepaneType matches current sidepane value in store
@@ -37,6 +38,28 @@ export const useSidepaneToggle = sidepaneType => {
   return toggleSidepane;
 };
 
+export const usePollViewToggle = () => {
+  const { view, setPollState } = usePollViewState();
+  const isOpen = useSidepaneState() === SIDE_PANE_OPTIONS.POLLS;
+  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.POLLS);
+
+  const togglePollView = useCallback(
+    id => {
+      id = typeof id === 'string' ? id : undefined;
+      setPollState({
+        [POLL_STATE.pollInView]: id,
+        [POLL_STATE.view]: id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ,
+      });
+      if (!id) {
+        toggleSidepane();
+      }
+    },
+    [view, setPollState, isOpen, toggleSidepane],
+  );
+
+  return togglePollView;
+};
+
 /**
  * reset's the sidepane value
  */
@@ -44,6 +67,7 @@ export const useSidepaneReset = () => {
   const hmsActions = useHMSActions();
   const resetSidepane = useCallback(() => {
     hmsActions.setAppData(APP_DATA.sidePane, '');
+    hmsActions.setAppData(APP_DATA.pollInView, '');
   }, [hmsActions]);
   return resetSidepane;
 };
