@@ -54,7 +54,7 @@ export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
           <ChevronLeftIcon />
         </Text>
       ) : null}
-      <Box css={{ flex: '1 1 0', justifyContent: 'center' }}>
+      <Box css={{ flex: '1 1 0' }}>
         {title ? (
           <Text
             variant="tiny"

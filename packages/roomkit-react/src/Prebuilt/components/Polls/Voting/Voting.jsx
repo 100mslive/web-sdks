@@ -34,36 +34,36 @@ export const Voting = ({ id, toggleVoting }) => {
 
   return (
     <Container rounded>
-      <Box css={{ px: '$10' }}>
+      <Flex
+        align="center"
+        css={{
+          gap: '$6',
+          py: '$6',
+          px: '$10',
+          my: '$4',
+          w: '100%',
+          color: '$on_surface_high',
+          borderBottom: '1px solid $border_default',
+        }}
+      >
         <Flex
-          align="center"
+          onClick={() => setPollView(POLL_VIEWS.CREATE_POLL_QUIZ)}
+          css={{ cursor: 'pointer', c: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+        >
+          <ChevronLeftIcon />
+        </Flex>
+        <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
+        <StatusIndicator isLive={isLive} shouldShowTimer={isLive && isTimed} />
+        <Box
           css={{
-            gap: '$6',
-            py: '$10',
-            w: '100%',
-            color: '$on_surface_high',
-            borderBottom: '1px solid $border_default',
+            marginLeft: 'auto',
+            cursor: 'pointer',
+            '&:hover': { opacity: '0.8' },
           }}
         >
-          <Flex
-            onClick={() => setPollView(POLL_VIEWS.CREATE_POLL_QUIZ)}
-            css={{ cursor: 'pointer', c: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-          >
-            <ChevronLeftIcon />
-          </Flex>
-          <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
-          <StatusIndicator isLive={isLive} shouldShowTimer={isLive && isTimed} />
-          <Box
-            css={{
-              marginLeft: 'auto',
-              cursor: 'pointer',
-              '&:hover': { opacity: '0.8' },
-            }}
-          >
-            <CrossIcon onClick={toggleVoting} />
-          </Box>
-        </Flex>
-      </Box>
+          <CrossIcon onClick={toggleVoting} />
+        </Box>
+      </Flex>
 
       <Flex direction="column" css={{ p: '$8 $10' }}>
         <Flex align="center">
