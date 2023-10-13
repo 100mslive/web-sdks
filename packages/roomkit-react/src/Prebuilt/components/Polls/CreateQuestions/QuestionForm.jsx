@@ -2,8 +2,8 @@
 import React, { useRef, useState } from 'react';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
 import { Box, Button, Dropdown, Flex, Input, Switch, Text } from '../../../../';
-import { ErrorDialog } from '../../../primitives/DialogContent';
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
+import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { useDropdownSelection } from '../../hooks/useDropdownSelection';
 import { isValidTextInput } from '../../../common/utils';
 import { MultipleChoiceOptionInputs } from '../common/MultipleChoiceOptions';
@@ -75,13 +75,15 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
       />
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
-          <Text variant="body2" css={{ mt: '$md', c: '$on_surface_medium' }}>
+          <Text variant="body2" css={{ my: '$6', c: '$on_surface_medium' }}>
             Options
           </Text>
+
           {isQuiz && (
-            <Text variant="xs" css={{ c: '$on_surface_medium', mb: '$md', mt: '$4' }}>
-              Use {type === QUESTION_TYPE.SINGLE_CHOICE ? 'radio buttons' : 'checkboxes'} to indicate correct answer
-              {type === QUESTION_TYPE.MULTIPLE_CHOICE ? 's' : ''}
+            <Text variant="xs" css={{ c: '$on_surface_medium', mb: '$md' }}>
+              {type === QUESTION_TYPE.SINGLE_CHOICE
+                ? 'Use the radio buttons to indicate the correct answer'
+                : 'Use the checkboxes to indicate the correct answer(s)'}
             </Text>
           )}
 
@@ -102,12 +104,12 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
               }}
               onClick={() => setOptions([...options, { text: '', isCorrectAnswer: false }])}
             >
-              <AddCircleIcon />
+              <AddCircleIcon style={{ position: 'relative', left: '-2px' }} />
 
               <Text
                 variant="body1"
                 css={{
-                  ml: '$9',
+                  ml: '$4',
                   c: 'inherit',
                 }}
               >
@@ -160,36 +162,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           Save
         </Button>
       </Flex>
-      <ErrorDialog
-        open={openDelete}
-        onOpenChange={setOpenDelete}
-        title="Delete question?"
-        css={{ w: '$80', p: '$10', backgroundColor: '#201617' }}
-      >
-        <Text variant="sm" css={{ color: '$on_surface_medium' }}>
-          Are you sure you want to delete this question? This action cannot be undone.
-        </Text>
-        <Flex css={{ w: '100%', mt: '$12', gap: '$md' }}>
-          <Button
-            variant="standard"
-            outlined
-            onClick={() => setOpenDelete(false)}
-            css={{ w: '100%', fontSize: '$md', fontWeight: '$semiBold' }}
-          >
-            Cancel
-          </Button>
-          <Button
-            css={{ w: '100%', fontSize: '$md', fontWeight: '$semiBold' }}
-            variant="danger"
-            onClick={() => {
-              removeQuestion();
-              setOpenDelete(false);
-            }}
-          >
-            Delete
-          </Button>
-        </Flex>
-      </ErrorDialog>
+      <DeleteQuestionModal open={openDelete} setOpen={setOpenDelete} removeQuestion={removeQuestion} />
     </>
   );
 };

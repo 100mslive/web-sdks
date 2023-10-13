@@ -1,10 +1,12 @@
 // @ts-check
-import React from 'react';
-import { CheckCircleIcon } from '@100mslive/react-icons';
+import React, { useState } from 'react';
+import { CheckCircleIcon, TrashIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
+import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { QUESTION_TYPE_TITLE } from '../../../common/constants';
 
-export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
+export const SavedQuestion = ({ question, index, length, convertToDraft, removeQuestion }) => {
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   return (
     <>
       <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
@@ -25,7 +27,18 @@ export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
           )}
         </Flex>
       ))}
-      <Flex justify="end" css={{ w: '100%' }}>
+      {question.skippable ? (
+        <Text variant="sm" css={{ color: '$on_surface_low', my: '$md' }}>
+          Not required to answer
+        </Text>
+      ) : null}
+      <Flex justify="between" css={{ w: '100%', alignItems: 'center' }}>
+        <Box
+          onClick={() => setOpenDeleteModal(true)}
+          css={{ color: '$on_surface_low', '&:hover': { color: '$on_surface_medium', cursor: 'pointer' } }}
+        >
+          <TrashIcon />
+        </Box>
         <Button
           variant="standard"
           css={{ fontWeight: '$semiBold', p: '$4 $8' }}
@@ -34,6 +47,11 @@ export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
           Edit
         </Button>
       </Flex>
+      <DeleteQuestionModal
+        removeQuestion={() => removeQuestion(question.draftID)}
+        open={openDeleteModal}
+        setOpen={setOpenDeleteModal}
+      />
     </>
   );
 };

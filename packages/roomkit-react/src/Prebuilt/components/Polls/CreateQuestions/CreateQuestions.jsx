@@ -110,7 +110,13 @@ const QuestionCard = ({ question, onSave, index, length, removeQuestion, isQuiz,
   return (
     <Flex direction="column" css={{ p: '$md', bg: '$surface_default', r: '$1', mb: '$sm' }}>
       {question.saved ? (
-        <SavedQuestion question={question} index={index} length={length} convertToDraft={convertToDraft} />
+        <SavedQuestion
+          question={question}
+          index={index}
+          length={length}
+          convertToDraft={convertToDraft}
+          removeQuestion={removeQuestion}
+        />
       ) : (
         <QuestionForm
           question={question}
