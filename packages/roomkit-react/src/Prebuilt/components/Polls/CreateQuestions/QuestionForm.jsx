@@ -44,7 +44,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           ref={ref}
           title={QUESTION_TYPE_TITLE[type]}
           css={{
-            backgroundColor: '$surface_default',
+            backgroundColor: '$surface_bright',
             border: '1px solid $border_bright',
           }}
           open={open}
@@ -72,7 +72,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
         placeholder="Ask a question"
         css={{
           mt: '$md',
-          backgroundColor: '$surface_default',
+          backgroundColor: '$surface_bright',
           border: '1px solid $border_bright',
         }}
         type="text"

@@ -10,7 +10,7 @@ export const DeleteQuestionModal = ({ open, setOpen, removeQuestion }) => {
     <Dialog.Root open={open}>
       <Dialog.Overlay />
       <Dialog.Portal>
-        <Dialog.Content css={{ p: '$8' }}>
+        <Dialog.Content css={{ p: '$10' }}>
           <Box>
             <Flex
               css={{
@@ -38,7 +38,7 @@ export const DeleteQuestionModal = ({ open, setOpen, removeQuestion }) => {
             <Text variant="sm" css={{ color: '$on_surface_medium', mb: '$8', mt: '$4' }}>
               The question will be deleted. You can't undo this action.
             </Text>
-            <Flex css={{ w: '100%', mt: '$8', gap: '$md' }}>
+            <Flex css={{ w: '100%', mt: '$12', gap: '$md' }}>
               <Button
                 variant="standard"
                 outlined

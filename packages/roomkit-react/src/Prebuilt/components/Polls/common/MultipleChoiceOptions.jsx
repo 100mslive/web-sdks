@@ -103,7 +103,7 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
               placeholder={`Option ${index + 1}`}
               css={{
                 w: '100%',
-                backgroundColor: '$surface_default',
+                backgroundColor: '$surface_bright',
                 border: '1px solid $border_bright',
               }}
               key={index}
