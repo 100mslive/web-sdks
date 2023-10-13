@@ -172,7 +172,10 @@ export function Notifications() {
             title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
             action: (
               <Button
-                onClick={() => togglePollView(notification.data.id)}
+                onClick={() => {
+                  togglePollView(notification.data.id);
+                  console.log('ollo', notification.data);
+                }}
                 variant="standard"
                 css={{
                   backgroundColor: '$surface_bright',
