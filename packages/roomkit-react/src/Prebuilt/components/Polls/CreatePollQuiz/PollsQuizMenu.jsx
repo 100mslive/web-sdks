@@ -22,7 +22,7 @@ export const PollsQuizMenu = () => {
 
   return (
     <Container rounded>
-      <ContentHeader content="Polls/Quiz" onClose={togglePollView} />
+      <ContentHeader content="Polls and Quizzes" onClose={togglePollView} />
       <Flex direction="column" css={{ px: '$10', pb: '$10', overflowY: 'auto' }}>
         {permissions?.pollWrite && <AddMenu />}
         <PrevMenu />
@@ -84,7 +84,7 @@ const AddMenu = () => {
   const validateTitle = useMemo(() => {
     if (!isValidTextInput(title)) {
       if (title) {
-        setTitleError('Title of Poll/Quiz need to between 2-100 characters');
+        setTitleError('The title should have between 2-100 characters');
       }
       return true;
     } else {
@@ -183,7 +183,7 @@ const PrevMenu = () => {
     >
       <Flex direction="column" css={{ w: '100%' }}>
         <Text variant="h6" css={{ c: '$on_surface_high' }}>
-          Previous Polls/Quiz
+          Previous Polls and Quizzes
         </Text>
         <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
           {polls.map(poll => (

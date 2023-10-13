@@ -39,20 +39,19 @@ export const StreamCard = ({ title, subtitle, Icon, imgSrc = '', css = {}, onCli
 
 export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
   return (
-    <Flex css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer' }}>
+    <Flex
+      css={{ w: '100%', py: '$8', px: '$10', cursor: 'pointer', borderBottom: '1px solid $border_bright', mb: '$8' }}
+    >
       {onBack ? (
         <Text
           css={{
-            p: '$2',
-            bg: '$surface_bright',
-            r: '$round',
             alignSelf: 'center',
             mr: '$8',
           }}
           onClick={onBack}
           data-testid="go_back"
         >
-          <ChevronLeftIcon width={16} height={16} />
+          <ChevronLeftIcon />
         </Text>
       ) : null}
       <Box css={{ flex: '1 1 0' }}>
@@ -72,7 +71,7 @@ export const ContentHeader = ({ onBack, onClose, title = '', content }) => {
       </Box>
       {onClose ? (
         <IconButton onClick={onClose} css={{ alignSelf: 'flex-start' }} data-testid="close_stream_section">
-          <CrossIcon width={16} height={16} />
+          <CrossIcon />
         </IconButton>
       ) : null}
     </Flex>
@@ -136,7 +135,7 @@ export const ErrorText = ({ error }) => {
     return null;
   }
   return (
-    <Text variant="sm" css={{ mb: '$8', color: '$alert_error_default' }}>
+    <Text variant="sm" css={{ my: '$4', color: '$alert_error_default' }}>
       {error}
     </Text>
   );

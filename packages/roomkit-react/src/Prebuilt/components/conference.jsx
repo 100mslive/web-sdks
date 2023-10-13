@@ -113,7 +113,7 @@ const Conference = () => {
     return () => {
       PictureInPicture.stop().catch(error => console.error('stopping pip', error));
     };
-  }, []);
+  }, [onJoinFunc]);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
