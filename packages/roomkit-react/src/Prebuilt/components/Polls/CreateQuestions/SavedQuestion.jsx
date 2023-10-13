@@ -16,14 +16,14 @@ export const SavedQuestion = ({ question, index, length, convertToDraft, removeQ
         {question.text}
       </Text>
       {question.options.map(option => (
-        <Flex css={{ alignItems: 'center' }}>
-          <Text variant="body2" css={{ my: '$xs', c: '$on_surface_medium' }}>
+        <Flex css={{ alignItems: 'center', my: '$xs' }}>
+          <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             {option.text}
           </Text>
           {option.isCorrectAnswer && (
-            <Box css={{ color: '$alert_success', mx: '$xs' }}>
-              <CheckCircleIcon />
-            </Box>
+            <Flex css={{ color: '$alert_success', mx: '$xs' }}>
+              <CheckCircleIcon height={24} width={24} />
+            </Flex>
           )}
         </Flex>
       ))}
