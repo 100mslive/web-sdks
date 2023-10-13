@@ -36,3 +36,4 @@ export * from './Link';
 export * from './Collapsible';
 export * from './Prebuilt';
 export * from './Progress';
+export * from './context/DialogContext';

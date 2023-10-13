@@ -1,5 +1,5 @@
-import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
+import React, { Fragment, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -11,9 +11,7 @@ import {
   useParticipants,
   usePreviewJoin,
   useRecordingStreaming,
-  // @ts-ignore: No implicit Any
 } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
@@ -31,7 +29,6 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 // @ts-ignore: No implicit Any
 import { Logo } from '../Header/HeaderComponents';
-import { PrebuiltAudioIndicator } from '../PrebuiltTileElements';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
 // @ts-ignore: No implicit Any
@@ -41,7 +38,7 @@ import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
-import { getFormattedCount } from '../../common/utils';
+import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
@@ -210,10 +207,18 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
   const aspectRatio = useLocalTileAspectRatio();
+  const [ref, { width: calculatedWidth, height: calculatedHeight }] = useMeasure<HTMLDivElement>();
+  const [avatarSize, attribBoxSize] = useMemo(
+    () => calculateAvatarAndAttribBoxSize(calculatedWidth, calculatedHeight),
+    [calculatedWidth, calculatedHeight],
+  );
 
   return (
     <StyledVideoTile.Container
+      ref={ref}
       css={{
         bg: '$surface_default',
         aspectRatio,
@@ -238,7 +243,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
-              <Avatar name={name} data-testid="preview_avatar_tile" size="medium" />
+              <Avatar name={name} data-testid="preview_avatar_tile" size={avatarSize} />
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
@@ -246,13 +251,13 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
       {!localPeer && !error ? <FullPageProgress /> : null}
 
       {showMuteIcon ? (
-        <PrebuiltAudioIndicator>
-          <MicOffIcon height={16} width={16} />
-        </PrebuiltAudioIndicator>
+        <StyledVideoTile.AudioIndicator size={attribBoxSize}>
+          <MicOffIcon />
+        </StyledVideoTile.AudioIndicator>
       ) : (
-        <PrebuiltAudioIndicator>
+        <StyledVideoTile.AudioIndicator size={attribBoxSize}>
           <AudioLevel trackId={localPeer?.audioTrack} />
-        </PrebuiltAudioIndicator>
+        </StyledVideoTile.AudioIndicator>
       )}
     </StyledVideoTile.Container>
   );
