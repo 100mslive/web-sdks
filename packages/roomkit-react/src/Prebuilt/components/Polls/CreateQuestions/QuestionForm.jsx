@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useRef, useState } from 'react';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
-import { Box, Button, Dropdown, Flex, Input, Switch, Text } from '../../../../';
+import { Box, Button, Dropdown, Flex, Input, Switch, Text, Tooltip } from '../../../../';
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
 import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { useDropdownSelection } from '../../hooks/useDropdownSelection';
@@ -24,6 +24,12 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
     ],
   );
   const [skippable, setSkippable] = useState(false);
+  const isValid = isValidQuestion({
+    text,
+    type,
+    options,
+    isQuiz,
+  });
 
   return (
     <>
@@ -138,30 +144,30 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
         >
           <TrashIcon onClick={() => setOpenDelete(!open)} />
         </Box>
-        <Button
-          variant="standard"
-          disabled={
-            !isValidQuestion({
-              text,
-              type,
-              options,
-              isQuiz,
-            })
-          }
-          onClick={() => {
-            onSave({
-              saved: true,
-              text,
-              type,
-              options,
-              skippable,
-              draftID: question.draftID,
-            });
-          }}
+        <Tooltip
+          disabled={isValid}
+          title={`Please fill all the fields ${isQuiz ? 'and mark the correct answer(s)' : ''} to continue`}
+          boxCss={{ maxWidth: '$40' }}
         >
-          Save
-        </Button>
+          <Button
+            variant="standard"
+            disabled={!isValid}
+            onClick={() => {
+              onSave({
+                saved: true,
+                text,
+                type,
+                options,
+                skippable,
+                draftID: question.draftID,
+              });
+            }}
+          >
+            Save
+          </Button>
+        </Tooltip>
       </Flex>
+
       <DeleteQuestionModal open={openDelete} setOpen={setOpenDelete} removeQuestion={removeQuestion} />
     </>
   );

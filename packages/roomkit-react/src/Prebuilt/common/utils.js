@@ -112,6 +112,6 @@ export const checkCorrectAnswer = (answer, localPeerResponse, type) => {
   }
 };
 
-export const isValidTextInput = (text, minLength = 2, maxLength = 100) => {
+export const isValidTextInput = (text, minLength = 1, maxLength = 100) => {
   return text && text.length >= minLength && text.length <= maxLength;
 };
