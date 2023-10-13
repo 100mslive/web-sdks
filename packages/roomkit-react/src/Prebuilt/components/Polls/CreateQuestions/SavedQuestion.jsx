@@ -7,7 +7,7 @@ import { QUESTION_TYPE_TITLE } from '../../../common/constants';
 export const SavedQuestion = ({ question, index, length, convertToDraft }) => {
   return (
     <>
-      <Text variant="overline" css={{ c: '$on_surface_low' }}>
+      <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
         Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
       </Text>
       <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>

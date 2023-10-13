@@ -23,7 +23,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
       { text: '', isCorrectAnswer: false },
     ],
   );
-  const [skippable, setSkippable] = useState(true);
+  const [skippable, setSkippable] = useState(false);
 
   return (
     <>
@@ -75,20 +75,24 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
       />
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
-          <Text variant="body2" css={{ my: '$md', c: '$on_surface_medium' }}>
-            Options{' '}
-            {isQuiz && (
-              <Text variant="xs" css={{ c: '$on_surface_medium' }}>
-                (Use checkboxes to indicate correct answers)
-              </Text>
-            )}
+          <Text variant="body2" css={{ mt: '$md', c: '$on_surface_medium' }}>
+            Options
           </Text>
+          {isQuiz && (
+            <Text variant="xs" css={{ c: '$on_surface_medium', mb: '$md', mt: '$4' }}>
+              Use {type === QUESTION_TYPE.SINGLE_CHOICE ? 'radio buttons' : 'checkboxes'} to indicate correct answer
+              {type === QUESTION_TYPE.MULTIPLE_CHOICE ? 's' : ''}
+            </Text>
+          )}
+
           {type === QUESTION_TYPE.SINGLE_CHOICE && (
             <SingleChoiceOptionInputs isQuiz={isQuiz} options={options} setOptions={setOptions} />
           )}
+
           {type === QUESTION_TYPE.MULTIPLE_CHOICE && (
             <MultipleChoiceOptionInputs isQuiz={isQuiz} options={options} setOptions={setOptions} />
           )}
+
           {options?.length < 20 && (
             <Flex
               css={{
@@ -107,18 +111,16 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
                   c: 'inherit',
                 }}
               >
-                Add Option
+                Add an option
               </Text>
             </Flex>
           )}
           {isQuiz ? (
-            <Flex css={{ mt: '$md' }}>
-              <Switch
-                css={{ mr: '$6' }}
-                defaultChecked={skippable}
-                onCheckedChange={checked => setSkippable(checked)}
-              />
-              <Text>Not required to answer</Text>
+            <Flex css={{ mt: '$md', gap: '$6' }}>
+              <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
+              <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+                Not required to answer
+              </Text>
             </Flex>
           ) : null}
         </>

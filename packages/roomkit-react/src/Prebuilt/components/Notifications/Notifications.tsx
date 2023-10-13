@@ -7,7 +7,6 @@ import {
   HMSRoomState,
   selectHasPeerHandRaised,
   selectLocalPeerID,
-  selectPeerByID,
   selectPeerNameByID,
   selectRoomState,
   useCustomEvent,
