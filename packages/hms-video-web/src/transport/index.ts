@@ -1167,15 +1167,12 @@ export default class HMSTransport implements ITransport {
   }
 
   private initStatsAnalytics() {
-    const { publishWindowSize, publishPushInterval, subscribeWindowSize, subscribePushInterval } =
-      this.getStatsAnalyticsIntervals();
-
     if (this.isFlagEnabled(InitFlags.FLAG_PUBLISH_STATS)) {
       this.publishStatsAnalytics = new PublishStatsAnalytics(
         this.store,
         this.eventBus,
-        publishWindowSize,
-        publishPushInterval,
+        this.getValueFromInitConfig('publishStats', 'maxSampleWindowSize', PUBLISH_STATS_SAMPLE_WINDOW),
+        this.getValueFromInitConfig('publishStats', 'maxSamplePushInterval', PUBLISH_STATS_PUSH_INTERVAL),
       );
 
       this.getWebrtcInternals()?.start();
@@ -1185,22 +1182,20 @@ export default class HMSTransport implements ITransport {
       this.subscribeStatsAnalytics = new SubscribeStatsAnalytics(
         this.store,
         this.eventBus,
-        subscribeWindowSize,
-        subscribePushInterval,
+        this.getValueFromInitConfig('subscribeStats', 'maxSampleWindowSize', SUBSCRIBE_STATS_SAMPLE_WINDOW),
+        this.getValueFromInitConfig('subscribeStats', 'maxSamplePushInterval', SUBSCRIBE_STATS_PUSH_INTERVAL),
       );
 
       this.getWebrtcInternals()?.start();
     }
   }
 
-  private getStatsAnalyticsIntervals() {
-    return {
-      publishWindowSize: this.initConfig?.config.publishStats?.maxSampleWindowSize || PUBLISH_STATS_SAMPLE_WINDOW,
-      publishPushInterval: this.initConfig?.config.publishStats?.maxSamplePushInterval || PUBLISH_STATS_PUSH_INTERVAL,
-      subscribeWindowSize: this.initConfig?.config.subscribeStats?.maxSampleWindowSize || SUBSCRIBE_STATS_SAMPLE_WINDOW,
-      subscribePushInterval:
-        this.initConfig?.config.subscribeStats?.maxSamplePushInterval || SUBSCRIBE_STATS_PUSH_INTERVAL,
-    };
+  private getValueFromInitConfig(
+    baseKey: 'publishStats' | 'subscribeStats',
+    subKey: 'maxSampleWindowSize' | 'maxSamplePushInterval',
+    defaultValue: number,
+  ) {
+    return this.initConfig?.config[baseKey]?.[subKey] || defaultValue;
   }
 
   /**
