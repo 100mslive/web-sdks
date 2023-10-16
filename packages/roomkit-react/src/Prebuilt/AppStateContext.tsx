@@ -1,4 +1,12 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { usePreviousDistinct } from 'react-use';
+import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import { useRoomLayout } from './provider/roomLayoutProvider';
+import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 export enum PrebuiltStates {
   MEETING = 'meeting',
@@ -7,13 +15,12 @@ export enum PrebuiltStates {
 }
 
 type AppStateContextType = {
-  activeState?: PrebuiltStates;
-  setActiveState: (state: PrebuiltStates) => void;
+  rejoin: () => void;
 };
 
 export const AppStateContext = React.createContext<AppStateContextType>({
-  setActiveState: (state: PrebuiltStates) => {
-    console.log('_state', state);
+  rejoin: () => {
+    console.log('Rejoin');
   },
 });
 
@@ -25,4 +32,40 @@ export const useHMSAppStateContext = () => {
     throw Error('Make sure AppStateContext.Provider is present at the top level of your application');
   }
   return context;
+};
+
+export const useAppStateManager = () => {
+  const roomLayout = useRoomLayout();
+  const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
+  const roomState = useHMSStore(selectRoomState);
+  const prevRoomState = usePreviousDistinct(roomState);
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { redirectToLeave } = useRedirectToLeave();
+
+  const rejoin = () => {
+    setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+  };
+
+  useEffect(() => {
+    if (!roomLayout) {
+      return;
+    }
+    if (roomState === HMSRoomState.Connected) {
+      setActiveState(PrebuiltStates.MEETING);
+    } else if (
+      prevRoomState &&
+      [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
+      [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
+    ) {
+      redirectToLeave().then(() => {
+        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
+        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
+      });
+    } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
+      setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    }
+  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
+
+  return { activeState, rejoin };
 };

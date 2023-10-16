@@ -1,12 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { usePreviousDistinct } from 'react-use';
-import {
-  HMSRoomState,
-  HMSStatsStoreWrapper,
-  HMSStoreWrapper,
-  IHMSNotifications,
-  selectRoomState,
-} from '@100mslive/hms-video-store';
+import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
   HMSActions,
@@ -41,7 +34,7 @@ import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
-import { AppStateContext, PrebuiltStates } from './AppStateContext';
+import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
@@ -49,7 +42,6 @@ import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
-import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
 import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
@@ -302,34 +294,10 @@ function AppRoutes({
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
-  const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
-  const roomState = useHMSStore(selectRoomState);
-  const prevRoomState = usePreviousDistinct(roomState);
-  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { redirectToLeave } = useRedirectToLeave();
+  const { activeState, rejoin } = useAppStateManager();
 
-  useEffect(() => {
-    if (!roomLayout) {
-      return;
-    }
-    if (roomState === HMSRoomState.Connected) {
-      setActiveState(PrebuiltStates.MEETING);
-    } else if (
-      prevRoomState &&
-      [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
-      [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
-    ) {
-      redirectToLeave().then(() => {
-        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
-        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
-      });
-    } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
-      setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
-    }
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
   return (
-    <AppStateContext.Provider value={{ activeState, setActiveState }}>
+    <AppStateContext.Provider value={{ rejoin }}>
       <>
         <ToastContainer />
         <Notifications />

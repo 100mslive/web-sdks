@@ -1,18 +1,18 @@
 import React from 'react';
 import { ExitIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { PrebuiltStates, useHMSAppStateContext } from '../AppStateContext';
+import { useHMSAppStateContext } from '../AppStateContext';
 import { Header } from './Header';
-import { useRoomLayoutPreviewScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { textEllipsis } from '../../utils';
 
 const PostLeave = () => {
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { setActiveState } = useHMSAppStateContext();
+  const { rejoin } = useHMSAppStateContext();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
     <Flex direction="column" css={{ size: '100%' }}>
@@ -54,7 +54,7 @@ const PostLeave = () => {
           </Text>
           <Button
             onClick={() => {
-              setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+              rejoin();
               ToastManager.clearAllToast();
             }}
             data-testid="join_again_btn"
