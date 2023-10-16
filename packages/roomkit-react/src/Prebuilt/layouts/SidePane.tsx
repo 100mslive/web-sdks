@@ -8,10 +8,11 @@ import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig, keyframes } from '../../Theme';
+import { config as cssConfig } from '../../Theme';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
+import { translateAcross } from '../../utils';
 
 const SidePane = ({
   screenType,
@@ -99,10 +100,7 @@ const SidePane = ({
               pb: mwebStreamingChat ? '$20' : '$12',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
-              animation: `${keyframes({
-                from: { transform: 'translate3d(0,100%,0)' },
-                to: { transform: 'translate3d(0,0,0)' },
-              })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+              animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
             },
           }}
         >
