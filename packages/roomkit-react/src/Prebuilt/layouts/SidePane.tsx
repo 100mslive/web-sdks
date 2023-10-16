@@ -10,9 +10,9 @@ import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
-import { translateAcross } from '../../utils';
 
 const SidePane = ({
   screenType,
