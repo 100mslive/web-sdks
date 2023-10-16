@@ -1,11 +1,14 @@
 import React, { Fragment, useState } from 'react';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
+// @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Tooltip } from '../../../Tooltip';
+import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton, MenuTriggerButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
@@ -73,7 +76,7 @@ export const DesktopLeaveRoom = ({
               <Dropdown.Item
                 css={{
                   bg: '$surface_dim',
-                  color: '$on_surface_low',
+                  color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
                 onClick={() => leaveRoom({ endstream: false })}
@@ -135,7 +138,7 @@ export const DesktopLeaveRoom = ({
       )}
 
       <Dialog.Root open={showEndStreamAlert} modal={false}>
-        <Dialog.Portal>
+        <PrebuiltDialogPortal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
@@ -145,16 +148,16 @@ export const DesktopLeaveRoom = ({
               isModal
             />
           </Dialog.Content>
-        </Dialog.Portal>
+        </PrebuiltDialogPortal>
       </Dialog.Root>
 
       <Dialog.Root open={showLeaveRoomAlert} modal={false}>
-        <Dialog.Portal>
+        <PrebuiltDialogPortal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
           </Dialog.Content>
-        </Dialog.Portal>
+        </PrebuiltDialogPortal>
       </Dialog.Root>
     </Fragment>
   );

@@ -3,7 +3,7 @@ import { useScreenShare } from '@100mslive/react-sdk';
 import { StarIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import PDFShareImg from './../../images/pdf-share.png';
 import ScreenShareImg from './../../images/screen-share.png';
-import { Box, Button, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
+import { Box, Dropdown, Flex, IconButton, Text, Tooltip } from '../../../';
 import { ShareMenuIcon } from '../ShareMenuIcon';
 import { PDFFileOptions } from './pdfFileOptions';
 
@@ -75,7 +75,8 @@ export function ShareScreenOptions() {
               alignItems: 'flex-start',
               gap: '$8',
               px: '$10',
-              py: '$6',
+              pt: '$6',
+              pb: '$10',
               '&:hover': {
                 bg: '$transparent',
                 cursor: 'default',
@@ -163,7 +164,7 @@ export function ShareScreenOptions() {
                   align="center"
                   css={{
                     position: 'absolute',
-                    top: '29%',
+                    top: '35%',
                     left: '54%',
                     padding: '$2 $4',
                     r: '$2',
@@ -199,32 +200,6 @@ export function ShareScreenOptions() {
                 </Text>
               </Flex>
             </Flex>
-          </Dropdown.Item>
-          <Dropdown.Item
-            css={{
-              px: '$10',
-              pb: '$10',
-              pt: '$6',
-              '&:hover': {
-                bg: '$transparent',
-                cursor: 'default',
-              },
-            }}
-          >
-            <Button
-              variant="standard"
-              outlined
-              type="submit"
-              onClick={() => {
-                updateState(MODALS.SHARE, false);
-              }}
-              data-testid="share_btn"
-              css={{
-                w: '100%',
-              }}
-            >
-              Cancel
-            </Button>
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Root>

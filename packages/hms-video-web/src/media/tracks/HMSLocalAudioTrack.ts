@@ -1,4 +1,5 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
@@ -75,16 +76,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      */
     prevTrack?.stop();
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
-    const newTrack = await getAudioTrack(settings);
-    newTrack.enabled = this.enabled;
-    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
+    try {
+      const newTrack = await getAudioTrack(settings);
+      newTrack.enabled = this.enabled;
+      HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
 
-    const localStream = this.stream as HMSLocalStream;
-    // change nativeTrack so plugin can start its work
-    await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
-    await localStream.replaceStreamTrack(prevTrack, newTrack);
-    this.nativeTrack = newTrack;
-    isLevelMonitored && this.initAudioLevelMonitor();
+      const localStream = this.stream as HMSLocalStream;
+      // change nativeTrack so plugin can start its work
+      await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
+      await localStream.replaceStreamTrack(prevTrack, newTrack);
+      this.nativeTrack = newTrack;
+      isLevelMonitored && this.initAudioLevelMonitor();
+    } catch (e) {
+      if (this.isPublished) {
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            error: e as Error,
+          }),
+        );
+      }
+      throw e;
+    }
     try {
       await this.pluginsManager.reprocessPlugins();
     } catch (e) {

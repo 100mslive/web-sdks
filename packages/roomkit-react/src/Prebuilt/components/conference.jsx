@@ -29,7 +29,7 @@ import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 const Conference = () => {
   const navigate = useNavigate();
   const { roomId, role } = useParams();
-  const { userName, endpoints } = useHMSPrebuiltContext();
+  const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
@@ -109,13 +109,14 @@ const Conference = () => {
   }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
 
   useEffect(() => {
+    onJoinFunc?.();
     return () => {
       PictureInPicture.stop().catch(error => console.error('stopping pip', error));
     };
-  }, []);
+  }, [onJoinFunc]);
 
-  if (!isConnectedToRoom) {
-    return <FullPageProgress text="Joining..." />;
+  if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
+    return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
   return (

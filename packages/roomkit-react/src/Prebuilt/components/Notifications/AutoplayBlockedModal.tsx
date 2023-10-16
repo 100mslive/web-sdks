@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAutoplayError } from '@100mslive/react-sdk';
-import { Button, Dialog, Text } from '../../../';
+import { Button, Dialog, Text } from '../../..';
+// @ts-ignore: No implicit Any
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 
 export function AutoplayBlockedModal() {

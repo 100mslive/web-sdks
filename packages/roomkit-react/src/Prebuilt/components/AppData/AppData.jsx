@@ -21,6 +21,7 @@ import {
   APP_DATA,
   CHAT_SELECTOR,
   DEFAULT_WAITING_VIEWER_ROLE,
+  POLL_STATE,
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
@@ -65,7 +66,11 @@ const initialAppData = {
   [APP_DATA.authToken]: '',
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
-  [APP_DATA.disableNotificiations]: false,
+  [APP_DATA.disableNotifications]: false,
+  [APP_DATA.pollState]: {
+    [POLL_STATE.pollInView]: '',
+    [POLL_STATE.view]: '',
+  },
 };
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {

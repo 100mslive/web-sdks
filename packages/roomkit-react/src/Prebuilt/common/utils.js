@@ -1,3 +1,5 @@
+import { QUESTION_TYPE } from './constants';
+
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
@@ -89,9 +91,27 @@ export const formatTime = timeInSeconds => {
   return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-export const getAttributeBoxSize = (width, height) => {
-  if (!width || !height) {
-    return '';
+const compareArrays = (a, b) => {
+  if (a.length !== b.length) return false;
+  else {
+    // Comparing each element of your array
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
   }
-  return width < 180 || height < 180 ? 'small' : 'medium';
+};
+
+export const checkCorrectAnswer = (answer, localPeerResponse, type) => {
+  if (type === QUESTION_TYPE.SINGLE_CHOICE) {
+    return answer?.option === localPeerResponse?.option;
+  } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
+    return answer?.options && localPeerResponse?.options && compareArrays(answer?.options, localPeerResponse?.options);
+  }
+};
+
+export const isValidTextInput = (text, minLength = 1, maxLength = 100) => {
+  return text && text.length >= minLength && text.length <= maxLength;
 };

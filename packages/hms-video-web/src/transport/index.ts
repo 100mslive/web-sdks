@@ -23,7 +23,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata, HMSPeer, HMSRole, HMSRoleChangeRequest } from '../interfaces';
+import { HLSConfig, HLSTimedMetadata, HMSRole, HMSRoleChangeRequest } from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
@@ -34,11 +34,14 @@ import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  findPeersRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
   HLSVariant,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
+  peerIterRequestParams,
+  PeersIterationResponse,
   PollInfoGetParams,
   PollInfoGetResponse,
   PollInfoSetParams,
@@ -558,17 +561,17 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async changeRole(forPeer: HMSPeer, toRole: string, force = false) {
+  async changeRole(forPeerId: string, toRole: string, force = false) {
     await this.signal.requestRoleChange({
-      requested_for: forPeer.peerId,
+      requested_for: forPeerId,
       role: toRole,
       force,
     });
   }
 
-  async changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean) {
+  async changeRoleOfPeer(forPeerId: string, toRole: string, force: boolean) {
     await this.signal.requestRoleChange({
-      requested_for: forPeer.peerId,
+      requested_for: forPeerId,
       role: toRole,
       force,
     });
@@ -745,6 +748,13 @@ export default class HMSTransport implements ITransport {
 
   async removeFromGroup(peerId: string, name: string): Promise<void> {
     this.signal.removeFromGroup(peerId, name);
+  }
+
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.findPeers(params);
+  }
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
+    return this.signal.peerIterNext(params);
   }
 
   async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {

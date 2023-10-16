@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import {
   selectAudioTrackByPeerID,
@@ -8,25 +8,25 @@ import {
   selectPeerMetadata,
   selectPeerNameByID,
   selectSessionStore,
-  selectTrackAudioByID,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
-  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { BrbTileIcon, HandIcon, MicOffIcon } from '@100mslive/react-icons';
 import TileConnection from './Connection/TileConnection';
 import TileMenu, { isSameTile } from './TileMenu/TileMenu';
+import { AudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
-import { Box, Flex } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
-import { config as cssConfig, keyframes } from '../../Theme';
+import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
+import { PrebuiltAttributeBox, PrebuiltAudioIndicator } from './PrebuiltTileElements';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
-import { getAttributeBoxSize } from '../common/utils';
 import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
+
+const iconDims = { height: '1rem', width: '1rem' };
 
 const Tile = ({
   peerId,
@@ -77,20 +77,8 @@ const Tile = ({
   const ref = useRef(null);
   const calculatedHeight = ref.current?.clientHeight || '';
   const calculatedWidth = ref.current?.clientWidth || '';
-
   const isTileBigEnoughToShowStats = calculatedHeight >= 180 && calculatedWidth >= 180;
-
-  const avatarSize = useMemo(() => {
-    if (!calculatedWidth || !calculatedHeight) {
-      return undefined;
-    }
-    if (calculatedWidth <= 150 || calculatedHeight <= 150) {
-      return 'small';
-    } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
-      return 'medium';
-    }
-    return 'large';
-  }, [calculatedWidth, calculatedHeight]);
+  const avatarSize = 'medium';
 
   return (
     <StyledVideoTile.Root
@@ -139,14 +127,13 @@ const Tile = ({
 
           {!hideAudioMuteOnTile ? (
             isAudioMuted ? (
-              <StyledVideoTile.AudioIndicator
-                data-testid="participant_audio_mute_icon"
-                size={getAttributeBoxSize(calculatedWidth, calculatedHeight)}
-              >
-                <MicOffIcon />
-              </StyledVideoTile.AudioIndicator>
+              <PrebuiltAudioIndicator data-testid="participant_audio_mute_icon">
+                <MicOffIcon style={iconDims} />
+              </PrebuiltAudioIndicator>
             ) : (
-              <AudioLevel trackId={audioTrack?.id} />
+              <PrebuiltAudioIndicator>
+                <AudioLevel trackId={audioTrack?.id} />
+              </PrebuiltAudioIndicator>
             )
           ) : null}
           {isMouseHovered || (isDragabble && isMobile) ? (
@@ -158,7 +145,7 @@ const Tile = ({
               enableSpotlightingPeer={enableSpotlightingPeer}
             />
           ) : null}
-          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} height={calculatedHeight} width={calculatedWidth} />}
+          {!hideMetadataOnTile && <PeerMetadata peerId={peerId} />}
 
           <TileConnection
             hideLabel={hideParticipantNameOnTile}
@@ -175,56 +162,7 @@ const Tile = ({
   );
 };
 
-const heightAnimation = value =>
-  keyframes({
-    '50%': {
-      transform: `scale3d(1,${value},1)`,
-    },
-    '100%': {
-      transform: `scale3d(1,1,1)`,
-    },
-  });
-
-const AudioLevelIndicator = ({ trackId, value, delay }) => {
-  const vanillaStore = useHMSVanillaStore();
-  const ref = useRef();
-
-  useEffect(() => {
-    const unsubscribe = vanillaStore.subscribe(audioLevel => {
-      if (ref.current) {
-        ref.current.style['animation'] = `${heightAnimation(
-          audioLevel ? value : 1,
-        )} 0.3s cubic-bezier(0.61, 1, 0.88, 1) infinite ${delay}s`;
-      }
-    }, selectTrackAudioByID(trackId));
-    return unsubscribe;
-  }, [vanillaStore, trackId, value, delay]);
-  return (
-    <Box
-      ref={ref}
-      css={{
-        w: 4,
-        height: 6,
-        r: 2,
-        bg: '$on_primary_high',
-      }}
-    />
-  );
-};
-
-export const AudioLevel = ({ trackId }) => {
-  return (
-    <StyledVideoTile.AudioIndicator>
-      <Flex align="center" justify="center" css={{ gap: '$2' }}>
-        {[3, 2, 3].map((v, i) => (
-          <AudioLevelIndicator trackId={trackId} value={v} delay={i * 0.15} key={i} />
-        ))}
-      </Flex>
-    </StyledVideoTile.AudioIndicator>
-  );
-};
-
-const PeerMetadata = ({ peerId, height, width }) => {
+const PeerMetadata = ({ peerId }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
   const isBRB = metaData?.isBRBOn || false;
   const isHandRaised = useHMSStore(selectHasPeerHandRaised(peerId));
@@ -232,14 +170,14 @@ const PeerMetadata = ({ peerId, height, width }) => {
   return (
     <Fragment>
       {isHandRaised ? (
-        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="raiseHand_icon_onTile">
-          <HandIcon width={24} height={24} />
-        </StyledVideoTile.AttributeBox>
+        <PrebuiltAttributeBox data-testid="raiseHand_icon_onTile">
+          <HandIcon style={iconDims} />
+        </PrebuiltAttributeBox>
       ) : null}
       {isBRB ? (
-        <StyledVideoTile.AttributeBox size={getAttributeBoxSize(width, height)} data-testid="brb_icon_onTile">
-          <BrbTileIcon width={22} height={22} />
-        </StyledVideoTile.AttributeBox>
+        <PrebuiltAttributeBox data-testid="brb_icon_onTile">
+          <BrbTileIcon style={iconDims} />
+        </PrebuiltAttributeBox>
       ) : null}
     </Fragment>
   );

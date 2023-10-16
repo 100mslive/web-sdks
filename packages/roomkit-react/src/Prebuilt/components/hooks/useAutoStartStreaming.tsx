@@ -20,12 +20,12 @@ export const useAutoStartStreaming = () => {
   const showStreamingUI = useShowStreamingUI();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const { isHLSRunning } = useRecordingStreaming();
+  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
   const streamStartedRef = useRef(false);
 
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted || !showStreamingUI || isHLSRunning) {
+      if (isHLSStarted || !showStreamingUI || isHLSRunning || isRTMPRunning) {
         return;
       }
       setHLSStarted(true);
@@ -38,7 +38,7 @@ export const useAutoStartStreaming = () => {
       streamStartedRef.current = false;
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSRunning, isHLSStarted, setHLSStarted, showStreamingUI]);
+  }, [hmsActions, isHLSRunning, isHLSStarted, setHLSStarted, showStreamingUI, isRTMPRunning]);
 
   useEffect(() => {
     if (!isHLSStarted && !isHLSRunning) {

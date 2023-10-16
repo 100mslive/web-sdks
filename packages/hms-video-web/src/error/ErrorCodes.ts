@@ -45,7 +45,7 @@ export const ErrorCodes = {
     DEVICE_IN_USE: 3003,
 
     // Lost access to capture device midway - {device_type}
-    DEVICE_LOST_MIDWAY: 3008,
+    DEVICE_LOST_MIDWAY: 3004,
 
     // There is no media to return. Please select either video or audio or both.
     NOTHING_TO_RETURN: 3005,
@@ -73,6 +73,9 @@ export const ErrorCodes = {
 
     // any error that occurs while playing audio of remote audio tracks
     AUDIO_PLAYBACK_ERROR: 3013,
+
+    // Selected device not detected on change
+    SELECTED_DEVICE_MISSING: 3014,
   },
 
   WebrtcErrors: {

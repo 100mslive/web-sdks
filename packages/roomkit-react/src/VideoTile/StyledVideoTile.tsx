@@ -58,7 +58,7 @@ const Info = styled('div', {
 const AttributeBox = styled('div', {
   position: 'absolute',
   top: '$4',
-  color: '$on_primary_high',
+  color: '$on_secondary_high',
   bg: '$secondary_dim',
   borderRadius: '$round',
   width: '$14',

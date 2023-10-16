@@ -52,6 +52,7 @@ import {
   HMSMessageInput,
   HMSPeer,
   HMSPeerID,
+  HMSPeerListIteratorOptions,
   HMSPlaylistType,
   HMSRoleName,
   HMSRoomState,
@@ -516,23 +517,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
-    const peer = this.getSDKHMSPeer(forPeerId);
-    if (!peer) {
-      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
-      return;
-    }
-
-    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
   async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
-    const peer = this.getSDKHMSPeer(forPeerId);
-    if (!peer) {
-      this.logPossibleInconsistency(`Unknown peer ID given ${forPeerId} for changerole`);
-      return;
-    }
-
-    await this.sdk.changeRoleOfPeer(peer, toRole, force);
+    await this.sdk.changeRoleOfPeer(forPeerId, toRole, force);
   }
 
   async changeRoleOfPeersWithRoles(roles: HMSRoleName[], toRole: HMSRoleName) {
@@ -569,6 +558,22 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
   async lowerRemotePeerHand(peerId: string) {
     await this.sdk.lowerRemotePeerHand(peerId);
+  }
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+    const iterator = this.sdk.getPeerListIterator(options);
+    return {
+      hasNext: () => iterator.hasNext(),
+      next: async () => {
+        const sdkPeers = await iterator.next();
+        return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
+      },
+      findPeers: async () => {
+        const sdkPeers = await iterator.findPeers();
+        return sdkPeers.map(peer => SDKToHMS.convertPeer(peer) as HMSPeer);
+      },
+      getTotal: () => iterator.getTotal(),
+    };
   }
 
   initAppData(appData: Record<string, any>) {
@@ -626,12 +631,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async removePeer(peerID: string, reason: string) {
-    const peer = this.getSDKHMSPeer(peerID);
-    if (peer && !peer.isLocal) {
-      await this.sdk.removePeer(peer as sdkTypes.HMSRemotePeer, reason);
-    } else {
-      this.logPossibleInconsistency(`No remote peer found for peerID - ${peerID}`);
-      return;
+    const localPeerId = this.sdk.getLocalPeer()?.peerId;
+    if (peerID !== localPeerId) {
+      await this.sdk.removePeer(peerID, reason);
     }
   }
 
