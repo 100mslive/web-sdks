@@ -12,6 +12,12 @@ export const slideUp = (controller: string) =>
     to: { height: 0 },
   });
 
+export const translateAcross = ({ xFrom = '0', yFrom = '0', zFrom = '0', xTo = '0', yTo = '0', zTo = '0' }) =>
+  keyframes({
+    from: { transform: `translate3d(${xFrom}, ${yFrom}, ${zFrom})` },
+    to: { transform: `translate3d(${xTo}, ${yTo}, ${zTo}` },
+  });
+
 export const dialogOpen = keyframes({
   '0%': { opacity: 0, transform: 'translate(-50%, -48%) scale(.90)' },
   '100%': { opacity: 1, transform: 'translate(-50%, -50%) scale(1)' },
