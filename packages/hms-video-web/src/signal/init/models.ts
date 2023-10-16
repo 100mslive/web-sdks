@@ -33,6 +33,10 @@ export interface InitConfig {
       readonly maxSampleWindowSize: number;
       readonly maxSamplePushInterval: number;
     };
+    readonly subscribeStats?: {
+      readonly maxSampleWindowSize: number;
+      readonly maxSamplePushInterval: number;
+    };
   };
 }
 
@@ -41,6 +45,7 @@ export enum InitFlags {
   FLAG_SERVER_SIMULCAST = 'simulcast',
   FLAG_NON_WEBRTC_DISABLE_OFFER = 'nonWebRTCDisableOffer',
   FLAG_PUBLISH_STATS = 'publishStats',
+  FLAG_SUBSCRIBE_STATS = 'subscribeStats',
   FLAG_ON_DEMAND_TRACKS = 'onDemandTracks',
   // Don't unsubscribe for beam to prevent a/v sync in case of active speaker
   FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE = 'disableVideoTrackAutoUnsubscribe',

@@ -31,6 +31,9 @@ export const CLIENT_ANAYLTICS_STORAGE_LIMIT = 100;
 export const PUBLISH_STATS_SAMPLE_WINDOW = 30;
 export const PUBLISH_STATS_PUSH_INTERVAL = 300;
 
+export const SUBSCRIBE_STATS_SAMPLE_WINDOW = 10;
+export const SUBSCRIBE_STATS_PUSH_INTERVAL = 60;
+
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',

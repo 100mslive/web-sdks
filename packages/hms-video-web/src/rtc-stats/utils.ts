@@ -2,7 +2,9 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
+import { RID } from '../interfaces';
 import {
+  HMSLocalTrackStats,
   HMSPeerStats,
   HMSTrackStats,
   MissingInboundStats,
@@ -52,7 +54,7 @@ export const getLocalTrackStats = async (
       if (mimeType) {
         codec = mimeType.substring(mimeType.indexOf('/') + 1);
       }
-      const out = outbound[stat];
+      const out = { ...outbound[stat], rid: (outbound[stat] as HMSLocalTrackStats)?.rid as RID | undefined };
       const inStats = inbound[out.ssrc];
       trackStats[stat] = {
         ...out,
@@ -127,7 +129,7 @@ export const getTrackStats = async (
 };
 
 const getRelevantStatsFromTrackReport = (trackReport?: RTCStatsReport) => {
-  let streamStats: RTCInboundRtpStreamStats | RTCOutboundRtpStreamStats | undefined;
+  let streamStats: RTCInboundRtpStreamStats | (RTCOutboundRtpStreamStats & { rid?: RID }) | undefined;
   // Valid by Webrtc spec, not in TS
   // let remoteStreamStats: RTCRemoteInboundRtpStreamStats | RTCRemoteOutboundRtpStreamStats;
   let remoteStreamStats: RTCRemoteInboundRtpStreamStats | undefined;
