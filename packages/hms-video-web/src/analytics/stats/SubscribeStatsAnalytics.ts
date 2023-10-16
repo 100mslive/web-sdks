@@ -7,7 +7,7 @@ import {
 } from './BaseStatsAnalytics';
 import {
   RemoteAudioSample,
-  RemoteAudioTrackAnalytis,
+  RemoteAudioTrackAnalytics,
   RemoteVideoSample,
   RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
@@ -20,7 +20,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
   protected trackAnalytics: Map<string, RunningRemoteTrackAnalytics> = new Map();
 
   protected toAnalytics(): SubscribeAnalyticPayload {
-    const audio: RemoteAudioTrackAnalytis[] = [];
+    const audio: RemoteAudioTrackAnalytics[] = [];
     const video: RemoteVideoTrackAnalytics[] = [];
     this.trackAnalytics.forEach(trackAnalytic => {
       if (trackAnalytic.track.type === 'audio') {
@@ -105,7 +105,7 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     );
   };
 
-  toAnalytics = (): RemoteAudioTrackAnalytis | RemoteVideoTrackAnalytics => {
+  toAnalytics = (): RemoteAudioTrackAnalytics | RemoteVideoTrackAnalytics => {
     return {
       track_id: this.track_id,
       ssrc: this.ssrc,

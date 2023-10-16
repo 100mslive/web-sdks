@@ -5,7 +5,7 @@ import {
   LocalVideoTrackAnalytics,
   PublishAnalyticPayload,
   RemoteAudioSample,
-  RemoteAudioTrackAnalytis,
+  RemoteAudioTrackAnalytics,
   RemoteVideoSample,
   RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
@@ -111,7 +111,7 @@ export abstract class RunningTrackAnalytics {
   protected abstract toAnalytics: () =>
     | LocalAudioTrackAnalytics
     | LocalVideoTrackAnalytics
-    | RemoteAudioTrackAnalytis
+    | RemoteAudioTrackAnalytics
     | RemoteVideoTrackAnalytics;
 
   protected abstract createSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;

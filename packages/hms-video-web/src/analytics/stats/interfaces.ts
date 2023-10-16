@@ -11,7 +11,7 @@ export interface PublishAnalyticPayload extends BaseStatsPayload {
 
 export interface SubscribeAnalyticPayload extends BaseStatsPayload {
   video: Array<RemoteVideoTrackAnalytics>; // Each element represents a video track that the peer is uploading
-  audio: Array<RemoteAudioTrackAnalytis>; // Each element represents an audio track that the peer is uploading
+  audio: Array<RemoteAudioTrackAnalytics>; // Each element represents an audio track that the peer is uploading
 }
 
 interface TrackAnalytics<Sample> {
@@ -26,7 +26,7 @@ export type LocalAudioTrackAnalytics = TrackAnalytics<LocalBaseSample>;
 
 export type LocalVideoTrackAnalytics = TrackAnalytics<LocalVideoSample>;
 
-export type RemoteAudioTrackAnalytis = TrackAnalytics<RemoteAudioSample>;
+export type RemoteAudioTrackAnalytics = TrackAnalytics<RemoteAudioSample>;
 
 export type RemoteVideoTrackAnalytics = TrackAnalytics<RemoteVideoSample>;
 
