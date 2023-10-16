@@ -6,8 +6,7 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
-// @ts-ignore: No implicit Any
+// @ts-ignore
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
@@ -30,7 +29,7 @@ export const MwebLandscapePrompt = () => {
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>
@@ -56,7 +55,7 @@ export const MwebLandscapePrompt = () => {
             </Flex>
           </Box>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };

@@ -115,3 +115,23 @@ export const checkCorrectAnswer = (answer, localPeerResponse, type) => {
 export const isValidTextInput = (text, minLength = 1, maxLength = 100) => {
   return text && text.length >= minLength && text.length <= maxLength;
 };
+
+export const calculateAvatarAndAttribBoxSize = (calculatedWidth, calculatedHeight) => {
+  if (!calculatedWidth || !calculatedHeight) {
+    return [undefined, undefined];
+  }
+
+  let avatarSize = 'large';
+  if (calculatedWidth <= 150 || calculatedHeight <= 150) {
+    avatarSize = 'small';
+  } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
+    avatarSize = 'medium';
+  }
+
+  let attribBoxSize = 'medium';
+  if (calculatedWidth <= 180 || calculatedHeight <= 180) {
+    attribBoxSize = 'small';
+  }
+
+  return [avatarSize, attribBoxSize];
+};
