@@ -27,7 +27,6 @@ const SidePane = ({
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
-  let isClosed = false;
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
     ViewComponent = <Polls />;
