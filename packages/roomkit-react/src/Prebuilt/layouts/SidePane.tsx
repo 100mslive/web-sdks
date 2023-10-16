@@ -8,7 +8,7 @@ import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
+import { config as cssConfig, keyframes } from '../../Theme';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
@@ -27,6 +27,7 @@ const SidePane = ({
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
+  let isClosed = false;
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
     ViewComponent = <Polls />;
@@ -97,6 +98,12 @@ const SidePane = ({
             '@md': {
               p: '$6 $8',
               pb: mwebStreamingChat ? '$20' : '$12',
+              borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              animation: `${keyframes({
+                from: { transform: 'translate3d(0,100%,0)' },
+                to: { transform: 'translate3d(0,0,0)' },
+              })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
             },
           }}
         >
