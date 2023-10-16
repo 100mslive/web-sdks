@@ -65,4 +65,5 @@ export interface HLSVariant {
   meetingURL?: string;
   metadata?: string;
   startedAt?: Date;
+  initialisedAt?: Date;
 }

@@ -4,8 +4,6 @@ import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
 import { SidePaneTabs } from '../components/SidePaneTabs';
-// @ts-ignore: No implicit Any
-import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
@@ -35,8 +33,6 @@ const SidePane = ({
   }
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
     ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
-  } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = <StreamingLanding />;
   }
   if (!ViewComponent && !trackId) {
     return null;

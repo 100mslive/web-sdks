@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { HMSNotificationTypes, useHMSActions, useHMSNotifications } from '@100mslive/react-sdk';
+import {
+  HMSChangeTrackStateRequest,
+  HMSNotificationTypes,
+  useHMSActions,
+  useHMSNotifications,
+} from '@100mslive/react-sdk';
 import { MicOnIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import { RequestDialog } from '../../primitives/DialogContent';
 
-export const TrackBulkUnmuteModal = () => {
+export const TrackUnmuteModal = () => {
   const hmsActions = useHMSActions();
-  const [muteNotification, setMuteNotification] = useState(null);
   const notification = useHMSNotifications([
-    HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST,
+    HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST,
     HMSNotificationTypes.ROOM_ENDED,
     HMSNotificationTypes.REMOVED_FROM_ROOM,
   ]);
+  const [muteNotification, setMuteNotification] = useState<HMSChangeTrackStateRequest | null>(null);
 
   useEffect(() => {
     switch (notification?.type) {
@@ -18,7 +24,7 @@ export const TrackBulkUnmuteModal = () => {
       case HMSNotificationTypes.ROOM_ENDED:
         setMuteNotification(null);
         break;
-      case HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST:
+      case HMSNotificationTypes.CHANGE_TRACK_STATE_REQUEST:
         if (notification?.data.enabled) {
           setMuteNotification(notification.data);
         }
@@ -32,17 +38,15 @@ export const TrackBulkUnmuteModal = () => {
     return null;
   }
 
-  const { requestedBy: peer, tracks, enabled } = muteNotification;
+  const { requestedBy: peer, track, enabled } = muteNotification;
 
   return (
     <RequestDialog
       title="Track Unmute Request"
-      body={`${peer?.name} has requested you to unmute your tracks.`}
-      onOpenChange={value => !value && setMuteNotification(null)}
+      onOpenChange={(value: boolean) => !value && setMuteNotification(null)}
+      body={`${peer?.name} has requested you to unmute your ${track?.source} ${track?.type}.`}
       onAction={() => {
-        tracks.forEach(track => {
-          hmsActions.setEnabledTrack(track.id, enabled);
-        });
+        hmsActions.setEnabledTrack(track.id, enabled);
         setMuteNotification(null);
       }}
       Icon={MicOnIcon}

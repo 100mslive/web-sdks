@@ -1,10 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectHLSState, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
@@ -12,10 +11,11 @@ export function HLSFailureModal() {
   const { hlsError } = useHMSStore(selectHLSState).error || false;
   const [openModal, setOpenModal] = useState(!!hlsError);
   const hmsActions = useHMSActions();
+  const { isRTMPRunning } = useRecordingStreaming();
   const [isHLSStarted, setHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted) {
+      if (isHLSStarted || isRTMPRunning) {
         return;
       }
       setHLSStarted(true);
@@ -27,7 +27,7 @@ export function HLSFailureModal() {
       }
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSStarted, setHLSStarted]);
+  }, [hmsActions, isHLSStarted, setHLSStarted, isRTMPRunning]);
 
   return hlsError ? (
     <Dialog.Root
@@ -38,7 +38,7 @@ export function HLSFailureModal() {
         }
       }}
     >
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(360px, 90%)' }}>
           <Dialog.Title
@@ -66,7 +66,7 @@ export function HLSFailureModal() {
             </Button>
           </Flex>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   ) : null;
 }

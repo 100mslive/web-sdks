@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Text } from '../../../';
+import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
+import { Text } from '../../..';
+// @ts-ignore: No implicit Any
 import { ErrorDialog } from '../../primitives/DialogContent';
 
-export const InitErrorModal = ({ notification }) => {
+export const InitErrorModal = () => {
+  const notification = useHMSNotifications(HMSNotificationTypes.ERROR);
   const [showModal, setShowModal] = useState(false);
   const [info, setInfo] = useState({ title: 'Init Error', description: '' });
 

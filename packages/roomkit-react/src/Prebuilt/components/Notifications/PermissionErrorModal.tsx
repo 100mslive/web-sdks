@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { HMSNotificationTypes, useHMSNotifications } from '@100mslive/react-sdk';
-import { Button, config as cssConfig, Dialog, Flex, Text } from '../../../';
+import { Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
+// @ts-ignore: No implicit Any
 import androidPermissionAlert from '../../images/android-perm-1.png';
+// @ts-ignore: No implicit Any
 import iosPermissions from '../../images/ios-perm-0.png';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+// @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../../common/constants';
 
 export function PermissionErrorModal() {
@@ -40,7 +42,7 @@ export function PermissionErrorModal() {
 
   return deviceType ? (
     <Dialog.Root open={!!deviceType}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(380px, 90%)', p: '$8' }}>
           <Dialog.Title
@@ -119,7 +121,7 @@ export function PermissionErrorModal() {
             </Flex>
           ) : null}
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   ) : null;
 }

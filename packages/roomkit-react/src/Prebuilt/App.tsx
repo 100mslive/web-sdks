@@ -22,7 +22,7 @@ import FullPageProgress from './components/FullPageProgress';
 import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
-// @ts-ignore: No implicit Any
+import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
 import { HeadlessEndRoomListener } from './components/Notifications/HeadlessEndRoomListener';
 // @ts-ignore: No implicit Any
@@ -32,6 +32,7 @@ import PreviewContainer from './components/Preview/PreviewContainer';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
+import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext, useHMSPrebuiltContext } from './AppContext';
@@ -98,6 +99,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
+    const containerID = 'prebuilt-container';
 
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
@@ -221,17 +223,23 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                     >
                       <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
                       <Init />
-                      <Box
-                        id="prebuilt-container"
-                        css={{
-                          bg: '$background_dim',
-                          size: '100%',
-                          lineHeight: '1.5',
-                          '-webkit-text-size-adjust': '100%',
-                        }}
-                      >
-                        <AppRoutes authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />
-                      </Box>
+                      <DialogContainerProvider dialogContainerSelector={`#${containerID}`}>
+                        <Box
+                          id={containerID}
+                          css={{
+                            bg: '$background_dim',
+                            size: '100%',
+                            lineHeight: '1.5',
+                            '-webkit-text-size-adjust': '100%',
+                            position: 'relative',
+                          }}
+                        >
+                          <AppRoutes
+                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
+                            defaultAuthToken={authToken}
+                          />
+                        </Box>
+                      </DialogContainerProvider>
                     </HMSThemeProvider>
                   );
                 }}
@@ -350,6 +358,7 @@ function AppRoutes({
       <>
         <ToastContainer />
         <Notifications />
+        <MwebLandscapePrompt />
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />
