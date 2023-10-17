@@ -254,17 +254,12 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
 
-  function renderContent(state: PrebuiltStates) {
-    switch (state) {
-      case PrebuiltStates.PREVIEW:
-        return isPreviewScreenEnabled ? <PreviewContainer /> : null;
-      case PrebuiltStates.MEETING:
-        return <Conference />;
-      case PrebuiltStates.LEAVE:
-        return isLeaveScreenEnabled ? <PostLeave /> : null;
-    }
+  if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
+    return <PreviewContainer />;
+  } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
+    return <PostLeave />;
   }
-  return <>{renderContent(activeState)}</>;
+  return <Conference />;
 };
 
 const BackSwipe = () => {
