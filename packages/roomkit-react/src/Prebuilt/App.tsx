@@ -73,6 +73,10 @@ export type HMSPrebuiltProps = {
   role?: string;
   onLeave?: () => void;
   onJoin?: () => void;
+  /**
+   * @remarks
+   * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
+   */
   containerSelector?: string;
 };
 
