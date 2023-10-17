@@ -49,6 +49,8 @@ import {
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
+// @ts-ignore: No implicit Any
+import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
 // @ts-ignore: No implicit Any
 const Conference = React.lazy(() => import('./components/conference'));
@@ -71,6 +73,11 @@ export type HMSPrebuiltProps = {
   role?: string;
   onLeave?: () => void;
   onJoin?: () => void;
+  /**
+   * @remarks
+   * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
+   */
+  containerSelector?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -87,6 +94,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       authToken = '',
       roomId = '',
       role = '',
+      containerSelector = DEFAULT_PORTAL_CONTAINER,
       logo,
       typography,
       themes,
@@ -99,7 +107,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
   ) => {
     const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
-    const containerID = 'prebuilt-container';
 
     const [hydrated, setHydrated] = React.useState(false);
     useEffect(() => {
@@ -176,6 +183,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             roomCode,
             roomId,
             role,
+            containerSelector,
             onLeave,
             onJoin,
             userName,
@@ -223,9 +231,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                     >
                       <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
                       <Init />
-                      <DialogContainerProvider dialogContainerSelector={`#${containerID}`}>
+                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
-                          id={containerID}
+                          id={DEFAULT_PORTAL_CONTAINER.slice(1)} //Skips the #
                           css={{
                             bg: '$background_dim',
                             size: '100%',

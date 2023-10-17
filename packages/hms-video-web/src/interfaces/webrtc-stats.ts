@@ -42,6 +42,14 @@ export interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCo
   packetsLost?: number;
   packetsLostRate?: number;
   packetsReceived?: number;
+  concealedSamples?: number;
+  silentConcealedSamples?: number;
+  audioLevel?: number;
+  totalSamplesReceived?: number;
+  concealmentEvents?: number;
+  fecPacketsDiscarded?: number;
+  fecPacketsReceived?: number;
+  totalSamplesDuration?: number;
 }
 
 export type PeerConnectionType = 'publish' | 'subscribe';
