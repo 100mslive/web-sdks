@@ -73,7 +73,7 @@ export type HMSPrebuiltProps = {
   role?: string;
   onLeave?: () => void;
   onJoin?: () => void;
-  portalContainerSelector: string;
+  portalContainerSelector?: string;
 };
 
 export type HMSPrebuiltRefType = {
