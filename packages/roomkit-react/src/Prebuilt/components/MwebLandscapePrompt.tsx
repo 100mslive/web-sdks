@@ -1,31 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
-// @ts-ignore: No implicit Any
-import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
-  const isMobileViewPort = useMedia(cssConfig.media.md);
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      const isMobile = (isAndroid || isIOS) && isMobileViewPort;
-      setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
+    const handleRotation = () => {
+      const angle = window.screen.orientation.angle;
+      const type = window.screen.orientation.type;
+      // Angle check needed to diff bw mobile and desktop
+      setShowMwebLandscapePrompt(angle > 90 && type.includes('landscape'));
     };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    handleRotation();
+    window.screen.orientation.addEventListener('change', handleRotation);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.screen.orientation.removeEventListener('change', handleRotation);
     };
-  }, [isMobileViewPort]);
+  }, []);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
