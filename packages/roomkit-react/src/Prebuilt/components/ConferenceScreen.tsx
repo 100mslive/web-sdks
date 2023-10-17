@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { usePrevious } from 'react-use';
+import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import {
   HMSRoomState,
   selectAppData,
@@ -11,38 +10,40 @@ import {
 } from '@100mslive/react-sdk';
 import { Footer } from './Footer/Footer';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
+// @ts-ignore: No implicit Any
 import { ActivatedPIP } from './PIP/PIPComponent';
+// @ts-ignore: No implicit Any
 import { PictureInPicture } from './PIP/PIPManager';
 import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
+// @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
-const Conference = () => {
-  const navigate = useNavigate();
-  const { roomId, role } = useParams();
+export const ConferenceScreen = () => {
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
-  const prevState = usePrevious(roomState);
   const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
   const hmsActions = useHMSActions();
   const [hideControls, setHideControls] = useState(false);
   const dropdownList = useHMSStore(selectAppData(APP_DATA.dropdownList));
   const authTokenInAppData = useAuthToken();
-  const headerRef = useRef();
-  const footerRef = useRef();
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
   const isMobileDevice = isAndroid || isIOS || isIPadOS;
-  const dropdownListRef = useRef();
+  const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice) {
@@ -52,12 +53,12 @@ const Conference = () => {
   const autoRoomJoined = useRef(isPreviewScreenEnabled);
 
   useEffect(() => {
-    let timeout = null;
+    let timeout: undefined | ReturnType<typeof setTimeout>;
     dropdownListRef.current = dropdownList || [];
-    if (dropdownListRef.current.length === 0) {
+    if (dropdownListRef.current && dropdownListRef.current.length === 0) {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        if (dropdownListRef.current.length === 0) {
+        if (dropdownListRef.current && dropdownListRef.current.length === 0) {
           setHideControls(isMobileDevice);
         }
       }, 5000);
@@ -66,23 +67,6 @@ const Conference = () => {
       clearTimeout(timeout);
     };
   }, [dropdownList, hideControls, isMobileDevice]);
-
-  useEffect(() => {
-    if (!roomId) {
-      navigate(`/`);
-      return;
-    }
-    if (!isPreviewScreenEnabled) {
-      return;
-    }
-    if (
-      !prevState &&
-      !(roomState === HMSRoomState.Connecting || roomState === HMSRoomState.Reconnecting || isConnectedToRoom)
-    ) {
-      if (role) navigate(`/preview/${roomId || ''}/${role}`);
-      else navigate(`/preview/${roomId || ''}`);
-    }
-  }, [isConnectedToRoom, prevState, roomState, navigate, role, roomId, isPreviewScreenEnabled]);
 
   useEffect(() => {
     if (
@@ -94,10 +78,10 @@ const Conference = () => {
     ) {
       hmsActions
         .join({
-          userName,
+          userName: userName || '',
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
-          initialSettings: {
+          settings: {
             isAudioMuted: !isPreviewScreenEnabled,
             isVideoMuted: !isPreviewScreenEnabled,
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
@@ -111,7 +95,7 @@ const Conference = () => {
   useEffect(() => {
     onJoinFunc?.();
     return () => {
-      PictureInPicture.stop().catch(error => console.error('stopping pip', error));
+      PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
     };
   }, [onJoinFunc]);
 
@@ -140,7 +124,7 @@ const Conference = () => {
             }}
             data-testid="header"
           >
-            <Header elements={screenProps.elements} screenType={screenProps.screenType} />
+            <Header />
           </Box>
         )}
         <Box
@@ -148,7 +132,10 @@ const Conference = () => {
             w: '100%',
             flex: '1 1 0',
             minHeight: 0,
-            px: screenProps?.elements?.video_tile_layout?.grid?.edge_to_edge ? 0 : '$10', // TODO: padding to be controlled by section/element
+            // @ts-ignore
+            px: (screenProps?.elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid?.edge_to_edge
+              ? 0
+              : '$10', // TODO: padding to be controlled by section/element
             paddingBottom: 'env(safe-area-inset-bottom)',
             '@lg': {
               px: 0,
@@ -158,13 +145,15 @@ const Conference = () => {
           data-testid="conferencing"
           onClick={toggleControls}
         >
-          <VideoStreamingSection
-            screenType={screenProps.screenType}
-            elements={screenProps.elements}
-            hideControls={hideControls}
-          />
+          {screenProps.elements ? (
+            <VideoStreamingSection
+              screenType={screenProps.screenType}
+              elements={screenProps.elements}
+              hideControls={hideControls}
+            />
+          ) : null}
         </Box>
-        {!screenProps.hideSections.includes('footer') && (
+        {!screenProps.hideSections.includes('footer') && screenProps.elements && (
           <Box
             ref={footerRef}
             css={{
@@ -190,5 +179,3 @@ const Conference = () => {
     </>
   );
 };
-
-export default Conference;

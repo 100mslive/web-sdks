@@ -10,6 +10,7 @@ import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -97,6 +98,9 @@ const SidePane = ({
             '@md': {
               p: '$6 $8',
               pb: mwebStreamingChat ? '$20' : '$12',
+              borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
             },
           }}
         >
