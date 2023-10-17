@@ -276,10 +276,10 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
-        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
-        if (detail.fatal) {
-          // added reconnection for making player work standalone as well
+        if (!navigator.onLine) {
           this.reConnectToStream();
+        } else {
+          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
         }
         break;
       }
