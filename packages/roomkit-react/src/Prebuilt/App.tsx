@@ -73,7 +73,7 @@ export type HMSPrebuiltProps = {
   role?: string;
   onLeave?: () => void;
   onJoin?: () => void;
-  portalContainerSelector?: string;
+  containerSelector?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -90,7 +90,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       authToken = '',
       roomId = '',
       role = '',
-      portalContainerSelector = DEFAULT_PORTAL_CONTAINER,
+      containerSelector = DEFAULT_PORTAL_CONTAINER,
       logo,
       typography,
       themes,
@@ -179,7 +179,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             roomCode,
             roomId,
             role,
-            portalContainerSelector,
+            containerSelector,
             onLeave,
             onJoin,
             userName,
@@ -227,7 +227,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                     >
                       <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
                       <Init />
-                      <DialogContainerProvider dialogContainerSelector={portalContainerSelector}>
+                      <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
                           id={DEFAULT_PORTAL_CONTAINER.slice(1)} //Skips the #
                           css={{

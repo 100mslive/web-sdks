@@ -8,7 +8,7 @@ type HMSPrebuiltContextType = {
   role?: string;
   userName?: string;
   userId?: string;
-  portalContainerSelector: string;
+  containerSelector: string;
   endpoints?: Record<string, string>;
   onLeave?: () => void;
   onJoin?: () => void;
@@ -18,7 +18,7 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   roomCode: '',
   userName: '',
   userId: '',
-  portalContainerSelector: DEFAULT_PORTAL_CONTAINER,
+  containerSelector: DEFAULT_PORTAL_CONTAINER,
   endpoints: {},
   onLeave: undefined,
   onJoin: undefined,
