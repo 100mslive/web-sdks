@@ -13,19 +13,17 @@ import {
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
-import Conference from './components/Conference';
+import { ConferenceScreen } from './components/ConferenceScreen';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
 // @ts-ignore: No implicit Any
 import { Init } from './components/init/Init';
 // @ts-ignore: No implicit Any
 import { KeyboardHandler } from './components/Input/KeyboardInputManager';
+import { LeaveScreen } from './components/LeaveScreen';
 import { MwebLandscapePrompt } from './components/MwebLandscapePrompt';
 import { Notifications } from './components/Notifications';
-// @ts-ignore: No implicit Any
-import PostLeave from './components/PostLeave';
-// @ts-ignore: No implicit Any
-import PreviewContainer from './components/Preview/PreviewContainer';
+import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
@@ -255,11 +253,11 @@ const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
   useAutoStartStreaming();
 
   if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
-    return <PreviewContainer />;
+    return <PreviewScreen />;
   } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
-    return <PostLeave />;
+    return <LeaveScreen />;
   }
-  return <Conference />;
+  return <ConferenceScreen />;
 };
 
 const BackSwipe = () => {

@@ -11,7 +11,7 @@ import { Header } from './Header';
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { textEllipsis } from '../../utils';
 
-const PostLeave = () => {
+export const LeaveScreen = () => {
   const { rejoin } = useHMSAppStateContext();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
@@ -67,5 +67,3 @@ const PostLeave = () => {
     </Flex>
   );
 };
-
-export default PostLeave;

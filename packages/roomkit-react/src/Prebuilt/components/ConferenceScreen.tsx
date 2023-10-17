@@ -30,7 +30,7 @@ import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
-const Conference = () => {
+export const ConferenceScreen = () => {
   const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
@@ -180,5 +180,3 @@ const Conference = () => {
     </>
   );
 };
-
-export default Conference;

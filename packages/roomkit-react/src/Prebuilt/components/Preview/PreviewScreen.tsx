@@ -13,7 +13,7 @@ import { useAuthToken } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
-const PreviewContainer = () => {
+export const PreviewScreen = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
@@ -39,5 +39,3 @@ const PreviewContainer = () => {
     </Flex>
   );
 };
-
-export default PreviewContainer;
