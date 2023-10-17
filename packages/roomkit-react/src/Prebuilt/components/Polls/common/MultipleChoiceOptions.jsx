@@ -1,7 +1,8 @@
 // @ts-check
 import React, { useCallback } from 'react';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Checkbox, Flex, Input, Label, Text } from '../../../../';
+import { Checkbox, Flex, Label, Text } from '../../../../';
+import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
 import { VoteProgress } from './VoteProgress';
 
@@ -81,6 +82,23 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
     [setOptions, isQuiz],
   );
 
+  const handleOptionTextChange = useCallback(
+    (index, text) => {
+      setOptions(options => [...options.slice(0, index), { ...options[index], text }, ...options.slice(index + 1)]);
+    },
+    [setOptions],
+  );
+
+  const removeOption = useCallback(
+    index =>
+      setOptions(options => {
+        const newOptions = [...options];
+        newOptions.splice(index, 1);
+        return newOptions;
+      }),
+    [setOptions],
+  );
+
   return (
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map((option, index) => {
@@ -92,6 +110,7 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
                 checked={option.isCorrectAnswer}
                 css={{
                   cursor: 'pointer',
+                  width: '$9',
                 }}
               >
                 <Checkbox.Indicator>
@@ -99,22 +118,11 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
                 </Checkbox.Indicator>
               </Checkbox.Root>
             )}
-            <Input
-              placeholder={`Option ${index + 1}`}
-              css={{
-                w: '100%',
-                backgroundColor: '$surface_default',
-                border: '1px solid $border_bright',
-              }}
-              key={index}
-              value={option?.text || ''}
-              onChange={event => {
-                setOptions(options => [
-                  ...options.slice(0, index),
-                  { ...options[index], text: event.target.value },
-                  ...options.slice(index + 1),
-                ]);
-              }}
+            <OptionInputWithDelete
+              index={index}
+              option={option}
+              handleOptionTextChange={handleOptionTextChange}
+              removeOption={removeOption}
             />
           </Flex>
         );
