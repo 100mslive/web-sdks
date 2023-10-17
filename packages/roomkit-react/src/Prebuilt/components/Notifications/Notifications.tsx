@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
@@ -31,7 +30,6 @@ import { TrackUnmuteModal } from './TrackUnmuteModal';
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 // @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
 // @ts-ignore: No implicit Any
@@ -39,13 +37,10 @@ import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
-  const navigate = useNavigate();
-  const params = useParams();
   const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
-  const { redirectToLeave } = useRedirectToLeave();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
@@ -96,28 +91,13 @@ export function Notifications() {
               title: `Error: ${notification.data?.message}`,
             });
           } else {
-            // show button action when the error is terminal
-            const toastId = ToastManager.addToast({
+            ToastManager.addToast({
               title:
                 notification.data?.message ||
                 'We couldn’t reconnect you. When you’re back online, try joining the room.',
-              inlineAction: true,
-              action: (
-                <Button
-                  onClick={() => {
-                    ToastManager.removeToast(toastId);
-                    navigate(`/${params.roomId}${params.role ? `/${params.role}` : ''}`);
-                  }}
-                >
-                  Rejoin
-                </Button>
-              ),
               close: false,
             });
           }
-          // goto leave for terminal if any action is not performed within 1s
-          // if network is still unavailable going to preview will throw an error
-          redirectToLeave(1000);
           return;
         }
         // Autoplay error or user denied screen share (cancelled browser pop-up)
@@ -156,7 +136,6 @@ export function Notifications() {
           title: `${notification.message}. 
               ${notification.data.reason && `Reason: ${notification.data.reason}`}`,
         });
-        redirectToLeave(1000);
         break;
       case HMSNotificationTypes.DEVICE_CHANGE_UPDATE:
         ToastManager.addToast({

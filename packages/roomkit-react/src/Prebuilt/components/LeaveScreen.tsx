@@ -1,21 +1,18 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { ExitIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { useHMSPrebuiltContext } from '../AppContext';
+import { useHMSAppStateContext } from '../AppStateContext';
 import { Header } from './Header';
-import { useRoomLayoutPreviewScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { textEllipsis } from '../../utils';
 
-const PostLeave = () => {
-  const navigate = useNavigate();
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { roomCode } = useHMSPrebuiltContext();
-  const { roomId, role } = useParams();
+export const LeaveScreen = () => {
+  const { rejoin } = useHMSAppStateContext();
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
     <Flex direction="column" css={{ size: '100%' }}>
@@ -57,9 +54,7 @@ const PostLeave = () => {
           </Text>
           <Button
             onClick={() => {
-              let redirectUrl = `${isPreviewScreenEnabled ? '/preview/' : '/meeting/'}${roomCode || roomId}`;
-              if (role && roomId) redirectUrl += '/' + role;
-              navigate(redirectUrl);
+              rejoin();
               ToastManager.clearAllToast();
             }}
             data-testid="join_again_btn"
@@ -72,5 +67,3 @@ const PostLeave = () => {
     </Flex>
   );
 };
-
-export default PostLeave;
