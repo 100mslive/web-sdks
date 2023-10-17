@@ -38,7 +38,7 @@ export function CreateQuestions() {
   };
   const headingTitle = interaction?.type
     ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
-    : 'Polls/Quiz';
+    : 'Polls and Quizzes';
   const isQuiz = interaction?.type === 'quiz';
   return (
     <Container rounded>
@@ -110,7 +110,13 @@ const QuestionCard = ({ question, onSave, index, length, removeQuestion, isQuiz,
   return (
     <Flex direction="column" css={{ p: '$md', bg: '$surface_default', r: '$1', mb: '$sm' }}>
       {question.saved ? (
-        <SavedQuestion question={question} index={index} length={length} convertToDraft={convertToDraft} />
+        <SavedQuestion
+          question={question}
+          index={index}
+          length={length}
+          convertToDraft={convertToDraft}
+          removeQuestion={removeQuestion}
+        />
       ) : (
         <QuestionForm
           question={question}

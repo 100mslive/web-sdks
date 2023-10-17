@@ -6,6 +6,7 @@ import {
   HMSRoomState,
   selectHasPeerHandRaised,
   selectLocalPeerID,
+  selectPeerNameByID,
   selectRoomState,
   useCustomEvent,
   useHMSNotifications,
@@ -145,16 +146,17 @@ export function Notifications() {
 
       case HMSNotificationTypes.POLL_STARTED:
         if (notification.data.startedBy !== localPeerID) {
+          const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy));
           ToastManager.addToast({
-            title: `A poll was started: ${notification.data.title}`,
+            title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
             action: (
               <Button
                 onClick={() => togglePollView(notification.data.id)}
                 variant="standard"
                 css={{
-                  backgroundColor: '$surfaceLight',
+                  backgroundColor: '$surface_bright',
                   fontWeight: '$semiBold',
-                  color: '$textHighEmp',
+                  color: '$on_surface_high',
                   p: '$xs $md',
                 }}
               >

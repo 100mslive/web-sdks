@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-// @ts-ignore
+import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
 import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
-  const isMobile = isAndroid || isIOS;
+  const isMobileViewPort = useMedia(cssConfig.media.md);
+  const isMobile = (isAndroid || isIOS) && isMobileViewPort;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {

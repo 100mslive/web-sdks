@@ -97,8 +97,7 @@ export const ConferenceScreen = () => {
     return () => {
       PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onJoinFunc]);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
