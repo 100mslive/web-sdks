@@ -225,14 +225,16 @@ export interface RTMPNotification {
   error?: ServerError;
 }
 
+export interface HLSRecording {
+  hls_vod: boolean;
+  single_file_per_layer: boolean;
+}
+
 export interface HLSNotification {
   enabled: boolean;
   variants?: Array<HLSVariantInfo>;
   error?: ServerError;
-  hls_recording?: {
-    hls_vod: boolean;
-    single_file_per_layer: boolean;
-  };
+  hls_recording?: HLSRecording;
 }
 
 export interface HLSVariantInfo {
@@ -240,6 +242,7 @@ export interface HLSVariantInfo {
   meeting_url?: string;
   metadata?: string;
   started_at?: number;
+  initialised_at?: number;
 }
 
 export interface MetadataChangeNotification {

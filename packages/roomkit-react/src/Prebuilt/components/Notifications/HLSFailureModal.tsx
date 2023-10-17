@@ -4,12 +4,13 @@ import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+// @ts-ignore: No implicit Any
 import { APP_DATA } from '../../common/constants';
 
 export function HLSFailureModal() {
-  const { hlsError } = useHMSStore(selectHLSState).error || false;
+  const hlsError = useHMSStore(selectHLSState).error || false;
   const [openModal, setOpenModal] = useState(!!hlsError);
   const hmsActions = useHMSActions();
   const { isRTMPRunning } = useRecordingStreaming();
@@ -22,7 +23,7 @@ export function HLSFailureModal() {
       setHLSStarted(true);
       await hmsActions.startHLSStreaming({});
     } catch (error) {
-      if (error.message.includes('invalid input')) {
+      if ((error as Error).message.includes('invalid input')) {
         await startHLS();
         return;
       }
@@ -39,7 +40,7 @@ export function HLSFailureModal() {
         }
       }}
     >
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(360px, 90%)' }}>
           <Dialog.Title
@@ -67,7 +68,7 @@ export function HLSFailureModal() {
             </Button>
           </Flex>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   ) : null;
 }

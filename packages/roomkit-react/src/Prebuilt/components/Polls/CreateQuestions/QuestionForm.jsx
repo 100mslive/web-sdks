@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
 import { Box, Button, Dropdown, Flex, Input, Switch, Text, Tooltip } from '../../../../';
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
@@ -30,6 +30,52 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
     options,
     isQuiz,
   });
+
+  const handleOptionTextChange = useCallback(
+    (index, text) => {
+      setOptions(options => [...options.slice(0, index), { ...options[index], text }, ...options.slice(index + 1)]);
+    },
+    [setOptions],
+  );
+
+  const removeOption = useCallback(
+    index =>
+      setOptions(options => {
+        const newOptions = [...options];
+        newOptions.splice(index, 1);
+        return newOptions;
+      }),
+    [setOptions],
+  );
+
+  const selectSingleChoiceAnswer = useCallback(
+    answerIndex => {
+      if (!isQuiz) {
+        return;
+      }
+      setOptions(options =>
+        options.map((option, index) => ({
+          ...option,
+          isCorrectAnswer: index === answerIndex,
+        })),
+      );
+    },
+    [setOptions, isQuiz],
+  );
+
+  const selectMultipleChoiceAnswer = useCallback(
+    (checked, index) => {
+      if (!isQuiz) {
+        return;
+      }
+      setOptions(options => [
+        ...options.slice(0, index),
+        { ...options[index], isCorrectAnswer: checked },
+        ...options.slice(index + 1),
+      ]);
+    },
+    [setOptions, isQuiz],
+  );
 
   return (
     <>
@@ -94,11 +140,23 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           )}
 
           {type === QUESTION_TYPE.SINGLE_CHOICE && (
-            <SingleChoiceOptionInputs isQuiz={isQuiz} options={options} setOptions={setOptions} />
+            <SingleChoiceOptionInputs
+              isQuiz={isQuiz}
+              options={options}
+              selectAnswer={selectSingleChoiceAnswer}
+              handleOptionTextChange={handleOptionTextChange}
+              removeOption={removeOption}
+            />
           )}
 
           {type === QUESTION_TYPE.MULTIPLE_CHOICE && (
-            <MultipleChoiceOptionInputs isQuiz={isQuiz} options={options} setOptions={setOptions} />
+            <MultipleChoiceOptionInputs
+              isQuiz={isQuiz}
+              options={options}
+              selectAnswer={selectMultipleChoiceAnswer}
+              handleOptionTextChange={handleOptionTextChange}
+              removeOption={removeOption}
+            />
           )}
 
           {options?.length < 20 && (

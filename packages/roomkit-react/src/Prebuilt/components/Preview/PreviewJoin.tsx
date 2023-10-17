@@ -1,5 +1,5 @@
-import React, { Fragment, Suspense, useCallback, useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
+import React, { Fragment, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -11,9 +11,7 @@ import {
   useParticipants,
   usePreviewJoin,
   useRecordingStreaming,
-  // @ts-ignore: No implicit Any
 } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import { MicOffIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Avatar, Box, config as cssConfig, Flex, flexCenter, styled, StyledVideoTile, Text, Video } from '../../..';
 import { AudioLevel } from '../../../AudioLevel';
@@ -31,7 +29,6 @@ import TileConnection from '../Connection/TileConnection';
 import FullPageProgress from '../FullPageProgress';
 // @ts-ignore: No implicit Any
 import { Logo } from '../Header/HeaderComponents';
-import { PrebuiltAudioIndicator } from '../PrebuiltTileElements';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
 // @ts-ignore: No implicit Any
@@ -41,7 +38,7 @@ import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
-import { getFormattedCount } from '../../common/utils';
+import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
@@ -56,13 +53,24 @@ const getParticipantChipContent = (peerCount = 0) => {
   return `${formattedNum} other${parseInt(formattedNum) === 1 ? '' : 's'} in the session`;
 };
 
+const useLocalTileAspectRatio = () => {
+  const localPeer = useHMSStore(selectLocalPeer);
+  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
+  const isMobile = useMedia(cssConfig.media.md);
+  let aspectRatio = 0;
+  if (videoTrack?.width && videoTrack?.height) {
+    aspectRatio = videoTrack.width / videoTrack.height;
+  } else {
+    aspectRatio = isMobile ? 9 / 16 : 16 / 9;
+  }
+  return aspectRatio;
+};
+
 const PreviewJoin = ({
-  onJoin,
   skipPreview,
   initialName,
   asRole,
 }: {
-  onJoin: () => void;
   skipPreview?: boolean;
   initialName?: string;
   asRole?: string;
@@ -102,16 +110,11 @@ const PreviewJoin = ({
       name,
     });
     join();
-    onJoin && onJoin();
-  }, [join, name, setPreviewPreference, onJoin]);
+  }, [join, name, setPreviewPreference]);
   const roomLayout = useRoomLayout();
 
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
-  const localPeer = useHMSStore(selectLocalPeer);
-  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
-  const isMobile = useMedia(cssConfig.media.md);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
+  const aspectRatio = useLocalTileAspectRatio();
   useEffect(() => {
     if (authToken) {
       if (skipPreview) {
@@ -204,13 +207,16 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const showMuteIcon = !isLocalAudioEnabled || !toggleAudio;
-  const videoTrack = useHMSStore(selectVideoTrackByID(localPeer?.videoTrack));
-  const isMobile = useMedia(cssConfig.media.md);
-  const aspectRatio =
-    videoTrack?.width && videoTrack?.height ? videoTrack.width / videoTrack.height : isMobile ? 9 / 16 : 16 / 9;
+  const aspectRatio = useLocalTileAspectRatio();
+  const [ref, { width: calculatedWidth, height: calculatedHeight }] = useMeasure<HTMLDivElement>();
+  const [avatarSize, attribBoxSize] = useMemo(
+    () => calculateAvatarAndAttribBoxSize(calculatedWidth, calculatedHeight),
+    [calculatedWidth, calculatedHeight],
+  );
 
   return (
     <StyledVideoTile.Container
+      ref={ref}
       css={{
         bg: '$surface_default',
         aspectRatio,
@@ -235,22 +241,21 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
 
           {!isVideoOn ? (
             <StyledVideoTile.AvatarContainer>
-              <Avatar name={name} data-testid="preview_avatar_tile" size="medium" />
+              <Avatar name={name} data-testid="preview_avatar_tile" size={avatarSize} />
             </StyledVideoTile.AvatarContainer>
           ) : null}
         </>
-      ) : !error ? (
-        <FullPageProgress />
       ) : null}
+      {!localPeer && !error ? <FullPageProgress /> : null}
 
       {showMuteIcon ? (
-        <PrebuiltAudioIndicator>
-          <MicOffIcon height={16} width={16} />
-        </PrebuiltAudioIndicator>
+        <StyledVideoTile.AudioIndicator size={attribBoxSize}>
+          <MicOffIcon />
+        </StyledVideoTile.AudioIndicator>
       ) : (
-        <PrebuiltAudioIndicator>
+        <StyledVideoTile.AudioIndicator size={attribBoxSize}>
           <AudioLevel trackId={localPeer?.audioTrack} />
-        </PrebuiltAudioIndicator>
+        </StyledVideoTile.AudioIndicator>
       )}
     </StyledVideoTile.Container>
   );

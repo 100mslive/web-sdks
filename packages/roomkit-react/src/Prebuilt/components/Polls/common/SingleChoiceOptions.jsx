@@ -1,6 +1,7 @@
 // @ts-check
-import React, { useCallback } from 'react';
-import { Flex, Input, Label, RadioGroup, Text } from '../../../../';
+import React from 'react';
+import { Flex, Label, RadioGroup, Text } from '../../../../';
+import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
 import { VoteProgress } from './VoteProgress';
 
@@ -72,22 +73,7 @@ export const SingleChoiceOptions = ({
   );
 };
 
-export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
-  const selectAnswer = useCallback(
-    answerIndex => {
-      if (!isQuiz) {
-        return;
-      }
-      setOptions(options =>
-        options.map((option, index) => ({
-          ...option,
-          isCorrectAnswer: index === answerIndex,
-        })),
-      );
-    },
-    [setOptions, isQuiz],
-  );
-
+export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handleOptionTextChange, removeOption }) => {
   const correctOptionIndex = options.findIndex(option => option.isCorrectAnswer);
 
   return (
@@ -95,12 +81,11 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map((option, index) => {
           return (
-            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$9' }}>
+            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$5' }}>
               {isQuiz && (
                 <RadioGroup.Item
                   css={{
                     background: 'none',
-                    h: '$9',
                     w: '$9',
                     border: '2px solid',
                     borderColor: '$on_surface_high',
@@ -125,23 +110,11 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
                   />
                 </RadioGroup.Item>
               )}
-
-              <Input
-                placeholder={`Option ${index + 1}`}
-                css={{
-                  w: '100%',
-                  backgroundColor: '$surface_bright',
-                  border: '1px solid $border_bright',
-                }}
-                value={option?.text || ''}
-                key={index}
-                onChange={event => {
-                  setOptions(options => [
-                    ...options.slice(0, index),
-                    { ...options[index], text: event.target.value },
-                    ...options.slice(index + 1),
-                  ]);
-                }}
+              <OptionInputWithDelete
+                index={index}
+                option={option}
+                handleOptionTextChange={handleOptionTextChange}
+                removeOption={removeOption}
               />
             </Flex>
           );

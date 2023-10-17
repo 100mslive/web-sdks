@@ -1,36 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { config as cssConfig } from '../../Theme';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
-// @ts-ignore: No implicit Any
-import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
-  const isMobileViewPort = useMedia(cssConfig.media.md);
-  const isMobile = (isAndroid || isIOS) && isMobileViewPort;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
+    const handleRotation = () => {
+      const angle = window.screen.orientation.angle;
+      const type = window.screen.orientation.type;
+      // Angle check needed to diff bw mobile and desktop
+      setShowMwebLandscapePrompt(angle >= 90 && type.includes('landscape'));
     };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
+    handleRotation();
+    window.screen.orientation.addEventListener('change', handleRotation);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.screen.orientation.removeEventListener('change', handleRotation);
     };
   }, []);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>
@@ -56,7 +51,7 @@ export const MwebLandscapePrompt = () => {
             </Flex>
           </Box>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };
