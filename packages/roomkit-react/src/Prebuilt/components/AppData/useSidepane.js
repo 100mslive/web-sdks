@@ -50,7 +50,9 @@ export const usePollViewToggle = () => {
         [POLL_STATE.pollInView]: id,
         [POLL_STATE.view]: id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ,
       });
-      toggleSidepane();
+      if (!id) {
+        toggleSidepane();
+      }
     },
     [view, setPollState, isOpen, toggleSidepane],
   );
