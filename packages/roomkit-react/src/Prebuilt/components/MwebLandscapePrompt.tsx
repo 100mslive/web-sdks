@@ -13,7 +13,7 @@ export const MwebLandscapePrompt = () => {
       const angle = window.screen.orientation.angle;
       const type = window.screen.orientation.type;
       // Angle check needed to diff bw mobile and desktop
-      setShowMwebLandscapePrompt(angle > 90 && type.includes('landscape'));
+      setShowMwebLandscapePrompt(angle >= 90 && type.includes('landscape'));
     };
     handleRotation();
     window.screen.orientation.addEventListener('change', handleRotation);
