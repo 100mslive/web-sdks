@@ -13,7 +13,6 @@ import {
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
-// @ts-ignore: No implicit Any
 import Conference from './components/Conference';
 // @ts-ignore: No implicit Any
 import { ErrorBoundary } from './components/ErrorBoundary';
