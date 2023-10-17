@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback } from 'react';
+import React from 'react';
 import { CheckIcon } from '@100mslive/react-icons';
 import { Checkbox, Flex, Label, Text } from '../../../../';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
@@ -67,38 +67,7 @@ export const MultipleChoiceOptions = ({
   );
 };
 
-export const MultipleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
-  const selectAnswer = useCallback(
-    (checked, index) => {
-      if (!isQuiz) {
-        return;
-      }
-      setOptions(options => [
-        ...options.slice(0, index),
-        { ...options[index], isCorrectAnswer: checked },
-        ...options.slice(index + 1),
-      ]);
-    },
-    [setOptions, isQuiz],
-  );
-
-  const handleOptionTextChange = useCallback(
-    (index, text) => {
-      setOptions(options => [...options.slice(0, index), { ...options[index], text }, ...options.slice(index + 1)]);
-    },
-    [setOptions],
-  );
-
-  const removeOption = useCallback(
-    index =>
-      setOptions(options => {
-        const newOptions = [...options];
-        newOptions.splice(index, 1);
-        return newOptions;
-      }),
-    [setOptions],
-  );
-
+export const MultipleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handleOptionTextChange, removeOption }) => {
   return (
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map((option, index) => {

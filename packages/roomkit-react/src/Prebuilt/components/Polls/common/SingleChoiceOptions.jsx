@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Flex, Label, RadioGroup, Text } from '../../../../';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
@@ -73,39 +73,7 @@ export const SingleChoiceOptions = ({
   );
 };
 
-export const SingleChoiceOptionInputs = ({ isQuiz, options, setOptions }) => {
-  const selectAnswer = useCallback(
-    answerIndex => {
-      if (!isQuiz) {
-        return;
-      }
-      setOptions(options =>
-        options.map((option, index) => ({
-          ...option,
-          isCorrectAnswer: index === answerIndex,
-        })),
-      );
-    },
-    [setOptions, isQuiz],
-  );
-
-  const handleOptionTextChange = useCallback(
-    (index, text) => {
-      setOptions(options => [...options.slice(0, index), { ...options[index], text }, ...options.slice(index + 1)]);
-    },
-    [setOptions],
-  );
-
-  const removeOption = useCallback(
-    index =>
-      setOptions(options => {
-        const newOptions = [...options];
-        newOptions.splice(index, 1);
-        return newOptions;
-      }),
-    [setOptions],
-  );
-
+export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handleOptionTextChange, removeOption }) => {
   const correctOptionIndex = options.findIndex(option => option.isCorrectAnswer);
 
   return (
