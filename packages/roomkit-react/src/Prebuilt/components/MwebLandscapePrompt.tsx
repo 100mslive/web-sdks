@@ -11,11 +11,11 @@ import { isAndroid, isIOS } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
   const isMobileViewPort = useMedia(cssConfig.media.md);
-  const isMobile = (isAndroid || isIOS) && isMobileViewPort;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
+      const isMobile = (isAndroid || isIOS) && isMobileViewPort;
       setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
     };
 
@@ -25,7 +25,7 @@ export const MwebLandscapePrompt = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [isMobileViewPort]);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
