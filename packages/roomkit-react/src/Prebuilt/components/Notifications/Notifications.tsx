@@ -146,7 +146,7 @@ export function Notifications() {
 
       case HMSNotificationTypes.POLL_STARTED:
         if (notification.data.startedBy !== localPeerID) {
-          const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy));
+          const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy)) || 'Participant';
           ToastManager.addToast({
             title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
             action: (
