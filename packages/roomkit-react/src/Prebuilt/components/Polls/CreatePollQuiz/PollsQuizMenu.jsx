@@ -172,6 +172,7 @@ const AddMenu = () => {
 };
 
 const PrevMenu = () => {
+  // filter polls that have been started or stopped sorted by when they were created and their live state
   const polls = useHMSStore(selectPolls)
     ?.filter(poll => poll.state === 'started' || poll.state === 'stopped')
     .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
