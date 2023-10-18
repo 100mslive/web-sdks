@@ -220,6 +220,12 @@ export class HMSSdk implements HMSInterface {
   }
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
+    if (!this.transport || !this.store) {
+      throw ErrorFactory.GenericErrors.NotConnected(
+        HMSAction.VALIDATION,
+        `Ensure preview or join is called and room state is Preview or Connected before calling this`,
+      );
+    }
     return new HMSPeerListIterator(this.transport, this.store, options);
   }
 
