@@ -1168,6 +1168,7 @@ export class HMSSdk implements HMSInterface {
   private createAndAddLocalPeerToStore(config: HMSConfig, role: string, userId: string, asRole?: string) {
     const policy = this.store.getPolicyForRole(role);
     const asRolePolicy = asRole ? this.store.getPolicyForRole(asRole) : undefined;
+    console.trace('Create Local Peer');
     const localPeer = new HMSLocalPeer({
       name: config.userName || '',
       customerUserId: userId,

@@ -481,6 +481,7 @@ export default class HMSTransport implements ITransport {
     this.retryScheduler.reset();
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
+    console.trace('Leave called in transport');
     try {
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();

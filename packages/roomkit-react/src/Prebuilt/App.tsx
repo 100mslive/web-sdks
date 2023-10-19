@@ -127,12 +127,16 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     }, [ref]);
 
     // leave room when component unmounts
-    useEffect(
-      () => () => {
-        reactiveStore?.current?.hmsActions.leave();
-      },
-      [],
-    );
+    useEffect(() => {
+      const store = reactiveStore.current?.hmsStore;
+      const actions = reactiveStore.current?.hmsActions;
+      return () => {
+        if (store?.getState(selectIsConnectedToRoom)) {
+          console.debug('Leaving because of prebuilt unmount');
+          actions?.leave();
+        }
+      };
+    }, []);
 
     const endpointsObj = endpoints as
       | {
