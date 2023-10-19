@@ -34,7 +34,11 @@ const CustomDialogPortal = ({ children, container }: { children: ReactNode; cont
   } else if (!containerRef.current) {
     containerRef.current = document.body;
   }
-  return <StyledDialogPortal container={containerRef.current}>{children}</StyledDialogPortal>;
+  return (
+    <StyledDialogPortal container={containerRef.current}>
+      <>{children}</>
+    </StyledDialogPortal>
+  );
 };
 
 export const Dialog = {
