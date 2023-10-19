@@ -10,8 +10,8 @@ export const MwebLandscapePrompt = () => {
 
   useEffect(() => {
     const handleRotation = () => {
-      const angle = window.screen.orientation.angle;
-      const type = window.screen.orientation.type;
+      const angle = window?.screen?.orientation?.angle || 0;
+      const type = window.screen?.orientation?.type || '';
       // Angle check needed to diff bw mobile and desktop
       setShowMwebLandscapePrompt(angle >= 90 && type.includes('landscape'));
     };
