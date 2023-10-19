@@ -10,6 +10,7 @@ import { config as cssConfig } from '../../Theme';
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isLandscape = useMedia(cssConfig.media.ls);
+  // isLandscape is false for desktops
 
   useEffect(() => {
     const handleRotation = () => {
