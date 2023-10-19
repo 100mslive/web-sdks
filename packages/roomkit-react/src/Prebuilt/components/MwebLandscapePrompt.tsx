@@ -12,19 +12,22 @@ export const MwebLandscapePrompt = () => {
   const isLandscape = useMedia(cssConfig.media.ls);
 
   useEffect(() => {
+    if (!window.screen?.orientation) {
+      setShowMwebLandscapePrompt(isLandscape);
+      return;
+    }
     const handleRotation = () => {
-      const angle = window?.screen?.orientation?.angle;
-      const type = window.screen?.orientation?.type || '';
+      const angle = window.screen.orientation.angle;
+      const type = window.screen.orientation.type || '';
       // Angle check needed to diff bw mobile and desktop
       setShowMwebLandscapePrompt(angle ? angle >= 90 && type.includes('landscape') : isLandscape);
     };
     handleRotation();
     window.screen.orientation.addEventListener('change', handleRotation);
-
     return () => {
       window.screen.orientation.removeEventListener('change', handleRotation);
     };
-  }, []);
+  }, [isLandscape]);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
