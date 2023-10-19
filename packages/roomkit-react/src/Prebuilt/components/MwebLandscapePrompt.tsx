@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
+import { config as cssConfig } from '../../Theme';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
+  const isLandscape = useMedia(cssConfig.media.ls);
 
   useEffect(() => {
     const handleRotation = () => {
-      const angle = window.screen.orientation.angle;
-      const type = window.screen.orientation.type;
+      const angle = window?.screen?.orientation?.angle;
+      const type = window.screen?.orientation?.type || '';
       // Angle check needed to diff bw mobile and desktop
-      setShowMwebLandscapePrompt(angle >= 90 && type.includes('landscape'));
+      setShowMwebLandscapePrompt(angle ? angle >= 90 && type.includes('landscape') : isLandscape);
     };
     handleRotation();
     window.screen.orientation.addEventListener('change', handleRotation);
