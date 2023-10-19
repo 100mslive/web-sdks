@@ -6,8 +6,6 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
-// @ts-ignore
-import { isIOS, isSafari } from '../common/constants';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
@@ -15,10 +13,10 @@ export const MwebLandscapePrompt = () => {
 
   useEffect(() => {
     const handleRotation = () => {
-      const angle = window?.screen?.orientation?.angle || 0;
+      const angle = window?.screen?.orientation?.angle;
       const type = window.screen?.orientation?.type || '';
       // Angle check needed to diff bw mobile and desktop
-      setShowMwebLandscapePrompt(isIOS && isSafari ? isLandscape : angle >= 90 && type.includes('landscape'));
+      setShowMwebLandscapePrompt(angle ? angle >= 90 && type.includes('landscape') : isLandscape);
     };
     handleRotation();
     window.screen.orientation.addEventListener('change', handleRotation);
