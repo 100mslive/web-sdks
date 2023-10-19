@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@100mslive/react-icons": "0.8.18-alpha.1",
-    "@100mslive/roomkit-react": "0.1.9-alpha.1",
+    "@100mslive/react-icons": "0.8.18",
+    "@100mslive/roomkit-react": "0.1.9",
     "axios": "^0.21.1",
     "js-cookies": "^1.0.4",
     "lodash.merge": "^4.6.2",
