@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMedia } from 'react-use';
 import {
   DeviceType,
   selectIsLocalVideoEnabled,
@@ -8,12 +9,13 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CameraFlipIcon, CheckIcon, CrossIcon, SpeakerIcon } from '@100mslive/react-icons';
+import { CameraFlipIcon, CheckIcon, CrossIcon, HeadphonesIcon, SpeakerIcon } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { Label } from '../../../Label';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
+import { config as cssConfig } from '../../../Theme';
 import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 
@@ -52,23 +54,29 @@ export const CamaraFlipActions = () => {
 export const AudioOutputActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { audioOutput } = allDevices;
+  const isMobile = useMedia(cssConfig.media.md);
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
-
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given
    */
   const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
+  const audioOutputLabel = audioOutput?.filter(item => item.deviceId === selectedDeviceIDs.audioOutput);
+
   if (!shouldShowAudioOutput || !audioOutputFiltered?.length > 0) {
     return null;
   }
   return (
     <AudioOutputSelectionSheet
       outputDevices={audioOutput}
-      outputSelected={selectedDeviceIDs.outputDevices}
+      outputSelected={selectedDeviceIDs.audioOutput}
       onChange={async deviceId => {
         try {
+          if (window.__hms && isMobile) {
+            // refresh device as `devicechange` listener won't work in mobile device
+            await window.__hms.actions.refreshDevices();
+          }
           await updateDevice({
             deviceId,
             deviceType: DeviceType.audioOutput,
@@ -83,7 +91,11 @@ export const AudioOutputActions = () => {
     >
       <Box>
         <IconButton>
-          <SpeakerIcon />
+          {audioOutputLabel && audioOutputLabel.length > 0 && audioOutputLabel[0].label.includes('speaker') ? (
+            <SpeakerIcon />
+          ) : (
+            <HeadphonesIcon />
+          )}
         </IconButton>
       </Box>
     </AudioOutputSelectionSheet>
