@@ -87,7 +87,7 @@ export const ConferenceScreen = () => {
             speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
           },
         })
-        .catch(console.error);
+        .catch(error => console.error('ConferenceScreen: Error in joining', error));
       autoRoomJoined.current = true;
     }
   }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
