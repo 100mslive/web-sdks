@@ -1,5 +1,4 @@
 import React from 'react';
-import { useMedia } from 'react-use';
 import {
   DeviceType,
   selectIsLocalVideoEnabled,
@@ -22,7 +21,6 @@ import { Label } from '../../../Label';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
-import { config as cssConfig } from '../../../Theme';
 import IconButton from '../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 
@@ -61,7 +59,7 @@ export const CamaraFlipActions = () => {
 export const AudioOutputActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { audioOutput } = allDevices;
-  const isMobile = useMedia(cssConfig.media.md);
+  const hmsActions = useHMSActions();
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
@@ -94,10 +92,8 @@ export const AudioOutputActions = () => {
       outputSelected={selectedDeviceIDs.audioOutput}
       onChange={async deviceId => {
         try {
-          if (window.__hms && isMobile) {
-            // refresh device as `devicechange` listener won't work in mobile device
-            await window.__hms.actions.refreshDevices();
-          }
+          // refresh device as `devicechange` listener won't work in mobile device
+          await hmsActions.refreshDevices();
           await updateDevice({
             deviceId,
             deviceType: DeviceType.audioOutput,
