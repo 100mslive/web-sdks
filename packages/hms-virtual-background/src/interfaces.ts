@@ -6,6 +6,7 @@ export enum HMSVirtualBackgroundTypes {
   IMAGE = 'image',
   VIDEO = 'video',
   CANVAS = 'canvas',
+  URL = 'url',
 }
 
 export type HMSVirtualBackground =
