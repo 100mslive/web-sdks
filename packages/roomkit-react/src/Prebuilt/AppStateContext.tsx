@@ -58,7 +58,7 @@ export const useAppStateManager = () => {
       [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
       [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
     ) {
-      redirectToLeave().then(() => {
+      redirectToLeave(1500).then(() => {
         const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
         setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
       });
