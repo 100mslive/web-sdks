@@ -284,7 +284,7 @@ export class HMSVideoPluginsManager {
       if (!this.hmsTrack.enabled || this.hmsTrack.nativeTrack.readyState === 'ended') {
         if (this.pluginsLoopState === 'running') {
           // mute just happened, reset canvases to black so even if it is sent to remote, it
-          // is a black screen instead of a stucked frame from previous run
+          // is a black screen instead of a stuck frame from previous run
           this.resetCanvases();
         }
         this.pluginsLoopState = 'paused';
@@ -333,7 +333,11 @@ export class HMSVideoPluginsManager {
         if (plugin.getPluginType() === HMSVideoPluginType.TRANSFORM) {
           const process = async (input: CanvasElement, output: CanvasElement) => {
             try {
-              await plugin.processVideoFrame(input, output, skipProcessing);
+              if (plugin?.processInputStream) {
+                await plugin.processInputStream(this.hmsTrack.stream);
+              } else if (plugin?.processVideoFrame) {
+                await plugin?.processVideoFrame(input, output, skipProcessing);
+              }
             } catch (err) {
               HMSLogger.e(this.TAG, `error in processing plugin ${name}`, err);
             }
@@ -355,7 +359,13 @@ export class HMSVideoPluginsManager {
           }
         } else if (plugin.getPluginType() === HMSVideoPluginType.ANALYZE && !skipProcessing) {
           // there is no need to await for this case
-          await this.analytics.processWithTime(name, async () => await plugin.processVideoFrame(this.inputCanvas!));
+          await this.analytics.processWithTime(name, async () => {
+            if (plugin?.processInputStream) {
+              plugin.processInputStream(this.hmsTrack.stream);
+            } else if (plugin?.processVideoFrame) {
+              plugin.processVideoFrame(this.inputCanvas!);
+            }
+          });
         }
       } catch (err) {
         //TODO error happened on processing of plugin notify UI
