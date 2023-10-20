@@ -9,7 +9,14 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CameraFlipIcon, CheckIcon, CrossIcon, HeadphonesIcon, SpeakerIcon } from '@100mslive/react-icons';
+import {
+  BluetoothIcon,
+  CameraFlipIcon,
+  CheckIcon,
+  CrossIcon,
+  HeadphonesIcon,
+  SpeakerIcon,
+} from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { Label } from '../../../Label';
 import { Box, Flex } from '../../../Layout';
@@ -67,6 +74,20 @@ export const AudioOutputActions = () => {
   if (!shouldShowAudioOutput || !audioOutputFiltered?.length > 0) {
     return null;
   }
+  let AudioOutputIcon = <SpeakerIcon />;
+  if (
+    audioOutputLabel &&
+    audioOutputLabel.length > 0 &&
+    audioOutputLabel[0].label.toLowerCase().includes('bluetooth')
+  ) {
+    AudioOutputIcon = <BluetoothIcon />;
+  } else if (
+    audioOutputLabel &&
+    audioOutputLabel.length > 0 &&
+    audioOutputLabel[0].label.toLowerCase().includes('headphone')
+  ) {
+    AudioOutputIcon = <HeadphonesIcon />;
+  }
   return (
     <AudioOutputSelectionSheet
       outputDevices={audioOutput}
@@ -90,13 +111,7 @@ export const AudioOutputActions = () => {
       }}
     >
       <Box>
-        <IconButton>
-          {audioOutputLabel && audioOutputLabel.length > 0 && audioOutputLabel[0].label.includes('speaker') ? (
-            <SpeakerIcon />
-          ) : (
-            <HeadphonesIcon />
-          )}
-        </IconButton>
+        <IconButton>{AudioOutputIcon} </IconButton>
       </Box>
     </AudioOutputSelectionSheet>
   );
