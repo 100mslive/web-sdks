@@ -27,7 +27,7 @@ const HLSView = () => {
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const hmsActions = useHMSActions();
   const { themeType, theme } = useTheme();
-  const [streamEnded, setStreamEnded] = useState(false);
+  const [streamStartCount, setStreamStartCount] = useState(0);
   let [hlsStatsState, setHlsStatsState] = useState(null);
   const hlsUrl = hlsState.variants[0]?.url;
   const [availableLayers, setAvailableLayers] = useState([]);
@@ -64,19 +64,11 @@ const HLSView = () => {
       videoEl?.removeEventListener('waiting', showLoader);
     };
   }, []);
-
   useEffect(() => {
-    const videoElem = videoRef.current;
-    const setStreamEndedCallback = () => {
-      setStreamEnded(true);
-      // no point keeping the callback attached once the streaming is ended
-      videoElem?.removeEventListener('ended', setStreamEndedCallback);
-    };
-    videoElem?.addEventListener('ended', setStreamEndedCallback);
-    return () => {
-      videoElem?.removeEventListener('ended', setStreamEndedCallback);
-    };
-  }, [hlsUrl]);
+    if (hlsState.running && hlsUrl) {
+      setStreamStartCount(streamStartCount + 1);
+    }
+  }, [hlsState.running, hlsUrl]);
 
   /**
    * initialize HMSHLSPlayer and add event listeners.
@@ -236,7 +228,7 @@ const HLSView = () => {
       {hlsStatsState?.url && enablHlsStats ? (
         <HlsStatsOverlay hlsStatsState={hlsStatsState} onClose={sfnOverlayClose} />
       ) : null}
-      {hlsUrl && !streamEnded ? (
+      {hlsState.running ? (
         <Flex
           id="hls-player-container"
           align="center"
@@ -380,13 +372,17 @@ const HLSView = () => {
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-            {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <RadioIcon height={56} width={56} />}
+            {!hlsState.running && streamStartCount >= 1 ? (
+              <ColoredHandIcon height={56} width={56} />
+            ) : (
+              <RadioIcon height={56} width={56} />
+            )}
           </Flex>
           <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
-            {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
+            {!hlsState.running && streamStartCount >= 1 ? 'Stream has ended' : 'Stream yet to start'}
           </Text>
           <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
-            {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
+            {!hlsState.running && streamStartCount >= 1 ? 'Have a nice day!' : 'Sit back and relax'}
           </Text>
         </Flex>
       )}
