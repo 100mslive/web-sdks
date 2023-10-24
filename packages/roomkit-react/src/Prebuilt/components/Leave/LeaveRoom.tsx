@@ -44,15 +44,16 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
     }
   };
-  const endRoom = () => {
-    hmsActions.endRoom(false, 'End Room');
+  const endRoom = async () => {
+    await hmsActions.stopHLSStreaming();
+    await hmsActions.endRoom(false, 'End Room');
   };
 
   const leaveRoom = async ({ endstream = false }) => {
     if (endstream || (hlsState.running && peersWithStreamingRights.length === 1)) {
       await stopStream();
     }
-    hmsActions.leave();
+    await hmsActions.leave();
   };
 
   if (!permissions || !isConnected) {

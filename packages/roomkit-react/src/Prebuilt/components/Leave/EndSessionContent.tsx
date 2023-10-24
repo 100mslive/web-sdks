@@ -11,7 +11,7 @@ export const EndSessionContent = ({
   isStreamingOn = false,
 }: {
   setShowEndStreamAlert: (value: boolean) => void;
-  leaveRoom: (args: { endstream: boolean }) => void;
+  leaveRoom: (args: { endstream: boolean }) => Promise<void>;
   isModal?: boolean;
   isStreamingOn: boolean;
 }) => {

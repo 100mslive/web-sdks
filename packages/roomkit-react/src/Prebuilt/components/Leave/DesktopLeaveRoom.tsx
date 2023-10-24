@@ -20,9 +20,9 @@ export const DesktopLeaveRoom = ({
   screenType,
   endRoom,
 }: {
-  leaveRoom: (args: { endstream: boolean }) => void;
+  leaveRoom: (args: { endstream: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
-  endRoom: () => void;
+  endRoom: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
