@@ -27,11 +27,17 @@ const PreviewForm = ({
     e.preventDefault();
   };
   const isMobile = useMedia(cssConfig.media.md);
-  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const { isHLSRunning, isRTMPRunning, isRecordingOn, isBrowserRecordingOn, isServerRecordingOn } =
+    useRecordingStreaming();
+  const isAnyRecordingOn = isRecordingOn || isBrowserRecordingOn || isServerRecordingOn;
   const layout = useRoomLayout();
   const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
+
   const showGoLive =
-    joinForm?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning && !isRTMPRunning;
+    joinForm?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE &&
+    !isHLSRunning &&
+    !isRTMPRunning &&
+    !isAnyRecordingOn;
 
   return (
     <Form
