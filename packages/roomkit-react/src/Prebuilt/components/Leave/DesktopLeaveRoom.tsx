@@ -20,7 +20,7 @@ export const DesktopLeaveRoom = ({
   screenType,
   endRoom,
 }: {
-  leaveRoom: (args: { endstream: boolean }) => Promise<void>;
+  leaveRoom: (args?: { endStream?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
 }) => {
@@ -78,7 +78,7 @@ export const DesktopLeaveRoom = ({
                   color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
-                onClick={async () => await leaveRoom({ endstream: false })}
+                onClick={async () => await leaveRoom()}
                 data-testid="just_leave_btn"
               >
                 <LeaveCard
@@ -89,7 +89,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                  onClick={async () => await leaveRoom({ endstream: false })}
+                  onClick={async () => await leaveRoom()}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
@@ -142,7 +142,7 @@ export const DesktopLeaveRoom = ({
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              leaveRoom={isStreamingOn ? () => leaveRoom({ endstream: true }) : endRoom}
+              leaveRoom={isStreamingOn ? () => leaveRoom({ endStream: true }) : endRoom}
               isStreamingOn={isStreamingOn}
               isModal
             />
