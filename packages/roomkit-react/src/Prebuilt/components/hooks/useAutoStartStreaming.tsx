@@ -7,6 +7,8 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { useShowStreamingUI } from '../../common/hooks';
@@ -32,6 +34,7 @@ export const useAutoStartStreaming = () => {
       await hmsActions.startHLSStreaming();
     } catch (error) {
       console.error(error);
+      ToastManager.addToast({ title: 'Failed to go live.', variant: 'error' });
       streamStartedRef.current = false;
       setHLSStarted(false);
     }

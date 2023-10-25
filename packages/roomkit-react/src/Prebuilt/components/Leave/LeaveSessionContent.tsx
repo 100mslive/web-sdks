@@ -10,7 +10,7 @@ export const LeaveSessionContent = ({
   isModal = false,
 }: {
   setShowLeaveRoomAlert: (value: boolean) => void;
-  leaveRoom: (args: { endstream: boolean }) => Promise<void>;
+  leaveRoom: (endstream?: boolean) => Promise<void>;
   isModal?: boolean;
 }) => {
   return (
@@ -47,7 +47,7 @@ export const LeaveSessionContent = ({
         <Button
           variant="danger"
           css={{ w: '100%' }}
-          onClick={() => leaveRoom({ endstream: false })}
+          onClick={async () => await leaveRoom()}
           id="leaveRoom"
           data-testid="leave_room"
         >

@@ -11,7 +11,7 @@ export const EndSessionContent = ({
   isStreamingOn = false,
 }: {
   setShowEndStreamAlert: (value: boolean) => void;
-  leaveRoom: (args: { endstream: boolean }) => Promise<void>;
+  leaveRoom: (endstream?: boolean) => Promise<void>;
   isModal?: boolean;
   isStreamingOn: boolean;
 }) => {
@@ -50,7 +50,7 @@ export const EndSessionContent = ({
           variant="danger"
           css={{ w: '100%' }}
           onClick={async () => {
-            await leaveRoom({ endstream: true });
+            await leaveRoom(true);
             setShowEndStreamAlert(false);
           }}
           id="stopStream"
