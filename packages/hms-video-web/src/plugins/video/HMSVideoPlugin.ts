@@ -1,4 +1,3 @@
-import { HMSMediaStream } from '../../internal';
 import { HMSPluginSupportResult } from '../audio';
 
 /**
@@ -53,13 +52,11 @@ export interface HMSVideoPlugin {
    * @param output the output canvas which should contain the output frame
    * @param skipProcessing use results from previous run if true
    */
-  processVideoFrame?(
+  processVideoFrame(
     input: HTMLCanvasElement,
     output?: HTMLCanvasElement,
     skipProcessing?: boolean,
   ): Promise<void> | void;
-
-  processInputStream?(inputStream: HMSMediaStream): Promise<void> | void;
 
   /**
    * the plugin can use this function to dispose off its resources. It'll be called when the processor instance is
