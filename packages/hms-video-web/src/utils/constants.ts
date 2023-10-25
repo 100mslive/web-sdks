@@ -60,3 +60,5 @@ export const PROTOCOL_VERSION = '2.5';
 export const PROTOCOL_SPEC = '20230919';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
+
+export const EFFECTS_SDK_KEY = '22d268435824179e93a2e3da317306dfb0c72f7a';

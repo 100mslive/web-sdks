@@ -1,3 +1,4 @@
+import { tsvb } from 'effects-sdk';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
@@ -14,6 +15,7 @@ import {
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
+import { EFFECTS_SDK_KEY } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
@@ -53,6 +55,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   publishedTrackId?: string;
 
+  effectsSDK: any;
+  isEffectsInitiated = false;
+  lastSetVB: string | number | undefined;
   /**
    * will be false for preview tracks
    */
@@ -91,6 +96,55 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this._layerDefinitions;
   }
 
+  async initiateEffectsVB() {
+    this.effectsSDK = new tsvb(EFFECTS_SDK_KEY);
+    this.effectsSDK.config({
+      models: {
+        colorcorrector: '',
+        facedetector: '',
+      },
+    });
+    this.effectsSDK.onReady = () => {
+      console.debug('effects SDK is ready');
+      this.effectsSDK.run();
+      // available preset mode = 'quality | balanced | speed | lightning'
+      this.effectsSDK.setSegmentationPreset('balanced');
+      // available fit mode = 'fill | fit'
+      this.effectsSDK.setBackgroundFitMode('fill');
+    };
+    this.isEffectsInitiated = true;
+  }
+
+  /**
+   * Pass either an image URL or a number between 0 and 1 to set blur value
+   */
+
+  async applyVB(value: number | string) {
+    if (!this.isEffectsInitiated) {
+      await this.initiateEffectsVB();
+    }
+    const localStream = this.stream as HMSLocalStream;
+    this.effectsSDK.useStream(localStream.nativeStream);
+
+    switch (typeof value) {
+      case 'number':
+        this.effectsSDK.setBlur(value);
+        break;
+      case 'string':
+        this.effectsSDK.setBackground(value);
+        break;
+    }
+
+    const streamWithVB = this.effectsSDK.getStream();
+    this.setProcessedTrack(streamWithVB.getVideoTracks()[0]);
+    this.lastSetVB = value;
+  }
+
+  disableVB() {
+    this.effectsSDK.clear();
+    this.lastSetVB = undefined;
+  }
+
   /**
    * use this function to set the enabled state of a track. If true the track will be unmuted and muted otherwise.
    * @param value
@@ -113,6 +167,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
+      }
+
+      // Handle camera toggle after enabling VB
+      if (this.lastSetVB) {
+        this.applyVB(this.lastSetVB);
       }
       this.videoHandler.updateSinks();
     }
@@ -189,6 +248,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    this.effectsSDK.clear();
+    this.lastSetVB = undefined;
+    this.isEffectsInitiated = false;
   }
 
   /**
@@ -335,7 +397,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
     }
-    await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    localStream.replaceStreamTrack(this.nativeTrack, newTrack);
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
