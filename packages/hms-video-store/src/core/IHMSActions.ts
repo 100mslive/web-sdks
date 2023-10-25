@@ -195,6 +195,21 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setVolume(value: number, trackId?: HMSTrackID): Promise<void>;
 
   /**
+   * @param blurPower set the intensity of the blur between 0-1
+   * @param imageURL An image URL
+   * @param disable Set to true to disable VB
+   */
+  setVB({
+    blurPower = 0,
+    imageURL = '',
+    disable = false,
+  }: {
+    blurPower?: number;
+    imageURL?: string;
+    disable?: boolean;
+  }): void;
+
+  /**
    * Set the audio output(speaker) device
    * @param deviceId string deviceId of the audio output device
    */

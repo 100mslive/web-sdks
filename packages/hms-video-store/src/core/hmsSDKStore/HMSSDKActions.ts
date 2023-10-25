@@ -143,6 +143,25 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     await this.sdk.getAudioOutput().unblockAutoplay();
   }
 
+  setVB({
+    blurPower,
+    imageURL,
+    disable = false,
+  }: {
+    blurPower?: number | undefined;
+    imageURL?: string | undefined;
+    disable: boolean;
+  }): void {
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      if (disable) {
+        sdkTrack.disableVB();
+      }
+      sdkTrack.applyVB({ blurPower, imageURL });
+    }
+  }
+
   async setVolume(value: number, trackId?: HMSTrackID) {
     if (trackId) {
       await this.setTrackVolume(value, trackId);

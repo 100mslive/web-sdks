@@ -56,8 +56,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   publishedTrackId?: string;
 
   effectsSDK: any;
-  isEffectsInitiated = false;
-  lastSetVB: string | number | undefined;
+  isEffectsInitialised = false;
+  lastSetVB: { blurPower?: number; imageURL?: string } | undefined;
   /**
    * will be false for preview tracks
    */
@@ -112,32 +112,29 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // available fit mode = 'fill | fit'
       this.effectsSDK.setBackgroundFitMode('fill');
     };
-    this.isEffectsInitiated = true;
+    this.isEffectsInitialised = true;
   }
 
   /**
    * Pass either an image URL or a number between 0 and 1 to set blur value
    */
 
-  async applyVB(value: number | string) {
-    if (!this.isEffectsInitiated) {
+  async applyVB({ blurPower = 0, imageURL = '' }: { blurPower?: number; imageURL?: string }) {
+    if (!this.isEffectsInitialised) {
       await this.initiateEffectsVB();
     }
     const localStream = this.stream as HMSLocalStream;
     this.effectsSDK.useStream(localStream.nativeStream);
 
-    switch (typeof value) {
-      case 'number':
-        this.effectsSDK.setBlur(value);
-        break;
-      case 'string':
-        this.effectsSDK.setBackground(value);
-        break;
+    if (blurPower) {
+      this.effectsSDK.setBlur(blurPower);
+    } else if (imageURL) {
+      this.effectsSDK.setBackground(imageURL);
     }
 
     const streamWithVB = this.effectsSDK.getStream();
     this.setProcessedTrack(streamWithVB.getVideoTracks()[0]);
-    this.lastSetVB = value;
+    this.lastSetVB = { blurPower, imageURL };
   }
 
   disableVB() {
@@ -250,7 +247,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.isPublished = false;
     this.effectsSDK.clear();
     this.lastSetVB = undefined;
-    this.isEffectsInitiated = false;
+    this.isEffectsInitialised = false;
   }
 
   /**
