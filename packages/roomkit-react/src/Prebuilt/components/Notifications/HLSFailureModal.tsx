@@ -5,6 +5,8 @@ import { Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
+import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { APP_DATA } from '../../common/constants';
@@ -23,10 +25,7 @@ export function HLSFailureModal() {
       setHLSStarted(true);
       await hmsActions.startHLSStreaming({});
     } catch (error) {
-      if ((error as Error).message.includes('invalid input')) {
-        await startHLS();
-        return;
-      }
+      ToastManager.addToast({ title: 'Failed to go live' });
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted, isRTMPRunning]);
