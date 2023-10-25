@@ -10,7 +10,7 @@ export const LeaveSessionContent = ({
   isModal = false,
 }: {
   setShowLeaveRoomAlert: (value: boolean) => void;
-  leaveRoom: (args?: { endStream?: boolean }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   isModal?: boolean;
 }) => {
   return (

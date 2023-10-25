@@ -20,7 +20,7 @@ export const DesktopLeaveRoom = ({
   screenType,
   endRoom,
 }: {
-  leaveRoom: (args?: { endStream?: boolean }) => Promise<void>;
+  leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
 }) => {
