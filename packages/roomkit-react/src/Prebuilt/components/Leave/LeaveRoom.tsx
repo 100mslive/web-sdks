@@ -44,8 +44,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
     }
   };
+
   const endRoom = async () => {
-    await hmsActions.stopHLSStreaming();
     await hmsActions.endRoom(false, 'End Room');
   };
 

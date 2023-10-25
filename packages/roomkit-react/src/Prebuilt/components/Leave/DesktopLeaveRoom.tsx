@@ -142,7 +142,7 @@ export const DesktopLeaveRoom = ({
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              leaveRoom={isStreamingOn ? leaveRoom : endRoom}
+              leaveRoom={isStreamingOn ? () => leaveRoom({ endstream: true }) : endRoom}
               isStreamingOn={isStreamingOn}
               isModal
             />
