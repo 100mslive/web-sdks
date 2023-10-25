@@ -45,6 +45,7 @@
     "tslib": "^2.2.0"
   },
   "dependencies": {
+    "effects-sdk": "^2.5.3",
     "eventemitter2": "^6.4.7",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^1.0.1",
