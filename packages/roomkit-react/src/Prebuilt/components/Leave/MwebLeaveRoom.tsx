@@ -17,11 +17,11 @@ import { useDropdownList } from '../hooks/useDropdownList';
 export const MwebLeaveRoom = ({
   leaveRoom,
   screenType,
-  endRoom,
+  endSession,
 }: {
   leaveRoom: (args: { endstream: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
-  endRoom: () => Promise<void>;
+  endSession: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -30,7 +30,7 @@ export const MwebLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
-  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
+  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endSession;
 
   useDropdownList({ open, name: 'LeaveRoom' });
 
@@ -100,7 +100,7 @@ export const MwebLeaveRoom = ({
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
-            leaveRoom={isStreamingOn ? leaveRoom : endRoom}
+            leaveRoom={isStreamingOn ? leaveRoom : endSession}
             isStreamingOn={isStreamingOn}
           />
         </Sheet.Content>

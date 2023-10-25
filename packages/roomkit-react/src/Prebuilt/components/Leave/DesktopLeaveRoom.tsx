@@ -18,11 +18,11 @@ import { useDropdownList } from '../hooks/useDropdownList';
 export const DesktopLeaveRoom = ({
   leaveRoom,
   screenType,
-  endRoom,
+  endSession,
 }: {
   leaveRoom: (args: { endstream: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
-  endRoom: () => Promise<void>;
+  endSession: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -31,7 +31,7 @@ export const DesktopLeaveRoom = ({
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
   const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
-  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
+  const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endSession;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
 
@@ -142,7 +142,7 @@ export const DesktopLeaveRoom = ({
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              leaveRoom={isStreamingOn ? leaveRoom : endRoom}
+              leaveRoom={isStreamingOn ? leaveRoom : endSession}
               isStreamingOn={isStreamingOn}
               isModal
             />
