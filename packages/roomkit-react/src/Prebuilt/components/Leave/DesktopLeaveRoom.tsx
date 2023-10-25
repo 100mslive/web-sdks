@@ -78,7 +78,7 @@ export const DesktopLeaveRoom = ({
                   color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
-                onClick={() => leaveRoom({ endstream: false })}
+                onClick={async () => await leaveRoom({ endstream: false })}
                 data-testid="just_leave_btn"
               >
                 <LeaveCard
@@ -89,7 +89,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                  onClick={() => leaveRoom({ endstream: false })}
+                  onClick={async () => await leaveRoom({ endstream: false })}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
