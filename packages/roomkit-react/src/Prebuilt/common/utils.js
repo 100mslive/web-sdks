@@ -1,3 +1,5 @@
+import { QUESTION_TYPE } from './constants';
+
 // eslint-disable-next-line complexity
 export function shadeColor(color, percent) {
   let R = parseInt(color.substring(1, 3), 16);
@@ -87,4 +89,49 @@ export const formatTime = timeInSeconds => {
   const seconds = timeInSeconds % 60;
   const hour = hours !== 0 ? `${hours < 10 ? '0' : ''}${hours}:` : '';
   return `${hour}${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+};
+
+const compareArrays = (a, b) => {
+  if (a.length !== b.length) return false;
+  else {
+    // Comparing each element of your array
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] !== b[i]) {
+        return false;
+      }
+    }
+    return true;
+  }
+};
+
+export const checkCorrectAnswer = (answer, localPeerResponse, type) => {
+  if (type === QUESTION_TYPE.SINGLE_CHOICE) {
+    return answer?.option === localPeerResponse?.option;
+  } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
+    return answer?.options && localPeerResponse?.options && compareArrays(answer?.options, localPeerResponse?.options);
+  }
+};
+
+export const isValidTextInput = (text, minLength = 1, maxLength = 100) => {
+  return text && text.length >= minLength && text.length <= maxLength;
+};
+
+export const calculateAvatarAndAttribBoxSize = (calculatedWidth, calculatedHeight) => {
+  if (!calculatedWidth || !calculatedHeight) {
+    return [undefined, undefined];
+  }
+
+  let avatarSize = 'large';
+  if (calculatedWidth <= 150 || calculatedHeight <= 150) {
+    avatarSize = 'small';
+  } else if (calculatedWidth <= 300 || calculatedHeight <= 300) {
+    avatarSize = 'medium';
+  }
+
+  let attribBoxSize = 'medium';
+  if (calculatedWidth <= 180 || calculatedHeight <= 180) {
+    attribBoxSize = 'small';
+  }
+
+  return [avatarSize, attribBoxSize];
 };

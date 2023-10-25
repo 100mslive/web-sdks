@@ -68,14 +68,13 @@ const VirtualizedParticipantItem = React.memo(
 );
 
 export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; onBack: () => void }) => {
-  const { peers, total, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
+  const { peers, total, hasNext, loadPeers, loadMorePeers } = usePaginatedParticipants({ role: roleName, limit: 20 });
   const [search, setSearch] = useState<string>('');
   const filteredPeers = peers.filter(p => p.name?.toLowerCase().includes(search));
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const [ref, { width }] = useMeasure<HTMLDivElement>();
   const height = ROW_HEIGHT * (filteredPeers.length + 1);
   const resetSidePane = useSidepaneReset();
-  const hasNext = total > peers.length;
 
   useEffect(() => {
     loadPeers();
@@ -111,7 +110,7 @@ export const PaginatedParticipants = ({ roleName, onBack }: { roleName: string; 
         <Box css={{ flex: '1 1 0', overflowY: 'auto', overflowX: 'hidden', mr: '-$10' }}>
           <VariableSizeList
             itemSize={index => (index === filteredPeers.length + 1 ? 16 : ROW_HEIGHT)}
-            itemData={{ peerList: filteredPeers, hasNext, loadMorePeers, isConnected: isConnected === true }}
+            itemData={{ peerList: filteredPeers, hasNext: hasNext(), loadMorePeers, isConnected: isConnected === true }}
             itemKey={itemKey}
             itemCount={filteredPeers.length + 1}
             width={width}

@@ -1,33 +1,37 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { RefreshIcon } from '@100mslive/react-icons';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
-// @ts-ignore: No implicit Any
-import { isAndroid, isIOS } from '../common/constants';
+import { config as cssConfig } from '../../Theme';
 
 export const MwebLandscapePrompt = () => {
-  const isMobile = isAndroid || isIOS;
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
+  const isLandscape = useMedia(cssConfig.media.ls);
 
   useEffect(() => {
-    const handleResize = () => {
-      setShowMwebLandscapePrompt(isMobile && window.innerHeight < window.innerWidth);
+    if (!window.screen?.orientation) {
+      setShowMwebLandscapePrompt(isLandscape);
+      return;
+    }
+    const handleRotation = () => {
+      const angle = window.screen.orientation.angle;
+      const type = window.screen.orientation.type || '';
+      // Angle check needed to diff bw mobile and desktop
+      setShowMwebLandscapePrompt(angle ? angle >= 90 && type.includes('landscape') : isLandscape);
     };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-
+    handleRotation();
+    window.screen.orientation.addEventListener('change', handleRotation);
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.screen.orientation.removeEventListener('change', handleRotation);
     };
-  }, []);
+  }, [isLandscape]);
 
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Box>
@@ -53,7 +57,7 @@ export const MwebLandscapePrompt = () => {
             </Flex>
           </Box>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };

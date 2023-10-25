@@ -8,8 +8,8 @@ export interface IHMSReactStore<S extends HMSStore | HMSStatsStore> extends ISto
   <U>(selector: StateSelector<S, U>, equalityFn?: EqualityChecker<U>): U;
 }
 
-export const hooksErrorMessage =
-  'It seems like you forgot to add your component within a top level HMSRoomProvider, please refer to 100ms react docs(https://docs.100ms.live/javascript/v2/features/integration#react-hooks) to check on the required steps for using this hook.';
+export const hooksErrorMessage = `It seems like you forgot to add your component within a top level HMSRoomProvider, please refer to 100ms react docs(https://www.100ms.live/docs/javascript/v2/how-to-guides/install-the-sdk/integration#react-hooks) to check on the required steps for using this hook. If the provider is present
+  at the top level, check the yarn.lock/package-lock.json, if there are multiple versions of @100mslive/react-sdk. Please ensure the versions of @100mslive/react-sdk and @100mslive/roomkit-react are the same versions from the release notes(https://www.100ms.live/docs/javascript/v2/changelog/release-notes) that you are trying to update to.`;
 
 export interface HMSContextProviderProps {
   actions: HMSActions; // for actions which may also mutate store

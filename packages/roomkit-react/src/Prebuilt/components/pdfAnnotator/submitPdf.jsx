@@ -31,7 +31,7 @@ export const SubmitPDF = ({ pdfFile, onOpenChange }) => {
         type="submit"
         onClick={() => {
           if (pdfFile) {
-            setPDFConfig({ state: true, file: pdfFile });
+            setPDFConfig(pdfFile);
             onOpenChange(false);
           }
         }}

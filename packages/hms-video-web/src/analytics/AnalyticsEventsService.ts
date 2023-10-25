@@ -75,6 +75,7 @@ export class AnalyticsEventsService {
       role: localPeer?.role?.name,
       user_name: localPeer?.name,
       user_data: localPeer?.metadata,
+      peer_id: localPeer?.peerId,
     };
     HTTPAnalyticsTransport.sendEvent(event);
   }

@@ -58,7 +58,11 @@ const App = () => {
     <Flex
       className="prebuilt-wrapper"
       direction="column"
-      css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
+      css={{
+        size: '100%',
+        overflowY: 'hidden',
+        bg: '$background_dim',
+      }}
     >
       {onlyEmail && showHeader && (
         <Suspense fallback={null}>

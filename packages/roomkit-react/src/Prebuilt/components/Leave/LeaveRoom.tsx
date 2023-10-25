@@ -18,7 +18,6 @@ import { config as cssConfig } from '../../../Theme';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
-import { useRedirectToLeave } from '../hooks/useRedirectToLeave';
 
 export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -34,13 +33,14 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   );
   const hlsState = useHMSStore(selectHLSState);
   const hmsActions = useHMSActions();
-  const { redirectToLeave } = useRedirectToLeave();
 
   const stopStream = async () => {
     try {
-      console.log('Stopping HLS stream');
-      await hmsActions.stopHLSStreaming();
-      ToastManager.addToast({ title: 'Stopping the stream' });
+      if (permissions?.hlsStreaming) {
+        console.log('Stopping HLS stream');
+        await hmsActions.stopHLSStreaming();
+        ToastManager.addToast({ title: 'Stopping the stream' });
+      }
     } catch (e) {
       console.error('Error stopping stream', e);
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
@@ -48,7 +48,6 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   };
   const endRoom = () => {
     hmsActions.endRoom(false, 'End Room');
-    redirectToLeave();
   };
 
   const leaveRoom = async ({ endstream = false }) => {
@@ -56,7 +55,6 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
       await stopStream();
     }
     hmsActions.leave();
-    redirectToLeave();
   };
 
   if (!permissions || !isConnected) {

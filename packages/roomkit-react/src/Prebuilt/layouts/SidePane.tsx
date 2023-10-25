@@ -2,15 +2,15 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
+import { Polls } from '../components/Polls/Polls';
 import { SidePaneTabs } from '../components/SidePaneTabs';
-// @ts-ignore: No implicit Any
-import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -29,10 +29,11 @@ const SidePane = ({
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   let ViewComponent;
+  if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
+    ViewComponent = <Polls />;
+  }
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
     ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
-  } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = <StreamingLanding />;
   }
   if (!ViewComponent && !trackId) {
     return null;
@@ -97,6 +98,9 @@ const SidePane = ({
             '@md': {
               p: '$6 $8',
               pb: mwebStreamingChat ? '$20' : '$12',
+              borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
             },
           }}
         >
