@@ -39,8 +39,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
       if (permissions?.hlsStreaming) {
         console.log('Stopping HLS stream');
         await hmsActions.stopHLSStreaming();
+        ToastManager.addToast({ title: 'Stopping the stream' });
       }
-      ToastManager.addToast({ title: 'Stopping the stream' });
     } catch (e) {
       console.error('Error stopping stream', e);
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
