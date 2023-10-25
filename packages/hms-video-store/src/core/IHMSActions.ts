@@ -199,15 +199,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param imageURL An image URL
    * @param disable Set to true to disable VB
    */
-  setVB({
-    blurPower = 0,
-    imageURL = '',
-    disable = false,
-  }: {
-    blurPower?: number;
-    imageURL?: string;
-    disable?: boolean;
-  }): void;
+  setVB({ blurPower, imageURL, disable }: { blurPower?: number; imageURL?: string; disable?: boolean }): void;
 
   /**
    * Set the audio output(speaker) device
