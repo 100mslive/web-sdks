@@ -145,11 +145,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   setVB({
     blurPower,
-    imageURL,
+    mediaURL,
     disable = false,
   }: {
     blurPower?: number | undefined;
-    imageURL?: string | undefined;
+    mediaURL?: string | undefined;
     disable: boolean;
   }): void {
     const trackID = this.store.getState(selectLocalVideoTrackID);
@@ -158,7 +158,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       if (disable) {
         sdkTrack.disableVB();
       }
-      sdkTrack.applyVB({ blurPower, imageURL });
+      sdkTrack.applyVB({ blurPower, mediaURL });
     }
   }
 

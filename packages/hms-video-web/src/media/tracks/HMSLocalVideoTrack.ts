@@ -55,9 +55,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   publishedTrackId?: string;
 
-  effectsSDK: any;
-  isEffectsInitialised = false;
-  lastSetVB: { blurPower?: number; imageURL?: string } | undefined;
+  effectsSDK: tsvb | undefined;
+  lastSetVB: { blurPower?: number; mediaURL?: string } | undefined;
   /**
    * will be false for preview tracks
    */
@@ -105,40 +104,50 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       },
     });
     this.effectsSDK.onReady = () => {
-      console.debug('effects SDK is ready');
-      this.effectsSDK.run();
-      // available preset mode = 'quality | balanced | speed | lightning'
-      this.effectsSDK.setSegmentationPreset('balanced');
-      // available fit mode = 'fill | fit'
-      this.effectsSDK.setBackgroundFitMode('fill');
+      if (this.effectsSDK) {
+        console.debug('effects SDK is ready');
+        this.effectsSDK.run();
+        // available preset mode = 'quality | balanced | speed | lightning'
+        this.effectsSDK.setSegmentationPreset('balanced');
+        // available fit mode = 'fill | fit'
+        this.effectsSDK.setBackgroundFitMode('fill');
+      }
     };
-    this.isEffectsInitialised = true;
+  }
+
+  private async checkEffectsInitialisation() {
+    if (!this.effectsSDK) {
+      await this.initiateEffectsVB();
+    }
+    if (!this.effectsSDK) {
+      console.error('Effects could not be initialised');
+    }
   }
 
   /**
-   * Pass either an image URL or a number between 0 and 1 to set blur value
+   * Pass either a media URL or a number between 0 and 1 to set blur value
    */
 
-  async applyVB({ blurPower = 0, imageURL = '' }: { blurPower?: number; imageURL?: string }) {
-    if (!this.isEffectsInitialised) {
-      await this.initiateEffectsVB();
-    }
-    const localStream = this.stream as HMSLocalStream;
-    this.effectsSDK.useStream(localStream.nativeStream);
+  async applyVB({ blurPower = 0, mediaURL = '' }: { blurPower?: number; mediaURL?: string }) {
+    await this.checkEffectsInitialisation();
+    if (this.effectsSDK) {
+      const localStream = this.stream as HMSLocalStream;
+      this.effectsSDK.useStream(localStream.nativeStream);
 
-    if (blurPower) {
-      this.effectsSDK.setBlur(blurPower);
-    } else if (imageURL) {
-      this.effectsSDK.setBackground(imageURL);
-    }
+      if (blurPower) {
+        this.effectsSDK.setBlur(blurPower);
+      } else if (mediaURL) {
+        this.effectsSDK.setBackground(mediaURL);
+      }
 
-    const streamWithVB = this.effectsSDK.getStream();
-    this.setProcessedTrack(streamWithVB.getVideoTracks()[0]);
-    this.lastSetVB = { blurPower, imageURL };
+      const streamWithVB = this.effectsSDK.getStream();
+      this.setProcessedTrack(streamWithVB?.getVideoTracks()[0]);
+      this.lastSetVB = { blurPower, mediaURL };
+    }
   }
 
   disableVB() {
-    this.effectsSDK.clear();
+    this.effectsSDK?.clear();
     this.lastSetVB = undefined;
   }
 
@@ -245,9 +254,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
-    this.effectsSDK.clear();
+    this.effectsSDK?.clear();
     this.lastSetVB = undefined;
-    this.isEffectsInitialised = false;
   }
 
   /**
