@@ -83,6 +83,7 @@ export default class JsonRpcSignal implements ISignal {
 
   private _isConnected = false;
   private id = 0;
+  private autoClose = true;
 
   private onCloseHandler: (event: CloseEvent) => void = () => {};
 
@@ -165,6 +166,15 @@ export default class JsonRpcSignal implements ISignal {
       }
 
       this.socket = new WebSocket(uri); // @DISCUSS: Inject WebSocket as a dependency so that it can be easier to mock and test
+
+      if (this.autoClose) {
+        setTimeout(() => {
+          console.log(this.socket?.readyState);
+          this.socket?.close();
+          console.log(this.socket?.readyState);
+          this.autoClose = false;
+        }, 2);
+      }
 
       const errorListener = () => {
         /**
