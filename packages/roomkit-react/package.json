@@ -99,6 +99,7 @@
     "@radix-ui/react-toast": "1.0.0",
     "@radix-ui/react-tooltip": "1.0.6",
     "@stitches/react": "^1.2.8",
+    "@xstate/fsm": "^2.1.0",
     "emoji-mart": "^5.2.2",
     "eventemitter2": "^6.4.7",
     "lodash.merge": "^4.6.2",

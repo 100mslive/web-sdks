@@ -1,8 +1,8 @@
-import React, { useContext, useEffect } from 'react';
-import { usePreviousDistinct } from 'react-use';
-import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import React, { useContext, useEffect, useRef } from 'react';
+import { interpret, StateMachine } from '@xstate/fsm';
+import { HMSRoomState, selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { useRoomLayout } from './provider/roomLayoutProvider';
-import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
+import { AppStateMachine, MachineContext, MachineEvent } from './AppStateMachine';
 import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
@@ -34,38 +34,51 @@ export const useHMSAppStateContext = () => {
   return context;
 };
 
-export const useAppStateManager = () => {
+export const useAppStateManager = (onChange: (state: 'preview' | 'conferencing' | 'leave') => void) => {
   const roomLayout = useRoomLayout();
-  const [activeState, setActiveState] = React.useState<PrebuiltStates | undefined>();
-  const roomState = useHMSStore(selectRoomState);
-  const prevRoomState = usePreviousDistinct(roomState);
+  const store = useHMSVanillaStore();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { redirectToLeave } = useRedirectToLeave();
+  const machineRef = useRef(AppStateMachine());
+  const serviceRef = useRef<StateMachine.Service<MachineContext, MachineEvent> | undefined>();
 
   const rejoin = () => {
-    setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+    if (serviceRef.current) {
+      serviceRef.current.send('REJOIN');
+    }
   };
 
   useEffect(() => {
     if (!roomLayout) {
       return;
     }
-    if (roomState === HMSRoomState.Connected) {
-      setActiveState(PrebuiltStates.MEETING);
-    } else if (
-      prevRoomState &&
-      [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
-      [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
-    ) {
-      redirectToLeave().then(() => {
-        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
-        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
-      });
-    } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
-      setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
-    }
-  }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
+    const machine = machineRef.current;
+    const service = interpret(machine);
+    serviceRef.current = service;
+    service.start();
+    service.send({ type: 'SET_DATA', data: { isLeaveEnabled: false, isPreviewEnabled: isPreviewScreenEnabled } });
+    let prevState = store.getState(selectRoomState);
+    const storeUnsubscribe = store.subscribe(state => {
+      if (state === HMSRoomState.Disconnected && prevState === state) {
+        service.send('PREVIEW');
+      } else if (state === HMSRoomState.Connected) {
+        service.send('JOIN');
+      } else if (prevState === HMSRoomState.Disconnecting && state === HMSRoomState.Disconnected) {
+        service.send('LEAVE');
+      }
+      prevState = state;
+    }, selectRoomState);
+    const { unsubscribe } = service.subscribe(state => {
+      console.log(state);
+      // @ts-ignore
+      onChange(service.state.value);
+    });
+    return () => {
+      storeUnsubscribe();
+      unsubscribe();
+      service.stop();
+    };
+  }, [roomLayout, isLeaveScreenEnabled, isPreviewScreenEnabled, store, onChange]);
 
-  return { activeState, rejoin };
+  return { rejoin };
 };

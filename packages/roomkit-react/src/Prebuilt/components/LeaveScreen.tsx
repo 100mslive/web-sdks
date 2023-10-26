@@ -5,14 +5,12 @@ import { ToastManager } from './Toast/ToastManager';
 import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
-import { useHMSAppStateContext } from '../AppStateContext';
 import { Header } from './Header';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
 import { textEllipsis } from '../../utils';
 
-export const LeaveScreen = () => {
-  const { rejoin } = useHMSAppStateContext();
+export const LeaveScreen = ({ rejoin }: { rejoin: () => void }) => {
   const [previewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW, defaultPreviewPreference);
   return (
     <Flex direction="column" css={{ size: '100%' }}>

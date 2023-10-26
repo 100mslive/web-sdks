@@ -1,4 +1,4 @@
-import React, { MutableRefObject, useEffect, useRef } from 'react';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
@@ -31,7 +31,7 @@ import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
-import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateContext';
+import { useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
@@ -39,10 +39,6 @@ import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
-import {
-  useRoomLayoutLeaveScreen,
-  useRoomLayoutPreviewScreen,
-} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
@@ -255,15 +251,17 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
-const AppStates = ({ activeState }: { activeState: PrebuiltStates }) => {
-  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
+const AppStates = () => {
+  // const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  // const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
+  const [activeState, setActiveState] = useState('');
+  const { rejoin } = useAppStateManager(setActiveState);
 
-  if (activeState === PrebuiltStates.PREVIEW && isPreviewScreenEnabled) {
+  if (activeState === 'preview') {
     return <PreviewScreen />;
-  } else if (activeState === PrebuiltStates.LEAVE && isLeaveScreenEnabled) {
-    return <LeaveScreen />;
+  } else if (activeState === 'leave') {
+    return <LeaveScreen rejoin={rejoin} />;
   }
   return <ConferenceScreen />;
 };
@@ -294,21 +292,20 @@ function AppRoutes({
 }) {
   const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
-  const { activeState, rejoin } = useAppStateManager();
 
   return (
-    <AppStateContext.Provider value={{ rejoin }}>
-      <>
-        <ToastContainer />
-        <Notifications />
-        <MwebLandscapePrompt />
-        <BackSwipe />
-        {!isNotificationsDisabled && <FlyingEmoji />}
-        <RemoteStopScreenshare />
-        <KeyboardHandler />
-        <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
-        {roomLayout && activeState && <AppStates activeState={activeState} />}
-      </>
-    </AppStateContext.Provider>
+    // <AppStateContext.Provider value={{ rejoin }}>
+    <>
+      <ToastContainer />
+      <Notifications />
+      <MwebLandscapePrompt />
+      <BackSwipe />
+      {!isNotificationsDisabled && <FlyingEmoji />}
+      <RemoteStopScreenshare />
+      <KeyboardHandler />
+      <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
+      {roomLayout && <AppStates />}
+    </>
+    // </AppStateContext.Provider>
   );
 }
