@@ -8,17 +8,17 @@ export class HMSAudioTrackSettingsBuilder {
   private _deviceId = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
-    { googEchoCancellation: { exact: true } },
+    { googAutoGainControl: true },
     // @ts-ignore
-    { googExperimentalEchoCancellation: { exact: true } },
+    { googNoiseSuppression: true },
     // @ts-ignore
-    { autoGainControl: { exact: true } },
+    { googEchoCancellation: true },
     // @ts-ignore
-    { noiseSuppression: { exact: true } },
+    { googExperimentalEchoCancellation: true },
     // @ts-ignore
-    { googHighpassFilter: { exact: true } },
+    { googHighpassFilter: true },
     // @ts-ignore
-    { googAudioMirroring: { exact: true } },
+    { googAudioMirroring: true },
   ];
 
   volume(volume: number) {
@@ -81,8 +81,12 @@ export class HMSAudioTrackSettings implements IHMSAudioTrackSettings, IAnalytics
 
   toConstraints(): MediaTrackConstraints {
     return {
-      deviceId: this.deviceId,
-      advanced: this.advanced,
+      // @ts-ignore
+      mandatory: {
+        sourceId: this.deviceId,
+      },
+      // @ts-ignore - this is changed to apply the constraints with the 'goog' prefix
+      optional: this.advanced,
     };
   }
 
