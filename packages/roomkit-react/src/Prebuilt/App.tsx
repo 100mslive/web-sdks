@@ -31,6 +31,7 @@ import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
+import { ComponentWithStateName, RenderComponentByStateName } from './RenderComponentByStateName';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
@@ -38,6 +39,10 @@ import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
+import {
+  useRoomLayoutLeaveScreen,
+  useRoomLayoutPreviewScreen,
+} from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { usePrebuiltStateManager } from './usePrebuiltStateManager';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
@@ -252,18 +257,25 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
 const AppStates = () => {
-  // const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
-  // const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
   const [activeState, setActiveState] = useState('');
   const { rejoin } = usePrebuiltStateManager(setActiveState);
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
+  const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
 
-  if (activeState === 'preview') {
-    return <PreviewScreen />;
-  } else if (activeState === 'leave') {
-    return <LeaveScreen rejoin={rejoin} />;
-  }
-  return <ConferenceScreen />;
+  return (
+    <RenderComponentByStateName state={activeState}>
+      <ComponentWithStateName state="preview">
+        {isPreviewScreenEnabled ? <PreviewScreen /> : null}
+      </ComponentWithStateName>
+      <ComponentWithStateName state="conferencing">
+        <ConferenceScreen />
+      </ComponentWithStateName>
+      <ComponentWithStateName state="leave">
+        {isLeaveScreenEnabled ? <LeaveScreen rejoin={rejoin} /> : null}
+      </ComponentWithStateName>
+    </RenderComponentByStateName>
+  );
 };
 
 const BackSwipe = () => {
@@ -294,7 +306,6 @@ function AppRoutes({
   const isNotificationsDisabled = useIsNotificationDisabled();
 
   return (
-    // <AppStateContext.Provider value={{ rejoin }}>
     <>
       <ToastContainer />
       <Notifications />
@@ -306,6 +317,5 @@ function AppRoutes({
       <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
       {roomLayout && <AppStates />}
     </>
-    // </AppStateContext.Provider>
   );
 }
