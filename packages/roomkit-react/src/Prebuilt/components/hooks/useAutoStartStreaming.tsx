@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
-  HMSException,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
@@ -32,9 +31,7 @@ export const useAutoStartStreaming = () => {
       streamStartedRef.current = true;
       await hmsActions.startHLSStreaming();
     } catch (error) {
-      if ((error as HMSException).message?.includes('beam already started')) {
-        return;
-      }
+      console.error(error);
       streamStartedRef.current = false;
       setHLSStarted(false);
     }
