@@ -88,7 +88,7 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
-    if (!isConnected && sidePane && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
+    if (!isConnected && sidePane && ![SIDE_PANE_OPTIONS.PARTICIPANTS, SIDE_PANE_OPTIONS.VB].includes(sidePane)) {
       resetSidePane();
     }
   }, [isConnected, sidePane, resetSidePane]);

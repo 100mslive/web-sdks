@@ -20,10 +20,12 @@ const SidePane = ({
   screenType,
   tileProps,
   hideControls = false,
+  preview = false,
 }: {
   screenType: keyof ConferencingScreen;
   tileProps?: TileCustomisationProps;
   hideControls?: boolean;
+  preview?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
@@ -63,6 +65,8 @@ const SidePane = ({
         h: '100%',
         flexShrink: 0,
         gap: '$4',
+        position: preview ? 'absolute' : 'relative',
+        right: preview ? '0' : 'unset',
         '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
@@ -89,7 +93,7 @@ const SidePane = ({
               ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
               : '$surface_dim',
             r: '$1',
-            position: 'relative',
+            position: preview ? 'absolute' : 'relative',
             '@lg': {
               w: '100%',
               h: '100%',

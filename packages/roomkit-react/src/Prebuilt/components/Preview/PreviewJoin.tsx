@@ -188,7 +188,7 @@ const PreviewJoin = ({
           />
         </Box>
       </Container>
-      <SidePane screenType="default" />
+      <SidePane screenType="default" preview />
     </Flex>
   ) : (
     <FullPageProgress />
