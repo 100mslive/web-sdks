@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
@@ -21,6 +21,8 @@ import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
 // @ts-ignore: No implicit Any
+import { VBToggle } from '../VBToggle';
+// @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
@@ -31,8 +33,6 @@ import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane
 import { useShowPolls } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../../common/constants';
-// @ts-ignore: No implicit Any
-const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 export const Footer = ({
   screenType,
@@ -82,11 +82,7 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        {isMobile ? null : (
-          <Suspense fallback={<></>}>
-            <VirtualBackground />
-          </Suspense>
-        )}
+        {isMobile ? null : <VBToggle />}
       </AppFooter.Left>
       <AppFooter.Center
         css={{

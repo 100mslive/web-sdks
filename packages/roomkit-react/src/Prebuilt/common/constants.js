@@ -46,6 +46,8 @@ export const APP_DATA = {
   activeScreensharePeerId: 'activeScreensharePeerId',
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
+  background: 'background',
+  backgroundType: 'backgroundType',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
@@ -61,6 +63,7 @@ export const SIDE_PANE_OPTIONS = {
   CHAT: 'Chat',
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
+  VB: 'VB',
 };
 
 export const POLL_STATE = {
@@ -129,3 +132,6 @@ export const QUESTION_TYPE = {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '#prebuilt-container';
+
+// Will support all media, setting to image here to test with current plugin interface
+export const VB_EFFECT = { BLUR: 'blur', BEAUTIFY: 'BEAUTIFY', NONE: 'none', MEDIA: 'image' };

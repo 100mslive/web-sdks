@@ -25,6 +25,7 @@ import {
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
+  VB_EFFECT,
 } from '../../common/constants';
 
 export const getAppDetails = appDetails => {
@@ -67,6 +68,8 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.background]: VB_EFFECT.NONE,
+  [APP_DATA.backgroundType]: VB_EFFECT.NONE,
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',

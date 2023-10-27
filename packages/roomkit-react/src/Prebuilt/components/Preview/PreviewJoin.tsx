@@ -1,4 +1,4 @@
-import React, { Fragment, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
 import {
   HMSRoomState,
@@ -18,6 +18,7 @@ import { AudioLevel } from '../../../AudioLevel';
 import { useHMSPrebuiltContext } from '../../AppContext';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
+import SidePane from '../../layouts/SidePane';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
@@ -31,6 +32,7 @@ import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
+import { VBToggle } from '../VBToggle';
 // @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
 // @ts-ignore: No implicit Any
@@ -41,9 +43,6 @@ import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } fro
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
-
-// @ts-ignore: No implicit Any
-const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
@@ -133,60 +132,63 @@ const PreviewJoin = ({
   }, [initialName]);
 
   return roomState === HMSRoomState.Preview ? (
-    <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
-      {toggleVideo ? null : <Box />}
-      <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
-        <Logo />
-        <Text
-          variant="h4"
-          css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
-        >
-          {previewHeader.title}
-        </Text>
-        <Text
-          css={{ c: '$on_surface_medium', my: '0', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
-          variant="sm"
-        >
-          {previewHeader.sub_title}
-        </Text>
-        <Flex justify="center" css={{ mt: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
-          {isStreamingOn ? (
-            <Chip
-              content="LIVE"
-              backgroundColor="$alert_error_default"
-              textColor="#FFF"
-              icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
-            />
-          ) : null}
-          <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
+    <Flex justify="center" css={{ size: '100%' }}>
+      <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' }, width: 'unset' }}>
+        {toggleVideo ? null : <Box />}
+        <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
+          <Logo />
+          <Text
+            variant="h4"
+            css={{ wordBreak: 'break-word', textAlign: 'center', mt: '$14', mb: '$4', '@md': { mt: '$8', mb: '$2' } }}
+          >
+            {previewHeader.title}
+          </Text>
+          <Text
+            css={{ c: '$on_surface_medium', my: '0', textAlign: 'center', maxWidth: '100%', wordWrap: 'break-word' }}
+            variant="sm"
+          >
+            {previewHeader.sub_title}
+          </Text>
+          <Flex justify="center" css={{ mt: '$14', '@md': { mt: '$8', mb: '0' }, gap: '$4' }}>
+            {isStreamingOn ? (
+              <Chip
+                content="LIVE"
+                backgroundColor="$alert_error_default"
+                textColor="#FFF"
+                icon={<Box css={{ h: '$sm', w: '$sm', backgroundColor: '$on_primary_high', borderRadius: '$round' }} />}
+              />
+            ) : null}
+            <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
+          </Flex>
         </Flex>
-      </Flex>
-      {toggleVideo ? (
-        <Flex
-          align="center"
-          justify="center"
-          css={{
-            mt: '$14',
-            '@md': { mt: 0 },
-            '@sm': { width: '100%' },
-            flexDirection: 'column',
-          }}
-        >
-          <PreviewTile name={name} error={previewError} />
-        </Flex>
-      ) : null}
-      <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
-        <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
-        <PreviewForm
-          name={name}
-          onChange={setName}
-          enableJoin={enableJoin}
-          onJoin={savePreferenceAndJoin}
-          cannotPublishVideo={!toggleVideo}
-          cannotPublishAudio={!toggleAudio}
-        />
-      </Box>
-    </Container>
+        {toggleVideo ? (
+          <Flex
+            align="center"
+            justify="center"
+            css={{
+              mt: '$14',
+              '@md': { mt: 0 },
+              '@sm': { width: '100%' },
+              flexDirection: 'column',
+            }}
+          >
+            <PreviewTile name={name} error={previewError} />
+          </Flex>
+        ) : null}
+        <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
+          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
+          <PreviewForm
+            name={name}
+            onChange={setName}
+            enableJoin={enableJoin}
+            onJoin={savePreferenceAndJoin}
+            cannotPublishVideo={!toggleVideo}
+            cannotPublishAudio={!toggleAudio}
+          />
+        </Box>
+      </Container>
+      <SidePane screenType="default" />
+    </Flex>
   ) : (
     <FullPageProgress />
   );
@@ -274,7 +276,7 @@ export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => 
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        <Suspense fallback="">{!isMobile ? <VirtualBackground /> : null}</Suspense>
+        {!isMobile ? <VBToggle /> : null}
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>
