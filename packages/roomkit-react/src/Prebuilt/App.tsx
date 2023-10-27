@@ -1,14 +1,7 @@
-import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
+import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
-import {
-  HMSActions,
-  HMSReactiveStore,
-  HMSRoomProvider,
-  selectIsConnectedToRoom,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { HMSActions, HMSReactiveStore, HMSRoomProvider } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
@@ -26,7 +19,7 @@ import { Notifications } from './components/Notifications';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
+import { RoomLayoutContext, RoomLayoutProvider } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
@@ -236,10 +229,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                             position: 'relative',
                           }}
                         >
-                          <AppRoutes
-                            authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint}
-                            defaultAuthToken={authToken}
-                          />
+                          <Main authTokenByRoomCodeEndpoint={tokenByRoomCodeEndpoint} defaultAuthToken={authToken} />
                         </Box>
                       </DialogContainerProvider>
                     </HMSThemeProvider>
@@ -256,10 +246,9 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
 
 HMSPrebuilt.displayName = 'HMSPrebuilt';
 
-const AppStates = () => {
+const MainContent = () => {
   useAutoStartStreaming();
-  const [activeState, setActiveState] = useState('');
-  const { rejoin } = usePrebuiltStateManager(setActiveState);
+  const { rejoin, state: activeState } = usePrebuiltStateManager();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
 
@@ -278,31 +267,13 @@ const AppStates = () => {
   );
 };
 
-const BackSwipe = () => {
-  const isConnectedToRoom = useHMSStore(selectIsConnectedToRoom);
-  const hmsActions = useHMSActions();
-  useEffect(() => {
-    const onRouteLeave = async () => {
-      if (isConnectedToRoom) {
-        await hmsActions.leave();
-      }
-    };
-    window.addEventListener('popstate', onRouteLeave);
-    return () => {
-      window.removeEventListener('popstate', onRouteLeave);
-    };
-  }, [hmsActions, isConnectedToRoom]);
-  return null;
-};
-
-function AppRoutes({
+function Main({
   authTokenByRoomCodeEndpoint,
   defaultAuthToken,
 }: {
   authTokenByRoomCodeEndpoint: string;
   defaultAuthToken?: string;
 }) {
-  const roomLayout = useRoomLayout();
   const isNotificationsDisabled = useIsNotificationDisabled();
 
   return (
@@ -310,12 +281,11 @@ function AppRoutes({
       <ToastContainer />
       <Notifications />
       <MwebLandscapePrompt />
-      <BackSwipe />
       {!isNotificationsDisabled && <FlyingEmoji />}
       <RemoteStopScreenshare />
       <KeyboardHandler />
       <AuthToken authTokenByRoomCodeEndpoint={authTokenByRoomCodeEndpoint} defaultAuthToken={defaultAuthToken} />
-      {roomLayout && <AppStates />}
+      <MainContent />
     </>
   );
 }

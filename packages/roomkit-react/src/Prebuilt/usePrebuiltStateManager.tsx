@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { interpret, StateMachine } from '@xstate/fsm';
 import { HMSRoomState, selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { useRoomLayout } from './provider/roomLayoutProvider';
@@ -8,13 +8,14 @@ import {
   useRoomLayoutPreviewScreen,
 } from './provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
-export const usePrebuiltStateManager = (onChange: (state: 'preview' | 'conferencing' | 'leave') => void) => {
+export const usePrebuiltStateManager = () => {
   const roomLayout = useRoomLayout();
   const store = useHMSVanillaStore();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const machineRef = useRef(PrebuiltStateMachine());
   const serviceRef = useRef<StateMachine.Service<MachineContext, MachineEvent> | undefined>();
+  const [state, setState] = useState<string>('');
 
   const rejoin = () => {
     if (serviceRef.current) {
@@ -35,7 +36,7 @@ export const usePrebuiltStateManager = (onChange: (state: 'preview' | 'conferenc
     const storeUnsubscribe = store.subscribe(state => {
       if (state === HMSRoomState.Disconnected && prevState === state) {
         service.send('NEXT');
-      } else if (state === HMSRoomState.Connected) {
+      } else if (state === HMSRoomState.Connected && prevState !== HMSRoomState.Reconnecting) {
         service.send('NEXT');
       } else if (prevState === HMSRoomState.Disconnecting && state === HMSRoomState.Disconnected) {
         service.send('NEXT');
@@ -43,15 +44,14 @@ export const usePrebuiltStateManager = (onChange: (state: 'preview' | 'conferenc
       prevState = state;
     }, selectRoomState);
     const { unsubscribe } = service.subscribe(state => {
-      // @ts-ignore
-      onChange(state.value);
+      setState(state.value);
     });
     return () => {
       storeUnsubscribe();
       unsubscribe();
       service.stop();
     };
-  }, [roomLayout, isLeaveScreenEnabled, isPreviewScreenEnabled, store, onChange]);
+  }, [roomLayout, isLeaveScreenEnabled, isPreviewScreenEnabled, store]);
 
-  return { rejoin };
+  return { rejoin, state };
 };
