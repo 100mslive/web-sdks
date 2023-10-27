@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
+  HMSRoomState,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
   selectLocalPeerRole,
   selectLocalVideoTrackID,
+  selectRoomState,
   selectVideoTrackByID,
   useHMSActions,
   useHMSStore,
@@ -34,6 +36,7 @@ export const VBPicker = () => {
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
+  const roomState = useHMSStore(selectRoomState);
 
   async function createPlugin() {
     if (!pluginRef.current) {
@@ -150,7 +153,7 @@ export const VBPicker = () => {
         </Box>
       </Flex>
 
-      {isVideoOn ? (
+      {isVideoOn && roomState !== HMSRoomState.Preview ? (
         <Video
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer.videoTrack}
