@@ -31,7 +31,6 @@ import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
 import { globalStyles, HMSThemeProvider } from '../Theme';
 import { HMSPrebuiltContext } from './AppContext';
-import { useAppStateManager } from './AppStateContext';
 // @ts-ignore: No implicit Any
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
@@ -39,6 +38,7 @@ import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
+import { usePrebuiltStateManager } from './usePrebuiltStateManager';
 // @ts-ignore: No implicit Any
 import { FeatureFlags } from './services/FeatureFlags';
 // @ts-ignore: No implicit Any
@@ -256,7 +256,7 @@ const AppStates = () => {
   // const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   useAutoStartStreaming();
   const [activeState, setActiveState] = useState('');
-  const { rejoin } = useAppStateManager(setActiveState);
+  const { rejoin } = usePrebuiltStateManager(setActiveState);
 
   if (activeState === 'preview') {
     return <PreviewScreen />;

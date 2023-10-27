@@ -5,16 +5,10 @@ export type MachineContext = {
   isPreviewEnabled: boolean;
 };
 
-export type MachineEvent =
-  | { type: 'entry' }
-  | { type: 'SET_DATA'; data: MachineContext }
-  | { type: 'PREVIEW' }
-  | { type: 'JOIN' }
-  | { type: 'REJOIN' }
-  | { type: 'LEAVE' };
-export const AppStateMachine = () =>
+export type MachineEvent = { type: 'entry' } | { type: 'SET_DATA'; data: MachineContext } | { type: 'NEXT' };
+export const PrebuiltStateMachine = () =>
   createMachine<MachineContext, MachineEvent>({
-    id: 'app-state',
+    id: 'prebuilt-state-machine',
     initial: 'disconnected',
     context: {
       isLeaveEnabled: true,
@@ -23,7 +17,7 @@ export const AppStateMachine = () =>
     states: {
       disconnected: {
         on: {
-          PREVIEW: {
+          NEXT: {
             target: 'preview',
           },
           SET_DATA: {
@@ -42,12 +36,12 @@ export const AppStateMachine = () =>
             target: 'conferencing',
             cond: context => !context.isPreviewEnabled,
           },
-          JOIN: 'conferencing',
+          NEXT: 'conferencing',
         },
       },
       conferencing: {
         on: {
-          LEAVE: 'leave',
+          NEXT: 'leave',
         },
       },
       leave: {
@@ -56,7 +50,7 @@ export const AppStateMachine = () =>
             target: 'preview',
             cond: context => !context.isLeaveEnabled,
           },
-          REJOIN: {
+          NEXT: {
             target: 'preview',
           },
         },
