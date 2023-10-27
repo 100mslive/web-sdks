@@ -26,6 +26,7 @@ const Wrapper = ({ css = {}, children }: { css?: CSS; children: React.ReactNode 
         background: '$surface_dim',
         r: '$1',
         position: 'relative',
+        ...css,
         '@lg': {
           w: '100%',
           h: '100%',
@@ -35,12 +36,13 @@ const Wrapper = ({ css = {}, children }: { css?: CSS; children: React.ReactNode 
           bottom: 0,
           borderRadius: 0,
           zIndex: 10,
+          ...(css['@lg'] || {}),
         },
         '@md': {
           p: '$6 $8',
           animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+          ...(css['@md'] || {}),
         },
-        ...css,
       }}
     >
       {children}
