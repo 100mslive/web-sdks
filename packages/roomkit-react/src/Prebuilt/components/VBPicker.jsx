@@ -1,20 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   selectIsLocalVideoEnabled,
+  selectLocalPeer,
   selectLocalPeerRole,
   selectLocalVideoTrackID,
+  selectVideoTrackByID,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon, SparkleIcon } from '@100mslive/react-icons';
-import { Box, Flex } from '../../Layout';
+import { Box, Flex, Video } from '../../index';
 import { Text } from '../../Text';
 import { VBCollection } from './VBCollection';
 // @ts-ignore
 import { useSidepaneToggle } from './AppData/useSidepane';
-import { useSetAppDataByKey } from './AppData/useUISettings';
+import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 // @ts-ignore
-import { APP_DATA, SIDE_PANE_OPTIONS, VB_EFFECT } from '../common/constants';
+import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS, VB_EFFECT } from '../common/constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -23,11 +25,15 @@ export const VBPicker = () => {
   const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
-  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const [background, setBackground] = useSetAppDataByKey(APP_DATA.background);
   const [backgroundType, setBackgroundType] = useSetAppDataByKey(APP_DATA.backgroundType);
+  const localPeer = useHMSStore(selectLocalPeer);
+  const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
+  const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
+  const track = useHMSStore(trackSelector);
 
   async function createPlugin() {
     if (!pluginRef.current) {
@@ -76,8 +82,7 @@ export const VBPicker = () => {
     }
   }
 
-  // TODO Close the panel when the video is toggled off
-  if (!isVBSupported || !isVideoOn) {
+  if (!isVBSupported) {
     return null;
   }
 
@@ -144,6 +149,15 @@ export const VBPicker = () => {
           <CloseIcon />
         </Box>
       </Flex>
+
+      {isVideoOn ? (
+        <Video
+          mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
+          trackId={localPeer.videoTrack}
+          data-testid="preview_tile"
+        />
+      ) : null}
+
       {VBCollections.map(collection => (
         <VBCollection
           {...collection}
