@@ -121,6 +121,7 @@ const SidePane = ({
                     '@md': {
                       background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
                       pb: '$20',
+                      maxHeight: 300,
                     },
                   }
                 : undefined
