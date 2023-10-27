@@ -148,7 +148,7 @@ const Container = styled("div", {
   px: "$10",
 });
 
-export const PreviewTile = ({ name, error, VB = false }) => {
+export const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -175,7 +175,7 @@ export const PreviewTile = ({ name, error, VB = false }) => {
       }}
       ref={borderAudioRef}
     >
-      {localPeer || VB ? (
+      {localPeer ? (
         <>
           <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
           <Video
