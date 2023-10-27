@@ -32,6 +32,7 @@ import FullPageProgress from '../FullPageProgress';
 import { Logo } from '../Header/HeaderComponents';
 // @ts-ignore: No implicit Any
 import SettingsModal from '../Settings/SettingsModal';
+// @ts-ignore: No implicit Any
 import { VBToggle } from '../VBToggle';
 // @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
