@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@100mslive/roomkit-web-component@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@100mslive/roomkit-web-component/-/roomkit-web-component-0.0.1.tgz#f5b96f8c5dcbf475817e0f8df8176b982a796228"
+  integrity sha512-JsNBqPUbeBRiGnSzGwMZ/pNHCAtIqSBDuMg5w99jS6DE8bq/s4ZQVtmJO2e8e0XJYW1T/L+eEc67lWpaOvh5SQ==
+  dependencies:
+    "@100mslive/roomkit-react" "0.1.9"
+    "@r2wc/react-to-web-component" "2.0.2"
+
 "@100mslive/types-prebuilt@0.12.0":
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.0.tgz#7057a01251606a03d4c6ac2c10f0e18ba189e3e9"

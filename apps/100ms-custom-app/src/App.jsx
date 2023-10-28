@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Flex } from '@100mslive/roomkit-react';
-import * as Test from '../../../packages/roomkit-web/dist/index.cjs';
+import * as Test from '../../../packages/roomkit-web-component/dist/index.cjs.js';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
@@ -13,7 +13,6 @@ import {
 console.log(Test);
 const Header = React.lazy(() => import('./components/Header'));
 
-const userName = JSON.stringify({ userName: 'test222' });
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -78,12 +77,7 @@ const App = () => {
       )}
       {(authToken || roomCode) && (
         <div style={{ height: '100%' }}>
-          <hms-prebuilt
-            auth-token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoyLCJ0eXBlIjoiYXBwIiwiYXBwX2RhdGEiOm51bGwsImFjY2Vzc19rZXkiOiI2MGNiMTIwN2E1Mjc0YmM2ZjFhM2M1YWUiLCJyb2xlIjoic3R1ZGVudCIsInJvb21faWQiOiI2MGNiMTIyNDRhN2I2N2I2OWYzNjdiMmYiLCJleHAiOjE2OTg1NjY4ODksImp0aSI6Ijg3NWU4NmY5LWM3NmUtNGQzOS1iYmFmLWM2Y2RiZjVhZTk1MiIsImlhdCI6MTY5ODQ4MDQ4OSwiaXNzIjoiNjBjYjEyMDdhNTI3NGJjNmYxYTNjNWFiIiwibmJmIjoxNjk4NDgwNDg5LCJzdWIiOiJhcGkifQ.ikGjYfK8cqKWCzQvGsqVrq1S4s2pgc7qb0aKtAK0uZU"
-            room-id="60cb12244a7b67b69f367b2f"
-            role="student"
-            options={userName}
-          ></hms-prebuilt>
+          <hms-prebuilt room-code="fba-xji-pnk"></hms-prebuilt>
         </div>
 
         // authToken={authToken}
