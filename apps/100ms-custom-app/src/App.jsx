@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
+import { Flex } from '@100mslive/roomkit-react';
+import * as Test from '../../../packages/roomkit-web/dist/index.cjs';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
@@ -9,8 +10,10 @@ import {
   getRoomIdRoleFromUrl,
 } from './utils/utils';
 
+console.log(Test);
 const Header = React.lazy(() => import('./components/Header'));
 
+const userName = JSON.stringify({ userName: 'test222' });
 const App = () => {
   const roomCode = getRoomCodeFromUrl();
   const [onlyEmail, setOnlyEmail] = useState(false);
@@ -20,7 +23,7 @@ const App = () => {
   // added subdomain in query param for easy testing in vercel links
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
-  const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const { isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -74,23 +77,29 @@ const App = () => {
         </Suspense>
       )}
       {(authToken || roomCode) && (
-        <HMSPrebuilt
-          roomCode={roomCode}
-          authToken={authToken}
-          roomId={roomId}
-          role={role}
-          screens={overrideLayout ? overrideLayout : undefined}
-          options={{
-            userName: isHeadless ? 'Beam' : undefined,
-            endpoints: {
-              tokenByRoomCode:
-                process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
-              roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
-              init: process.env.REACT_APP_INIT_ENDPOINT,
-            },
-          }}
-          ref={hmsPrebuiltRef}
-        />
+        <div style={{ height: '100%' }}>
+          <hms-prebuilt
+            auth-token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoyLCJ0eXBlIjoiYXBwIiwiYXBwX2RhdGEiOm51bGwsImFjY2Vzc19rZXkiOiI2MGNiMTIwN2E1Mjc0YmM2ZjFhM2M1YWUiLCJyb2xlIjoic3R1ZGVudCIsInJvb21faWQiOiI2MGNiMTIyNDRhN2I2N2I2OWYzNjdiMmYiLCJleHAiOjE2OTg1NjY4ODksImp0aSI6Ijg3NWU4NmY5LWM3NmUtNGQzOS1iYmFmLWM2Y2RiZjVhZTk1MiIsImlhdCI6MTY5ODQ4MDQ4OSwiaXNzIjoiNjBjYjEyMDdhNTI3NGJjNmYxYTNjNWFiIiwibmJmIjoxNjk4NDgwNDg5LCJzdWIiOiJhcGkifQ.ikGjYfK8cqKWCzQvGsqVrq1S4s2pgc7qb0aKtAK0uZU"
+            room-id="60cb12244a7b67b69f367b2f"
+            role="student"
+            options={userName}
+          ></hms-prebuilt>
+        </div>
+
+        // authToken={authToken}
+        // roomId={roomId}
+        // role={role}
+        // screens={overrideLayout ? overrideLayout : undefined}
+        // options={{
+        //   userName: isHeadless ? 'Beam' : undefined,
+        //   endpoints: {
+        //     tokenByRoomCode:
+        //       process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
+        //     roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
+        //     init: process.env.REACT_APP_INIT_ENDPOINT,
+        //   },
+        // }}
+        // ref={hmsPrebuiltRef}
       )}
     </Flex>
   );

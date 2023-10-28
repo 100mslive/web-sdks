@@ -3,6 +3,7 @@ const esbuild = require('esbuild');
 const PostCssPlugin = require('esbuild-plugin-postcss2');
 const autoprefixer = require('autoprefixer');
 
+// eslint-disable-next-line complexity
 async function main() {
   if (fs.existsSync('./dist')) {
     fs.rmSync('./dist', { recursive: true }, e => {
@@ -13,7 +14,12 @@ async function main() {
   }
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const source = pkg.name === '100ms_edtech_template' ? './src/App.js' : './src/index.ts';
+  const source =
+    pkg.name === '100ms_edtech_template'
+      ? './src/App.js'
+      : pkg.name === '@100mslive/roomkit-web-component'
+      ? './src/index.js'
+      : './src/index.ts';
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };
