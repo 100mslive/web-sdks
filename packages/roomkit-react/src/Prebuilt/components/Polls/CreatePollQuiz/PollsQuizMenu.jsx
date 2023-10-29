@@ -172,7 +172,11 @@ const AddMenu = () => {
 };
 
 const PrevMenu = () => {
-  const polls = useHMSStore(selectPolls)?.filter(poll => poll.state === 'started' || poll.state === 'stopped');
+  // filter polls that have been started or stopped sorted by when they were created and their live state
+  const polls = useHMSStore(selectPolls)
+    ?.filter(poll => poll.state === 'started' || poll.state === 'stopped')
+    .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+    .sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
   return polls?.length ? (
     <Flex
       css={{
