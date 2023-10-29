@@ -184,7 +184,7 @@ export const getAuthTokenUsingRoomIdRole = async function ({
     }
   } catch (e) {
     console.error('failed to getAuthTokenUsingRoomIdRole', e);
-    // throw Error('failed to get auth token using roomid and role');
+    throw Error('failed to get auth token using roomid and role');
   }
 };
 
