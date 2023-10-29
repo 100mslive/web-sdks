@@ -1,11 +1,11 @@
-# `@100mslive/roomkit-web-component`
+# `@100mslive/roomkit-web`
 
 A web component version of the [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
 
 ## Usage
 
 ```
-import '@100mslive/roomkit-web-component'
+import '@100mslive/roomkit-web'
 
 Vue
 
@@ -15,7 +15,7 @@ YourComponent.vue
  <hms-prebuilt room-code="<room-code-goes-here>"></hms-prebuilt>
 </template>
 <script>
-import '@100mslive/roomkit-web-component';
+import '@100mslive/roomkit-web';
 </script>
 ```
 
