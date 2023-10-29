@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { Flex } from '@100mslive/roomkit-react';
-import * as Test from '../../../packages/roomkit-web-component/dist/index.cjs.js';
+import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
@@ -9,9 +8,6 @@ import {
   getRoomCodeFromUrl,
   getRoomIdRoleFromUrl,
 } from './utils/utils';
-
-console.log(Test);
-window.log = () => console.log('ollo');
 
 const Header = React.lazy(() => import('./components/Header'));
 
@@ -24,7 +20,7 @@ const App = () => {
   // added subdomain in query param for easy testing in vercel links
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
-  const { isHeadless } = useOverridePrebuiltLayout();
+  const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -42,13 +38,6 @@ const App = () => {
       hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
       hmsActions?.setAppData?.('disableNotifications', true);
     }
-    const hmsPrebuiltElement = document.querySelector('hms-prebuilt');
-    // Access the 'room-code' prop
-    const roomCodeProp = hmsPrebuiltElement?.getAttribute('room-code');
-    console.log('room-code: ollo ', roomCodeProp);
-    // Access the 'on-leave' prop
-    const onLeaveProp = hmsPrebuiltElement?.getAttribute('on-leave');
-    console.log('on-leave: ollo ', onLeaveProp);
   }, [authToken, roomCode, isHeadless]);
 
   useEffect(() => {
@@ -85,24 +74,23 @@ const App = () => {
         </Suspense>
       )}
       {(authToken || roomCode) && (
-        <div style={{ height: '100%' }}>
-          <hms-prebuilt room-code="fba-xji-pnk" on-leave="log"></hms-prebuilt>
-        </div>
-
-        // authToken={authToken}
-        // roomId={roomId}
-        // role={role}
-        // screens={overrideLayout ? overrideLayout : undefined}
-        // options={{
-        //   userName: isHeadless ? 'Beam' : undefined,
-        //   endpoints: {
-        //     tokenByRoomCode:
-        //       process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
-        //     roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
-        //     init: process.env.REACT_APP_INIT_ENDPOINT,
-        //   },
-        // }}
-        // ref={hmsPrebuiltRef}
+        <HMSPrebuilt
+          roomCode={roomCode}
+          authToken={authToken}
+          roomId={roomId}
+          role={role}
+          screens={overrideLayout ? overrideLayout : undefined}
+          options={{
+            userName: isHeadless ? 'Beam' : undefined,
+            endpoints: {
+              tokenByRoomCode:
+                process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
+              roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
+              init: process.env.REACT_APP_INIT_ENDPOINT,
+            },
+          }}
+          ref={hmsPrebuiltRef}
+        />
       )}
     </Flex>
   );
