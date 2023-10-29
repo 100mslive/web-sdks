@@ -1,5 +1,6 @@
 # `@100mslive/roomkit-web-component`
 
+A web component version of the [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
 ## Usage
 
 ```
