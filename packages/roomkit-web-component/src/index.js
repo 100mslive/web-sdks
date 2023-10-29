@@ -5,7 +5,6 @@ const HMSPrebuiltWebComponent = r2wc(HMSPrebuilt, {
   props: {
     roomCode: 'string',
     authToken: 'string',
-    onLeave: 'function',
     roomId: 'string',
     role: 'string',
     options: 'json',
