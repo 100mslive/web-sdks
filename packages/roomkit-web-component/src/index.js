@@ -8,6 +8,7 @@ const HMSPrebuiltWebComponent = r2wc(HMSPrebuilt, {
     roomId: 'string',
     role: 'string',
     options: 'json',
+    onLeave: 'function',
   },
 });
 

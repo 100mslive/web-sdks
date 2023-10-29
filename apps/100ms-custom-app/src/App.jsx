@@ -11,6 +11,8 @@ import {
 } from './utils/utils';
 
 console.log(Test);
+window.log = () => console.log('ollo');
+
 const Header = React.lazy(() => import('./components/Header'));
 
 const App = () => {
@@ -40,6 +42,13 @@ const App = () => {
       hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
       hmsActions?.setAppData?.('disableNotifications', true);
     }
+    const hmsPrebuiltElement = document.querySelector('hms-prebuilt');
+    // Access the 'room-code' prop
+    const roomCodeProp = hmsPrebuiltElement?.getAttribute('room-code');
+    console.log('room-code: ollo ', roomCodeProp);
+    // Access the 'on-leave' prop
+    const onLeaveProp = hmsPrebuiltElement?.getAttribute('on-leave');
+    console.log('on-leave: ollo ', onLeaveProp);
   }, [authToken, roomCode, isHeadless]);
 
   useEffect(() => {
@@ -77,7 +86,7 @@ const App = () => {
       )}
       {(authToken || roomCode) && (
         <div style={{ height: '100%' }}>
-          <hms-prebuilt room-code="fba-xji-pnk"></hms-prebuilt>
+          <hms-prebuilt room-code="fba-xji-pnk" on-leave="log"></hms-prebuilt>
         </div>
 
         // authToken={authToken}
