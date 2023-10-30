@@ -36,23 +36,26 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
 
   const stopStream = async () => {
     try {
-      console.log('Stopping HLS stream');
-      await hmsActions.stopHLSStreaming();
-      ToastManager.addToast({ title: 'Stopping the stream' });
+      if (permissions?.hlsStreaming) {
+        console.log('Stopping HLS stream');
+        await hmsActions.stopHLSStreaming();
+        ToastManager.addToast({ title: 'Stopping the stream' });
+      }
     } catch (e) {
       console.error('Error stopping stream', e);
       ToastManager.addToast({ title: 'Error in stopping the stream', type: 'error' });
     }
   };
-  const endRoom = () => {
-    hmsActions.endRoom(false, 'End Room');
+
+  const endRoom = async () => {
+    await hmsActions.endRoom(false, 'End Room');
   };
 
-  const leaveRoom = async ({ endstream = false }) => {
-    if (endstream || (hlsState.running && peersWithStreamingRights.length === 1)) {
+  const leaveRoom = async (options: { endStream?: boolean } = { endStream: false }) => {
+    if (options.endStream || (hlsState.running && peersWithStreamingRights.length === 1)) {
       await stopStream();
     }
-    hmsActions.leave();
+    await hmsActions.leave();
   };
 
   if (!permissions || !isConnected) {

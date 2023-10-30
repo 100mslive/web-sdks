@@ -23,10 +23,7 @@ export function HLSFailureModal() {
       setHLSStarted(true);
       await hmsActions.startHLSStreaming({});
     } catch (error) {
-      if ((error as Error).message.includes('invalid input')) {
-        await startHLS();
-        return;
-      }
+      console.error(error);
       setHLSStarted(false);
     }
   }, [hmsActions, isHLSStarted, setHLSStarted, isRTMPRunning]);

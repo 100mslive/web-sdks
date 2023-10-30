@@ -139,6 +139,7 @@ export class RoomUpdateManager {
     if (!notification?.variants) {
       return;
     }
+    room.hls.running = true;
     room.hls.variants = [];
     notification.variants.forEach((_: HLSVariant, index: number) => {
       room.hls.variants.push({

@@ -28,8 +28,10 @@ const PreviewForm = ({
   };
   const isMobile = useMedia(cssConfig.media.md);
   const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+
   const layout = useRoomLayout();
   const { join_form: joinForm = {} } = layout?.screens?.preview?.default?.elements || {};
+
   const showGoLive =
     joinForm?.join_btn_type === JoinForm_JoinBtnType.JOIN_BTN_TYPE_JOIN_AND_GO_LIVE && !isHLSRunning && !isRTMPRunning;
 
