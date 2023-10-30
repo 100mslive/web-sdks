@@ -65,7 +65,7 @@ export const Voting = ({ id, toggleVoting }) => {
         </Box>
       </Flex>
 
-      <Flex direction="column" css={{ p: '$8 $10' }}>
+      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto' }}>
         <Flex align="center">
           <Box css={{ flex: 'auto' }}>
             <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>

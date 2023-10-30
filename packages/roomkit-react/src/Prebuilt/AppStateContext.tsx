@@ -58,10 +58,9 @@ export const useAppStateManager = () => {
       [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
       [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
     ) {
-      redirectToLeave().then(() => {
-        const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
-        setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
-      });
+      const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
+      setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
+      redirectToLeave(1000); // to clear toasts after 1 second
     } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
       setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
     }
