@@ -50,4 +50,4 @@ import '@100mslive/roomkit-web';
 
     - `userId` (optional): The user ID to be assigned to the peer.
 
-> NOTE: The callbacks on-join and on-leave havet to be present on the `window` as of now for them to be triggered.
+> NOTE: The callbacks on-join and on-leave have to be present on the `window` as of now for them to be triggered.
