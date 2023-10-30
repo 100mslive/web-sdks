@@ -23,8 +23,8 @@ import '@100mslive/roomkit-web';
 
 `hms-prebuilt` accepts the following props:
 
-`room-code` (optional if roomId and role are being used instead)
-- The room code of the room you want to join. You can get the room code from the [100ms dashboard](https://dashboard.100ms.live). This prop can be skipped if the roomId and role are being provided instead.
+`room-code` (optional if room-id and role are being used instead)
+- The room code of the room you want to join. You can get the room code from the [100ms dashboard](https://dashboard.100ms.live). This prop can be skipped if the room-id and role are being provided instead.
 
 `logo` (optional)
 - An image URL as a string which is displayed in the preview screen and header.
@@ -32,11 +32,11 @@ import '@100mslive/roomkit-web';
 `auth-token` (optional)
 - This token is room and role specific. It can be copied from the join room modal on the [dashboard](https://dashboard.100ms.live). Read more about it [here](/get-started/v2/get-started/security-and-tokens#auth-token-for-client-sdks).
 
-`room-id` (optional unless roomCode is not being used)
-- The room ID of the room you want to join. You can get the room ID from the [dashboard](https://dashboard.100ms.live). It should be specified with the role prop if the room code is not being provided.
+`room-id` (optional unless room-code is not being used)
+- The room ID of the room you want to join. You can get the room ID from the [dashboard](https://dashboard.100ms.live). It should be specified with the role prop if the room-code is not being provided.
 
-`role` (optional unless roomId is specified)
-- A string specifying the role of the peer. Should be specified if the roomId is being used to join the room.
+`role` (optional unless room-id is specified)
+- A string specifying the role of the peer. Should be specified if the room-id is being used to join the room.
 
 `on-join` (optional)
 - A callback function that will be executed after the peer joins the call. 
