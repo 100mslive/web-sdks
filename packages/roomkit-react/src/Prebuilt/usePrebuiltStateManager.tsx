@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { interpret, StateMachine } from '@xstate/fsm';
 import { HMSRoomState, selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
+// @ts-ignore: No implicit Any
+import { PictureInPicture } from './components/PIP/PIPManager';
 import { useRoomLayout } from './provider/roomLayoutProvider';
+import { useHMSPrebuiltContext } from './AppContext';
 import { MachineContext, MachineEvent, PrebuiltStateMachine } from './PrebuiltStateMachine';
 import {
   useRoomLayoutLeaveScreen,
@@ -11,6 +14,7 @@ import {
 export const usePrebuiltStateManager = () => {
   const roomLayout = useRoomLayout();
   const store = useHMSVanillaStore();
+  const { onLeave, onJoin } = useHMSPrebuiltContext();
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const machineRef = useRef(PrebuiltStateMachine());
@@ -45,13 +49,19 @@ export const usePrebuiltStateManager = () => {
     }, selectRoomState);
     const { unsubscribe } = service.subscribe(state => {
       setState(state.value);
+      if (state.value === 'conferencing') {
+        onJoin?.();
+      } else if (state.value === 'leave') {
+        PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
+        onLeave?.();
+      }
     });
     return () => {
       storeUnsubscribe();
       unsubscribe();
       service.stop();
     };
-  }, [roomLayout, isLeaveScreenEnabled, isPreviewScreenEnabled, store]);
+  }, [roomLayout, isLeaveScreenEnabled, isPreviewScreenEnabled, store]); //eslint-disable-line
 
   return { rejoin, state };
 };

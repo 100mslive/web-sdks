@@ -13,7 +13,6 @@ import { HLSFailureModal } from './Notifications/HLSFailureModal';
 // @ts-ignore: No implicit Any
 import { ActivatedPIP } from './PIP/PIPComponent';
 // @ts-ignore: No implicit Any
-import { PictureInPicture } from './PIP/PIPManager';
 import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
 import { useHMSPrebuiltContext } from '../AppContext';
@@ -31,7 +30,7 @@ import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
 export const ConferenceScreen = () => {
-  const { userName, endpoints, onJoin: onJoinFunc } = useHMSPrebuiltContext();
+  const { userName, endpoints } = useHMSPrebuiltContext();
   const screenProps = useRoomLayoutConferencingScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const roomState = useHMSStore(selectRoomState);
@@ -91,13 +90,6 @@ export const ConferenceScreen = () => {
       autoRoomJoined.current = true;
     }
   }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
-
-  useEffect(() => {
-    onJoinFunc?.();
-    return () => {
-      PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
-    };
-  }, [onJoinFunc]);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
