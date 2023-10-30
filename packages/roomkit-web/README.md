@@ -1,6 +1,6 @@
 # `@100mslive/roomkit-web`
 
-A web component version of the [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
+A web component implementation of the HMSPrebuilt component from [roomkit-react](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) library.
 
 ## Usage
 
@@ -23,33 +23,31 @@ import '@100mslive/roomkit-web';
 
 `hms-prebuilt` accepts the following props:
 
-`room-code` (optional)
-
+`room-code` (optional if roomId and role are being used instead)
 - The room code of the room you want to join. You can get the room code from the [100ms dashboard](https://dashboard.100ms.live). This prop can be skipped if the roomId and role are being provided instead.
 
-`room-id` (optional)
-
-- The room ID of the room you wish to join. Can be copied from the dashboard and used in combination with `role`
-
-`role` (optional)
-
-- The name of the role you wish to join as. Used in combination with the `room-id`
+`logo` (optional)
+- An image URL as a string which is displayed in the preview screen and header.
 
 `auth-token` (optional)
+- Can be copied from the developer section of the [dashboard](https://dashboard.100ms.live). Read more about it [here](/get-started/v2/get-started/security-and-tokens#auth-token-for-client-sdks).
 
-- This room and role specific token can be copied from the corresponding template page from the dashboard
+`roomId` (optional unless roomCode is not being used)
+- The room ID of the room you want to join. You can get the room ID from the [dashboard](https://dashboard.100ms.live). It should be specified with the role prop if the room code is not being provided.
+
+`role` (optional unless roomId is specified)
+- A string specifying the role of the peer. Should be specified if the roomId is being used to join the room.
+
+`on-join` (optional)
+- A callback function that will be executed after the peer joins the call. 
 
 `on-leave` (optional)
+- A callback function that will be executed after the peer leaves the call, the session ends or if the peer gets kicked out.
 
-- A callback function that will be executed when the user leaves or is removed from the call. It must be present on the window object
+`options` (optional)
+- A stringified JSON object which accepts the following parameters:
+    - `userName` (optional): The name to be assigned to the peer.
 
-`options`
+    - `userId` (optional): The user ID to be assigned to the peer.
 
-```json
-{
-  "userName": "",
-  "userId": ""
-}
-```
-
-- `userName` will auto-fill in the call preview, and `userId` will be assigned to the user. Both values are optional
+> NOTE: The callbacks on-join and on-leave havet to be present on the `window` as of now for them to be triggered.
