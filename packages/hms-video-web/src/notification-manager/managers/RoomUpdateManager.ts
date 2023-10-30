@@ -40,6 +40,9 @@ export class RoomUpdateManager {
       case HMSNotificationMethod.RECORDING_STOP:
         this.onRecordingStop(notification as RecordingNotification);
         break;
+      case HMSNotificationMethod.RECORDING_UPDATE:
+        this.onRecordingStop(notification as RecordingNotification);
+        break;
       case HMSNotificationMethod.ROOM_STATE:
         this.handlePreviewRoomState(notification as PeriodicRoomState);
         break;
@@ -130,6 +133,9 @@ export class RoomUpdateManager {
     this.setRecordingStatus(false, notification);
   }
 
+  private onRecordingUpdate(notification: RecordingNotification) {
+    this.setRecordingStatus(false, notification);
+  }
   private InitHLS(notification: HLSNotification) {
     const room = this.store.getRoom();
     if (!room) {

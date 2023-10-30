@@ -41,6 +41,15 @@ export interface Info {
   user_id: string;
 }
 
+export type HMSBeamState = {
+  Initialized: 'initialized';
+  Started: 'started';
+  Paused: 'paused';
+  Resumed: 'resumed';
+  Stopped: 'stopped';
+  Failed: 'failed';
+};
+
 export interface PolicyParams {
   name: string;
   known_roles: {
@@ -98,14 +107,17 @@ export interface RoomState {
     sfu: {
       started_at?: number;
       enabled: boolean;
+      state?: HMSBeamState;
     };
     browser: {
       started_at?: number;
       enabled: boolean;
+      state?: HMSBeamState;
     };
     hls: {
       started_at?: number;
       enabled: boolean;
+      state?: HMSBeamState;
       config?: {
         hls_vod: boolean;
         single_file_per_layer: boolean;
@@ -114,7 +126,7 @@ export interface RoomState {
   };
   streaming?: {
     enabled: boolean;
-    rtmp: { enabled: boolean; started_at?: number };
+    rtmp: { enabled: boolean; started_at?: number; state?: HMSBeamState };
     hls: HLSNotification;
   };
 }
@@ -213,16 +225,18 @@ export interface MessageNotificationInfo {
 }
 
 export interface RecordingNotification {
-  type: 'sfu' | 'Browser';
+  type: 'sfu' | 'Browser' | 'hls';
   started_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
+  state?: HMSBeamState;
 }
 
 export interface RTMPNotification {
   peer?: PeerNotificationInfo;
   started_at?: number;
   error?: ServerError;
+  state?: HMSBeamState;
 }
 
 export interface HLSRecording {
@@ -243,6 +257,7 @@ export interface HLSVariantInfo {
   metadata?: string;
   started_at?: number;
   initialised_at?: number;
+  state?: HMSBeamState;
 }
 
 export interface MetadataChangeNotification {
