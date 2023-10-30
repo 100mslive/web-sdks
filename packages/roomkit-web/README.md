@@ -32,7 +32,7 @@ import '@100mslive/roomkit-web';
 `auth-token` (optional)
 - This token is room and role specific. It can be copied from the join room modal on the [dashboard](https://dashboard.100ms.live). Read more about it [here](/get-started/v2/get-started/security-and-tokens#auth-token-for-client-sdks).
 
-`roomId` (optional unless roomCode is not being used)
+`room-id` (optional unless roomCode is not being used)
 - The room ID of the room you want to join. You can get the room ID from the [dashboard](https://dashboard.100ms.live). It should be specified with the role prop if the room code is not being provided.
 
 `role` (optional unless roomId is specified)
