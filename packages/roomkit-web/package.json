@@ -1,0 +1,34 @@
+{
+  "name": "@100mslive/roomkit-web",
+  "version": "0.0.2",
+  "description": "A web component implementation of 100ms Prebuilt component",
+  "keywords": [
+    "web-components",
+    "100ms",
+    "Prebuilt"
+  ],
+  "source": "src/index.ts",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "author": "100ms",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "rm -rf dist && node ../../scripts/build-webapp"
+  },
+  "dependencies": {
+    "@100mslive/roomkit-react": "0.1.9",
+    "@r2wc/react-to-web-component": "2.0.2"
+  }
+}
