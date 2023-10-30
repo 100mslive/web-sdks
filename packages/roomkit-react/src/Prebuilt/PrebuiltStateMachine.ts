@@ -17,9 +17,10 @@ export const PrebuiltStateMachine = () =>
     states: {
       disconnected: {
         on: {
-          NEXT: {
-            target: 'preview',
-          },
+          NEXT: [
+            { target: 'conferencing', cond: context => !context.isPreviewEnabled },
+            { target: 'preview', cond: context => context.isPreviewEnabled },
+          ],
           SET_DATA: {
             actions: (context, event) => {
               if (event.type === 'SET_DATA') {
@@ -32,24 +33,19 @@ export const PrebuiltStateMachine = () =>
       },
       preview: {
         on: {
-          entry: {
-            target: 'conferencing',
-            cond: context => !context.isPreviewEnabled,
-          },
           NEXT: 'conferencing',
         },
       },
       conferencing: {
         on: {
-          NEXT: 'leave',
+          NEXT: [
+            { target: 'leave', cond: context => context.isLeaveEnabled },
+            { target: 'preview', cond: context => !context.isLeaveEnabled },
+          ],
         },
       },
       leave: {
         on: {
-          entry: {
-            target: 'preview',
-            cond: context => !context.isLeaveEnabled,
-          },
           NEXT: {
             target: 'preview',
           },

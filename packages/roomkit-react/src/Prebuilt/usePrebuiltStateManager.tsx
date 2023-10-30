@@ -35,7 +35,10 @@ export const usePrebuiltStateManager = () => {
     const service = interpret(machine);
     serviceRef.current = service;
     service.start();
-    service.send({ type: 'SET_DATA', data: { isLeaveEnabled: false, isPreviewEnabled: isPreviewScreenEnabled } });
+    service.send({
+      type: 'SET_DATA',
+      data: { isLeaveEnabled: isLeaveScreenEnabled, isPreviewEnabled: isPreviewScreenEnabled },
+    });
     let prevState = store.getState(selectRoomState);
     const storeUnsubscribe = store.subscribe(state => {
       if (state === HMSRoomState.Disconnected && prevState === state) {
