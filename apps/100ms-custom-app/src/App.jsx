@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
+import { Flex } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
@@ -20,7 +20,7 @@ const App = () => {
   // added subdomain in query param for easy testing in vercel links
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
-  const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const { isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -73,25 +73,12 @@ const App = () => {
           />
         </Suspense>
       )}
-      {(authToken || roomCode) && (
-        <HMSPrebuilt
-          roomCode={roomCode}
-          authToken={authToken}
-          roomId={roomId}
-          role={role}
-          screens={overrideLayout ? overrideLayout : undefined}
-          options={{
-            userName: isHeadless ? 'Beam' : undefined,
-            endpoints: {
-              tokenByRoomCode:
-                process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
-              roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
-              init: process.env.REACT_APP_INIT_ENDPOINT,
-            },
-          }}
-          ref={hmsPrebuiltRef}
-        />
-      )}
+      <iframe
+        title="100ms-app"
+        allow="camera *;microphone *;display-capture *"
+        src=""
+        style={{ height: '100vh', width: '100%', border: 0 }}
+      ></iframe>
     </Flex>
   );
 };

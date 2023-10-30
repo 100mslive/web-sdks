@@ -333,7 +333,7 @@ export class HMSSdk implements HMSInterface {
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
     this.setUpPreview(config, listener);
-
+    // -
     // Request permissions and populate devices before waiting for policy
     if (config.alwaysRequestPermissions) {
       this.localTrackManager.requestPermissions().then(async () => {
@@ -1188,16 +1188,20 @@ export class HMSSdk implements HMSInterface {
    */
   private commonSetup(config: HMSConfig, roomId: string, listener: HMSPreviewListener | HMSUpdateListener) {
     this.stringifyMetadata(config);
-    if (!config.initEndpoint) {
-      config.initEndpoint = 'https://prod-init.100ms.live';
-    }
-    this.errorListener = listener;
-    this.deviceChangeListener = listener;
-    this.initStoreAndManagers();
-
-    this.store.setErrorListener(this.errorListener);
-    if (!this.store.getRoom()) {
-      this.store.setRoom(new HMSRoom(roomId));
+    try {
+      if (!config.initEndpoint) {
+        config.initEndpoint = 'https://prod-init.100ms.live';
+      }
+      this.errorListener = listener;
+      this.deviceChangeListener = listener;
+      this.initStoreAndManagers();
+      console.log('inside common setup');
+      this.store.setErrorListener(this.errorListener);
+      if (!this.store.getRoom()) {
+        this.store.setRoom(new HMSRoom(roomId));
+      }
+    } catch (e) {
+      console.log('ollo ', e);
     }
   }
 

@@ -212,7 +212,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
       await this.sdkPreviewWithListeners(config);
     } catch (err) {
-      HMSLogger.e('Cannot show preview. Failed to connect to room - ', err);
+      HMSLogger.e('Cannot show preview! Failed to connect to room - ', err);
       throw err;
     }
   }

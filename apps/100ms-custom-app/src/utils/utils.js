@@ -169,20 +169,22 @@ export const getAuthTokenUsingRoomIdRole = async function ({
   role = '',
   userId = '',
 }) {
-  try {
-    const resp = await fetch(`${apiBasePath}${subdomain}/api/token`, {
-      method: 'POST',
-      body: JSON.stringify({
-        room_id: roomId,
-        role,
-        user_id: userId,
-      }),
-    });
-    const { token = '' } = await resp.json();
-    return token;
-  } catch (e) {
-    console.error('failed to getAuthTokenUsingRoomIdRole', e);
-    throw Error('failed to get auth token using roomid and role');
+  if (roomId && role) {
+    try {
+      const resp = await fetch(`${apiBasePath}${subdomain}/api/token`, {
+        method: 'POST',
+        body: JSON.stringify({
+          room_id: roomId,
+          role,
+          user_id: userId,
+        }),
+      });
+      const { token = '' } = await resp.json();
+      return token;
+    } catch (e) {
+      console.error('failed to getAuthTokenUsingRoomIdRole', e);
+      throw Error('failed to get auth token using roomid and role');
+    }
   }
 };
 
