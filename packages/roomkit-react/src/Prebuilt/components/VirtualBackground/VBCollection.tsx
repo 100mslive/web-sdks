@@ -1,9 +1,9 @@
 import React from 'react';
-import { Box } from '../../Layout';
-import { Text } from '../../Text';
+import { Box } from '../../../Layout';
+import { Text } from '../../../Text';
 import { VBOption } from './VBOption';
 // @ts-ignore
-import { VB_EFFECT } from '../common/constants';
+import { VB_EFFECT } from '../../common/constants';
 
 export const VBCollection = ({
   options,
@@ -32,7 +32,7 @@ export const VBCollection = ({
       </Text>
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
         {options.map(option => (
-          <VBOption
+          <VBOption.Root
             key={option?.mediaURL || option?.title}
             {...option}
             isActive={
@@ -40,7 +40,10 @@ export const VBCollection = ({
                 option.type === activeBackgroundType) ||
               activeBackground === option?.mediaURL
             }
-          />
+          >
+            <VBOption.Icon>{option?.icon}</VBOption.Icon>
+            <VBOption.Title>{option?.title}</VBOption.Title>
+          </VBOption.Root>
         ))}
       </Box>
     </Box>

@@ -21,7 +21,7 @@ import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
 // @ts-ignore: No implicit Any
-import { VBToggle } from '../VBToggle';
+import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any

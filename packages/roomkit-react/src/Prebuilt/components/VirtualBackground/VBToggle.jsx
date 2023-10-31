@@ -1,10 +1,10 @@
 import React from 'react';
 import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../Tooltip';
-import IconButton from '../IconButton';
-import { useIsSidepaneTypeOpen, useSidepaneToggle } from './AppData/useSidepane';
-import { SIDE_PANE_OPTIONS } from '../common/constants';
+import { Tooltip } from '../../../Tooltip';
+import IconButton from '../../IconButton';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
