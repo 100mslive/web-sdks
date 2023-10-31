@@ -1,14 +1,17 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   DeviceType,
   selectIsLocalVideoEnabled,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
   useDevices,
+  useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { Box, Button, Dropdown, Flex, StyledVideoTile, Text, Video } from '../../../';
+import { config as cssConfig } from '../../../Theme';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useUISettings } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
@@ -30,7 +33,9 @@ const Settings = ({ setHide }) => {
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(videoTrackId);
+  const hmsActions = useHMSActions();
   const track = useHMSStore(trackSelector);
+  const isMobile = useMedia(cssConfig.media.md);
 
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given
@@ -100,6 +105,11 @@ const Settings = ({ setHide }) => {
               deviceType: DeviceType.audioOutput,
             })
           }
+          refreshDevices={async () => {
+            if (isMobile) {
+              await hmsActions.refreshDevices();
+            }
+          }}
         >
           <TestAudio id={selectedDeviceIDs.audioOutput} />
         </DeviceSelector>
@@ -108,7 +118,7 @@ const Settings = ({ setHide }) => {
   );
 };
 
-const DeviceSelector = ({ title, devices, selection, onChange, icon, children = null }) => {
+const DeviceSelector = ({ title, devices, selection, onChange, icon, refreshDevices = null, children = null }) => {
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
   const ref = useRef(null);
@@ -138,7 +148,15 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, children = 
             },
           }}
         >
-          <Dropdown.Root open={open} onOpenChange={setOpen}>
+          <Dropdown.Root
+            open={open}
+            onOpenChange={async () => {
+              if (refreshDevices) {
+                await refreshDevices();
+              }
+              setOpen();
+            }}
+          >
             <DialogDropdownTrigger
               ref={ref}
               icon={icon}

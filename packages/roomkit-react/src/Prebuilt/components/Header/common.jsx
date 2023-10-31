@@ -82,7 +82,7 @@ export const AudioOutputActions = () => {
   } else if (
     audioOutputLabel &&
     audioOutputLabel.length > 0 &&
-    audioOutputLabel[0].label.toLowerCase().includes('headphone')
+    audioOutputLabel[0].label.toLowerCase().includes('wired')
   ) {
     AudioOutputIcon = <HeadphonesIcon />;
   }
@@ -92,8 +92,6 @@ export const AudioOutputActions = () => {
       outputSelected={selectedDeviceIDs.audioOutput}
       onChange={async deviceId => {
         try {
-          // refresh device as `devicechange` listener won't work in mobile device
-          await hmsActions.refreshDevices();
           await updateDevice({
             deviceId,
             deviceType: DeviceType.audioOutput,
@@ -106,7 +104,12 @@ export const AudioOutputActions = () => {
         }
       }}
     >
-      <Box>
+      <Box
+        onClick={async () => {
+          // refresh device as `devicechange` listener won't work in mobile device
+          await hmsActions.refreshDevices();
+        }}
+      >
         <IconButton>{AudioOutputIcon} </IconButton>
       </Box>
     </AudioOutputSelectionSheet>
