@@ -66,28 +66,25 @@ export const AudioActions = () => {
   const { audioInput, audioOutput } = allDevices;
   let currentAudio = audioInput;
   let selectedAudio = selectedDeviceIDs.audioInput;
-  let title = 'Audio Input';
   if (shouldShowAudioOutput) {
-    title = 'Audio Output';
     currentAudio = audioOutput;
     selectedAudio = selectedDeviceIDs.audioOutput;
   }
   const hmsActions = useHMSActions();
   const audioFiltered = currentAudio?.find(item => !!item.label);
-  const audioLabel = currentAudio?.find(item => item.deviceId === selectedAudio);
+  const currentSelection = currentAudio?.find(item => item.deviceId === selectedAudio);
 
   if (!audioFiltered) {
     return null;
   }
   let AudioIcon = <SpeakerIcon />;
-  if (audioLabel && audioLabel.label.toLowerCase().includes('bluetooth')) {
+  if (currentSelection && currentSelection.label.toLowerCase().includes('bluetooth')) {
     AudioIcon = <BluetoothIcon />;
-  } else if (audioLabel && audioLabel.label.toLowerCase().includes('wired')) {
+  } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
     AudioIcon = <HeadphonesIcon />;
   }
   return (
     <AudioSelectionSheet
-      title={title}
       audioDevices={currentAudio}
       audioSelected={selectedAudio}
       onChange={async deviceId => {
@@ -98,7 +95,7 @@ export const AudioActions = () => {
           });
         } catch (e) {
           ToastManager.addToast({
-            title: `Error while changing audio input ${e.message || ''}`,
+            title: `Error while changing audio device ${e.message || ''}`,
             variant: 'error',
           });
         }
@@ -116,7 +113,7 @@ export const AudioActions = () => {
   );
 };
 
-const AudioSelectionSheet = ({ title, audioDevices, audioSelected, onChange, children }) => {
+const AudioSelectionSheet = ({ audioDevices, audioSelected, onChange, children }) => {
   return (
     <Sheet.Root>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
@@ -124,7 +121,7 @@ const AudioSelectionSheet = ({ title, audioDevices, audioSelected, onChange, chi
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Text variant="h6" css={{ display: 'flex' }}>
-              {title}
+              Audio
             </Text>
             <Sheet.Close>
               <IconButton as="div" data-testid="dialog_cross_icon">
