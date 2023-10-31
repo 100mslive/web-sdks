@@ -10,7 +10,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon, SparkleIcon } from '@100mslive/react-icons';
+import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
@@ -106,36 +106,37 @@ export const VBPicker = () => {
           type: VB_EFFECT.BLUR,
           onClick: async () => await addPlugin({ blurPower: 0.5 }),
         },
-        {
-          title: 'Touch-up',
-          icon: <SparkleIcon style={iconDims} />,
-          type: VB_EFFECT.BEAUTIFY,
-          onClick: () => console.log('Touch-up'),
-        },
+        // {
+        //   title: 'Touch-up',
+        //   icon: <SparkleIcon style={iconDims} />,
+        //   type: VB_EFFECT.BEAUTIFY,
+        //   onClick: () => console.log('Touch-up'),
+        // },
       ],
     },
     {
       title: 'Backgrounds',
       // TODO Refactor onClicks here
       options: [
-        {
-          type: VB_EFFECT.MEDIA,
-          mediaURL: 'https://www.100ms.live/images/vb-1.jpeg',
-          onClick: async () => await addPlugin({ mediaURL: 'https://www.100ms.live/images/vb-1.jpeg' }),
-        },
-        {
-          type: VB_EFFECT.MEDIA,
-          mediaURL: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms1.png',
-          onClick: async () =>
-            await addPlugin({ mediaURL: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms1.png' }),
-        },
-        {
-          type: VB_EFFECT.MEDIA,
-          mediaURL: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms3.png',
-          onClick: async () =>
-            await addPlugin({ mediaURL: 'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/hms3.png' }),
-        },
-      ],
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-1.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-2.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-3.png',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-4.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-5.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-6.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-7.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-8.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-9.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-10.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-11.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-12.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-13.jpg',
+        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-14.jpg',
+      ].map(mediaURL => ({
+        type: VB_EFFECT.MEDIA,
+        mediaURL,
+        onClick: async () => await addPlugin({ mediaURL }),
+      })),
     },
   ];
 
@@ -158,11 +159,13 @@ export const VBPicker = () => {
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer.videoTrack}
           data-testid="preview_tile"
+          css={{ width: '100%', height: '16rem' }}
         />
       ) : null}
 
       {VBCollections.map(collection => (
         <VBCollection
+          key={collection.title}
           {...collection}
           activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
           activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}

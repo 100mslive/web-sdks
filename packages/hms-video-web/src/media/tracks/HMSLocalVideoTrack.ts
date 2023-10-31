@@ -123,7 +123,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
   }
 
-  processPlugins() {
+  private processPlugins() {
     const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream as unknown as MediaStream);
     // this.nativeTrack = processedStream.getVideoTracks()[0];
     this.replaceSender(processedStream.getVideoTracks()[0], true);

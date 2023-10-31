@@ -17,6 +17,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         facedetector: '',
       },
     });
+
     this.effects.onReady = () => {
       if (this.effects) {
         console.debug('effects is ready');
@@ -30,6 +31,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.effects.disableBeautification();
       }
     };
+  }
+
+  getName(): string {
+    return 'HMSEffects';
   }
 
   setBlur(blur: number) {
