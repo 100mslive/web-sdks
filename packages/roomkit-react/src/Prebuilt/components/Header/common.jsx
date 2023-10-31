@@ -56,12 +56,25 @@ export const CamaraFlipActions = () => {
   );
 };
 
+// It will handle and show audio input devices in Mweb while audio output devices in desktop
 export const AudioOutputActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
-  const { audioInput } = allDevices;
+
+  // don't show speaker selector where the API is not supported, and use
+  // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
+  const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
+  const { audioInput, audioOutput } = allDevices;
+  let currentAudio = audioInput;
+  let selectedAudio = selectedDeviceIDs.audioInput;
+  let title = 'Audio Input';
+  if (shouldShowAudioOutput) {
+    title = 'Audio Output';
+    currentAudio = audioOutput;
+    selectedAudio = selectedDeviceIDs.audioOutput;
+  }
   const hmsActions = useHMSActions();
-  const audioInputFiltered = audioInput?.filter(item => !!item.label) ?? [];
-  const audioInputLabel = audioInput?.filter(item => item.deviceId === selectedDeviceIDs.audioInput)?.[0];
+  const audioInputFiltered = currentAudio?.filter(item => !!item.label) ?? [];
+  const audioInputLabel = currentAudio?.filter(item => item.deviceId === selectedAudio)?.[0];
 
   if (!(audioInputFiltered?.length > 0)) {
     return null;
@@ -74,8 +87,9 @@ export const AudioOutputActions = () => {
   }
   return (
     <AudioOutputSelectionSheet
-      outputDevices={audioInput}
-      outputSelected={selectedDeviceIDs.audioInput}
+      title={title}
+      outputDevices={currentAudio}
+      outputSelected={selectedAudio}
       onChange={async deviceId => {
         try {
           await updateDevice({
@@ -102,7 +116,7 @@ export const AudioOutputActions = () => {
   );
 };
 
-const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, children }) => {
+const AudioOutputSelectionSheet = ({ title, outputDevices, outputSelected, onChange, children }) => {
   return (
     <Sheet.Root>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
@@ -110,7 +124,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Text variant="h6" css={{ display: 'flex' }}>
-              Audio Input
+              {title}
             </Text>
             <Sheet.Close>
               <IconButton as="div" data-testid="dialog_cross_icon">
@@ -125,7 +139,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
           css={{
             px: '$8',
             maxHeight: '80vh',
-            overflowY: 'scroll',
+            overflowY: 'auto',
           }}
         >
           {outputDevices.map(audioDevice => {
