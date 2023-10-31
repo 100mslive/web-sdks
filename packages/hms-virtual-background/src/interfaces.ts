@@ -9,7 +9,6 @@ export enum HMSVirtualBackgroundTypes {
 }
 
 export type HMSVirtualBackground =
-  | HTMLImageElement
   | string
   | HMSVirtualBackgroundTypes.BLUR
   | HMSVirtualBackgroundTypes.NONE

@@ -27,7 +27,7 @@ const iconDims = { height: '40px', width: '40px' };
 
 export const VBPicker = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const pluginRef = useRef<HMSVBPlugin | null>(null);
+  const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
   const [isVBSupported, setIsVBSupported] = useState(false);
@@ -66,7 +66,6 @@ export const VBPicker = () => {
     }
     try {
       await createPlugin();
-      // @ts-ignore
       window.HMS.virtualBackground = pluginRef.current;
       if (mediaURL) {
         const img = document.createElement('img');
