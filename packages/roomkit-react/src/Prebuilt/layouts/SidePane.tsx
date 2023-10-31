@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
@@ -11,6 +11,8 @@ import VideoTile from '../components/VideoTile';
 import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
+import { resetSidepane } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
@@ -40,6 +42,13 @@ const SidePane = ({
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
     ViewComponent = <VBPicker />;
   }
+
+  useEffect(() => {
+    return () => {
+      resetSidepane();
+    };
+  }, [resetSidepane]);
+
   if (!ViewComponent && !trackId) {
     return null;
   }

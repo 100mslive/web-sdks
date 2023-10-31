@@ -14,7 +14,7 @@ import {
 } from '@100mslive/react-sdk';
 import { normalizeAppPolicyConfig } from '../init/initUtils';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneState, useSidepaneToggle } from './useSidepane';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 import { useSetAppDataByKey } from './useUISettings';
 import {
   APP_DATA,
@@ -77,20 +77,11 @@ const initialAppData = {
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const hmsActions = useHMSActions();
-  const roomState = useHMSStore(selectRoomState);
-  const sidePane = useSidepaneState();
-  const resetSidePane = useSidepaneReset();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const appData = useHMSStore(selectFullAppData);
-
-  useEffect(() => {
-    if ([HMSRoomState.Disconnected, HMSRoomState.Connecting].includes(roomState) && sidePane) {
-      resetSidePane();
-    }
-  }, [roomState, sidePane, resetSidePane]);
 
   useEffect(() => {
     hmsActions.initAppData({
