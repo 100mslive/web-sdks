@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { HMSVBPlugin } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -16,15 +17,17 @@ import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
+// @ts-ignore
 import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore
-import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS, VB_EFFECT } from '../../common/constants';
+import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
+import { defaultMedia, VB_EFFECT } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
 export const VBPicker = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const pluginRef = useRef(null);
+  const pluginRef = useRef<HMSVBPlugin | null>(null);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
   const [isVBSupported, setIsVBSupported] = useState(false);
@@ -40,7 +43,6 @@ export const VBPicker = () => {
 
   async function createPlugin() {
     if (!pluginRef.current) {
-      const { HMSVBPlugin } = await import('@100mslive/hms-virtual-background');
       pluginRef.current = new HMSVBPlugin(background, backgroundType);
     }
   }
@@ -51,14 +53,20 @@ export const VBPicker = () => {
     }
     createPlugin().then(() => {
       //check support of plugin
-      const pluginSupport = hmsActions.validateVideoPluginSupport(pluginRef.current);
-      setIsVBSupported(pluginSupport.isSupported);
+      if (pluginRef.current) {
+        const pluginSupport = hmsActions.validateVideoPluginSupport(pluginRef.current);
+        setIsVBSupported(pluginSupport.isSupported);
+      }
     });
   }, [hmsActions, localPeerVideoTrackID]);
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
+    if (!pluginRef.current) {
+      return;
+    }
     try {
       await createPlugin();
+      // @ts-ignore
       window.HMS.virtualBackground = pluginRef.current;
       if (mediaURL) {
         const img = document.createElement('img');
@@ -71,8 +79,8 @@ export const VBPicker = () => {
       // Will store blur power here
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
-
-      await hmsActions.addPluginToVideoTrack(pluginRef.current, Math.floor(role.publishParams.video.frameRate / 2));
+      if (role)
+        await hmsActions.addPluginToVideoTrack(pluginRef.current, Math.floor(role.publishParams.video.frameRate / 2));
     } catch (err) {
       console.error('add virtual background plugin failed', err);
     }
@@ -89,57 +97,6 @@ export const VBPicker = () => {
     return null;
   }
 
-  const VBCollections = [
-    {
-      title: 'Effects',
-      options: [
-        {
-          title: 'No effect',
-          icon: <CrossCircleIcon style={iconDims} />,
-          type: VB_EFFECT.NONE,
-          onClick: async () => await removePlugin(),
-          isActive: true,
-        },
-        {
-          title: 'Blur',
-          icon: <BlurPersonHighIcon style={iconDims} />,
-          type: VB_EFFECT.BLUR,
-          onClick: async () => await addPlugin({ blurPower: 0.5 }),
-        },
-        // {
-        //   title: 'Touch-up',
-        //   icon: <SparkleIcon style={iconDims} />,
-        //   type: VB_EFFECT.BEAUTIFY,
-        //   onClick: () => console.log('Touch-up'),
-        // },
-      ],
-    },
-    {
-      title: 'Backgrounds',
-      // TODO Refactor onClicks here
-      options: [
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-1.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-2.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-3.png',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-4.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-5.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-6.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-7.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-8.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-9.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-10.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-11.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-12.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-13.jpg',
-        'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-14.jpg',
-      ].map(mediaURL => ({
-        type: VB_EFFECT.MEDIA,
-        mediaURL,
-        onClick: async () => await addPlugin({ mediaURL }),
-      })),
-    },
-  ];
-
   return (
     <Box css={{ maxHeight: '100%', overflowY: 'auto' }}>
       <Flex align="center" justify="between" css={{ w: '100%', pb: '$10' }}>
@@ -154,23 +111,46 @@ export const VBPicker = () => {
         </Box>
       </Flex>
 
+      {/* Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen */}
       {isVideoOn && roomState !== HMSRoomState.Preview ? (
         <Video
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
-          trackId={localPeer.videoTrack}
+          trackId={localPeer?.videoTrack}
           data-testid="preview_tile"
           css={{ width: '100%', height: '16rem' }}
         />
       ) : null}
 
-      {VBCollections.map(collection => (
-        <VBCollection
-          key={collection.title}
-          {...collection}
-          activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
-          activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}
-        />
-      ))}
+      <VBCollection
+        title="Effects"
+        options={[
+          {
+            title: 'No effect',
+            icon: <CrossCircleIcon style={iconDims} />,
+            type: VB_EFFECT.NONE,
+            onClick: async () => await removePlugin(),
+          },
+          {
+            title: 'Blur',
+            icon: <BlurPersonHighIcon style={iconDims} />,
+            type: VB_EFFECT.BLUR,
+            onClick: async () => await addPlugin({ blurPower: 0.5 }),
+          },
+        ]}
+        activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
+        activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}
+      />
+
+      <VBCollection
+        title="Backgrounds"
+        options={defaultMedia.map(mediaURL => ({
+          type: VB_EFFECT.MEDIA,
+          mediaURL,
+          onClick: async () => await addPlugin({ mediaURL }),
+        }))}
+        activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
+        activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}
+      />
     </Box>
   );
 };

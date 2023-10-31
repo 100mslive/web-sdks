@@ -4,7 +4,6 @@ import {
   selectAvailableRoleNames,
   selectFullAppData,
   selectHLSState,
-  selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectRolesMap,
   selectRoomState,
@@ -25,8 +24,8 @@ import {
   SIDE_PANE_OPTIONS,
   UI_MODE_GRID,
   UI_SETTINGS,
-  VB_EFFECT,
 } from '../../common/constants';
+import { VB_EFFECT } from '../VirtualBackground/constants';
 
 export const getAppDetails = appDetails => {
   try {
@@ -78,7 +77,7 @@ const initialAppData = {
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const hmsActions = useHMSActions();
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const roomState = useHMSStore(selectRoomState);
   const sidePane = useSidepaneState();
   const resetSidePane = useSidepaneReset();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
@@ -88,10 +87,10 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
-    if (!isConnected && sidePane && ![SIDE_PANE_OPTIONS.PARTICIPANTS, SIDE_PANE_OPTIONS.VB].includes(sidePane)) {
+    if (roomState === HMSRoomState.Disconnected && sidePane) {
       resetSidePane();
     }
-  }, [isConnected, sidePane, resetSidePane]);
+  }, [roomState, sidePane, resetSidePane]);
 
   useEffect(() => {
     hmsActions.initAppData({

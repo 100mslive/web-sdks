@@ -132,6 +132,3 @@ export const QUESTION_TYPE = {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '#prebuilt-container';
-
-// Will support all media, setting to image here to test with current plugin interface
-export const VB_EFFECT = { BLUR: 'blur', BEAUTIFY: 'BEAUTIFY', NONE: 'none', MEDIA: 'image' };

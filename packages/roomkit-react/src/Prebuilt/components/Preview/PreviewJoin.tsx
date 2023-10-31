@@ -133,7 +133,7 @@ const PreviewJoin = ({
   }, [initialName]);
 
   return roomState === HMSRoomState.Preview ? (
-    <Flex justify="center" css={{ size: '100%' }}>
+    <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
       <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' }, width: 'unset' }}>
         {toggleVideo ? null : <Box />}
         <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
@@ -188,7 +188,9 @@ const PreviewJoin = ({
           />
         </Box>
       </Container>
-      <SidePane screenType="default" preview />
+      <Box css={{ position: 'absolute', right: '0', top: 0, height: '100%' }}>
+        <SidePane screenType="default" />
+      </Box>
     </Flex>
   ) : (
     <FullPageProgress />

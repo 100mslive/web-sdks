@@ -2,8 +2,7 @@ import React from 'react';
 import { Box } from '../../../Layout';
 import { Text } from '../../../Text';
 import { VBOption } from './VBOption';
-// @ts-ignore
-import { VB_EFFECT } from '../../common/constants';
+import { VB_EFFECT } from './constants';
 
 export const VBCollection = ({
   options,

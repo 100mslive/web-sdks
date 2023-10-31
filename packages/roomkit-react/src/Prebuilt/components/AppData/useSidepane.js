@@ -59,7 +59,7 @@ export const usePollViewToggle = () => {
 };
 
 /**
- * reset's the sidepane value
+ * resets the sidepane value
  */
 export const useSidepaneReset = () => {
   const hmsActions = useHMSActions();

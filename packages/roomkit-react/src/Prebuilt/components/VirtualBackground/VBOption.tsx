@@ -6,13 +6,11 @@ const Root = ({
   onClick,
   mediaURL,
   isActive,
-  type,
   children,
 }: {
   onClick?: () => Promise<void>;
   mediaURL?: string;
   isActive: boolean;
-  type: string;
   children?: React.JSX.Element[];
 }) => (
   <Flex
@@ -27,12 +25,7 @@ const Root = ({
       '&:hover': { border: '2px solid $primary_dim' },
       ...(mediaURL ? { height: '$20', backgroundImage: `url(${mediaURL})`, backgroundSize: 'cover' } : {}),
     }}
-    onClick={async () => {
-      if (onClick) {
-        console.log(type);
-        await onClick();
-      }
-    }}
+    onClick={async () => await onClick?.()}
   >
     {children}
   </Flex>
