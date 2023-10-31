@@ -57,7 +57,7 @@ export const CamaraFlipActions = () => {
 };
 
 // It will handle and show audio input devices in Mweb while audio output devices in desktop
-export const AudioOutputActions = () => {
+export const AudioActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
 
   // don't show speaker selector where the API is not supported, and use
@@ -73,28 +73,28 @@ export const AudioOutputActions = () => {
     selectedAudio = selectedDeviceIDs.audioOutput;
   }
   const hmsActions = useHMSActions();
-  const audioInputFiltered = currentAudio?.filter(item => !!item.label) ?? [];
-  const audioInputLabel = currentAudio?.filter(item => item.deviceId === selectedAudio)?.[0];
+  const audioFiltered = currentAudio?.find(item => !!item.label);
+  const audioLabel = currentAudio?.find(item => item.deviceId === selectedAudio);
 
-  if (!(audioInputFiltered?.length > 0)) {
+  if (!audioFiltered) {
     return null;
   }
-  let AudioInputIcon = <SpeakerIcon />;
-  if (audioInputLabel && audioInputLabel.label.toLowerCase().includes('bluetooth')) {
-    AudioInputIcon = <BluetoothIcon />;
-  } else if (audioInputLabel && audioInputLabel.label.toLowerCase().includes('wired')) {
-    AudioInputIcon = <HeadphonesIcon />;
+  let AudioIcon = <SpeakerIcon />;
+  if (audioLabel && audioLabel.label.toLowerCase().includes('bluetooth')) {
+    AudioIcon = <BluetoothIcon />;
+  } else if (audioLabel && audioLabel.label.toLowerCase().includes('wired')) {
+    AudioIcon = <HeadphonesIcon />;
   }
   return (
-    <AudioOutputSelectionSheet
+    <AudioSelectionSheet
       title={title}
-      outputDevices={currentAudio}
-      outputSelected={selectedAudio}
+      audioDevices={currentAudio}
+      audioSelected={selectedAudio}
       onChange={async deviceId => {
         try {
           await updateDevice({
             deviceId,
-            deviceType: DeviceType.audioInput,
+            deviceType: shouldShowAudioOutput ? DeviceType.audioOutput : DeviceType.audioInput,
           });
         } catch (e) {
           ToastManager.addToast({
@@ -110,13 +110,13 @@ export const AudioOutputActions = () => {
           await hmsActions.refreshDevices();
         }}
       >
-        <IconButton>{AudioInputIcon} </IconButton>
+        <IconButton>{AudioIcon} </IconButton>
       </Box>
-    </AudioOutputSelectionSheet>
+    </AudioSelectionSheet>
   );
 };
 
-const AudioOutputSelectionSheet = ({ title, outputDevices, outputSelected, onChange, children }) => {
+const AudioSelectionSheet = ({ title, audioDevices, audioSelected, onChange, children }) => {
   return (
     <Sheet.Root>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
@@ -142,13 +142,13 @@ const AudioOutputSelectionSheet = ({ title, outputDevices, outputSelected, onCha
             overflowY: 'auto',
           }}
         >
-          {outputDevices.map(audioDevice => {
+          {audioDevices.map(audioDevice => {
             return (
               <SelectWithLabel
                 key={audioDevice.deviceId}
                 label={audioDevice.label}
                 id={audioDevice.deviceId}
-                checked={audioDevice.deviceId === outputSelected}
+                checked={audioDevice.deviceId === audioSelected}
                 onChange={() => onChange(audioDevice.deviceId)}
               />
             );
