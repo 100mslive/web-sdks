@@ -58,39 +58,37 @@ export const CamaraFlipActions = () => {
 
 export const AudioOutputActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
-  const { audioOutput } = allDevices;
+  const { audioInput } = allDevices;
   const hmsActions = useHMSActions();
-  // don't show speaker selector where the API is not supported, and use
-  // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
-  const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
-  /**
-   * Chromium browsers return an audioOutput with empty label when no permissions are given
-   */
-  const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
-  const audioOutputLabel = audioOutput?.filter(item => item.deviceId === selectedDeviceIDs.audioOutput)?.[0];
 
-  if (!shouldShowAudioOutput || !audioOutputFiltered?.length > 0) {
+  /**
+   * Chromium browsers return an audioInput with empty label when no permissions are given
+   */
+  const audioInputFiltered = audioInput?.filter(item => !!item.label) ?? [];
+  const audioInputLabel = audioInput?.filter(item => item.deviceId === selectedDeviceIDs.audioInput)?.[0];
+
+  if (!(audioInputFiltered?.length > 0)) {
     return null;
   }
-  let AudioOutputIcon = <SpeakerIcon />;
-  if (audioOutputLabel && audioOutputLabel.label.toLowerCase().includes('bluetooth')) {
-    AudioOutputIcon = <BluetoothIcon />;
-  } else if (audioOutputLabel && audioOutputLabel.label.toLowerCase().includes('wired')) {
-    AudioOutputIcon = <HeadphonesIcon />;
+  let AudioInputIcon = <SpeakerIcon />;
+  if (audioInputLabel && audioInputLabel.label.toLowerCase().includes('bluetooth')) {
+    AudioInputIcon = <BluetoothIcon />;
+  } else if (audioInputLabel && audioInputLabel.label.toLowerCase().includes('wired')) {
+    AudioInputIcon = <HeadphonesIcon />;
   }
   return (
     <AudioOutputSelectionSheet
-      outputDevices={audioOutput}
-      outputSelected={selectedDeviceIDs.audioOutput}
+      outputDevices={audioInput}
+      outputSelected={selectedDeviceIDs.audioInput}
       onChange={async deviceId => {
         try {
           await updateDevice({
             deviceId,
-            deviceType: DeviceType.audioOutput,
+            deviceType: DeviceType.audioInput,
           });
         } catch (e) {
           ToastManager.addToast({
-            title: `Error while changing audio output ${e.message || ''}`,
+            title: `Error while changing audio input ${e.message || ''}`,
             variant: 'error',
           });
         }
@@ -102,7 +100,7 @@ export const AudioOutputActions = () => {
           await hmsActions.refreshDevices();
         }}
       >
-        <IconButton>{AudioOutputIcon} </IconButton>
+        <IconButton>{AudioInputIcon} </IconButton>
       </Box>
     </AudioOutputSelectionSheet>
   );
@@ -116,7 +114,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Text variant="h6" css={{ display: 'flex' }}>
-              Audio Output
+              Audio Input
             </Text>
             <Sheet.Close>
               <IconButton as="div" data-testid="dialog_cross_icon">
