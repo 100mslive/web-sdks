@@ -29,6 +29,7 @@ export { default as BarIcon } from './BarIcon';
 export { default as BatteryFullIcon } from './BatteryFullIcon';
 export { default as BatteryPowerIcon } from './BatteryPowerIcon';
 export { default as BillIcon } from './BillIcon';
+export { default as BluetoothIcon } from './BluetoothIcon';
 export { default as BlurPersonHighIcon } from './BlurPersonHighIcon';
 export { default as BlurPersonLowIcon } from './BlurPersonLowIcon';
 export { default as BoltIcon } from './BoltIcon';

@@ -7,7 +7,7 @@ import { Logo, SpeakerTag } from './HeaderComponents';
 // @ts-ignore: No implicit any
 import { LiveStatus, RecordingStatus, StreamActions } from './StreamActions';
 // @ts-ignore: No implicit any
-import { AudioOutputActions, CamaraFlipActions } from './common';
+import { AudioActions, CamaraFlipActions } from './common';
 
 export const Header = () => {
   const roomState = useHMSStore(selectRoomState);
@@ -40,7 +40,7 @@ export const Header = () => {
         {isMobile ? (
           <>
             <CamaraFlipActions />
-            <AudioOutputActions />
+            <AudioActions />
           </>
         ) : null}
       </Flex>
