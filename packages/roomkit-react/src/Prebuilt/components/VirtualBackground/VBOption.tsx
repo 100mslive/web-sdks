@@ -31,15 +31,17 @@ const Root = ({
   </Flex>
 );
 
-const Title = ({ children }: { children?: string }) => (
-  <Text variant="xs" css={{ color: '$on_surface_medium' }}>
-    {children}
-  </Text>
-);
+const Title = ({ children }: { children?: string }) => {
+  return children ? (
+    <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+      {children}
+    </Text>
+  ) : null;
+};
 
-const Icon = ({ children }: { children?: React.JSX.Element }) => (
-  <Box css={{ color: '$on_surface_high' }}>{children}</Box>
-);
+const Icon = ({ children }: { children?: React.JSX.Element }) => {
+  return children ? <Box css={{ color: '$on_surface_high' }}>{children}</Box> : null;
+};
 
 export const VBOption = {
   Root,
