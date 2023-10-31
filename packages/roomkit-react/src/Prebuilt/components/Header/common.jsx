@@ -64,15 +64,15 @@ export const AudioActions = () => {
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
   const { audioInput, audioOutput } = allDevices;
-  let currentAudio = audioInput;
+  let availableAudioDevices = audioInput;
   let selectedAudio = selectedDeviceIDs.audioInput;
   if (shouldShowAudioOutput) {
-    currentAudio = audioOutput;
+    availableAudioDevices = audioOutput;
     selectedAudio = selectedDeviceIDs.audioOutput;
   }
   const hmsActions = useHMSActions();
-  const audioFiltered = currentAudio?.find(item => !!item.label);
-  const currentSelection = currentAudio?.find(item => item.deviceId === selectedAudio);
+  const audioFiltered = availableAudioDevices?.find(item => !!item.label);
+  const currentSelection = availableAudioDevices?.find(item => item.deviceId === selectedAudio);
 
   if (!audioFiltered) {
     return null;
@@ -85,7 +85,7 @@ export const AudioActions = () => {
   }
   return (
     <AudioSelectionSheet
-      audioDevices={currentAudio}
+      audioDevices={availableAudioDevices}
       audioSelected={selectedAudio}
       onChange={async deviceId => {
         try {
