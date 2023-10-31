@@ -87,7 +87,7 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
-    if (roomState === HMSRoomState.Disconnected && sidePane) {
+    if ([HMSRoomState.Disconnected, HMSRoomState.Connecting].includes(roomState) && sidePane) {
       resetSidePane();
     }
   }, [roomState, sidePane, resetSidePane]);
