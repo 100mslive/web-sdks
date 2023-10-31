@@ -12,7 +12,7 @@ import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
-import { resetSidepane } from '../components/AppData/useSidepane';
+import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
@@ -32,6 +32,7 @@ const SidePane = ({
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
+  const resetSidePane = useSidepaneReset();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
     ViewComponent = <Polls />;
@@ -45,9 +46,9 @@ const SidePane = ({
 
   useEffect(() => {
     return () => {
-      resetSidepane();
+      resetSidePane();
     };
-  }, [resetSidepane]);
+  }, [resetSidePane]);
 
   if (!ViewComponent && !trackId) {
     return null;
