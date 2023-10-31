@@ -37,6 +37,12 @@ const Settings = ({ setHide }) => {
   const track = useHMSStore(trackSelector);
   const isMobile = useMedia(cssConfig.media.md);
 
+  useEffect(() => {
+    if (isMobile) {
+      hmsActions.refreshDevices();
+    }
+  }, [hmsActions, isMobile]);
+
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given
    */
@@ -90,11 +96,6 @@ const Settings = ({ setHide }) => {
               deviceType: DeviceType.audioInput,
             })
           }
-          refreshDevices={async () => {
-            if (isMobile) {
-              await hmsActions.refreshDevices();
-            }
-          }}
         />
       ) : null}
 
@@ -118,7 +119,7 @@ const Settings = ({ setHide }) => {
   );
 };
 
-const DeviceSelector = ({ title, devices, selection, onChange, icon, refreshDevices = null, children = null }) => {
+const DeviceSelector = ({ title, devices, selection, onChange, icon, children = null }) => {
   const [open, setOpen] = useState(false);
   const selectionBg = useDropdownSelection();
   const ref = useRef(null);
@@ -148,15 +149,7 @@ const DeviceSelector = ({ title, devices, selection, onChange, icon, refreshDevi
             },
           }}
         >
-          <Dropdown.Root
-            open={open}
-            onOpenChange={async () => {
-              if (refreshDevices) {
-                await refreshDevices();
-              }
-              setOpen();
-            }}
-          >
+          <Dropdown.Root open={open} onOpenChange={setOpen}>
             <DialogDropdownTrigger
               ref={ref}
               icon={icon}
