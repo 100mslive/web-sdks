@@ -13,8 +13,6 @@ import {
 } from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
-import { HMSMediaStreamPlugin } from '../../plugins/video/HMSMediaStreamPlugin';
-import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
@@ -32,7 +30,6 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
 export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
-  private mediaStreamPluginsManager: HMSMediaStreamPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
@@ -78,7 +75,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
-    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager();
     this.setFirstTrackId(this.trackId);
   }
 
@@ -121,22 +117,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
-  }
-
-  private processPlugins() {
-    const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream as unknown as MediaStream);
-    // this.nativeTrack = processedStream.getVideoTracks()[0];
-    this.replaceSender(processedStream.getVideoTracks()[0], true);
-  }
-
-  addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
-    this.mediaStreamPluginsManager.addPlugins(plugins);
-    this.processPlugins();
-  }
-
-  removeStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
-    this.mediaStreamPluginsManager.removePlugins(plugins);
-    this.processPlugins();
   }
 
   /**
