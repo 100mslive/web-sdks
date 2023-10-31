@@ -10,6 +10,7 @@ import {
   HMSLocalTrack as SDKHMSLocalTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLogLevel,
+  HMSMediaStreamPlugin,
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
@@ -455,6 +456,15 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   async addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
     return this.addRemoveVideoPlugin(plugin, 'add', pluginFrameRate);
   }
+
+  async addPluginToVideoStream(plugin: HMSMediaStreamPlugin): Promise<void> {
+    return this.addRemoveMediaStreamPlugin(plugin, 'add');
+  }
+
+  async removePluginFromVideoStream(plugin: HMSMediaStreamPlugin): Promise<void> {
+    return this.addRemoveMediaStreamPlugin(plugin, 'remove');
+  }
+
   async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
     return this.addRemoveAudioPlugin(plugin, 'add');
   }
@@ -1375,6 +1385,27 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
           await (sdkTrack as SDKHMSLocalVideoTrack).removePlugin(plugin);
         }
         this.syncRoomState(`${action}VideoPlugin`);
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+      }
+    }
+  }
+
+  private async addRemoveMediaStreamPlugin(plugin: HMSMediaStreamPlugin, action: 'add' | 'remove') {
+    if (!plugin) {
+      HMSLogger.w('Invalid plugin received in store');
+      return;
+    }
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        if (action === 'add') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins([plugin]);
+        } else if (action === 'remove') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).removeStreamPlugins([plugin]);
+        }
+        this.syncRoomState(`${action}MediaStreamPlugin`);
       } else {
         this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
       }

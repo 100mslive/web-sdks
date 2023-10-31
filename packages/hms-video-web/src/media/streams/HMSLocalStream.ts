@@ -55,6 +55,7 @@ export class HMSLocalStream extends HMSMediaStream {
    * sender needs to be replaced.
    */
   async replaceSenderTrack(track: MediaStreamTrack, withTrack: MediaStreamTrack) {
+    console.log('inside replaceSenderTrack - connection', this.connection);
     if (!this.connection || this.connection.connectionState === 'closed') {
       HMSLogger.d(this.TAG, `publish connection is not initialised or closed`);
       return;

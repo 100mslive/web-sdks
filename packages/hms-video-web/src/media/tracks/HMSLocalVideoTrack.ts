@@ -123,20 +123,24 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
   }
 
-  private processPlugins() {
-    const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream as unknown as MediaStream);
-    // this.nativeTrack = processedStream.getVideoTracks()[0];
-    this.replaceSender(processedStream.getVideoTracks()[0], true);
+  private async processPlugins() {
+    try {
+      const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
+      const newTrack = processedStream.getVideoTracks()[0];
+      await this.replaceSender(newTrack, true);
+    } catch (e) {
+      console.error('error in processing plugin(s)', e);
+    }
   }
 
-  addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+  async addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
     this.mediaStreamPluginsManager.addPlugins(plugins);
-    this.processPlugins();
+    await this.processPlugins();
   }
 
-  removeStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+  async removeStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
     this.mediaStreamPluginsManager.removePlugins(plugins);
-    this.processPlugins();
+    await this.processPlugins();
   }
 
   /**
@@ -355,7 +359,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
     }
-    await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    localStream.replaceStreamTrack(this.nativeTrack, newTrack);
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {

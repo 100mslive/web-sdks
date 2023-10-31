@@ -14,7 +14,11 @@ export class HMSMediaStreamPluginsManager {
   applyPlugins(inputStream: MediaStream): MediaStream {
     let processedStream = inputStream;
     for (const plugin of this.plugins) {
-      processedStream = plugin.apply(processedStream);
+      try {
+        processedStream = plugin.apply(processedStream);
+      } catch (e) {
+        console.error('could not apply plugin', plugin);
+      }
     }
     return processedStream;
   }
