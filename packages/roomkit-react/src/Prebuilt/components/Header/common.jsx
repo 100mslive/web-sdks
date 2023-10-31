@@ -67,23 +67,15 @@ export const AudioOutputActions = () => {
    * Chromium browsers return an audioOutput with empty label when no permissions are given
    */
   const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
-  const audioOutputLabel = audioOutput?.filter(item => item.deviceId === selectedDeviceIDs.audioOutput);
+  const audioOutputLabel = audioOutput?.filter(item => item.deviceId === selectedDeviceIDs.audioOutput)?.[0];
 
   if (!shouldShowAudioOutput || !audioOutputFiltered?.length > 0) {
     return null;
   }
   let AudioOutputIcon = <SpeakerIcon />;
-  if (
-    audioOutputLabel &&
-    audioOutputLabel.length > 0 &&
-    audioOutputLabel[0].label.toLowerCase().includes('bluetooth')
-  ) {
+  if (audioOutputLabel && audioOutputLabel.label.toLowerCase().includes('bluetooth')) {
     AudioOutputIcon = <BluetoothIcon />;
-  } else if (
-    audioOutputLabel &&
-    audioOutputLabel.length > 0 &&
-    audioOutputLabel[0].label.toLowerCase().includes('wired')
-  ) {
+  } else if (audioOutputLabel && audioOutputLabel.label.toLowerCase().includes('wired')) {
     AudioOutputIcon = <HeadphonesIcon />;
   }
   return (
