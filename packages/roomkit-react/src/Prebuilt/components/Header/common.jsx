@@ -60,10 +60,6 @@ export const AudioOutputActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { audioInput } = allDevices;
   const hmsActions = useHMSActions();
-
-  /**
-   * Chromium browsers return an audioInput with empty label when no permissions are given
-   */
   const audioInputFiltered = audioInput?.filter(item => !!item.label) ?? [];
   const audioInputLabel = audioInput?.filter(item => item.deviceId === selectedDeviceIDs.audioInput)?.[0];
 

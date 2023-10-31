@@ -90,6 +90,11 @@ const Settings = ({ setHide }) => {
               deviceType: DeviceType.audioInput,
             })
           }
+          refreshDevices={async () => {
+            if (isMobile) {
+              await hmsActions.refreshDevices();
+            }
+          }}
         />
       ) : null}
 
@@ -105,11 +110,6 @@ const Settings = ({ setHide }) => {
               deviceType: DeviceType.audioOutput,
             })
           }
-          refreshDevices={async () => {
-            if (isMobile) {
-              await hmsActions.refreshDevices();
-            }
-          }}
         >
           <TestAudio id={selectedDeviceIDs.audioOutput} />
         </DeviceSelector>
