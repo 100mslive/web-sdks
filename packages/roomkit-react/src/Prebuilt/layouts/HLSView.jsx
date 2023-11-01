@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useFullscreen, useMedia, useToggle } from 'react-use';
+import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
@@ -42,6 +42,7 @@ const HLSView = () => {
   const controlsRef = useRef();
   const controlsTimerRef = useRef();
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+  const lastHlsUrl = usePrevious(hlsUrl);
 
   const isMobile = useMedia(config.media.md);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -64,6 +65,11 @@ const HLSView = () => {
       videoEl?.removeEventListener('waiting', showLoader);
     };
   }, []);
+  useEffect(() => {
+    if (streamEnded && lastHlsUrl !== hlsUrl) {
+      setStreamEnded(false);
+    }
+  }, [hlsUrl, streamEnded, lastHlsUrl]);
 
   useEffect(() => {
     const videoElem = videoRef.current;

@@ -19,9 +19,9 @@ export const MwebLeaveRoom = ({
   screenType,
   endRoom,
 }: {
-  leaveRoom: (args: { endstream: boolean }) => void;
+  leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
-  endRoom: () => void;
+  endRoom: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -67,7 +67,7 @@ export const MwebLeaveRoom = ({
               bg="$surface_default"
               titleColor="$on_surface_high"
               icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-              onClick={() => leaveRoom({ endstream: false })}
+              onClick={async () => await leaveRoom()}
               css={{ pt: 0, mt: '$10', color: '$on_surface_low', '&:hover': { color: '$on_surface_high' } }}
             />
 
