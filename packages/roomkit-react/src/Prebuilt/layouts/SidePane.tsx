@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
@@ -7,8 +7,12 @@ import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
+// @ts-ignore: No implicit Any
+import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
+import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
@@ -20,14 +24,15 @@ const SidePane = ({
   hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
-  tileProps: TileCustomisationProps;
-  hideControls: boolean;
+  tileProps?: TileCustomisationProps;
+  hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
+  const resetSidePane = useSidepaneReset();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
     ViewComponent = <Polls />;
@@ -35,6 +40,16 @@ const SidePane = ({
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
     ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
   }
+  if (sidepane === SIDE_PANE_OPTIONS.VB) {
+    ViewComponent = <VBPicker />;
+  }
+
+  useEffect(() => {
+    return () => {
+      resetSidePane();
+    };
+  }, [resetSidePane]);
+
   if (!ViewComponent && !trackId) {
     return null;
   }
@@ -58,6 +73,7 @@ const SidePane = ({
         h: '100%',
         flexShrink: 0,
         gap: '$4',
+        position: 'relative',
         '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
