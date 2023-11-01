@@ -14,6 +14,4 @@ export const defaultMedia = [
   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-10.jpg',
   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-11.jpg',
   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-12.jpg',
-  //   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-13.jpg',
-  //   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-14.jpg',
 ];
