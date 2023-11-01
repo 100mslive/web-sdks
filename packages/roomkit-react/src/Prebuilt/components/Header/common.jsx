@@ -8,7 +8,14 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CameraFlipIcon, CheckIcon, CrossIcon, SpeakerIcon } from '@100mslive/react-icons';
+import {
+  BluetoothIcon,
+  CameraFlipIcon,
+  CheckIcon,
+  CrossIcon,
+  HeadphonesIcon,
+  SpeakerIcon,
+} from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { Label } from '../../../Label';
 import { Box, Flex } from '../../../Layout';
@@ -49,48 +56,64 @@ export const CamaraFlipActions = () => {
   );
 };
 
-export const AudioOutputActions = () => {
+// It will handle and show audio input devices in Mweb while audio output devices in desktop
+export const AudioActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
-  const { audioOutput } = allDevices;
+
   // don't show speaker selector where the API is not supported, and use
   // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
+  const { audioInput, audioOutput } = allDevices;
+  let availableAudioDevices = audioInput;
+  let selectedAudio = selectedDeviceIDs.audioInput;
+  if (shouldShowAudioOutput) {
+    availableAudioDevices = audioOutput;
+    selectedAudio = selectedDeviceIDs.audioOutput;
+  }
+  const hmsActions = useHMSActions();
+  const audioFiltered = availableAudioDevices?.find(item => !!item.label);
+  const currentSelection = availableAudioDevices?.find(item => item.deviceId === selectedAudio);
 
-  /**
-   * Chromium browsers return an audioOutput with empty label when no permissions are given
-   */
-  const audioOutputFiltered = audioOutput?.filter(item => !!item.label) ?? [];
-  if (!shouldShowAudioOutput || !audioOutputFiltered?.length > 0) {
+  if (!audioFiltered) {
     return null;
   }
+  let AudioIcon = <SpeakerIcon />;
+  if (currentSelection && currentSelection.label.toLowerCase().includes('bluetooth')) {
+    AudioIcon = <BluetoothIcon />;
+  } else if (currentSelection && currentSelection.label.toLowerCase().includes('wired')) {
+    AudioIcon = <HeadphonesIcon />;
+  }
   return (
-    <AudioOutputSelectionSheet
-      outputDevices={audioOutput}
-      outputSelected={selectedDeviceIDs.outputDevices}
+    <AudioSelectionSheet
+      audioDevices={availableAudioDevices}
+      audioSelected={selectedAudio}
       onChange={async deviceId => {
         try {
           await updateDevice({
             deviceId,
-            deviceType: DeviceType.audioOutput,
+            deviceType: shouldShowAudioOutput ? DeviceType.audioOutput : DeviceType.audioInput,
           });
         } catch (e) {
           ToastManager.addToast({
-            title: `Error while changing audio output ${e.message || ''}`,
+            title: `Error while changing audio device ${e.message || ''}`,
             variant: 'error',
           });
         }
       }}
     >
-      <Box>
-        <IconButton>
-          <SpeakerIcon />
-        </IconButton>
+      <Box
+        onClick={async () => {
+          // refresh device as `devicechange` listener won't work in mobile device
+          await hmsActions.refreshDevices();
+        }}
+      >
+        <IconButton>{AudioIcon} </IconButton>
       </Box>
-    </AudioOutputSelectionSheet>
+    </AudioSelectionSheet>
   );
 };
 
-const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, children }) => {
+const AudioSelectionSheet = ({ audioDevices, audioSelected, onChange, children }) => {
   return (
     <Sheet.Root>
       <Sheet.Trigger asChild>{children}</Sheet.Trigger>
@@ -98,7 +121,7 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
         <Sheet.Title css={{ py: '$10', px: '$8', alignItems: 'center' }}>
           <Flex direction="row" justify="between" css={{ w: '100%' }}>
             <Text variant="h6" css={{ display: 'flex' }}>
-              Audio Output
+              Audio
             </Text>
             <Sheet.Close>
               <IconButton as="div" data-testid="dialog_cross_icon">
@@ -113,16 +136,16 @@ const AudioOutputSelectionSheet = ({ outputDevices, outputSelected, onChange, ch
           css={{
             px: '$8',
             maxHeight: '80vh',
-            overflowY: 'scroll',
+            overflowY: 'auto',
           }}
         >
-          {outputDevices.map(audioDevice => {
+          {audioDevices.map(audioDevice => {
             return (
               <SelectWithLabel
                 key={audioDevice.deviceId}
                 label={audioDevice.label}
                 id={audioDevice.deviceId}
-                checked={audioDevice.deviceId === outputSelected}
+                checked={audioDevice.deviceId === audioSelected}
                 onChange={() => onChange(audioDevice.deviceId)}
               />
             );

@@ -39,27 +39,28 @@ export const useSidepaneToggle = sidepaneType => {
 };
 
 export const usePollViewToggle = () => {
+  const hmsActions = useHMSActions();
   const { view, setPollState } = usePollViewState();
   const isOpen = useSidepaneState() === SIDE_PANE_OPTIONS.POLLS;
-  const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.POLLS);
 
   const togglePollView = useCallback(
     id => {
       id = typeof id === 'string' ? id : undefined;
+      const newView = id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ;
       setPollState({
         [POLL_STATE.pollInView]: id,
-        [POLL_STATE.view]: id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ,
+        [POLL_STATE.view]: newView,
       });
-      toggleSidepane();
+      hmsActions.setAppData(APP_DATA.sidePane, newView ? SIDE_PANE_OPTIONS.POLLS : '');
     },
-    [view, setPollState, isOpen, toggleSidepane],
+    [hmsActions, view, setPollState, isOpen],
   );
 
   return togglePollView;
 };
 
 /**
- * reset's the sidepane value
+ * resets the sidepane value
  */
 export const useSidepaneReset = () => {
   const hmsActions = useHMSActions();
