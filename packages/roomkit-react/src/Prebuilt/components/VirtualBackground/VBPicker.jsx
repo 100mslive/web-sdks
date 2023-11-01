@@ -41,6 +41,9 @@ export const VBPicker = () => {
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
 
+  // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
+  const showVideoTile = isVideoOn && roomState !== HMSRoomState.Preview;
+
   async function createPlugin() {
     if (!pluginRef.current) {
       pluginRef.current = new HMSVBPlugin(background, backgroundType);
@@ -61,9 +64,6 @@ export const VBPicker = () => {
   }, [hmsActions, localPeerVideoTrackID]);
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    if (!pluginRef.current) {
-      return;
-    }
     try {
       await createPlugin();
       window.HMS.virtualBackground = pluginRef.current;
@@ -75,19 +75,22 @@ export const VBPicker = () => {
       } else if (blurPower) {
         await pluginRef.current.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
       }
-      // Will store blur power here
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
       if (role)
         await hmsActions.addPluginToVideoTrack(pluginRef.current, Math.floor(role.publishParams.video.frameRate / 2));
     } catch (err) {
       console.error('add virtual background plugin failed', err);
+      setBackground(VB_EFFECT.NONE);
+      setBackgroundType(VB_EFFECT.NONE);
     }
   }
 
   async function removePlugin() {
     if (pluginRef.current) {
       await hmsActions.removePluginFromVideoTrack(pluginRef.current);
+      setBackground(VB_EFFECT.NONE);
+      setBackgroundType(VB_EFFECT.NONE);
       pluginRef.current = null;
     }
   }
@@ -97,7 +100,7 @@ export const VBPicker = () => {
   }
 
   return (
-    <Box css={{ maxHeight: '100%', overflowY: 'auto' }}>
+    <Box css={{ maxHeight: '100%', overflowY: 'auto', pr: '$6' }}>
       <Flex align="center" justify="between" css={{ w: '100%', pb: '$10' }}>
         <Text variant="h6" css={{ color: '$on_surface_high' }}>
           Virtual Background
@@ -110,8 +113,7 @@ export const VBPicker = () => {
         </Box>
       </Flex>
 
-      {/* Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen */}
-      {isVideoOn && roomState !== HMSRoomState.Preview ? (
+      {showVideoTile ? (
         <Video
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer?.videoTrack}

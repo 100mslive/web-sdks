@@ -25,7 +25,7 @@ export const VBCollection = ({
     return null;
   }
   return (
-    <Box css={{ my: '$10' }}>
+    <Box css={{ mt: '$10' }}>
       <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
         {title}
       </Text>
