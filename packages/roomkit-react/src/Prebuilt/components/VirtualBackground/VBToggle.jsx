@@ -11,7 +11,7 @@ export const VBToggle = () => {
   const isVBOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VB);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
-  if (!isVideoOn || !(isSafari || isFirefox)) {
+  if (!isVideoOn || isSafari || isFirefox) {
     return null;
   }
 
