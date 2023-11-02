@@ -4,13 +4,14 @@ import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { isFirefox, isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isVBOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VB);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
-  if (!isVideoOn || isSafari) {
+
+  if (!isVideoOn || !(isSafari || isFirefox)) {
     return null;
   }
 
