@@ -24,6 +24,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   settings: HMSAudioTrackSettings;
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
+  private manuallySelectedDeviceId?: string;
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
@@ -59,6 +60,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
+  }
+
+  getManuallySelectedDeviceId() {
+    return this.manuallySelectedDeviceId;
   }
 
   private handleVisibilityChange = async () => {
@@ -266,6 +271,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
+      this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       await this.replaceTrackWith(settings);
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {
