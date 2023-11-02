@@ -27,7 +27,7 @@ const iconDims = { height: '40px', width: '40px' };
 
 export const VBPicker = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const pluginRef = useRef(null);
+  const pluginRef = useRef(window.vbPluginRef);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
   const [isVBSupported, setIsVBSupported] = useState(false);
@@ -63,6 +63,12 @@ export const VBPicker = () => {
     });
   }, [hmsActions, localPeerVideoTrackID]);
 
+  useEffect(() => {
+    return () => {
+      window.vbPluginRef = pluginRef.current;
+    };
+  }, []);
+
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
     try {
       await createPlugin();
@@ -86,12 +92,11 @@ export const VBPicker = () => {
     }
   }
 
-  async function removePlugin() {
+  async function disableEffects() {
     if (pluginRef.current) {
-      await hmsActions.removePluginFromVideoTrack(pluginRef.current);
       setBackground(VB_EFFECT.NONE);
       setBackgroundType(VB_EFFECT.NONE);
-      pluginRef.current = null;
+      pluginRef.current.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
     }
   }
 
@@ -129,7 +134,7 @@ export const VBPicker = () => {
             title: 'No effect',
             icon: <CrossCircleIcon style={iconDims} />,
             type: VB_EFFECT.NONE,
-            onClick: async () => await removePlugin(),
+            onClick: async () => await disableEffects(),
           },
           {
             title: 'Blur',

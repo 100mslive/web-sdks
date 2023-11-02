@@ -1,5 +1,6 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
+import { HMSVBPlugin } from '@100mslive/hms-virtual-background';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
   HMSActions,
@@ -26,6 +27,7 @@ import { Notifications } from './components/Notifications';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { VB_EFFECT } from './components/VirtualBackground/constants';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -117,6 +119,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStore,
         hmsNotifications,
       };
+      // @ts-ignore
+      window.vbPluginRef = new HMSVBPlugin(VB_EFFECT.NONE, VB_EFFECT.NONE);
     }, []);
 
     useEffect(() => {
@@ -130,6 +134,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(
       () => () => {
         reactiveStore?.current?.hmsActions.leave();
+        // @ts-ignore
+        window.vbPluginRef = null;
       },
       [],
     );
