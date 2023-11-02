@@ -71,6 +71,7 @@ export const VBPicker = () => {
         const img = document.createElement('img');
         img.alt = 'VB';
         img.src = mediaURL;
+        img.crossOrigin = 'anonymous';
         await pluginRef.current.setBackground(img, VB_EFFECT.MEDIA);
       } else if (blurPower) {
         await pluginRef.current.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
