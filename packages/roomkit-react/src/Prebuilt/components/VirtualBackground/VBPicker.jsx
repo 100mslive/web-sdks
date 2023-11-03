@@ -129,7 +129,7 @@ export const VBPicker = () => {
           },
         ]}
         activeBackgroundType={backgroundType || VB_EFFECT.NONE}
-        activeBackground={vbPlugin?.background?.src || vbPlugin?.background || VB_EFFECT.NONE}
+        activeBackground={vbPlugin.background?.src || vbPlugin.background || VB_EFFECT.NONE}
       />
 
       <VBCollection
