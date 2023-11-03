@@ -14,14 +14,13 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-import { vbPluginRef } from '../../plugins/VirtualBackground/VBPluginSingleton';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
 // @ts-ignore
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia, VB_EFFECT } from './constants';
+import { defaultMedia, VB_EFFECT, vbPlugin } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -32,8 +31,8 @@ export const VBPicker = () => {
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const localPeer = useHMSStore(selectLocalPeer);
-  const [background, setBackground] = useState(vbPluginRef.background);
-  const [backgroundType, setBackgroundType] = useState(vbPluginRef.backgroundType);
+  const [background, setBackground] = useState(vbPlugin.background);
+  const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
@@ -54,33 +53,33 @@ export const VBPicker = () => {
     }
 
     //check support of plugin
-    if (vbPluginRef) {
-      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPluginRef);
+    if (vbPlugin) {
+      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
       setIsVBSupported(pluginSupport.isSupported);
     }
   }, [hmsActions, localPeerVideoTrackID]);
 
   async function disableEffects() {
-    if (vbPluginRef) {
-      vbPluginRef.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
+    if (vbPlugin) {
+      vbPlugin.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
       clearVBState();
     }
   }
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
     try {
-      window.HMS.virtualBackground = vbPluginRef;
+      window.HMS.virtualBackground = vbPlugin;
       if (mediaURL) {
         const img = document.createElement('img');
         img.alt = 'VB';
         img.src = mediaURL;
-        await vbPluginRef.setBackground(img, VB_EFFECT.MEDIA);
+        await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
       } else if (blurPower) {
-        await vbPluginRef.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
+        await vbPlugin.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
       }
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
-      if (role) await hmsActions.addPluginToVideoTrack(vbPluginRef, Math.floor(role.publishParams.video.frameRate / 2));
+      if (role) await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
     } catch (err) {
       console.error('Failed to apply VB', err);
       disableEffects();
@@ -131,7 +130,7 @@ export const VBPicker = () => {
           },
         ]}
         activeBackgroundType={backgroundType || VB_EFFECT.NONE}
-        activeBackground={vbPluginRef?.background?.src || vbPluginRef?.background || VB_EFFECT.NONE}
+        activeBackground={vbPlugin?.background?.src || vbPlugin?.background || VB_EFFECT.NONE}
       />
 
       <VBCollection

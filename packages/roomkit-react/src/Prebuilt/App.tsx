@@ -37,8 +37,6 @@ import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
 // @ts-ignore: No implicit Any
-import { vbPluginRef } from './plugins/VirtualBackground/VBPluginSingleton';
-// @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
 import {
@@ -119,8 +117,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsStore,
         hmsNotifications,
       };
-      // @ts-ignore
-      console.debug('Initialised VB Plugin', vbPluginRef);
     }, []);
 
     useEffect(() => {
