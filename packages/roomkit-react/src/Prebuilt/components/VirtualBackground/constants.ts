@@ -1,6 +1,7 @@
 // Will support all media, setting to image here to test with current plugin interface
 export const VB_EFFECT = { BLUR: 'blur', BEAUTIFY: 'BEAUTIFY', NONE: 'none', MEDIA: 'image' };
 
+// ['https://www.100ms.live/images/vb-1.jpeg', 'https://www.100ms.live/images/vb-2.jpg'];
 export const defaultMedia = [
   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-1.jpg',
   'https://d2qi07yyjujoxr.cloudfront.net/webapp/vb/vb-2.jpg',

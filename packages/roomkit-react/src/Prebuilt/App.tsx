@@ -121,6 +121,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       };
       // @ts-ignore
       window.vbPluginRef = new HMSVBPlugin(VB_EFFECT.NONE, VB_EFFECT.NONE);
+      // @ts-ignore
+      console.debug('initialised VB plugin', window.vbPluginRef);
     }, []);
 
     useEffect(() => {
