@@ -1,6 +1,5 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
 import { HMSStatsStoreWrapper, HMSStoreWrapper, IHMSNotifications } from '@100mslive/hms-video-store';
-import { HMSVBPlugin } from '@100mslive/hms-virtual-background';
 import { Layout, Logo, Screens, Theme, Typography } from '@100mslive/types-prebuilt';
 import {
   HMSActions,
@@ -27,7 +26,6 @@ import { Notifications } from './components/Notifications';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { VB_EFFECT } from './components/VirtualBackground/constants';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -38,6 +36,8 @@ import { AppStateContext, PrebuiltStates, useAppStateManager } from './AppStateC
 import { FlyingEmoji } from './plugins/FlyingEmoji';
 // @ts-ignore: No implicit Any
 import { RemoteStopScreenshare } from './plugins/RemoteStopScreenshare';
+// @ts-ignore: No implicit Any
+import { vbPluginRef } from './plugins/VirtualBackground/VBPluginSingleton';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled } from './components/AppData/useUISettings';
 import { useAutoStartStreaming } from './components/hooks/useAutoStartStreaming';
@@ -120,9 +120,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         hmsNotifications,
       };
       // @ts-ignore
-      window.vbPluginRef = new HMSVBPlugin(VB_EFFECT.NONE, VB_EFFECT.NONE);
-      // @ts-ignore
-      console.debug('initialised VB plugin', window.vbPluginRef);
+      console.debug('Initialised VB Plugin', vbPluginRef);
     }, []);
 
     useEffect(() => {
@@ -136,8 +134,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     useEffect(
       () => () => {
         reactiveStore?.current?.hmsActions.leave();
-        // @ts-ignore
-        window.vbPluginRef = null;
       },
       [],
     );

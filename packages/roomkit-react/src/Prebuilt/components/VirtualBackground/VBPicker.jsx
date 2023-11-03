@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { HMSVBPlugin } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -15,6 +14,7 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
+import { vbPluginRef } from '../../plugins/VirtualBackground/VBPluginSingleton';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
@@ -32,8 +32,8 @@ export const VBPicker = () => {
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const localPeer = useHMSStore(selectLocalPeer);
-  const [background, setBackground] = useState(window.vbPluginRef.background);
-  const [backgroundType, setBackgroundType] = useState(window.vbPluginRef.backgroundType);
+  const [background, setBackground] = useState(vbPluginRef.background);
+  const [backgroundType, setBackgroundType] = useState(vbPluginRef.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
@@ -48,49 +48,39 @@ export const VBPicker = () => {
     setBackgroundType(VB_EFFECT.NONE);
   };
 
-  async function createPlugin() {
-    if (!window.vbPluginRef) {
-      window.vbPluginRef = new HMSVBPlugin(VB_EFFECT.NONE, VB_EFFECT.NONE);
-      clearVBState();
-    }
-  }
-
   useEffect(() => {
     if (!localPeerVideoTrackID) {
       return;
     }
-    createPlugin().then(() => {
-      //check support of plugin
-      if (window.vbPluginRef) {
-        const pluginSupport = hmsActions.validateVideoPluginSupport(window.vbPluginRef);
-        setIsVBSupported(pluginSupport.isSupported);
-      }
-    });
+
+    //check support of plugin
+    if (vbPluginRef) {
+      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPluginRef);
+      setIsVBSupported(pluginSupport.isSupported);
+    }
   }, [hmsActions, localPeerVideoTrackID]);
 
   async function disableEffects() {
-    if (window.vbPluginRef) {
-      window.vbPluginRef.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
+    if (vbPluginRef) {
+      vbPluginRef.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
       clearVBState();
     }
   }
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
     try {
-      await createPlugin();
-      window.HMS.virtualBackground = window.vbPluginRef;
+      window.HMS.virtualBackground = vbPluginRef;
       if (mediaURL) {
         const img = document.createElement('img');
         img.alt = 'VB';
         img.src = mediaURL;
-        await window.vbPluginRef.setBackground(img, VB_EFFECT.MEDIA);
+        await vbPluginRef.setBackground(img, VB_EFFECT.MEDIA);
       } else if (blurPower) {
-        await window.vbPluginRef.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
+        await vbPluginRef.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
       }
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
-      if (role)
-        await hmsActions.addPluginToVideoTrack(window.vbPluginRef, Math.floor(role.publishParams.video.frameRate / 2));
+      if (role) await hmsActions.addPluginToVideoTrack(vbPluginRef, Math.floor(role.publishParams.video.frameRate / 2));
     } catch (err) {
       console.error('Failed to apply VB', err);
       disableEffects();
@@ -141,7 +131,7 @@ export const VBPicker = () => {
           },
         ]}
         activeBackgroundType={backgroundType || VB_EFFECT.NONE}
-        activeBackground={window.vbPluginRef?.background?.src || window.vbPluginRef?.background || VB_EFFECT.NONE}
+        activeBackground={vbPluginRef?.background?.src || vbPluginRef?.background || VB_EFFECT.NONE}
       />
 
       <VBCollection
