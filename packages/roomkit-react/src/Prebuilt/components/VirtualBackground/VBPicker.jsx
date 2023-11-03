@@ -68,7 +68,6 @@ export const VBPicker = () => {
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
     try {
-      window.HMS.virtualBackground = vbPlugin;
       if (mediaURL) {
         const img = document.createElement('img');
         img.alt = 'VB';
