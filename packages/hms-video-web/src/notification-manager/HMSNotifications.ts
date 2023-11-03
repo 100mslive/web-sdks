@@ -41,14 +41,23 @@ export interface Info {
   user_id: string;
 }
 
-export type HMSBeamState = {
-  Initialized: 'initialized';
-  Started: 'started';
-  Paused: 'paused';
-  Resumed: 'resumed';
-  Stopped: 'stopped';
-  Failed: 'failed';
-};
+export enum HMSRecordingState {
+  NONE = 'none',
+  INITIALISED = 'initialized',
+  STARTED = 'started',
+  PAUSED = 'paused',
+  RESUMED = 'resumed',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+
+export enum HMSStreamingState {
+  NONE = 'none',
+  INITIALISED = 'initialized',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
 
 export interface PolicyParams {
   name: string;
@@ -106,18 +115,22 @@ export interface RoomState {
   recording?: {
     sfu: {
       started_at?: number;
+      updated_at?: number;
       enabled: boolean;
-      state?: HMSBeamState;
+      state?: HMSRecordingState;
     };
     browser: {
       started_at?: number;
+      updated_at?: number;
       enabled: boolean;
-      state?: HMSBeamState;
+      state?: HMSRecordingState;
     };
     hls: {
+      initialised_at?: number;
       started_at?: number;
+      updated_at?: number;
       enabled: boolean;
-      state?: HMSBeamState;
+      state?: HMSRecordingState;
       config?: {
         hls_vod: boolean;
         single_file_per_layer: boolean;
@@ -126,7 +139,7 @@ export interface RoomState {
   };
   streaming?: {
     enabled: boolean;
-    rtmp: { enabled: boolean; started_at?: number; state?: HMSBeamState };
+    rtmp: { enabled: boolean; started_at?: number; updated_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
 }
@@ -223,20 +236,30 @@ export interface MessageNotificationInfo {
   message: any;
   type: string;
 }
-
+export enum RecordingNotificationType {
+  SFU = 'sfu',
+  BROWSER = 'Browser',
+  HLS = 'HLS',
+}
 export interface RecordingNotification {
-  type: 'sfu' | 'Browser' | 'hls';
+  type: RecordingNotificationType;
+  initialised_at?: number; // only used for type hls
   started_at?: number;
+  updated_at?: number;
+  stopped_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
-  state?: HMSBeamState;
+  state?: HMSRecordingState;
+  hls_recording?: HLSRecording; // only used for type hls
 }
 
 export interface RTMPNotification {
   peer?: PeerNotificationInfo;
-  started_at?: number;
   error?: ServerError;
-  state?: HMSBeamState;
+  started_at?: number;
+  updated_at?: number;
+  stopped_at?: number;
+  state?: HMSStreamingState;
 }
 
 export interface HLSRecording {
@@ -257,7 +280,9 @@ export interface HLSVariantInfo {
   metadata?: string;
   started_at?: number;
   initialised_at?: number;
-  state?: HMSBeamState;
+  updated_at?: number;
+  stopped_at?: number;
+  state?: HMSStreamingState;
 }
 
 export interface MetadataChangeNotification {
