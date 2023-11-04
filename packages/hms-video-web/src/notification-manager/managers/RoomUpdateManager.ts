@@ -158,17 +158,19 @@ export class RoomUpdateManager {
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
-    hlsNotification?.variants?.forEach(variant => {
-      hls.variants.push({
-        meetingURL: variant?.meeting_url,
-        url: variant?.url,
-        metadata: variant?.metadata,
-        startedAt: convertDateNumToDate(variant?.started_at),
-        initialisedAt: convertDateNumToDate(variant?.initialised_at),
-        state: variant.state,
-        updatedAt: convertDateNumToDate(variant.updated_at),
+    if (hlsNotification?.enabled) {
+      hlsNotification?.variants?.forEach(variant => {
+        hls.variants.push({
+          meetingURL: variant?.meeting_url,
+          url: variant?.url,
+          metadata: variant?.metadata,
+          startedAt: convertDateNumToDate(variant?.started_at),
+          initialisedAt: convertDateNumToDate(variant?.initialised_at),
+          state: variant.state,
+          updatedAt: convertDateNumToDate(variant.updated_at),
+        });
       });
-    });
+    }
     return hls;
   }
 
@@ -237,6 +239,7 @@ export class RoomUpdateManager {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
         error: this.toSdkError(notification.error),
+        state: notification.state,
       };
       action = HMSRoomUpdate.SERVER_RECORDING_STATE_UPDATED;
     } else if (notification.type === RecordingNotificationType.HLS) {
@@ -247,6 +250,7 @@ export class RoomUpdateManager {
         running,
         startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
         error: this.toSdkError(notification.error),
+        state: notification?.state,
       };
       action = HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED;
     }
@@ -258,6 +262,15 @@ export class RoomUpdateManager {
     const running = this.isStreamingRunning(notification.state);
     if (!room) {
       HMSLogger.w(this.TAG, 'on policy change - room not present');
+      return;
+    }
+    if (!running) {
+      room.rtmp = {
+        running,
+        state: notification.state,
+        error: this.toSdkError(notification.error),
+      };
+      this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
       return;
     }
     room.rtmp = {
