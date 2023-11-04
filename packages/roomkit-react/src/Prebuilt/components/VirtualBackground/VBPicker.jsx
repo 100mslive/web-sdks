@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   HMSRoomState,
+  selectIsLargeRoom,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
   selectLocalPeerRole,
@@ -38,9 +39,10 @@ export const VBPicker = () => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
-  const showVideoTile = isVideoOn && roomState !== HMSRoomState.Preview;
+  const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
 
   const clearVBState = () => {
     setBackground(VB_EFFECT.NONE);
@@ -91,7 +93,7 @@ export const VBPicker = () => {
 
   return (
     <Box css={{ maxHeight: '100%', overflowY: 'auto', pr: '$6' }}>
-      <Flex align="center" justify="between" css={{ w: '100%', pb: '$10' }}>
+      <Flex align="center" justify="between" css={{ w: '100%', position: 'sticky', top: 0 }}>
         <Text variant="h6" css={{ color: '$on_surface_high' }}>
           Virtual Background
         </Text>
@@ -108,7 +110,7 @@ export const VBPicker = () => {
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer?.videoTrack}
           data-testid="preview_tile"
-          css={{ width: '100%', height: '16rem' }}
+          css={{ width: '100%', height: '16rem', position: 'sticky', top: '$17' }}
         />
       ) : null}
 
