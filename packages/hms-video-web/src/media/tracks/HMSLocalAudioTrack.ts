@@ -66,6 +66,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     return this.manuallySelectedDeviceId;
   }
 
+  resetManuallySelectedDeviceId() {
+    this.manuallySelectedDeviceId = undefined;
+  }
+
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'visible') {
       await this.replaceTrackWith(this.settings);
