@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 import {
-  HMSException,
   selectIsConnectedToRoom,
   selectPermissions,
   useHMSActions,
@@ -20,7 +19,7 @@ export const useAutoStartStreaming = () => {
   const showStreamingUI = useShowStreamingUI();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const { isHLSRunning, isRTMPRunning } = useRecordingStreaming();
+  const { isHLSRunning, isRTMPRunning, isRecordingOn } = useRecordingStreaming();
   const streamStartedRef = useRef(false);
 
   const startHLS = useCallback(async () => {
@@ -32,9 +31,7 @@ export const useAutoStartStreaming = () => {
       streamStartedRef.current = true;
       await hmsActions.startHLSStreaming();
     } catch (error) {
-      if ((error as HMSException).message?.includes('beam already started')) {
-        return;
-      }
+      console.error(error);
       streamStartedRef.current = false;
       setHLSStarted(false);
     }
@@ -47,10 +44,10 @@ export const useAutoStartStreaming = () => {
   }, [isHLSStarted, isHLSRunning]);
 
   useEffect(() => {
-    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming) {
+    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming || isRecordingOn) {
       return;
     }
-    // Is a streaming kit and broadcaster joins
+    // Is a streaming kit and peer with streaming permissions joins
     startHLS();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected]);

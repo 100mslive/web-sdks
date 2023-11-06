@@ -46,6 +46,8 @@ export const APP_DATA = {
   activeScreensharePeerId: 'activeScreensharePeerId',
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
+  background: 'background',
+  backgroundType: 'backgroundType',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
@@ -61,6 +63,7 @@ export const SIDE_PANE_OPTIONS = {
   CHAT: 'Chat',
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
+  VB: 'VB',
 };
 
 export const POLL_STATE = {

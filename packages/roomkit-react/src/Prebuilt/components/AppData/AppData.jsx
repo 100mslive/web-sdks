@@ -4,7 +4,6 @@ import {
   selectAvailableRoleNames,
   selectFullAppData,
   selectHLSState,
-  selectIsConnectedToRoom,
   selectLocalPeerRoleName,
   selectRolesMap,
   selectRoomState,
@@ -15,7 +14,7 @@ import {
 } from '@100mslive/react-sdk';
 import { normalizeAppPolicyConfig } from '../init/initUtils';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneState, useSidepaneToggle } from './useSidepane';
+import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 import { useSetAppDataByKey } from './useUISettings';
 import {
   APP_DATA,
@@ -26,6 +25,7 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
+import { VB_EFFECT } from '../VirtualBackground/constants';
 
 export const getAppDetails = appDetails => {
   try {
@@ -67,6 +67,8 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
+  [APP_DATA.background]: VB_EFFECT.NONE,
+  [APP_DATA.backgroundType]: VB_EFFECT.NONE,
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
@@ -75,20 +77,11 @@ const initialAppData = {
 
 export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
   const hmsActions = useHMSActions();
-  const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const sidePane = useSidepaneState();
-  const resetSidePane = useSidepaneReset();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const roleNames = useHMSStore(selectAvailableRoleNames);
   const rolesMap = useHMSStore(selectRolesMap);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const appData = useHMSStore(selectFullAppData);
-
-  useEffect(() => {
-    if (!isConnected && sidePane && sidePane !== SIDE_PANE_OPTIONS.PARTICIPANTS) {
-      resetSidePane();
-    }
-  }, [isConnected, sidePane, resetSidePane]);
 
   useEffect(() => {
     hmsActions.initAppData({
