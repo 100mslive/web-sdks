@@ -24,24 +24,27 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
 
-  const formattedVideoInputList = videoInput?.map(videoInput => ({
-    active: selectedDeviceIDs.videoInput === videoInput.deviceId,
-    content: (
-      <Text
-        variant="sm"
-        onClick={() =>
-          updateDevice({
-            deviceType: DeviceType.videoInput,
-            deviceId: videoInput.deviceId,
-          })
-        }
-        css={optionsCSS}
-      >
-        {videoInput.label}
-      </Text>
-    ),
-    title: videoInput.label,
-  }));
+  const formattedVideoInputList = videoInput?.map(videoInput => {
+    window.alert(JSON.stringify(videoInput.getCapabilities()));
+    return {
+      active: selectedDeviceIDs.videoInput === videoInput.deviceId,
+      content: (
+        <Text
+          variant="sm"
+          onClick={() =>
+            updateDevice({
+              deviceType: DeviceType.videoInput,
+              deviceId: videoInput.deviceId,
+            })
+          }
+          css={optionsCSS}
+        >
+          {videoInput.label}
+        </Text>
+      ),
+      title: videoInput.label,
+    };
+  });
 
   const formattedAudioInputList = audioInput?.map(audioInput => ({
     active: selectedDeviceIDs.audioInput === audioInput.deviceId,
