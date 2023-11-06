@@ -15,11 +15,8 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-// @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
-// @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-// @ts-ignore
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia, VB_EFFECT, vbPlugin } from './constants';
 
@@ -86,6 +83,12 @@ export const VBPicker = () => {
       disableEffects();
     }
   }
+
+  useEffect(() => {
+    if (!isVideoOn) {
+      toggleVB();
+    }
+  }, [isVideoOn, toggleVB]);
 
   if (!isVBSupported) {
     return null;
