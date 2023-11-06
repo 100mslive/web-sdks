@@ -148,7 +148,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         )
       ) : null}
 
-      {localVideoTrack?.facingMode && roomState === HMSRoomState.Preview ? (
+      {localVideoTrack?.facingMode === 'environment' && roomState === HMSRoomState.Preview ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
