@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { HMSVBPlugin } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
+  selectIsLargeRoom,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
   selectLocalPeerRole,
@@ -15,90 +15,101 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-// @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
-// @ts-ignore
-import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
-// @ts-ignore
-import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia, VB_EFFECT } from './constants';
+import { useUISettings } from '../AppData/useUISettings';
+import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
+import { defaultMedia, VB_EFFECT, vbPlugin } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
+const MAX_RETRIES = 2;
 
 export const VBPicker = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
-  const pluginRef = useRef(null);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
   const [isVBSupported, setIsVBSupported] = useState(false);
   const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
-  const [background, setBackground] = useSetAppDataByKey(APP_DATA.background);
-  const [backgroundType, setBackgroundType] = useSetAppDataByKey(APP_DATA.backgroundType);
   const localPeer = useHMSStore(selectLocalPeer);
+  const [background, setBackground] = useState(vbPlugin.background);
+  const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
+  const isLargeRoom = useHMSStore(selectIsLargeRoom);
+  const addedPluginToVideoTrack = useRef(false);
 
-  async function createPlugin() {
-    if (!pluginRef.current) {
-      pluginRef.current = new HMSVBPlugin(background, backgroundType);
-    }
-  }
+  // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
+  const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
+
+  const clearVBState = () => {
+    setBackground(VB_EFFECT.NONE);
+    setBackgroundType(VB_EFFECT.NONE);
+  };
 
   useEffect(() => {
     if (!localPeerVideoTrackID) {
       return;
     }
-    createPlugin().then(() => {
-      //check support of plugin
-      if (pluginRef.current) {
-        const pluginSupport = hmsActions.validateVideoPluginSupport(pluginRef.current);
-        setIsVBSupported(pluginSupport.isSupported);
-      }
-    });
+
+    //check support of plugin
+    if (vbPlugin) {
+      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
+      setIsVBSupported(pluginSupport.isSupported);
+    }
   }, [hmsActions, localPeerVideoTrackID]);
 
-  async function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    if (!pluginRef.current) {
-      return;
+  async function disableEffects() {
+    if (vbPlugin) {
+      vbPlugin.setBackground(VB_EFFECT.NONE, VB_EFFECT.NONE);
+      clearVBState();
     }
+  }
+
+  async function addPlugin({ mediaURL = '', blurPower = 0 }) {
+    let retries = 0;
     try {
-      await createPlugin();
-      window.HMS.virtualBackground = pluginRef.current;
       if (mediaURL) {
         const img = document.createElement('img');
         img.alt = 'VB';
         img.src = mediaURL;
-        await pluginRef.current.setBackground(img, VB_EFFECT.MEDIA);
+        try {
+          await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
+        } catch (e) {
+          console.error(e);
+          if (retries++ < MAX_RETRIES) {
+            await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
+          }
+        }
       } else if (blurPower) {
-        await pluginRef.current.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
+        await vbPlugin.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
       }
-      // Will store blur power here
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
-      if (role)
-        await hmsActions.addPluginToVideoTrack(pluginRef.current, Math.floor(role.publishParams.video.frameRate / 2));
+      if (role && !addedPluginToVideoTrack.current) {
+        await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+        addedPluginToVideoTrack.current = true;
+      }
     } catch (err) {
-      console.error('add virtual background plugin failed', err);
+      console.error('Failed to apply VB', err);
+      disableEffects();
     }
   }
 
-  async function removePlugin() {
-    if (pluginRef.current) {
-      await hmsActions.removePluginFromVideoTrack(pluginRef.current);
-      pluginRef.current = null;
+  useEffect(() => {
+    if (!isVideoOn) {
+      toggleVB();
     }
-  }
+  }, [isVideoOn, toggleVB]);
 
   if (!isVBSupported) {
     return null;
   }
 
   return (
-    <Box css={{ maxHeight: '100%', overflowY: 'auto' }}>
-      <Flex align="center" justify="between" css={{ w: '100%', pb: '$10' }}>
+    <Box css={{ maxHeight: '100%', overflowY: 'auto', pr: '$6' }}>
+      <Flex align="center" justify="between" css={{ w: '100%', position: 'sticky', top: 0 }}>
         <Text variant="h6" css={{ color: '$on_surface_high' }}>
           Virtual Background
         </Text>
@@ -110,13 +121,12 @@ export const VBPicker = () => {
         </Box>
       </Flex>
 
-      {/* Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen */}
-      {isVideoOn && roomState !== HMSRoomState.Preview ? (
+      {showVideoTile ? (
         <Video
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer?.videoTrack}
           data-testid="preview_tile"
-          css={{ width: '100%', height: '16rem' }}
+          css={{ width: '100%', height: '16rem', position: 'sticky', top: '$17' }}
         />
       ) : null}
 
@@ -127,7 +137,7 @@ export const VBPicker = () => {
             title: 'No effect',
             icon: <CrossCircleIcon style={iconDims} />,
             type: VB_EFFECT.NONE,
-            onClick: async () => await removePlugin(),
+            onClick: async () => await disableEffects(),
           },
           {
             title: 'Blur',
@@ -136,8 +146,8 @@ export const VBPicker = () => {
             onClick: async () => await addPlugin({ blurPower: 0.5 }),
           },
         ]}
-        activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
-        activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}
+        activeBackgroundType={backgroundType || VB_EFFECT.NONE}
+        activeBackground={vbPlugin.background?.src || vbPlugin.background || VB_EFFECT.NONE}
       />
 
       <VBCollection
@@ -147,8 +157,8 @@ export const VBPicker = () => {
           mediaURL,
           onClick: async () => await addPlugin({ mediaURL }),
         }))}
-        activeBackgroundType={pluginRef.current?.backgroundType || VB_EFFECT.NONE}
-        activeBackground={pluginRef.current?.background?.src || pluginRef.current?.background || VB_EFFECT.NONE}
+        activeBackgroundType={backgroundType || VB_EFFECT.NONE}
+        activeBackground={background?.src || background || VB_EFFECT.NONE}
       />
     </Box>
   );
