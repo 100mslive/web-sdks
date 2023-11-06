@@ -134,7 +134,7 @@ const PreviewJoin = ({
 
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>
-      <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' }, width: 'unset' }}>
+      <Container css={{ h: '100%', pt: '$10', '@md': { justifyContent: 'space-between' } }}>
         {toggleVideo ? null : <Box />}
         <Flex direction="column" justify="center" css={{ w: '100%', maxWidth: '640px' }}>
           <Logo />
