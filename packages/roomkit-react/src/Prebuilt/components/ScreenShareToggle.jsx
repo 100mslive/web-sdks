@@ -28,9 +28,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
           active={!isVideoScreenshare}
           css={css}
           disabled={isAudioOnly}
-          onClick={() => {
-            toggleScreenShare();
-          }}
+          onClick={() => toggleScreenShare({ systemAudio: 'include' })}
         >
           <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>
             <Box>
