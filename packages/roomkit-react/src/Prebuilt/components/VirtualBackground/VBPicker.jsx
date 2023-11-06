@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -14,15 +14,13 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
-// @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
-// @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-// @ts-ignore
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia, VB_EFFECT, vbPlugin } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
+const MAX_RETRIES = 2;
 
 export const VBPicker = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -38,6 +36,7 @@ export const VBPicker = () => {
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
+  const addedPluginToVideoTrack = useRef(false);
 
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && roomState !== HMSRoomState.Preview;
@@ -67,18 +66,29 @@ export const VBPicker = () => {
   }
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
+    let retries = 0;
     try {
       if (mediaURL) {
         const img = document.createElement('img');
         img.alt = 'VB';
         img.src = mediaURL;
-        await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
+        try {
+          await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
+        } catch (e) {
+          console.error(e);
+          if (retries++ < MAX_RETRIES) {
+            await vbPlugin.setBackground(img, VB_EFFECT.MEDIA);
+          }
+        }
       } else if (blurPower) {
         await vbPlugin.setBackground(VB_EFFECT.BLUR, VB_EFFECT.BLUR);
       }
       setBackground(mediaURL || VB_EFFECT.BLUR);
       setBackgroundType(mediaURL ? VB_EFFECT.MEDIA : VB_EFFECT.BLUR);
-      if (role) await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+      if (role && !addedPluginToVideoTrack.current) {
+        await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+        addedPluginToVideoTrack.current = true;
+      }
     } catch (err) {
       console.error('Failed to apply VB', err);
       disableEffects();
