@@ -1,10 +1,8 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   DeviceType,
   HMSRoomState,
-  selectLocalVideoTrackID,
   selectRoomState,
-  selectVideoTrackByID,
   useAVToggle,
   useDevices,
   useHMSActions,
@@ -23,28 +21,27 @@ const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100
 export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput } = allDevices;
+  const [hasFrontCam, setHasFrontCam] = useState(false);
+  const [hasBackCam, setHasBackCam] = useState(false);
 
-  const formattedVideoInputList = videoInput?.map(videoInput => {
-    window.alert(JSON.stringify(videoInput.getCapabilities()));
-    return {
-      active: selectedDeviceIDs.videoInput === videoInput.deviceId,
-      content: (
-        <Text
-          variant="sm"
-          onClick={() =>
-            updateDevice({
-              deviceType: DeviceType.videoInput,
-              deviceId: videoInput.deviceId,
-            })
-          }
-          css={optionsCSS}
-        >
-          {videoInput.label}
-        </Text>
-      ),
-      title: videoInput.label,
-    };
-  });
+  const formattedVideoInputList = videoInput?.map(videoInput => ({
+    active: selectedDeviceIDs.videoInput === videoInput.deviceId,
+    content: (
+      <Text
+        variant="sm"
+        onClick={() =>
+          updateDevice({
+            deviceType: DeviceType.videoInput,
+            deviceId: videoInput.deviceId,
+          })
+        }
+        css={optionsCSS}
+      >
+        {videoInput.label}
+      </Text>
+    ),
+    title: videoInput.label,
+  }));
 
   const formattedAudioInputList = audioInput?.map(audioInput => ({
     active: selectedDeviceIDs.audioInput === audioInput.deviceId,
@@ -67,11 +64,22 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
 
   const { isLocalVideoEnabled, isLocalAudioEnabled, toggleAudio, toggleVideo } = useAVToggle();
   const actions = useHMSActions();
-  const videoTrackId = useHMSStore(selectLocalVideoTrackID);
-  const localVideoTrack = useHMSStore(selectVideoTrackByID(videoTrackId));
   const roomState = useHMSStore(selectRoomState);
   const hasAudioDevices = audioInput?.length > 0;
   const hasVideoDevices = videoInput?.length > 0;
+
+  useEffect(() => {
+    videoInput.forEach(videoInput => {
+      const facingMode = videoInput.getCapabilities().facingMode?.[0] || '';
+      if (!hasBackCam && facingMode === 'environment') {
+        setHasBackCam(true);
+      }
+      if (!hasFrontCam && facingMode === 'user') {
+        setHasFrontCam(true);
+      }
+    });
+    // eslint-disable-next-line
+  }, [formattedVideoInputList]);
 
   return (
     <Fragment>
@@ -151,7 +159,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
         )
       ) : null}
 
-      {localVideoTrack?.facingMode === 'environment' && roomState === HMSRoomState.Preview ? (
+      {hasBackCam && hasFrontCam && roomState === HMSRoomState.Preview ? (
         <Tooltip title="Switch Camera" key="switchCamera">
           <IconButton
             onClick={async () => {
