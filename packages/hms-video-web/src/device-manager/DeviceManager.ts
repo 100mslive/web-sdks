@@ -168,7 +168,7 @@ export class DeviceManager implements HMSDeviceManager {
     const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
     // change the input device only if the manually selected device is disconnected
-    if (audioTrack && !this.audioInput.find(device => device.deviceId === audioTrack.settings.deviceId)) {
+    if (audioTrack && !this.audioInput.find(device => device.deviceId === audioTrack.getManuallySelectedDeviceId())) {
       await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
     }
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
