@@ -61,7 +61,7 @@ const SidePane = ({
     hideMetadataOnTile: tileProps?.hide_metadata_on_tile,
     objectFit: tileProps?.video_object_fit,
   };
-
+  const VB = sidepane === SIDE_PANE_OPTIONS.VB;
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (
@@ -92,7 +92,7 @@ const SidePane = ({
           css={{
             w: '$100',
             h: mwebStreamingChat ? '0' : '100%',
-            p: '$10',
+            p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,
             maxHeight: mwebStreamingChat ? '300px' : 'unset',
