@@ -195,6 +195,7 @@ export class DeviceManager implements HMSDeviceManager {
     if (manualSelection) {
       return manualSelection;
     }
+    // if manually selected device is not available, reset on the track
     audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
