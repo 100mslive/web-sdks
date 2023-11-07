@@ -1,8 +1,4 @@
 export const worker = `(function metronomeWorkerSetup() {
-  let interval_id,
-    is_ticking = false,
-    adjusted_tempo = 60 * 30;
-    let timer = 0;
   function ticker() {
     self.postMessage('tick');
   }
@@ -10,7 +6,7 @@ export const worker = `(function metronomeWorkerSetup() {
     const [data, time] = event.data;
     switch (data) {
       case 'start':
-        interval_id = setTimeout(ticker, time);
+        setTimeout(ticker, time);
         break;
       default:
         break;
