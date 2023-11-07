@@ -44,7 +44,6 @@ export interface HMSRecording {
 export interface HMSBrowserRecording {
   running: boolean;
   startedAt?: Date;
-  updatedAt?: Date;
   state?: HMSRecordingState;
   error?: HMSException;
 }
@@ -60,7 +59,6 @@ export interface HMSHLSRecording {
   running: boolean;
   initialisedAt?: Date;
   startedAt?: Date;
-  updatedAt?: Date;
   state?: HMSRecordingState;
   error?: ServerError;
   /**
@@ -79,7 +77,6 @@ export interface HMSRTMP {
    * @alpha
    **/
   startedAt?: Date;
-  updatedAt?: Date;
   state?: HMSStreamingState;
   error?: HMSException;
 }
@@ -96,6 +93,5 @@ export interface HLSVariant {
   metadata?: string;
   startedAt?: Date;
   initialisedAt?: Date;
-  updatedAt?: Date;
   state?: HMSStreamingState;
 }

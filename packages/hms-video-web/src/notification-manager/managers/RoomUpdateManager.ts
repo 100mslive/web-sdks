@@ -104,7 +104,6 @@ export class RoomUpdateManager {
 
     room.rtmp.running = this.isStreamingRunning(streaming?.rtmp?.state);
     room.rtmp.startedAt = convertDateNumToDate(streaming?.rtmp?.started_at);
-    room.rtmp.updatedAt = convertDateNumToDate(streaming?.rtmp?.updated_at);
     room.rtmp.state = streaming?.rtmp?.state;
 
     room.recording.server = this.getPeerListSFURecording(recording);
@@ -195,7 +194,6 @@ export class RoomUpdateManager {
         startedAt: convertDateNumToDate(variant?.started_at),
         initialisedAt: convertDateNumToDate(variant?.initialised_at),
         state: variant.state,
-        updatedAt: convertDateNumToDate(variant.updated_at),
       });
     });
     return hls;
@@ -210,7 +208,6 @@ export class RoomUpdateManager {
         singleFilePerLayer: !!hlsNotification?.hls_recording?.single_file_per_layer,
         hlsVod: !!hlsNotification?.hls_recording?.hls_vod,
         startedAt: convertDateNumToDate(hlsNotification?.started_at),
-        updatedAt: convertDateNumToDate(hlsNotification?.updated_at),
         initialisedAt: convertDateNumToDate(hlsNotification?.initialised_at),
         state: hlsNotification?.state,
         error: this.toSdkError(hlsNotification?.error),
@@ -225,7 +222,6 @@ export class RoomUpdateManager {
     return {
       running,
       startedAt: convertDateNumToDate(hlsNotification?.started_at),
-      updatedAt: convertDateNumToDate(hlsNotification?.updated_at),
       initialisedAt: convertDateNumToDate(hlsNotification?.initialised_at),
       state: hlsNotification?.state,
       singleFilePerLayer: hlsNotification?.config?.single_file_per_layer,
@@ -238,7 +234,6 @@ export class RoomUpdateManager {
     return {
       running,
       startedAt: convertDateNumToDate(browserNotification?.started_at),
-      updatedAt: convertDateNumToDate(browserNotification?.updated_at),
       state: browserNotification?.state,
     };
   }
@@ -304,7 +299,6 @@ export class RoomUpdateManager {
       running,
       startedAt: running ? convertDateNumToDate(notification.started_at) : undefined,
       state: notification.state,
-      updatedAt: convertDateNumToDate(notification.updated_at),
       error: this.toSdkError(notification.error),
     };
     this.listener?.onRoomUpdate(HMSRoomUpdate.RTMP_STREAMING_STATE_UPDATED, room);
