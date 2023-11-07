@@ -458,6 +458,16 @@ export const ErrorFactory = {
       );
     },
 
+    LocalStorageAccessDenied(description = 'Join the link using a normal window if using incognito mode') {
+      return new HMSException(
+        ErrorCodes.GenericErrors.LOCAL_STORAGE_ACCESS_DENIED,
+        'LocalStorageAccessDenied',
+        HMSAction.NONE,
+        `LocalStorageAccessDenied`,
+        description,
+      );
+    },
+
     MissingMediaDevices() {
       return new HMSException(
         ErrorCodes.GenericErrors.MISSING_MEDIADEVICES,

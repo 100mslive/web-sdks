@@ -144,6 +144,7 @@ export const ErrorCodes = {
     MISSING_MEDIADEVICES: 6010,
 
     MISSING_RTCPEERCONNECTION: 6011,
+    LOCAL_STORAGE_ACCESS_DENIED: 6012,
   },
 
   PlaylistErrors: {

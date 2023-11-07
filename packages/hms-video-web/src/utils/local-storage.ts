@@ -1,6 +1,7 @@
 import { initializeLocalstoragePolyfill } from './local-storage-polyfill';
 import HMSLogger from './logger';
 import { isBrowser } from './support';
+import { ErrorFactory } from '../error/ErrorFactory';
 
 export class LocalStorage<T> {
   private storage: Storage | null = null;
@@ -18,7 +19,7 @@ export class LocalStorage<T> {
       }
       return this.storage;
     } catch (e) {
-      HMSLogger.e('Error in initialising localStorage', e);
+      HMSLogger.e('Error initialising localStorage', ErrorFactory.GenericErrors.LocalStorageAccessDenied());
       return null;
     }
   }

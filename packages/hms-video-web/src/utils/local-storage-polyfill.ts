@@ -1,5 +1,6 @@
 import HMSLogger from './logger';
 import { isBrowser } from './support';
+import { ErrorFactory } from '../error/ErrorFactory';
 
 class LocalStorage {
   valuesMap = new Map();
@@ -41,6 +42,6 @@ export const initializeLocalstoragePolyfill = () => {
       window.localStorage = new LocalStorage();
     }
   } catch (e) {
-    HMSLogger.e('Error in initialising localStorage', e);
+    HMSLogger.e('Error initialising localStorage', ErrorFactory.GenericErrors.LocalStorageAccessDenied());
   }
 };
