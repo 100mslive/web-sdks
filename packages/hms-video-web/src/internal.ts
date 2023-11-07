@@ -1,9 +1,8 @@
 import adapter from 'webrtc-adapter';
-import { initializeLocalstoragePolyfill } from './utils/local-storage-polyfill';
+import './utils/local-storage-polyfill';
 import HMSLogger from './utils/logger';
 const sdk_version = require('../package.json').version;
 
-initializeLocalstoragePolyfill();
 HMSLogger.d('adapter', `${adapter.browserDetails.browser} v${adapter.browserDetails.version}`);
 HMSLogger.d('sdk version', sdk_version);
 

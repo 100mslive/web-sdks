@@ -1193,13 +1193,7 @@ export class HMSSdk implements HMSInterface {
     }
     this.errorListener = listener;
     this.deviceChangeListener = listener;
-    try {
-      console.log('inside try ollo');
-      this.initStoreAndManagers();
-    } catch (e) {
-      console.error(e, 'ollo');
-    }
-
+    this.initStoreAndManagers();
     this.store.setErrorListener(this.errorListener);
     if (!this.store.getRoom()) {
       this.store.setRoom(new HMSRoom(roomId));
