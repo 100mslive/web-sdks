@@ -40,6 +40,6 @@ export const initializeLocalstoragePolyfill = () => {
       window.localStorage = new LocalStorage();
     }
   } catch (e) {
-    console.error(e, 'localStorage is not supported');
+    console.error(e);
   }
 };

@@ -73,12 +73,6 @@ const App = () => {
           />
         </Suspense>
       )}
-      {/* <iframe
-        title="100ms-app"
-        allow="camera *;microphone *;display-capture *"
-        src="https://dashboard-app-git-web-2337-localstorage-100mslive.vercel.app/byz-spqk-xui"
-        style={{ height: '100vh', width: '100%', border: 0 }}
-      ></iframe> */}
       {(authToken || roomCode) && (
         <HMSPrebuilt
           roomCode={roomCode}
