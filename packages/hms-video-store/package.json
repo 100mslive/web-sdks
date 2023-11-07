@@ -48,6 +48,7 @@
     "zustand": "3.5.7"
   },
   "devDependencies": {
+    "jsdom-worker": "^0.3.0",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0"
   },
