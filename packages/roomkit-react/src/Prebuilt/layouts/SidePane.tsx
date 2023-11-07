@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
@@ -6,9 +6,13 @@ import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
+// @ts-ignore: No implicit Any
+import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { CSS } from '../../Theme';
 import { ComponentWithState, RenderComponentByState } from '../RenderComponentByState';
+// @ts-ignore: No implicit Any
+import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
@@ -56,14 +60,19 @@ const SidePane = ({
   hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
-  tileProps: TileCustomisationProps;
-  hideControls: boolean;
+  tileProps?: TileCustomisationProps;
+  hideControls?: boolean;
 }) => {
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
-
+  const resetSidePane = useSidepaneReset();
+  useEffect(() => {
+    return () => {
+      resetSidePane();
+    };
+  }, [resetSidePane]);
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
     roundedVideoTile: tileProps?.rounded_video_tile,
@@ -135,6 +144,11 @@ const SidePane = ({
         <ComponentWithState state={sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS}>
           <Wrapper>
             <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />
+          </Wrapper>
+        </ComponentWithState>
+        <ComponentWithState state={sidepane === SIDE_PANE_OPTIONS.VB}>
+          <Wrapper css={{ p: '$10 $6 $10 $10' }}>
+            <VBPicker />
           </Wrapper>
         </ComponentWithState>
       </RenderComponentByState>

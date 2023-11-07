@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useState } from 'react';
 import { useDebounce, useMedia } from 'react-use';
 import {
   selectHandRaisedPeers,
@@ -96,11 +96,6 @@ export const ParticipantCount = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const toggleSidepane = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const isParticipantsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  useEffect(() => {
-    if (isParticipantsOpen && peerCount === 0) {
-      toggleSidepane();
-    }
-  }, [isParticipantsOpen, peerCount, toggleSidepane]);
 
   if (peerCount === 0) {
     return null;

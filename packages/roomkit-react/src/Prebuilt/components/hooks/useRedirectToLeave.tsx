@@ -10,14 +10,11 @@ export const useRedirectToLeave = () => {
 
   const redirect = useCallback(
     (timeout = 0) => {
-      return new Promise<void>(resolve => {
-        setTimeout(() => {
-          PictureInPicture.stop().catch(() => console.error('stopping pip'));
-          ToastManager.clearAllToast();
-          onLeave?.();
-          resolve();
-        }, timeout);
-      });
+      setTimeout(() => {
+        PictureInPicture.stop().catch(() => console.error('stopping pip'));
+        ToastManager.clearAllToast();
+        onLeave?.();
+      }, timeout);
     },
     [onLeave],
   );

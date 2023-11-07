@@ -1,5 +1,5 @@
 {
-  "version": "0.10.17",
+  "version": "0.10.19",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -41,29 +41,22 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.9.17",
+    "@100mslive/hms-video": "0.9.19",
     "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"
   },
   "devDependencies": {
+    "jsdom-worker": "^0.3.0",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0"
   },
-  "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/100mslive/hms-video-store.git"
-  },
+  "description": "@100mslive Core SDK which abstracts the complexities of webRTC while providing a reactive store for data management with a unidirectional data flow",
   "keywords": [
     "video",
     "webrtc",
     "conferencing",
     "100ms"
-  ],
-  "bugs": {
-    "url": "https://github.com/100mslive/hms-video-store/issues"
-  },
-  "homepage": "https://github.com/100mslive/hms-video-store#readme"
+  ]
 }

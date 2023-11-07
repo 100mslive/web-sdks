@@ -33,10 +33,9 @@ export const RequestPrompt = ({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} modal={false} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ p: '$10' }}>
+        <Dialog.Content css={{ p: '$10' }} onInteractOutside={e => e.preventDefault()}>
           <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>
             <Text variant="h6">{title}</Text>
           </Dialog.Title>
