@@ -1,3 +1,4 @@
+import HMSLogger from './logger';
 import { isBrowser } from './support';
 
 class LocalStorage {
@@ -40,6 +41,6 @@ export const initializeLocalstoragePolyfill = () => {
       window.localStorage = new LocalStorage();
     }
   } catch (e) {
-    console.error(e);
+    HMSLogger.e('Error in initialising localStorage', e);
   }
 };
