@@ -382,8 +382,6 @@ export class DeviceManager implements HMSDeviceManager {
       return;
     }
 
-    // only check for label because if groupId check is added it will select speaker
-    // when an external earphone without microphone is added
     const matchingLabel = this.audioOutput.find(
       device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
     );
@@ -392,10 +390,15 @@ export class DeviceManager implements HMSDeviceManager {
       return matchingLabel;
     }
 
-    const matchingGroupId = this.audioOutput.find(
-      device => device.deviceId !== 'default' && device.groupId === inputDevice.groupId,
-    );
-    if (matchingGroupId) {
+    const matchingGroupId = this.audioOutput.find(device => device.groupId === inputDevice.groupId);
+
+    // Select the device with matching group only when it is the default device
+    // if a earphone without mic is connected, the above would pick system speakers instead of the earphone
+    if (
+      matchingGroupId &&
+      this.audioOutput[0].deviceId === 'default' &&
+      matchingGroupId.groupId === this.audioOutput[0].groupId
+    ) {
       return matchingGroupId;
     }
 
