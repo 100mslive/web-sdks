@@ -19,12 +19,19 @@ export const useAutoStartStreaming = () => {
   const showStreamingUI = useShowStreamingUI();
   const hmsActions = useHMSActions();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const { isHLSRunning, isRTMPRunning, isRecordingOn } = useRecordingStreaming();
+  const { isHLSRunning, isRTMPRunning, isHLSRecordingOn, isBrowserRecordingOn } = useRecordingStreaming();
   const streamStartedRef = useRef(false);
 
   const startHLS = useCallback(async () => {
     try {
-      if (isHLSStarted || !showStreamingUI || isHLSRunning || isRTMPRunning) {
+      if (
+        isHLSStarted ||
+        !showStreamingUI ||
+        isHLSRunning ||
+        isRTMPRunning ||
+        isHLSRecordingOn ||
+        isBrowserRecordingOn
+      ) {
         return;
       }
       setHLSStarted(true);
@@ -44,7 +51,7 @@ export const useAutoStartStreaming = () => {
   }, [isHLSStarted, isHLSRunning]);
 
   useEffect(() => {
-    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming || isRecordingOn) {
+    if (!isConnected || streamStartedRef.current || !permissions?.hlsStreaming) {
       return;
     }
     // Is a streaming kit and peer with streaming permissions joins
