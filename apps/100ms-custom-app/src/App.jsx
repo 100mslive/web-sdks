@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
-import { Flex } from '@100mslive/roomkit-react';
+import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
 import {
@@ -20,7 +20,7 @@ const App = () => {
   // added subdomain in query param for easy testing in vercel links
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
-  const { isHeadless } = useOverridePrebuiltLayout();
+  const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -73,14 +73,7 @@ const App = () => {
           />
         </Suspense>
       )}
-      <iframe
-        title="100ms-app"
-        allow="camera *;microphone *;display-capture *"
-        // Vercel link goes here
-        src=""
-        style={{ height: '100vh', width: '100%', border: 0 }}
-      ></iframe>
-      {/* {(authToken || roomCode) && (
+      {(authToken || roomCode) && (
         <HMSPrebuilt
           roomCode={roomCode}
           authToken={authToken}
@@ -98,7 +91,7 @@ const App = () => {
           }}
           ref={hmsPrebuiltRef}
         />
-      )} */}
+      )}
     </Flex>
   );
 };
