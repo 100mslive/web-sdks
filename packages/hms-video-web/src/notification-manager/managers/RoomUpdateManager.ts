@@ -1,6 +1,7 @@
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
 import {
+  HLSVariant,
   HMSBrowserRecording,
   HMSHLS,
   HMSHLSRecording,
@@ -136,6 +137,27 @@ export class RoomUpdateManager {
     return ![HMSStreamingState.NONE, HMSStreamingState.STOPPED, HMSStreamingState.FAILED].includes(state);
   }
 
+  private initHLS(notification?: HLSNotification): HMSHLS {
+    const room = this.store.getRoom();
+    const hls: HMSHLS = {
+      running: true,
+      variants: [],
+    };
+    if (!room) {
+      HMSLogger.w(this.TAG, 'on hls - room not present');
+      return hls;
+    }
+    if (!notification?.variants) {
+      return hls;
+    }
+    notification.variants.forEach((_: HLSVariant, index: number) => {
+      hls.variants.push({
+        initialisedAt: convertDateNumToDate(notification?.variants?.[index].initialised_at),
+        url: '',
+      });
+    });
+    return hls;
+  }
   private updateHLSStatus(notification: HLSNotification) {
     const room = this.store.getRoom();
     const running =
@@ -146,31 +168,36 @@ export class RoomUpdateManager {
       HMSLogger.w(this.TAG, 'on hls - room not present');
       return;
     }
-
     notification.enabled = running;
     room.hls = this.convertHls(notification);
     this.listener?.onRoomUpdate(HMSRoomUpdate.HLS_STREAMING_STATE_UPDATED, room);
   }
 
   private convertHls(hlsNotification?: HLSNotification) {
+    const isInitialised =
+      hlsNotification?.variants && hlsNotification.variants.length > 0
+        ? hlsNotification.variants[0].state === HMSStreamingState.INITIALISED
+        : false;
+    if (isInitialised) {
+      return this.initHLS(hlsNotification);
+    }
     const hls: HMSHLS = {
       running: !!hlsNotification?.enabled,
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
-    if (hlsNotification?.enabled) {
-      hlsNotification?.variants?.forEach(variant => {
-        hls.variants.push({
-          meetingURL: variant?.meeting_url,
-          url: variant?.url,
-          metadata: variant?.metadata,
-          startedAt: convertDateNumToDate(variant?.started_at),
-          initialisedAt: convertDateNumToDate(variant?.initialised_at),
-          state: variant.state,
-          updatedAt: convertDateNumToDate(variant.updated_at),
-        });
+    // handling for initialized state
+    hlsNotification?.variants?.forEach(variant => {
+      hls.variants.push({
+        meetingURL: variant?.meeting_url,
+        url: variant?.url,
+        metadata: variant?.metadata,
+        startedAt: convertDateNumToDate(variant?.started_at),
+        initialisedAt: convertDateNumToDate(variant?.initialised_at),
+        state: variant.state,
+        updatedAt: convertDateNumToDate(variant.updated_at),
       });
-    }
+    });
     return hls;
   }
 

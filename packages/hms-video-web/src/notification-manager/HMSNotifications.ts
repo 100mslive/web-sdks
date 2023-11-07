@@ -43,7 +43,7 @@ export interface Info {
 
 export enum HMSRecordingState {
   NONE = 'none',
-  INITIALISED = 'initialized',
+  INITIALISED = 'initialised',
   STARTED = 'started',
   PAUSED = 'paused',
   RESUMED = 'resumed',
@@ -53,7 +53,7 @@ export enum HMSRecordingState {
 
 export enum HMSStreamingState {
   NONE = 'none',
-  INITIALISED = 'initialized',
+  INITIALISED = 'initialised',
   STARTED = 'started',
   STOPPED = 'stopped',
   FAILED = 'failed',
