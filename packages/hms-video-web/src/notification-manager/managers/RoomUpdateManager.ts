@@ -177,6 +177,7 @@ export class RoomUpdateManager {
       hlsNotification?.variants && hlsNotification.variants.length > 0
         ? hlsNotification.variants[0].state === HMSStreamingState.INITIALISED
         : false;
+    // handling for initialized state
     if (isInitialised) {
       return this.initHLS(hlsNotification);
     }
@@ -185,7 +186,6 @@ export class RoomUpdateManager {
       variants: [],
       error: this.toSdkError(hlsNotification?.error),
     };
-    // handling for initialized state
     hlsNotification?.variants?.forEach(variant => {
       hls.variants.push({
         meetingURL: variant?.meeting_url,

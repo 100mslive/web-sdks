@@ -282,6 +282,7 @@ export interface MetadataChangeNotification {
     updated_by?: string;
     data: any;
     key: string;
+    updated_at?: number;
   }[];
 }
 
