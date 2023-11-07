@@ -115,20 +115,17 @@ export interface RoomState {
   recording?: {
     sfu: {
       started_at?: number;
-      updated_at?: number;
       enabled: boolean;
       state?: HMSRecordingState;
     };
     browser: {
       started_at?: number;
-      updated_at?: number;
       enabled: boolean;
       state?: HMSRecordingState;
     };
     hls: {
       initialised_at?: number;
       started_at?: number;
-      updated_at?: number;
       enabled: boolean;
       state?: HMSRecordingState;
       config?: {
@@ -139,7 +136,7 @@ export interface RoomState {
   };
   streaming?: {
     enabled: boolean;
-    rtmp: { enabled: boolean; started_at?: number; updated_at?: number; state?: HMSStreamingState };
+    rtmp: { enabled: boolean; started_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
 }
@@ -245,8 +242,6 @@ export interface RecordingNotification {
   type: RecordingNotificationType;
   initialised_at?: number; // only used for type hls
   started_at?: number;
-  updated_at?: number;
-  stopped_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
   state?: HMSRecordingState;
@@ -257,8 +252,6 @@ export interface RTMPNotification {
   peer?: PeerNotificationInfo;
   error?: ServerError;
   started_at?: number;
-  updated_at?: number;
-  stopped_at?: number;
   state?: HMSStreamingState;
 }
 
@@ -280,8 +273,6 @@ export interface HLSVariantInfo {
   metadata?: string;
   started_at?: number;
   initialised_at?: number;
-  updated_at?: number;
-  stopped_at?: number;
   state?: HMSStreamingState;
 }
 
@@ -291,7 +282,6 @@ export interface MetadataChangeNotification {
     updated_by?: string;
     data: any;
     key: string;
-    updated_at?: number;
   }[];
 }
 
