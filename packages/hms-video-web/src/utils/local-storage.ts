@@ -10,11 +10,16 @@ export class LocalStorage<T> {
    * localstorage is not available in SSR, so get it only at time of use
    */
   getStorage() {
-    if (isBrowser && !this.storage) {
-      initializeLocalstoragePolyfill();
-      this.storage = window.localStorage;
+    try {
+      if (isBrowser && !this.storage) {
+        initializeLocalstoragePolyfill();
+        this.storage = window.localStorage;
+      }
+      return this.storage;
+    } catch (e) {
+      console.error(e);
+      return null;
     }
-    return this.storage;
   }
 
   get(): T | undefined {

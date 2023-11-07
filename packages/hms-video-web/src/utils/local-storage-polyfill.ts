@@ -35,8 +35,11 @@ class LocalStorage {
 }
 
 export const initializeLocalstoragePolyfill = () => {
-  console.log('initializeLocalstoragePolyfill', isBrowser, localStorage);
-  if (isBrowser && !localStorage) {
-    window.localStorage = new LocalStorage();
+  try {
+    if (isBrowser && !localStorage) {
+      window.localStorage = new LocalStorage();
+    }
+  } catch (e) {
+    console.error(e, 'localStorage is not supported');
   }
 };
