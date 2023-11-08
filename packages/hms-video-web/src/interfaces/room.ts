@@ -1,6 +1,24 @@
 import { ServerError } from './internal';
 import { HMSException } from '../error/HMSException';
 
+export enum HMSRecordingState {
+  NONE = 'none',
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  PAUSED = 'paused',
+  RESUMED = 'resumed',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+
+export enum HMSStreamingState {
+  NONE = 'none',
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+
 export interface HMSRoom {
   id: string;
   name?: string;
@@ -18,22 +36,30 @@ export interface HMSRoom {
 }
 
 export interface HMSRecording {
-  browser: {
-    running: boolean;
-    startedAt?: Date;
-    error?: HMSException;
-  };
-  server: {
-    running: boolean;
-    startedAt?: Date;
-    error?: HMSException;
-  };
+  browser: HMSBrowserRecording;
+  server: HMSSFURecording;
   hls: HMSHLSRecording;
+}
+
+export interface HMSBrowserRecording {
+  running: boolean;
+  startedAt?: Date;
+  state?: HMSRecordingState;
+  error?: HMSException;
+}
+
+export interface HMSSFURecording {
+  running: boolean;
+  startedAt?: Date;
+  state?: HMSRecordingState;
+  error?: HMSException;
 }
 
 export interface HMSHLSRecording {
   running: boolean;
+  initialisedAt?: Date;
   startedAt?: Date;
+  state?: HMSRecordingState;
   error?: ServerError;
   /**
    * if the final output is one file or one file per hls layer
@@ -51,6 +77,7 @@ export interface HMSRTMP {
    * @alpha
    **/
   startedAt?: Date;
+  state?: HMSStreamingState;
   error?: HMSException;
 }
 
@@ -66,4 +93,5 @@ export interface HLSVariant {
   metadata?: string;
   startedAt?: Date;
   initialisedAt?: Date;
+  state?: HMSStreamingState;
 }
