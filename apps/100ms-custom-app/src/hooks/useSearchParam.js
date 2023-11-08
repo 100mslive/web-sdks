@@ -3,5 +3,5 @@ export function useSearchParam(param) {
     return '';
   }
   const url = new URL(window.location.href);
-  return url.searchParams.get(param);
+  return url.searchParams.get(param) || undefined;
 }

@@ -1,5 +1,5 @@
 {
-  "version": "0.10.19",
+  "version": "0.10.20-alpha.0",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
@@ -41,13 +41,14 @@
   "author": "100ms",
   "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.9.19",
+    "@100mslive/hms-video": "0.9.20-alpha.0",
     "eventemitter2": "^6.4.7",
     "immer": "^9.0.6",
     "reselect": "4.0.0",
     "zustand": "3.5.7"
   },
   "devDependencies": {
+    "jsdom-worker": "^0.3.0",
     "ts-node": "^10.4.0",
     "tslib": "^2.2.0"
   },

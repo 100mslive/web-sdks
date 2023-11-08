@@ -6,7 +6,7 @@ import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
-import { sleep } from '../../utils/timer-utils';
+import { workerSleep } from '../../utils/timer-utils';
 import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;
@@ -216,7 +216,7 @@ export class HMSVideoPluginsManager {
       return;
     }
     while (this.pluginsLoopState === 'paused') {
-      await sleep(100);
+      await workerSleep(100);
     }
   }
 
@@ -288,7 +288,7 @@ export class HMSVideoPluginsManager {
           this.resetCanvases();
         }
         this.pluginsLoopState = 'paused';
-        await sleep(sleepTimeMs);
+        await workerSleep(sleepTimeMs);
         continue;
       }
       let processingTime = 0;
@@ -306,7 +306,7 @@ export class HMSVideoPluginsManager {
       }
       this.pluginsLoopState = 'running';
       // take into account processing time to decide time to wait for the next loop
-      await sleep(sleepTimeMs - processingTime);
+      await workerSleep(sleepTimeMs - processingTime);
     }
   }
 
