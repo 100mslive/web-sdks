@@ -458,7 +458,7 @@ export const ErrorFactory = {
       );
     },
 
-    LocalStorageAccessDenied(description = 'Join the link using a normal window if using incognito mode') {
+    LocalStorageAccessDenied(description = 'Access to localStorage has been denied') {
       return new HMSException(
         ErrorCodes.GenericErrors.LOCAL_STORAGE_ACCESS_DENIED,
         'LocalStorageAccessDenied',
