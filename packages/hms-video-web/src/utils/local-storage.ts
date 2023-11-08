@@ -1,5 +1,7 @@
 import { initializeLocalstoragePolyfill } from './local-storage-polyfill';
+import HMSLogger from './logger';
 import { isBrowser } from './support';
+import { ErrorFactory } from '../error/ErrorFactory';
 
 export class LocalStorage<T> {
   private storage: Storage | null = null;
@@ -10,11 +12,16 @@ export class LocalStorage<T> {
    * localstorage is not available in SSR, so get it only at time of use
    */
   getStorage() {
-    if (isBrowser && !this.storage) {
-      initializeLocalstoragePolyfill();
-      this.storage = window.localStorage;
+    try {
+      if (isBrowser && !this.storage) {
+        initializeLocalstoragePolyfill();
+        this.storage = window.localStorage;
+      }
+      return this.storage;
+    } catch (e) {
+      HMSLogger.e('Error initialising localStorage', ErrorFactory.GenericErrors.LocalStorageAccessDenied());
+      return null;
     }
-    return this.storage;
   }
 
   get(): T | undefined {
