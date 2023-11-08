@@ -97,7 +97,7 @@ export function CreateQuestions() {
           </Text>
         </Flex>
         <Flex css={{ w: '100%' }} justify="end">
-          <Button disabled={!isValidPoll} onClick={launchPoll}>
+          <Button disabled={!isValidPoll} onClick={launchPoll} css={{ fontWeight: '$semiBold' }}>
             Launch {interaction.type}
           </Button>
         </Flex>

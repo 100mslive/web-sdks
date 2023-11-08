@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   selectLocalPeerRoleName,
   selectPermissions,
@@ -65,6 +65,7 @@ function InteractionSelectionCard({ title, icon, active, onClick }) {
 
 const AddMenu = () => {
   const actions = useHMSActions();
+  const inputRef = useRef(null);
   const [title, setTitle] = useState('');
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const [anonymous, setAnonymous] = useState(false);
@@ -104,37 +105,45 @@ const AddMenu = () => {
         <InteractionSelectionCard
           title={INTERACTION_TYPE.POLL}
           icon={<StatsIcon width={32} height={32} />}
-          onClick={() => setInteractionType(INTERACTION_TYPE.POLL)}
+          onClick={() => {
+            setInteractionType(INTERACTION_TYPE.POLL);
+            inputRef.current?.focus();
+          }}
           active={interactionType === INTERACTION_TYPE.POLL}
         />
         <InteractionSelectionCard
           title={INTERACTION_TYPE.QUIZ}
           icon={<QuestionIcon width={32} height={32} />}
-          onClick={() => setInteractionType(INTERACTION_TYPE.QUIZ)}
+          onClick={() => {
+            setInteractionType(INTERACTION_TYPE.QUIZ);
+            inputRef.current?.focus();
+          }}
           active={interactionType === INTERACTION_TYPE.QUIZ}
         />
       </Flex>
       <Flex direction="column">
         <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
+          ref={inputRef}
           type="text"
           value={title}
+          autoFocus
           onChange={event => setTitle(event.target.value)}
           css={{
             backgroundColor: '$surface_bright',
             border: '1px solid $border_default',
           }}
         />
-        <Flex align="center" css={{ mt: '$10' }}>
+        <Flex direction="rowReverse" align="center" justify="between" css={{ mt: '$10', w: '100%' }}>
           <Switch onCheckedChange={value => setHideVoteCount(value)} css={{ mr: '$6' }} />
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
-            Hide Vote Count
+            Hide vote count
           </Text>
         </Flex>
-        <Flex align="center" css={{ mt: '$10' }}>
+        <Flex direction="rowReverse" align="center" justify="between" css={{ mt: '$10', w: '100%' }}>
           <Switch onCheckedChange={value => setAnonymous(value)} css={{ mr: '$6' }} />
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
-            Make Results Anonymous
+            Make results anonymous
           </Text>
         </Flex>
         {/* <Timer
@@ -163,7 +172,7 @@ const AddMenu = () => {
               .catch(err => setError(err.message));
           }}
         >
-          Create {interactionType}
+          Add Questions
         </Button>
         <ErrorText error={error || titleError} />
       </Flex>

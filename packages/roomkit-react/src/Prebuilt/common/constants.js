@@ -118,7 +118,7 @@ export const INTERACTION_TYPE = {
 export const QUESTION_TYPE_TITLE = {
   'single-choice': 'Single Choice',
   'multiple-choice': 'Multiple Choice',
-  // "short-answer": "Short Answer",
+  // 'short-answer': 'Short Answer',
   // "long-answer": "Long Answer",
 };
 

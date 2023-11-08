@@ -86,10 +86,11 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handle
                 <RadioGroup.Item
                   css={{
                     background: 'none',
-                    w: '$9',
                     border: '2px solid',
                     borderColor: '$on_surface_high',
                     display: 'flex',
+                    w: '$8',
+                    flexShrink: '0',
                     justifyContent: 'center',
                     alignItems: 'center',
                     cursor: 'pointer',

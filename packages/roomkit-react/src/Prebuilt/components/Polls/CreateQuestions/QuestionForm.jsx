@@ -1,7 +1,8 @@
 // @ts-check
 import React, { useCallback, useRef, useState } from 'react';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
-import { Box, Button, Dropdown, Flex, Input, Switch, Text, Tooltip } from '../../../../';
+import { Button, Dropdown, Flex, Input, Switch, Text, Tooltip } from '../../../../';
+import IconButton from '../../../IconButton';
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
 import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { useDropdownSelection } from '../../hooks/useDropdownSelection';
@@ -10,10 +11,13 @@ import { MultipleChoiceOptionInputs } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptionInputs } from '../common/SingleChoiceOptions';
 import { QUESTION_TYPE, QUESTION_TYPE_TITLE } from '../../../common/constants';
 
+const Line = () => <Flex css={{ w: '100%', borderBottom: '1px solid $border_bright', h: '1px', my: '$8' }} />;
+
 export const QuestionForm = ({ question, index, length, onSave, removeQuestion, isQuiz }) => {
   const ref = useRef(null);
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
+  // const inputRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(question.type || QUESTION_TYPE.SINGLE_CHOICE);
   const [text, setText] = useState(question.text);
@@ -121,13 +125,21 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           backgroundColor: '$surface_bright',
           border: '1px solid $border_bright',
         }}
+        autoFocus
         type="text"
         value={text}
         onChange={event => setText(event.target.value)}
       />
+
+      <Line />
+
+      {/* {type === QUESTION_TYPE.SHORT_ANSWER && isQuiz ? (
+        <Input ref={inputRef} placeholder="Enter the answer" onBlur={e => acceptTextAnswer(inputRef.current?.value)} />
+      ) : null} */}
+
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
-          <Text variant="body2" css={{ my: '$6', c: '$on_surface_medium' }}>
+          <Text variant="body2" css={{ mb: '$6', c: '$on_surface_medium' }}>
             Options
           </Text>
 
@@ -181,27 +193,22 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
               </Text>
             </Flex>
           )}
-          {isQuiz ? (
-            <Flex css={{ mt: '$md', gap: '$6' }}>
-              <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
-              <Text variant="sm" css={{ color: '$on_surface_medium' }}>
-                Not required to answer
-              </Text>
-            </Flex>
-          ) : null}
+
+          <Line />
+
+          <Flex justify="between" css={{ gap: '$6', w: '100%' }}>
+            <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+              Allow to skip
+            </Text>
+            <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
+          </Flex>
         </>
       ) : null}
 
-      <Flex justify="between" align="center" css={{ mt: '$12' }}>
-        <Box
-          css={{
-            color: '$on_surface_medium',
-            cursor: 'pointer',
-            '&:hover': { color: '$on_surface_high' },
-          }}
-        >
-          <TrashIcon onClick={() => setOpenDelete(!open)} />
-        </Box>
+      <Flex justify="end" align="center" css={{ mt: '$12', w: '100%', gap: '$4' }}>
+        <IconButton css={{ background: 'none' }} onClick={() => setOpenDelete(!open)}>
+          <TrashIcon />
+        </IconButton>
         <Tooltip
           disabled={isValid}
           title={
