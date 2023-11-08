@@ -21,6 +21,7 @@ const App = () => {
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const paramUserName = useSearchParam('name');
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -81,7 +82,7 @@ const App = () => {
           role={role}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
-            userName: isHeadless ? 'Beam' : undefined,
+            userName: isHeadless ? 'Beam' : paramUserName,
             endpoints: {
               tokenByRoomCode:
                 process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
