@@ -6,12 +6,19 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore
+import { isMobileUserAgent } from '../common/utils';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isLandscape = useMedia(cssConfig.media.ls);
 
   useEffect(() => {
+    if (!isMobileUserAgent) {
+      setShowMwebLandscapePrompt(false);
+      return;
+    }
+
     if (!window.screen?.orientation) {
       setShowMwebLandscapePrompt(isLandscape);
       return;
