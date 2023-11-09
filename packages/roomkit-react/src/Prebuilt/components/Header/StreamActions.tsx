@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { HMSRecordingState } from '@100mslive/hms-video';
 import {
   HMSRoomState,
   selectHLSState,
   selectIsConnectedToRoom,
   selectPermissions,
+  selectRecordingState,
   selectRoomState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, CrossIcon, PauseCircleIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 // @ts-ignore
@@ -38,6 +40,8 @@ export const LiveStatus = () => {
       const timeStamp = hlsState?.variants[0]?.[screenType === 'hls_live_streaming' ? 'startedAt' : 'initialisedAt'];
       if (hlsState?.running && timeStamp) {
         setLiveTime(Date.now() - timeStamp.getTime());
+      } else {
+        setLiveTime(0);
       }
     }, 1000);
   }, [hlsState?.running, hlsState?.variants]);
@@ -114,6 +118,32 @@ export const RecordingStatus = () => {
       </Flex>
     </Tooltip>
   );
+};
+
+export const RecordingPauseStatus = () => {
+  const recording = useHMSStore(selectRecordingState);
+  if (recording.hls && recording.hls.state === HMSRecordingState.PAUSED) {
+    return (
+      <Tooltip
+        boxCss={{ zIndex: 1 }}
+        title={getRecordingText({
+          isBrowserRecordingOn: false,
+          isServerRecordingOn: false,
+          isHLSRecordingOn: true,
+        })}
+      >
+        <Flex
+          css={{
+            color: '$on_surface_high',
+            alignItems: 'center',
+          }}
+        >
+          <PauseCircleIcon width={24} height={24} />
+        </Flex>
+      </Tooltip>
+    );
+  }
+  return null;
 };
 
 const StartRecording = () => {
@@ -216,6 +246,7 @@ export const StreamActions = () => {
       <AdditionalRoomState />
       {!isMobile && (
         <Flex align="center" css={{ gap: '$4' }}>
+          <RecordingPauseStatus />
           <RecordingStatus />
           {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
         </Flex>
