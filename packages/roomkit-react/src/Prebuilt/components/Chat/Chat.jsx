@@ -92,7 +92,10 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         </Box>
         {permissions.removeOthers && (
           <Flex
-            onClick={() => clearPinnedMessage(pinnedMessageIndex)}
+            onClick={() => {
+              clearPinnedMessage(pinnedMessageIndex);
+              setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
+            }}
             css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
           >
             <CrossIcon />
