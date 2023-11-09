@@ -15,7 +15,7 @@ import HMSLogger from '../../utils/logger';
 import { PromiseCallbacks } from '../../utils/promise';
 import { Queue } from '../../utils/queue';
 import { isPageHidden } from '../../utils/support';
-import { sleep } from '../../utils/timer-utils';
+import { workerSleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
@@ -601,7 +601,7 @@ export default class JsonRpcSignal implements ISignal {
         }
 
         const delay = (2 + Math.random() * 2) * 1000;
-        await sleep(delay);
+        await workerSleep(delay);
       }
     }
     HMSLogger.e(`Sending ${method} over WS failed after ${Math.min(retry, MAX_RETRIES)} retries`, {
