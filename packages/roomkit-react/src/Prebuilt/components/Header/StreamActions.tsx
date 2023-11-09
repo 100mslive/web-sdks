@@ -1,16 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { HMSRecordingState } from '@100mslive/hms-video';
 import {
   HMSRoomState,
   selectHLSState,
   selectIsConnectedToRoom,
   selectPermissions,
+  selectRecordingState,
   selectRoomState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-import { AlertTriangleIcon, CrossIcon, RecordIcon } from '@100mslive/react-icons';
+import { AlertTriangleIcon, CrossIcon, PauseCircleIcon, RecordIcon } from '@100mslive/react-icons';
 import { Box, Button, config as cssConfig, Flex, HorizontalDivider, Loading, Popover, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 // @ts-ignore
@@ -72,7 +74,7 @@ export const LiveStatus = () => {
       <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
       <Flex align="center" gap="2">
         <Text variant={!isMobile ? 'button' : 'body2'}>LIVE</Text>
-        <Text variant="caption">{hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}</Text>
+        <Text variant="caption">{hlsState?.variants?.length > 0 && isHLSRunning ? formatTime(liveTime) : ''}</Text>
       </Flex>
     </Flex>
   );
@@ -114,6 +116,32 @@ export const RecordingStatus = () => {
       </Flex>
     </Tooltip>
   );
+};
+
+export const RecordingPauseStatus = () => {
+  const recording = useHMSStore(selectRecordingState);
+  if (recording.hls && recording.hls.state === HMSRecordingState.PAUSED) {
+    return (
+      <Tooltip
+        boxCss={{ zIndex: 1 }}
+        title={getRecordingText({
+          isBrowserRecordingOn: false,
+          isServerRecordingOn: false,
+          isHLSRecordingOn: true,
+        })}
+      >
+        <Flex
+          css={{
+            color: '$on_surface_high',
+            alignItems: 'center',
+          }}
+        >
+          <PauseCircleIcon width={24} height={24} />
+        </Flex>
+      </Tooltip>
+    );
+  }
+  return null;
 };
 
 const StartRecording = () => {
@@ -216,6 +244,7 @@ export const StreamActions = () => {
       <AdditionalRoomState />
       {!isMobile && (
         <Flex align="center" css={{ gap: '$4' }}>
+          <RecordingPauseStatus />
           <RecordingStatus />
           {roomState !== HMSRoomState.Preview ? <LiveStatus /> : null}
         </Flex>

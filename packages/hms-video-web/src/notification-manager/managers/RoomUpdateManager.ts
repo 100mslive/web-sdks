@@ -202,7 +202,7 @@ export class RoomUpdateManager {
   private getHLSRecording(hlsNotification?: RecordingNotification): HMSHLSRecording {
     let hlsRecording: HMSHLSRecording = { running: false };
     const running = this.isRecordingRunning(hlsNotification?.state);
-    if (running) {
+    if (running || hlsNotification?.state === HMSRecordingState.PAUSED) {
       hlsRecording = {
         running,
         singleFilePerLayer: !!hlsNotification?.hls_recording?.single_file_per_layer,
