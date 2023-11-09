@@ -23,7 +23,7 @@ import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
 
 const formatTime = date => {
@@ -314,7 +314,7 @@ const ChatMessage = React.memo(
 );
 const ChatList = React.forwardRef(
   ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
-    const { setPinnedMessage } = useSetPinnedMessage();
+    const { setPinnedMessages } = useSetPinnedMessages();
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
         scrollToBottom(1);
@@ -343,7 +343,7 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            onPin={() => setPinnedMessage(messages[index])}
+            onPin={() => setPinnedMessages(messages[index])}
           />
         )}
       </VariableSizeList>

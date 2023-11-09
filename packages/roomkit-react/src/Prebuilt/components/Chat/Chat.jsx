@@ -10,7 +10,7 @@ import {
   useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -19,7 +19,7 @@ import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
@@ -27,41 +27,78 @@ const PINNED_MESSAGE_LENGTH = 80;
 
 const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
-  const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+  const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
+
   const formattedPinnedMessage =
-    pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
-      ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
-      : pinnedMessage;
+    pinnedMessages?.[pinnedMessageIndex]?.length && pinnedMessages?.[pinnedMessageIndex].length > PINNED_MESSAGE_LENGTH
+      ? `${pinnedMessages?.[pinnedMessageIndex].slice(0, PINNED_MESSAGE_LENGTH)}...`
+      : pinnedMessages?.[pinnedMessageIndex];
 
-  return pinnedMessage ? (
-    <Flex
-      title={pinnedMessage}
-      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8', mt: '$8' }}
-      align="center"
-      justify="between"
-    >
-      <PinIcon />
-
-      <Box
-        css={{
-          color: '$on_surface_medium',
-          w: '100%',
-          maxHeight: '$18',
-          overflowY: 'auto',
-        }}
-      >
-        <Text variant="sm">
-          <AnnotisedMessage message={formattedPinnedMessage} />
-        </Text>
-      </Box>
-      {permissions.removeOthers && (
-        <Flex
-          onClick={() => clearPinnedMessage()}
-          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-        >
-          <CrossIcon />
+  return pinnedMessages?.[pinnedMessageIndex] ? (
+    <Flex align="center" css={{ w: '100%', gap: '$4' }}>
+      {pinnedMessages.length > 1 ? (
+        <Flex direction="column" css={{ gap: '$4' }}>
+          <Flex
+            onClick={() => setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0))}
+            css={
+              pinnedMessageIndex === 0
+                ? { cursor: 'not-allowed', color: '$on_surface_low' }
+                : { cursor: 'pointer', color: '$on_surface_medium' }
+            }
+          >
+            <ChevronUpIcon height={20} width={20} />
+          </Flex>
+          <Flex
+            onClick={() => setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1))}
+            css={
+              pinnedMessageIndex === pinnedMessages.length - 1
+                ? { cursor: 'not-allowed', color: '$on_surface_low' }
+                : { cursor: 'pointer', color: '$on_surface_medium' }
+            }
+          >
+            <ChevronDownIcon height={20} width={20} />
+          </Flex>
         </Flex>
-      )}
+      ) : null}
+      <Flex
+        title={pinnedMessages?.[pinnedMessageIndex]}
+        css={{
+          p: '$4',
+          color: '$on_surface_medium',
+          bg: '$surface_default',
+          r: '$1',
+          gap: '$4',
+          mb: '$8',
+          mt: '$8',
+          flexGrow: 1,
+        }}
+        align="center"
+        justify="between"
+      >
+        <PinIcon />
+
+        <Box
+          css={{
+            color: '$on_surface_medium',
+            w: '100%',
+            maxHeight: '$18',
+            overflowY: 'auto',
+          }}
+        >
+          <Text variant="sm">
+            <AnnotisedMessage message={formattedPinnedMessage} />
+          </Text>
+        </Box>
+        {permissions.removeOthers && (
+          <Flex
+            onClick={() => clearPinnedMessage(pinnedMessageIndex)}
+            css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+          >
+            <CrossIcon />
+          </Flex>
+        )}
+      </Flex>
     </Flex>
   ) : null;
 };
@@ -79,7 +116,7 @@ export const Chat = ({ screenType }) => {
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
-  const { setPinnedMessage } = useSetPinnedMessage();
+  const { removePinnedMessage } = useSetPinnedMessages();
 
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
@@ -125,7 +162,9 @@ export const Chat = ({ screenType }) => {
       }}
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
-        <>{elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}</>
+        <>
+          {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={removePinnedMessage} /> : null}
+        </>
       )}
 
       <ChatBody
