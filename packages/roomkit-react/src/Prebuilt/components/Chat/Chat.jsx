@@ -10,13 +10,14 @@ import {
   useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
+import { PinnedMessageNavigation } from './PinnedMessageNavigation';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
@@ -29,44 +30,64 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   const permissions = useHMSStore(selectPermissions);
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
+  const isMobile = useMedia(cssConfig.media.md);
 
   const formattedPinnedMessage =
     pinnedMessages?.[pinnedMessageIndex]?.length && pinnedMessages?.[pinnedMessageIndex].length > PINNED_MESSAGE_LENGTH
       ? `${pinnedMessages?.[pinnedMessageIndex].slice(0, PINNED_MESSAGE_LENGTH)}...`
       : pinnedMessages?.[pinnedMessageIndex];
 
+  const pinnedMessageRef = useRef(null);
+
+  const handleTouchStart = e => {
+    // Store the initial touch position
+    pinnedMessageRef.current.startY = e.touches[0].clientY;
+  };
+
+  const showPreviousPinnedMessage = useCallback(
+    () => setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0)),
+    [],
+  );
+
+  const showNextPinnedMessage = useCallback(
+    () => setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1)),
+    [pinnedMessages],
+  );
+
+  const handleTouchMove = e => {
+    if (pinnedMessageRef.current.startY) {
+      const currentY = e.touches[0].clientY;
+      const deltaY = currentY - pinnedMessageRef.current.startY;
+      if (deltaY > 50) {
+        showPreviousPinnedMessage();
+      } else if (deltaY < -50) {
+        showNextPinnedMessage();
+      }
+      pinnedMessageRef.current.startY = null;
+    }
+  };
+
   return pinnedMessages?.[pinnedMessageIndex] ? (
-    <Flex align="center" css={{ w: '100%', gap: '$4' }}>
-      {pinnedMessages.length > 1 ? (
-        <Flex direction="column" css={{ gap: '$4' }}>
-          <Flex
-            onClick={() => setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0))}
-            css={
-              pinnedMessageIndex === 0
-                ? { cursor: 'not-allowed', color: '$on_surface_low' }
-                : { cursor: 'pointer', color: '$on_surface_medium' }
-            }
-          >
-            <ChevronUpIcon height={20} width={20} />
-          </Flex>
-          <Flex
-            onClick={() => setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1))}
-            css={
-              pinnedMessageIndex === pinnedMessages.length - 1
-                ? { cursor: 'not-allowed', color: '$on_surface_low' }
-                : { cursor: 'pointer', color: '$on_surface_medium' }
-            }
-          >
-            <ChevronDownIcon height={20} width={20} />
-          </Flex>
-        </Flex>
-      ) : null}
+    <Flex
+      ref={pinnedMessageRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      align="center"
+      css={{ w: '100%', gap: '$4' }}
+    >
+      <PinnedMessageNavigation
+        pinnedMessageIndex={pinnedMessageIndex}
+        pinnedMessages={pinnedMessages}
+        showPreviousPinnedMessage={showPreviousPinnedMessage}
+        showNextPinnedMessage={showNextPinnedMessage}
+        isMobile={isMobile}
+      />
       <Flex
         title={pinnedMessages?.[pinnedMessageIndex]}
         css={{
           p: '$4',
           color: '$on_surface_medium',
-          bg: '$surface_default',
+          bg: isMobile ? 'rgba(0, 0, 0, 0.64)' : '$surface_default',
           r: '$1',
           gap: '$4',
           mb: '$8',
@@ -177,6 +198,11 @@ export const Chat = ({ screenType }) => {
         scrollToBottom={scrollToBottom}
         screenType={screenType}
       />
+
+      {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
+        <PinnedMessage clearPinnedMessage={removePinnedMessage} />
+      ) : null}
+
       <ChatFooter
         role={chatOptions.role}
         onSend={() => scrollToBottom(1)}
