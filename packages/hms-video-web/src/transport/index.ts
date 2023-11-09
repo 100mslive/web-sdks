@@ -39,6 +39,7 @@ import {
   HLSTimedMetadataParams,
   HLSVariant,
   JoinLeaveGroupResponse,
+  ListenMetadataChangeParams,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
   PeersIterationResponse,
@@ -696,8 +697,8 @@ export default class HMSTransport implements ITransport {
     return this.signal.setSessionMetadata(params);
   }
 
-  listenMetadataChange(keys: string[]): Promise<void> {
-    return this.signal.listenMetadataChange(keys);
+  listenMetadataChange(params: ListenMetadataChangeParams): Promise<void> {
+    return this.signal.listenMetadataChange(params);
   }
 
   setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse> {

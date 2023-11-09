@@ -25,6 +25,7 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
+  ListenMetadataChangeParams,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
   PeersIterationResponse,
@@ -405,14 +406,14 @@ export default class JsonRpcSignal implements ISignal {
     return this.call<SetSessionMetadataResponse>(HMSSignalMethod.SET_METADATA, { ...params });
   }
 
-  listenMetadataChange(keys: string[]): Promise<void> {
+  listenMetadataChange(params: ListenMetadataChangeParams): Promise<void> {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
         HMSAction.RECONNECT_SIGNAL,
         'Failed to observe session store key due to network disconnection',
       );
     }
-    return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, { keys });
+    return this.call(HMSSignalMethod.LISTEN_METADATA_CHANGE, params);
   }
 
   getSessionMetadata(key?: string) {

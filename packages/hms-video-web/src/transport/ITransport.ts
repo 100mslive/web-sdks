@@ -4,6 +4,7 @@ import {
   findPeersRequestParams,
   GetSessionMetadataResponse,
   JoinLeaveGroupResponse,
+  ListenMetadataChangeParams,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
   PeersIterationResponse,
@@ -58,7 +59,7 @@ export default interface ITransport {
 
   setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
 
-  listenMetadataChange(keys: string[]): Promise<void>;
+  listenMetadataChange(params: ListenMetadataChangeParams): Promise<void>;
 
   changeTrackState(trackUpdateRequest: TrackUpdateRequestParams): Promise<void>;
 

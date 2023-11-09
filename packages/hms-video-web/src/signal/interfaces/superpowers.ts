@@ -63,6 +63,11 @@ export interface SetSessionMetadataParams {
   if_change_version?: number;
 }
 
+export interface ListenMetadataChangeParams {
+  keys?: string[];
+  match?: string[];
+}
+
 export interface HLSRequestParams {
   variants?: Array<HLSVariant>;
   hls_recording?: {

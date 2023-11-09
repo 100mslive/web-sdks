@@ -6,6 +6,7 @@ import {
   HLSRequestParams,
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
+  ListenMetadataChangeParams,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
   PeersIterationResponse,
@@ -104,7 +105,7 @@ export interface ISignal extends IAnalyticsTransportProvider {
 
   setSessionMetadata(params: SetSessionMetadataParams): Promise<SetSessionMetadataResponse>;
 
-  listenMetadataChange(keys: string[]): Promise<void>;
+  listenMetadataChange(params: ListenMetadataChangeParams): Promise<void>;
 
   close(): Promise<void>;
 

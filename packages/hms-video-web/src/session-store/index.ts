@@ -25,7 +25,7 @@ export class SessionStore implements HMSSessionStore {
 
     if (this.observedKeys.size !== prevObservedKeys.size) {
       try {
-        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+        await this.transport.listenMetadataChange(this.getListenMetadataChangeParams());
       } catch (e) {
         this.observedKeys = prevObservedKeys;
         throw e;
@@ -39,11 +39,22 @@ export class SessionStore implements HMSSessionStore {
 
     if (this.observedKeys.size !== prevObservedKeys.size) {
       try {
-        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+        await this.transport.listenMetadataChange(this.getListenMetadataChangeParams());
       } catch (e) {
         this.observedKeys = prevObservedKeys;
         throw e;
       }
     }
+  }
+
+  private getListenMetadataChangeParams() {
+    const observedKeys = Array.from(this.observedKeys);
+    const keys = observedKeys.filter(key => !key.includes('*'));
+    const match = observedKeys.filter(key => key.includes('*'));
+
+    return {
+      keys: keys.length > 0 ? keys : undefined,
+      match: match.length > 0 ? match : undefined,
+    };
   }
 }
