@@ -40,8 +40,6 @@ export const LiveStatus = () => {
       const timeStamp = hlsState?.variants[0]?.[screenType === 'hls_live_streaming' ? 'startedAt' : 'initialisedAt'];
       if (hlsState?.running && timeStamp) {
         setLiveTime(Date.now() - timeStamp.getTime());
-      } else {
-        setLiveTime(0);
       }
     }, 1000);
   }, [hlsState?.running, hlsState?.variants]);
@@ -76,7 +74,7 @@ export const LiveStatus = () => {
       <Box css={{ w: '$4', h: '$4', r: '$round', bg: '$alert_error_default', mr: '$2' }} />
       <Flex align="center" gap="2">
         <Text variant={!isMobile ? 'button' : 'body2'}>LIVE</Text>
-        <Text variant="caption">{hlsState?.variants?.length > 0 ? formatTime(liveTime) : ''}</Text>
+        <Text variant="caption">{hlsState?.variants?.length > 0 && isHLSRunning ? formatTime(liveTime) : ''}</Text>
       </Flex>
     </Flex>
   );
