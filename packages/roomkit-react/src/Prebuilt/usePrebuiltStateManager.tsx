@@ -5,7 +5,7 @@ import { selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { PictureInPicture } from './components/PIP/PIPManager';
 import { useRoomLayout } from './provider/roomLayoutProvider';
 import { useHMSPrebuiltContext } from './AppContext';
-import { MachineContext, MachineEvent, PrebuiltStateMachine } from './PrebuiltStateMachine';
+import { PrebuiltStateMachine, PrebuiltStateMachineContext, PrebuiltStateMachineEvent } from './PrebuiltStateMachine';
 import {
   useRoomLayoutLeaveScreen,
   useRoomLayoutPreviewScreen,
@@ -18,13 +18,11 @@ export const usePrebuiltStateManager = () => {
   const { isLeaveScreenEnabled } = useRoomLayoutLeaveScreen();
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const machineRef = useRef(PrebuiltStateMachine());
-  const serviceRef = useRef<StateMachine.Service<MachineContext, MachineEvent> | undefined>();
+  const serviceRef = useRef<StateMachine.Service<PrebuiltStateMachineContext, PrebuiltStateMachineEvent> | undefined>();
   const [state, setState] = useState<string>('');
 
   const rejoin = () => {
-    if (serviceRef.current && serviceRef.current.state.value === 'leave') {
-      serviceRef.current.send('rejoin');
-    }
+    serviceRef.current?.send('Rejoin');
   };
 
   useEffect(() => {
@@ -36,7 +34,7 @@ export const usePrebuiltStateManager = () => {
     serviceRef.current = service;
     service.start();
     service.send({
-      type: 'SET_DATA',
+      type: 'InitContext',
       data: { isLeaveEnabled: isLeaveScreenEnabled, isPreviewEnabled: isPreviewScreenEnabled, onLeave, onJoin },
     });
     const storeUnsubscribe = store.subscribe(state => {

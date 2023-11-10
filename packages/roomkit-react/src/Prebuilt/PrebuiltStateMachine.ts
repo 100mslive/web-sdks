@@ -1,20 +1,19 @@
 import { createMachine } from '@xstate/fsm';
 import { HMSRoomState } from '@100mslive/react-sdk';
 
-export type MachineContext = {
+export type PrebuiltStateMachineContext = {
   isLeaveEnabled: boolean;
   isPreviewEnabled: boolean;
   onJoin?: () => void;
   onLeave?: () => void;
 };
 
-export type MachineEvent =
-  | { type: 'idle' }
-  | { type: 'rejoin' }
-  | { type: 'SET_DATA'; data: MachineContext }
+export type PrebuiltStateMachineEvent =
+  | { type: 'Rejoin' }
+  | { type: 'InitContext'; data: PrebuiltStateMachineContext }
   | { type: HMSRoomState };
 export const PrebuiltStateMachine = () =>
-  createMachine<MachineContext, MachineEvent>({
+  createMachine<PrebuiltStateMachineContext, PrebuiltStateMachineEvent>({
     id: 'prebuilt-state-machine',
     initial: 'idle',
     context: {
@@ -46,10 +45,10 @@ export const PrebuiltStateMachine = () =>
               cond: context => context.isPreviewEnabled,
             },
           ],
-          SET_DATA: {
+          InitContext: {
             actions: (context, event) => {
-              if (event.type === 'SET_DATA') {
-                context.isPreviewEnabled = !event.data.isPreviewEnabled;
+              if (event.type === 'InitContext') {
+                context.isPreviewEnabled = event.data.isPreviewEnabled;
                 context.isLeaveEnabled = event.data.isLeaveEnabled;
                 context.onJoin = event.data.onJoin;
                 context.onLeave = event.data.onLeave;
@@ -76,7 +75,7 @@ export const PrebuiltStateMachine = () =>
       },
       leave: {
         on: {
-          rejoin: [
+          Rejoin: [
             { target: 'conferencing', cond: context => !context.isPreviewEnabled },
             { target: 'preview', cond: context => context.isPreviewEnabled },
           ],
