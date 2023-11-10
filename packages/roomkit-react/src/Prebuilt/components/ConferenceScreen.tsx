@@ -70,13 +70,6 @@ export const ConferenceScreen = () => {
     if (!authTokenInAppData) {
       return;
     }
-    // if (
-    //   authTokenInAppData &&
-    //   !isConnectedToRoom &&
-    //   !isPreviewScreenEnabled &&
-    //   roomState !== HMSRoomState.Connecting &&
-    //   !autoRoomJoined.current
-    // ) {
     hmsActions
       .join({
         userName: userName || '',
@@ -89,8 +82,6 @@ export const ConferenceScreen = () => {
         },
       })
       .catch(console.error);
-    // autoRoomJoined.current = true;
-    // }
   }, [authTokenInAppData, endpoints?.init, hmsActions, isPreviewScreenEnabled, userName]);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
