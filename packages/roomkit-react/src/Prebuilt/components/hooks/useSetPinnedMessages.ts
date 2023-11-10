@@ -38,7 +38,7 @@ export const useSetPinnedMessages = () => {
         await hmsActions.sessionStore
           .set(
             SESSION_STORE_KEY.PINNED_MESSAGES,
-            [...pinnedMessages].filter((pinnedMessage, index) => index !== indexToRemove),
+            [...pinnedMessages].filter((_, index) => index !== indexToRemove),
           )
           .catch(err => ToastManager.addToast({ title: err.description }));
       }
