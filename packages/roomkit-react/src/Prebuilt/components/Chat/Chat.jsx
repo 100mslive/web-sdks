@@ -50,8 +50,8 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   );
 
   const swipeHandlers = useSwipeable({
-    onSwipedUp: () => showPreviousPinnedMessage(),
-    onSwipedDown: () => showNextPinnedMessage(),
+    onSwipedUp: () => showNextPinnedMessage(),
+    onSwipedDown: () => showPreviousPinnedMessage(),
   });
 
   return pinnedMessages?.[pinnedMessageIndex] ? (

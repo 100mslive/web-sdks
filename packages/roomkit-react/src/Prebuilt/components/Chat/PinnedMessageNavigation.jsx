@@ -12,9 +12,9 @@ export const PinnedMessageNavigation = ({
   const sticksCount = Math.min(3, pinnedMessages.length);
   const getActiveStick = useCallback(() => {
     if (pinnedMessageIndex === 0) return 0;
-    if (pinnedMessageIndex === pinnedMessages.length - 1) return 2;
+    if (pinnedMessageIndex === pinnedMessages.length - 1) return sticksCount;
     return 1;
-  }, [pinnedMessageIndex, pinnedMessages]);
+  }, [pinnedMessageIndex, pinnedMessages, sticksCount]);
 
   if (pinnedMessages.length < 2) {
     return null;
