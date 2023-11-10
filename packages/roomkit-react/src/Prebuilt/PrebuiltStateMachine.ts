@@ -1,4 +1,5 @@
 import { createMachine } from '@xstate/fsm';
+import { HMSRoomState } from '@100mslive/react-sdk';
 
 export type MachineContext = {
   isLeaveEnabled: boolean;
@@ -7,24 +8,43 @@ export type MachineContext = {
   onLeave?: () => void;
 };
 
-export type MachineEvent = { type: 'entry' } | { type: 'SET_DATA'; data: MachineContext } | { type: 'NEXT' };
+export type MachineEvent =
+  | { type: 'idle' }
+  | { type: 'rejoin' }
+  | { type: 'SET_DATA'; data: MachineContext }
+  | { type: HMSRoomState };
 export const PrebuiltStateMachine = () =>
   createMachine<MachineContext, MachineEvent>({
     id: 'prebuilt-state-machine',
-    initial: 'disconnected',
+    initial: 'idle',
     context: {
       isLeaveEnabled: true,
       isPreviewEnabled: true,
     },
     states: {
-      disconnected: {
+      idle: {
         on: {
-          NEXT: [
+          Connecting: [
             {
               target: 'conferencing',
               cond: context => !context.isPreviewEnabled,
             },
-            { target: 'preview', cond: context => context.isPreviewEnabled },
+
+            {
+              target: 'preview',
+              cond: context => context.isPreviewEnabled,
+            },
+          ],
+          Disconnected: [
+            {
+              target: 'conferencing',
+              cond: context => !context.isPreviewEnabled,
+            },
+
+            {
+              target: 'preview',
+              cond: context => context.isPreviewEnabled,
+            },
           ],
           SET_DATA: {
             actions: (context, event) => {
@@ -40,7 +60,7 @@ export const PrebuiltStateMachine = () =>
       },
       preview: {
         on: {
-          NEXT: {
+          Connected: {
             target: 'conferencing',
             actions: context => context.onJoin?.(),
           },
@@ -48,7 +68,7 @@ export const PrebuiltStateMachine = () =>
       },
       conferencing: {
         on: {
-          NEXT: [
+          Disconnecting: [
             { target: 'leave', cond: context => context.isLeaveEnabled, actions: context => context.onLeave?.() },
             { target: 'preview', cond: context => !context.isLeaveEnabled, actions: context => context.onLeave?.() },
           ],
@@ -56,7 +76,7 @@ export const PrebuiltStateMachine = () =>
       },
       leave: {
         on: {
-          NEXT: [
+          rejoin: [
             { target: 'conferencing', cond: context => !context.isPreviewEnabled },
             { target: 'preview', cond: context => context.isPreviewEnabled },
           ],

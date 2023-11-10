@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { interpret, StateMachine } from '@xstate/fsm';
-import { HMSRoomState, selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
+import { selectRoomState, useHMSVanillaStore } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import { PictureInPicture } from './components/PIP/PIPManager';
 import { useRoomLayout } from './provider/roomLayoutProvider';
@@ -23,7 +23,7 @@ export const usePrebuiltStateManager = () => {
 
   const rejoin = () => {
     if (serviceRef.current && serviceRef.current.state.value === 'leave') {
-      serviceRef.current.send('NEXT');
+      serviceRef.current.send('rejoin');
     }
   };
 
@@ -39,25 +39,15 @@ export const usePrebuiltStateManager = () => {
       type: 'SET_DATA',
       data: { isLeaveEnabled: isLeaveScreenEnabled, isPreviewEnabled: isPreviewScreenEnabled, onLeave, onJoin },
     });
-    let prevState = store.getState(selectRoomState);
     const storeUnsubscribe = store.subscribe(state => {
-      if (state === HMSRoomState.Disconnected && prevState === state) {
-        service.send('NEXT');
-        console.log('next');
-      } else if (state === HMSRoomState.Connected && prevState !== HMSRoomState.Reconnecting) {
-        service.send('NEXT');
-        console.log('next');
-      } else if (prevState === HMSRoomState.Disconnecting && state === HMSRoomState.Disconnected) {
-        service.send('NEXT');
-        console.log('next');
-      }
-      prevState = state;
+      service.send(state);
     }, selectRoomState);
     const { unsubscribe } = service.subscribe(state => {
-      console.log('state', state.value);
-      setState(state.value);
-      if (state.value !== 'conferencing') {
-        PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
+      if (state.changed) {
+        setState(state.value);
+        if (state.value !== 'conferencing') {
+          PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
+        }
       }
     });
     return () => {
