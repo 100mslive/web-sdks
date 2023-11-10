@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import {
   HMSNotificationTypes,
@@ -38,12 +39,6 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
       : pinnedMessages?.[pinnedMessageIndex];
 
   const pinnedMessageRef = useRef(null);
-
-  const handleTouchStart = e => {
-    // Store the initial touch position
-    pinnedMessageRef.current.startY = e.touches[0].clientY;
-  };
-
   const showPreviousPinnedMessage = useCallback(
     () => setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0)),
     [],
@@ -54,34 +49,13 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
     [pinnedMessages],
   );
 
-  const handleTouchMove = e => {
-    if (pinnedMessageRef.current.startY) {
-      const currentY = e.touches[0].clientY;
-      const deltaY = currentY - pinnedMessageRef.current.startY;
-      if (deltaY > 50) {
-        showPreviousPinnedMessage();
-      } else if (deltaY < -50) {
-        showNextPinnedMessage();
-      }
-      pinnedMessageRef.current.startY = null;
-    }
-  };
+  const swipeHandlers = useSwipeable({
+    onSwipedUp: () => showPreviousPinnedMessage(),
+    onSwipedDown: () => showNextPinnedMessage(),
+  });
 
   return pinnedMessages?.[pinnedMessageIndex] ? (
-    <Flex
-      ref={pinnedMessageRef}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      align="center"
-      css={{ w: '100%', gap: '$4' }}
-    >
-      <PinnedMessageNavigation
-        pinnedMessageIndex={pinnedMessageIndex}
-        pinnedMessages={pinnedMessages}
-        showPreviousPinnedMessage={showPreviousPinnedMessage}
-        showNextPinnedMessage={showNextPinnedMessage}
-        isMobile={isMobile}
-      />
+    <Flex {...swipeHandlers} ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
       <Flex
         title={pinnedMessages?.[pinnedMessageIndex]}
         css={{
@@ -97,6 +71,13 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
         align="center"
         justify="between"
       >
+        <PinnedMessageNavigation
+          pinnedMessageIndex={pinnedMessageIndex}
+          pinnedMessages={pinnedMessages}
+          showPreviousPinnedMessage={showPreviousPinnedMessage}
+          showNextPinnedMessage={showNextPinnedMessage}
+          isMobile={isMobile}
+        />
         <PinIcon />
 
         <Box
