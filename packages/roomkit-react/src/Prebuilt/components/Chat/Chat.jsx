@@ -55,7 +55,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
   });
 
   return pinnedMessages?.[pinnedMessageIndex] ? (
-    <Flex {...swipeHandlers} ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
+    <Flex ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
       <Flex
         title={pinnedMessages?.[pinnedMessageIndex]}
         css={{
@@ -88,7 +88,7 @@ const PinnedMessage = ({ clearPinnedMessage }) => {
             overflowY: 'auto',
           }}
         >
-          <Text variant="sm">
+          <Text variant="sm" {...swipeHandlers}>
             <AnnotisedMessage message={formattedPinnedMessage} />
           </Text>
         </Box>
