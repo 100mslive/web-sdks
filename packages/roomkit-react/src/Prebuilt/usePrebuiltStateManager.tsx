@@ -22,7 +22,7 @@ export const usePrebuiltStateManager = () => {
   const [state, setState] = useState<string>('');
 
   const rejoin = () => {
-    if (serviceRef.current) {
+    if (serviceRef.current && serviceRef.current.state.value === 'leave') {
       serviceRef.current.send('NEXT');
     }
   };
@@ -37,26 +37,27 @@ export const usePrebuiltStateManager = () => {
     service.start();
     service.send({
       type: 'SET_DATA',
-      data: { isLeaveEnabled: isLeaveScreenEnabled, isPreviewEnabled: isPreviewScreenEnabled },
+      data: { isLeaveEnabled: isLeaveScreenEnabled, isPreviewEnabled: isPreviewScreenEnabled, onLeave, onJoin },
     });
     let prevState = store.getState(selectRoomState);
     const storeUnsubscribe = store.subscribe(state => {
       if (state === HMSRoomState.Disconnected && prevState === state) {
         service.send('NEXT');
+        console.log('next');
       } else if (state === HMSRoomState.Connected && prevState !== HMSRoomState.Reconnecting) {
         service.send('NEXT');
+        console.log('next');
       } else if (prevState === HMSRoomState.Disconnecting && state === HMSRoomState.Disconnected) {
         service.send('NEXT');
+        console.log('next');
       }
       prevState = state;
     }, selectRoomState);
     const { unsubscribe } = service.subscribe(state => {
+      console.log('state', state.value);
       setState(state.value);
-      if (state.value === 'conferencing') {
-        onJoin?.();
-      } else if (state.value === 'leave') {
+      if (state.value !== 'conferencing') {
         PictureInPicture.stop().catch((error: unknown) => console.error('stopping pip', (error as Error).message));
-        onLeave?.();
       }
     });
     return () => {

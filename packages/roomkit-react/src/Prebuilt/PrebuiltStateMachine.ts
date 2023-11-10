@@ -3,6 +3,8 @@ import { createMachine } from '@xstate/fsm';
 export type MachineContext = {
   isLeaveEnabled: boolean;
   isPreviewEnabled: boolean;
+  onJoin?: () => void;
+  onLeave?: () => void;
 };
 
 export type MachineEvent = { type: 'entry' } | { type: 'SET_DATA'; data: MachineContext } | { type: 'NEXT' };
@@ -18,14 +20,19 @@ export const PrebuiltStateMachine = () =>
       disconnected: {
         on: {
           NEXT: [
-            { target: 'conferencing', cond: context => !context.isPreviewEnabled },
+            {
+              target: 'conferencing',
+              cond: context => !context.isPreviewEnabled,
+            },
             { target: 'preview', cond: context => context.isPreviewEnabled },
           ],
           SET_DATA: {
             actions: (context, event) => {
               if (event.type === 'SET_DATA') {
-                context.isPreviewEnabled = event.data.isPreviewEnabled;
+                context.isPreviewEnabled = !event.data.isPreviewEnabled;
                 context.isLeaveEnabled = event.data.isLeaveEnabled;
+                context.onJoin = event.data.onJoin;
+                context.onLeave = event.data.onLeave;
               }
             },
           },
@@ -33,22 +40,26 @@ export const PrebuiltStateMachine = () =>
       },
       preview: {
         on: {
-          NEXT: 'conferencing',
+          NEXT: {
+            target: 'conferencing',
+            actions: context => context.onJoin?.(),
+          },
         },
       },
       conferencing: {
         on: {
           NEXT: [
-            { target: 'leave', cond: context => context.isLeaveEnabled },
-            { target: 'preview', cond: context => !context.isLeaveEnabled },
+            { target: 'leave', cond: context => context.isLeaveEnabled, actions: context => context.onLeave?.() },
+            { target: 'preview', cond: context => !context.isLeaveEnabled, actions: context => context.onLeave?.() },
           ],
         },
       },
       leave: {
         on: {
-          NEXT: {
-            target: 'preview',
-          },
+          NEXT: [
+            { target: 'conferencing', cond: context => !context.isPreviewEnabled },
+            { target: 'preview', cond: context => context.isPreviewEnabled },
+          ],
         },
       },
     },

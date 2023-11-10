@@ -49,7 +49,6 @@ export const ConferenceScreen = () => {
       setHideControls(value => !value);
     }
   };
-  const autoRoomJoined = useRef(isPreviewScreenEnabled);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
@@ -68,28 +67,31 @@ export const ConferenceScreen = () => {
   }, [dropdownList, hideControls, isMobileDevice]);
 
   useEffect(() => {
-    if (
-      authTokenInAppData &&
-      !isConnectedToRoom &&
-      !isPreviewScreenEnabled &&
-      roomState !== HMSRoomState.Connecting &&
-      !autoRoomJoined.current
-    ) {
-      hmsActions
-        .join({
-          userName: userName || '',
-          authToken: authTokenInAppData,
-          initEndpoint: endpoints?.init,
-          settings: {
-            isAudioMuted: !isPreviewScreenEnabled,
-            isVideoMuted: !isPreviewScreenEnabled,
-            speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
-          },
-        })
-        .catch(console.error);
-      autoRoomJoined.current = true;
+    if (!authTokenInAppData) {
+      return;
     }
-  }, [authTokenInAppData, endpoints?.init, hmsActions, isConnectedToRoom, isPreviewScreenEnabled, roomState, userName]);
+    // if (
+    //   authTokenInAppData &&
+    //   !isConnectedToRoom &&
+    //   !isPreviewScreenEnabled &&
+    //   roomState !== HMSRoomState.Connecting &&
+    //   !autoRoomJoined.current
+    // ) {
+    hmsActions
+      .join({
+        userName: userName || '',
+        authToken: authTokenInAppData,
+        initEndpoint: endpoints?.init,
+        settings: {
+          isAudioMuted: !isPreviewScreenEnabled,
+          isVideoMuted: !isPreviewScreenEnabled,
+          speakerAutoSelectionBlacklist: ['Yeti Stereo Microphone'],
+        },
+      })
+      .catch(console.error);
+    // autoRoomJoined.current = true;
+    // }
+  }, [authTokenInAppData, endpoints?.init, hmsActions, isPreviewScreenEnabled, userName]);
 
   if (!isConnectedToRoom && ![HMSRoomState.Reconnecting, HMSRoomState.Disconnected].includes(roomState)) {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
