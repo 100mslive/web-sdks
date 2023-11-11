@@ -22,10 +22,17 @@ export const useSetPinnedMessages = () => {
   const setPinnedMessages = useCallback(
     async (message: HMSMessage) => {
       const peerName = vanillaStore.getState(selectPeerNameByID(message?.sender)) || message?.senderName;
-      const newPinnedMessage = message ? (peerName ? `${peerName}: ${message.message}` : message.message) : null;
+      let newPinnedMessage = null;
+
+      if (message && peerName) {
+        newPinnedMessage = `${peerName}: ${message.message}`;
+      } else if (message) {
+        newPinnedMessage = message.message;
+      }
+
       if (newPinnedMessage && pinnedMessages.indexOf(newPinnedMessage) === -1) {
         await hmsActions.sessionStore
-          .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage])
+          .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage].slice(-3)) // Limiting to maximum of 3 messages - FIFO
           .catch(err => ToastManager.addToast({ title: err.description }));
       }
     },
@@ -38,7 +45,7 @@ export const useSetPinnedMessages = () => {
         await hmsActions.sessionStore
           .set(
             SESSION_STORE_KEY.PINNED_MESSAGES,
-            [...pinnedMessages].filter((_, index) => index !== indexToRemove),
+            pinnedMessages.filter((_: string, index: number) => index !== indexToRemove),
           )
           .catch(err => ToastManager.addToast({ title: err.description }));
       }

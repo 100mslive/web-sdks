@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 
@@ -10,11 +10,6 @@ export const PinnedMessageNavigation = ({
   isMobile,
 }) => {
   const sticksCount = Math.min(3, pinnedMessages.length);
-  const getActiveStick = useCallback(() => {
-    if (pinnedMessageIndex === 0) return 0;
-    if (pinnedMessageIndex === pinnedMessages.length - 1) return pinnedMessages.length === 2 ? 1 : 2;
-    return 1;
-  }, [pinnedMessageIndex, pinnedMessages, sticksCount]);
 
   if (pinnedMessages.length < 2) {
     return null;
@@ -22,12 +17,12 @@ export const PinnedMessageNavigation = ({
 
   return isMobile ? (
     <Flex direction="column" css={{ gap: '$1' }}>
-      {[...Array(sticksCount)].map((stick, index) => (
+      {[...Array(sticksCount)].map((_, index) => (
         <Box
           css={{
             borderLeft: '2px solid',
             height: '$8',
-            borderColor: index === getActiveStick() ? '$on_surface_high' : '$on_surface_low',
+            borderColor: index === pinnedMessageIndex ? '$on_surface_high' : '$on_surface_low',
           }}
         />
       ))}
