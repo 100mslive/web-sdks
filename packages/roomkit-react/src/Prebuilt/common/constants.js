@@ -108,7 +108,19 @@ export const SESSION_STORE_KEY = {
   TRANSCRIPTION_STATE: 'transcriptionState',
   PINNED_MESSAGE: 'pinnedMessage',
   SPOTLIGHT: 'spotlight',
+  CHAT_PEER_BLACKLIST: 'chatPeerBlacklist',
+  CHAT_MESSAGE_BLACKLIST: 'chatMessageBlacklist',
+  CHAT_STATE: 'chatState',
 };
+
+/**
+ * Chat state: {
+ *  enabled?: boolean;
+ *  updatedBy?: string;
+ * }
+ *
+ * If unset, to assume enabled
+ */
 
 export const INTERACTION_TYPE = {
   POLL: 'Poll',

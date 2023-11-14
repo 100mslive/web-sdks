@@ -30,7 +30,20 @@ export const defaultLayout: Layout = {
     conferencing: {
       default: {
         elements: {
-          chat: {},
+          chat: {
+            // Empty array -> not allowed; unset -> can message all roles
+            // roles_whitelist: [],
+
+            // @ts-ignore
+            public_chat_enabled: true,
+            private_chat_enabled: true,
+            chat_title: '',
+            message_placeholder: '',
+            real_time_controls: {
+              can_disable_chat: true, //Show toggle to disable chat in the room if true
+              can_block_user: true,
+            },
+          },
           participant_list: {},
           video_tile_layout: {
             grid: {
