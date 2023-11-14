@@ -105,3 +105,12 @@ export interface HMSPlaylistManager {
    */
   setPlaybackRate(type: HMSPlaylistType, value: number): void;
 }
+
+export interface HMSPlaylistSettings {
+  video: {
+    bitrate: number;
+  };
+  audio: {
+    bitrate: number;
+  };
+}

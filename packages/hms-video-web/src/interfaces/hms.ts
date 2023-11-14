@@ -6,7 +6,7 @@ import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer } from './peer';
 import { HMSPeerListIteratorOptions } from './peer-list-iterator';
-import { HMSPlaylistManager } from './playlist';
+import { HMSPlaylistManager, HMSPlaylistSettings } from './playlist';
 import { HMSPreviewListener } from './preview-listener';
 import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
@@ -99,4 +99,6 @@ export interface HMSInterface {
   lowerRemotePeerHand(peerId: string): Promise<void>;
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
+
+  updatePlaylistSettings(options: HMSPlaylistSettings): void;
 }
