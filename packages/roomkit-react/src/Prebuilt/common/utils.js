@@ -135,3 +135,5 @@ export const calculateAvatarAndAttribBoxSize = (calculatedWidth, calculatedHeigh
 
   return [avatarSize, attribBoxSize];
 };
+
+export const isMobileUserAgent = /Mobi|Android|iPhone/i.test(navigator.userAgent);

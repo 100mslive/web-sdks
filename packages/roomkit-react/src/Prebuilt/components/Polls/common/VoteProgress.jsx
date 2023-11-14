@@ -6,7 +6,7 @@ export const VoteProgress = ({ option, totalResponses }) => {
   const progressValue = (100 * option.voteCount) / totalResponses;
 
   return showProgress ? (
-    <Progress.Root value={progressValue}>
+    <Progress.Root value={progressValue} css={{ mt: '$4' }}>
       <Progress.Content
         style={{
           transform: `translateX(-${100 - progressValue}%)`,

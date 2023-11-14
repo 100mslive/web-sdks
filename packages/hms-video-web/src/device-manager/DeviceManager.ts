@@ -165,8 +165,11 @@ export class DeviceManager implements HMSDeviceManager {
     await this.enumerateDevices();
     this.logDevices('After Device Change');
     const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
     await this.setOutputDevice(true);
-    await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
+    if (audioTrack) {
+      await this.handleAudioInputDeviceChange(localPeer?.audioTrack);
+    }
     await this.handleVideoInputDeviceChange(localPeer?.videoTrack);
     this.eventBus.analytics.publish(
       AnalyticsEventFactory.deviceChange({
@@ -184,6 +187,16 @@ export class DeviceManager implements HMSDeviceManager {
    * @returns {MediaDeviceInfo}
    */
   getNewAudioInputDevice() {
+    const localPeer = this.store.getLocalPeer();
+    const audioTrack = localPeer?.audioTrack;
+    const manualSelection = this.audioInput.find(
+      device => device.deviceId === audioTrack?.getManuallySelectedDeviceId(),
+    );
+    if (manualSelection) {
+      return manualSelection;
+    }
+    // if manually selected device is not available, reset on the track
+    audioTrack?.resetManuallySelectedDeviceId();
     const defaultDevice = this.audioInput.find(device => device.deviceId === 'default');
     if (defaultDevice) {
       // Selecting a non-default device so that the deviceId comparision does not give
@@ -357,21 +370,36 @@ export class DeviceManager implements HMSDeviceManager {
     }
   };
 
+  // eslint-disable-next-line complexity
   private getAudioOutputDeviceMatchingInput(inputDevice?: MediaDeviceInfo) {
     const blacklist = this.store.getConfig()?.settings?.speakerAutoSelectionBlacklist || [];
-    if (blacklist === 'all') {
+    if (blacklist === 'all' || !inputDevice) {
       return;
     }
 
-    const inputLabel = inputDevice?.label.toLowerCase() || '';
+    const inputLabel = inputDevice.label.toLowerCase() || '';
     if (blacklist.some(label => inputLabel.includes(label.toLowerCase()))) {
       return;
     }
 
-    if (inputDevice?.groupId) {
-      // only check for label because if groupId check is added it will select speaker
-      // when an external earphone without microphone is added
-      return this.audioOutput.find(device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label);
+    const matchingLabel = this.audioOutput.find(
+      device => inputDevice.deviceId !== 'default' && device.label === inputDevice.label,
+    );
+
+    if (matchingLabel) {
+      return matchingLabel;
+    }
+
+    const matchingGroupId = this.audioOutput.find(device => device.groupId === inputDevice.groupId);
+
+    // Select the device with matching group only when it is the default device
+    // if a earphone without mic is connected, the above would pick system speakers instead of the earphone
+    if (
+      matchingGroupId &&
+      this.audioOutput[0].deviceId === 'default' &&
+      matchingGroupId.groupId === this.audioOutput[0].groupId
+    ) {
+      return matchingGroupId;
     }
 
     return;
