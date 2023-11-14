@@ -25,7 +25,7 @@ import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useBlacklistMessage } from '../hooks/useBlacklistMessage';
+import { useBlacklist } from '../hooks/useBlacklist';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -133,7 +133,7 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, message }) => {
+const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
@@ -141,7 +141,8 @@ const ChatActions = ({ onPin, showPinAction, message }) => {
   };
   const [open, setOpen] = useState(false);
 
-  const { blacklistMessage } = useBlacklistMessage();
+  const { blacklistItem: blacklistMessage } = useBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+  const { blacklistItem: blacklistPeer } = useBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -180,7 +181,7 @@ const ChatActions = ({ onPin, showPinAction, message }) => {
           <CopyIcon style={iconStyle} />
         </IconButton>
 
-        {can_block_user || can_hide_message ? (
+        {!sentByLocalPeer && (can_block_user || can_hide_message) ? (
           <Dropdown.Trigger asChild>
             <IconButton>
               <Tooltip title="More options">
@@ -206,7 +207,11 @@ const ChatActions = ({ onPin, showPinAction, message }) => {
           ) : null}
 
           {can_block_user ? (
-            <Dropdown.Item data-testid="pin_message_btn" onClick={onPin} css={{ color: '$alert_error_default' }}>
+            <Dropdown.Item
+              data-testid="pin_message_btn"
+              onClick={() => blacklistPeer(peerId)}
+              css={{ color: '$alert_error_default' }}
+            >
               <CrossCircleIcon style={iconStyle} />
               <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
                 Block from chat
@@ -327,7 +332,15 @@ const ChatMessage = React.memo(
               receiver={message.recipientPeer}
               roles={message.recipientRoles}
             />
-            {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} message={message} /> : null}
+            {!isOverlay ? (
+              <ChatActions
+                onPin={onPin}
+                showPinAction={showPinAction}
+                message={message}
+                peerId={message.sender}
+                sentByLocalPeer={message.sender === localPeerId}
+              />
+            ) : null}
           </Text>
           <Text
             variant="sm"
@@ -433,7 +446,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDSet }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
@@ -446,8 +459,14 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
 
   const filteredMessages =
     useMemo(
-      () => messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [],
-      [messages, blacklistedMessageIDSet],
+      () =>
+        messages?.filter(
+          message =>
+            message.type === 'chat' &&
+            !blacklistedMessageIDSet.has(message.id) &&
+            !blacklistedPeerIDSet.has(message.sender),
+        ) || [],
+      [messages, blacklistedMessageIDSet, blacklistedPeerIDSet],
     ) || [];
 
   const isMobile = useMedia(cssConfig.media.md);

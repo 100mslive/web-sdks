@@ -31,3 +31,17 @@ export const ChatPaused = ({ pausedBy, canUnpauseChat, unPauseChat }) => {
     </Flex>
   );
 };
+
+export const ChatBlocked = () => {
+  return (
+    <Flex
+      align="center"
+      justify="between"
+      css={{ borderRadius: '$1', bg: '$surface_default', p: '$4 $4 $4 $8', w: '100%' }}
+    >
+      <Text variant="sm" css={{ color: '$on_surface_medium', textAlign: 'center', w: '100%' }}>
+        You've been blocked from sending messages
+      </Text>
+    </Flex>
+  );
+};

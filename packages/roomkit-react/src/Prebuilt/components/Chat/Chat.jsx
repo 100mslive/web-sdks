@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerName } from '@100mslive/hms-video-store';
+import { selectLocalPeerID, selectLocalPeerName } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -18,7 +18,7 @@ import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage, ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
-import { ChatPaused } from './ChatPaused';
+import { ChatBlocked, ChatPaused } from './ChatStates';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
@@ -73,6 +73,7 @@ export const Chat = ({ screenType }) => {
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
@@ -93,7 +94,8 @@ export const Chat = ({ screenType }) => {
       });
     }
   }, [notification, peerSelector, setPeerSelector]);
-
+  const blacklistedPeerIDSet = new Set(useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || []);
+  const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
   const storeMessageSelector = selectHMSMessagesCount;
   const localPeerName = useHMSStore(selectLocalPeerName);
   const { elements } = useRoomLayoutConferencingScreen();
@@ -141,8 +143,22 @@ export const Chat = ({ screenType }) => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         screenType={screenType}
+        blacklistedPeerIDSet={blacklistedPeerIDSet}
       />
-      {isChatEnabled ? (
+
+      {!isChatEnabled ? (
+        <ChatPaused
+          canUnpauseChat={can_disable_chat}
+          pausedBy={chatStateUpdatedBy}
+          unPauseChat={() =>
+            hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, { enabled: true, updatedBy: localPeerName })
+          }
+        />
+      ) : null}
+
+      {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
+
+      {isChatEnabled && !isLocalPeerBlacklisted ? (
         <ChatFooter
           role={chatOptions.role}
           onSend={() => scrollToBottom(1)}
@@ -163,15 +179,7 @@ export const Chat = ({ screenType }) => {
             <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
           )}
         </ChatFooter>
-      ) : (
-        <ChatPaused
-          canUnpauseChat={can_disable_chat}
-          pausedBy={chatStateUpdatedBy}
-          unPauseChat={() =>
-            hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, { enabled: true, updatedBy: localPeerName })
-          }
-        />
-      )}
+      ) : null}
     </Flex>
   );
 };
