@@ -173,7 +173,7 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
         css={{
           fontSize: '$md',
           fontWeight: '$semiBold',
-          color: checked ? '$on_surface_high' : '$on_surface_low',
+          color: '$on_surface_high',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
