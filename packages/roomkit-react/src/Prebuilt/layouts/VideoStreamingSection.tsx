@@ -67,6 +67,7 @@ export const VideoStreamingSection = ({
       SESSION_STORE_KEY.PINNED_MESSAGE,
       SESSION_STORE_KEY.SPOTLIGHT,
       SESSION_STORE_KEY.CHAT_STATE,
+      SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);

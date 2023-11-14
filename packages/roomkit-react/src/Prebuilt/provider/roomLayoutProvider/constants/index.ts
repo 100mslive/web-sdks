@@ -38,11 +38,12 @@ export const defaultLayout: Layout = {
             public_chat_enabled: true,
             private_chat_enabled: true,
             chat_title: 'Live Chat',
+            allow_pinning_messages: true,
             message_placeholder: 'Send a message',
             real_time_controls: {
               can_disable_chat: true, //Show toggle to disable chat in the room if true
               can_block_user: true,
-              can_hide_messages: true,
+              can_hide_message: true,
             },
           },
           participant_list: {},

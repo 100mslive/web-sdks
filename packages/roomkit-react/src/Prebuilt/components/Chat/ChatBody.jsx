@@ -11,10 +11,11 @@ import {
   selectMessagesByRole,
   selectPeerNameByID,
   selectPermissions,
+  selectSessionStore,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { CopyIcon, CrossCircleIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -24,10 +25,12 @@ import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useBlacklistMessage } from '../hooks/useBlacklistMessage';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
-const iconStyle = { height: '1rem', width: '1rem' };
+const iconStyle = { height: '1.125rem', width: '1.125rem' };
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -130,10 +133,15 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, messageContent }) => {
-  // const { elements } = useRoomLayoutConferencingScreen();
-  // const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls;
+const ChatActions = ({ onPin, showPinAction, message }) => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
+    can_hide_message: false,
+    can_block_user: false,
+  };
   const [open, setOpen] = useState(false);
+
+  const { blacklistMessage } = useBlacklistMessage();
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -156,7 +164,7 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
         <IconButton
           onClick={() => {
             try {
-              navigator?.clipboard.writeText(messageContent);
+              navigator?.clipboard.writeText(message.message);
               ToastManager.addToast({
                 title: 'Message copied successfully',
               });
@@ -171,13 +179,16 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
         >
           <CopyIcon style={iconStyle} />
         </IconButton>
-        <Dropdown.Trigger asChild>
-          <IconButton>
-            <Tooltip title="More options">
-              <VerticalMenuIcon style={iconStyle} />
-            </Tooltip>
-          </IconButton>
-        </Dropdown.Trigger>
+
+        {can_block_user || can_hide_message ? (
+          <Dropdown.Trigger asChild>
+            <IconButton>
+              <Tooltip title="More options">
+                <VerticalMenuIcon style={iconStyle} />
+              </Tooltip>
+            </IconButton>
+          </Dropdown.Trigger>
+        ) : null}
       </Flex>
       <Dropdown.Portal>
         <Dropdown.Content
@@ -185,12 +196,23 @@ const ChatActions = ({ onPin, showPinAction, messageContent }) => {
           align="end"
           css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
-          <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
-            <PinIcon />
-            <Text variant="sm" css={{ ml: '$4' }}>
-              Hide for everyone
-            </Text>
-          </Dropdown.Item>
+          {can_hide_message ? (
+            <Dropdown.Item data-testid="pin_message_btn" onClick={() => blacklistMessage(message.id)}>
+              <EyeCloseIcon style={iconStyle} />
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
+                Hide for everyone
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+
+          {can_block_user ? (
+            <Dropdown.Item data-testid="pin_message_btn" onClick={onPin} css={{ color: '$alert_error_default' }}>
+              <CrossCircleIcon style={iconStyle} />
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                Block from chat
+              </Text>
+            </Dropdown.Item>
+          ) : null}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -305,9 +327,7 @@ const ChatMessage = React.memo(
               receiver={message.recipientPeer}
               roles={message.recipientRoles}
             />
-            {!isOverlay ? (
-              <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
-            ) : null}
+            {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} message={message} /> : null}
           </Text>
           <Text
             variant="sm"
@@ -419,8 +439,17 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  let messages = useHMSStore(storeMessageSelector);
-  messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
+  let messages = useHMSStore(storeMessageSelector) || [];
+  const blacklistedMessageIDSet = new Set(
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [],
+  );
+
+  const filteredMessages =
+    useMemo(
+      () => messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [],
+      [messages, blacklistedMessageIDSet],
+    ) || [];
+
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const unreadCount = useUnreadCount({ role, peerId });
@@ -456,7 +485,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
   return (
     <Fragment>
       <VirtualizedChatMessages
-        messages={messages}
+        messages={filteredMessages}
         scrollToBottom={scrollToBottom}
         unreadCount={unreadCount}
         ref={listRef}
