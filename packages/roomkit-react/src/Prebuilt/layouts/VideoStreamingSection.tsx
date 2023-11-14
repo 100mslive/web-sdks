@@ -4,9 +4,17 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsConnectedToRoom,
+  selectLocalPeerName,
+  selectLocalPeerRoleName,
+  selectSessionStore,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
+import { ToastBatcher } from '../components/Toast/ToastBatcher';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
@@ -46,6 +54,10 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  const localPeerName = useHMSStore(selectLocalPeerName);
+  const { enabled: isChatEnabled, updatedBy: chatStateUpdatedBy } = useHMSStore(
+    selectSessionStore(SESSION_STORE_KEY.CHAT_STATE),
+  ) || { enabled: true, updatedBy: '' };
 
   useEffect(() => {
     if (!isConnected) {
@@ -58,6 +70,15 @@ export const VideoStreamingSection = ({
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
+
+  useEffect(() => {
+    if (!chatStateUpdatedBy || chatStateUpdatedBy === localPeerName) {
+      return;
+    }
+    const type = isChatEnabled ? 'CHAT_RESUMED' : 'CHAT_PAUSED';
+    const notification = { id: crypto.randomUUID(), message: '', type, data: { name: localPeerName } };
+    ToastBatcher.showToast({ notification, type });
+  }, [isChatEnabled]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI

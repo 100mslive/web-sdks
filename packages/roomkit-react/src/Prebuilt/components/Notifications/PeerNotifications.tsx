@@ -17,6 +17,7 @@ export const PeerNotifications = () => {
   const notification = useHMSNotifications(notificationTypes);
   const isPeerJoinSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_JOINED);
   const isPeerLeftSubscribed = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.PEER_LEFT);
+
   useEffect(() => {
     if (!notification?.data) {
       return;

@@ -48,6 +48,8 @@ const initialAppData = {
     PEER_JOINED: false,
     PEER_LEFT: false,
     NEW_MESSAGE: true,
+    CHAT_RESUMED: true,
+    CHAT_PAUSED: true,
     ERROR: true,
     METADATA_UPDATED: true,
   },
