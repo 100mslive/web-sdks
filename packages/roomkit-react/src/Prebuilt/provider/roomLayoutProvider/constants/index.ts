@@ -42,6 +42,7 @@ export const defaultLayout: Layout = {
             real_time_controls: {
               can_disable_chat: true, //Show toggle to disable chat in the room if true
               can_block_user: true,
+              can_hide_messages: true,
             },
           },
           participant_list: {},

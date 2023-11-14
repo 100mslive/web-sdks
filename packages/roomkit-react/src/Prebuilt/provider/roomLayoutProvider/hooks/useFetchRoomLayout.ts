@@ -3,19 +3,19 @@ import type { GetResponse, Layout } from '@100mslive/types-prebuilt';
 import { defaultLayout } from '../constants';
 
 // TODO: remove this usage
-// const fetchWithRetry = async (url = '', options = {}) => {
-//   const MAX_RETRIES = 4;
-//   let error = Error('something went wrong');
-//   for (let i = 0; i < MAX_RETRIES; i++) {
-//     try {
-//       return await fetch(url, options);
-//     } catch (err) {
-//       error = err as Error;
-//     }
-//   }
-//   console.error('Fetch failed after max retries', { url, options });
-//   throw error;
-// };
+const fetchWithRetry = async (url = '', options = {}) => {
+  const MAX_RETRIES = 4;
+  let error = Error('something went wrong');
+  for (let i = 0; i < MAX_RETRIES; i++) {
+    try {
+      return await fetch(url, options);
+    } catch (err) {
+      error = err as Error;
+    }
+  }
+  console.error('Fetch failed after max retries', { url, options });
+  throw error;
+};
 
 // this should take endpoint and return
 export type useFetchRoomLayoutProps = {
@@ -51,15 +51,12 @@ export const useFetchRoomLayout = ({
       }
       isFetchInProgress.current = true;
       try {
-        // const resp = await fetchWithRetry(endpoint || 'https://api.100ms.live/v2/layouts/ui', {
-        //   headers: {
-        //     Authorization: `Bearer ${authToken}`,
-        //   },
-        // });
-        // layoutResp.current = await resp.json();
-        layoutResp.current = {
-          data: [defaultLayout],
-        };
+        const resp = await fetchWithRetry(endpoint || 'https://api.100ms.live/v2/layouts/ui', {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        layoutResp.current = await resp.json();
       } catch (e) {
         console.error('[Room Layout API]: Failed to fetch / process room layout. Resorting to default layout.', e);
         layoutResp.current = {
@@ -73,8 +70,8 @@ export const useFetchRoomLayout = ({
         );
         layoutForRole = defaultLayout;
       }
-      const layout = layoutForRole;
-      setLayout(layout);
+      // const layout = layoutForRole;
+      setLayout(defaultLayout);
       isFetchInProgress.current = false;
     })();
   }, [authToken, endpoint]);

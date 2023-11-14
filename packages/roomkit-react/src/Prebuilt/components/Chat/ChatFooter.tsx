@@ -2,9 +2,10 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { useHMSActions } from '@100mslive/react-sdk';
-import { EmojiIcon, SendIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled } from '../../..';
+import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
+import { IconButton } from '../../../IconButton';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -13,6 +14,8 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
+// @ts-ignore
+import { SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -82,7 +85,10 @@ export const ChatFooter = ({
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
+  const localPeerName = useHMSStore(selectLocalPeerName);
   const isOverlayChat = elements?.chat?.is_overlay;
+  // @ts-ignore
+  const { can_disable_chat } = elements?.chat?.real_time_controls || false;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -122,10 +128,48 @@ export const ChatFooter = ({
   }, [setDraftMessage]);
 
   return (
-    <>
+    <Box>
       {/* {screenType !== 'hls_live_streaming' ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
       ) : null} */}
+      {can_disable_chat ? (
+        <Flex align="center" justify="end" css={{ w: '100%', mb: '$4' }}>
+          <Popover.Root>
+            <Popover.Trigger asChild>
+              <IconButton css={{ border: '1px solid $border_bright' }}>
+                <VerticalMenuIcon height="16" width="16" />
+              </IconButton>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                align="end"
+                side="top"
+                onClick={() => {
+                  hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
+                    enabled: false,
+                    updatedBy: localPeerName,
+                  });
+                }}
+                css={{
+                  backgroundColor: '$surface_default',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '$4',
+                  borderRadius: '$1',
+                  color: '$on_surface_high',
+                  cursor: 'pointer',
+                  '&:hover': { backgroundColor: '$surface_dim' },
+                }}
+              >
+                <PauseCircleIcon />
+                <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+                  Pause Chat
+                </Text>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+        </Flex>
+      ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
@@ -195,6 +239,6 @@ export const ChatFooter = ({
           </BaseIconButton>
         </Flex>
       </Flex>
-    </>
+    </Box>
   );
 };
