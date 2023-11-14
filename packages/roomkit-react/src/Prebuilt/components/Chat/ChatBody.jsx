@@ -14,7 +14,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { CopyIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -22,9 +22,12 @@ import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
+import { ToastManager } from '../Toast/ToastManager';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
 import { useUnreadCount } from './useUnreadCount';
+
+const iconStyle = { height: '1rem', width: '1rem' };
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -127,21 +130,55 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction }) => {
+const ChatActions = ({ onPin, showPinAction, messageContent }) => {
+  // const { elements } = useRoomLayoutConferencingScreen();
+  // const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls;
   const [open, setOpen] = useState(false);
-  if (!showPinAction) {
-    return null;
-  }
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger className="chat_actions" css={{ opacity: open ? 1 : 0, '@md': { opacity: 1 } }} asChild>
-        <IconButton>
-          <Tooltip title="More options">
-            <VerticalMenuIcon />
-          </Tooltip>
+      <Flex
+        className="chat_actions"
+        css={{
+          background: '$surface_bright',
+          borderRadius: '$1',
+          p: '$2',
+          opacity: open ? 1 : 0,
+          '@md': { opacity: 1 },
+        }}
+      >
+        {showPinAction ? (
+          <IconButton data-testid="pin_message_btn" onClick={onPin}>
+            <PinIcon style={iconStyle} />
+          </IconButton>
+        ) : null}
+
+        <IconButton
+          onClick={() => {
+            try {
+              navigator?.clipboard.writeText(messageContent);
+              ToastManager.addToast({
+                title: 'Message copied successfully',
+              });
+            } catch (e) {
+              console.log(e);
+              ToastManager.addToast({
+                title: 'Could not copy message',
+              });
+            }
+          }}
+          data-testid="copy_message_btn"
+        >
+          <CopyIcon style={iconStyle} />
         </IconButton>
-      </Dropdown.Trigger>
+        <Dropdown.Trigger asChild>
+          <IconButton>
+            <Tooltip title="More options">
+              <VerticalMenuIcon style={iconStyle} />
+            </Tooltip>
+          </IconButton>
+        </Dropdown.Trigger>
+      </Flex>
       <Dropdown.Portal>
         <Dropdown.Content
           sideOffset={5}
@@ -151,32 +188,9 @@ const ChatActions = ({ onPin, showPinAction }) => {
           <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
             <PinIcon />
             <Text variant="sm" css={{ ml: '$4' }}>
-              Pin Message
+              Hide for everyone
             </Text>
           </Dropdown.Item>
-          {/* {isMobile ? (
-            <Dropdown.Item
-              data-testid="copy_message_btn"
-              onClick={() => {
-                try {
-                  navigator?.clipboard.writeText(messageContent);
-                  ToastManager.addToast({
-                    title: 'Message copied successfully',
-                  });
-                } catch (e) {
-                  console.log(e);
-                  ToastManager.addToast({
-                    title: 'Could not copy message',
-                  });
-                }
-              }}
-            >
-              <CopyIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Copy Message
-              </Text>
-            </Dropdown.Item>
-          ) : null} */}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -291,7 +305,9 @@ const ChatMessage = React.memo(
               receiver={message.recipientPeer}
               roles={message.recipientRoles}
             />
-            {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} /> : null}
+            {!isOverlay ? (
+              <ChatActions onPin={onPin} showPinAction={showPinAction} messageContent={message.message} />
+            ) : null}
           </Text>
           <Text
             variant="sm"
