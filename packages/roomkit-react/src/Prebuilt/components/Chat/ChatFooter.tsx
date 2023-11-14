@@ -85,6 +85,8 @@ export const ChatFooter = ({
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
+  // @ts-ignore to update
+  const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeerName = useHMSStore(selectLocalPeerName);
   const isOverlayChat = elements?.chat?.is_overlay;
   // @ts-ignore
@@ -197,7 +199,7 @@ export const ChatFooter = ({
               '& ~ .send-msg': { color: '$on_surface_low' },
               '&::placeholder': { color: '$on_surface_medium' },
             }}
-            placeholder="Send a message...."
+            placeholder={message_placeholder}
             ref={inputRef}
             required
             autoFocus={!isMobile}

@@ -37,8 +37,8 @@ export const defaultLayout: Layout = {
             // @ts-ignore
             public_chat_enabled: true,
             private_chat_enabled: true,
-            chat_title: '',
-            message_placeholder: '',
+            chat_title: 'Live Chat',
+            message_placeholder: 'Send a message',
             real_time_controls: {
               can_disable_chat: true, //Show toggle to disable chat in the room if true
               can_block_user: true,

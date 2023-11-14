@@ -50,6 +50,8 @@ export const SidePaneTabs = React.memo<{
   const [activeRole, setActiveRole] = useState('');
   const peerCount = useHMSStore(selectPeerCount);
   const { elements } = useRoomLayoutConferencingScreen();
+  // @ts-ignore to update
+  const { chat_title } = elements?.chat || 'Live Chat';
   const showChat = !!elements?.chat;
   const showParticipants = !!elements?.participant_list;
   const hideTabs = !(showChat && showParticipants);
@@ -109,7 +111,7 @@ export const SidePaneTabs = React.memo<{
             <>
               <Text variant="sm" css={{ fontWeight: '$semiBold', p: '$4', c: '$on_surface_high', pr: '$12' }}>
                 {showChat ? (
-                  'Chat'
+                  chat_title
                 ) : (
                   <span>
                     Participants <ParticipantCount count={peerCount} />
@@ -141,7 +143,7 @@ export const SidePaneTabs = React.memo<{
                     color: activeTab !== SIDE_PANE_OPTIONS.CHAT ? '$on_surface_low' : '$on_surface_high',
                   }}
                 >
-                  Chat
+                  {chat_title}
                 </Tabs.Trigger>
                 <Tabs.Trigger
                   value={SIDE_PANE_OPTIONS.PARTICIPANTS}
