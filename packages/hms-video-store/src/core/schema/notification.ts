@@ -59,7 +59,6 @@ export interface HMSLeaveRoomRequestNotification extends BaseNotification {
   type: HMSNotificationTypes.ROOM_ENDED | HMSNotificationTypes.REMOVED_FROM_ROOM;
   data: HMSLeaveRoomRequest;
 }
-
 export interface HMSDeviceChangeEventNotification extends BaseNotification {
   type: HMSNotificationTypes.DEVICE_CHANGE_UPDATE;
   data?: HMSDeviceChangeEvent;

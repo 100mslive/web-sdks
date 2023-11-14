@@ -31,9 +31,6 @@ export const defaultLayout: Layout = {
       default: {
         elements: {
           chat: {
-            // Empty array -> not allowed; unset -> can message all roles
-            // roles_whitelist: [],
-
             // @ts-ignore
             public_chat_enabled: true,
             private_chat_enabled: true,
@@ -41,7 +38,7 @@ export const defaultLayout: Layout = {
             allow_pinning_messages: true,
             message_placeholder: 'Send a message',
             real_time_controls: {
-              can_disable_chat: true, //Show toggle to disable chat in the room if true
+              can_disable_chat: true,
               can_block_user: true,
               can_hide_message: true,
             },
