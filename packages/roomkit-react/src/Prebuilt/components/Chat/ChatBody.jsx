@@ -16,15 +16,17 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, CrossCircleIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { CopyIcon, CrossCircleIcon, CrossIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
+import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
+import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useBlacklist } from '../hooks/useBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
@@ -134,7 +136,7 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer }) => {
+const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
@@ -158,8 +160,91 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
     unpinBlacklistedMessages(blacklistedPeerIDSet, blacklistedMessageIDSet);
   }, [blacklistedMessageIDs, blacklistedPeerIDs]);
 
+  const copyMessageContent = useCallback(() => {
+    try {
+      navigator?.clipboard.writeText(message.message);
+      ToastManager.addToast({
+        title: 'Message copied successfully',
+      });
+    } catch (e) {
+      console.log(e);
+      ToastManager.addToast({
+        title: 'Could not copy message',
+      });
+    }
+  }, [message]);
+
+  const options = {
+    pin: {
+      text: 'Pin message',
+      icon: <PinIcon style={iconStyle} />,
+      onClick: onPin,
+      show: showPinAction,
+    },
+    copy: {
+      text: 'Copy text',
+      icon: <CopyIcon style={iconStyle} />,
+      onClick: copyMessageContent,
+      show: true,
+    },
+    hide: {
+      text: 'Hide for everyone',
+      icon: <EyeCloseIcon style={iconStyle} />,
+      onClick: async () => blacklistMessage(message.id),
+      show: can_hide_message,
+    },
+    block: {
+      text: 'Block from chat',
+      icon: <CrossCircleIcon style={iconStyle} />,
+      onClick: async () => blacklistPeer(peerId),
+      color: '$alert_error_default',
+      show: can_block_user && !sentByLocalPeer,
+    },
+  };
+
+  if (isMobile) {
+    return (
+      <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
+        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => setOpenSheet(false)}>
+          <Sheet.Title
+            css={{
+              display: 'flex',
+              color: '$on_surface_high',
+              w: '100%',
+              justifyContent: 'space-between',
+              mt: '$8',
+              fontSize: '$md',
+              px: '$10',
+              pb: '$8',
+              borderBottom: '1px solid $border_bright',
+              alignItems: 'center',
+            }}
+          >
+            Message options
+            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => setOpenSheet(false)}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Sheet.Title>
+
+          {Object.keys(options).map(optionKey => {
+            const option = options[optionKey];
+            return option.show ? (
+              <MwebChatOption
+                key={optionKey}
+                text={option.text}
+                icon={option.icon}
+                onClick={option.onClick}
+                color={option?.color}
+              />
+            ) : null;
+          })}
+        </Sheet.Content>
+      </Sheet.Root>
+    );
+  }
+
   return (
-    <Dropdown.Root open={open} onOpenChange={setOpen}>
+    <Dropdown.Root open={open} onOpenChange={setOpen} css={{ '@md': { display: 'none' } }}>
       <Flex
         className="chat_actions"
         css={{
@@ -170,32 +255,19 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           '@md': { opacity: 1 },
         }}
       >
-        {showPinAction ? (
-          <IconButton data-testid="pin_message_btn" onClick={onPin}>
-            <PinIcon style={iconStyle} />
+        {options.pin.show ? (
+          <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
+            {options.pin.icon}
           </IconButton>
         ) : null}
 
-        <IconButton
-          onClick={() => {
-            try {
-              navigator?.clipboard.writeText(message.message);
-              ToastManager.addToast({
-                title: 'Message copied successfully',
-              });
-            } catch (e) {
-              console.log(e);
-              ToastManager.addToast({
-                title: 'Could not copy message',
-              });
-            }
-          }}
-          data-testid="copy_message_btn"
-        >
-          <CopyIcon style={iconStyle} />
-        </IconButton>
+        {options.copy.show ? (
+          <IconButton onClick={options.copy.onClick} data-testid="copy_message_btn">
+            <CopyIcon style={iconStyle} />
+          </IconButton>
+        ) : null}
 
-        {!sentByLocalPeer && (can_block_user || can_hide_message) ? (
+        {options.block.show || options.hide.show ? (
           <Dropdown.Trigger asChild>
             <IconButton>
               <Tooltip title="More options">
@@ -211,24 +283,24 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           align="end"
           css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
-          {can_hide_message ? (
-            <Dropdown.Item data-testid="pin_message_btn" onClick={async () => blacklistMessage(message.id)}>
-              <EyeCloseIcon style={iconStyle} />
+          {options.hide.show ? (
+            <Dropdown.Item data-testid="hide_message_btn" onClick={options.hide.onClick}>
+              {options.hide.icon}
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
-                Hide for everyone
+                {options.hide.text}
               </Text>
             </Dropdown.Item>
           ) : null}
 
-          {can_block_user ? (
+          {options.block.show ? (
             <Dropdown.Item
-              data-testid="pin_message_btn"
-              onClick={async () => blacklistPeer(peerId)}
-              css={{ color: '$alert_error_default' }}
+              data-testid="block_peer_btn"
+              onClick={options.block.onClick}
+              css={{ color: options.block.color }}
             >
-              <CrossCircleIcon style={iconStyle} />
+              {options.block.icon}
               <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
-                Block from chat
+                {options.block.text}
               </Text>
             </Dropdown.Item>
           ) : null}
@@ -267,6 +339,7 @@ const ChatMessage = React.memo(
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
     });
+    const [openSheet, setOpenSheet] = useState(false);
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
 
@@ -286,7 +359,12 @@ const ChatMessage = React.memo(
       <Box
         ref={ref}
         as="div"
-        css={{ mb: '$10', pr: '$10', mt: '$8', '&:hover .chat_actions': { opacity: 1 } }}
+        css={{
+          mb: '$10',
+          pr: '$10',
+          mt: '$8',
+          '&:hover .chat_actions': { opacity: 1 },
+        }}
         style={style}
       >
         <Flex
@@ -300,9 +378,17 @@ const ChatMessage = React.memo(
             px: messageType ? '$4' : '$2',
             py: messageType ? '$4' : 0,
             userSelect: 'none',
+            '@md': {
+              cursor: 'pointer',
+            },
           }}
           key={message.time}
           data-testid="chat_msg"
+          onClick={() => {
+            if (isMobile) {
+              setOpenSheet(true);
+            }
+          }}
         >
           <Text
             css={{
@@ -346,15 +432,17 @@ const ChatMessage = React.memo(
               receiver={message.recipientPeer}
               roles={message.recipientRoles}
             />
-            {!isOverlay ? (
-              <ChatActions
-                onPin={onPin}
-                showPinAction={showPinAction}
-                message={message}
-                peerId={message.sender}
-                sentByLocalPeer={message.sender === localPeerId}
-              />
-            ) : null}
+
+            <ChatActions
+              onPin={onPin}
+              showPinAction={showPinAction}
+              message={message}
+              peerId={message.sender}
+              sentByLocalPeer={message.sender === localPeerId}
+              isMobile={isMobile}
+              openSheet={openSheet}
+              setOpenSheet={setOpenSheet}
+            />
           </Text>
           <Text
             variant="sm"
@@ -366,7 +454,10 @@ const ChatMessage = React.memo(
               userSelect: 'all',
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
-            onClick={e => e.stopPropagation()}
+            onClick={e => {
+              e.stopPropagation();
+              setOpenSheet(true);
+            }}
           >
             <AnnotisedMessage message={message.message} />
           </Text>
