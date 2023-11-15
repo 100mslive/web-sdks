@@ -72,17 +72,8 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     const latestStat = this.getLatestStat();
     const firstStat = this.getFirstStat();
 
-    const audio_concealed_samples =
-      (latestStat.concealedSamples || 0) -
-      (latestStat.silentConcealedSamples || 0) -
-      ((firstStat.concealedSamples || 0) - (firstStat.silentConcealedSamples || 0));
-
-    return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>({
+    const baseSample = {
       timestamp: Date.now(),
-      audio_concealed_samples,
-      audio_level: this.calculateInstancesOfHigh('audioLevel', 0.05),
-      audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
-      audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
       fec_packets_discarded: this.calculateDifferenceForSample('fecPacketsDiscarded'),
       fec_packets_received: this.calculateDifferenceForSample('fecPacketsReceived'),
       total_samples_duration: this.calculateDifferenceForSample('totalSamplesDuration'),
@@ -90,7 +81,25 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
-    });
+    };
+
+    if (latestStat.kind === 'video') {
+      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(baseSample);
+    } else {
+      const audio_concealed_samples =
+        (latestStat.concealedSamples || 0) -
+        (latestStat.silentConcealedSamples || 0) -
+        ((firstStat.concealedSamples || 0) - (firstStat.silentConcealedSamples || 0));
+
+      return removeUndefinedFromObject<RemoteAudioSample>(
+        Object.assign(baseSample, {
+          audio_concealed_samples,
+          audio_level: this.calculateInstancesOfHigh('audioLevel', 0.05),
+          audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
+          audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
+        }),
+      );
+    }
   };
 
   protected shouldCreateSample = () => {
