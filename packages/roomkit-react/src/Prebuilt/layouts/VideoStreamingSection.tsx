@@ -65,7 +65,7 @@ export const VideoStreamingSection = ({
       return;
     }
     hmsActions.sessionStore.observe([
-      SESSION_STORE_KEY.PINNED_MESSAGE,
+      SESSION_STORE_KEY.PINNED_MESSAGES,
       SESSION_STORE_KEY.SPOTLIGHT,
       SESSION_STORE_KEY.CHAT_STATE,
       SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
