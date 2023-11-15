@@ -28,15 +28,15 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
     : pinnedMessages?.[pinnedMessageIndex]?.text;
 
   const pinnedMessageRef = useRef(null);
-  const showPreviousPinnedMessage = useCallback(
-    () => setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0)),
-    [],
-  );
+  const showPreviousPinnedMessage = useCallback(() => {
+    setHideOverflow(true);
+    setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0));
+  }, []);
 
-  const showNextPinnedMessage = useCallback(
-    () => setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1)),
-    [pinnedMessages],
-  );
+  const showNextPinnedMessage = useCallback(() => {
+    setHideOverflow(true);
+    setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1));
+  }, [pinnedMessages]);
 
   const swipeHandlers = useSwipeable({
     onSwipedUp: () => showNextPinnedMessage(),
@@ -83,6 +83,8 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             w: '100%',
             maxHeight: '$18',
             overflowY: 'auto',
+            overflowX: 'hidden',
+            wordBreak: 'break-word',
             '& p span': {
               color: '$primary_default',
             },
