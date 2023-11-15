@@ -6,6 +6,7 @@ import { VariableSizeList } from 'react-window';
 import {
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerName,
   selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
@@ -315,6 +316,7 @@ const ChatMessage = React.memo(
 const ChatList = React.forwardRef(
   ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
     const { setPinnedMessages } = useSetPinnedMessages();
+    const localPeerName = useHMSStore(selectLocalPeerName);
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
         scrollToBottom(1);
@@ -343,7 +345,7 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            onPin={() => setPinnedMessages(messages[index])}
+            onPin={() => setPinnedMessages(messages[index], localPeerName)}
           />
         )}
       </VariableSizeList>

@@ -22,15 +22,10 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
   const isMobile = useMedia(cssConfig.media.md);
 
   const [hideOverflow, setHideOverflow] = useState(false);
-  console.log(
-    hideOverflow,
-    pinnedMessages?.[pinnedMessageIndex]?.length && pinnedMessages?.[pinnedMessageIndex].length > PINNED_MESSAGE_LENGTH,
-    'ollo',
-  );
 
   const formattedPinnedMessage = hideOverflow
-    ? `${pinnedMessages?.[pinnedMessageIndex].slice(0, PINNED_MESSAGE_LENGTH)}... `
-    : pinnedMessages?.[pinnedMessageIndex];
+    ? `${pinnedMessages?.[pinnedMessageIndex]?.text.slice(0, PINNED_MESSAGE_LENGTH)}... `
+    : pinnedMessages?.[pinnedMessageIndex]?.text;
 
   const pinnedMessageRef = useRef(null);
   const showPreviousPinnedMessage = useCallback(
@@ -51,16 +46,16 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
   useEffect(() => {
     setHideOverflow(
       !!(
-        pinnedMessages?.[pinnedMessageIndex]?.length &&
-        pinnedMessages?.[pinnedMessageIndex].length > PINNED_MESSAGE_LENGTH
+        pinnedMessages?.[pinnedMessageIndex]?.text?.length &&
+        pinnedMessages?.[pinnedMessageIndex]?.text.length > PINNED_MESSAGE_LENGTH
       ),
     );
   }, [pinnedMessageIndex, pinnedMessages]);
 
-  return pinnedMessages?.[pinnedMessageIndex] ? (
+  return pinnedMessages?.[pinnedMessageIndex]?.text ? (
     <Flex ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
       <Flex
-        title={pinnedMessages?.[pinnedMessageIndex]}
+        title={pinnedMessages[pinnedMessageIndex].text}
         css={{
           p: '$4',
           color: '$on_surface_medium',

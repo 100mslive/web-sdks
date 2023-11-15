@@ -20,14 +20,14 @@ export const useSetPinnedMessages = () => {
   const vanillaStore = useHMSVanillaStore();
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
   const setPinnedMessages = useCallback(
-    async (message: HMSMessage) => {
+    async (message: HMSMessage, pinnedBy: string) => {
       const peerName = vanillaStore.getState(selectPeerNameByID(message?.sender)) || message?.senderName;
-      let newPinnedMessage = null;
+      const newPinnedMessage = { text: '', id: message.id, pinnedBy, authorId: message?.sender };
 
       if (message && peerName) {
-        newPinnedMessage = `${peerName}: ${message.message}`;
+        newPinnedMessage['text'] = `${peerName}: ${message.message}`;
       } else if (message) {
-        newPinnedMessage = message.message;
+        newPinnedMessage['text'] = message.message;
       }
 
       if (newPinnedMessage && pinnedMessages.indexOf(newPinnedMessage) === -1) {
