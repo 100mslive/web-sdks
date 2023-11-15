@@ -212,13 +212,7 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
           {can_hide_message ? (
-            <Dropdown.Item
-              data-testid="pin_message_btn"
-              onClick={async () => {
-                blacklistMessage(message.id);
-                await unpinBlacklistedMessages();
-              }}
-            >
+            <Dropdown.Item data-testid="pin_message_btn" onClick={async () => blacklistMessage(message.id)}>
               <EyeCloseIcon style={iconStyle} />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
                 Hide for everyone
@@ -229,10 +223,7 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           {can_block_user ? (
             <Dropdown.Item
               data-testid="pin_message_btn"
-              onClick={async () => {
-                blacklistPeer(peerId);
-                await unpinBlacklistedMessages();
-              }}
+              onClick={async () => blacklistPeer(peerId)}
               css={{ color: '$alert_error_default' }}
             >
               <CrossCircleIcon style={iconStyle} />
