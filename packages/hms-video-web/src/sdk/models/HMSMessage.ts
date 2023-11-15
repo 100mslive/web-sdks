@@ -1,6 +1,6 @@
 import { HMSPeer } from './peer';
 import { HMSRole } from '../../interfaces';
-import { HMSMessage } from '../../interfaces/message';
+import { HMSMessage, HMSQuotedMessage } from '../../interfaces/message';
 import { SendMessage } from '../../notification-manager';
 import { ISignalParamsProvider } from '../../signal/ISignalSendParamsProvider';
 
@@ -12,8 +12,18 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   time: Date;
   type: string;
   id?: string;
+  quotedMessage?: HMSQuotedMessage;
 
-  constructor({ sender, message, type = 'chat', recipientPeer, recipientRoles, time, id }: HMSMessage) {
+  constructor({
+    sender,
+    message,
+    type = 'chat',
+    recipientPeer,
+    recipientRoles,
+    time,
+    id,
+    quotedMessage = undefined,
+  }: HMSMessage) {
     this.sender = sender;
     this.message = message;
     this.type = type;
@@ -21,6 +31,10 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
     this.recipientRoles = recipientRoles;
     this.time = time;
     this.id = id;
+    console.log('ollo setting in constructor', quotedMessage);
+    if (quotedMessage) {
+      this.quotedMessage = quotedMessage;
+    }
   }
 
   toSignalParams() {
@@ -42,6 +56,7 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   }
 
   toString() {
+    console.log('tostr', this.quotedMessage);
     return `{
       sender: ${this.sender};
       recipientPeer: ${this.recipientPeer};
@@ -49,7 +64,8 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
       message: ${this.message};
       time: ${this.time};
       type: ${this.type};
-      id: ${this.id}
+      id: ${this.id};
+      quotedMessage: ${this.quotedMessage};
     }`;
   }
 }

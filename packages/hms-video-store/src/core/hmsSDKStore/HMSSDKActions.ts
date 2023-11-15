@@ -54,6 +54,7 @@ import {
   HMSPeerID,
   HMSPeerListIteratorOptions,
   HMSPlaylistType,
+  HMSQuotedMessage,
   HMSRoleName,
   HMSRoomState,
   HMSStore,
@@ -370,8 +371,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.sendBroadcastMessage(message);
   }
 
-  async sendBroadcastMessage(message: string, type?: string) {
-    const sdkMessage = await this.sdk.sendBroadcastMessage(message, type);
+  async sendBroadcastMessage(message: string, type?: string, quotedMessage?: HMSQuotedMessage) {
+    console.log('ollo action', quotedMessage, type);
+    const sdkMessage = await this.sdk.sendBroadcastMessage(message, type, quotedMessage);
     this.updateMessageInStore(sdkMessage, { message, type });
   }
 
@@ -394,15 +396,22 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
 
-  private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {
+  private updateMessageInStore(
+    sdkMessage: sdkTypes.HMSMessage | void,
+    messageInput: string | HMSMessageInput,
+    quotedMessage?: HMSQuotedMessage,
+  ) {
     if (!sdkMessage) {
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
-    hmsMessage.senderName = 'You';
+    hmsMessage.senderName = `${this.sdk.getLocalPeer()?.name} (You)`;
+    hmsMessage.sender = this.sdk.getLocalPeer()?.peerId;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    hmsMessage.quotedMessage = quotedMessage;
     this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }

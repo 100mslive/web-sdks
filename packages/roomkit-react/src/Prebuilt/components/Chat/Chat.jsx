@@ -60,6 +60,7 @@ export const Chat = ({ screenType }) => {
     selectSessionStore(SESSION_STORE_KEY.CHAT_STATE),
   ) || { enabled: true, updatedBy: '' };
   const isMobile = useMedia(cssConfig.media.md);
+  const [quotedMessage, setQuotedMessage] = useState(undefined);
 
   let isScrolledToBottom = false;
   if (listRef.current) {
@@ -102,6 +103,7 @@ export const Chat = ({ screenType }) => {
         scrollToBottom={scrollToBottom}
         screenType={screenType}
         blacklistedPeerIDs={blacklistedPeerIDs}
+        setQuotedMessage={setQuotedMessage}
       />
 
       {!isChatEnabled ? (
@@ -122,6 +124,8 @@ export const Chat = ({ screenType }) => {
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
         <ChatFooter
+          quotedMessage={quotedMessage}
+          setQuotedMessage={setQuotedMessage}
           role={chatOptions.role}
           onSend={() => scrollToBottom(1)}
           selection={chatOptions.selection}
