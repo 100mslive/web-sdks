@@ -51,7 +51,7 @@ export const VideoStreamingSection = ({
     if (!isConnected) {
       return;
     }
-    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
+    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGES, SESSION_STORE_KEY.SPOTLIGHT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
 

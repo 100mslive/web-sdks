@@ -123,9 +123,6 @@ export const ChatFooter = ({
 
   return (
     <>
-      {/* {screenType !== 'hls_live_streaming' ? (
-        <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
-      ) : null} */}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
