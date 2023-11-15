@@ -28,7 +28,7 @@ const App = () => {
     if (roomCode) {
       fetchData(subdomain, roomCode, setOnlyEmail, setData, setShowHeader);
     }
-  }, []);
+  }, [roomCode, subdomain]);
 
   useEffect(() => {
     // remove notifications and messages for beam
