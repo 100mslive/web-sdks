@@ -2,27 +2,33 @@ import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 
-export const PinnedMessageNavigation = ({
-  pinnedMessages,
-  pinnedMessageIndex,
-  showPreviousPinnedMessage,
-  showNextPinnedMessage,
+export const Navigation = ({
+  total,
+  index,
+  showPrevious,
+  showNext,
   isMobile,
+}: {
+  total: number;
+  index: number;
+  showPrevious: () => void;
+  showNext: () => void;
+  isMobile: boolean;
 }) => {
-  const sticksCount = Math.min(3, pinnedMessages.length);
+  const sticksCount = Math.min(3, total);
 
-  if (pinnedMessages.length < 2) {
+  if (total < 2) {
     return null;
   }
 
   return isMobile ? (
     <Flex direction="column" css={{ gap: '$1' }}>
-      {[...Array(sticksCount)].map((_, index) => (
+      {[...Array(sticksCount)].map((_, i) => (
         <Box
           css={{
             borderLeft: '2px solid',
             height: '$8',
-            borderColor: index === pinnedMessageIndex ? '$on_surface_high' : '$on_surface_low',
+            borderColor: i === index ? '$on_surface_high' : '$on_surface_low',
           }}
         />
       ))}
@@ -30,9 +36,9 @@ export const PinnedMessageNavigation = ({
   ) : (
     <Flex direction="column" css={{ gap: '$4' }}>
       <Flex
-        onClick={showPreviousPinnedMessage}
+        onClick={showPrevious}
         css={
-          pinnedMessageIndex === 0
+          index === 0
             ? { cursor: 'not-allowed', color: '$on_surface_low' }
             : { cursor: 'pointer', color: '$on_surface_medium' }
         }
@@ -40,9 +46,9 @@ export const PinnedMessageNavigation = ({
         <ChevronUpIcon height={20} width={20} />
       </Flex>
       <Flex
-        onClick={showNextPinnedMessage}
+        onClick={showNext}
         css={
-          pinnedMessageIndex === pinnedMessages.length - 1
+          index === total - 1
             ? { cursor: 'not-allowed', color: '$on_surface_low' }
             : { cursor: 'pointer', color: '$on_surface_medium' }
         }

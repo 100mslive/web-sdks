@@ -9,7 +9,7 @@ import { config as cssConfig } from '../../../Theme';
 // @ts-ignore
 import { AnnotisedMessage } from './ChatBody';
 // @ts-ignore
-import { PinnedMessageNavigation } from './PinnedMessageNavigation';
+import { Navigation } from './Navigation';
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -69,11 +69,11 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         align="center"
         justify="between"
       >
-        <PinnedMessageNavigation
-          pinnedMessageIndex={pinnedMessageIndex}
-          pinnedMessages={pinnedMessages}
-          showPreviousPinnedMessage={showPreviousPinnedMessage}
-          showNextPinnedMessage={showNextPinnedMessage}
+        <Navigation
+          index={pinnedMessageIndex}
+          total={pinnedMessages.length}
+          showPrevious={showPreviousPinnedMessage}
+          showNext={showNextPinnedMessage}
           isMobile={isMobile}
         />
         <PinIcon />

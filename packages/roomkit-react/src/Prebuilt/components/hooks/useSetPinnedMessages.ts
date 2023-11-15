@@ -12,6 +12,13 @@ import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
+type PinnedMessage = {
+  text: string;
+  id: string;
+  authorId?: string;
+  pinnedBy: string;
+};
+
 /**
  * set pinned chat message by updating the session store
  */
@@ -30,7 +37,10 @@ export const useSetPinnedMessages = () => {
         newPinnedMessage['text'] = message.message;
       }
 
-      if (newPinnedMessage && pinnedMessages.indexOf(newPinnedMessage) === -1) {
+      if (
+        newPinnedMessage &&
+        pinnedMessages.findIndex((pinnedMessage: PinnedMessage) => pinnedMessage.id === newPinnedMessage.id) === -1
+      ) {
         await hmsActions.sessionStore
           .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage].slice(-3)) // Limiting to maximum of 3 messages - FIFO
           .catch(err => ToastManager.addToast({ title: err.description }));
