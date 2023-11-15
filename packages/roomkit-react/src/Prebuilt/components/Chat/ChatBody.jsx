@@ -141,9 +141,22 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
-
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const { blacklistItem: blacklistMessage } = useBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+
+  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const { blacklistItem: blacklistPeer } = useBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
+  const { unpinBlacklistedMessages } = useSetPinnedMessages();
+
+  useEffect(() => {
+    if (!(blacklistedPeerIDs.length || blacklistedMessageIDs.length)) {
+      return;
+    }
+    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+
+    unpinBlacklistedMessages(blacklistedPeerIDSet, blacklistedMessageIDSet);
+  }, [blacklistedMessageIDs, blacklistedPeerIDs]);
 
   return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
@@ -199,7 +212,13 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
           {can_hide_message ? (
-            <Dropdown.Item data-testid="pin_message_btn" onClick={() => blacklistMessage(message.id)}>
+            <Dropdown.Item
+              data-testid="pin_message_btn"
+              onClick={async () => {
+                blacklistMessage(message.id);
+                await unpinBlacklistedMessages();
+              }}
+            >
               <EyeCloseIcon style={iconStyle} />
               <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
                 Hide for everyone
@@ -210,7 +229,10 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer })
           {can_block_user ? (
             <Dropdown.Item
               data-testid="pin_message_btn"
-              onClick={() => blacklistPeer(peerId)}
+              onClick={async () => {
+                blacklistPeer(peerId);
+                await unpinBlacklistedMessages();
+              }}
               css={{ color: '$alert_error_default' }}
             >
               <CrossCircleIcon style={iconStyle} />
@@ -448,28 +470,27 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDSet }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDs }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
   let messages = useHMSStore(storeMessageSelector) || [];
-  const blacklistedMessageIDSet = new Set(
-    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [],
-  );
-
+  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const filteredMessages =
-    useMemo(
-      () =>
+    useMemo(() => {
+      const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+      const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+      return (
         messages?.filter(
           message =>
             message.type === 'chat' &&
             !blacklistedMessageIDSet.has(message.id) &&
             !blacklistedPeerIDSet.has(message.sender),
-        ) || [],
-      [messages, blacklistedMessageIDSet, blacklistedPeerIDSet],
-    ) || [];
+        ) || []
+      );
+    }, [messages, blacklistedMessageIDs, blacklistedPeerIDs]) || [];
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();

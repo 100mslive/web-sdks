@@ -49,7 +49,8 @@ export const Chat = ({ screenType }) => {
       });
     }
   }, [notification, peerSelector, setPeerSelector]);
-  const blacklistedPeerIDSet = new Set(useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || []);
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
+  const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
   const storeMessageSelector = selectHMSMessagesCount;
   const localPeerName = useHMSStore(selectLocalPeerName);
@@ -100,7 +101,7 @@ export const Chat = ({ screenType }) => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         screenType={screenType}
-        blacklistedPeerIDSet={blacklistedPeerIDSet}
+        blacklistedPeerIDs={blacklistedPeerIDs}
       />
 
       {!isChatEnabled ? (
