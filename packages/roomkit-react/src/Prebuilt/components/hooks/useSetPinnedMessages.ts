@@ -39,7 +39,7 @@ export const useSetPinnedMessages = () => {
 
       if (
         newPinnedMessage &&
-        pinnedMessages.findIndex((pinnedMessage: PinnedMessage) => pinnedMessage.id === newPinnedMessage.id) === -1
+        !pinnedMessages.find((pinnedMessage: PinnedMessage) => pinnedMessage.id === newPinnedMessage.id)
       ) {
         await hmsActions.sessionStore
           .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage].slice(-3)) // Limiting to maximum of 3 messages - FIFO
