@@ -6,34 +6,16 @@
  */
 
 import { ErrorCodes } from './ErrorCodes';
+import { HMSAction } from './HMSAction';
 import { HMSException } from './HMSException';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
-
-export enum HMSAction {
-  NONE = 'NONE',
-  TRACK = 'TRACK',
-  INIT = 'INIT',
-  GET_TOKEN = 'GET_TOKEN',
-  PUBLISH = 'PUBLISH',
-  UNPUBLISH = 'UNPUBLISH',
-  JOIN = 'JOIN',
-  SUBSCRIBE = 'SUBSCRIBE',
-  DATA_CHANNEL_SEND = 'DATA_CHANNEL_SEND',
-  RESTART_ICE = 'RESTART_ICE',
-  VIDEO_PLUGINS = 'VIDEO_PLUGINS',
-  AUDIO_PLUGINS = 'AUDIO_PLUGINS',
-  AUTOPLAY = 'AUTOPLAY',
-  RECONNECT_SIGNAL = 'RECONNECT_SIGNAL',
-  VALIDATION = 'VALIDATION',
-  PLAYLIST = 'PLAYLIST',
-  PREVIEW = 'PREVIEW',
-}
 
 const terminalActions: (HMSSignalMethod | HMSAction)[] = [
   HMSSignalMethod.JOIN,
   HMSSignalMethod.OFFER,
   HMSSignalMethod.ANSWER,
   HMSSignalMethod.TRICKLE,
+  HMSSignalMethod.SERVER_ERROR,
   HMSAction.JOIN,
 ];
 
@@ -258,6 +240,17 @@ export const ErrorFactory = {
         description,
       );
     },
+
+    SelectedDeviceMissing(deviceType: string) {
+      return new HMSException(
+        ErrorCodes.TracksErrors.SELECTED_DEVICE_MISSING,
+        'SelectedDeviceMissing',
+        HMSAction.TRACK,
+        `Could not detect selected ${deviceType} device`,
+        `Please check connection to the ${deviceType} device`,
+        false,
+      );
+    },
   },
 
   WebrtcErrors: {
@@ -318,6 +311,16 @@ export const ErrorFactory = {
         'ICEDisconnected',
         action,
         `[${action.toString()}]: Ice connection state DISCONNECTED`,
+        description,
+      );
+    },
+
+    StatsFailed(action: HMSAction, description = '') {
+      return new HMSException(
+        ErrorCodes.WebrtcErrors.STATS_FAILED,
+        'StatsFailed',
+        action,
+        `Failed to WebRTC get stats - ${description}`,
         description,
       );
     },
@@ -451,6 +454,16 @@ export const ErrorFactory = {
         'PreviewAlreadyInProgress',
         action,
         `[Preview]: Cannot join if preview is in progress`,
+        description,
+      );
+    },
+
+    LocalStorageAccessDenied(description = 'Access to localStorage has been denied') {
+      return new HMSException(
+        ErrorCodes.GenericErrors.LOCAL_STORAGE_ACCESS_DENIED,
+        'LocalStorageAccessDenied',
+        HMSAction.NONE,
+        `LocalStorageAccessDenied`,
         description,
       );
     },

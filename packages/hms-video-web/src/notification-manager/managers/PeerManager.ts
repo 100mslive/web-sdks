@@ -1,8 +1,10 @@
 import { TrackManager } from './TrackManager';
-import { HMSPeer, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
+import { createRemotePeer } from './utils';
+import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteVideoTrack } from '../../media/tracks';
-import { HMSRemotePeer } from '../../sdk/models/peer';
+import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
 import { IStore } from '../../sdk/store';
+import { HAND_RAISE_GROUP_NAME } from '../../utils/constants';
 import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
@@ -97,10 +99,28 @@ export class PeerManager {
     this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_LEFT, hmsPeer);
   };
 
+  // eslint-disable-next-line complexity
   handlePeerUpdate(notification: PeerNotification) {
-    const peer = this.store.getPeerById(notification.peer_id);
+    let peer = this.store.getPeerById(notification.peer_id);
+    if (!peer && notification.realtime) {
+      // create peer if not already created in store
+      peer = this.makePeer(notification);
+      this.listener?.onPeerUpdate(
+        peer.isHandRaised ? HMSPeerUpdate.HAND_RAISE_CHANGED : HMSPeerUpdate.PEER_ADDED,
+        peer,
+      );
+      return;
+    }
+
+    // if peer is present but not realtime now, remove it from store
+    if (peer && !peer.isLocal && !notification.realtime) {
+      this.store.removePeer(peer.peerId);
+      this.listener?.onPeerUpdate(HMSPeerUpdate.PEER_REMOVED, peer);
+      return;
+    }
 
     if (!peer) {
+      HMSLogger.d(this.TAG, `peer ${notification.peer_id} not found`);
       return;
     }
 
@@ -109,6 +129,12 @@ export class PeerManager {
       peer.updateRole(newRole);
       this.updateSimulcastLayersForPeer(peer);
       this.listener?.onPeerUpdate(HMSPeerUpdate.ROLE_UPDATED, peer);
+    }
+    const wasHandRaised = peer.isHandRaised;
+    peer.updateGroups(notification.groups);
+    const isHandRaised = notification.groups?.includes(HAND_RAISE_GROUP_NAME);
+    if (wasHandRaised !== isHandRaised) {
+      this.listener?.onPeerUpdate(HMSPeerUpdate.HAND_RAISE_CHANGED, peer);
     }
     this.handlePeerInfoUpdate({ peer, ...notification.info });
   }
@@ -130,24 +156,23 @@ export class PeerManager {
   private makePeer(peer: PeerNotification) {
     let hmsPeer = this.store.getPeerById(peer.peer_id) as HMSRemotePeer;
     if (!hmsPeer) {
-      hmsPeer = new HMSRemotePeer({
-        peerId: peer.peer_id,
-        name: peer.info.name,
-        customerUserId: peer.info.user_id,
-        metadata: peer.info.data,
-        role: this.store.getPolicyForRole(peer.role),
-        joinedAt: convertDateNumToDate(peer.joined_at),
-        fromRoomState: !!peer.is_from_room_state,
-      });
+      hmsPeer = createRemotePeer(peer, this.store);
+      hmsPeer.realtime = peer.realtime;
+      hmsPeer.joinedAt = convertDateNumToDate(peer.joined_at);
+      hmsPeer.fromRoomState = !!peer.is_from_room_state;
       this.store.addPeer(hmsPeer);
       HMSLogger.d(this.TAG, `adding to the peerList`, `${hmsPeer}`);
     }
 
     for (const trackId in peer.tracks) {
+      const trackInfo = peer.tracks[trackId];
       this.store.setTrackState({
         peerId: peer.peer_id,
-        trackInfo: peer.tracks[trackId],
+        trackInfo,
       });
+      if (trackInfo.type === 'video') {
+        this.trackManager.processTrackInfo(trackInfo, peer.peer_id, false);
+      }
     }
     return hmsPeer;
   }

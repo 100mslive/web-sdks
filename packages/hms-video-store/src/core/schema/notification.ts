@@ -1,3 +1,4 @@
+import { HMSPoll } from '@100mslive/hms-video';
 import { HMSDeviceChangeEvent } from './device-change';
 import { HMSException } from './error';
 import { HMSMessage } from './message';
@@ -17,7 +18,8 @@ export interface HMSPeerNotification extends BaseNotification {
     | HMSNotificationTypes.PEER_LEFT
     | HMSNotificationTypes.NAME_UPDATED
     | HMSNotificationTypes.METADATA_UPDATED
-    | HMSNotificationTypes.ROLE_UPDATED;
+    | HMSNotificationTypes.ROLE_UPDATED
+    | HMSNotificationTypes.HAND_RAISE_CHANGED;
   data: HMSPeer;
 }
 
@@ -68,7 +70,12 @@ export interface HMSPlaylistItemNotification<T> extends BaseNotification {
 
 export interface HMSReconnectionNotification extends BaseNotification {
   type: HMSNotificationTypes.RECONNECTED | HMSNotificationTypes.RECONNECTING;
-  data: null;
+  data: HMSException | null;
+}
+
+export interface HMSPollNotification extends BaseNotification {
+  type: HMSNotificationTypes.POLL_STARTED | HMSNotificationTypes.POLL_STOPPED | HMSNotificationTypes.POLL_VOTES_UPDATED;
+  data: HMSPoll;
 }
 
 export type HMSNotification =
@@ -113,6 +120,11 @@ export enum HMSNotificationTypes {
   PLAYLIST_TRACK_ENDED = 'PLAYLIST_TRACK_ENDED',
   NAME_UPDATED = 'NAME_UPDATED',
   METADATA_UPDATED = 'METADATA_UPDATED',
+  POLL_CREATED = 'POLL_CREATED',
+  POLL_STARTED = 'POLL_STARTED',
+  POLL_STOPPED = 'POLL_STOPPED',
+  POLL_VOTES_UPDATED = 'POLL_VOTES_UPDATED',
+  HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
 }
 
 export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
@@ -140,9 +152,14 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.CHANGE_MULTI_TRACK_STATE_REQUEST]: HMSChangeMultiTrackStateRequestNotification;
   [HMSNotificationTypes.RECONNECTED]: HMSReconnectionNotification;
   [HMSNotificationTypes.RECONNECTING]: HMSReconnectionNotification;
+  [HMSNotificationTypes.POLL_STARTED]: HMSPollNotification;
+  [HMSNotificationTypes.POLL_STOPPED]: HMSPollNotification;
+  [HMSNotificationTypes.POLL_VOTES_UPDATED]: HMSPollNotification;
+  [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
+  [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
 }[T];
 
-type MappedNotifications<Type extends HMSNotificationTypes[]> = {
+export type MappedNotifications<Type extends HMSNotificationTypes[]> = {
   [index in keyof Type]: HMSNotificationMapping<Type[index]>;
 };
 

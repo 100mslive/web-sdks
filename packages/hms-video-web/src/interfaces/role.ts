@@ -1,5 +1,7 @@
 import { SimulcastLayers } from './simulcast-layers';
 
+export type HMSRoleName = string;
+
 export interface HMSRole {
   name: string;
   publishParams: PublishParams;
@@ -16,6 +18,8 @@ export interface HMSRole {
     hlsStreaming: boolean;
     rtmpStreaming: boolean;
     browserRecording: boolean;
+    pollRead: boolean;
+    pollWrite: boolean;
   };
   priority: number;
 }

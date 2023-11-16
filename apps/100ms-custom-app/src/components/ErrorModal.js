@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dialog, Text } from '@100mslive/react-ui';
+import { Dialog, Text } from '@100mslive/roomkit-react';
 import { DialogContent } from './DialogContent';
 
 const ErrorModal = ({ title, body }) => {

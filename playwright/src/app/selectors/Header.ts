@@ -33,8 +33,8 @@ export class Header {
   //recording
   start_recording_btn = 'button[data-testid="start_recording"]';
   start_recording_confirm_btn = 'button[data-testid="start_recording_confirm"]';
-  recording_resolution_width_btn = 'button[data-testid="recording_resolution_width"]';
-  recording_resolution_height_btn = 'button[data-testid="recording_resolution_height"]';
+  recording_resolution_width_btn = 'input[data-testid="recording_resolution_width"]';
+  recording_resolution_height_btn = 'input[data-testid="recording_resolution_height"]';
   stop_recording_btn = 'button[data-testid="stop_recording"]';
   stop_recording_confirm_btn = 'button[data-testid="stop_recording_confirm"]';
 
@@ -45,17 +45,19 @@ export class Header {
   start_hls_btn = 'button[data-testid="start_hls"]';
   stop_hls_btn = 'button[data-testid="stop_hls"]';
   end_stream_btn = 'button[data-testid="end_stream"]';
+  live_indicator = 'text=Live with HLS';
 
   //rtmp
   rtmp_stream_btn = 'div[data-testid="rtmp_stream"]';
   rtmp_url_btn = 'input[data-testid="0_rtmp_url"]';
   rtmp_key_btn = 'input[data-testid="0_rtmp_key"]';
-  rtmp_resolution_width_btn = 'div[data-testid="rtmp_resolution_width"]';
-  rtmp_resolution_height_btn = 'div[data-testid="rtmp_resolution_height"]';
+  rtmp_resolution_width_btn = 'input[data-testid="rtmp_resolution_width"]';
+  rtmp_resolution_height_btn = 'input[data-testid="rtmp_resolution_height"]';
   rtmp_recording_btn = 'button[data-testid="rtmp_recording"]';
   add_stream_btn = 'div[data-testid="add_stream"]';
   start_rtmp_btn = 'button[data-testid="start_rtmp"]';
   stop_rtmp_btn = 'button[data-testid="stop_rtmp"]';
+  rtmp_indicator = 'text=Live with RTMP';
 
   //close stream popup
   close_stream_section = 'div[data-testid="close_stream_section"]';

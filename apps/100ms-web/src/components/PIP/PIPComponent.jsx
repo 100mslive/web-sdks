@@ -9,7 +9,7 @@ import {
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
 import { PipIcon } from "@100mslive/react-icons";
-import { Tooltip } from "@100mslive/react-ui";
+import { Tooltip } from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { PictureInPicture } from "./PIPManager";
 import { MediaSession } from "./SetupMediaSession";
@@ -28,15 +28,15 @@ const PIPComponent = ({ peers, showLocalPeer }) => {
   const isFeatureEnabled = useIsFeatureEnabled(FEATURE_LIST.PICTURE_IN_PICTURE);
 
   const onPipToggle = useCallback(() => {
-    if (!isPipOn) {
+    if (isPipOn) {
+      PictureInPicture.stop().catch(err =>
+        console.error("error in stopping pip", err)
+      );
+    } else {
       PictureInPicture.start(hmsActions, setIsPipOn).catch(err =>
         console.error("error in starting pip", err)
       );
       MediaSession.setup(hmsActions, store);
-    } else {
-      PictureInPicture.stop().catch(err =>
-        console.error("error in stopping pip", err)
-      );
     }
   }, [hmsActions, isPipOn, store]);
 

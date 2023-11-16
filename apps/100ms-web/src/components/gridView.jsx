@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { useMedia } from "react-use";
-import { Box, config as cssConfig, Flex } from "@100mslive/react-ui";
+import { Box, config as cssConfig, Flex } from "@100mslive/roomkit-react";
 import { FirstPersonDisplay } from "./FirstPersonDisplay";
 import { Image } from "./Image";
 import VideoList from "./VideoList";
@@ -86,7 +86,7 @@ export const GridSidePaneView = ({ peers }) => {
     >
       <Flex css={{ flex: "1 1 0" }} align="end">
         {peers && peers.length > 0 && (
-          <VideoList peers={peers} maxColCount={2} />
+          <VideoList peers={peers} maxColCount={1} />
         )}
       </Flex>
     </Flex>

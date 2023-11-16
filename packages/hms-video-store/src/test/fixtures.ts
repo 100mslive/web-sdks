@@ -18,5 +18,7 @@ export const makeFakePeer = (): HMSPeer => {
     isLocal: false,
     name: 'test',
     videoTrack: '',
+    groups: [],
+    isHandRaised: false,
   };
 };

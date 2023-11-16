@@ -1,12 +1,12 @@
+import { PublishAnalyticPayload, SubscribeAnalyticPayload } from './stats/interfaces';
 import { AdditionalAnalyticsProperties } from './AdditionalAnalyticsProperties';
 import AnalyticsEvent from './AnalyticsEvent';
 import { AnalyticsEventLevel } from './AnalyticsEventLevel';
 import { IAnalyticsPropertiesProvider } from './IAnalyticsPropertiesProvider';
-import { SelectedDevices } from '../device-manager';
 import { HMSException } from '../error/HMSException';
-import { DeviceMap } from '../interfaces';
+import { DeviceMap, SelectedDevices } from '../interfaces';
+import { HMSRemoteVideoTrack } from '../media//tracks/HMSRemoteVideoTrack';
 import { HMSTrackSettings } from '../media/settings/HMSTrackSettings';
-import { HMSRemoteVideoTrack } from '../media/tracks';
 
 export default class AnalyticsEventFactory {
   private static KEY_REQUESTED_AT = 'requested_at';
@@ -172,6 +172,13 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static rtcStatsFailed(error: HMSException) {
+    const name = 'rtc.stats.failed';
+    const level = AnalyticsEventLevel.ERROR;
+
+    return new AnalyticsEvent({ name, level, properties: this.getErrorProperties(error) });
+  }
+
   /**
    * TODO: remove once everything is switched to server side degradation, this
    * event can be handled on server side as well.
@@ -206,6 +213,22 @@ export default class AnalyticsEventFactory {
     return new AnalyticsEvent({
       name: 'perf.networkquality.preview',
       level: properties.error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
+  static publishStats(properties: PublishAnalyticPayload) {
+    return new AnalyticsEvent({
+      name: 'publisher.stats',
+      level: AnalyticsEventLevel.INFO,
+      properties,
+    });
+  }
+
+  static subscribeStats(properties: SubscribeAnalyticPayload) {
+    return new AnalyticsEvent({
+      name: 'subscriber.stats',
+      level: AnalyticsEventLevel.INFO,
       properties,
     });
   }

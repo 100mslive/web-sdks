@@ -7,8 +7,8 @@ import {
   selectPeerByID,
   selectRoleByRoleName,
 } from '@100mslive/hms-video-store';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
+import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
 import { HMSSdk } from '../../packages/hms-video-web/src';
 
 /**
@@ -37,6 +37,7 @@ export class CypressPeer {
     this.store = hms.getStore();
     // @ts-ignore
     this.sdk = this.actions.sdk;
+    this.sdk.setLogLevel(0);
     this.name = `peer_${Math.random().toString(36).slice(2, 7)}`; // random suffix
     this.authToken = token;
   }
@@ -65,6 +66,7 @@ export class CypressPeer {
 
   waitForTracks = async (peerId: string) => {
     return new Promise(resolve => {
+      // eslint-disable-next-line complexity
       this.store.subscribe(peer => {
         if (!peer) {
           return;

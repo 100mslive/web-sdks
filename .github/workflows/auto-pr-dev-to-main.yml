@@ -1,0 +1,22 @@
+name: Create PR from dev to main
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - dev
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        if: github.event.pull_request.merged == true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: ''
+          destination_branch: 'main'
+          pr_title: 'QA Handover PR'
+          pr_body: ':robot: Automated PR from **${{ github.ref }}** to **main**'
+          pr_label: 'release'

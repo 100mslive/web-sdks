@@ -1,5 +1,6 @@
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteAudioTrack } from '../media/tracks';

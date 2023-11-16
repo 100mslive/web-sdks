@@ -2,8 +2,10 @@ import { Subscribe } from 'zustand/vanilla';
 import { HMSSdk } from '@100mslive/hms-video';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { HMSReactiveStore } from '../hmsSDKStore/HMSReactiveStore';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
-import { createDefaultStatsStore, HMSReactiveStore, HMSStatsStore, selectRoomState } from '..';
+import { createDefaultStatsStore, HMSStatsStore } from '../schema';
+import { selectRoomState } from '../selectors';
 
 /**
  * @internal

@@ -7,7 +7,7 @@ import {
   useHMSVanillaStore,
 } from "@100mslive/react-sdk";
 import { ClosedCaptionIcon } from "@100mslive/react-icons";
-import { Box, IconButton, Text, Tooltip } from "@100mslive/react-ui";
+import { Box, IconButton, Text, Tooltip } from "@100mslive/roomkit-react";
 import { Transcriber } from "./Transcriber";
 import { SESSION_STORE_KEY } from "../../common/constants";
 
@@ -34,27 +34,31 @@ export function TranscriptionButton() {
 
   useEffect(() => {
     if (!transcriber.current) {
-      transcriber.current = new Transcriber(
-        rawStore,
-        async (transcript, peerName) => {
+      // create transcriber with the current room state for transcription
+      transcriber.current = new Transcriber({
+        hmsStore: rawStore,
+        setTranscriptAndSpeakingPeer: async (transcript, peerName) => {
+          const transcriptionCurrentEnabledState = !!rawStore.getState(
+            selectSessionStore(SESSION_STORE_KEY.TRANSCRIPTION_STATE)
+          )?.enabled;
           await hmsActions.sessionStore.set(
             SESSION_STORE_KEY.TRANSCRIPTION_STATE,
             {
-              enabled: true,
+              enabled: transcriptionCurrentEnabledState,
               transcript,
               speakingPeer: peerName,
             }
           );
         },
-        async isEnabled => {
+        setIsTranscriptionEnabled: async newEnabledState => {
           await hmsActions.sessionStore.set(
             SESSION_STORE_KEY.TRANSCRIPTION_STATE,
             {
-              enabled: isEnabled,
+              enabled: newEnabledState,
             }
           );
-        }
-      );
+        },
+      });
     }
     return () => {
       if (transcriber.current) {

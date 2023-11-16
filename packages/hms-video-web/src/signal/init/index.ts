@@ -1,5 +1,6 @@
 import { InitConfig } from './models';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import HMSLogger from '../../utils/logger';
 
 const TAG = '[InitService]';

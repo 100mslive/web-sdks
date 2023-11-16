@@ -22,8 +22,8 @@ jobs:
               - 'packages/hms-video-store/src/!(test)**/!(*.test.ts)'
             react-sdk:
               - 'packages/react-sdk/src/**'
-            react-ui:
-              - 'packages/react-ui/src/**'
+            roomkit-react:
+              - 'packages/roomkit-react/src/**'
             react-icons:
               - 'packages/react-icons/src/**'
             sdk-test: 

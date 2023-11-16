@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import { useMedia } from "react-use";
-import Hls from "hls.js";
+import { HMSHLSPlayer } from "@100mslive/hls-player";
 import {
   selectAppData,
   selectIsAllowedToPublish,
@@ -29,7 +29,7 @@ import {
   Flex,
   Text,
   Tooltip,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { RoleChangeModal } from "../RoleChangeModal";
 import SettingsModal from "../Settings/SettingsModal";
@@ -85,6 +85,8 @@ export const MoreSettings = () => {
     setOpenModals(modals => {
       const copy = new Set(modals);
       if (value) {
+        // avoiding extra set state trigger which removes currently open dialog by clearing set.
+        copy.clear();
         copy.add(modalName);
       } else {
         copy.delete(modalName);
@@ -98,6 +100,7 @@ export const MoreSettings = () => {
       <Dropdown.Root
         open={openModals.has(MODALS.MORE_SETTINGS)}
         onOpenChange={value => updateState(MODALS.MORE_SETTINGS, value)}
+        modal={false}
       >
         <Dropdown.Trigger asChild data-testid="more_settings_btn">
           <IconButton>
@@ -113,6 +116,7 @@ export const MoreSettings = () => {
           sideOffset={5}
           align="center"
           css={{
+            backgroundColor: "$surface_dim",
             maxHeight: "$96",
             "@md": { w: "$64" },
             "div[role='separator']:first-child": {
@@ -123,6 +127,7 @@ export const MoreSettings = () => {
           {isMobile && permissions?.browserRecording ? (
             <>
               <Dropdown.Item
+                css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
                 onClick={() => updateState(MODALS.START_RECORDING, true)}
               >
                 <RecordIcon />
@@ -130,11 +135,11 @@ export const MoreSettings = () => {
                   {isBrowserRecordingOn ? "Stop" : "Start"} Recording
                 </Text>
               </Dropdown.Item>
-              <Dropdown.ItemSeparator />
             </>
           ) : null}
           {isChangeNameEnabled && (
             <Dropdown.Item
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
               onClick={() => updateState(MODALS.CHANGE_NAME, true)}
               data-testid="change_name_btn"
             >
@@ -149,6 +154,7 @@ export const MoreSettings = () => {
           />
           {permissions?.changeRole && (
             <Dropdown.Item
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
               onClick={() => updateState(MODALS.BULK_ROLE_CHANGE, true)}
               data-testid="bulk_role_change_btn"
             >
@@ -166,6 +172,7 @@ export const MoreSettings = () => {
           )}
           {permissions.mute && (
             <Dropdown.Item
+              css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
               onClick={() => updateState(MODALS.MUTE_ALL, true)}
               data-testid="mute_all_btn"
             >
@@ -175,8 +182,8 @@ export const MoreSettings = () => {
               </Text>
             </Dropdown.Item>
           )}
-          <Dropdown.ItemSeparator />
           <Dropdown.Item
+            css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
             onClick={() => updateState(MODALS.DEVICE_SETTINGS, true)}
             data-testid="device_settings_btn"
           >
@@ -188,8 +195,9 @@ export const MoreSettings = () => {
           {FeatureFlags.enableStatsForNerds &&
             isSFNEnabled &&
             (localPeerRole === "hls-viewer" ? (
-              Hls.isSupported() ? (
+              HMSHLSPlayer.isSupported() ? (
                 <Dropdown.Item
+                  css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
                   onClick={() =>
                     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats)
                   }
@@ -220,6 +228,7 @@ export const MoreSettings = () => {
               ) : null
             ) : (
               <Dropdown.Item
+                css={{ "&:hover": { backgroundColor: "$surface_bright" } }}
                 onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)}
                 data-testid="stats_for_nreds_btn"
               >

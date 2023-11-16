@@ -4,6 +4,7 @@ import {
   HMSAudioTrackSettings,
   HMSConfig,
   HMSLogLevel,
+  HMSMidCallPreviewConfig,
   HMSPluginSupportResult,
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
@@ -19,9 +20,12 @@ import {
   HMSGenericTypes,
   HMSMessageID,
   HMSPeerID,
+  HMSPeerListIterator,
+  HMSPeerListIteratorOptions,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
+  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from './schema';
@@ -44,7 +48,7 @@ import { HMSRoleChangeRequest } from './selectors';
  * @category Core
  */
 export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
-  preview(config: HMSPreviewConfig): Promise<void>;
+  preview(config: HMSMidCallPreviewConfig | HMSPreviewConfig): Promise<void>;
   /**
    * join function can be used to join the room, if the room join is successful,
    * current details of participants and track details are populated in the store.
@@ -61,6 +65,11 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * This function can be used to leave the room, if the call is repeated it's ignored.
    */
   leave(): Promise<void>;
+
+  /**
+   * stop tracks fetched during midcall preview and general cleanup
+   */
+  cancelMidCallPreview(): Promise<void>;
 
   /**
    * If you want to enable screenshare for the local peer this class can be called.
@@ -496,4 +505,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * is persisted throughout a session till the last peer leaves a room(cleared after the last peer leaves the room)
    */
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
+
+  interactivityCenter: IHMSInteractivityCenter;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 }

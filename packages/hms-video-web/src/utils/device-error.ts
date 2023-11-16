@@ -1,6 +1,6 @@
 import { getLocalStream } from './media';
 import { getAudioTrack, getVideoTrack } from './track';
-import { HMSAction } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { HMSAudioTrackSettingsBuilder } from '../media/settings/HMSAudioTrackSettings';
 import { HMSVideoTrackSettingsBuilder } from '../media/settings/HMSVideoTrackSettings';

@@ -1,4 +1,4 @@
-import HMSRemoteStream from './HMSRemoteStream';
+import { HMSRemoteStream } from './HMSRemoteStream';
 import { PreferAudioLayerParams, PreferVideoLayerParams } from '../../connection/channel-messages';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { HMSSimulcastLayer } from '../../interfaces';

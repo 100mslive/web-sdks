@@ -1,6 +1,7 @@
 import { HMSPeer as IHMSPeer } from '../../../interfaces/peer';
 import { HMSRole } from '../../../interfaces/role';
 import { HMSAudioTrack, HMSTrack, HMSVideoTrack } from '../../../media/tracks';
+import { HAND_RAISE_GROUP_NAME } from '../../../utils/constants';
 
 export type HMSPeerInit = {
   peerId: string;
@@ -11,6 +12,10 @@ export type HMSPeerInit = {
   role?: HMSRole;
   joinedAt?: Date;
   fromRoomState?: boolean;
+  metworkQuality?: number;
+  groups?: string[];
+  realtime?: boolean;
+  isHandRaised?: boolean;
 };
 
 export class HMSPeer implements IHMSPeer {
@@ -24,18 +29,27 @@ export class HMSPeer implements IHMSPeer {
   auxiliaryTracks: HMSTrack[] = [];
   role?: HMSRole;
   joinedAt?: Date;
+  networkQuality?: number;
+  groups?: string[];
+  realtime?: boolean;
 
-  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt }: HMSPeerInit) {
+  constructor({ peerId, name, isLocal, customerUserId, metadata, role, joinedAt, groups, realtime }: HMSPeerInit) {
     this.name = name;
     this.peerId = peerId;
     this.isLocal = isLocal;
     this.customerUserId = customerUserId;
     this.metadata = metadata;
     this.joinedAt = joinedAt;
+    this.groups = groups;
+    this.realtime = realtime;
 
     if (role) {
       this.role = role;
     }
+  }
+
+  get isHandRaised() {
+    return !!this.groups?.includes(HAND_RAISE_GROUP_NAME);
   }
 
   /**
@@ -50,11 +64,19 @@ export class HMSPeer implements IHMSPeer {
   updateName(newName: string) {
     this.name = newName;
   }
+
+  updateNetworkQuality(quality: number) {
+    this.networkQuality = quality;
+  }
   /**
    * @internal
    */
   updateMetadata(data: string) {
     this.metadata = data;
+  }
+
+  updateGroups(groups: string[]) {
+    this.groups = groups;
   }
 
   toString() {
@@ -65,6 +87,7 @@ export class HMSPeer implements IHMSPeer {
       customerUserId: ${this.customerUserId};
       ${this.audioTrack ? `audioTrack: ${this.audioTrack?.trackId};` : ''}
       ${this.videoTrack ? `videoTrack: ${this.videoTrack?.trackId};` : ''}
+      groups: ${this.groups?.join()}
     }`;
   }
 }

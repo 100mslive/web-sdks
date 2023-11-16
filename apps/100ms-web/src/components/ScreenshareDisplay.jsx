@@ -1,7 +1,7 @@
 import React from "react";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { CrossIcon, ShareScreenIcon } from "@100mslive/react-icons";
-import { Button, Flex, Text } from "@100mslive/react-ui";
+import { Button, Flex, Text } from "@100mslive/roomkit-react";
 
 export const ScreenshareDisplay = () => {
   const hmsActions = useHMSActions();
@@ -19,8 +19,8 @@ export const ScreenshareDisplay = () => {
         h: "100%",
         r: "$3",
         m: "0 auto",
-        color: "$textPrimary",
-        bg: "$surfaceDefault",
+        color: "$on_surface_high",
+        bg: "$surface_default",
         textAlign: "center",
       }}
     >

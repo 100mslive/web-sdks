@@ -1,12 +1,17 @@
 import { HMSConnectionQuality, HMSConnectionQualityListener } from '../../interfaces';
+import { IStore } from '../../sdk/store';
 import { ConnectionQualityList } from '../HMSNotifications';
 
 export class ConnectionQualityManager {
-  constructor(public listener?: HMSConnectionQualityListener) {}
+  constructor(private store: IStore, public listener?: HMSConnectionQualityListener) {}
 
   handleQualityUpdate(qualityList: ConnectionQualityList) {
     const peers = qualityList.peers;
     const hmsPeers: HMSConnectionQuality[] = peers.map(peer => {
+      const storePeer = this.store.getPeerById(peer.peer_id);
+      if (storePeer) {
+        storePeer.updateNetworkQuality(peer.downlink_score);
+      }
       return {
         peerID: peer.peer_id,
         downlinkQuality: peer.downlink_score,

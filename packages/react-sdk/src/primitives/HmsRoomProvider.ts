@@ -7,8 +7,8 @@ import {
   HMSNotifications,
   HMSNotificationTypeParam,
   HMSReactiveStore,
-  HMSStats,
   HMSStatsStore,
+  HMSStatsStoreWrapper,
   HMSStore,
   HMSStoreWrapper,
 } from '@100mslive/hms-video-store';
@@ -19,7 +19,7 @@ export interface HMSRoomProviderProps<T extends HMSGenericTypes> {
   actions?: HMSActions<T>;
   store?: HMSStoreWrapper<T>;
   notifications?: HMSNotifications;
-  stats?: HMSStats;
+  stats?: HMSStatsStoreWrapper;
   /**
    * if true this will enable webrtc stats collection
    */
@@ -111,11 +111,10 @@ export const HMSRoomProvider = <T extends HMSGenericTypes = { sessionStore: Reco
 
   useEffect(() => {
     if (isBrowser && leaveOnUnload) {
-      const beforeUnloadCallback = () => providerProps.actions.leave();
-      window.addEventListener('beforeunload', beforeUnloadCallback);
-
+      const unloadCallback = () => providerProps.actions.leave();
+      window.addEventListener('unload', unloadCallback);
       return () => {
-        window.removeEventListener('beforeunload', beforeUnloadCallback);
+        window.removeEventListener('unload', unloadCallback);
       };
     }
 

@@ -3,15 +3,22 @@ import data from "@emoji-mart/data";
 import Picker from "@emoji-mart/react";
 import { useHMSActions } from "@100mslive/react-sdk";
 import { EmojiIcon, SendIcon } from "@100mslive/react-icons";
-import { Box, Flex, IconButton, Popover, styled } from "@100mslive/react-ui";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Popover,
+  styled,
+} from "@100mslive/roomkit-react";
 import { ToastManager } from "../Toast/ToastManager";
 import { useChatDraftMessage } from "../AppData/useChatState";
 import { useEmojiPickerStyles } from "./useEmojiPickerStyles";
 
 const TextArea = styled("textarea", {
   width: "100%",
+  fontFamily: "$sans",
   bg: "transparent",
-  color: "$textPrimary",
+  color: "$on_surface_high",
   resize: "none",
   lineHeight: "1rem",
   position: "relative",
@@ -106,7 +113,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
     <Flex
       align="center"
       css={{
-        bg: "$surfaceLight",
+        bg: "$surface_bright",
         minHeight: "$16",
         maxHeight: "$24",
         position: "relative",
@@ -120,6 +127,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         placeholder="Write something here"
         ref={inputRef}
         autoFocus
+        css={{ fontSize: "1rem" }}
         onKeyPress={async event => {
           if (event.key === "Enter") {
             if (!event.shiftKey) {

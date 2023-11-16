@@ -1,7 +1,9 @@
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import {
   HMSFacingMode,
@@ -13,9 +15,9 @@ import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSVideoPluginsManager } from '../../plugins/video';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
-import { getVideoTrack } from '../../utils/track';
+import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
-import HMSLocalStream from '../streams/HMSLocalStream';
+import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>, oldSettings: HMSVideoTrackSettings) {
   return function hasChanged(
@@ -97,7 +99,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (value === this.enabled) {
       return;
     }
-    super.setEnabled(value);
     if (this.source === 'regular') {
       let track: MediaStreamTrack;
       if (value) {
@@ -108,6 +109,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await this.replaceSender(track, value);
       this.nativeTrack?.stop();
       this.nativeTrack = track;
+      await super.setEnabled(value);
       if (value) {
         await this.pluginsManager.waitForRestart();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
@@ -141,7 +143,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   async setSettings(settings: Partial<IHMSVideoTrackSettings>, internal = false) {
     const newSettings = this.buildNewSettings(settings);
     await this.handleDeviceChange(newSettings, internal);
-    if (!this.enabled) {
+    if (!this.enabled || isEmptyTrack(this.nativeTrack)) {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
@@ -293,13 +295,24 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
      * Note: Do not change the order of this.
      */
     prevTrack?.stop();
-    const newTrack = await getVideoTrack(settings);
-    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-    // Replace deviceId with actual deviceId when it is default
-    if (this.settings.deviceId === 'default') {
-      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+    try {
+      const newTrack = await getVideoTrack(settings);
+      HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
+      // Replace deviceId with actual deviceId when it is default
+      if (this.settings.deviceId === 'default') {
+        this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId });
+      }
+      return newTrack;
+    } catch (error) {
+      if (this.isPublished) {
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            error: error as Error,
+          }),
+        );
+      }
+      throw error;
     }
-    return newTrack;
   }
 
   /**
@@ -343,6 +356,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return newSettings;
   };
 
+  // eslint-disable-next-line complexity
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
     const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
@@ -351,7 +365,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      if (this.source === 'video') {
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        this.videoHandler.updateSinks();
+      } else {
+        await this.nativeTrack.applyConstraints(settings.toConstraints());
+      }
     }
   };
 

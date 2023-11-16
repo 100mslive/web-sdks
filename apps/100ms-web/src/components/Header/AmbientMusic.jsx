@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MusicIcon } from "@100mslive/react-icons";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { IconButton, Tooltip } from "@100mslive/roomkit-react";
 import { useSetUiSettings } from "../AppData/useUISettings";
 import { useWhenAloneInRoom } from "../../common/hooks";
 import { UI_SETTINGS } from "../../common/constants";
@@ -84,7 +84,7 @@ export const AmbientMusic = () => {
 
   return (
     <Tooltip
-      title={`${playing ? `Disable Ambient Music` : `Play Ambient Music`}`}
+      title={playing ? `Disable Ambient Music` : `Play Ambient Music`}
       key="ambient-music"
     >
       <IconButton

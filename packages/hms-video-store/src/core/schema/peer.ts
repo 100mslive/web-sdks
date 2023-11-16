@@ -6,11 +6,12 @@ import {
   ScreenCaptureHandle,
 } from '../hmsSDKStore/sdkTypes';
 
-export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 export type HMSPeerID = string;
 export type HMSTrackID = string;
 export type HMSTrackSource = 'regular' | 'screen' | 'plugin' | 'audioplaylist' | 'videoplaylist' | string;
 export type HMSTrackType = 'audio' | 'video';
+export type HMSGroupName = string;
+export type { HMSSimulcastLayerDefinition, HMSSimulcastLayer };
 /**
  * Use this to identify what is being screenshared, not all browsers will support
  * everything.
@@ -39,6 +40,8 @@ export interface HMSPeer {
   customerUserId?: string;
   metadata?: string;
   joinedAt?: Date;
+  groups?: HMSGroupName[];
+  isHandRaised: boolean;
 }
 
 /**
@@ -113,4 +116,11 @@ export interface HMSSpeaker {
   peerID: HMSPeerID;
   trackID: HMSTrackID;
   audioLevel: number;
+}
+
+export interface HMSPeerListIterator {
+  hasNext(): boolean;
+  next(): Promise<HMSPeer[]>;
+  getTotal(): number;
+  findPeers(): Promise<HMSPeer[]>;
 }

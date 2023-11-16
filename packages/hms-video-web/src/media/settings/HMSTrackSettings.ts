@@ -1,7 +1,8 @@
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from './HMSAudioTrackSettings';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from './HMSVideoTrackSettings';
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
-import { ErrorFactory, HMSAction } from '../../error/ErrorFactory';
+import { ErrorFactory } from '../../error/ErrorFactory';
+import { HMSAction } from '../../error/HMSAction';
 
 export class HMSTrackSettingsBuilder {
   private _video: HMSVideoTrackSettings | null = new HMSVideoTrackSettingsBuilder().build();

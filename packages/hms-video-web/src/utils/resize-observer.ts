@@ -10,10 +10,10 @@ export interface HMSResizeObserverCallback {
  * This is a wrapper around ResizeObserver which will call the callback passed
  * for an element while observing, only when that element is intersecting
  */
-class HMSResizeObserverWrapper {
+export class HMSResizeObserverWrapper {
   private resizeObserver?: ResizeObserver;
   private readonly TAG = '[HMSResizeObserverWrapper]';
-  private listeners = new Map<HTMLElement, HMSResizeObserverCallback>();
+  private listeners = new WeakMap<HTMLElement, HMSResizeObserverCallback>();
   constructor() {
     this.createObserver();
   }
@@ -40,9 +40,7 @@ class HMSResizeObserverWrapper {
 
   unobserve = (element: HTMLElement) => {
     this.resizeObserver?.unobserve(element);
-    if (this.listeners.has(element)) {
-      this.listeners.delete(element);
-    }
+    this.listeners.delete(element);
   };
 
   private createObserver = () => {
@@ -53,9 +51,7 @@ class HMSResizeObserverWrapper {
 
   private handleResize = (entries: ResizeObserverEntry[]) => {
     for (const entry of entries) {
-      if (this.listeners.has(entry.target as HTMLElement)) {
-        this.listeners.get(entry.target as HTMLElement)?.(entry);
-      }
+      this.listeners.get(entry.target as HTMLElement)?.(entry);
     }
   };
 }

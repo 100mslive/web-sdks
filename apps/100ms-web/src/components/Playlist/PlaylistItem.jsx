@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, Flex, Text } from "@100mslive/react-ui";
+import { Dropdown, Flex, Text } from "@100mslive/roomkit-react";
 
 function formatDuration(duration) {
   if (!duration) {
@@ -28,10 +28,10 @@ export const PlaylistItem = React.memo(
           p: "$8",
           "&:hover": {
             cursor: "pointer",
-            bg: "$menuBg",
+            bg: "$surface_default",
           },
           "&:focus-visible": {
-            bg: "$menuBg",
+            bg: "$surface_default",
           },
         }}
         onClick={onClick}
@@ -43,7 +43,7 @@ export const PlaylistItem = React.memo(
         >
           <Text
             variant="md"
-            css={{ color: selected ? "$brandDefault" : "$textPrimary" }}
+            css={{ color: selected ? "$primary_default" : "$on_surface_high" }}
           >
             {name}
           </Text>

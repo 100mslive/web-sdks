@@ -1,6 +1,6 @@
 import React from "react";
 import { ColoredTimeIcon } from "@100mslive/react-icons";
-import { Box, Flex, Text } from "@100mslive/react-ui";
+import { Box, Flex, Text } from "@100mslive/roomkit-react";
 
 export const WaitingView = React.memo(() => {
   return (
@@ -11,7 +11,7 @@ export const WaitingView = React.memo(() => {
         maxWidth: "96%",
         h: "100%",
         m: "auto",
-        background: "$surfaceDefault",
+        background: "$surface_default",
         borderRadius: "$3",
       }}
       data-testid="waiting_view"
@@ -41,7 +41,7 @@ export const WaitingView = React.memo(() => {
             Please wait
           </Text>
           <Text
-            color="$textMedEmp"
+            color="$on_surface_medium"
             css={{ mt: "$4", "@md": { fontSize: "$sm" } }}
           >
             Sit back and relax till others let you join.

@@ -1,5 +1,5 @@
 import React from "react";
-import { styled, Text, textEllipsis } from "@100mslive/react-ui";
+import { styled, Text, textEllipsis } from "@100mslive/roomkit-react";
 import { ConnectionIndicator } from "./ConnectionIndicator";
 
 const TileConnection = ({ name, peerId, hideLabel, width }) => {
@@ -8,7 +8,7 @@ const TileConnection = ({ name, peerId, hideLabel, width }) => {
       {!hideLabel ? (
         <Text
           css={{
-            c: "$textHighEmp",
+            c: "$on_surface_high",
             ...textEllipsis(width - 60),
           }}
           variant="xs"
@@ -28,7 +28,7 @@ const Wrapper = styled("div", {
   position: "absolute",
   bottom: "$2",
   left: "$2",
-  backgroundColor: "$backgroundDark",
+  backgroundColor: "$background_dim",
   borderRadius: "$1",
   maxWidth: "85%",
   zIndex: 1,

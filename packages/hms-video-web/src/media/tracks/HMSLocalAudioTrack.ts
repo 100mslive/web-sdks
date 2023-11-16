@@ -1,4 +1,5 @@
 import { HMSAudioTrack } from './HMSAudioTrack';
+import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
@@ -10,7 +11,7 @@ import { isBrowser, isIOS } from '../../utils/support';
 import { getAudioTrack, isEmptyTrack } from '../../utils/track';
 import { TrackAudioLevelMonitor } from '../../utils/track-audio-level-monitor';
 import { HMSAudioTrackSettings, HMSAudioTrackSettingsBuilder } from '../settings';
-import HMSLocalStream from '../streams/HMSLocalStream';
+import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
@@ -24,6 +25,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private pluginsManager: HMSAudioPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private context?: AudioContext;
+  private manuallySelectedDeviceId?: string;
 
   audioLevelMonitor?: TrackAudioLevelMonitor;
 
@@ -65,6 +67,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     this.context = context;
     this.pluginsManager.setContext(context);
   }
+  getManuallySelectedDeviceId() {
+    return this.manuallySelectedDeviceId;
+  }
+
+  resetManuallySelectedDeviceId() {
+    this.manuallySelectedDeviceId = undefined;
+  }
 
   private handleVisibilityChange = async () => {
     if (document.visibilityState === 'visible') {
@@ -81,16 +90,27 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
      */
     prevTrack?.stop();
     const isLevelMonitored = Boolean(this.audioLevelMonitor);
-    const newTrack = await getAudioTrack(settings);
-    newTrack.enabled = this.enabled;
-    HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
+    try {
+      const newTrack = await getAudioTrack(settings);
+      newTrack.enabled = this.enabled;
+      HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
 
-    const localStream = this.stream as HMSLocalStream;
-    // change nativeTrack so plugin can start its work
-    await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
-    await localStream.replaceStreamTrack(prevTrack, newTrack);
-    this.nativeTrack = newTrack;
-    isLevelMonitored && this.initAudioLevelMonitor();
+      const localStream = this.stream as HMSLocalStream;
+      // change nativeTrack so plugin can start its work
+      await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
+      await localStream.replaceStreamTrack(prevTrack, newTrack);
+      this.nativeTrack = newTrack;
+      isLevelMonitored && this.initAudioLevelMonitor();
+    } catch (e) {
+      if (this.isPublished) {
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.publish({
+            error: e as Error,
+          }),
+        );
+      }
+      throw e;
+    }
     try {
       await this.pluginsManager.reprocessPlugins();
     } catch (e) {
@@ -263,6 +283,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   private handleDeviceChange = async (settings: HMSAudioTrackSettings, internal = false) => {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
+      this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       await this.replaceTrackWith(settings);
       if (!internal) {
         DeviceStorageManager.updateSelection('audioInput', {

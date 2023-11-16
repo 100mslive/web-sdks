@@ -1,4 +1,4 @@
-import { HMSAction } from './ErrorFactory';
+import { HMSAction } from './HMSAction';
 import { IAnalyticsPropertiesProvider } from '../analytics/IAnalyticsPropertiesProvider';
 import { HMSSignalMethod } from '../signal/jsonrpc/models';
 

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgRestApiIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path
@@ -16,5 +15,4 @@ const SvgRestApiIcon = (props: SVGProps<SVGSVGElement>) => (
     <path d="M19.467 21h.739v-4.222h-.74V21Z" fill="currentColor" />
   </svg>
 );
-
 export default SvgRestApiIcon;

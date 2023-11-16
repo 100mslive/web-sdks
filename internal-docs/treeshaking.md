@@ -13,4 +13,4 @@ tree-shakeable by themselves.
 
 we are using esbuild, commonjs and typescript plugins with rollup to generate both commonjs and esm output along with types.
 
-For reference to the config, check any of react-sdk, react-icons, react-ui folder.
+For reference to the config, check any of react-sdk, react-icons, roomkit-react folder.

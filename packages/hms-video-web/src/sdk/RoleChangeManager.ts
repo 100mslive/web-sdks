@@ -1,4 +1,5 @@
 import { IStore } from './store';
+import { DeviceManager } from '../device-manager';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
@@ -10,6 +11,7 @@ export default class RoleChangeManager {
   constructor(
     private store: IStore,
     private transport: ITransport,
+    private deviceManager: DeviceManager,
     private publish: (settings: InitialSettings) => Promise<void>,
     private removeAuxiliaryTrack: (trackId: string) => void,
     private listener?: HMSUpdateListener,
@@ -64,8 +66,14 @@ export default class RoleChangeManager {
 
     // call publish with new settings, local track manager will diff policies
     await this.publish(initialSettings);
+    await this.syncDevices(initialSettings, newRole);
   };
 
+  private async syncDevices(initialSettings: InitialSettings, newRole: HMSRole) {
+    if ((!initialSettings.isAudioMuted || !initialSettings.isVideoMuted) && newRole.publishParams.allowed.length > 0) {
+      await this.deviceManager.init(true);
+    }
+  }
   private async removeVideoTracks(removeVideo: boolean) {
     if (!removeVideo) {
       return;

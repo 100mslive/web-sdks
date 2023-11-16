@@ -30,6 +30,8 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
   bytesSent?: number;
   packetsSent?: number;
   qualityLimitationReason?: string;
+  qualityLimitationDurations?: { none: number; cpu: number; bandwidth: number; other: number };
+  totalPacketSendDelay?: number;
   rid?: RID;
 }
 
@@ -40,6 +42,14 @@ export interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCo
   packetsLost?: number;
   packetsLostRate?: number;
   packetsReceived?: number;
+  concealedSamples?: number;
+  silentConcealedSamples?: number;
+  audioLevel?: number;
+  totalSamplesReceived?: number;
+  concealmentEvents?: number;
+  fecPacketsDiscarded?: number;
+  fecPacketsReceived?: number;
+  totalSamplesDuration?: number;
 }
 
 export type PeerConnectionType = 'publish' | 'subscribe';
@@ -49,6 +59,7 @@ interface BaseTrackStats extends RTCRtpStreamStats {
   peerName?: string;
   bitrate: number;
   codec?: string;
+  enabled?: boolean;
 }
 
 /**

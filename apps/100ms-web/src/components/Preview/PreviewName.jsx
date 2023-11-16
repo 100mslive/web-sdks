@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Input, styled } from "@100mslive/react-ui";
+import { Button, Input, styled } from "@100mslive/roomkit-react";
 import { isStreamingKit } from "../../common/utils";
 
 const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
@@ -13,7 +13,7 @@ const PreviewName = ({ name, onChange, onJoin, enableJoin }) => {
         id="name"
         css={{ w: "100%" }}
         value={name}
-        onChange={e => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value.trimStart())}
         placeholder="Enter your name"
         autoFocus
         autoComplete="name"

@@ -54,7 +54,7 @@ export class AnalyticsTimer {
     );
   }
 
-  cleanUp() {
+  cleanup() {
     this.eventPerformanceMeasures = {};
   }
 }

@@ -57,7 +57,7 @@ export const selectAudioPlaylist: HMSPlaylistSelector = {
   playbackRate: selectPlaylistPlaybackRate(HMSPlaylistType.audio),
   volume: selectPlaylistVolume(HMSPlaylistType.audio),
   list: selectPlaylist(HMSPlaylistType.audio),
-  selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.audio),
+  selectedItem: selectPlaylistSelectedItem(HMSPlaylistType.audio) as any,
 };
 
 export const selectVideoPlaylist: HMSPlaylistSelector = {
@@ -67,5 +67,5 @@ export const selectVideoPlaylist: HMSPlaylistSelector = {
   playbackRate: selectPlaylistPlaybackRate(HMSPlaylistType.video),
   volume: selectPlaylistVolume(HMSPlaylistType.video),
   list: selectPlaylist(HMSPlaylistType.video),
-  selectedItem: <any>selectPlaylistSelectedItem(HMSPlaylistType.video),
+  selectedItem: selectPlaylistSelectedItem(HMSPlaylistType.video) as any,
 };

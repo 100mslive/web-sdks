@@ -1,4 +1,5 @@
 import { ENV, isNode, parsedUserAgent } from './support';
+import { isPresent } from './validations';
 import { DomainCategory } from '../analytics/AnalyticsEventDomains';
 import { domainCategory } from '../analytics/domain-analytics';
 import { HMSFrameworkInfo } from '../interfaces';
@@ -12,6 +13,7 @@ type UserAgent = {
   sdk_version: string;
   env: 'debug' | 'prod';
   domain: DomainCategory;
+  is_prebuilt: boolean;
   device_model?: string;
   framework?: HMSFrameworkInfo['type'] | 'node';
   framework_version?: HMSFrameworkInfo['version'];
@@ -30,6 +32,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
       sdk_version,
       env,
       domain: domainCategory,
+      is_prebuilt: !!frameworkInfo?.isPrebuilt,
       framework: 'node',
       framework_version: process.version,
       framework_sdk_version: frameworkInfo?.sdkVersion,
@@ -58,6 +61,7 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     device_model,
     env,
     domain: domainCategory,
+    is_prebuilt: !!frameworkInfo?.isPrebuilt,
     framework: frameworkInfo?.type,
     framework_version: frameworkInfo?.version,
     framework_sdk_version: frameworkInfo?.sdkVersion,
@@ -70,6 +74,6 @@ function replaceSpaces(s: string) {
 
 const convertObjectToString = (object: UserAgent, delimiter = ',') =>
   Object.keys(object)
-    .filter(key => !!object[key as keyof UserAgent])
+    .filter(key => isPresent(object[key as keyof UserAgent]))
     .map(key => `${key}:${object[key as keyof UserAgent]}`)
     .join(delimiter);

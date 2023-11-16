@@ -1,5 +1,9 @@
 {
-  "packages": ["packages/*", "apps/*", "playwright/*"],
+  "packages": [
+    "packages/*",
+    "apps/*",
+    "playwright/*"
+  ],
   "version": "independent",
   "npmClient": "yarn",
   "useWorkspaces": true,
@@ -11,5 +15,6 @@
     "publish": {
       "registry": "https://registry.npmjs.org/"
     }
-  }
+  },
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json"
 }

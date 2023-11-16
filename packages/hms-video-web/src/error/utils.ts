@@ -1,5 +1,6 @@
 import adapter from 'webrtc-adapter';
-import { ErrorFactory, HMSAction } from './ErrorFactory';
+import { ErrorFactory } from './ErrorFactory';
+import { HMSAction } from './HMSAction';
 import { HMSException } from './HMSException';
 
 export enum HMSGetMediaActions {

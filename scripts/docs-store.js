@@ -57,7 +57,7 @@ const removeFileExtensionFromLinks = content => {
  * @returns {string | undefined}
  */
 const replaceContentLinks = content => {
-  return content?.replace('/modules', '/home/content');
+  return content?.replace(/\/modules/g, '/home/content');
 };
 
 const main = () => {

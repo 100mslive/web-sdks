@@ -9,11 +9,12 @@ import {
   useHMSActions,
   useHMSStore,
 } from "@100mslive/react-sdk";
-import { Flex } from "@100mslive/react-ui";
+import { Flex } from "@100mslive/roomkit-react";
 import FullPageProgress from "../components/FullPageProgress";
 import EmbedView from "./EmbedView";
 import { InsetView } from "./InsetView";
 import { MainGridView } from "./mainGridView";
+import PDFView from "./PDFView";
 import ScreenShareView from "./screenShareView";
 import SidePane from "./SidePane";
 import { WaitingView } from "./WaitingView";
@@ -22,6 +23,7 @@ import { useAppConfig } from "../components/AppData/useAppConfig";
 import {
   useHLSViewerRole,
   useIsHeadless,
+  usePDFConfig,
   usePinnedTrack,
   useUISettings,
   useUrlToEmbed,
@@ -49,7 +51,9 @@ export const ConferenceMainView = () => {
   const { uiViewMode, isAudioOnly } = useUISettings();
   const hlsViewerRole = useHLSViewerRole();
   const waitingViewerRole = useWaitingViewerRole();
-  const urlToIframe = useUrlToEmbed();
+  const embedConfig = useUrlToEmbed();
+  const pdfConfig = usePDFConfig();
+
   useEffect(() => {
     if (!isConnected) {
       return;
@@ -83,8 +87,10 @@ export const ConferenceMainView = () => {
     ViewComponent = HLSView;
   } else if (localPeerRole === waitingViewerRole) {
     ViewComponent = WaitingView;
-  } else if (urlToIframe) {
+  } else if (embedConfig) {
     ViewComponent = EmbedView;
+  } else if (pdfConfig) {
+    ViewComponent = PDFView;
   } else if (whiteboardShared) {
     ViewComponent = WhiteboardView;
   } else if (uiMode === "inset") {

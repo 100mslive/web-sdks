@@ -1,8 +1,6 @@
 ## Web sdks
 
-
 This monorepo will contain all packages related to core sdk and store.
-
 
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
@@ -23,8 +21,9 @@ yarn install
 ### Test
 
 ```
-yarn test 
+yarn test
 ```
+
 ### Running playwright tests
 
 Navigate to playwright directory before running below commands.
@@ -65,8 +64,6 @@ the folder directly and run `yarn start`.
 # for react-sdk
 > yarn reactsdk
 
-# for react-ui
-> yarn reactui
 ```
 
 > Note: run yarn start in sdk first and then in store

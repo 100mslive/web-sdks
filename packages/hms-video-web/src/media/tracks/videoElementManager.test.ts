@@ -3,8 +3,8 @@ import { HMSLocalVideoTrack } from '../..';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { EventBus } from '../../events/EventBus';
-import HMSLocalStream from '../streams/HMSLocalStream';
-import HMSRemoteStream from '../streams/HMSRemoteStream';
+import { HMSLocalStream } from '../streams/HMSLocalStream';
+import { HMSRemoteStream } from '../streams/HMSRemoteStream';
 
 const remoteStreamId = '123';
 const remoteTrackId = '456';
@@ -77,5 +77,16 @@ describe('videoElementManager', () => {
     expect(remoteTrack.getSinks().length).toBe(1);
     remoteTrack.attach(document.createElement('video'));
     expect(remoteTrack.getSinks().length).toBe(2);
+  });
+
+  test('test cleanup', async () => {
+    const track = localTrack;
+    const videoElement1 = document.createElement('video');
+    const videoElement2 = document.createElement('video');
+    await track.videoHandler.addVideoElement(videoElement1);
+    await track.videoHandler.addVideoElement(videoElement2);
+    expect(track.videoHandler.getVideoElements().length).toBe(2);
+    track.videoHandler.cleanup();
+    expect(track.videoHandler.getVideoElements().length).toBe(0);
   });
 });

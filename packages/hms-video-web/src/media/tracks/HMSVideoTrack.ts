@@ -1,7 +1,7 @@
 import { HMSTrack, HMSTrackSource } from './HMSTrack';
 import { HMSTrackType } from './HMSTrackType';
 import { VideoElementManager } from './VideoElementManager';
-import HMSMediaStream from '../streams/HMSMediaStream';
+import { HMSMediaStream } from '../streams';
 
 export class HMSVideoTrack extends HMSTrack {
   readonly type: HMSTrackType = HMSTrackType.VIDEO;
@@ -53,9 +53,7 @@ export class HMSVideoTrack extends HMSTrack {
   removeSink(videoElement: HTMLVideoElement) {
     if (videoElement.srcObject !== null) {
       videoElement.srcObject = null;
-      if (this.sinkCount > 0) {
-        this.sinkCount--;
-      }
+      this.reduceSinkCount();
     }
   }
 
@@ -67,13 +65,25 @@ export class HMSVideoTrack extends HMSTrack {
   protected addSinkInternal(videoElement: HTMLVideoElement, track: MediaStreamTrack) {
     const srcObject = videoElement.srcObject;
     if (srcObject !== null && srcObject instanceof MediaStream) {
-      const existingTrackID = srcObject.getVideoTracks()[0]?.id;
-      if (existingTrackID === track.id) {
-        // it's already attached, attaching again would just cause flickering
-        return;
+      const existingTrack = srcObject.getVideoTracks()[0];
+      if (existingTrack?.id === track.id) {
+        if (!existingTrack.muted && existingTrack.readyState === 'live') {
+          // it's already attached, attaching again would just cause flickering
+          return;
+        } else {
+          this.reduceSinkCount();
+        }
+      } else {
+        this.reduceSinkCount();
       }
     }
     videoElement.srcObject = new MediaStream([track]);
     this.sinkCount++;
+  }
+
+  private reduceSinkCount() {
+    if (this.sinkCount > 0) {
+      this.sinkCount--;
+    }
   }
 }

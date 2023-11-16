@@ -38,7 +38,7 @@ export class Center {
 
   //network
   network_offline_notification =
-    'text=You are offline for now. while we try to reconnect, please check your internet connection.';
+    'text=You lost your network connection. Trying to reconnect.';
   network_connected_notification = 'text=You are now connected';
 
   constructor(page: PageWrapper) {

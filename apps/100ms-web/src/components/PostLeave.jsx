@@ -1,7 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { ExitIcon } from "@100mslive/react-icons";
-import { Box, Button, Flex, Text, textEllipsis } from "@100mslive/react-ui";
+import {
+  Box,
+  Button,
+  Flex,
+  Text,
+  textEllipsis,
+} from "@100mslive/roomkit-react";
 import { ToastManager } from "./Toast/ToastManager";
 import { Header } from "./Header";
 import { useNavigation } from "./hooks/useNavigation";
@@ -28,21 +34,25 @@ const PostLeave = () => {
         justify="center"
         direction="column"
         align="center"
-        css={{ bg: "$mainBg", flex: "1 1 0", position: "relative" }}
+        css={{ bg: "$background_dim", flex: "1 1 0", position: "relative" }}
       >
         <Text variant="h2" css={{ fontWeight: "$semiBold" }}>
           👋
         </Text>
         <Text
           variant="h4"
-          css={{ color: "$textHighEmp", fontWeight: "$semiBold", mt: "$12" }}
+          css={{
+            color: "$on_surface_high",
+            fontWeight: "$semiBold",
+            mt: "$12",
+          }}
         >
           You left the {getRoutePrefix() ? "stream" : "room"}
         </Text>
         <Text
           variant="body1"
           css={{
-            color: "$textMedEmp",
+            color: "$on_surface_medium",
             mt: "$8",
             fontWeight: "$regular",
             textAlign: "center",
@@ -59,7 +69,7 @@ const PostLeave = () => {
         <Flex css={{ mt: "$14", gap: "$10", alignItems: "center" }}>
           <Text
             variant="body1"
-            css={{ color: "$textMedEmp", fontWeight: "$regular" }}
+            css={{ color: "$on_surface_medium", fontWeight: "$regular" }}
           >
             Left by mistake?
           </Text>

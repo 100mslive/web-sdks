@@ -1,9 +1,11 @@
+import { HMSInteractivityCenter } from './session-store/interactivity-center';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
 import { HMSMessage } from './message';
-import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from './peer';
+import { HMSLocalPeer, HMSPeer } from './peer';
+import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager } from './playlist';
 import { HMSPreviewListener } from './preview-listener';
 import { HMSRole } from './role';
@@ -17,12 +19,14 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
+import { HMSPeerListIterator } from '../sdk/HMSPeerListIterator';
 import { HMSLogLevel } from '../utils/logger';
 
-export default interface HMS {
+export interface HMSInterface {
   preview(config: HMSPreviewConfig, listener: HMSPreviewListener): Promise<void>;
   join(config: HMSConfig, listener: HMSUpdateListener): Promise<void>;
   leave(notifyServer?: boolean): Promise<void>;
+  cancelMidCallPreview(): Promise<void>;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 
@@ -31,6 +35,7 @@ export default interface HMS {
   getRoles(): HMSRole[];
   getAudioOutput(): IAudioOutputManager;
   getSessionStore(): HMSSessionStore;
+  getInteractivityCenter(): HMSInteractivityCenter;
   getPlaylistManager(): HMSPlaylistManager;
   getWebrtcInternals(): HMSWebrtcInternals | undefined;
   refreshDevices(): Promise<void>;
@@ -38,9 +43,9 @@ export default interface HMS {
   /**
    * @deprecated Use `changeRoleOfPeer` instead
    */
-  changeRole(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+  changeRole(forPeerId: string, toRole: string, force?: boolean): void;
 
-  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force?: boolean): void;
+  changeRoleOfPeer(forPeerId: string, toRole: string, force?: boolean): void;
 
   changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string): void;
 
@@ -48,7 +53,7 @@ export default interface HMS {
 
   changeTrackState(forRemoteTrack: HMSRemoteTrack, enabled: boolean): Promise<void>;
   changeMultiTrackState(params: HMSChangeMultiTrackStateParams): Promise<void>;
-  removePeer(peer: HMSRemotePeer, reason: string): Promise<void>;
+  removePeer(peerId: string, reason: string): Promise<void>;
   endRoom(lock: boolean, reason: string): Promise<void>;
   startRTMPOrRecording(params: RTMPRecordingConfig): Promise<void>;
   stopRTMPAndRecording(): Promise<void>;
@@ -87,4 +92,11 @@ export default interface HMS {
   setAnalyticsLevel(level: HMSAnalyticsLevel): void;
   addAudioListener(listener: HMSAudioListener): void;
   addConnectionQualityListener(qualityListener: HMSConnectionQualityListener): void;
+
+  raiseLocalPeerHand(): Promise<void>;
+  lowerLocalPeerHand(): Promise<void>;
+  raiseRemotePeerHand(peerId: string): Promise<void>;
+  lowerRemotePeerHand(peerId: string): Promise<void>;
+
+  getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
 }

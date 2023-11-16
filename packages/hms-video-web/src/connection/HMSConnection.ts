@@ -1,5 +1,6 @@
 import { HMSConnectionRole } from './model';
-import { ErrorFactory, HMSAction } from '../error/ErrorFactory';
+import { ErrorFactory } from '../error/ErrorFactory';
+import { HMSAction } from '../error/HMSAction';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { ISignal } from '../signal/ISignal';
@@ -44,7 +45,7 @@ export default abstract class HMSConnection {
     return this.nativeConnection.connectionState;
   }
 
-  private get action(): HMSAction {
+  private get action() {
     return this.role === HMSConnectionRole.Publish ? HMSAction.PUBLISH : HMSAction.SUBSCRIBE;
   }
 
@@ -168,7 +169,8 @@ export default abstract class HMSConnection {
 
     if (sender) {
       const params = sender.getParameters();
-      if (params.encodings.length > 0) {
+      // modify only for non-simulcast encodings
+      if (params.encodings.length === 1) {
         if (maxBitrate) {
           params.encodings[0].maxBitrate = maxBitrate * 1000;
         }

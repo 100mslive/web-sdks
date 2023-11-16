@@ -22,3 +22,9 @@ export interface DeviceMap {
 export interface DeviceChangeListener {
   onDeviceChange?(event: HMSDeviceChangeEvent): void;
 }
+
+export type SelectedDevices = {
+  [DeviceType.audioInput]?: MediaDeviceInfo;
+  [DeviceType.videoInput]?: MediaDeviceInfo;
+  [DeviceType.audioOutput]?: MediaDeviceInfo;
+};

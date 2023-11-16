@@ -30,6 +30,8 @@ export default interface ITransportObserver {
    */
   onNotification(message: any): void;
 
+  onConnected(): void;
+
   onTrackAdd(track: HMSTrack): void;
 
   onTrackRemove(track: HMSTrack): void;

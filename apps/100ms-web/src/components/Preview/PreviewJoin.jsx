@@ -20,7 +20,7 @@ import {
   useBorderAudioLevel,
   useTheme,
   Video,
-} from "@100mslive/react-ui";
+} from "@100mslive/roomkit-react";
 import IconButton from "../../IconButton";
 import { AudioVideoToggle } from "../AudioVideoToggle";
 import TileConnection from "../Connection/TileConnection";
@@ -95,11 +95,24 @@ const PreviewJoin = ({
   }, [token, skipPreview]);
   return (
     <Container>
-      <Text variant="h4" css={{ wordBreak: "break-word", textAlign: "center" }}>
+      <Text
+        variant="h4"
+        css={{
+          wordBreak: "break-word",
+          textAlign: "center",
+          color: "$on_surface_high",
+        }}
+      >
         Get Started
       </Text>
       <Text
-        css={{ c: "$textMedEmp", my: "$6", textAlign: "center" }}
+        css={{
+          c: "$on_surface_medium",
+          my: "$6",
+          textAlign: "center",
+          maxWidth: "100%",
+          wordWrap: "break-word",
+        }}
         variant="body1"
       >
         Setup your audio and video before joining
@@ -135,7 +148,7 @@ const Container = styled("div", {
   px: "$10",
 });
 
-const PreviewTile = ({ name, error }) => {
+export const PreviewTile = ({ name, error }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const borderAudioRef = useBorderAudioLevel(localPeer?.audioTrack);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -149,7 +162,7 @@ const PreviewTile = ({ name, error }) => {
   return (
     <StyledVideoTile.Container
       css={{
-        bg: "$surfaceDefault",
+        bg: "$surface_default",
         aspectRatio: width / height,
         width: "unset",
         height: "min(360px, 60vh)",
@@ -186,7 +199,7 @@ const PreviewTile = ({ name, error }) => {
   );
 };
 
-const PreviewControls = () => {
+export const PreviewControls = () => {
   return (
     <Flex
       justify="between"

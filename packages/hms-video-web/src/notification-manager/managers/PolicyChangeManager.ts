@@ -31,12 +31,20 @@ export class PolicyChangeManager {
     // const publishParams = params.known_roles[params.name]?.publishParams;
     // this.store.setPublishParams(publishParams);
 
+    this.updateLocalPeerRole(params);
+    this.eventBus.policyChange.publish(params);
+  }
+
+  private updateLocalPeerRole(params: PolicyParams) {
+    const localPeer = this.store.getLocalPeer();
     if (localPeer?.role && localPeer.role.name !== params.name) {
       const newRole = this.store.getPolicyForRole(params.name);
       const oldRole = localPeer.role;
       localPeer.updateRole(newRole);
+      if (newRole.name === localPeer.asRole?.name) {
+        delete localPeer.asRole;
+      }
       this.eventBus.localRoleUpdate.publish({ oldRole, newRole });
     }
-    this.eventBus.policyChange.publish(params);
   }
 }

@@ -146,7 +146,7 @@ export class RetryScheduler {
 
     const delay = this.getDelayForRetryCount(category, failedRetryCount);
 
-    HMSLogger.i(
+    HMSLogger.d(
       this.TAG,
       `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Scheduling retry task in ${delay}ms`,
     );
@@ -171,7 +171,7 @@ export class RetryScheduler {
       if (changeState && this.inProgress.size === 0) {
         this.onStateChange(originalState);
       }
-      HMSLogger.i(this.TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
+      HMSLogger.d(this.TAG, `schedule: [${TFC[category]}] [failedRetryCount=${failedRetryCount}] Recovered ♻️`);
     } else {
       await this.scheduleTask({
         category,

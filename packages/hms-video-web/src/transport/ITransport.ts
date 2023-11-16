@@ -1,15 +1,12 @@
-import {
-  HLSConfig,
-  HLSTimedMetadata,
-  HMSPeer,
-  HMSRole,
-  HMSRoleChangeRequest,
-  RTMPRecordingConfig,
-} from '../interfaces';
+import { HLSConfig, HLSTimedMetadata, HMSRole, HMSRoleChangeRequest, RTMPRecordingConfig } from '../interfaces';
 import { HMSLocalTrack } from '../media/tracks';
 import {
+  findPeersRequestParams,
   GetSessionMetadataResponse,
+  JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
+  peerIterRequestParams,
+  PeersIterationResponse,
   SetSessionMetadataParams,
   SetSessionMetadataResponse,
   TrackUpdateRequestParams,
@@ -36,9 +33,9 @@ export default interface ITransport {
   /**
    * @deprecated Use `changeRoleOfPeer`
    */
-  changeRole(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
+  changeRole(forPeerId: string, toRole: string, force: boolean): Promise<void>;
 
-  changeRoleOfPeer(forPeer: HMSPeer, toRole: string, force: boolean): Promise<void>;
+  changeRoleOfPeer(forPeerId: string, toRole: string, force: boolean): Promise<void>;
 
   acceptRoleChange(request: HMSRoleChangeRequest): Promise<void>;
 
@@ -68,4 +65,16 @@ export default interface ITransport {
   changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams): Promise<void>;
 
   handleLocalRoleUpdate({ oldRole, newRole }: { oldRole: HMSRole; newRole: HMSRole }): Promise<void>;
+
+  joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  leaveGroup(name: string): Promise<JoinLeaveGroupResponse>;
+
+  addToGroup(peerId: string, name: string): Promise<void>;
+
+  removeFromGroup(peerId: string, name: string): Promise<void>;
+
+  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse>;
+
+  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse>;
 }

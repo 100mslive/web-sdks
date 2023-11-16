@@ -1,9 +1,9 @@
 import { PauseIcon, PlayIcon } from "@100mslive/react-icons";
-import { IconButton, Tooltip } from "@100mslive/react-ui";
+import { IconButton, Tooltip } from "@100mslive/roomkit-react";
 
 export const PlayButton = ({ onClick, isPaused }) => {
   return (
-    <Tooltip title={`${isPaused ? "Play" : "Pause"}`} side="top">
+    <Tooltip title={isPaused ? "Play" : "Pause"} side="top">
       <IconButton onClick={onClick} data-testid="play_pause_btn">
         {isPaused ? (
           <PlayIcon width={32} height={32} />
