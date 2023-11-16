@@ -26,7 +26,7 @@ export interface HMSMessage {
    * true if message will not be put it in store because it has been ignored
    */
   ignored: boolean;
-  quotedMessageID?: string;
+  quotedMessageID?: HMSMessageID;
 }
 
 /**

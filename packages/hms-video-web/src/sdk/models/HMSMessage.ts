@@ -41,7 +41,6 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
       info: {
         message: this.message,
         type: this.type,
-        quotedMessageID: this.quotedMessageID || '',
       },
     };
     if (roles?.length) {
@@ -54,6 +53,7 @@ export default class Message implements HMSMessage, ISignalParamsProvider<SendMe
   }
 
   toString() {
+    console.log('tostr', this.quotedMessageID);
     return `{
       sender: ${this.sender};
       recipientPeer: ${this.recipientPeer};

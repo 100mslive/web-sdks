@@ -394,16 +394,22 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
   }
 
-  private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {
+  private updateMessageInStore(
+    sdkMessage: sdkTypes.HMSMessage | void,
+    messageInput: string | HMSMessageInput,
+    quotedMessageID?: string,
+  ) {
     if (!sdkMessage) {
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = `${this.sdk.getLocalPeer()?.name} (You)`;
     hmsMessage.sender = this.sdk.getLocalPeer()?.peerId;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    hmsMessage.quotedMessageID = quotedMessageID;
     this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }

@@ -97,6 +97,7 @@ export class NotificationManager {
   handleNotification(message: { method: string; params: any }, isReconnecting = false) {
     const method = message.method as HMSNotificationMethod;
     const notification = message.params;
+
     if (
       ![
         HMSNotificationMethod.ACTIVE_SPEAKERS,

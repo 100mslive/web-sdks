@@ -8,7 +8,6 @@ import {
   selectLocalPeerID,
   selectLocalPeerName,
   selectLocalPeerRoleName,
-  selectMessageByMessageID,
   selectMessagesByPeerID,
   selectMessagesByRole,
   selectPeerNameByID,
@@ -384,7 +383,6 @@ const ChatMessage = React.memo(
     const [openSheet, setOpenSheet] = useState(false);
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
-    const quotedMessage = useHMSStore(selectMessageByMessageID(message?.quotedMessageID));
 
     useEffect(() => {
       if (message.id && !message.read && inView) {
@@ -488,18 +486,6 @@ const ChatMessage = React.memo(
               setQuotedMessageID={setQuotedMessageID}
             />
           </Text>
-          {quotedMessage ? (
-            <Box css={{ background: '$surface_bright', borderRadius: '$1', p: '$4', pl: '$8', w: '100%' }}>
-              <Flex>
-                <Text variant="xs" css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                  {quotedMessage?.senderName}
-                </Text>
-              </Flex>
-              <Text variant="xs" css={{ color: '$on_surface_high' }}>
-                {quotedMessage?.message}
-              </Text>
-            </Box>
-          ) : null}
           <Text
             variant="sm"
             css={{
@@ -515,7 +501,7 @@ const ChatMessage = React.memo(
               setOpenSheet(true);
             }}
           >
-            <AnnotisedMessage message={message.message} />
+            <AnnotisedMessage message={message.message + JSON.stringify(message?.quotedMessageID)} />
           </Text>
         </Flex>
       </Box>

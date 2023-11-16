@@ -89,7 +89,7 @@ export const ChatFooter = ({
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const quotedMessage = useHMSStore(selectMessageByMessageID(quotedMessageID));
+  const quotedMessage = useHMSStore(selectMessageByMessageID);
 
   // @ts-ignore to update
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
@@ -207,7 +207,7 @@ export const ChatFooter = ({
             </IconButton>
           </Flex>
           <Text variant="sm" css={{ color: '$on_surface_high' }}>
-            {quotedMessage?.message}
+            {quotedMessage.message}
           </Text>
         </Box>
       ) : null}
