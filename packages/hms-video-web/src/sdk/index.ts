@@ -637,8 +637,8 @@ export class HMSSdk implements HMSInterface {
     return this.audioOutput;
   }
 
-  sendMessage(type: string, message: string) {
-    this.sendMessageInternal({ message, type });
+  sendMessage(type: string, message: string, quotedMessageID?: string) {
+    this.sendMessageInternal({ message, type, quotedMessageID });
   }
 
   async sendBroadcastMessage(message: string, type?: string, quotedMessageID?: string) {
@@ -688,6 +688,7 @@ export class HMSSdk implements HMSInterface {
       time: new Date(),
       quotedMessageID,
     });
+
     HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
     const response = await this.transport.sendMessage(hmsMessage);
     hmsMessage.time = new Date(response.timestamp);

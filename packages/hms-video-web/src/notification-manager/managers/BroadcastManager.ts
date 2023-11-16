@@ -32,7 +32,6 @@ export class BroadcastManager {
         knownRoles[role] && recipientRoles.push(knownRoles[role]);
       }
     }
-
     const hmsMessage = new Message({
       ...notifMessage,
       sender,

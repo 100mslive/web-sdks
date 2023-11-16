@@ -232,6 +232,7 @@ export interface SendMessage {
 export interface MessageNotificationInfo {
   message: any;
   type: string;
+  quotedMessageID?: string;
 }
 export enum RecordingNotificationType {
   SFU = 'sfu',
