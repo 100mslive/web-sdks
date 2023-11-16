@@ -1,10 +1,11 @@
 import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
+import { randomUUID } from 'crypto';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
 
 const HmsStitches = createStitches({
-  prefix: 'hms-ui',
+  prefix: `hms-ui-${randomUUID()}`,
   theme: {
     ...baseConfig.theme,
     colors: {
