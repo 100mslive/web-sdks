@@ -62,8 +62,6 @@ export type HMSPrebuiltProps = {
   options?: HMSPrebuiltOptions;
   screens?: Screens;
   authToken?: string;
-  roomId?: string;
-  role?: string;
   onLeave?: () => void;
   onJoin?: () => void;
   /**
@@ -85,8 +83,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     {
       roomCode = '',
       authToken = '',
-      roomId = '',
-      role = '',
       containerSelector = DEFAULT_PORTAL_CONTAINER,
       logo,
       typography,
@@ -138,14 +134,12 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       | {
           init: string;
           tokenByRoomCode: string;
-          tokenByRoomIdRole: string;
           roomLayout: string;
         }
       | undefined;
     const tokenByRoomCodeEndpoint: string = endpointsObj?.tokenByRoomCode || '';
     const initEndpoint: string = endpointsObj?.init || '';
     const roomLayoutEndpoint: string = endpointsObj?.roomLayout || '';
-    const tokenByRoomIdRoleEndpoint: string = endpointsObj?.tokenByRoomIdRole || '';
 
     const overrideLayout: Partial<Layout> = {
       logo,
@@ -154,10 +148,10 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
     };
 
-    if (!roomCode && !(authToken && roomId && role)) {
+    if (!roomCode && !authToken) {
       console.error(`
           HMSPrebuilt can be initialised by providing: 
-          either just "roomCode" or "authToken" and "roomId" and "role".
+          either "roomCode" or "authToken".
           Please check if you are providing the above values for initialising prebuilt.
         `);
       throw Error('Incorrect initializing params for HMSPrebuilt component');
@@ -174,8 +168,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
         <HMSPrebuiltContext.Provider
           value={{
             roomCode,
-            roomId,
-            role,
             containerSelector,
             onLeave,
             onJoin,
@@ -184,7 +176,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
             endpoints: {
               tokenByRoomCode: tokenByRoomCodeEndpoint,
               init: initEndpoint,
-              tokenByRoomIdRole: tokenByRoomIdRoleEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
           }}
@@ -222,7 +213,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData appDetails={metadata} tokenEndpoint={tokenByRoomIdRoleEndpoint} />
+                      <AppData appDetails={metadata} />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box

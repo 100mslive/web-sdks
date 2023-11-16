@@ -75,7 +75,7 @@ const initialAppData = {
   },
 };
 
-export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
+export const AppData = React.memo(({ appDetails }) => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const roleNames = useHMSStore(selectAvailableRoleNames);
@@ -107,13 +107,12 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
 
   useEffect(() => {
     const appData = {
-      [APP_DATA.tokenEndpoint]: tokenEndpoint,
       [APP_DATA.appConfig]: getAppDetails(appDetails),
     };
     for (const key in appData) {
       hmsActions.setAppData([key], appData[key]);
     }
-  }, [appDetails, tokenEndpoint, hmsActions]);
+  }, [appDetails, hmsActions]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {
