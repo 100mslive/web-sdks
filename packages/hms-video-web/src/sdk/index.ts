@@ -30,6 +30,7 @@ import {
   HMSMessageInput,
   HMSPlaylistType,
   HMSPreviewConfig,
+  HMSQuotedMessage,
   HMSRole,
   HMSRoleChangeRequest,
   HMSScreenShareConfig,
@@ -641,8 +642,9 @@ export class HMSSdk implements HMSInterface {
     this.sendMessageInternal({ message, type });
   }
 
-  async sendBroadcastMessage(message: string, type?: string, quotedMessageID?: string) {
-    return await this.sendMessageInternal({ message, type, quotedMessageID });
+  async sendBroadcastMessage(message: string, type?: string, quotedMessage?: HMSQuotedMessage) {
+    console.log('ollo sdk', quotedMessage);
+    return await this.sendMessageInternal({ message, type, quotedMessage });
   }
 
   async sendGroupMessage(message: string, roles: HMSRole[], type?: string) {
@@ -673,8 +675,9 @@ export class HMSSdk implements HMSInterface {
     recipientPeer,
     type = 'chat',
     message,
-    quotedMessageID = '',
+    quotedMessage = undefined,
   }: HMSMessageInput) {
+    console.log('ollo internal', quotedMessage);
     if (message.replace(/\u200b/g, ' ').trim() === '') {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
       throw ErrorFactory.GenericErrors.ValidationFailed('Empty message not allowed');
@@ -686,7 +689,7 @@ export class HMSSdk implements HMSInterface {
       recipientPeer,
       recipientRoles,
       time: new Date(),
-      quotedMessageID,
+      quotedMessage,
     });
     HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
     const response = await this.transport.sendMessage(hmsMessage);

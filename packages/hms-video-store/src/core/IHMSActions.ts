@@ -22,6 +22,7 @@ import {
   HMSPeerID,
   HMSPeerListIterator,
   HMSPeerListIteratorOptions,
+  HMSQuotedMessage,
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
@@ -108,7 +109,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @param message - string message to broadcast
    * @param type - type of message eg: image, video etc. - optional defaults to chat
    */
-  sendBroadcastMessage(message: string, type?: string, quotedMessageID?: string): Promise<void>;
+  sendBroadcastMessage(message: string, type?: string, quotedMessage?: HMSQuotedMessage): Promise<void>;
   /**
    *
    * @param message - string message to send

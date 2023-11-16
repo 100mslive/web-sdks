@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerName, selectMessageByMessageID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon, EmojiIcon, ForwardIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -74,22 +74,21 @@ export const ChatFooter = ({
   peerId,
   onSend,
   children /* onSelect, selection, screenType */,
-  quotedMessageID = '',
-  setQuotedMessageID,
+  quotedMessage = undefined,
+  setQuotedMessage,
 }: {
   role: any;
   peerId: string;
   onSend: any;
   children: ReactNode;
-  quotedMessageID?: string;
-  setQuotedMessageID: any;
+  quotedMessage?: any;
+  setQuotedMessage: any;
 }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const quotedMessage = useHMSStore(selectMessageByMessageID);
 
   // @ts-ignore to update
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
@@ -109,12 +108,12 @@ export const ChatFooter = ({
       } else if (peerId) {
         await hmsActions.sendDirectMessage(message, peerId);
       } else {
-        if (quotedMessageID) {
-          await hmsActions.sendBroadcastMessage(message, 'chat', quotedMessageID);
+        if (quotedMessage) {
+          await hmsActions.sendBroadcastMessage(message, 'chat', quotedMessage);
         } else {
           await hmsActions.sendBroadcastMessage(message);
         }
-        setQuotedMessageID('');
+        setQuotedMessage(undefined);
       }
       inputRef.current.value = '';
       setTimeout(() => {
@@ -124,7 +123,7 @@ export const ChatFooter = ({
       const err = error as Error;
       ToastManager.addToast({ title: err.message });
     }
-  }, [role, peerId, hmsActions, onSend, quotedMessageID]);
+  }, [role, peerId, hmsActions, onSend, quotedMessage]);
 
   useEffect(() => {
     const messageElement = inputRef.current;
@@ -183,7 +182,7 @@ export const ChatFooter = ({
           </Popover.Root>
         </Flex>
       ) : null}
-      {quotedMessageID && quotedMessage ? (
+      {quotedMessage ? (
         <Box
           css={{
             bg: '$surface_default',
@@ -202,7 +201,7 @@ export const ChatFooter = ({
                 {quotedMessage?.senderName}
               </Text>
             </Flex>
-            <IconButton css={{ color: '$on_surface_high' }} onClick={() => setQuotedMessageID('')}>
+            <IconButton css={{ color: '$on_surface_high' }} onClick={() => setQuotedMessage(undefined)}>
               <CrossIcon />
             </IconButton>
           </Flex>
@@ -223,8 +222,8 @@ export const ChatFooter = ({
             pl: '$8',
             flexGrow: 1,
             r: '$1',
-            borderTopLeftRadius: quotedMessageID ? 0 : '$1',
-            borderTopRightRadius: quotedMessageID ? 0 : '$1',
+            borderTopLeftRadius: quotedMessage ? 0 : '$1',
+            borderTopRightRadius: quotedMessage ? 0 : '$1',
             '@md': {
               minHeight: 'unset',
               h: '$14',

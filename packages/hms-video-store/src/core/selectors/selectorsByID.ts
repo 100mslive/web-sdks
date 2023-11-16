@@ -4,7 +4,6 @@ import {
   selectFullAppData,
   selectHMSMessages,
   selectLocalPeerID,
-  selectMessagesMap,
   selectPeers,
   selectPeersMap,
   selectPollsMap,
@@ -522,8 +521,3 @@ export const selectHasPeerHandRaised = (peerId: HMSPeerID) =>
 export const selectPeerName = (peerId: HMSPeerID) => createSelector(selectPeerByID(peerId), peer => peer?.name);
 
 export const selectPollByID = byIDCurry(selectPollByIDBare);
-
-export const selectMessageByMessageID = (id: string) =>
-  createSelector(selectMessagesMap, messages => {
-    return messages?.[id] ? messages[id] : undefined;
-  });
