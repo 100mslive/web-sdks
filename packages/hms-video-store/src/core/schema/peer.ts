@@ -97,7 +97,7 @@ export interface HMSScreenVideoTrack extends Omit<HMSVideoTrack, 'facingMode'> {
   /**
    * this can be used to identify the shared tab, if
    * the shared tab has set a captureHandle on its end as well as communicate
-   * with the tab for e.g. using broadcast channel.
+   * with the tab, for example using broadcast channel.
    */
   captureHandle?: ScreenCaptureHandle;
 }
@@ -106,7 +106,7 @@ export type HMSTrack = HMSVideoTrack | HMSAudioTrack | HMSScreenVideoTrack | HMS
 
 /**
  * HMS Speaker stores the details of peers speaking at any point of time along with
- * their audio levels. This can be used to current speakers or highlight videotiles.
+ * their audio levels. This can be used to current speakers or highlight video tiles.
  *
  * @privateRemarks
  * This is a separate interface instead of being part of the HMSPeer interface as the
