@@ -1,10 +1,11 @@
 import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
+import { v4 as uuidv4 } from 'uuid';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
 
 const HmsStitches = createStitches({
-  prefix: 'hms-ui',
+  prefix: `hms-ui-${uuidv4()}`,
   theme: {
     ...baseConfig.theme,
     colors: {
