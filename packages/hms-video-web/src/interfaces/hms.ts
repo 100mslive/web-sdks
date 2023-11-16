@@ -3,7 +3,7 @@ import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
-import { HMSMessage, HMSQuotedMessage } from './message';
+import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer } from './peer';
 import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager } from './playlist';
@@ -78,7 +78,7 @@ export interface HMSInterface {
    * @see sendBroadcastMessage
    */
   sendMessage(type: string, message: string): HMSMessage | void;
-  sendBroadcastMessage(message: string, type?: string, quotedMessage?: HMSQuotedMessage): Promise<HMSMessage>;
+  sendBroadcastMessage(message: string, type?: string): Promise<HMSMessage>;
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
   sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
 

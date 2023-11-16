@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { CrossIcon, EmojiIcon, ForwardIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
 // @ts-ignore
@@ -74,22 +74,17 @@ export const ChatFooter = ({
   peerId,
   onSend,
   children /* onSelect, selection, screenType */,
-  quotedMessage = undefined,
-  setQuotedMessage,
 }: {
   role: any;
   peerId: string;
   onSend: any;
   children: ReactNode;
-  quotedMessage?: any;
-  setQuotedMessage: any;
 }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-
   // @ts-ignore to update
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeerName = useHMSStore(selectLocalPeerName);
@@ -108,12 +103,7 @@ export const ChatFooter = ({
       } else if (peerId) {
         await hmsActions.sendDirectMessage(message, peerId);
       } else {
-        if (quotedMessage) {
-          await hmsActions.sendBroadcastMessage(message, 'chat', quotedMessage);
-        } else {
-          await hmsActions.sendBroadcastMessage(message);
-        }
-        setQuotedMessage(undefined);
+        await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = '';
       setTimeout(() => {
@@ -123,7 +113,7 @@ export const ChatFooter = ({
       const err = error as Error;
       ToastManager.addToast({ title: err.message });
     }
-  }, [role, peerId, hmsActions, onSend, quotedMessage]);
+  }, [role, peerId, hmsActions, onSend]);
 
   useEffect(() => {
     const messageElement = inputRef.current;
@@ -182,34 +172,6 @@ export const ChatFooter = ({
           </Popover.Root>
         </Flex>
       ) : null}
-      {quotedMessage ? (
-        <Box
-          css={{
-            bg: '$surface_default',
-            p: '$4',
-            pl: '$8',
-            borderTopLeftRadius: '$2',
-            borderTopRightRadius: '$2',
-            borderBottom: '1px solid $border_bright',
-            mt: '$4',
-          }}
-        >
-          <Flex align="center" justify="between" css={{ w: '100%' }}>
-            <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
-              <ForwardIcon style={{ transform: 'scale(-1, 1)' }} />{' '}
-              <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
-                {quotedMessage?.senderName}
-              </Text>
-            </Flex>
-            <IconButton css={{ color: '$on_surface_high' }} onClick={() => setQuotedMessage(undefined)}>
-              <CrossIcon />
-            </IconButton>
-          </Flex>
-          <Text variant="sm" css={{ color: '$on_surface_high' }}>
-            {quotedMessage.message}
-          </Text>
-        </Box>
-      ) : null}
       <Flex align="center" css={{ gap: '$4', w: '100%' }}>
         <Flex
           align="center"
@@ -222,8 +184,6 @@ export const ChatFooter = ({
             pl: '$8',
             flexGrow: 1,
             r: '$1',
-            borderTopLeftRadius: quotedMessage ? 0 : '$1',
-            borderTopRightRadius: quotedMessage ? 0 : '$1',
             '@md': {
               minHeight: 'unset',
               h: '$14',

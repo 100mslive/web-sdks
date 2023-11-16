@@ -16,15 +16,7 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import {
-  CopyIcon,
-  CrossCircleIcon,
-  CrossIcon,
-  EyeCloseIcon,
-  ForwardIcon,
-  PinIcon,
-  VerticalMenuIcon,
-} from '@100mslive/react-icons';
+import { CopyIcon, CrossCircleIcon, CrossIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -144,18 +136,7 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-
-const ChatActions = ({
-  onPin,
-  showPinAction,
-  message,
-  peerId,
-  sentByLocalPeer,
-  isMobile,
-  openSheet,
-  setOpenSheet,
-  setQuotedMessage,
-}) => {
+const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
@@ -194,20 +175,6 @@ const ChatActions = ({
   }, [message]);
 
   const options = {
-    quote: {
-      text: 'Quote in reply',
-      icon: <ForwardIcon style={{ ...iconStyle, transform: 'scale(-1, 1)' }} />,
-      onClick: () =>
-        setQuotedMessage({
-          senderName: message?.senderName,
-          sender: message?.sender,
-          time: message.time,
-          type: message?.type,
-          message: message.message,
-          id: message.id,
-        }),
-      show: true,
-    },
     pin: {
       text: 'Pin message',
       icon: <PinIcon style={iconStyle} />,
@@ -288,12 +255,6 @@ const ChatActions = ({
           '@md': { opacity: 1 },
         }}
       >
-        {options.quote.show ? (
-          <IconButton data-testid="quote_message_btn" onClick={options.quote.onClick}>
-            {options.quote.icon}
-          </IconButton>
-        ) : null}
-
         {options.pin.show ? (
           <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
             {options.pin.icon}
@@ -360,17 +321,7 @@ const SenderName = styled(Text, {
 });
 
 const ChatMessage = React.memo(
-  ({
-    index,
-    style = {},
-    message,
-    setRowHeight,
-    isLast = false,
-    unreadCount = 0,
-    scrollToBottom,
-    onPin,
-    setQuotedMessage,
-  }) => {
+  ({ index, style = {}, message, setRowHeight, isLast = false, unreadCount = 0, scrollToBottom, onPin }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const rowRef = useRef(null);
     useEffect(() => {
@@ -491,7 +442,6 @@ const ChatMessage = React.memo(
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
-              setQuotedMessage={setQuotedMessage}
             />
           </Text>
           <Text
@@ -509,7 +459,7 @@ const ChatMessage = React.memo(
               setOpenSheet(true);
             }}
           >
-            <AnnotisedMessage message={message.message + JSON.stringify(message?.quotedMessage)} />
+            <AnnotisedMessage message={message.message} />
           </Text>
         </Flex>
       </Box>
@@ -517,10 +467,7 @@ const ChatMessage = React.memo(
   },
 );
 const ChatList = React.forwardRef(
-  (
-    { width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom, setQuotedMessage },
-    listRef,
-  ) => {
+  ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
     const { setPinnedMessages } = useSetPinnedMessages();
     const localPeerName = useHMSStore(selectLocalPeerName);
     useLayoutEffect(() => {
@@ -551,7 +498,6 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            setQuotedMessage={setQuotedMessage}
             onPin={() => setPinnedMessages(messages[index], localPeerName)}
           />
         )}
@@ -559,121 +505,115 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(
-  ({ messages, unreadCount = 0, scrollToBottom, setQuotedMessage }, listRef) => {
-    const rowHeights = useRef({});
+const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, scrollToBottom }, listRef) => {
+  const rowHeights = useRef({});
 
-    function getRowHeight(index) {
-      // 72 will be default row height for any message length
-      // 16 will add margin value as clientHeight don't include margin
-      return rowHeights.current[index] + 16 || 72;
-    }
+  function getRowHeight(index) {
+    // 72 will be default row height for any message length
+    // 16 will add margin value as clientHeight don't include margin
+    return rowHeights.current[index] + 16 || 72;
+  }
 
-    const setRowHeight = useCallback(
-      (index, size) => {
-        listRef.current.resetAfterIndex(0);
-        rowHeights.current = { ...rowHeights.current, [index]: size };
-      },
-      [listRef],
-    );
+  const setRowHeight = useCallback(
+    (index, size) => {
+      listRef.current.resetAfterIndex(0);
+      rowHeights.current = { ...rowHeights.current, [index]: size };
+    },
+    [listRef],
+  );
 
-    return (
-      <Box
-        css={{
-          mr: '-$10',
-          h: '100%',
+  return (
+    <Box
+      css={{
+        mr: '-$10',
+        h: '100%',
+      }}
+      as="div"
+    >
+      <AutoSizer
+        style={{
+          width: '90%',
         }}
-        as="div"
       >
-        <AutoSizer
-          style={{
-            width: '90%',
-          }}
-        >
-          {({ height, width }) => (
-            <ChatList
-              width={width}
-              height={height}
-              messages={messages}
-              setRowHeight={setRowHeight}
-              getRowHeight={getRowHeight}
-              scrollToBottom={scrollToBottom}
-              ref={listRef}
-              unreadCount={unreadCount}
-              setQuotedMessage={setQuotedMessage}
-            />
-          )}
-        </AutoSizer>
-      </Box>
-    );
-  },
-);
+        {({ height, width }) => (
+          <ChatList
+            width={width}
+            height={height}
+            messages={messages}
+            setRowHeight={setRowHeight}
+            getRowHeight={getRowHeight}
+            scrollToBottom={scrollToBottom}
+            ref={listRef}
+            unreadCount={unreadCount}
+          />
+        )}
+      </AutoSizer>
+    </Box>
+  );
+});
 
-export const ChatBody = React.forwardRef(
-  ({ role, peerId, scrollToBottom, blacklistedPeerIDs, setQuotedMessage }, listRef) => {
-    const storeMessageSelector = role
-      ? selectMessagesByRole(role)
-      : peerId
-      ? selectMessagesByPeerID(peerId)
-      : selectHMSMessages;
-    let messages = useHMSStore(storeMessageSelector) || [];
-    const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-    const filteredMessages =
-      useMemo(() => {
-        const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
-        const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-        return (
-          messages?.filter(
-            message =>
-              message.type === 'chat' &&
-              !blacklistedMessageIDSet.has(message.id) &&
-              !blacklistedPeerIDSet.has(message.sender),
-          ) || []
-        );
-      }, [messages, blacklistedMessageIDs, blacklistedPeerIDs]) || [];
-
-    const isMobile = useMedia(cssConfig.media.md);
-    const { elements } = useRoomLayoutConferencingScreen();
-    const unreadCount = useUnreadCount({ role, peerId });
-
-    if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDs }, listRef) => {
+  const storeMessageSelector = role
+    ? selectMessagesByRole(role)
+    : peerId
+    ? selectMessagesByPeerID(peerId)
+    : selectHMSMessages;
+  let messages = useHMSStore(storeMessageSelector) || [];
+  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
+  const filteredMessages =
+    useMemo(() => {
+      const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+      const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
       return (
-        <Flex
-          css={{
-            width: '100%',
-            flex: '1 1 0',
-            textAlign: 'center',
-            px: '$4',
-          }}
-          align="center"
-          justify="center"
-        >
-          <Box>
-            <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
-            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
-              Start a conversation
-            </Text>
-            <Text
-              variant="sm"
-              css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
-            >
-              There are no messages here yet. Start a conversation by sending a message.
-            </Text>
-          </Box>
-        </Flex>
+        messages?.filter(
+          message =>
+            message.type === 'chat' &&
+            !blacklistedMessageIDSet.has(message.id) &&
+            !blacklistedPeerIDSet.has(message.sender),
+        ) || []
       );
-    }
+    }, [messages, blacklistedMessageIDs, blacklistedPeerIDs]) || [];
 
+  const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const unreadCount = useUnreadCount({ role, peerId });
+
+  if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
-      <Fragment>
-        <VirtualizedChatMessages
-          messages={filteredMessages}
-          scrollToBottom={scrollToBottom}
-          unreadCount={unreadCount}
-          ref={listRef}
-          setQuotedMessage={setQuotedMessage}
-        />
-      </Fragment>
+      <Flex
+        css={{
+          width: '100%',
+          flex: '1 1 0',
+          textAlign: 'center',
+          px: '$4',
+        }}
+        align="center"
+        justify="center"
+      >
+        <Box>
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+          <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
+            Start a conversation
+          </Text>
+          <Text
+            variant="sm"
+            css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
+          >
+            There are no messages here yet. Start a conversation by sending a message.
+          </Text>
+        </Box>
+      </Flex>
     );
-  },
-);
+  }
+
+  return (
+    <Fragment>
+      <VirtualizedChatMessages
+        messages={filteredMessages}
+        scrollToBottom={scrollToBottom}
+        unreadCount={unreadCount}
+        ref={listRef}
+      />
+    </Fragment>
+  );
+});
