@@ -154,7 +154,7 @@ const ChatActions = ({
   isMobile,
   openSheet,
   setOpenSheet,
-  setQuotedMessage,
+  setQuotedMessageID,
 }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
@@ -197,15 +197,7 @@ const ChatActions = ({
     quote: {
       text: 'Quote in reply',
       icon: <ForwardIcon style={{ ...iconStyle, transform: 'scale(-1, 1)' }} />,
-      onClick: () =>
-        setQuotedMessage({
-          senderName: message?.senderName,
-          sender: message?.sender,
-          time: message.time,
-          type: message?.type,
-          message: message.message,
-          id: message.id,
-        }),
+      onClick: () => setQuotedMessageID(message.id),
       show: true,
     },
     pin: {
@@ -369,7 +361,7 @@ const ChatMessage = React.memo(
     unreadCount = 0,
     scrollToBottom,
     onPin,
-    setQuotedMessage,
+    setQuotedMessageID,
   }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const rowRef = useRef(null);
@@ -491,7 +483,7 @@ const ChatMessage = React.memo(
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
-              setQuotedMessage={setQuotedMessage}
+              setQuotedMessageID={setQuotedMessageID}
             />
           </Text>
           <Text
@@ -509,7 +501,7 @@ const ChatMessage = React.memo(
               setOpenSheet(true);
             }}
           >
-            <AnnotisedMessage message={message.message + JSON.stringify(message?.quotedMessage)} />
+            <AnnotisedMessage message={message.message + JSON.stringify(message?.quotedMessageID)} />
           </Text>
         </Flex>
       </Box>
@@ -518,7 +510,7 @@ const ChatMessage = React.memo(
 );
 const ChatList = React.forwardRef(
   (
-    { width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom, setQuotedMessage },
+    { width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom, setQuotedMessageID },
     listRef,
   ) => {
     const { setPinnedMessages } = useSetPinnedMessages();
@@ -551,7 +543,7 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            setQuotedMessage={setQuotedMessage}
+            setQuotedMessageID={setQuotedMessageID}
             onPin={() => setPinnedMessages(messages[index], localPeerName)}
           />
         )}
@@ -560,7 +552,7 @@ const ChatList = React.forwardRef(
   },
 );
 const VirtualizedChatMessages = React.forwardRef(
-  ({ messages, unreadCount = 0, scrollToBottom, setQuotedMessage }, listRef) => {
+  ({ messages, unreadCount = 0, scrollToBottom, setQuotedMessageID }, listRef) => {
     const rowHeights = useRef({});
 
     function getRowHeight(index) {
@@ -600,7 +592,7 @@ const VirtualizedChatMessages = React.forwardRef(
               scrollToBottom={scrollToBottom}
               ref={listRef}
               unreadCount={unreadCount}
-              setQuotedMessage={setQuotedMessage}
+              setQuotedMessageID={setQuotedMessageID}
             />
           )}
         </AutoSizer>
@@ -610,7 +602,7 @@ const VirtualizedChatMessages = React.forwardRef(
 );
 
 export const ChatBody = React.forwardRef(
-  ({ role, peerId, scrollToBottom, blacklistedPeerIDs, setQuotedMessage }, listRef) => {
+  ({ role, peerId, scrollToBottom, blacklistedPeerIDs, setQuotedMessageID }, listRef) => {
     const storeMessageSelector = role
       ? selectMessagesByRole(role)
       : peerId
@@ -671,7 +663,7 @@ export const ChatBody = React.forwardRef(
           scrollToBottom={scrollToBottom}
           unreadCount={unreadCount}
           ref={listRef}
-          setQuotedMessage={setQuotedMessage}
+          setQuotedMessageID={setQuotedMessageID}
         />
       </Fragment>
     );

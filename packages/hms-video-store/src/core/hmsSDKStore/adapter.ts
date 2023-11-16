@@ -169,6 +169,7 @@ export class SDKToHMS {
       type: sdkMessage.type,
       message: sdkMessage.message,
       id: sdkMessage.id,
+      quotedMessageID: sdkMessage?.quotedMessageID,
     };
   }
 

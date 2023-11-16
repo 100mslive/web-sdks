@@ -26,16 +26,7 @@ export interface HMSMessage {
    * true if message will not be put it in store because it has been ignored
    */
   ignored: boolean;
-  quotedMessage?: HMSQuotedMessage;
-}
-
-export interface HMSQuotedMessage {
-  senderName?: string;
-  sender?: string;
-  time: Date;
-  type?: string;
-  message: any;
-  id?: string;
+  quotedMessageID?: HMSMessageID;
 }
 
 /**
@@ -46,5 +37,5 @@ export interface HMSMessageInput {
   recipientRoles?: HMSRoleName[];
   type?: string;
   message: any;
-  quotedMessage?: HMSQuotedMessage;
+  quotedMessageID?: string;
 }
