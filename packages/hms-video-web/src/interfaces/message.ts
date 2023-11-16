@@ -6,15 +6,7 @@ export interface HMSMessageInput {
   recipientRoles?: HMSRole[];
   type?: string;
   message: string;
-  quotedMessage?: HMSQuotedMessage;
-}
-export interface HMSQuotedMessage {
-  senderName?: string;
-  sender?: string;
-  time: Date;
-  type?: string;
-  message: any;
-  id?: string;
+  quotedMessageID?: string;
 }
 
 export interface HMSMessage {
@@ -25,5 +17,5 @@ export interface HMSMessage {
   type?: string;
   message: any;
   id?: string;
-  quotedMessage?: HMSQuotedMessage;
+  quotedMessageID?: string;
 }
