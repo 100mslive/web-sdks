@@ -78,8 +78,6 @@ const App = () => {
         <HMSPrebuilt
           roomCode={roomCode}
           authToken={authToken}
-          roomId={roomId}
-          role={role}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : paramUserName,

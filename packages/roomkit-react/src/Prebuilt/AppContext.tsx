@@ -4,8 +4,6 @@ import { DEFAULT_PORTAL_CONTAINER } from './common/constants';
 
 type HMSPrebuiltContextType = {
   roomCode: string;
-  roomId?: string;
-  role?: string;
   userName?: string;
   userId?: string;
   containerSelector: string;
