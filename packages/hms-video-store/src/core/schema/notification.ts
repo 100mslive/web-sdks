@@ -41,6 +41,7 @@ export interface HMSTrackNotification extends BaseNotification {
 export interface HMSMessageNotification extends BaseNotification {
   type: HMSNotificationTypes.NEW_MESSAGE;
   data: HMSMessage;
+  quotedMessageID?: string;
 }
 export interface HMSExceptionNotification extends BaseNotification {
   type: HMSNotificationTypes.ERROR;
