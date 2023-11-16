@@ -102,7 +102,7 @@ export const RequestDialog = ({ open = true, onOpenChange, title, body, actionTe
 );
 
 /**
- * a row of items which breaks into column on small screen. For e.g. title on left and options to select
+ * a row of items which breaks into column on small screen. For example title on left and options to select
  * from on right for select component.
  */
 export const DialogRow = ({ children, breakSm = false, css, justify = 'between' }) => {
