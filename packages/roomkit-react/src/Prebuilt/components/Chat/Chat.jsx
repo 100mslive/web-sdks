@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerID, selectLocalPeerName, selectSessionStore } from '@100mslive/hms-video-store';
+import { selectLocalPeerID, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -53,12 +53,8 @@ export const Chat = ({ screenType }) => {
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
   const storeMessageSelector = selectHMSMessagesCount;
-  const localPeerName = useHMSStore(selectLocalPeerName);
   const { elements } = useRoomLayoutConferencingScreen();
-  const { can_disable_chat } = elements?.chat.real_time_controls || false;
-  const { enabled: isChatEnabled, updatedBy: chatStateUpdatedBy } = useHMSStore(
-    selectSessionStore(SESSION_STORE_KEY.CHAT_STATE),
-  ) || { enabled: true, updatedBy: '' };
+  const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
   let isScrolledToBottom = false;
@@ -104,15 +100,7 @@ export const Chat = ({ screenType }) => {
         blacklistedPeerIDs={blacklistedPeerIDs}
       />
 
-      {!isChatEnabled ? (
-        <ChatPaused
-          canUnpauseChat={can_disable_chat}
-          pausedBy={chatStateUpdatedBy}
-          unPauseChat={() =>
-            hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, { enabled: true, updatedBy: localPeerName })
-          }
-        />
-      ) : null}
+      <ChatPaused />
 
       {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
 

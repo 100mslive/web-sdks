@@ -525,5 +525,5 @@ export const selectPollByID = byIDCurry(selectPollByIDBare);
 
 export const selectMessageByMessageID = (id: string) =>
   createSelector(selectMessagesMap, messages => {
-    return messages?.[id] ? messages[id] : undefined;
+    return messages[id];
   });

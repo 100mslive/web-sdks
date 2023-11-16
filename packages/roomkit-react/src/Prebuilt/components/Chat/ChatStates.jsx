@@ -1,10 +1,29 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { selectLocalPeerName, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
-export const ChatPaused = ({ pausedBy, canUnpauseChat, unPauseChat }) => {
-  return (
+export const ChatPaused = () => {
+  const hmsActions = useHMSActions();
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { can_disable_chat } = elements?.chat.real_time_controls || false;
+  const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
+  const localPeerName = useHMSStore(selectLocalPeerName);
+
+  const unPauseChat = useCallback(
+    async () =>
+      await hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
+        enabled: true,
+        updatedBy: localPeerName,
+      }),
+    [hmsActions],
+  );
+
+  return isChatEnabled ? null : (
     <Flex
       align="center"
       justify="between"
@@ -18,10 +37,10 @@ export const ChatPaused = ({ pausedBy, canUnpauseChat, unPauseChat }) => {
           variant="xs"
           css={{ color: '$on_surface_medium', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
-          Chat has been paused by {pausedBy}
+          Chat has been paused by {chatStateUpdatedBy}
         </Text>
       </Box>
-      {canUnpauseChat ? (
+      {can_disable_chat ? (
         <Button css={{ fontWeight: '$semiBold', fontSize: '$sm', borderRadius: '$2' }} onClick={unPauseChat}>
           Resume
         </Button>

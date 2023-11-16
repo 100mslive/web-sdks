@@ -51,7 +51,7 @@ export const SidePaneTabs = React.memo<{
   const peerCount = useHMSStore(selectPeerCount);
   const { elements } = useRoomLayoutConferencingScreen();
   // @ts-ignore to update
-  const { chat_title } = elements?.chat || 'Live Chat';
+  const { chat_title } = elements?.chat || 'Chat';
   const showChat = !!elements?.chat;
   const showParticipants = !!elements?.participant_list;
   const hideTabs = !(showChat && showParticipants);

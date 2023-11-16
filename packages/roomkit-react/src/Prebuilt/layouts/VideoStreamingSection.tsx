@@ -4,6 +4,7 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { v4 as uuid } from 'uuid';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerName,
@@ -56,9 +57,8 @@ export const VideoStreamingSection = ({
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
   const localPeerName = useHMSStore(selectLocalPeerName);
-  const { enabled: isChatEnabled, updatedBy: chatStateUpdatedBy } = useHMSStore(
-    selectSessionStore(SESSION_STORE_KEY.CHAT_STATE),
-  ) || { enabled: true, updatedBy: '' };
+  const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
 
   useEffect(() => {
     if (!isConnected) {
@@ -79,9 +79,9 @@ export const VideoStreamingSection = ({
       return;
     }
     const type = isChatEnabled ? 'CHAT_RESUMED' : 'CHAT_PAUSED';
-    const notification = { id: crypto.randomUUID(), message: '', type, data: { name: localPeerName } };
+    const notification = { id: uuid(), message: '', type, data: { name: localPeerName } };
     ToastBatcher.showToast({ notification, type });
-  }, [isChatEnabled]);
+  }, [isChatEnabled, chatStateUpdatedBy, localPeerName]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI
