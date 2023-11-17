@@ -31,7 +31,6 @@ export const defaultLayout: Layout = {
       default: {
         elements: {
           chat: {
-            // @ts-ignore
             public_chat_enabled: true,
             private_chat_enabled: true,
             chat_title: 'Chat',

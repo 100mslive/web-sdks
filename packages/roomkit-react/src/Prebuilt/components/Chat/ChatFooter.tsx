@@ -85,12 +85,10 @@ export const ChatFooter = ({
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  // @ts-ignore to update
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeerName = useHMSStore(selectLocalPeerName);
   const isOverlayChat = elements?.chat?.is_overlay;
-  // @ts-ignore
-  const { can_disable_chat } = elements?.chat?.real_time_controls || false;
+  const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
