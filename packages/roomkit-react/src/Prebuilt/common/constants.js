@@ -113,15 +113,6 @@ export const SESSION_STORE_KEY = {
   CHAT_STATE: 'chatState',
 };
 
-/**
- * Chat state: {
- *  enabled?: boolean;
- *  updatedBy?: string;
- * }
- *
- * If unset, to assume enabled
- */
-
 export const INTERACTION_TYPE = {
   POLL: 'Poll',
   QUIZ: 'Quiz',

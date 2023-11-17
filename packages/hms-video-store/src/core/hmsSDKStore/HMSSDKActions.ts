@@ -402,6 +402,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     hmsMessage.read = true;
     hmsMessage.senderName = `${this.sdk.getLocalPeer()?.name} (You)`;
+    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
     this.putMessageInStore(hmsMessage);
     return hmsMessage;
   }
