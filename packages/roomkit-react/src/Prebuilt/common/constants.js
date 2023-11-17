@@ -107,6 +107,9 @@ export const SESSION_STORE_KEY = {
   TRANSCRIPTION_STATE: 'transcriptionState',
   PINNED_MESSAGES: 'pinnedMessages',
   SPOTLIGHT: 'spotlight',
+  CHAT_PEER_BLACKLIST: 'chatPeerBlacklist',
+  CHAT_MESSAGE_BLACKLIST: 'chatMessageBlacklist',
+  CHAT_STATE: 'chatState',
 };
 
 export const INTERACTION_TYPE = {

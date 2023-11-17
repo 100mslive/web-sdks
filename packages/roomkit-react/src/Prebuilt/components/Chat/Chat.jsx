@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { selectLocalPeerID, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -14,18 +15,20 @@ import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
 import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
+import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
-import { CHAT_SELECTOR } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
@@ -46,9 +49,12 @@ export const Chat = ({ screenType }) => {
       });
     }
   }, [notification, peerSelector, setPeerSelector]);
-
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
+  const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+  const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
   const storeMessageSelector = selectHMSMessagesCount;
   const { elements } = useRoomLayoutConferencingScreen();
+  const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
   let isScrolledToBottom = false;
@@ -91,32 +97,39 @@ export const Chat = ({ screenType }) => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         screenType={screenType}
+        blacklistedPeerIDs={blacklistedPeerIDs}
       />
+
+      <ChatPaused />
+
+      {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
 
       {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
         <PinnedMessage clearPinnedMessage={removePinnedMessage} />
       ) : null}
 
-      <ChatFooter
-        role={chatOptions.role}
-        onSend={() => scrollToBottom(1)}
-        selection={chatOptions.selection}
-        screenType={screenType}
-        onSelect={({ role, peerId, selection }) => {
-          setChatOptions({
-            role,
-            peerId,
-            selection,
-          });
-          setPeerSelector(peerId);
-          setRoleSelector(role);
-        }}
-        peerId={chatOptions.peerId}
-      >
-        {!isSelectorOpen && !isScrolledToBottom && (
-          <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
-        )}
-      </ChatFooter>
+      {isChatEnabled && !isLocalPeerBlacklisted ? (
+        <ChatFooter
+          role={chatOptions.role}
+          onSend={() => scrollToBottom(1)}
+          selection={chatOptions.selection}
+          screenType={screenType}
+          onSelect={({ role, peerId, selection }) => {
+            setChatOptions({
+              role,
+              peerId,
+              selection,
+            });
+            setPeerSelector(peerId);
+            setRoleSelector(role);
+          }}
+          peerId={chatOptions.peerId}
+        >
+          {!isSelectorOpen && !isScrolledToBottom && (
+            <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
+          )}
+        </ChatFooter>
+      ) : null}
     </Flex>
   );
 };

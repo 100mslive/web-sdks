@@ -29,13 +29,15 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
 
   const pinnedMessageRef = useRef(null);
   const showPreviousPinnedMessage = useCallback(() => {
-    setHideOverflow(true);
-    setPinnedMessageIndex(currentIndex => Math.max(currentIndex - 1, 0));
-  }, []);
+    const previousIndex = Math.max(pinnedMessageIndex - 1, 0);
+    setHideOverflow(pinnedMessages[previousIndex].text.length > PINNED_MESSAGE_LENGTH);
+    setPinnedMessageIndex(previousIndex);
+  }, [pinnedMessages]);
 
   const showNextPinnedMessage = useCallback(() => {
-    setHideOverflow(true);
-    setPinnedMessageIndex(currentIndex => Math.min(currentIndex + 1, pinnedMessages.length - 1));
+    const nextIndex = Math.min(pinnedMessageIndex + 1, pinnedMessages.length - 1);
+    setHideOverflow(pinnedMessages[nextIndex].text.length > PINNED_MESSAGE_LENGTH);
+    setPinnedMessageIndex(nextIndex);
   }, [pinnedMessages]);
 
   const swipeHandlers = useSwipeable({

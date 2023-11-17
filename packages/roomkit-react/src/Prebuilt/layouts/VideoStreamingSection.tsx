@@ -4,9 +4,19 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { v4 as uuid } from 'uuid';
+import {
+  selectIsConnectedToRoom,
+  selectLocalPeerName,
+  selectLocalPeerRoleName,
+  selectSessionStore,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
+// @ts-ignore: No implicit Any
+import { ToastBatcher } from '../components/Toast/ToastBatcher';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
@@ -46,14 +56,32 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  const localPeerName = useHMSStore(selectLocalPeerName);
+  const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
+    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
 
   useEffect(() => {
     if (!isConnected) {
       return;
     }
-    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGES, SESSION_STORE_KEY.SPOTLIGHT]);
+    hmsActions.sessionStore.observe([
+      SESSION_STORE_KEY.PINNED_MESSAGES,
+      SESSION_STORE_KEY.SPOTLIGHT,
+      SESSION_STORE_KEY.CHAT_STATE,
+      SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
+      SESSION_STORE_KEY.CHAT_PEER_BLACKLIST,
+    ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
+
+  useEffect(() => {
+    if (!chatStateUpdatedBy || chatStateUpdatedBy === localPeerName) {
+      return;
+    }
+    const type = isChatEnabled ? 'CHAT_RESUMED' : 'CHAT_PAUSED';
+    const notification = { id: uuid(), message: '', type, data: { name: localPeerName } };
+    ToastBatcher.showToast({ notification, type });
+  }, [isChatEnabled, chatStateUpdatedBy, localPeerName]);
 
   if (!localPeerRole) {
     // we don't know the role yet to decide how to render UI

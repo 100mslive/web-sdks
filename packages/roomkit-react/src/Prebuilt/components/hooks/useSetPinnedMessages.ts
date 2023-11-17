@@ -15,7 +15,7 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 type PinnedMessage = {
   text: string;
   id: string;
-  authorId?: string;
+  authorId: string;
   pinnedBy: string;
 };
 
@@ -25,11 +25,12 @@ type PinnedMessage = {
 export const useSetPinnedMessages = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
-  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+  const pinnedMessages: PinnedMessage[] = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+
   const setPinnedMessages = useCallback(
     async (message: HMSMessage, pinnedBy: string) => {
       const peerName = vanillaStore.getState(selectPeerNameByID(message?.sender)) || message?.senderName;
-      const newPinnedMessage = { text: '', id: message.id, pinnedBy, authorId: message?.sender };
+      const newPinnedMessage = { text: '', id: message.id, pinnedBy, authorId: message?.sender || '' };
 
       if (message && peerName) {
         newPinnedMessage['text'] = `${peerName}: ${message.message}`;
@@ -37,10 +38,7 @@ export const useSetPinnedMessages = () => {
         newPinnedMessage['text'] = message.message;
       }
 
-      if (
-        newPinnedMessage &&
-        !pinnedMessages.find((pinnedMessage: PinnedMessage) => pinnedMessage.id === newPinnedMessage.id)
-      ) {
+      if (newPinnedMessage && !pinnedMessages.find(pinnedMessage => pinnedMessage.id === newPinnedMessage.id)) {
         await hmsActions.sessionStore
           .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage].slice(-3)) // Limiting to maximum of 3 messages - FIFO
           .catch(err => ToastManager.addToast({ title: err.description }));
@@ -55,7 +53,7 @@ export const useSetPinnedMessages = () => {
         await hmsActions.sessionStore
           .set(
             SESSION_STORE_KEY.PINNED_MESSAGES,
-            pinnedMessages.filter((_: string, index: number) => index !== indexToRemove),
+            pinnedMessages.filter((_, index: number) => index !== indexToRemove),
           )
           .catch(err => ToastManager.addToast({ title: err.description }));
       }
@@ -63,5 +61,19 @@ export const useSetPinnedMessages = () => {
     [pinnedMessages, hmsActions],
   );
 
-  return { setPinnedMessages, removePinnedMessage };
+  const unpinBlacklistedMessages = useCallback(
+    async (blacklistedPeerIDSet: Set<string>, blacklistedMessageIDSet: Set<string>) => {
+      const filteredPinnedMessages = pinnedMessages?.filter(
+        pinnedMessage =>
+          !blacklistedMessageIDSet?.has(pinnedMessage.id) && !blacklistedPeerIDSet.has(pinnedMessage.authorId),
+      );
+
+      await hmsActions.sessionStore
+        .set(SESSION_STORE_KEY.PINNED_MESSAGES, filteredPinnedMessages)
+        .catch(err => ToastManager.addToast({ title: err.description }));
+    },
+    [hmsActions, pinnedMessages],
+  );
+
+  return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages };
 };
