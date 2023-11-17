@@ -94,7 +94,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
@@ -213,7 +212,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData appDetails={metadata} />
+                      <AppData />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box

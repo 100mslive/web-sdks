@@ -1,6 +1,8 @@
 import {
   ConferencingScreen,
+  DefaultConferencingScreen_Elements,
   DefaultPreviewScreen_Elements,
+  HLSLiveStreamingScreen_Elements,
   LeaveScreen,
   PreviewScreen,
   Screens,
@@ -43,10 +45,12 @@ export function useRoomLayoutPreviewScreen() {
   };
 }
 
+type ConferencingScreenElements = DefaultConferencingScreen_Elements & HLSLiveStreamingScreen_Elements;
+
 export function useRoomLayoutConferencingScreen() {
   const screenProps = useRoomLayoutScreen({ screen: 'conferencing' }) || {};
   const screenType = Object.keys(screenProps)[0] as keyof ConferencingScreen;
-  const elements = screenProps[screenType]?.elements;
+  const elements = screenProps[screenType]?.elements as ConferencingScreenElements;
   // @ts-ignore
   const hideSections: string[] = screenProps[screenType]?.hideSections || [];
   return {
