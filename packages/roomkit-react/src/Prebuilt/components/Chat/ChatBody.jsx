@@ -28,7 +28,7 @@ import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useBlacklist } from '../hooks/useBlacklist';
+import { useChatBlacklist } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -144,10 +144,10 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
   };
   const [open, setOpen] = useState(false);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
-  const { blacklistItem: blacklistMessage } = useBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
 
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const { blacklistItem: blacklistPeer } = useBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
+  const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
   useEffect(() => {

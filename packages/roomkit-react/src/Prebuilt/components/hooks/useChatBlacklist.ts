@@ -2,8 +2,12 @@ import { useCallback } from 'react';
 import { selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore
+import { SESSION_STORE_KEY } from '../../common/constants';
 
-export const useBlacklist = (sessionStoreKey: string) => {
+export const useChatBlacklist = (
+  sessionStoreKey: SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST | SESSION_STORE_KEY.CHAT_PEER_BLACKLIST,
+) => {
   const hmsActions = useHMSActions();
 
   const blacklistedIDs = useHMSStore(selectSessionStore(sessionStoreKey)) || [];
