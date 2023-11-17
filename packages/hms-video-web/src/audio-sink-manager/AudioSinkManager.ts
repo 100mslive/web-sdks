@@ -91,7 +91,7 @@ export class AudioSinkManager {
     this.audio.addEventListener('pause', this.handlePause);
   }
 
-  cleanUp() {
+  cleanup() {
     this.audio?.removeEventListener('pause', this.handlePause);
     this.audio = undefined;
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);

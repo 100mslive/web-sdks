@@ -140,7 +140,6 @@ export class HMSSdk implements HMSInterface {
     this.networkTestManager = new NetworkTestManager(this.eventBus, this.listener);
     this.audioContextManager = new AudioContextManager();
     this.playlistManager = new PlaylistManager(this, this.eventBus, this.audioContextManager);
-    this.notificationManager = new NotificationManager(this.store, this.eventBus, this.listener, this.audioListener);
     this.deviceManager = new DeviceManager(this.store, this.eventBus);
     this.audioSinkManager = new AudioSinkManager(this.store, this.audioContextManager, this.eventBus);
     this.audioOutput = new AudioOutputManager(this.deviceManager, this.audioSinkManager);
@@ -162,6 +161,13 @@ export class HMSSdk implements HMSInterface {
       this.eventBus,
       this.analyticsEventsService,
       this.analyticsTimer,
+    );
+    this.notificationManager = new NotificationManager(
+      this.store,
+      this.eventBus,
+      this.transport,
+      this.listener,
+      this.audioListener,
     );
     this.sessionStore = new SessionStore(this.transport);
     this.interactivityCenter = new InteractivityCenter(this.transport, this.store, this.listener);
@@ -553,7 +559,7 @@ export class HMSSdk implements HMSInterface {
   private cleanup() {
     this.cleanDeviceManagers();
     this.eventBus.analytics.unsubscribe(this.sendAnalyticsEvent);
-    this.analyticsTimer.cleanUp();
+    this.analyticsTimer.cleanup();
     this.audioContextManager.cleanup();
     DeviceStorageManager.cleanup();
     this.playlistManager.cleanup();
