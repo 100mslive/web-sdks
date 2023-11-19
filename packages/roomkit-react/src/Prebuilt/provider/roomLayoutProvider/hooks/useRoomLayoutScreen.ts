@@ -45,7 +45,7 @@ export function useRoomLayoutPreviewScreen() {
   };
 }
 
-type ConferencingScreenElements = DefaultConferencingScreen_Elements & HLSLiveStreamingScreen_Elements;
+export type ConferencingScreenElements = DefaultConferencingScreen_Elements & HLSLiveStreamingScreen_Elements;
 
 export function useRoomLayoutConferencingScreen() {
   const screenProps = useRoomLayoutScreen({ screen: 'conferencing' }) || {};
