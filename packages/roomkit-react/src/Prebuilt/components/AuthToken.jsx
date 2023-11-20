@@ -3,7 +3,7 @@ import { useHMSActions } from '@100mslive/react-sdk';
 import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ErrorDialog } from '../primitives/DialogContent';
-import { useSetAppDataByKey, useTokenEndpoint } from './AppData/useUISettings';
+import { useSetAppDataByKey } from './AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
 /**
@@ -17,7 +17,6 @@ import { APP_DATA } from '../common/constants';
  */
 const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken }) => {
   const hmsActions = useHMSActions();
-  const tokenEndpoint = useTokenEndpoint();
   const { roomCode, userId } = useHMSPrebuiltContext();
   const [error, setError] = useState({ title: '', body: '' });
   let authToken = defaultAuthToken;
@@ -28,7 +27,8 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       setAuthTokenInAppData(authToken);
       return;
     }
-    if (!tokenEndpoint && !roomCode) {
+
+    if (!roomCode) {
       return;
     }
 
@@ -36,7 +36,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       .getAuthTokenByRoomCode({ roomCode, userId }, { endpoint: authTokenByRoomCodeEndpoint })
       .then(token => setAuthTokenInAppData(token))
       .catch(error => setError(convertError(error)));
-  }, [hmsActions, tokenEndpoint, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId]);
+  }, [hmsActions, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId]);
 
   if (error.title) {
     return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;

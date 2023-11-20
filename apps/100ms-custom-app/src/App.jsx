@@ -28,7 +28,7 @@ const App = () => {
     if (roomCode) {
       fetchData(subdomain, roomCode, setOnlyEmail, setData, setShowHeader);
     }
-  }, []);
+  }, [roomCode, subdomain]);
 
   useEffect(() => {
     // remove notifications and messages for beam
@@ -78,8 +78,6 @@ const App = () => {
         <HMSPrebuilt
           roomCode={roomCode}
           authToken={authToken}
-          roomId={roomId}
-          role={role}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless ? 'Beam' : paramUserName,

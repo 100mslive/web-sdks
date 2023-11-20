@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -6,25 +6,34 @@ import { VariableSizeList } from 'react-window';
 import {
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerName,
   selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
   selectPeerNameByID,
   selectPermissions,
+  selectSessionStore,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import { CopyIcon, CrossCircleIcon, CrossIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
+import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import emptyChat from '../../images/empty-chat.svg';
+import { ToastManager } from '../Toast/ToastManager';
+import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useChatBlacklist } from '../hooks/useChatBlacklist';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
+import { SESSION_STORE_KEY } from '../../common/constants';
+
+const iconStyle = { height: '1.125rem', width: '1.125rem' };
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -127,56 +136,176 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction }) => {
+const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
+    can_hide_message: false,
+    can_block_user: false,
+  };
   const [open, setOpen] = useState(false);
-  if (!showPinAction) {
-    return null;
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
+  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+
+  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
+  const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
+  const { unpinBlacklistedMessages } = useSetPinnedMessages();
+
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+
+  useEffect(() => {
+    if (!(blacklistedPeerIDs.length || blacklistedMessageIDs.length)) {
+      return;
+    }
+    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+
+    unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
+  }, [blacklistedMessageIDs, blacklistedPeerIDs, pinnedMessages, unpinBlacklistedMessages]);
+
+  const copyMessageContent = useCallback(() => {
+    try {
+      navigator?.clipboard.writeText(message.message);
+      ToastManager.addToast({
+        title: 'Message copied successfully',
+      });
+    } catch (e) {
+      console.log(e);
+      ToastManager.addToast({
+        title: 'Could not copy message',
+      });
+    }
+  }, [message]);
+
+  const options = {
+    pin: {
+      text: 'Pin message',
+      icon: <PinIcon style={iconStyle} />,
+      onClick: onPin,
+      show: showPinAction,
+    },
+    copy: {
+      text: 'Copy text',
+      icon: <CopyIcon style={iconStyle} />,
+      onClick: copyMessageContent,
+      show: true,
+    },
+    hide: {
+      text: 'Hide for everyone',
+      icon: <EyeCloseIcon style={iconStyle} />,
+      onClick: async () => blacklistMessage(blacklistedPeerIDs, message.id),
+      show: can_hide_message,
+    },
+    block: {
+      text: 'Block from chat',
+      icon: <CrossCircleIcon style={iconStyle} />,
+      onClick: async () => blacklistPeer(blacklistedMessageIDs, peerId),
+      color: '$alert_error_default',
+      show: can_block_user && !sentByLocalPeer,
+    },
+  };
+
+  if (isMobile) {
+    return (
+      <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
+        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => setOpenSheet(false)}>
+          <Sheet.Title
+            css={{
+              display: 'flex',
+              color: '$on_surface_high',
+              w: '100%',
+              justifyContent: 'space-between',
+              mt: '$8',
+              fontSize: '$md',
+              px: '$10',
+              pb: '$8',
+              borderBottom: '1px solid $border_bright',
+              alignItems: 'center',
+            }}
+          >
+            Message options
+            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => setOpenSheet(false)}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Sheet.Title>
+
+          {Object.keys(options).map(optionKey => {
+            const option = options[optionKey];
+            return option.show ? (
+              <MwebChatOption
+                key={optionKey}
+                text={option.text}
+                icon={option.icon}
+                onClick={option.onClick}
+                color={option?.color}
+              />
+            ) : null;
+          })}
+        </Sheet.Content>
+      </Sheet.Root>
+    );
   }
 
   return (
-    <Dropdown.Root open={open} onOpenChange={setOpen}>
-      <Dropdown.Trigger className="chat_actions" css={{ opacity: open ? 1 : 0, '@md': { opacity: 1 } }} asChild>
-        <IconButton>
-          <Tooltip title="More options">
-            <VerticalMenuIcon />
-          </Tooltip>
-        </IconButton>
-      </Dropdown.Trigger>
+    <Dropdown.Root open={open} onOpenChange={setOpen} css={{ '@md': { display: 'none' } }}>
+      <Flex
+        className="chat_actions"
+        css={{
+          background: '$surface_bright',
+          borderRadius: '$1',
+          p: '$2',
+          opacity: open ? 1 : 0,
+          '@md': { opacity: 1 },
+        }}
+      >
+        {options.pin.show ? (
+          <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
+            {options.pin.icon}
+          </IconButton>
+        ) : null}
+
+        {options.copy.show ? (
+          <IconButton onClick={options.copy.onClick} data-testid="copy_message_btn">
+            <CopyIcon style={iconStyle} />
+          </IconButton>
+        ) : null}
+
+        {options.block.show || options.hide.show ? (
+          <Dropdown.Trigger asChild>
+            <IconButton>
+              <Tooltip title="More options">
+                <VerticalMenuIcon style={iconStyle} />
+              </Tooltip>
+            </IconButton>
+          </Dropdown.Trigger>
+        ) : null}
+      </Flex>
       <Dropdown.Portal>
         <Dropdown.Content
           sideOffset={5}
           align="end"
           css={{ width: '$48', backgroundColor: '$surface_bright', py: '$0', border: '1px solid $border_bright' }}
         >
-          <Dropdown.Item data-testid="pin_message_btn" onClick={onPin}>
-            <PinIcon />
-            <Text variant="sm" css={{ ml: '$4' }}>
-              Pin Message
-            </Text>
-          </Dropdown.Item>
-          {/* {isMobile ? (
-            <Dropdown.Item
-              data-testid="copy_message_btn"
-              onClick={() => {
-                try {
-                  navigator?.clipboard.writeText(messageContent);
-                  ToastManager.addToast({
-                    title: 'Message copied successfully',
-                  });
-                } catch (e) {
-                  console.log(e);
-                  ToastManager.addToast({
-                    title: 'Could not copy message',
-                  });
-                }
-              }}
-            >
-              <CopyIcon />
-              <Text variant="sm" css={{ ml: '$4' }}>
-                Copy Message
+          {options.hide.show ? (
+            <Dropdown.Item data-testid="hide_message_btn" onClick={options.hide.onClick}>
+              {options.hide.icon}
+              <Text variant="sm" css={{ ml: '$4', fontWeight: '$semiBold' }}>
+                {options.hide.text}
               </Text>
             </Dropdown.Item>
-          ) : null} */}
+          ) : null}
+
+          {options.block.show ? (
+            <Dropdown.Item
+              data-testid="block_peer_btn"
+              onClick={options.block.onClick}
+              css={{ color: options.block.color }}
+            >
+              {options.block.icon}
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                {options.block.text}
+              </Text>
+            </Dropdown.Item>
+          ) : null}
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -212,6 +341,7 @@ const ChatMessage = React.memo(
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
     });
+    const [openSheet, setOpenSheet] = useState(false);
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
 
@@ -231,7 +361,12 @@ const ChatMessage = React.memo(
       <Box
         ref={ref}
         as="div"
-        css={{ mb: '$10', pr: '$10', mt: '$8', '&:hover .chat_actions': { opacity: 1 } }}
+        css={{
+          mb: '$10',
+          pr: '$10',
+          mt: '$8',
+          '&:hover .chat_actions': { opacity: 1 },
+        }}
         style={style}
       >
         <Flex
@@ -245,9 +380,17 @@ const ChatMessage = React.memo(
             px: messageType ? '$4' : '$2',
             py: messageType ? '$4' : 0,
             userSelect: 'none',
+            '@md': {
+              cursor: 'pointer',
+            },
           }}
           key={message.time}
           data-testid="chat_msg"
+          onClick={() => {
+            if (isMobile) {
+              setOpenSheet(true);
+            }
+          }}
         >
           <Text
             css={{
@@ -291,7 +434,17 @@ const ChatMessage = React.memo(
               receiver={message.recipientPeer}
               roles={message.recipientRoles}
             />
-            {!isOverlay ? <ChatActions onPin={onPin} showPinAction={showPinAction} /> : null}
+
+            <ChatActions
+              onPin={onPin}
+              showPinAction={showPinAction}
+              message={message}
+              peerId={message.sender}
+              sentByLocalPeer={message.sender === localPeerId}
+              isMobile={isMobile}
+              openSheet={openSheet}
+              setOpenSheet={setOpenSheet}
+            />
           </Text>
           <Text
             variant="sm"
@@ -303,7 +456,10 @@ const ChatMessage = React.memo(
               userSelect: 'all',
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
-            onClick={e => e.stopPropagation()}
+            onClick={e => {
+              e.stopPropagation();
+              setOpenSheet(true);
+            }}
           >
             <AnnotisedMessage message={message.message} />
           </Text>
@@ -314,7 +470,9 @@ const ChatMessage = React.memo(
 );
 const ChatList = React.forwardRef(
   ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
-    const { setPinnedMessage } = useSetPinnedMessage();
+    const { setPinnedMessages } = useSetPinnedMessages();
+    const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+    const localPeerName = useHMSStore(selectLocalPeerName);
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
         scrollToBottom(1);
@@ -343,7 +501,7 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            onPin={() => setPinnedMessage(messages[index])}
+            onPin={() => setPinnedMessages(pinnedMessages, messages[index], localPeerName)}
           />
         )}
       </VariableSizeList>
@@ -397,14 +555,27 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, listRef) => {
+export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDs }, listRef) => {
   const storeMessageSelector = role
     ? selectMessagesByRole(role)
     : peerId
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
-  let messages = useHMSStore(storeMessageSelector);
-  messages = useMemo(() => messages?.filter(message => message.type === 'chat') || [], [messages]);
+  let messages = useHMSStore(storeMessageSelector) || [];
+  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
+  const filteredMessages = () => {
+    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+    return (
+      messages?.filter(
+        message =>
+          message.type === 'chat' &&
+          !blacklistedMessageIDSet.has(message.id) &&
+          !blacklistedPeerIDSet.has(message.sender),
+      ) || []
+    );
+  };
+
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const unreadCount = useUnreadCount({ role, peerId });
@@ -440,7 +611,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom }, list
   return (
     <Fragment>
       <VirtualizedChatMessages
-        messages={messages}
+        messages={filteredMessages}
         scrollToBottom={scrollToBottom}
         unreadCount={unreadCount}
         ref={listRef}
