@@ -237,8 +237,12 @@ export class HMSSdk implements HMSInterface {
   }
 
   updatePlaylistSettings(options: HMSPlaylistSettings) {
-    Object.assign(this.playlistSettings.video, options.video);
-    Object.assign(this.playlistSettings.audio, options.audio);
+    if (options.video) {
+      Object.assign(this.playlistSettings.video, options.video);
+    }
+    if (options.audio) {
+      Object.assign(this.playlistSettings.audio, options.audio);
+    }
   }
 
   private handleAutoplayError = (error: HMSException) => {
