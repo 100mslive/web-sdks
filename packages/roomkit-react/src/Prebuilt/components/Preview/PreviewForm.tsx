@@ -10,6 +10,7 @@ import { PreviewSettings } from './PreviewJoin';
 
 const PreviewForm = ({
   name,
+  userInputEnabled,
   onChange,
   onJoin,
   enableJoin,
@@ -17,6 +18,7 @@ const PreviewForm = ({
   cannotPublishAudio = false,
 }: {
   name: string;
+  userInputEnabled: boolean;
   onChange: (name: string) => void;
   onJoin: () => void;
   enableJoin: boolean;
@@ -48,6 +50,7 @@ const PreviewForm = ({
         <Input
           required
           id="name"
+          disabled={userInputEnabled}
           css={{ w: '100%', boxSizing: 'border-box' }}
           value={name}
           onChange={e => onChange(e.target.value.trimStart())}
