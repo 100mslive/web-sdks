@@ -17,7 +17,7 @@ export const useChatBlacklist = (
       await hmsActions.sessionStore
         .set(sessionStoreKey, [...blacklistedIDs, blacklistID])
         .catch(err => ToastManager.addToast({ title: err.description })),
-    [hmsActions, blacklistedIDs],
+    [hmsActions, blacklistedIDs, sessionStoreKey],
   );
 
   return { blacklistItem };
