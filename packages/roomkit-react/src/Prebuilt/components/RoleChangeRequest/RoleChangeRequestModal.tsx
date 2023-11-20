@@ -61,7 +61,7 @@ export const RoleChangeRequestModal = () => {
       >
         <PreviewTile name={name || ''} />
 
-        <PreviewControls hideSettings={true} />
+        <PreviewControls hideSettings={true} vbEnabled={true} />
       </Flex>
     </>
   );
