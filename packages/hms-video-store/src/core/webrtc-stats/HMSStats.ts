@@ -1,7 +1,7 @@
 import { Subscribe } from 'zustand/vanilla';
-import { HMSSdk } from '@100mslive/hms-video';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { HMSSdk } from '../../coreSDK';
 import { HMSReactiveStore } from '../hmsSDKStore/HMSReactiveStore';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
 import { createDefaultStatsStore, HMSStatsStore } from '../schema';

@@ -4,7 +4,7 @@ import { DomainCategory } from '../analytics/AnalyticsEventDomains';
 import { domainCategory } from '../analytics/domain-analytics';
 import { HMSFrameworkInfo } from '../interfaces';
 
-const sdk_version = require('../../package.json').version;
+const sdk_version = require('../../../package.json').version;
 
 type UserAgent = {
   os: string;

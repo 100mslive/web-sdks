@@ -9,11 +9,11 @@ import create, {
   StateSliceListener,
   StoreApi,
 } from 'zustand/vanilla';
-import { HMSSdk, isBrowser } from '@100mslive/hms-video';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSSDKActions } from './HMSSDKActions';
 import { NamedSetState } from './internalTypes';
 import { storeNameWithTabTitle } from '../../common/storeName';
+import { HMSSdk, isBrowser } from '../../coreSDK';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStatsStoreReadOnly, IHMSStore, IHMSStoreReadOnly, IStore } from '../IHMSStore';
 import { createDefaultStoreState, HMSGenericTypes, HMSStore } from '../schema';

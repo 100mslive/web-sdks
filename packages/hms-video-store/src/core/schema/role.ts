@@ -1,4 +1,4 @@
-import type { HMSRole } from '@100mslive/hms-video';
+import type { HMSRole } from '../../coreSDK';
 
 export type HMSRoleName = string;
 

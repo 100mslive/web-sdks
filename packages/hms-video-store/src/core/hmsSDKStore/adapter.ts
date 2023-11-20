@@ -1,3 +1,5 @@
+import { areArraysEqual } from './sdkUtils/storeMergeUtils';
+import * as sdkTypes from '../../coreSDK';
 import {
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
@@ -5,9 +7,7 @@ import {
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSTrack as SDKHMSTrack,
-} from '@100mslive/hms-video';
-import { areArraysEqual } from './sdkUtils/storeMergeUtils';
-import * as sdkTypes from './sdkTypes';
+} from '../../coreSDK';
 import {
   HMSAudioTrack,
   HMSDeviceChangeEvent,

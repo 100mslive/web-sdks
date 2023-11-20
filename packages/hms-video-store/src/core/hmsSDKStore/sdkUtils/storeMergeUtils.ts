@@ -1,4 +1,4 @@
-import { HMSLocalTrack as SDKHMSLocalTrack, HMSPoll } from '@100mslive/hms-video';
+import { HMSLocalTrack as SDKHMSLocalTrack, HMSPoll } from '../../../coreSDK';
 import { HMSPeer, HMSPeerID, HMSScreenVideoTrack, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../schema';
 import { HMSPeerStats, HMSTrackStats } from '../sdkTypes';
 

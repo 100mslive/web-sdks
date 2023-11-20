@@ -1,4 +1,4 @@
-import { isBrowser } from '@100mslive/hms-video';
+import { isBrowser } from '../coreSDK';
 
 export const storeNameWithTabTitle = (storeName: string) => {
   return isBrowser ? `${storeName} ${document.title}` : storeName;

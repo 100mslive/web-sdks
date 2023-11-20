@@ -1,10 +1,10 @@
-import { HMSPoll } from '@100mslive/hms-video';
 import { HMSDeviceChangeEvent } from './device-change';
 import { HMSException } from './error';
 import { HMSMessage } from './message';
 import { HMSPeer, HMSTrack } from './peer';
 import { HMSPlaylistItem } from './playlist';
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest, HMSLeaveRoomRequest } from './requests';
+import { HMSPoll } from '../../coreSDK';
 
 interface BaseNotification {
   id: number;

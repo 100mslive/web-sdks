@@ -1,4 +1,4 @@
-import { HMSRole } from '../interfaces/role';
+import { HMSRole } from './role';
 import { HMSPeer } from '../sdk/models/peer';
 
 /**

@@ -1,21 +1,4 @@
 import {
-  HLSTimedMetadata,
-  HMSAudioPlugin,
-  HMSAudioTrackSettings,
-  HMSConfig,
-  HMSLogLevel,
-  HMSMidCallPreviewConfig,
-  HMSPluginSupportResult,
-  HMSPreferredSimulcastLayer,
-  HMSPreviewConfig,
-  HMSScreenShareConfig,
-  HMSVideoPlugin,
-  HMSVideoTrackSettings,
-  TokenRequest,
-  TokenRequestOptions,
-} from '@100mslive/hms-video';
-import { HLSConfig, RTMPRecordingConfig } from './hmsSDKStore/sdkTypes';
-import {
   HMSChangeMultiTrackStateParams,
   HMSGenericTypes,
   HMSMessageID,
@@ -30,6 +13,24 @@ import {
   IHMSSessionStoreActions,
 } from './schema';
 import { HMSRoleChangeRequest } from './selectors';
+import {
+  HLSConfig,
+  HLSTimedMetadata,
+  HMSAudioPlugin,
+  HMSAudioTrackSettings,
+  HMSConfig,
+  HMSLogLevel,
+  HMSMidCallPreviewConfig,
+  HMSPluginSupportResult,
+  HMSPreferredSimulcastLayer,
+  HMSPreviewConfig,
+  HMSScreenShareConfig,
+  HMSVideoPlugin,
+  HMSVideoTrackSettings,
+  RTMPRecordingConfig,
+  TokenRequest,
+  TokenRequestOptions,
+} from '../coreSDK';
 
 /**
  * The below interface defines our SDK API Surface for taking room related actions.

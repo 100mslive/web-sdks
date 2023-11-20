@@ -3,7 +3,7 @@ import {
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
   HMSSdk,
-} from '@100mslive/hms-video';
+} from '../../coreSDK';
 import { IHMSInteractivityCenter } from '../schema';
 
 export class HMSInteractivityCenter implements IHMSInteractivityCenter {

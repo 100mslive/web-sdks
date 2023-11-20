@@ -1,3 +1,22 @@
+import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { isRemoteTrack } from './sdkUtils/sdkUtils';
+import {
+  areArraysEqual,
+  isEntityUpdated,
+  mergeNewPeersInDraft,
+  mergeNewPollsInDraft,
+  mergeNewTracksInDraft,
+  mergeTrackArrayFields,
+} from './sdkUtils/storeMergeUtils';
+import { SDKToHMS } from './adapter';
+import { HMSInteractivityCenter } from './HMSInteractivityCenter';
+import { HMSNotifications } from './HMSNotifications';
+import { HMSPlaylist } from './HMSPlaylist';
+import { HMSSessionStore } from './HMSSessionStore';
+import { NamedSetState } from './internalTypes';
+import * as sdkTypes from './sdkTypes';
+import { HMSLogger } from '../../common/ui-logger';
+import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
 import {
   HMSAudioPlugin,
   HMSAudioTrack as SDKHMSAudioTrack,
@@ -21,26 +40,7 @@ import {
   HMSVideoPlugin,
   HMSVideoTrack as SDKHMSVideoTrack,
   SessionStoreUpdate,
-} from '@100mslive/hms-video';
-import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
-import { isRemoteTrack } from './sdkUtils/sdkUtils';
-import {
-  areArraysEqual,
-  isEntityUpdated,
-  mergeNewPeersInDraft,
-  mergeNewPollsInDraft,
-  mergeNewTracksInDraft,
-  mergeTrackArrayFields,
-} from './sdkUtils/storeMergeUtils';
-import { SDKToHMS } from './adapter';
-import { HMSInteractivityCenter } from './HMSInteractivityCenter';
-import { HMSNotifications } from './HMSNotifications';
-import { HMSPlaylist } from './HMSPlaylist';
-import { HMSSessionStore } from './HMSSessionStore';
-import { NamedSetState } from './internalTypes';
-import * as sdkTypes from './sdkTypes';
-import { HMSLogger } from '../../common/ui-logger';
-import { BeamSpeakerLabelsLogger } from '../../controller/beam/BeamSpeakerLabelsLogger';
+} from '../../coreSDK';
 import { IHMSActions } from '../IHMSActions';
 import { IHMSStore } from '../IHMSStore';
 import {

@@ -1,8 +1,4 @@
-import {
-  HMSPollCreateParams,
-  HMSPollQuestionCreateParams,
-  HMSPollQuestionResponseCreateParams,
-} from '@100mslive/hms-video';
+import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponseCreateParams } from '../../coreSDK';
 
 export interface IHMSInteractivityCenter {
   createPoll(poll: HMSPollCreateParams): Promise<void>;

@@ -59,7 +59,7 @@ import {
   simulcastMapping,
   TokenRequest,
   TokenRequestOptions,
-} from '@100mslive/hms-video';
+} from '../../coreSDK';
 
 export {
   HMSException,

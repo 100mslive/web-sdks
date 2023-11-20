@@ -1,5 +1,5 @@
-import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP } from '@100mslive/hms-video';
 import { HMSPeerID } from './peer';
+import { HLSVariant, HMSHLS, HMSRecording, HMSRTMP } from '../../coreSDK';
 
 export type { HMSRecording, HMSRTMP, HMSHLS, HLSVariant };
 export type HMSRoomID = string;

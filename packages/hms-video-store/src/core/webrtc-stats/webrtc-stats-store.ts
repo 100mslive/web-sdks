@@ -1,4 +1,4 @@
-import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '@100mslive/hms-video';
+import { HMSPeerStats, HMSSdk, HMSTrackStats, HMSWebrtcStats } from '../../coreSDK';
 import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
 import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';

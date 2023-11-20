@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
-import { HMSRole } from '@100mslive/hms-video';
 import { selectLocalPeerRole, selectPeersMap, selectPreviewRole, selectRolesMap, selectTracksMap } from './selectors';
 import { isRoleAllowedToPublish } from './selectorUtils';
+import { HMSRole } from '../../coreSDK';
 import { HMSPeer, HMSStore } from '../schema';
 
 export interface HMSPeerWithMuteStatus {

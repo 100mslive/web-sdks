@@ -1,4 +1,4 @@
-import { HMSSdk, SessionStoreUpdate } from '@100mslive/hms-video';
+import { HMSSdk, SessionStoreUpdate } from '../../coreSDK';
 import { IHMSSessionStoreActions } from '../schema';
 
 export class HMSSessionStore<T extends Record<string, any>> implements IHMSSessionStoreActions<T> {
