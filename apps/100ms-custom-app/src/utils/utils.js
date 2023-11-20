@@ -102,13 +102,13 @@ export const fetchData = (
   return getWithRetry(url, headers)
     .then(res => res.json())
     .then(res => {
-      if (res.data.success) {
-        setOnlyEmail(res.data.same_user);
+      if (res.success) {
+        setOnlyEmail(res.same_user);
         setShowHeader(true);
         setData({
-          roomLinks: res.data.room_links,
-          policyID: res.data.policy_id,
-          theme: res.data.theme,
+          roomLinks: res.room_links,
+          policyID: res.policy_id,
+          theme: res.theme,
         });
       }
     })
