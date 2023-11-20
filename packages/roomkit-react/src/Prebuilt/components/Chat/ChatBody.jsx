@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -150,6 +150,8 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
   const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+
   useEffect(() => {
     if (!(blacklistedPeerIDs.length || blacklistedMessageIDs.length)) {
       return;
@@ -157,8 +159,8 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
     const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
 
-    unpinBlacklistedMessages(blacklistedPeerIDSet, blacklistedMessageIDSet);
-  }, [blacklistedMessageIDs, blacklistedPeerIDs]);
+    unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
+  }, [blacklistedMessageIDs, blacklistedPeerIDs, pinnedMessages, unpinBlacklistedMessages]);
 
   const copyMessageContent = useCallback(() => {
     try {
@@ -190,13 +192,13 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
     hide: {
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
-      onClick: async () => blacklistMessage(message.id),
+      onClick: async () => blacklistMessage(blacklistedPeerIDs, message.id),
       show: can_hide_message,
     },
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(peerId),
+      onClick: async () => blacklistPeer(blacklistedMessageIDs, peerId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -469,6 +471,7 @@ const ChatMessage = React.memo(
 const ChatList = React.forwardRef(
   ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
     const { setPinnedMessages } = useSetPinnedMessages();
+    const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
     const localPeerName = useHMSStore(selectLocalPeerName);
     useLayoutEffect(() => {
       if (listRef.current && listRef.current.scrollToItem) {
@@ -498,7 +501,7 @@ const ChatList = React.forwardRef(
             unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
-            onPin={() => setPinnedMessages(messages[index], localPeerName)}
+            onPin={() => setPinnedMessages(pinnedMessages, messages[index], localPeerName)}
           />
         )}
       </VariableSizeList>
@@ -560,19 +563,18 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
     : selectHMSMessages;
   let messages = useHMSStore(storeMessageSelector) || [];
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const filteredMessages =
-    useMemo(() => {
-      const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
-      const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-      return (
-        messages?.filter(
-          message =>
-            message.type === 'chat' &&
-            !blacklistedMessageIDSet.has(message.id) &&
-            !blacklistedPeerIDSet.has(message.sender),
-        ) || []
-      );
-    }, [messages, blacklistedMessageIDs, blacklistedPeerIDs]) || [];
+  const filteredMessages = () => {
+    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
+    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+    return (
+      messages?.filter(
+        message =>
+          message.type === 'chat' &&
+          !blacklistedMessageIDSet.has(message.id) &&
+          !blacklistedPeerIDSet.has(message.sender),
+      ) || []
+    );
+  };
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
