@@ -20,7 +20,7 @@ export const ChatPaused = () => {
         enabled: true,
         updatedBy: localPeerName,
       }),
-    [hmsActions],
+    [hmsActions, localPeerName],
   );
 
   return isChatEnabled ? null : (

@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { useHMSActions } from '@100mslive/react-sdk';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
@@ -10,14 +10,12 @@ export const useChatBlacklist = (
 ) => {
   const hmsActions = useHMSActions();
 
-  const blacklistedIDs = useHMSStore(selectSessionStore(sessionStoreKey)) || [];
-
   const blacklistItem = useCallback(
-    async (blacklistID: string) =>
+    async (blacklistedIDs: string[], blacklistID: string) =>
       await hmsActions.sessionStore
         .set(sessionStoreKey, [...blacklistedIDs, blacklistID])
         .catch(err => ToastManager.addToast({ title: err.description })),
-    [hmsActions, blacklistedIDs],
+    [hmsActions, sessionStoreKey],
   );
 
   return { blacklistItem };
