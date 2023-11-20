@@ -9,7 +9,6 @@ import {
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import { AppData } from './components/AppData/AppData';
 // @ts-ignore: No implicit Any
 import AuthToken from './components/AuthToken';
@@ -94,7 +93,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     },
     ref,
   ) => {
-    const metadata = '';
     const reactiveStore = useRef<HMSPrebuiltRefType>();
 
     const [hydrated, setHydrated] = React.useState(false);
@@ -213,7 +211,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData appDetails={metadata} />
+                      <AppData />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box

@@ -2,7 +2,6 @@ import { useCallback } from 'react';
 import { useHMSActions } from '@100mslive/react-sdk';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 export const useChatBlacklist = (
