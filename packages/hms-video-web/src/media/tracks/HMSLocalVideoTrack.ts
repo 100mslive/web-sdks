@@ -12,7 +12,8 @@ import {
   ScreenCaptureHandle,
 } from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
-import { HMSVideoPluginsManager } from '../../plugins/video';
+import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
+import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
@@ -30,6 +31,7 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
 export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
+  private mediaStreamPluginsManager: HMSMediaStreamPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
@@ -75,6 +77,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
+    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager();
     this.setFirstTrackId(this.trackId);
   }
 
@@ -117,6 +120,26 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
+  }
+
+  private async processPlugins() {
+    try {
+      const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
+      const newTrack = processedStream.getVideoTracks()[0];
+      await this.replaceSender(newTrack, true);
+    } catch (e) {
+      console.error('error in processing plugin(s)', e);
+    }
+  }
+
+  async addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+    this.mediaStreamPluginsManager.addPlugins(plugins);
+    await this.processPlugins();
+  }
+
+  async removeStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+    this.mediaStreamPluginsManager.removePlugins(plugins);
+    await this.processPlugins();
   }
 
   /**
