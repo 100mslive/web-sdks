@@ -1,3 +1,4 @@
 export * from './core';
 export { HMSReactiveStore } from './core/hmsSDKStore/HMSReactiveStore';
-export type { HMSPluginUnsupportedTypes, HMSVideoPlugin, HMSPluginSupportResult } from './coreSDK';
+export { HMSPluginUnsupportedTypes, HMSRecordingState } from './coreSDK';
+export type { HMSVideoPlugin, HMSPluginSupportResult } from './coreSDK';
