@@ -100,6 +100,7 @@ export const fetchData = (
   headers.set('Content-Type', 'application/json');
 
   return getWithRetry(url, headers)
+    .then(res => res.json())
     .then(res => {
       if (res.data.success) {
         setOnlyEmail(res.data.same_user);
