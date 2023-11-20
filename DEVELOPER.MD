@@ -64,7 +64,7 @@
   }
   ```
 
-- **Single Source of Truth** for business logic. For e.g. let's say that
+- **Single Source of Truth** for business logic. For example, let's say that
   there are two peer related components who want to do sth special based on
   a condition. Both shouldn't independently evaluate the condition, either
   they should be sent the variable from a parent or have the condition isolated
