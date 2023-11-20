@@ -1,6 +1,7 @@
 import { tsvb } from 'effects-sdk';
 import { HMSMediaStreamPlugin } from '@100mslive/hms-video';
 import { EFFECTS_SDK_KEY } from './constants';
+import { HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
@@ -8,6 +9,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private backgroundURL = '';
   private beautify = false;
+  backgroundType = HMSVirtualBackgroundTypes.NONE;
 
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
@@ -40,11 +42,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   setBlur(blur: number) {
     this.blurAmount = blur;
     this.backgroundURL = '';
+    this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
   }
 
   setBackground(url: string) {
     this.backgroundURL = url;
     this.blurAmount = 0;
+    this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
   }
 
   apply(stream: MediaStream): MediaStream {
@@ -64,7 +68,12 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.effects.getStream() || stream;
   }
 
+  clear() {
+    this.effects.clear();
+  }
+
   stop() {
+    this.clear();
     this.effects.stop();
   }
 }

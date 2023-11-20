@@ -1,4 +1,4 @@
-import { HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { HMSEffectsPlugin } from '@100mslive/hms-virtual-background';
 
 export const defaultMedia = [
   'https://assets.100ms.live/webapp/vb-mini/vb-1.jpg',
@@ -15,4 +15,4 @@ export const defaultMedia = [
   'https://assets.100ms.live/webapp/vb-mini/vb-12.jpg',
 ];
 
-export const vbPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+export const vbPlugin = new HMSEffectsPlugin();
