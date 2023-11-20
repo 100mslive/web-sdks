@@ -108,7 +108,7 @@ export const Chat = ({ screenType }) => {
       {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
 
       {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
-        <PinnedMessage clearPinnedMessage={removePinnedMessage} />
+        <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
       ) : null}
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
