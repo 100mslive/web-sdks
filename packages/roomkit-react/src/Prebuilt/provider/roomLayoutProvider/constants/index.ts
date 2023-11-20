@@ -30,7 +30,18 @@ export const defaultLayout: Layout = {
     conferencing: {
       default: {
         elements: {
-          chat: {},
+          chat: {
+            public_chat_enabled: true,
+            private_chat_enabled: true,
+            chat_title: 'Chat',
+            allow_pinning_messages: true,
+            message_placeholder: 'Send a message...',
+            real_time_controls: {
+              can_disable_chat: true,
+              can_block_user: true,
+              can_hide_message: true,
+            },
+          },
           participant_list: {},
           video_tile_layout: {
             grid: {

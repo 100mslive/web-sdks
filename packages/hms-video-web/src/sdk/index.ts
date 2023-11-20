@@ -71,6 +71,7 @@ import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
 import { isNode } from '../utils/support';
+import { workerSleep } from '../utils/timer-utils';
 import { validateMediaDevicesExistence, validateRTCPeerConnection } from '../utils/validations';
 
 const INITIAL_STATE = {
@@ -581,6 +582,11 @@ export class HMSSdk implements HMSInterface {
   private async internalLeave(notifyServer = true, error?: HMSException) {
     const room = this.store?.getRoom();
     if (room) {
+      // Wait for preview or join to finish to prevent any race conditions happening because preview/join are called multiple times
+      // This can happen when useEffects are not properly handled in case of react apps
+      while (this.sdkState.isPreviewInProgress || this.sdkState.isJoinInProgress) {
+        await workerSleep(100);
+      }
       const roomId = room.id;
       this.networkTestManager?.stop();
       this.eventBus.leave.publish(error);

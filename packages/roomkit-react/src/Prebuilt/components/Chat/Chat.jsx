@@ -1,76 +1,34 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { selectLocalPeerID, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
   selectPeerNameByID,
-  selectPermissions,
-  selectSessionStore,
   useHMSActions,
   useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { ChevronDownIcon, CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
-import { Box, Flex } from '../../../Layout';
-import { Text } from '../../../Text';
+import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-import { AnnotisedMessage, ChatBody } from './ChatBody';
+import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
+import { ChatBlocked, ChatPaused } from './ChatStates';
+import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { useSetPinnedMessage } from '../hooks/useSetPinnedMessage';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
-
-const PINNED_MESSAGE_LENGTH = 80;
-
-const PinnedMessage = ({ clearPinnedMessage }) => {
-  const permissions = useHMSStore(selectPermissions);
-  const pinnedMessage = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGE));
-  const formattedPinnedMessage =
-    pinnedMessage?.length && pinnedMessage.length > PINNED_MESSAGE_LENGTH
-      ? `${pinnedMessage.slice(0, PINNED_MESSAGE_LENGTH)}...`
-      : pinnedMessage;
-
-  return pinnedMessage ? (
-    <Flex
-      title={pinnedMessage}
-      css={{ p: '$4', color: '$on_surface_medium', bg: '$surface_default', r: '$1', gap: '$4', mb: '$8', mt: '$8' }}
-      align="center"
-      justify="between"
-    >
-      <PinIcon />
-
-      <Box
-        css={{
-          color: '$on_surface_medium',
-          w: '100%',
-          maxHeight: '$18',
-          overflowY: 'auto',
-        }}
-      >
-        <Text variant="sm">
-          <AnnotisedMessage message={formattedPinnedMessage} />
-        </Text>
-      </Box>
-      {permissions.removeOthers && (
-        <Flex
-          onClick={() => clearPinnedMessage()}
-          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-        >
-          <CrossIcon />
-        </Flex>
-      )}
-    </Flex>
-  ) : null;
-};
 
 export const Chat = ({ screenType }) => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const localPeerId = useHMSStore(selectLocalPeerID);
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
@@ -79,7 +37,8 @@ export const Chat = ({ screenType }) => {
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
-  const { setPinnedMessage } = useSetPinnedMessage();
+  const { removePinnedMessage } = useSetPinnedMessages();
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
@@ -91,9 +50,12 @@ export const Chat = ({ screenType }) => {
       });
     }
   }, [notification, peerSelector, setPeerSelector]);
-
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
+  const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
+  const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
   const storeMessageSelector = selectHMSMessagesCount;
   const { elements } = useRoomLayoutConferencingScreen();
+  const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
   let isScrolledToBottom = false;
@@ -125,7 +87,11 @@ export const Chat = ({ screenType }) => {
       }}
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
-        <>{elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={setPinnedMessage} /> : null}</>
+        <>
+          {elements?.chat?.allow_pinning_messages ? (
+            <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
+          ) : null}
+        </>
       )}
 
       <ChatBody
@@ -134,27 +100,39 @@ export const Chat = ({ screenType }) => {
         ref={listRef}
         scrollToBottom={scrollToBottom}
         screenType={screenType}
+        blacklistedPeerIDs={blacklistedPeerIDs}
       />
-      <ChatFooter
-        role={chatOptions.role}
-        onSend={() => scrollToBottom(1)}
-        selection={chatOptions.selection}
-        screenType={screenType}
-        onSelect={({ role, peerId, selection }) => {
-          setChatOptions({
-            role,
-            peerId,
-            selection,
-          });
-          setPeerSelector(peerId);
-          setRoleSelector(role);
-        }}
-        peerId={chatOptions.peerId}
-      >
-        {!isSelectorOpen && !isScrolledToBottom && (
-          <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
-        )}
-      </ChatFooter>
+
+      <ChatPaused />
+
+      {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
+
+      {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
+        <PinnedMessage clearPinnedMessage={removePinnedMessage} />
+      ) : null}
+
+      {isChatEnabled && !isLocalPeerBlacklisted ? (
+        <ChatFooter
+          role={chatOptions.role}
+          onSend={() => scrollToBottom(1)}
+          selection={chatOptions.selection}
+          screenType={screenType}
+          onSelect={({ role, peerId, selection }) => {
+            setChatOptions({
+              role,
+              peerId,
+              selection,
+            });
+            setPeerSelector(peerId);
+            setRoleSelector(role);
+          }}
+          peerId={chatOptions.peerId}
+        >
+          {!isSelectorOpen && !isScrolledToBottom && (
+            <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
+          )}
+        </ChatFooter>
+      ) : null}
     </Flex>
   );
 };
