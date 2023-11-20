@@ -563,7 +563,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
     : selectHMSMessages;
   let messages = useHMSStore(storeMessageSelector) || [];
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const filteredMessages = () => {
+  const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
     const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
     return (
@@ -611,7 +611,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
   return (
     <Fragment>
       <VirtualizedChatMessages
-        messages={filteredMessages}
+        messages={getFilteredMessages()}
         scrollToBottom={scrollToBottom}
         unreadCount={unreadCount}
         ref={listRef}
