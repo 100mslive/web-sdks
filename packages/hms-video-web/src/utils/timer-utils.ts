@@ -14,8 +14,6 @@ export const worker = `(function metronomeWorkerSetup() {
   };
 })()`;
 
-const WorkerThread = new Worker(URL.createObjectURL(new Blob([worker], { type: 'application/javascript' })));
-
 /**
  * Delay for a @see ms amount of time
  * @param ms -- time in milliseconds
@@ -34,12 +32,16 @@ export function workerSleep(ms: number): Promise<void> {
   if (ms < 0) {
     throw Error('`ms` should be a positive integer');
   }
-  // const buffer = new ArrayBuffer(8);
+  if (typeof Worker === 'undefined') {
+    return sleep(ms);
+  }
+  const WorkerThread = new Worker(URL.createObjectURL(new Blob([worker], { type: 'application/javascript' })));
   WorkerThread.postMessage(['start', ms]);
   return new Promise(resolve => {
     WorkerThread.onmessage = event => {
       if (event.data === 'tick') {
         resolve();
+        WorkerThread.terminate();
       }
     };
   });
