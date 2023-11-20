@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectPermissions, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
@@ -28,17 +28,17 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
     : pinnedMessages?.[pinnedMessageIndex]?.text;
 
   const pinnedMessageRef = useRef(null);
-  const showPreviousPinnedMessage = useCallback(() => {
+  const showPreviousPinnedMessage = () => {
     const previousIndex = Math.max(pinnedMessageIndex - 1, 0);
     setHideOverflow(pinnedMessages[previousIndex].text.length > PINNED_MESSAGE_LENGTH);
     setPinnedMessageIndex(previousIndex);
-  }, [pinnedMessages]);
+  };
 
-  const showNextPinnedMessage = useCallback(() => {
+  const showNextPinnedMessage = () => {
     const nextIndex = Math.min(pinnedMessageIndex + 1, pinnedMessages.length - 1);
     setHideOverflow(pinnedMessages[nextIndex].text.length > PINNED_MESSAGE_LENGTH);
     setPinnedMessageIndex(nextIndex);
-  }, [pinnedMessages]);
+  };
 
   const swipeHandlers = useSwipeable({
     onSwipedUp: () => showNextPinnedMessage(),
@@ -94,7 +94,11 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         >
           <Text variant="sm" css={{ color: '$on_surface_medium' }} {...swipeHandlers}>
             <AnnotisedMessage message={formattedPinnedMessage} />
-            {hideOverflow ? <span onClick={() => setHideOverflow(false)}>See more</span> : null}
+            {hideOverflow ? (
+              <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(false)}>
+                See more
+              </span>
+            ) : null}
           </Text>
         </Box>
         {permissions?.removeOthers && (

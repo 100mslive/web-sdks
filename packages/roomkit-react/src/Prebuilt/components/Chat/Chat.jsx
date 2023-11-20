@@ -38,6 +38,7 @@ export const Chat = ({ screenType }) => {
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { removePinnedMessage } = useSetPinnedMessages();
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
@@ -87,7 +88,9 @@ export const Chat = ({ screenType }) => {
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
         <>
-          {elements?.chat?.allow_pinning_messages ? <PinnedMessage clearPinnedMessage={removePinnedMessage} /> : null}
+          {elements?.chat?.allow_pinning_messages ? (
+            <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
+          ) : null}
         </>
       )}
 
