@@ -1,5 +1,4 @@
 import adapter from 'webrtc-adapter';
-import './utils/local-storage-polyfill';
 import HMSLogger from './utils/logger';
 const sdk_version = require('../../package.json').version;
 

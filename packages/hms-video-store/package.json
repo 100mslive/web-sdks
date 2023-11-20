@@ -18,6 +18,7 @@
       "default": "./dist/index.js"
     }
   },
+  "sideEffects":  "false",
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
