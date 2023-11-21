@@ -42,6 +42,10 @@ export class HMSWebrtcStats {
     return this.remoteTrackStats[trackId];
   };
 
+  getAllRemoteTracksStats = () => {
+    return this.remoteTrackStats;
+  };
+
   getLocalTrackStats = () => {
     return this.localTrackStats;
   };

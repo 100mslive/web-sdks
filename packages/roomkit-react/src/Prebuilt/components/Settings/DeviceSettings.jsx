@@ -1,14 +1,17 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   DeviceType,
   selectIsLocalVideoEnabled,
   selectLocalVideoTrackID,
   selectVideoTrackByID,
   useDevices,
+  useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { MicOnIcon, SpeakerIcon, VideoOnIcon } from '@100mslive/react-icons';
 import { Box, Button, Dropdown, Flex, StyledVideoTile, Text, Video } from '../../../';
+import { config as cssConfig } from '../../../Theme';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useUISettings } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
@@ -26,11 +29,19 @@ const Settings = ({ setHide }) => {
   const videoTrackId = useHMSStore(selectLocalVideoTrackID);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   // don't show speaker selector where the API is not supported, and use
-  // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
+  // a generic word("Audio") for Mic. In some cases(Chrome Android for example) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(videoTrackId);
+  const hmsActions = useHMSActions();
   const track = useHMSStore(trackSelector);
+  const isMobile = useMedia(cssConfig.media.md);
+
+  useEffect(() => {
+    if (isMobile) {
+      hmsActions.refreshDevices();
+    }
+  }, [hmsActions, isMobile]);
 
   /**
    * Chromium browsers return an audioOutput with empty label when no permissions are given

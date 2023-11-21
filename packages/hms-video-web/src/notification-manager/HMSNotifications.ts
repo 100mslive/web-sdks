@@ -41,6 +41,24 @@ export interface Info {
   user_id: string;
 }
 
+export enum HMSRecordingState {
+  NONE = 'none',
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  PAUSED = 'paused',
+  RESUMED = 'resumed',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+
+export enum HMSStreamingState {
+  NONE = 'none',
+  INITIALISED = 'initialised',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+  FAILED = 'failed',
+}
+
 export interface PolicyParams {
   name: string;
   known_roles: {
@@ -98,14 +116,18 @@ export interface RoomState {
     sfu: {
       started_at?: number;
       enabled: boolean;
+      state?: HMSRecordingState;
     };
     browser: {
       started_at?: number;
       enabled: boolean;
+      state?: HMSRecordingState;
     };
     hls: {
+      initialised_at?: number;
       started_at?: number;
       enabled: boolean;
+      state?: HMSRecordingState;
       config?: {
         hls_vod: boolean;
         single_file_per_layer: boolean;
@@ -114,7 +136,7 @@ export interface RoomState {
   };
   streaming?: {
     enabled: boolean;
-    rtmp: { enabled: boolean; started_at?: number };
+    rtmp: { enabled: boolean; started_at?: number; state?: HMSStreamingState };
     hls: HLSNotification;
   };
 }
@@ -211,28 +233,38 @@ export interface MessageNotificationInfo {
   message: any;
   type: string;
 }
-
+export enum RecordingNotificationType {
+  SFU = 'sfu',
+  BROWSER = 'Browser',
+  HLS = 'HLS',
+}
 export interface RecordingNotification {
-  type: 'sfu' | 'Browser';
+  type: RecordingNotificationType;
+  initialised_at?: number; // only used for type hls
   started_at?: number;
   peer?: PeerNotificationInfo;
   error?: ServerError;
+  state?: HMSRecordingState;
+  hls_recording?: HLSRecording; // only used for type hls
 }
 
 export interface RTMPNotification {
   peer?: PeerNotificationInfo;
-  started_at?: number;
   error?: ServerError;
+  started_at?: number;
+  state?: HMSStreamingState;
+}
+
+export interface HLSRecording {
+  hls_vod: boolean;
+  single_file_per_layer: boolean;
 }
 
 export interface HLSNotification {
   enabled: boolean;
   variants?: Array<HLSVariantInfo>;
   error?: ServerError;
-  hls_recording?: {
-    hls_vod: boolean;
-    single_file_per_layer: boolean;
-  };
+  hls_recording?: HLSRecording;
 }
 
 export interface HLSVariantInfo {
@@ -240,6 +272,8 @@ export interface HLSVariantInfo {
   meeting_url?: string;
   metadata?: string;
   started_at?: number;
+  initialised_at?: number;
+  state?: HMSStreamingState;
 }
 
 export interface MetadataChangeNotification {

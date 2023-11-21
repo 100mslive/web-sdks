@@ -13,6 +13,12 @@ export class HMSPeerListIterator {
   private defaultPaginationLimit = 10;
   constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
 
+  private validateConnection() {
+    if (!this.transport || !this.store) {
+      throw Error(`Use usePaginatedParticipants or hmsActions.getPeerListIterator after preview or join has happened`);
+    }
+  }
+
   hasNext(): boolean {
     return !this.isEnd;
   }
@@ -22,6 +28,7 @@ export class HMSPeerListIterator {
   }
 
   async findPeers() {
+    this.validateConnection();
     const response = await this.transport.findPeers({
       ...(this.options || {}),
       limit: this.options?.limit || this.defaultPaginationLimit,
@@ -31,6 +38,7 @@ export class HMSPeerListIterator {
   }
 
   async next() {
+    this.validateConnection();
     let response: PeersIterationResponse;
     if (!this.iterator && !this.isEnd) {
       return await this.findPeers();

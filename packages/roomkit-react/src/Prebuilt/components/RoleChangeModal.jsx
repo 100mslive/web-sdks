@@ -9,7 +9,6 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
-import { PrebuiltDialogPortal } from './PrebuiltDialogPortal';
 import { useDropdownSelection } from './hooks/useDropdownSelection';
 import { useFilteredRoles } from '../common/hooks';
 import { textEllipsis } from '../../utils';
@@ -48,7 +47,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
   const peerNameMaxWidth = 200;
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ width: 'min(400px,80%)', p: '$10' }}>
           <Dialog.Title css={{ p: 0 }} asChild>
@@ -180,7 +179,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
             </Box>
           </Flex>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };

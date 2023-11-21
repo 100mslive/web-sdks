@@ -17,19 +17,19 @@ export const StyledDialogTrigger = styled(DialogPrimitive.Trigger, {
   appearance: 'none !important', // Needed for safari it shows white overlay
 });
 
-export const StyledDialogOverlay = styled(DialogPrimitive.Overlay, {
+export const CustomDialogOverlay = styled(DialogPrimitive.Overlay, {
   backgroundColor: 'rgba(0, 0, 0, 0.5);',
-  position: 'fixed',
+  position: 'absolute',
   inset: 0,
 });
 
 export const StyledDialogPortal = styled(DialogPrimitive.Portal, {});
 
-export const StyledDialogContent = styled(DialogPrimitive.Content, {
+export const CustomDialogContent = styled(DialogPrimitive.Content, {
   color: '$on_surface_medium',
   backgroundColor: '$surface_default',
   borderRadius: '8px',
-  position: 'fixed',
+  position: 'absolute',
   top: '50%',
   left: '50%',
   border: '$space$px solid $border_bright',

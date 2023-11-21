@@ -224,6 +224,18 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private volumeEventHandler = () => {
     this._volume = this._videoEl.volume;
   };
+
+  private reConnectToStream = () => {
+    window.addEventListener(
+      'online',
+      () => {
+        this._hls.startLoad();
+      },
+      {
+        once: true,
+      },
+    );
+  };
   // eslint-disable-next-line complexity
   private handleHLSException = (_: any, data: ErrorData) => {
     console.error(this.TAG, `error type ${data.type} with details ${data.details} is fatal ${data.fatal}`);
@@ -232,6 +244,9 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       details: details,
       fatal: data.fatal,
     };
+    if (!detail.fatal) {
+      return;
+    }
     switch (data.details) {
       case Hls.ErrorDetails.MANIFEST_INCOMPATIBLE_CODECS_ERROR: {
         const error = HMSHLSErrorFactory.HLSMediaError.manifestIncompatibleCodecsError(detail);
@@ -261,7 +276,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       }
       case Hls.ErrorDetails.LEVEL_LOAD_ERROR: {
         const error = HMSHLSErrorFactory.HLSNetworkError.layerLoadError(detail);
-        this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        if (!navigator.onLine) {
+          this.reConnectToStream();
+        } else {
+          this.emitEvent(HMSHLSPlayerEvents.ERROR, error);
+        }
         break;
       }
       default: {
@@ -314,13 +333,35 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl.addEventListener('pause', this.pauseEventHandler);
     this._videoEl.addEventListener('volumechange', this.volumeEventHandler);
   }
-
+  /**
+   * 1 min retries before user came online, reason room automatically disconnected if user is offline for more than 1mins
+   * Retries logic will run exponential like (1, 2, 4, 8, 8, 8, 8, 8, 8, 8secs)
+   * there will be total 10 retries
+   */
   private getPlayerConfig(): Partial<HlsConfig> {
     return {
       enableWorker: true,
       maxBufferLength: 20,
       backBufferLength: 10,
       abrBandWidthUpFactor: 1,
+      playlistLoadPolicy: {
+        default: {
+          maxTimeToFirstByteMs: 8000,
+          maxLoadTimeMs: 20000,
+          timeoutRetry: {
+            maxNumRetry: 10,
+            retryDelayMs: 1000,
+            maxRetryDelayMs: 8000,
+            backoff: 'exponential',
+          },
+          errorRetry: {
+            maxNumRetry: 10,
+            retryDelayMs: 1000,
+            maxRetryDelayMs: 8000,
+            backoff: 'exponential',
+          },
+        },
+      },
     };
   }
 

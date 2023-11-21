@@ -2,7 +2,6 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { Box, Button, config as cssConfig, Dialog, Flex, Text } from '../../..';
 import { Sheet } from '../../../Sheet';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 
 export const RequestPrompt = ({
   open = true,
@@ -34,17 +33,16 @@ export const RequestPrompt = ({
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <PrebuiltDialogPortal>
-        <Dialog.Overlay />
-        <Dialog.Content css={{ p: '$10' }}>
+    <Dialog.Root open={open} modal={false} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Content css={{ p: '$10' }} onInteractOutside={e => e.preventDefault()}>
           <Dialog.Title css={{ p: 0, display: 'flex', flexDirection: 'row', gap: '$md', justifyContent: 'center' }}>
             <Text variant="h6">{title}</Text>
           </Dialog.Title>
           <Box css={{ mt: '$4', mb: '$10' }}>{body}</Box>
           <RequestActions actionText={actionText} onAction={onAction} />
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 };

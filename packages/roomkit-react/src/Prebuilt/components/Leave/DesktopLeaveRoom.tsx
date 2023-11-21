@@ -8,7 +8,6 @@ import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Dialog } from '../../../Modal';
 import { Tooltip } from '../../../Tooltip';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton, MenuTriggerButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
@@ -21,9 +20,9 @@ export const DesktopLeaveRoom = ({
   screenType,
   endRoom,
 }: {
-  leaveRoom: (args: { endstream: boolean }) => void;
+  leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
-  endRoom: () => void;
+  endRoom: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -31,7 +30,7 @@ export const DesktopLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn && permissions?.hlsStreaming;
   const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
 
   useDropdownList({ open: open || showEndStreamAlert || showLeaveRoomAlert, name: 'LeaveRoom' });
@@ -79,7 +78,7 @@ export const DesktopLeaveRoom = ({
                   color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
-                onClick={() => leaveRoom({ endstream: false })}
+                onClick={async () => await leaveRoom()}
                 data-testid="just_leave_btn"
               >
                 <LeaveCard
@@ -90,7 +89,7 @@ export const DesktopLeaveRoom = ({
                   bg=""
                   titleColor="$on_surface_high"
                   icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                  onClick={() => leaveRoom({ endstream: false })}
+                  onClick={async () => await leaveRoom()}
                   css={{ p: 0 }}
                 />
               </Dropdown.Item>
@@ -138,26 +137,26 @@ export const DesktopLeaveRoom = ({
       )}
 
       <Dialog.Root open={showEndStreamAlert} modal={false}>
-        <PrebuiltDialogPortal>
+        <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <EndSessionContent
               setShowEndStreamAlert={setShowEndStreamAlert}
-              leaveRoom={isStreamingOn ? leaveRoom : endRoom}
+              leaveRoom={isStreamingOn ? () => leaveRoom({ endStream: true }) : endRoom}
               isStreamingOn={isStreamingOn}
               isModal
             />
           </Dialog.Content>
-        </PrebuiltDialogPortal>
+        </Dialog.Portal>
       </Dialog.Root>
 
       <Dialog.Root open={showLeaveRoomAlert} modal={false}>
-        <PrebuiltDialogPortal>
+        <Dialog.Portal>
           <Dialog.Overlay />
           <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
             <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} isModal />
           </Dialog.Content>
-        </PrebuiltDialogPortal>
+        </Dialog.Portal>
       </Dialog.Root>
     </Fragment>
   );

@@ -9,7 +9,7 @@ export const RaiseHand = () => {
   const { isHandRaised, toggleHandRaise } = useMyMetadata();
   return (
     <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
-      <IconButton active={!isHandRaised} onClick={async () => await toggleHandRaise()}>
+      <IconButton data-testid="hand_raise_btn" active={!isHandRaised} onClick={async () => await toggleHandRaise()}>
         <HandIcon />
       </IconButton>
     </Tooltip>

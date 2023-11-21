@@ -9,7 +9,7 @@ import { ISignal } from '../../signal/ISignal';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
-import { sleep } from '../../utils/timer-utils';
+import { workerSleep } from '../../utils/timer-utils';
 import { PreferAudioLayerParams, PreferLayerResponse, PreferVideoLayerParams } from '../channel-messages';
 import HMSConnection from '../HMSConnection';
 import HMSDataChannel from '../HMSDataChannel';
@@ -189,7 +189,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
           throw Error(`code=${error.code}, message=${error.message}`);
         }
         const delay = (2 + Math.random() * 2) * 1000;
-        await sleep(delay);
+        await workerSleep(delay);
       } else {
         break;
       }

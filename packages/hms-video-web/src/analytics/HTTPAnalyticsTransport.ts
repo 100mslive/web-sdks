@@ -50,7 +50,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
   }
 
   sendEvent(event: AnalyticsEvent) {
-    if (!this.env || !this.websocketURL) {
+    if (!this.env) {
       this.addEventToStorage(event);
       return;
     }

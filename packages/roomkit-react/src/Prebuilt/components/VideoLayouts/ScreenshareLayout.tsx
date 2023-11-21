@@ -19,15 +19,14 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   const [page, setPage] = useState(0);
   const activeSharePeer = peersSharing[page];
   const isMobile = useMedia(cssConfig.media.md);
-  const secondaryPeers = useMemo(
-    () =>
-      isMobile
-        ? activeSharePeer
-          ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)]
-          : peers //keep active sharing peer as first tile
-        : peers.filter(p => p.id !== activeSharePeer?.id),
-    [activeSharePeer, peers, isMobile],
-  );
+  const secondaryPeers = useMemo(() => {
+    if (isMobile) {
+      return activeSharePeer
+        ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)] //keep active sharing peer as first tile
+        : peers;
+    }
+    return peers.filter(p => p.id !== activeSharePeer?.id);
+  }, [activeSharePeer, peers, isMobile]);
   useEffect(() => {
     setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
     return () => {

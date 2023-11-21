@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
+import { Polls } from '../components/Polls/Polls';
 import { SidePaneTabs } from '../components/SidePaneTabs';
-// @ts-ignore: No implicit Any
-import { StreamingLanding } from '../components/Streaming/StreamingLanding';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
+// @ts-ignore: No implicit Any
+import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
+// @ts-ignore: No implicit Any
+import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { translateAcross } from '../../utils';
 // @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -20,20 +24,32 @@ const SidePane = ({
   hideControls = false,
 }: {
   screenType: keyof ConferencingScreen;
-  tileProps: TileCustomisationProps;
-  hideControls: boolean;
+  tileProps?: TileCustomisationProps;
+  hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
+  const resetSidePane = useSidepaneReset();
   let ViewComponent;
+  if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
+    ViewComponent = <Polls />;
+  }
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
     ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
-  } else if (sidepane === SIDE_PANE_OPTIONS.STREAMING) {
-    ViewComponent = <StreamingLanding />;
   }
+  if (sidepane === SIDE_PANE_OPTIONS.VB) {
+    ViewComponent = <VBPicker {...elements.virtual_background} />;
+  }
+
+  useEffect(() => {
+    return () => {
+      resetSidePane();
+    };
+  }, [resetSidePane]);
+
   if (!ViewComponent && !trackId) {
     return null;
   }
@@ -45,7 +61,7 @@ const SidePane = ({
     hideMetadataOnTile: tileProps?.hide_metadata_on_tile,
     objectFit: tileProps?.video_object_fit,
   };
-
+  const VB = sidepane === SIDE_PANE_OPTIONS.VB;
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
 
   return (
@@ -57,6 +73,7 @@ const SidePane = ({
         h: '100%',
         flexShrink: 0,
         gap: '$4',
+        position: 'relative',
         '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
@@ -75,7 +92,7 @@ const SidePane = ({
           css={{
             w: '$100',
             h: mwebStreamingChat ? '0' : '100%',
-            p: '$10',
+            p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,
             maxHeight: mwebStreamingChat ? '300px' : 'unset',
@@ -97,6 +114,9 @@ const SidePane = ({
             '@md': {
               p: '$6 $8',
               pb: mwebStreamingChat ? '$20' : '$12',
+              borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
+              animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
             },
           }}
         >

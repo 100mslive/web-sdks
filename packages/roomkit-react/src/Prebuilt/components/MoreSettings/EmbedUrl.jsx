@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { LinkIcon } from '@100mslive/react-icons';
 import { Button, Dialog, Dropdown, Flex, Input, Text } from '../../../';
-import { PrebuiltDialogPortal } from '../PrebuiltDialogPortal';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
@@ -31,7 +30,7 @@ export function EmbedUrlModal({ onOpenChange }) {
 
   return (
     <Dialog.Root defaultOpen onOpenChange={onOpenChange}>
-      <PrebuiltDialogPortal>
+      <Dialog.Portal>
         <Dialog.Overlay />
         <Dialog.Content css={{ w: 'min(420px, 90%)', p: '$8', bg: '$surface_dim' }}>
           <Dialog.Title
@@ -76,7 +75,7 @@ export function EmbedUrlModal({ onOpenChange }) {
             </Button>
           </Flex>
         </Dialog.Content>
-      </PrebuiltDialogPortal>
+      </Dialog.Portal>
     </Dialog.Root>
   );
 }

@@ -1,10 +1,6 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
-import {
-  ConferencingScreen,
-  DefaultConferencingScreen_Elements,
-  HLSLiveStreamingScreen_Elements,
-} from '@100mslive/types-prebuilt';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { useAVToggle } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
@@ -21,22 +17,26 @@ import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit Any
 import { ScreenshareToggle } from '../ScreenShareToggle';
 // @ts-ignore: No implicit Any
+import { VBToggle } from '../VirtualBackground/VBToggle';
+// @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
+import { PollsToggle } from './PollsToggle';
+import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { useShowPolls } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
-const VirtualBackground = React.lazy(() => import('../../plugins/VirtualBackground/VirtualBackground'));
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const Footer = ({
   screenType,
   elements,
 }: {
   screenType: keyof ConferencingScreen;
-  elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+  elements: ConferencingScreenElements;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
@@ -46,6 +46,7 @@ export const Footer = ({
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const { showPolls } = useShowPolls();
 
   useEffect(() => {
     if (!isChatOpen && openByDefault) {
@@ -78,11 +79,7 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        {isMobile ? null : (
-          <Suspense fallback={<></>}>
-            <VirtualBackground />
-          </Suspense>
-        )}
+        {!isMobile && elements.virtual_background ? <VBToggle /> : null}
       </AppFooter.Left>
       <AppFooter.Center
         css={{
@@ -108,6 +105,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
+        {showPolls && <PollsToggle />}
         {!isMobile && elements?.chat && <ChatToggle />}
         {elements?.participant_list && <ParticipantCount />}
         <MoreSettings elements={elements} screenType={screenType} />

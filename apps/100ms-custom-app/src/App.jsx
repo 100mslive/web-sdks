@@ -1,10 +1,4 @@
-import React, {
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Flex, HMSPrebuilt } from '@100mslive/roomkit-react';
 import { useOverridePrebuiltLayout } from './hooks/useOverridePrebuiltLayout';
 import { useSearchParam } from './hooks/useSearchParam';
@@ -27,20 +21,14 @@ const App = () => {
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const paramUserName = useSearchParam('name');
   const hmsPrebuiltRef = useRef();
-  const confirmLeave = useCallback(e => {
-    e.returnValue = 'Are you sure you want to leave?';
-  }, []);
-  const removeExitListener = useCallback(
-    () => window.removeEventListener('beforeunload', confirmLeave),
-    []
-  );
 
   useEffect(() => {
     if (roomCode) {
       fetchData(subdomain, roomCode, setOnlyEmail, setData, setShowHeader);
     }
-  }, []);
+  }, [roomCode, subdomain]);
 
   useEffect(() => {
     // remove notifications and messages for beam
@@ -71,7 +59,11 @@ const App = () => {
     <Flex
       className="prebuilt-wrapper"
       direction="column"
-      css={{ size: '100%', overflowY: 'hidden', bg: '$background_dim' }}
+      css={{
+        size: '100%',
+        overflowY: 'hidden',
+        bg: '$background_dim',
+      }}
     >
       {onlyEmail && showHeader && (
         <Suspense fallback={null}>
@@ -86,16 +78,9 @@ const App = () => {
         <HMSPrebuilt
           roomCode={roomCode}
           authToken={authToken}
-          roomId={roomId}
-          role={role}
-          onLeave={removeExitListener}
-          onJoin={() => {
-            if (!isHeadless)
-              window.addEventListener('beforeunload', confirmLeave);
-          }}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
-            userName: isHeadless ? 'Beam' : undefined,
+            userName: isHeadless ? 'Beam' : paramUserName,
             endpoints: {
               tokenByRoomCode:
                 process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,

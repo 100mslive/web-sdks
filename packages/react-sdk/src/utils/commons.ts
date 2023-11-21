@@ -25,10 +25,10 @@ export default function usePrevious<T>(state: T): T | undefined {
   return ref.current;
 }
 
-const chromiumBasedBrowsers = ['chrome', 'brave', 'opera', 'edge'];
+const chromiumBasedBrowsers = ['blink'];
 
 export const isChromiumBased = chromiumBasedBrowsers.some(
-  (value: string) => parsedUserAgent.getBrowser()?.name?.toLowerCase() === value,
+  (value: string) => parsedUserAgent.getEngine()?.name?.toLowerCase() === value,
 );
 
 export const pdfIframeURL = 'https://pdf-annotation.100ms.live/generic/web/viewer.html';
