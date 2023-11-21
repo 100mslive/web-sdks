@@ -46,9 +46,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const addedPluginToVideoTrack = useRef(false);
-  const mediaList = background_media?.length
-    ? background_media.map((media: VirtualBackgroundMedia) => media?.url)
-    : defaultMedia;
+  const mediaList = [...background_media.map((media: VirtualBackgroundMedia) => media?.url), ...defaultMedia];
 
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
