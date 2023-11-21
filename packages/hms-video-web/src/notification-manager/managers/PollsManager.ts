@@ -1,5 +1,6 @@
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
+import { createHMSPollFromPollParams } from '../../session-store/interactivity-center/HMSInteractivityCenter';
 import { PollResult } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
@@ -37,27 +38,9 @@ export class PollsManager {
       }
 
       const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
-      const poll: HMSPoll = {
-        id: pollParams.poll_id,
-        title: pollParams.title,
-        startedBy: pollParams.started_by,
-        createdBy: pollParams.created_by,
-        anonymous: pollParams.anonymous,
-        type: pollParams.type,
-        duration: pollParams.duration,
-        locked: pollParams.locked, // poll is locked automatically when it starts
-        mode: pollParams.mode as HMSPoll['mode'],
-        visibility: pollParams.visibility,
-        rolesThatCanVote: pollParams.vote || [],
-        rolesThatCanViewResponses: pollParams.responses || [],
-        state: pollParams.state,
-        stoppedBy: pollParams.stopped_by,
-        startedAt: convertDateNumToDate(pollParams.started_at),
-        stoppedAt: convertDateNumToDate(pollParams.stopped_at),
-        createdAt: convertDateNumToDate(pollParams.created_at),
 
-        questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
-      };
+      const poll = createHMSPollFromPollParams(pollParams);
+      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
 
       await this.updatePollResponses(poll, true);
 
