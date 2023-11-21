@@ -178,6 +178,7 @@ const PreviewJoin = ({
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
+            disabled={!!initialName}
             onChange={setName}
             enableJoin={enableJoin}
             onJoin={savePreferenceAndJoin}
