@@ -1,4 +1,4 @@
-import { HMSLogLevel } from '../';
+import { HMSLogLevel } from '../internal';
 
 const HMS_STORE_TAG = 'HMS-Store:';
 

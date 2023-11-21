@@ -1,5 +1,5 @@
+import { HMSLocalVideoTrack } from './HMSLocalVideoTrack';
 import { HMSRemoteVideoTrack } from './HMSRemoteVideoTrack';
-import { HMSLocalVideoTrack } from '../..';
 import HMSPublishConnection from '../../connection/publish/publishConnection';
 import HMSSubscribeConnection from '../../connection/subscribe/subscribeConnection';
 import { EventBus } from '../../events/EventBus';
