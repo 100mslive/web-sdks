@@ -27,6 +27,7 @@ import { Slider } from '../../../Slider';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
@@ -186,6 +187,7 @@ const SimulcastLayers = ({ trackId }) => {
 export const TileMenuContent = props => {
   const actions = useHMSActions();
   const { removeOthers } = useHMSStore(selectPermissions);
+  const { userName } = useHMSPrebuiltContext();
   const {
     videoTrackID,
     audioTrackID,
@@ -220,17 +222,19 @@ export const TileMenuContent = props => {
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         {canMinimise && <MinimiseInset />}
-        <StyledMenuTile.ItemButton
-          onClick={() => {
-            openNameChangeModal();
-            closeSheetOnClick();
-          }}
-        >
-          <PencilIcon height={20} width={20} />
-          <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
-            Change Name
-          </Text>
-        </StyledMenuTile.ItemButton>
+        {!userName && (
+          <StyledMenuTile.ItemButton
+            onClick={() => {
+              openNameChangeModal();
+              closeSheetOnClick();
+            }}
+          >
+            <PencilIcon height={20} width={20} />
+            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+              Change Name
+            </Text>
+          </StyledMenuTile.ItemButton>
+        )}
       </>
     )
   ) : (
