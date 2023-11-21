@@ -59,6 +59,8 @@ export class PollsManager {
         questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
       };
 
+      await this.updatePollResponses(poll, true);
+
       polls.push(poll);
       this.store.setPoll(poll);
     }
@@ -95,40 +97,7 @@ export class PollsManager {
       }
 
       this.updatePollResult(savedPoll, updatedPoll);
-
-      const serverResponseParams = await this.transport.getPollResponses({
-        poll_id: updatedPoll.poll_id,
-        index: 0,
-        count: 50,
-        self: false,
-      });
-
-      serverResponseParams.responses?.forEach(({ response, peer, final }) => {
-        const question = savedPoll?.questions?.find(question => question.index === response.question);
-        if (!question) {
-          return;
-        }
-        const pollResponse: HMSPollQuestionResponse = {
-          id: response.response_id,
-          questionIndex: response.question,
-          option: response.option,
-          options: response.options,
-          text: response.text,
-          responseFinal: final,
-          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
-          skipped: response.skipped,
-          type: response.type,
-          update: response.update,
-        };
-
-        if (Array.isArray(question.responses) && question.responses.length > 0) {
-          if (!question.responses.find(({ id }) => id === pollResponse.id)) {
-            question.responses.push(pollResponse);
-          }
-        } else {
-          question.responses = [pollResponse];
-        }
-      });
+      await this.updatePollResponses(savedPoll, false);
 
       updatedPolls.push(savedPoll);
     }
@@ -160,6 +129,42 @@ export class PollsManager {
           savedOption.voteCount = updatedVoteCount;
         }
       });
+    });
+  }
+
+  private async updatePollResponses(poll: HMSPoll, self: boolean) {
+    const serverResponseParams = await this.transport.getPollResponses({
+      poll_id: poll.id,
+      index: 0,
+      count: 50,
+      self,
+    });
+
+    serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+      const question = poll?.questions?.find(question => question.index === response.question);
+      if (!question) {
+        return;
+      }
+      const pollResponse: HMSPollQuestionResponse = {
+        id: response.response_id,
+        questionIndex: response.question,
+        option: response.option,
+        options: response.options,
+        text: response.text,
+        responseFinal: final,
+        peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+        skipped: response.skipped,
+        type: response.type,
+        update: response.update,
+      };
+
+      if (Array.isArray(question.responses) && question.responses.length > 0) {
+        if (!question.responses.find(({ id }) => id === pollResponse.id)) {
+          question.responses.push(pollResponse);
+        }
+      } else {
+        question.responses = [pollResponse];
+      }
     });
   }
 }
