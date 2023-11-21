@@ -1,6 +1,5 @@
-import { HMSPeer, HMSPeerID, HMSTrack, HMSTrackID, HMSVideoTrack } from '../../core';
-import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../core/hmsSDKStore/sdkUtils/storeMergeUtils';
-import { HMSTrack as SDKTrack } from '../../coreSDK';
+import { HMSPeer, HMSPeerID, HMSTrack, HMSTrack as SDKTrack, HMSTrackID, HMSVideoTrack } from '../../';
+import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 
 type trackMap = Record<HMSTrackID, HMSTrack>;

@@ -1,4 +1,4 @@
-import { HMSLogLevel } from '../core/hmsSDKStore/sdkTypes';
+import { HMSLogLevel } from '../';
 
 const HMS_STORE_TAG = 'HMS-Store:';
 

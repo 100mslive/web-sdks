@@ -1,6 +1,6 @@
+import { HMSGenericTypes, HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../';
 import { HMSLogger } from '../../common/ui-logger';
-import { HMSGenericTypes, HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
-import { IHMSActions } from '../../core/IHMSActions';
+import { IHMSActions } from '../../IHMSActions';
 
 /**
  * Log data of audio level and speaker speaking periodically to beam for transcript

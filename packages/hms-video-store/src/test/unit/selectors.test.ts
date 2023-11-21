@@ -57,7 +57,7 @@ import {
   selectUnreadHMSMessagesCount,
   selectVideoPlaylist,
   selectVideoTrackByPeerID,
-} from '../../core';
+} from '../../';
 import {
   auxiliaryAudio,
   hostRole,

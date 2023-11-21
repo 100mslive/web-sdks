@@ -1,4 +1,5 @@
-import { HMSStatsStore, selectHMSStats } from '../../core';
+import { HMSStatsStore } from '../../';
+import { selectHMSStats } from '../../webrtc-stats';
 import {
   localAudioTrackStats,
   localPeerStats,
