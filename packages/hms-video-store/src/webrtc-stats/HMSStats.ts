@@ -1,11 +1,11 @@
 import { Subscribe } from 'zustand/vanilla';
+import { HMSReactiveStore } from './internal';
 import { subscribeToSdkWebrtcStats } from './webrtc-stats-store';
 import { storeNameWithTabTitle } from '../common/storeName';
 import { GetState, IHMSStatsStore, IHMSStatsStoreReadOnly, IHMSStore } from '../IHMSStore';
 import { createDefaultStatsStore, HMSStatsStore } from '../schema';
 import { HMSSdk } from '../sdk';
 import { selectRoomState } from '../selectors';
-import { HMSReactiveStore } from '../';
 
 /**
  * @internal

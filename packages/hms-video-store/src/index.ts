@@ -9,6 +9,7 @@ export type { IHMSActions as HMSActions } from './IHMSActions';
 export * from './schema';
 export type { IHMSNotifications as HMSNotifications } from './schema/notification';
 export * from './selectors';
+export * from './webrtc-stats';
 export {
   HMSLogLevel,
   HMSAudioPluginType,
