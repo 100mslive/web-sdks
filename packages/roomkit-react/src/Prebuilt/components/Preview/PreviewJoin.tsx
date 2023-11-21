@@ -81,7 +81,6 @@ const PreviewJoin = ({
   const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
-  const [userInputEnabled, setUserInputEnabled] = useState(false);
   const { toggleAudio, toggleVideo } = useAVToggle();
   const [previewError, setPreviewError] = useState(false);
   const { endpoints } = useHMSPrebuiltContext();
@@ -128,7 +127,6 @@ const PreviewJoin = ({
   useEffect(() => {
     if (initialName) {
       setName(initialName);
-      setUserInputEnabled(true);
     }
   }, [initialName]);
 
@@ -180,7 +178,7 @@ const PreviewJoin = ({
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
-            userInputEnabled={userInputEnabled}
+            initialName={initialName}
             onChange={setName}
             enableJoin={enableJoin}
             onJoin={savePreferenceAndJoin}
