@@ -3,6 +3,7 @@ import { useMedia } from 'react-use';
 import { HMSException } from '@100mslive/hms-video';
 import {
   HMSSimulcastLayerDefinition,
+  HMSTrackID,
   HMSVideoTrack,
   selectPermissions,
   selectSessionStore,
@@ -44,7 +45,7 @@ export const isSameTile = ({
   videoTrackID,
   audioTrackID,
 }: {
-  trackId: string;
+  trackId: HMSTrackID;
   videoTrackID: string;
   audioTrackID: string;
 }) => trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
@@ -64,9 +65,9 @@ const SpotlightActions = ({
   const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightPeerId = (peer?: string) =>
+  const setSpotlightPeerId = (peerIdToSpotlight?: string) =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peerIdToSpotlight)
       .catch((err: HMSException) => ToastManager.addToast({ title: err.description }));
 
   return (
@@ -122,7 +123,7 @@ const MinimiseInset = () => {
   );
 };
 
-const SimulcastLayers = ({ trackId }: { trackId: string }) => {
+const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
   const track: HMSVideoTrack = useHMSStore(selectTrackByID(trackId)) as HMSVideoTrack;
   const actions = useHMSActions();
   const bg = useDropdownSelection();
@@ -200,26 +201,36 @@ const SimulcastLayers = ({ trackId }: { trackId: string }) => {
   );
 };
 
-export const TileMenuContent = (props: any) => {
+export const TileMenuContent = ({
+  videoTrackID,
+  audioTrackID,
+  isLocal,
+  isScreenshare,
+  showSpotlight,
+  showPinAction,
+  peerID,
+  canMinimise,
+  closeSheetOnClick = () => {
+    return;
+  },
+  openNameChangeModal = () => {
+    return;
+  },
+}: {
+  videoTrackID: string;
+  audioTrackID: string;
+  isLocal: boolean;
+  isScreenshare: boolean;
+  showSpotlight: boolean;
+  showPinAction: boolean;
+  peerID: string;
+  canMinimise: boolean;
+  closeSheetOnClick: () => void;
+  openNameChangeModal: () => void;
+}) => {
   const actions = useHMSActions();
   const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
-  const {
-    videoTrackID,
-    audioTrackID,
-    isLocal,
-    isScreenshare,
-    showSpotlight,
-    showPinAction,
-    peerID,
-    canMinimise,
-    closeSheetOnClick = () => {
-      return;
-    },
-    openNameChangeModal = () => {
-      return;
-    },
-  } = props;
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
@@ -291,7 +302,7 @@ export const TileMenuContent = (props: any) => {
               Volume ({volume})
             </Box>
           </Flex>
-          <Slider css={{ my: '0.5rem' }} step={5} value={[volume || 0]} onValueChange={e => setVolume?.(e[0])} />
+          <Slider css={{ my: '0.5rem' }} step={5} value={[volume || 100]} onValueChange={e => setVolume?.(e[0])} />
         </StyledMenuTile.VolumeItem>
       ) : null}
 
