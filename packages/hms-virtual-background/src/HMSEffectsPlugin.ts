@@ -1,6 +1,6 @@
 import { tsvb } from 'effects-sdk';
 import { HMSMediaStreamPlugin } from '@100mslive/hms-video';
-import { EFFECTS_SDK_KEY } from './constants';
+import { EFFECTS_SDK_ASSETS, EFFECTS_SDK_KEY } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
@@ -14,13 +14,17 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
     this.effects.config({
-      models: {
-        colorcorrector: '',
-        facedetector: '',
+      sdk_url: EFFECTS_SDK_ASSETS,
+      wasmPaths: {
+        'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
+        'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
+        'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
+        'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
       },
     });
 
     this.effects.onReady = () => {
+      console.log('effectssdk onready fired');
       if (this.effects) {
         console.debug('effects is ready');
         this.effects.run();
@@ -33,7 +37,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.effects.disableBeautification();
       }
     };
-    this.effects.onReady();
   }
 
   getName(): string {
@@ -41,18 +44,21 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBlur(blur: number) {
+    console.log('effectssdk blur', blur);
     this.blurAmount = blur;
     this.backgroundURL = '';
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
   }
 
   setBackground(url: string) {
+    console.log('effectssdk img', url);
     this.backgroundURL = url;
     this.blurAmount = 0;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
   }
 
   apply(stream: MediaStream): MediaStream {
+    console.log('effectssdk apply');
     this.effects.useStream(stream);
     if (this.blurAmount) {
       this.effects.setBlur(this.blurAmount);
@@ -70,6 +76,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   clear() {
+    console.log('effectssdk clear');
     this.effects.clear();
     this.backgroundType = HMSVirtualBackgroundTypes.NONE;
   }
