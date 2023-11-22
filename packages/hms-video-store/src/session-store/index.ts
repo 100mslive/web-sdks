@@ -1,11 +1,11 @@
 import { HMSSessionStore } from '../interfaces';
-import ITransport from '../transport/ITransport';
+import HMSTransport from '../transport';
 import { convertDateNumToDate } from '../utils/date';
 
 export class SessionStore implements HMSSessionStore {
   private observedKeys: Set<string> = new Set();
 
-  constructor(private transport: ITransport) {}
+  constructor(private transport: HMSTransport) {}
 
   async get(key: string) {
     const { data, updated_at } = await this.transport.getSessionMetadata(key);

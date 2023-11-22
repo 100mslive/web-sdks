@@ -2,7 +2,7 @@ import AnalyticsEvent from './AnalyticsEvent';
 import { HMSAnalyticsLevel } from './AnalyticsEventLevel';
 import { AnalyticsTransport } from './AnalyticsTransport';
 import { HTTPAnalyticsTransport } from './HTTPAnalyticsTransport';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import { ANALYTICS_BUFFER_SIZE } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 
@@ -15,7 +15,7 @@ export class AnalyticsEventsService {
 
   level: HMSAnalyticsLevel = HMSAnalyticsLevel.INFO;
 
-  constructor(private store: IStore) {}
+  constructor(private store: Store) {}
 
   setTransport(transport: AnalyticsTransport) {
     this.transport = transport;

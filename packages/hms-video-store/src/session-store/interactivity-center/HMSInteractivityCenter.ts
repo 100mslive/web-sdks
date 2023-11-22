@@ -9,13 +9,13 @@ import {
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
 } from '../../interfaces/session-store/polls';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
-  constructor(private transport: HMSTransport, private store: IStore, private listener?: PollsListener) {}
+  constructor(private transport: HMSTransport, private store: Store, private listener?: PollsListener) {}
 
   setListener(listener?: PollsListener) {
     this.listener = listener;

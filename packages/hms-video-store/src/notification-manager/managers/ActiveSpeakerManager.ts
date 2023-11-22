@@ -1,10 +1,10 @@
 import { HMSAudioListener, HMSPeerUpdate, HMSSpeaker, HMSUpdateListener } from '../../interfaces';
 import { HMSAudioTrack } from '../../media/tracks';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { SpeakerList } from '../HMSNotifications';
 
 export class ActiveSpeakerManager {
-  constructor(private store: IStore, public listener?: HMSUpdateListener, public audioListener?: HMSAudioListener) {}
+  constructor(private store: Store, public listener?: HMSUpdateListener, public audioListener?: HMSAudioListener) {}
 
   handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList['speaker-list'];

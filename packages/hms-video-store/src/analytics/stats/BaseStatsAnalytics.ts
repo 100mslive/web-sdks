@@ -14,7 +14,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSTrack } from '../../internal';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { sleep } from '../../utils/timer-utils';
 
@@ -23,7 +23,7 @@ export abstract class BaseStatsAnalytics {
   protected sequenceNum = 1;
 
   constructor(
-    protected store: IStore,
+    protected store: Store,
     protected eventBus: EventBus,
     protected readonly sampleWindowSize: number,
     protected readonly pushInterval: number,

@@ -2,7 +2,7 @@ import { PeerManager } from './PeerManager';
 import { TrackManager } from './TrackManager';
 import { HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSPeer } from '../../sdk/models/peer';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HMSNotifications';
@@ -23,7 +23,7 @@ import { PeerListNotification, PeerNotification, PeriodicRoomState } from '../HM
 export class PeerListManager {
   private readonly TAG = '[PeerListManager]';
   constructor(
-    private store: IStore,
+    private store: Store,
     private peerManager: PeerManager,
     private trackManager: TrackManager,
     public listener?: HMSUpdateListener,

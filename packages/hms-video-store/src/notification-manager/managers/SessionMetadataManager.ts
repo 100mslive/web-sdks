@@ -1,11 +1,11 @@
 import { HMSUpdateListener, SessionStoreUpdate } from '../../interfaces';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { convertDateNumToDate } from '../../utils/date';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { MetadataChangeNotification } from '../HMSNotifications';
 
 export class SessionMetadataManager {
-  constructor(private store: IStore, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, public listener?: HMSUpdateListener) {}
 
   handleNotification(method: string, notification: any) {
     if (method !== HMSNotificationMethod.METADATA_CHANGE) {

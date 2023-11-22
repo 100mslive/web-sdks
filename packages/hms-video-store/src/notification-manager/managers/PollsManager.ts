@@ -1,5 +1,5 @@
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { PollResult } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
@@ -7,7 +7,7 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PollStartNotification, PollStatsNotification, PollStopNotification } from '../HMSNotifications';
 
 export class PollsManager {
-  constructor(private store: IStore, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

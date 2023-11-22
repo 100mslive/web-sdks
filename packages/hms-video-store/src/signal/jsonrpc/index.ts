@@ -58,10 +58,9 @@ import {
   TrackUpdateRequestParams,
   UpdatePeerRequestParams,
 } from '../interfaces';
-import { ISignal } from '../ISignal';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
 
-export default class JsonRpcSignal implements ISignal {
+export default class JsonRpcSignal {
   readonly TAG = '[SIGNAL]: ';
   readonly observer: ISignalEventsObserver;
   readonly pongResponseTimes = new Queue<number>(PONG_RESPONSE_TIMES_SIZE);

@@ -1,5 +1,5 @@
 import { EventBus } from '../../events/EventBus';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { PolicyParams } from '../HMSNotifications';
 
@@ -10,7 +10,7 @@ import { PolicyParams } from '../HMSNotifications';
  * - Emit 'policy-change' to finish preview before calling listener.onPreview
  */
 export class PolicyChangeManager {
-  constructor(private store: IStore, private eventBus: EventBus) {}
+  constructor(private store: Store, private eventBus: EventBus) {}
 
   handlePolicyChange(params: PolicyParams) {
     const localPeer = this.store.getLocalPeer();

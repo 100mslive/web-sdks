@@ -1,7 +1,6 @@
 import { JoinParameters } from './models/JoinParameters';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
-import ITransport from './ITransport';
 import ITransportObserver from './ITransportObserver';
 import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
@@ -30,7 +29,7 @@ import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import Message from '../sdk/models/HMSMessage';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
@@ -65,7 +64,6 @@ import {
   StartRTMPOrRecordingRequestParams,
   TrackUpdateRequestParams,
 } from '../signal/interfaces';
-import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
@@ -100,7 +98,7 @@ interface NegotiateJoinParams {
   autoSubscribeVideo: boolean;
 }
 
-export default class HMSTransport implements ITransport {
+export default class HMSTransport {
   private state: TransportState = TransportState.Disconnected;
   private trackStates: Map<string, TrackState> = new Map();
   private publishConnection: HMSPublishConnection | null = null;
@@ -118,7 +116,7 @@ export default class HMSTransport implements ITransport {
   constructor(
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
-    private store: IStore,
+    private store: Store,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
@@ -244,7 +242,7 @@ export default class HMSTransport implements ITransport {
     },
   };
 
-  private signal: ISignal = new JsonRpcSignal(this.signalObserver);
+  private signal = new JsonRpcSignal(this.signalObserver);
   private analyticsSignalTransport = new SignalAnalyticsTransport(this.signal);
 
   private publishConnectionObserver: IPublishConnectionObserver = {
