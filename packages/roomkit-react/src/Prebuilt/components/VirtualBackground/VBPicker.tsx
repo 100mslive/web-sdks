@@ -12,6 +12,7 @@ import {
   selectVideoTrackByID,
   useHMSActions,
   useHMSStore,
+  useScreenShare,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Flex, Video } from '../../../index';
@@ -49,8 +50,9 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const mediaList = [...background_media.map((media: VirtualBackgroundMedia) => media?.url), ...defaultMedia];
 
   const inPreview = roomState === HMSRoomState.Preview;
+  const { amIScreenSharing } = useScreenShare();
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
-  const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
+  const showVideoTile = isVideoOn && isLargeRoom && !inPreview && !amIScreenSharing;
 
   const clearVBState = () => {
     setBackground(HMSVirtualBackgroundTypes.NONE);
@@ -117,33 +119,33 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   }
 
   return (
-    <Box css={{ pr: '$6' }}>
-      <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
-        <Text variant="h6" css={{ color: '$on_surface_high' }}>
-          Virtual Background
-        </Text>
-        <Box
-          css={{ color: '$on_surface_high', '&:hover': { color: '$on_surface_medium' }, cursor: 'pointer' }}
-          onClick={toggleVB}
-        >
-          <CloseIcon />
-        </Box>
-      </Flex>
+    <Box css={{ pr: '$6', maxHeight: '100%', overflowY: 'auto' }}>
+      <Box css={{ position: 'sticky', top: 0 }}>
+        <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
+          <Text variant="h6" css={{ color: '$on_surface_high' }}>
+            Virtual Background
+          </Text>
+          <Box
+            css={{ color: '$on_surface_high', '&:hover': { color: '$on_surface_medium' }, cursor: 'pointer' }}
+            onClick={toggleVB}
+          >
+            <CloseIcon />
+          </Box>
+        </Flex>
 
-      {showVideoTile ? (
-        <Video
-          mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
-          trackId={localPeer?.videoTrack}
-          data-testid="preview_tile"
-          css={{ width: '100%', height: '16rem' }}
-        />
-      ) : null}
+        {showVideoTile ? (
+          <Video
+            mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
+            trackId={localPeer?.videoTrack}
+            data-testid="preview_tile"
+            css={{ width: '100%', height: '16rem' }}
+          />
+        ) : null}
+      </Box>
 
       <Box
         css={{
           mt: '$4',
-          maxHeight: `calc(100vh - ${showVideoTile ? 360 : 100}px ${inPreview ? '' : '- 140px'})`,
-          overflowY: 'auto',
         }}
       >
         <VBCollection
