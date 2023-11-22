@@ -217,7 +217,7 @@ export const TileMenuContent = props => {
   const isMobile = useMedia(cssConfig.media.md);
 
   return isLocal ? (
-    (showPinAction || canMinimise) && (
+    (showPinAction || canMinimise || !userName || showSpotlight) && (
       <>
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
