@@ -7,7 +7,6 @@ import {
   selectIsLocalVideoEnabled,
   selectLocalPeer,
   selectLocalPeerRole,
-  selectLocalVideoTrackID,
   selectRoomState,
   selectVideoTrackByID,
   useHMSActions,
@@ -32,11 +31,11 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
-  const [isVBSupported, setIsVBSupported] = useState(false);
-  const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const localPeer = useHMSStore(selectLocalPeer);
   // @ts-ignore
-  const [background, setBackground] = useState(vbPlugin.background);
+  const [background, setBackground] = useState(
+    vbPlugin.backgroundType === HMSVirtualBackgroundTypes.IMAGE ? vbPlugin.backgroundURL : vbPlugin.backgroundType,
+  );
   // @ts-ignore
   const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
@@ -53,27 +52,28 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
 
-  const clearVBState = () => {
-    setBackground(HMSVirtualBackgroundTypes.NONE);
-    setBackgroundType(HMSVirtualBackgroundTypes.NONE);
-  };
+  // const clearVBState = () => {
+  //   setBackground(HMSVirtualBackgroundTypes.NONE);
+  //   setBackgroundType(HMSVirtualBackgroundTypes.NONE);
+  // };
 
-  useEffect(() => {
-    if (!localPeerVideoTrackID) {
-      return;
-    }
+  // useEffect(() => {
+  //   if (!localPeerVideoTrackID) {
+  //     return;
+  //   }
 
-    //check support of plugin
-    if (vbPlugin) {
-      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
-      setIsVBSupported(pluginSupport.isSupported);
-    }
-  }, [hmsActions, localPeerVideoTrackID]);
+  //   //check support of plugin
+  //   if (vbPlugin) {
+  //     const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
+  //     setIsVBSupported(pluginSupport.isSupported);
+  //   }
+  // }, [hmsActions, localPeerVideoTrackID]);
 
   async function disableEffects() {
     if (vbPlugin) {
-      vbPlugin.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
-      clearVBState();
+      // vbPlugin.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+      vbPlugin.clear();
+      // clearVBState();
     }
   }
 
@@ -81,24 +81,24 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
     let retries = 0;
     try {
       if (mediaURL) {
-        const img = document.createElement('img');
-        img.alt = 'VB';
-        img.src = mediaURL;
+        // const img = document.createElement('img');
+        // img.alt = 'VB';
+        // img.src = mediaURL;
         try {
-          await vbPlugin.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
+          await vbPlugin.setBackground(mediaURL);
         } catch (e) {
           console.error(e);
           if (retries++ < MAX_RETRIES) {
-            await vbPlugin.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
+            await vbPlugin.setBackground(mediaURL);
           }
         }
       } else if (blurPower) {
-        await vbPlugin.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
+        await vbPlugin.setBlur(blurPower);
       }
       setBackground(mediaURL || HMSVirtualBackgroundTypes.BLUR);
       setBackgroundType(mediaURL ? HMSVirtualBackgroundTypes.IMAGE : HMSVirtualBackgroundTypes.BLUR);
       if (role && !addedPluginToVideoTrack.current) {
-        await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
+        await hmsActions.addPluginToVideoStream(vbPlugin);
         addedPluginToVideoTrack.current = true;
       }
     } catch (err) {
@@ -112,10 +112,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       toggleVB();
     }
   }, [isVideoOn, toggleVB]);
-
-  if (!isVBSupported) {
-    return null;
-  }
 
   return (
     <Box css={{ maxHeight: '100%', overflowY: 'auto', pr: '$6' }}>
@@ -158,7 +154,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
         ]}
         activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
         // @ts-ignore
-        activeBackground={vbPlugin.background?.src || vbPlugin.background || HMSVirtualBackgroundTypes.NONE}
+        activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
       />
 
       <VBCollection
@@ -169,7 +165,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           onClick: async () => await addPlugin({ mediaURL }),
         }))}
         activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-        activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
+        activeBackground={background || HMSVirtualBackgroundTypes.NONE}
       />
     </Box>
   );

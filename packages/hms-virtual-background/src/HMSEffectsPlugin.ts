@@ -7,7 +7,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1
   private blurAmount = 0;
-  private backgroundURL = '';
+  backgroundURL = '';
   private beautify = false;
   backgroundType = HMSVirtualBackgroundTypes.NONE;
 
@@ -33,6 +33,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.effects.disableBeautification();
       }
     };
+    this.effects.onReady();
   }
 
   getName(): string {
@@ -70,6 +71,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   clear() {
     this.effects.clear();
+    this.backgroundType = HMSVirtualBackgroundTypes.NONE;
   }
 
   stop() {
