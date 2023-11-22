@@ -9,7 +9,7 @@ on:
         default: 'prod-in'
   schedule:
     # prod-in
-    - cron: '20 9 * * *'
+    - cron: '*/5 * * * *'
 
   push:
     branches: [main]
