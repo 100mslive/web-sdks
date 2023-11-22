@@ -12,6 +12,10 @@ export const StyledVideo = styled('video', {
   borderRadius: '$2',
   objectFit: 'cover',
   background: '$background_default',
+  '&::-webkit-media-controls-start-playback-button': {
+    display: 'none !important',
+    '-webkit-appearance': 'none',
+  },
   variants: {
     mirror: {
       true: {
