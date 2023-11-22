@@ -157,6 +157,7 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
+    await this.autoSelectAudio();
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -257,6 +258,17 @@ export class AudioSinkManager {
       audioEl.srcObject = null;
       audioEl.remove();
       track.setAudioElement(null);
+    }
+  };
+
+  private autoSelectAudio = async () => {
+    if (this.audioSink?.children.length === 0) {
+      const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
+      const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+      if (localAudioTrack && device) {
+        await localAudioTrack.setSettings({ deviceId: device?.deviceId });
+        await localAudioTrack.setSettings({ deviceId: 'default' });
+      }
     }
   };
 }
