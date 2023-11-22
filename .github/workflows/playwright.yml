@@ -1,6 +1,8 @@
 name: Web Automation Tests
 
 on:
+  repository_dispatch:
+    types: [automation]
   workflow_dispatch:
     inputs:
       region:
@@ -8,7 +10,6 @@ on:
         required: true
         default: 'prod-in'
   schedule:
-    # prod-in
     - cron: '*/5 * * * *'
 
   push:
@@ -18,10 +19,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'playwright/*'
-  repository_dispatch:
-    types: [automation]
-
+      - ".github/workflows/uptime.yml"
 jobs:
   test:
     timeout-minutes: 15
