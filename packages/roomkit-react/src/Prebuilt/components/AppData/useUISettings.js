@@ -154,6 +154,7 @@ const useSetAppData = ({ key1, key2 }) => {
       const appData = store.getState(selectAppData());
       setPreferences({
         ...appData.uiSettings,
+        isAudioOnly: undefined,
         subscribedNotifications: appData.subscribedNotifications,
       });
     },

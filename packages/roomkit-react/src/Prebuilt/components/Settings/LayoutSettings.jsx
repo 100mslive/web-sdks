@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Box, Flex, Slider, Text } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetUiSettings } from '../AppData/useUISettings';
@@ -6,10 +7,25 @@ import { settingOverflow } from './common.js';
 import { UI_SETTINGS } from '../../common/constants';
 
 export const LayoutSettings = () => {
-  const [{ maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
+  const hmsActions = useHMSActions();
+  const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
+  const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
+  const [{ isAudioOnly, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
+  const toggleIsAudioOnly = useCallback(
+    async isAudioOnlyModeOn => {
+      if (isAudioOnlyModeOn) {
+        // turn off video and screen share if user switches to audio only mode
+        isLocalVideoEnabled && (await hmsActions.setLocalVideoEnabled(false));
+        isLocalScreenShared && (await hmsActions.setScreenShareEnabled(false));
+      }
+      setUISettings({ [UI_SETTINGS.isAudioOnly]: isAudioOnlyModeOn });
+    },
+    [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings],
+  );
 
   return (
     <Box className={settingOverflow()}>
+      <SwitchWithLabel label="Audio Only Mode" id="audioOnlyMode" checked={isAudioOnly} onChange={toggleIsAudioOnly} />
       <SwitchWithLabel
         label="Mirror Local Video"
         id="mirrorMode"
