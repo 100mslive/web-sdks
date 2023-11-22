@@ -48,32 +48,15 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const mediaList = background_media?.length
     ? background_media.map((media: VirtualBackgroundMedia) => media?.url)
     : defaultMedia;
-
+  if (!addedPluginToVideoTrack.current) {
+    vbPlugin.effects.onReady();
+  }
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
 
-  // const clearVBState = () => {
-  //   setBackground(HMSVirtualBackgroundTypes.NONE);
-  //   setBackgroundType(HMSVirtualBackgroundTypes.NONE);
-  // };
-
-  // useEffect(() => {
-  //   if (!localPeerVideoTrackID) {
-  //     return;
-  //   }
-
-  //   //check support of plugin
-  //   if (vbPlugin) {
-  //     const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
-  //     setIsVBSupported(pluginSupport.isSupported);
-  //   }
-  // }, [hmsActions, localPeerVideoTrackID]);
-
   async function disableEffects() {
     if (vbPlugin) {
-      // vbPlugin.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
       vbPlugin.clear();
-      // clearVBState();
     }
   }
 
@@ -81,9 +64,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
     let retries = 0;
     try {
       if (mediaURL) {
-        // const img = document.createElement('img');
-        // img.alt = 'VB';
-        // img.src = mediaURL;
         try {
           await vbPlugin.setBackground(mediaURL);
         } catch (e) {
