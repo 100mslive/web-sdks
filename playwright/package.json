@@ -11,7 +11,7 @@
     "prod-us": "APP_ENV=prod ENV_PATH=env/.env.prod-us playwright test --grep-invert @qaonly",
     "prod-eu": "APP_ENV=prod ENV_PATH=env/.env.prod-eu playwright test --grep-invert @qaonly",
     "stag-in": "APP_ENV=prod ENV_PATH=env/.env.stag-in playwright test --grep-invert @qaonly",
-    "prod-sanity": "APP_ENV=prod ENV_PATH=env/.env.prod-in playwright test --grep-invert @ignore",
+    "prod-sanity": "APP_ENV=prod ENV_PATH=env/.env.prod-in playwright test",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "format": "prettier --write src/**/*.ts"
