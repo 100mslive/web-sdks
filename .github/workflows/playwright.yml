@@ -19,7 +19,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - ".github/workflows/uptime.yml"
+      - ".github/workflows/playwright.yml"
 jobs:
   test:
     timeout-minutes: 15
