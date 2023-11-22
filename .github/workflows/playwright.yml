@@ -35,7 +35,7 @@ jobs:
         run: echo "REGION=${{ github.event.inputs.region }}" >> $GITHUB_ENV
 
       - name: (From Cron) PROD-IN
-        if: github.event.schedule == '20 9 * * *'
+        if: github.event.schedule == '*/5 * * * *'
         run: echo "REGION=prod-in" >> $GITHUB_ENV
 
       - name: print selected region
