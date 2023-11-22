@@ -26,10 +26,10 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
   const [savedUserId, setSavedUserId] = useUserPreferences(UserPreferencesKeys.USER_ID);
 
   useEffect(() => {
-    if (!savedUserId) {
+    if (!savedUserId && !userId) {
       setSavedUserId(v4());
     }
-  }, [savedUserId, setSavedUserId]);
+  }, [savedUserId, setSavedUserId, userId]);
 
   useEffect(() => {
     if (authToken) {
