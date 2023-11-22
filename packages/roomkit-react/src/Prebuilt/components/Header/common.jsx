@@ -61,7 +61,7 @@ export const AudioActions = () => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
 
   // don't show speaker selector where the API is not supported, and use
-  // a generic word("Audio") for Mic. In some cases(Chrome Android for e.g.) this changes both mic and speaker keeping them in sync.
+  // a generic word("Audio") for Mic. In some cases(Chrome Android for example) this changes both mic and speaker keeping them in sync.
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype;
   const { audioInput, audioOutput } = allDevices;
   let availableAudioDevices = audioInput;
@@ -173,7 +173,7 @@ const SelectWithLabel = ({ label, icon = <></>, checked, id, onChange }) => {
         css={{
           fontSize: '$md',
           fontWeight: '$semiBold',
-          color: checked ? '$on_surface_high' : '$on_surface_low',
+          color: '$on_surface_high',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',

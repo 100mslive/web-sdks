@@ -12,9 +12,13 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+//@ts-ignore
 import { normalizeAppPolicyConfig } from '../init/initUtils';
+//@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
+// @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
+// @ts-ignore
 import { useSetAppDataByKey } from './useUISettings';
 import {
   APP_DATA,
@@ -25,15 +29,6 @@ import {
   UI_MODE_GRID,
   UI_SETTINGS,
 } from '../../common/constants';
-import { VB_EFFECT } from '../VirtualBackground/constants';
-
-export const getAppDetails = appDetails => {
-  try {
-    return !appDetails ? {} : JSON.parse(appDetails);
-  } catch (error) {
-    return {};
-  }
-};
 
 const initialAppData = {
   [APP_DATA.uiSettings]: {
@@ -67,15 +62,15 @@ const initialAppData = {
   [APP_DATA.minimiseInset]: false,
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
-  [APP_DATA.background]: VB_EFFECT.NONE,
-  [APP_DATA.backgroundType]: VB_EFFECT.NONE,
+  [APP_DATA.background]: 'none',
+  [APP_DATA.backgroundType]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
   },
 };
 
-export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
+export const AppData = React.memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const roleNames = useHMSStore(selectAvailableRoleNames);
@@ -88,6 +83,7 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
       ...initialAppData,
       ...appData,
     });
+    // @ts-ignore
     hmsActions.setFrameworkInfo({
       type: 'react-web',
       isPrebuilt: true,
@@ -100,20 +96,11 @@ export const AppData = React.memo(({ appDetails, tokenEndpoint }) => {
     const uiSettings = preferences || {};
     const updatedSettings = {
       ...uiSettings,
+      [UI_SETTINGS.isAudioOnly]: undefined,
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
   }, [preferences, hmsActions]);
-
-  useEffect(() => {
-    const appData = {
-      [APP_DATA.tokenEndpoint]: tokenEndpoint,
-      [APP_DATA.appConfig]: getAppDetails(appDetails),
-    };
-    for (const key in appData) {
-      hmsActions.setAppData([key], appData[key]);
-    }
-  }, [appDetails, tokenEndpoint, hmsActions]);
 
   useEffect(() => {
     if (!preferences.subscribedNotifications) {

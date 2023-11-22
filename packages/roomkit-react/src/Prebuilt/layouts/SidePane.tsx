@@ -68,6 +68,7 @@ const SidePane = ({
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   const resetSidePane = useSidepaneReset();
+
   useEffect(() => {
     return () => {
       resetSidePane();
@@ -148,7 +149,7 @@ const SidePane = ({
         </ComponentWithState>
         <ComponentWithState state={sidepane === SIDE_PANE_OPTIONS.VB}>
           <Wrapper css={{ p: '$10 $6 $10 $10' }}>
-            <VBPicker />
+            <VBPicker {...elements.virtual_background} />
           </Wrapper>
         </ComponentWithState>
       </RenderComponentByState>

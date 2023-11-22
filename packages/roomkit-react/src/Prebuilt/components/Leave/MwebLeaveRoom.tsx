@@ -29,7 +29,7 @@ export const MwebLeaveRoom = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const { isStreamingOn } = useRecordingStreaming();
-  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn;
+  const showStream = screenType !== 'hls_live_streaming' && isStreamingOn && permissions?.hlsStreaming;
   const showLeaveOptions = (permissions?.hlsStreaming && isStreamingOn) || permissions?.endRoom;
 
   useDropdownList({ open, name: 'LeaveRoom' });

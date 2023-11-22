@@ -13,7 +13,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { APP_DATA, POLL_STATE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, POLL_STATE, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -57,10 +57,6 @@ export const useIsHLSStartedFromUI = () => {
 
 export const useIsRTMPStartedFromUI = () => {
   return useHMSStore(selectAppData(APP_DATA.rtmpStarted));
-};
-
-export const useTokenEndpoint = () => {
-  return useHMSStore(selectAppData(APP_DATA.tokenEndpoint));
 };
 
 export const useAuthToken = () => {
@@ -158,6 +154,7 @@ const useSetAppData = ({ key1, key2 }) => {
       const appData = store.getState(selectAppData());
       setPreferences({
         ...appData.uiSettings,
+        [UI_SETTINGS.isAudioOnly]: undefined,
         subscribedNotifications: appData.subscribedNotifications,
       });
     },

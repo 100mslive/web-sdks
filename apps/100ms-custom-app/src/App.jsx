@@ -21,13 +21,14 @@ const App = () => {
   const subdomain = useSearchParam('subdomain') || window.location.hostname;
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
+  const paramUserName = useSearchParam('name');
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
     if (roomCode) {
       fetchData(subdomain, roomCode, setOnlyEmail, setData, setShowHeader);
     }
-  }, []);
+  }, [roomCode, subdomain]);
 
   useEffect(() => {
     // remove notifications and messages for beam
@@ -77,11 +78,9 @@ const App = () => {
         <HMSPrebuilt
           roomCode={roomCode}
           authToken={authToken}
-          roomId={roomId}
-          role={role}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
-            userName: isHeadless ? 'Beam' : undefined,
+            userName: isHeadless ? 'Beam' : paramUserName,
             endpoints: {
               tokenByRoomCode:
                 process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
