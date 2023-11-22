@@ -117,7 +117,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   }
 
   return (
-    <Box css={{ pr: '$6' }}>
+    <Flex css={{ pr: '$6', size: '100%' }} direction="column">
       <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
         <Text variant="h6" css={{ color: '$on_surface_high' }}>
           Virtual Background
@@ -142,8 +142,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       <Box
         css={{
           mt: '$4',
-          maxHeight: `calc(100vh - ${showVideoTile ? 360 : 100}px ${inPreview ? '' : '- 140px'})`,
           overflowY: 'auto',
+          flex: '1 1 0',
+          mr: '-$10',
+          pr: '$10',
         }}
       >
         <VBCollection
@@ -178,6 +180,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
         />
       </Box>
-    </Box>
+    </Flex>
   );
 };
