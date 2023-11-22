@@ -13,7 +13,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
-import { APP_DATA, POLL_STATE, SESSION_STORE_KEY } from '../../common/constants';
+import { APP_DATA, POLL_STATE, SESSION_STORE_KEY, UI_SETTINGS } from '../../common/constants';
 
 /**
  * fields saved related to UI settings in store's app data can be
@@ -154,7 +154,7 @@ const useSetAppData = ({ key1, key2 }) => {
       const appData = store.getState(selectAppData());
       setPreferences({
         ...appData.uiSettings,
-        isAudioOnly: undefined,
+        [UI_SETTINGS.isAudioOnly]: undefined,
         subscribedNotifications: appData.subscribedNotifications,
       });
     },
