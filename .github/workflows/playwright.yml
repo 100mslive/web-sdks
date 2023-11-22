@@ -6,7 +6,7 @@ on:
       region:
         description: 'Region to run the test for'
         required: true
-        default: 'prod-sanity'
+        default: 'prod-in'
   schedule:
     # prod-in
     - cron: '20 9 * * *'
