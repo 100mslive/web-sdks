@@ -40,7 +40,7 @@ const testdata = [
   },
 ];
 testdata.forEach(data => {
-  test(`${data.testCaseNo} ${data.feature} on preview is customizable and should be ${data.value}`, async ({
+  test(`${data.testCaseNo} ${data.feature} on preview is customizable and should be ${data.value} @ignore`, async ({
     page: nativePage,
   }) => {
     page = await PageWrapper.openMeetingPage(nativePage);

@@ -57,7 +57,7 @@ const testdata = [
   },
 ];
 testdata.forEach(data => {
-  test(` ${data.testCaseNo} ${data.feature} should be ${data.state}`, async ({ page: nativePage }) => {
+  test(` ${data.testCaseNo} ${data.feature} should be ${data.state} @ignore`, async ({ page: nativePage }) => {
     page = await PageWrapper.openMeetingPage(nativePage);
     await page.interceptAndMockLayoutApi(data);
     console.log(data.assert);

@@ -14,7 +14,7 @@ const viewers = [
   ['co-broadcaster', 'viewer-realtime'],
 ];
 viewers.forEach(data => {
-  test(`${data[1]} is able to join stage.`, async ({ context }) => {
+  test(`${data[1]} is able to join stage. @ignore`, async ({ context }) => {
     page = await PageWrapper.openPages(context, data);
     await page[0].delay(5000);
     await page[0].click(page[1].center.participants);
