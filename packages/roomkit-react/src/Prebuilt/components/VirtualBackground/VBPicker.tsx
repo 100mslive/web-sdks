@@ -130,7 +130,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
         </Box>
       </Flex>
 
-      {!showVideoTile ? (
+      {showVideoTile ? (
         <Video
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer?.videoTrack}
