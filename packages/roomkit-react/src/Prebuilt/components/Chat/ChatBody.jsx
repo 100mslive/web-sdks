@@ -585,7 +585,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
         message =>
           message.type === 'chat' &&
           !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message?.sender?.customerUserId),
+          !blacklistedPeerIDSet.has(message.sender?.customerUserId),
       ) || []
     );
   };
