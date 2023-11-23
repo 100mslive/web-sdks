@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeerID, selectSessionStore } from '@100mslive/hms-video-store';
+import { selectLocalPeer, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -28,7 +28,7 @@ export const Chat = ({ screenType }) => {
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
-  const localPeerId = useHMSStore(selectLocalPeerID);
+  const localPeer = useHMSStore(selectLocalPeer);
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
@@ -52,7 +52,7 @@ export const Chat = ({ screenType }) => {
   }, [notification, peerSelector, setPeerSelector]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-  const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeerId);
+  const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
   const storeMessageSelector = selectHMSMessagesCount;
   const { elements } = useRoomLayoutConferencingScreen();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
