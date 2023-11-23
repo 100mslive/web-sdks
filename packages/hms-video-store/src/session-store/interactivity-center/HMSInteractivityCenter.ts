@@ -8,9 +8,10 @@ import {
   HMSPollQuestionResponse,
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
+  HMSPollUserTrackingMode,
 } from '../../interfaces/session-store/polls';
 import { IStore } from '../../sdk/store';
-import { PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
+import { PollInfoParams, PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
 
@@ -22,8 +23,15 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async createPoll(pollParams: HMSPollCreateParams) {
+    const HMS_USER_TRACKING_MODE_MAP: Record<HMSPollUserTrackingMode, string> = {
+      customerID: 'userid',
+      peerID: 'peerid',
+      userName: 'username',
+    };
+
     const { poll_id: serverPollID } = await this.transport.setPollInfo({
       ...pollParams,
+      mode: pollParams.mode ? HMS_USER_TRACKING_MODE_MAP[pollParams.mode] : undefined,
       poll_id: pollParams.id,
       vote: pollParams.rolesThatCanVote,
       responses: pollParams.rolesThatCanViewResponses,
@@ -39,21 +47,14 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
     const questions = await this.transport.getPollQuestions({ poll_id: pollParams.id, index: 0, count: 50 });
 
-    const poll: HMSPoll = {
-      id: pollParams.id,
-      title: pollParams.title,
-      anonymous: pollParams.anonymous,
-      type: pollParams.type,
-      duration: pollParams.duration,
-      locked: pollParams.locked, // poll is locked automatically when it starts
-      mode: pollParams.mode,
-      visibility: pollParams.visibility,
-      rolesThatCanVote: pollParams.rolesThatCanVote || [],
-      rolesThatCanViewResponses: pollParams.rolesThatCanViewResponses || [],
+    const poll = createHMSPollFromPollParams({
+      ...pollParams,
+      poll_id: pollParams.id,
       state: 'created',
-      createdBy: this.store.getLocalPeer()?.peerId,
-      questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
-    };
+      created_by: this.store.getLocalPeer()?.peerId,
+    });
+
+    poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
 
     this.listener?.onPollsUpdate(HMSPollsUpdate.POLL_CREATED, [poll]);
   }
@@ -117,27 +118,8 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     const polls: HMSPoll[] = [];
     for (const pollParams of pollsList.polls) {
       const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
-      const poll: HMSPoll = {
-        id: pollParams.poll_id,
-        title: pollParams.title,
-        startedBy: pollParams.started_by,
-        createdBy: pollParams.created_by,
-        anonymous: pollParams.anonymous,
-        type: pollParams.type,
-        duration: pollParams.duration,
-        locked: pollParams.locked, // poll is locked automatically when it starts
-        mode: pollParams.mode as HMSPoll['mode'],
-        visibility: pollParams.visibility,
-        rolesThatCanVote: pollParams.vote || [],
-        rolesThatCanViewResponses: pollParams.responses || [],
-        state: pollParams.state,
-        stoppedBy: pollParams.stopped_by,
-        startedAt: convertDateNumToDate(pollParams.started_at),
-        stoppedAt: convertDateNumToDate(pollParams.stopped_at),
-        createdAt: convertDateNumToDate(pollParams.created_at),
-
-        questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
-      };
+      const poll = createHMSPollFromPollParams(pollParams);
+      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
 
       polls.push(poll);
       this.store.setPoll(poll);
@@ -189,3 +171,31 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return question;
   }
 }
+
+export const createHMSPollFromPollParams = (pollParams: PollInfoParams): HMSPoll => {
+  const BIZ_USER_TRACKING_MODE_MAP: Record<string, HMSPollUserTrackingMode> = {
+    userid: 'customerID',
+    peerid: 'peerID',
+    username: 'userName',
+  };
+
+  return {
+    id: pollParams.poll_id,
+    title: pollParams.title,
+    startedBy: pollParams.started_by,
+    createdBy: pollParams.created_by,
+    anonymous: pollParams.anonymous,
+    type: pollParams.type,
+    duration: pollParams.duration,
+    locked: pollParams.locked, // poll is locked automatically when it starts
+    mode: pollParams.mode ? BIZ_USER_TRACKING_MODE_MAP[pollParams.mode] : undefined,
+    visibility: pollParams.visibility,
+    rolesThatCanVote: pollParams.vote || [],
+    rolesThatCanViewResponses: pollParams.responses || [],
+    state: pollParams.state,
+    stoppedBy: pollParams.stopped_by,
+    startedAt: convertDateNumToDate(pollParams.started_at),
+    stoppedAt: convertDateNumToDate(pollParams.stopped_at),
+    createdAt: convertDateNumToDate(pollParams.created_at),
+  };
+};

@@ -1,6 +1,6 @@
 // @ts-check
 import React, { useCallback, useMemo, useState } from 'react';
-import { selectLocalPeerID, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, IconButton, Input, styled, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
@@ -38,9 +38,11 @@ export const QuestionCard = ({
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
-  const localPeerID = useHMSStore(selectLocalPeerID);
-  const localPeerResponse = responses?.find(response => response.peer?.peerid === localPeerID);
-  const isLocalPeerCreator = localPeerID === startedBy;
+  const localPeer = useHMSStore(selectLocalPeer);
+  const localPeerResponse = responses?.find(
+    response => response.peer?.peerid === localPeer?.id || response.peer?.userid === localPeer?.customerUserId,
+  );
+  const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const roleCanViewResponse =
     !rolesThatCanViewResponses ||
