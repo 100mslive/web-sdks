@@ -34,6 +34,13 @@ import { useUnreadCount } from './useUnreadCount';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const iconStyle = { height: '1.125rem', width: '1.125rem' };
+const tooltipBoxCSS = {
+  fontSize: '$xs',
+  backgroundColor: '$surface_default',
+  p: '$1 $5',
+  fontWeight: '$regular',
+  borderRadius: '$3',
+};
 
 const formatTime = date => {
   if (!(date instanceof Date)) {
@@ -136,7 +143,7 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
+const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
@@ -144,10 +151,11 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
   };
   const [open, setOpen] = useState(false);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
-  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+  const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
 
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
+  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
@@ -179,12 +187,14 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
   const options = {
     pin: {
       text: 'Pin message',
+      tooltipText: 'Pin',
       icon: <PinIcon style={iconStyle} />,
       onClick: onPin,
       show: showPinAction,
     },
     copy: {
       text: 'Copy text',
+      tooltipText: 'Copy',
       icon: <CopyIcon style={iconStyle} />,
       onClick: copyMessageContent,
       show: true,
@@ -192,13 +202,13 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
     hide: {
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
-      onClick: async () => blacklistMessage(blacklistedPeerIDs, message.id),
+      onClick: async () => blacklistMessage(blacklistedMessageIDs, message.id),
       show: can_hide_message,
     },
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedMessageIDs, peerId),
+      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.sender?.customerUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -258,25 +268,29 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
         }}
       >
         {options.pin.show ? (
-          <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
-            {options.pin.icon}
-          </IconButton>
+          <Tooltip boxCss={tooltipBoxCSS} title={options.pin.tooltipText}>
+            <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
+              {options.pin.icon}
+            </IconButton>
+          </Tooltip>
         ) : null}
 
         {options.copy.show ? (
-          <IconButton onClick={options.copy.onClick} data-testid="copy_message_btn">
-            <CopyIcon style={iconStyle} />
-          </IconButton>
+          <Tooltip boxCss={tooltipBoxCSS} title={options.copy.tooltipText}>
+            <IconButton onClick={options.copy.onClick} data-testid="copy_message_btn">
+              <CopyIcon style={iconStyle} />
+            </IconButton>
+          </Tooltip>
         ) : null}
 
         {options.block.show || options.hide.show ? (
-          <Dropdown.Trigger asChild>
-            <IconButton>
-              <Tooltip title="More options">
+          <Tooltip boxCss={tooltipBoxCSS} title="More actions">
+            <Dropdown.Trigger asChild>
+              <IconButton>
                 <VerticalMenuIcon style={iconStyle} />
-              </Tooltip>
-            </IconButton>
-          </Dropdown.Trigger>
+              </IconButton>
+            </Dropdown.Trigger>
+          </Tooltip>
         ) : null}
       </Flex>
       <Dropdown.Portal>
@@ -344,7 +358,6 @@ const ChatMessage = React.memo(
     const [openSheet, setOpenSheet] = useState(false);
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
-
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
@@ -362,9 +375,9 @@ const ChatMessage = React.memo(
         ref={ref}
         as="div"
         css={{
-          mb: '$10',
+          mb: '$5',
           pr: '$10',
-          mt: '$8',
+          mt: '$4',
           '&:hover .chat_actions': { opacity: 1 },
         }}
         style={style}
@@ -376,12 +389,14 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             // Theme independent color, token should not be used for transparent chat
             bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
-            r: messageType ? '$1' : undefined,
-            px: messageType ? '$4' : '$2',
-            py: messageType ? '$4' : 0,
+            r: '$1',
+            p: '$1 $2',
             userSelect: 'none',
             '@md': {
               cursor: 'pointer',
+            },
+            '&:hover': {
+              background: 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)',
             },
           }}
           key={message.time}
@@ -439,7 +454,6 @@ const ChatMessage = React.memo(
               onPin={onPin}
               showPinAction={showPinAction}
               message={message}
-              peerId={message.sender}
               sentByLocalPeer={message.sender === localPeerId}
               isMobile={isMobile}
               openSheet={openSheet}
@@ -563,7 +577,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
     : selectHMSMessages;
   let messages = useHMSStore(storeMessageSelector) || [];
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const filteredMessages = () => {
+  const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
     const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
     return (
@@ -571,7 +585,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
         message =>
           message.type === 'chat' &&
           !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message.sender),
+          !blacklistedPeerIDSet.has(message.sender?.customerUserId),
       ) || []
     );
   };
@@ -611,7 +625,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
   return (
     <Fragment>
       <VirtualizedChatMessages
-        messages={filteredMessages}
+        messages={getFilteredMessages()}
         scrollToBottom={scrollToBottom}
         unreadCount={unreadCount}
         ref={listRef}

@@ -3,6 +3,7 @@ import { PageWrapper } from '../PageWrapper';
 export class Center {
   private page: PageWrapper;
 
+  participants = 'text=Participants';
   conferencing = 'div[data-testid="conferencing"]';
   participant_tile = 'div[data-testid="participant_tile_?"]';
   audio_mute_icon_onTile = 'div[data-testid="participant_audio_mute_icon"]';
@@ -17,6 +18,7 @@ export class Center {
   sfn_onText = 'h2 div p'
   expected_sfn_header = 'Stats For Nerds'
   sfn_dialog_texts = '[role="dialog"] div p'
+  stream_yet_to_start = 'text=Stream yet to start'
 
   participant_tile_menu_btn = 'div[data-testid="participant_tile_?"] button[data-testid="participant_menu_btn"]';
   tile_menu_remove_participant = 'button[data-testid="remove_participant_btn"]';
