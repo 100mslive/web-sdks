@@ -18,7 +18,7 @@ import FullPageProgress from '../components/FullPageProgress';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../components/Toast/ToastBatcher';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -112,12 +112,14 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane
-          screenType={screenType}
-          // @ts-ignore
-          tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
-          hideControls={hideControls}
-        />
+        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
+          <SidePane
+            screenType={screenType}
+            // @ts-ignore
+            tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+            hideControls={hideControls}
+          />
+        </Box>
       </Flex>
     </Suspense>
   );
