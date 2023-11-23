@@ -143,7 +143,7 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
+const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
@@ -208,7 +208,7 @@ const ChatActions = ({ onPin, showPinAction, message, peerId, sentByLocalPeer, i
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedPeerIDs, peerId),
+      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.sender?.customerUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -358,7 +358,6 @@ const ChatMessage = React.memo(
     const [openSheet, setOpenSheet] = useState(false);
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
-
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
@@ -455,7 +454,6 @@ const ChatMessage = React.memo(
               onPin={onPin}
               showPinAction={showPinAction}
               message={message}
-              peerId={message.sender}
               sentByLocalPeer={message.sender === localPeerId}
               isMobile={isMobile}
               openSheet={openSheet}
@@ -587,7 +585,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
         message =>
           message.type === 'chat' &&
           !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message.sender),
+          !blacklistedPeerIDSet.has(message.sender?.customerUserId),
       ) || []
     );
   };
