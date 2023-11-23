@@ -126,7 +126,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
       const newTrack = processedStream.getVideoTracks()[0];
-      await this.replaceSender(newTrack, true);
+      await this.removeOrReplaceProcessedTrack(newTrack);
     } catch (e) {
       console.error('error in processing plugin(s)', e);
     }

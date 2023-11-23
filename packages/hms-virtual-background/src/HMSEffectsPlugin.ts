@@ -10,16 +10,17 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   backgroundURL = '';
   private beautify = false;
   backgroundType = HMSVirtualBackgroundTypes.NONE;
+  // private isEffectsReady = false;
 
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       wasmPaths: {
-        'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
+        // 'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
-        'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
-        'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
+        // 'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
+        // 'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
       },
     });
 
@@ -59,6 +60,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   apply(stream: MediaStream): MediaStream {
     console.log('effectssdk apply');
+    this.effects.clear();
     this.effects.useStream(stream);
     if (this.blurAmount) {
       this.effects.setBlur(this.blurAmount);

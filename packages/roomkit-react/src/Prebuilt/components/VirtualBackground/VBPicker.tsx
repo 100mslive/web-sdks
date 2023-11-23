@@ -48,9 +48,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const mediaList = background_media?.length
     ? background_media.map((media: VirtualBackgroundMedia) => media?.url)
     : defaultMedia;
-  if (!addedPluginToVideoTrack.current) {
-    vbPlugin.effects.onReady();
-  }
+
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
 
