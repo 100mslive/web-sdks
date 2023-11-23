@@ -22,4 +22,8 @@ export class HMSMediaStreamPluginsManager {
     }
     return processedStream;
   }
+
+  getPlugins(): string[] {
+    return Array.from(this.plugins).map(plugin => plugin.getName());
+  }
 }

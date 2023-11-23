@@ -115,6 +115,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await super.setEnabled(value);
       if (value) {
         await this.pluginsManager.waitForRestart();
+        await this.processPlugins();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
       this.videoHandler.updateSinks();
@@ -124,9 +125,14 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async processPlugins() {
     try {
-      const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
-      const newTrack = processedStream.getVideoTracks()[0];
-      await this.removeOrReplaceProcessedTrack(newTrack);
+      const plugins = this.mediaStreamPluginsManager.getPlugins();
+      if (plugins.length > 0) {
+        const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
+        const newTrack = processedStream.getVideoTracks()[0];
+        await this.setProcessedTrack(newTrack);
+      } else {
+        await this.setProcessedTrack();
+      }
     } catch (e) {
       console.error('error in processing plugin(s)', e);
     }
@@ -179,7 +185,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @see HMSVideoPlugin
    */
   getPlugins(): string[] {
-    return this.pluginsManager.getPlugins();
+    return this.mediaStreamPluginsManager.getPlugins().length > 0
+      ? this.mediaStreamPluginsManager.getPlugins()
+      : this.pluginsManager.getPlugins();
   }
 
   /**

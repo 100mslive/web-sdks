@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
@@ -32,12 +32,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
   const localPeer = useHMSStore(selectLocalPeer);
-  // @ts-ignore
-  const [background, setBackground] = useState(
-    vbPlugin.backgroundType === HMSVirtualBackgroundTypes.IMAGE ? vbPlugin.backgroundURL : vbPlugin.backgroundType,
-  );
-  // @ts-ignore
-  const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
+  // const [background, setBackground] = useState(
+  //   vbPlugin.backgroundType === HMSVirtualBackgroundTypes.IMAGE ? vbPlugin.backgroundURL : vbPlugin.backgroundType,
+  // );
+  // const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
@@ -56,6 +54,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
     if (vbPlugin) {
       vbPlugin.clear();
     }
+    if (addedPluginToVideoTrack.current) {
+      await hmsActions.removePluginFromVideoStream(vbPlugin);
+      addedPluginToVideoTrack.current = false;
+    }
   }
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
@@ -73,8 +75,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       } else if (blurPower) {
         await vbPlugin.setBlur(blurPower);
       }
-      setBackground(mediaURL || HMSVirtualBackgroundTypes.BLUR);
-      setBackgroundType(mediaURL ? HMSVirtualBackgroundTypes.IMAGE : HMSVirtualBackgroundTypes.BLUR);
       if (role && !addedPluginToVideoTrack.current) {
         await hmsActions.addPluginToVideoStream(vbPlugin);
         addedPluginToVideoTrack.current = true;
@@ -130,7 +130,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
             onClick: async () => await addPlugin({ blurPower: 0.5 }),
           },
         ]}
-        activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
+        activeBackgroundType={vbPlugin.backgroundType || HMSVirtualBackgroundTypes.NONE}
         // @ts-ignore
         activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
       />
@@ -142,8 +142,8 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           mediaURL,
           onClick: async () => await addPlugin({ mediaURL }),
         }))}
-        activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-        activeBackground={background || HMSVirtualBackgroundTypes.NONE}
+        activeBackgroundType={vbPlugin.backgroundType || HMSVirtualBackgroundTypes.NONE}
+        activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
       />
     </Box>
   );
