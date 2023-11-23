@@ -6,7 +6,6 @@ import {
   selectIsLargeRoom,
   selectIsLocalVideoEnabled,
   selectLocalPeer,
-  selectLocalPeerRole,
   selectRoomState,
   selectVideoTrackByID,
   useHMSActions,
@@ -25,17 +24,11 @@ import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia, vbPlugin } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
-const MAX_RETRIES = 2;
 
 export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
-  const role = useHMSStore(selectLocalPeerRole);
   const localPeer = useHMSStore(selectLocalPeer);
-  // const [background, setBackground] = useState(
-  //   vbPlugin.backgroundType === HMSVirtualBackgroundTypes.IMAGE ? vbPlugin.backgroundURL : vbPlugin.backgroundType,
-  // );
-  // const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
@@ -54,6 +47,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
     if (vbPlugin) {
       vbPlugin.clear();
     }
+    // should we remove the plugin on no effects?
     if (addedPluginToVideoTrack.current) {
       await hmsActions.removePluginFromVideoStream(vbPlugin);
       addedPluginToVideoTrack.current = false;
@@ -61,21 +55,13 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   }
 
   async function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    let retries = 0;
     try {
       if (mediaURL) {
-        try {
-          await vbPlugin.setBackground(mediaURL);
-        } catch (e) {
-          console.error(e);
-          if (retries++ < MAX_RETRIES) {
-            await vbPlugin.setBackground(mediaURL);
-          }
-        }
+        vbPlugin.setBackground(mediaURL);
       } else if (blurPower) {
-        await vbPlugin.setBlur(blurPower);
+        vbPlugin.setBlur(blurPower);
       }
-      if (role && !addedPluginToVideoTrack.current) {
+      if (localPeer?.videoTrack && !addedPluginToVideoTrack.current) {
         await hmsActions.addPluginToVideoStream(vbPlugin);
         addedPluginToVideoTrack.current = true;
       }
@@ -131,7 +117,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           },
         ]}
         activeBackgroundType={vbPlugin.backgroundType || HMSVirtualBackgroundTypes.NONE}
-        // @ts-ignore
         activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
       />
 
