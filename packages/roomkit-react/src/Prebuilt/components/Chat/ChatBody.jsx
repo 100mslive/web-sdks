@@ -208,7 +208,7 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.customerUserId),
+      onClick: async () => blacklistPeer(blacklistedPeerIDs, message?.sender?.customerUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
