@@ -29,7 +29,7 @@ export class HMSPeerListIterator {
 
   async findPeers() {
     this.validateConnection();
-    const response = await this.transport.findPeers({
+    const response = await this.transport.signal.findPeers({
       ...(this.options || {}),
       limit: this.options?.limit || this.defaultPaginationLimit,
     });
@@ -43,7 +43,7 @@ export class HMSPeerListIterator {
     if (!this.iterator && !this.isEnd) {
       return await this.findPeers();
     } else if (this.iterator) {
-      response = await this.transport.peerIterNext({
+      response = await this.transport.signal.peerIterNext({
         iterator: this.iterator,
         limit: this.options?.limit || this.defaultPaginationLimit,
       });

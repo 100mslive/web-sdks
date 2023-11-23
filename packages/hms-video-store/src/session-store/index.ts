@@ -8,13 +8,13 @@ export class SessionStore implements HMSSessionStore {
   constructor(private transport: HMSTransport) {}
 
   async get(key: string) {
-    const { data, updated_at } = await this.transport.getSessionMetadata(key);
+    const { data, updated_at } = await this.transport.signal.getSessionMetadata(key);
 
     return { value: data, updatedAt: convertDateNumToDate(updated_at) };
   }
 
   async set(key: string, data: any) {
-    const { data: value, updated_at } = await this.transport.setSessionMetadata({ key, data });
+    const { data: value, updated_at } = await this.transport.signal.setSessionMetadata({ key, data });
     const updatedAt = convertDateNumToDate(updated_at);
     return { value, updatedAt };
   }
@@ -25,7 +25,7 @@ export class SessionStore implements HMSSessionStore {
 
     if (this.observedKeys.size !== prevObservedKeys.size) {
       try {
-        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+        await this.transport.signal.listenMetadataChange(Array.from(this.observedKeys));
       } catch (e) {
         this.observedKeys = prevObservedKeys;
         throw e;
@@ -39,7 +39,7 @@ export class SessionStore implements HMSSessionStore {
 
     if (this.observedKeys.size !== prevObservedKeys.size) {
       try {
-        await this.transport.listenMetadataChange(Array.from(this.observedKeys));
+        await this.transport.signal.listenMetadataChange(Array.from(this.observedKeys));
       } catch (e) {
         this.observedKeys = prevObservedKeys;
         throw e;
