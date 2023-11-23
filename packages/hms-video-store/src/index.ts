@@ -45,6 +45,6 @@ export type {
   HMSPollQuestionAnswer,
 } from './internal';
 
-export { HMSReactiveStore } from './hmsSDKStore/HMSReactiveStore';
+export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSPluginUnsupportedTypes, HMSRecordingState } from './internal';
 export type { HMSVideoPlugin, HMSPluginSupportResult, HMSFrameworkInfo } from './internal';

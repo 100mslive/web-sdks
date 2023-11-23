@@ -1,1 +1,1 @@
-export { HMSReactiveStore } from '../hmsSDKStore/HMSReactiveStore';
+export { HMSReactiveStore } from '../reactive-store/HMSReactiveStore';

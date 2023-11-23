@@ -1,6 +1,6 @@
-import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../hmsSDKStore/sdkUtils/storeMergeUtils';
 import { IHMSStatsStore, IHMSStore } from '../IHMSStore';
 import { HMSPeerStats, HMSTrackStats } from '../interfaces';
+import { mergeLocalTrackStats, mergeNewIndividualStatsInDraft } from '../reactive-store/sdkUtils/storeMergeUtils';
 import { HMSWebrtcStats } from '../rtc-stats';
 import { createDefaultStatsStore, HMSPeerID, HMSRoomState, HMSTrack, HMSTrackID } from '../schema';
 import { HMSSdk } from '../sdk';
