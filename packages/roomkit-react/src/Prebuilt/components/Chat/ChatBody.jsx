@@ -147,7 +147,7 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
-    can_block_user: true,
+    can_block_user: false,
   };
   const [open, setOpen] = useState(false);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
