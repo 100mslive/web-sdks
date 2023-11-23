@@ -6,21 +6,31 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 for (const dependency in packageJson.peerDependencies) {
   const requiredVersion = packageJson.peerDependencies[dependency];
   try {
-    console.log(`\x1b[31m${path.resolve(__dirname, '..')}\x1b[0m`);
-
-    const installedVersion = path.resolve(`${dependency}/package.json`).version;
+    let installedVersion = 0;
+    // check if monorepo
+    if (fs.existsSync(path.resolve(__dirname, '../../package.json'))) {
+      const { workspaces } = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../package.json'), 'utf8'));
+      if (workspaces.length) {
+        installedVersion = JSON.parse(
+          fs.readFileSync(
+            path.resolve(__dirname, `../../node_modules/${dependency.split('/').join('/')}/package.json`),
+            'utf8',
+          ),
+        ).version;
+      } else {
+        process.exit(0);
+      }
+    } else {
+      installedVersion = JSON.parse(fs.readFileSync(path.resolve(`${dependency}/package.json`))).version;
+    }
     if (!require('semver').satisfies(installedVersion, requiredVersion)) {
       console.error(
         `Error: ${dependency} version ${requiredVersion} is required, but version ${installedVersion} is installed.`,
       );
-      process.emitWarning(
-        `Error: ${dependency} version ${requiredVersion} is required, but version ${installedVersion} is installed.`,
-      );
-      // process.exit(1);
+      process.exit(1);
     }
   } catch (err) {
     console.error(`Error: ${dependency} is not installed.`);
-    process.emitWarning(`Error: ${dependency} is not installed.`);
-    // process.exit(1);
+    process.exit(1);
   }
 }
