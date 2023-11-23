@@ -9,10 +9,7 @@ export class HMSMediaStreamPluginsManager {
 
   removePlugins(plugins: HMSMediaStreamPlugin[]) {
     plugins.forEach(plugin => {
-      const deleted = this.plugins.delete(plugin);
-      if (deleted) {
-        plugin.stop();
-      }
+      this.plugins.delete(plugin);
     });
   }
 

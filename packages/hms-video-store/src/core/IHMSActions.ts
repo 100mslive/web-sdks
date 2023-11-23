@@ -220,14 +220,20 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
 
   /**
-   * Add or remove a video plugin from/to the local peer video stream. Eg. Virtual Background, Face Filters etc.
+   * Add  video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
    * Video plugins can be added/removed at any time after the video track is available.
    * @param plugin HMSMediaStreamPlugin
    * @see HMSMediaStreamPlugin
    */
-  addPluginToVideoStream(plugin: HMSMediaStreamPlugin): Promise<void>;
+  addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
-  removePluginFromVideoStream(plugin: HMSMediaStreamPlugin): Promise<void>;
+  /**
+   * Remove video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
+   * Video plugins can be added/removed at any time after the video track is available.
+   * @param plugin HMSMediaStreamPlugin
+   * @see HMSMediaStreamPlugin
+   */
+  removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
   /**
    * To check the support of the plugin, based on browser, os and audio devices

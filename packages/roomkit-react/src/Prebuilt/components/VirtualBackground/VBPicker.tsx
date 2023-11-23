@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { HMSEffectsPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import React, { useEffect, useState } from 'react';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLargeRoom,
   selectIsLocalVideoEnabled,
+  selectIsLocalVideoPluginPresent,
   selectLocalPeer,
   selectRoomState,
   selectVideoTrackByID,
@@ -20,7 +21,7 @@ import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia } from './constants';
+import { defaultMedia, VBEffectsPlugin } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -34,8 +35,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const pluginRef = useRef<null | HMSEffectsPlugin>(null);
-  const [background, setBackground] = useState<string | HMSVirtualBackgroundTypes>(HMSVirtualBackgroundTypes.NONE);
+  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBEffectsPlugin.getName()));
+  const [background, setBackground] = useState<string | HMSVirtualBackgroundTypes>(
+    VBEffectsPlugin.getBackground() as string | HMSVirtualBackgroundTypes,
+  );
   const mediaList = background_media?.length
     ? background_media.filter(media => !!media.url).map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
@@ -45,10 +48,9 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
 
   async function disableEffects() {
     // should we remove the plugin on no effects?
-    if (pluginRef.current) {
-      await hmsActions.removePluginFromVideoStream(pluginRef.current);
-      pluginRef.current = null;
-      setBackground(HMSVirtualBackgroundTypes.NONE);
+    if (isPluginAdded) {
+      VBEffectsPlugin.removeEffects();
+      setBackground(VBEffectsPlugin.getBackground() as string | HMSVirtualBackgroundTypes);
     }
   }
 
@@ -57,17 +59,15 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       console.error('Video track is not available yet');
       return;
     }
-    if (!pluginRef.current) {
-      pluginRef.current = new HMSEffectsPlugin();
-      hmsActions.addPluginToVideoStream(pluginRef.current);
+    if (!isPluginAdded) {
+      hmsActions.addPluginsToVideoStream([VBEffectsPlugin]);
     }
-    const vbPlugin = pluginRef.current;
     if (mediaURL) {
-      vbPlugin.setBackground(mediaURL);
+      VBEffectsPlugin.setBackground(mediaURL);
     } else if (blurPower) {
-      vbPlugin.setBlur(blurPower);
+      VBEffectsPlugin.setBlur(blurPower);
     }
-    setBackground(vbPlugin.getBackground() as string);
+    setBackground(VBEffectsPlugin.getBackground() as string);
   }
 
   useEffect(() => {

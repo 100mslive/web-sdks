@@ -457,12 +457,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     return this.addRemoveVideoPlugin(plugin, 'add', pluginFrameRate);
   }
 
-  async addPluginToVideoStream(plugin: HMSMediaStreamPlugin): Promise<void> {
-    return this.addRemoveMediaStreamPlugin(plugin, 'add');
+  async addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void> {
+    return this.addRemoveMediaStreamVideoPlugins(plugins, 'add');
   }
 
-  async removePluginFromVideoStream(plugin: HMSMediaStreamPlugin): Promise<void> {
-    return this.addRemoveMediaStreamPlugin(plugin, 'remove');
+  async removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void> {
+    return this.addRemoveMediaStreamVideoPlugins(plugins, 'remove');
   }
 
   async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
@@ -1391,8 +1391,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  private async addRemoveMediaStreamPlugin(plugin: HMSMediaStreamPlugin, action: 'add' | 'remove') {
-    if (!plugin) {
+  private async addRemoveMediaStreamVideoPlugins(plugins: HMSMediaStreamPlugin[], action: 'add' | 'remove') {
+    if (plugins.length === 0) {
       HMSLogger.w('Invalid plugin received in store');
       return;
     }
@@ -1401,9 +1401,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const sdkTrack = this.hmsSDKTracks[trackID];
       if (sdkTrack) {
         if (action === 'add') {
-          await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins([plugin]);
+          await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins(plugins);
         } else if (action === 'remove') {
-          await (sdkTrack as SDKHMSLocalVideoTrack).removeStreamPlugins([plugin]);
+          await (sdkTrack as SDKHMSLocalVideoTrack).removeStreamPlugins(plugins);
         }
         this.syncRoomState(`${action}MediaStreamPlugin`);
       } else {
