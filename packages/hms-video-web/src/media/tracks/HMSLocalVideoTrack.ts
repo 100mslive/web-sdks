@@ -139,6 +139,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   async addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+    if (this.pluginsManager.getPlugins().length > 0) {
+      throw Error('Plugins of type HMSMediaStreamPlugin and HMSVideoPlugin cannot be used together');
+    }
     this.mediaStreamPluginsManager.addPlugins(plugins);
     await this.processPlugins();
   }
@@ -194,6 +197,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @see HMSVideoPlugin
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
+    if (this.mediaStreamPluginsManager.getPlugins().length > 0) {
+      throw Error('Plugins of type HMSVideoPlugin and HMSMediaStreamPlugin cannot be used together');
+    }
     return this.pluginsManager.addPlugin(plugin, pluginFrameRate);
   }
 
