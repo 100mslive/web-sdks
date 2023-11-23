@@ -127,7 +127,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     try {
       const plugins = this.mediaStreamPluginsManager.getPlugins();
       if (plugins.length > 0) {
-        const processedStream = this.mediaStreamPluginsManager.applyPlugins(this.stream.nativeStream);
+        const processedStream = this.mediaStreamPluginsManager.applyPlugins(new MediaStream([this.nativeTrack]));
         const newTrack = processedStream.getVideoTracks()[0];
         await this.setProcessedTrack(newTrack);
       } else {
@@ -366,7 +366,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     } else {
       await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
     }
-    await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    console.log('replacesender', localStream.nativeStream.getVideoTracks(), newTrack);
   }
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {

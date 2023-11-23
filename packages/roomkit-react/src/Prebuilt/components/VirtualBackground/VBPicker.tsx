@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import React, { useEffect, useRef, useState } from 'react';
+import { HMSEffectsPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -19,9 +19,8 @@ import { VBCollection } from './VBCollection';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-// @ts-ignore
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia, vbPlugin } from './constants';
+import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -35,40 +34,40 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const addedPluginToVideoTrack = useRef(false);
+  const pluginRef = useRef<null | HMSEffectsPlugin>(null);
+  const [background, setBackground] = useState<string | HMSVirtualBackgroundTypes>(HMSVirtualBackgroundTypes.NONE);
   const mediaList = background_media?.length
-    ? background_media.map((media: VirtualBackgroundMedia) => media?.url)
+    ? background_media.filter(media => !!media.url).map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
 
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
   const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
 
   async function disableEffects() {
-    if (vbPlugin) {
-      vbPlugin.clear();
-    }
     // should we remove the plugin on no effects?
-    if (addedPluginToVideoTrack.current) {
-      await hmsActions.removePluginFromVideoStream(vbPlugin);
-      addedPluginToVideoTrack.current = false;
+    if (pluginRef.current) {
+      await hmsActions.removePluginFromVideoStream(pluginRef.current);
+      pluginRef.current = null;
+      setBackground(HMSVirtualBackgroundTypes.NONE);
     }
   }
 
-  async function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    try {
-      if (mediaURL) {
-        vbPlugin.setBackground(mediaURL);
-      } else if (blurPower) {
-        vbPlugin.setBlur(blurPower);
-      }
-      if (localPeer?.videoTrack && !addedPluginToVideoTrack.current) {
-        await hmsActions.addPluginToVideoStream(vbPlugin);
-        addedPluginToVideoTrack.current = true;
-      }
-    } catch (err) {
-      console.error('Failed to apply VB', err);
-      disableEffects();
+  function addPlugin({ mediaURL = '', blurPower = 0 }) {
+    if (!localPeer?.videoTrack) {
+      console.error('Video track is not available yet');
+      return;
     }
+    if (!pluginRef.current) {
+      pluginRef.current = new HMSEffectsPlugin();
+      hmsActions.addPluginToVideoStream(pluginRef.current);
+    }
+    const vbPlugin = pluginRef.current;
+    if (mediaURL) {
+      vbPlugin.setBackground(mediaURL);
+    } else if (blurPower) {
+      vbPlugin.setBlur(blurPower);
+    }
+    setBackground(vbPlugin.getBackground() as string);
   }
 
   useEffect(() => {
@@ -106,29 +105,27 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           {
             title: 'No effect',
             icon: <CrossCircleIcon style={iconDims} />,
-            type: HMSVirtualBackgroundTypes.NONE,
+            value: HMSVirtualBackgroundTypes.NONE,
             onClick: async () => await disableEffects(),
           },
           {
             title: 'Blur',
             icon: <BlurPersonHighIcon style={iconDims} />,
-            type: HMSVirtualBackgroundTypes.BLUR,
+            value: HMSVirtualBackgroundTypes.BLUR,
             onClick: async () => await addPlugin({ blurPower: 0.5 }),
           },
         ]}
-        activeBackgroundType={vbPlugin.backgroundType || HMSVirtualBackgroundTypes.NONE}
-        activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
+        activeBackground={background}
       />
 
       <VBCollection
         title="Backgrounds"
         options={mediaList.map(mediaURL => ({
-          type: HMSVirtualBackgroundTypes.IMAGE,
           mediaURL,
+          value: mediaURL,
           onClick: async () => await addPlugin({ mediaURL }),
         }))}
-        activeBackgroundType={vbPlugin.backgroundType || HMSVirtualBackgroundTypes.NONE}
-        activeBackground={vbPlugin.backgroundURL || HMSVirtualBackgroundTypes.NONE}
+        activeBackground={background}
       />
     </Box>
   );

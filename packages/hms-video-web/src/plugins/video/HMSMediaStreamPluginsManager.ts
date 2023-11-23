@@ -8,16 +8,22 @@ export class HMSMediaStreamPluginsManager {
   }
 
   removePlugins(plugins: HMSMediaStreamPlugin[]) {
-    plugins.forEach(plugin => this.plugins.delete(plugin));
+    plugins.forEach(plugin => {
+      const deleted = this.plugins.delete(plugin);
+      if (deleted) {
+        plugin.stop();
+      }
+    });
   }
 
   applyPlugins(inputStream: MediaStream): MediaStream {
     let processedStream = inputStream;
     for (const plugin of this.plugins) {
       try {
+        console.log('ps', processedStream.getVideoTracks()[0]);
         processedStream = plugin.apply(processedStream);
       } catch (e) {
-        console.error('could not apply plugin', plugin);
+        console.error('could not apply plugin', e, plugin);
       }
     }
     return processedStream;

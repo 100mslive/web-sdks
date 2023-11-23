@@ -7,7 +7,6 @@ import { VBOption } from './VBOption';
 export const VBCollection = ({
   options,
   title,
-  activeBackgroundType = HMSVirtualBackgroundTypes.NONE,
   activeBackground = '',
 }: {
   options: {
@@ -15,11 +14,10 @@ export const VBCollection = ({
     icon?: React.JSX.Element;
     onClick?: () => Promise<void>;
     mediaURL?: string;
-    type: string;
+    value: string | HMSVirtualBackgroundTypes.BLUR | HMSVirtualBackgroundTypes.NONE;
   }[];
   title: string;
-  activeBackground: HTMLImageElement | string;
-  activeBackgroundType: HMSVirtualBackgroundTypes;
+  activeBackground: string;
 }) => {
   if (options.length === 0) {
     return null;
@@ -31,15 +29,7 @@ export const VBCollection = ({
       </Text>
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
         {options.map(option => (
-          <VBOption.Root
-            key={option?.mediaURL || option?.title}
-            {...option}
-            isActive={
-              ([HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.BLUR].includes(activeBackgroundType) &&
-                option.type === activeBackgroundType) ||
-              activeBackground === option?.mediaURL
-            }
-          >
+          <VBOption.Root key={option.value} {...option} isActive={activeBackground === option.value}>
             <VBOption.Icon>{option?.icon}</VBOption.Icon>
             <VBOption.Title>{option?.title}</VBOption.Title>
           </VBOption.Root>

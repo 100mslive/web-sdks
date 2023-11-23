@@ -3,13 +3,15 @@ import { HMSMediaStreamPlugin } from '@100mslive/hms-video';
 import { EFFECTS_SDK_ASSETS, EFFECTS_SDK_KEY } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
+export type HMSEffectsBackground = string | MediaStream | MediaStreamTrack | HTMLVideoElement;
+
 export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1
   private blurAmount = 0;
-  backgroundURL = '';
+  private background: HMSEffectsBackground = '';
   private beautify = false;
-  backgroundType = HMSVirtualBackgroundTypes.NONE;
+  private backgroundType = HMSVirtualBackgroundTypes.NONE;
 
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
@@ -18,12 +20,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       models: {
         colorcorrector: '',
         facedetector: '',
+        lowlighter: '',
       },
       wasmPaths: {
-        // 'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
+        'ort-wasm.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm.wasm`,
         'ort-wasm-simd.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd.wasm`,
-        // 'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
-        // 'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
+        'ort-wasm-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-threaded.wasm`,
+        'ort-wasm-simd-threaded.wasm': `${EFFECTS_SDK_ASSETS}ort-wasm-simd-threaded.wasm`,
       },
     });
   }
@@ -34,18 +37,22 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
 
   setBlur(blur: number) {
     this.blurAmount = blur;
-    this.backgroundURL = '';
+    this.background = '';
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.effects.clearBackground();
     this.effects.setBlur(blur);
   }
 
-  setBackground(url: string) {
-    this.backgroundURL = url;
+  setBackground(url: HMSEffectsBackground) {
+    this.background = url;
     this.blurAmount = 0;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.effects.clearBlur();
     this.effects.setBackground(url);
+  }
+
+  getBackground() {
+    return this.background || this.backgroundType;
   }
 
   apply(stream: MediaStream): MediaStream {
@@ -61,8 +68,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
         this.effects.disableBeautification();
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
-        } else if (this.backgroundURL) {
-          this.setBackground(this.backgroundURL);
+        } else if (this.background) {
+          this.setBackground(this.background);
         }
         if (this.beautify) {
           this.effects.enableBeautification();
@@ -82,7 +89,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.clearBackground();
     this.effects.clearBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-    this.backgroundURL = '';
+    this.background = '';
   }
 
   stop() {
