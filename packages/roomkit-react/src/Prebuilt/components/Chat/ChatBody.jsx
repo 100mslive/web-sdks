@@ -208,7 +208,7 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.senderUserId),
+      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.customerUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -585,7 +585,7 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
         message =>
           message.type === 'chat' &&
           !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message.senderUserId),
+          !blacklistedPeerIDSet.has(message?.sender?.customerUserId),
       ) || []
     );
   };
