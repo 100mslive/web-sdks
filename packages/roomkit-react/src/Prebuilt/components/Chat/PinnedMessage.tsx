@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
-import { selectPermissions, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
+import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon, PinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -16,13 +16,12 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 const PINNED_MESSAGE_LENGTH = 75;
 
 export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
-  const permissions = useHMSStore(selectPermissions);
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
   const isMobile = useMedia(cssConfig.media.md);
 
   const [hideOverflow, setHideOverflow] = useState(false);
-
+  const canOverflow = pinnedMessages?.[pinnedMessageIndex]?.text?.length > PINNED_MESSAGE_LENGTH || false;
   const formattedPinnedMessage = hideOverflow
     ? `${pinnedMessages?.[pinnedMessageIndex]?.text.slice(0, PINNED_MESSAGE_LENGTH)}... `
     : pinnedMessages?.[pinnedMessageIndex]?.text;
@@ -94,24 +93,23 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         >
           <Text variant="sm" css={{ color: '$on_surface_medium' }} {...swipeHandlers}>
             <AnnotisedMessage message={formattedPinnedMessage} />
-            {hideOverflow ? (
-              <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(false)}>
-                See more
+            {canOverflow ? (
+              <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>
+                $nbsp;{hideOverflow ? 'See more' : 'Collapse'}
               </span>
             ) : null}
           </Text>
         </Box>
-        {permissions?.removeOthers && (
-          <Flex
-            onClick={() => {
-              clearPinnedMessage(pinnedMessageIndex);
-              setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
-            }}
-            css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-          >
-            <CrossIcon />
-          </Flex>
-        )}
+
+        <Flex
+          onClick={() => {
+            clearPinnedMessage(pinnedMessageIndex);
+            setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
+          }}
+          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+        >
+          <CrossIcon />
+        </Flex>
       </Flex>
     </Flex>
   ) : null;
