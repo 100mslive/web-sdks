@@ -101,5 +101,5 @@
       }
     }
   ],
-  "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js"]
+  "ignorePatterns": ["**/dist/**", "**/src/models/Noise.js", "playwright/**"]
 }
