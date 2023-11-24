@@ -27,7 +27,7 @@ export const Navigation = ({
         <Box
           css={{
             borderLeft: '2px solid',
-            height: '$8',
+            height: '$4',
             borderColor: i === index ? '$on_surface_high' : '$on_surface_low',
           }}
         />
