@@ -9,6 +9,7 @@ import {
 import { CheckIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../../';
 import { ParticipantSearch } from '../Footer/ParticipantList';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useFilteredRoles } from '../../common/hooks';
 
 const ChatDotIcon = () => {
@@ -90,7 +91,14 @@ const PeerItem = ({ onSelect, peerId, name, active }) => {
   );
 };
 
-const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, searchValue, onSelect }) => {
+const VirtualizedSelectItemList = ({
+  peers,
+  selectedRole,
+  selectedPeerId,
+  searchValue,
+  public_chat_enabled,
+  onSelect,
+}) => {
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
     () =>
@@ -102,7 +110,9 @@ const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, search
   );
 
   const listItems = useMemo(() => {
-    const selectItems = [<Everyone onSelect={onSelect} active={!selectedRole && !selectedPeerId} />];
+    const selectItems = public_chat_enabled
+      ? [<Everyone onSelect={onSelect} active={!selectedRole && !selectedPeerId} />]
+      : [];
 
     roles.length > 0 && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
     roles.forEach(userRole =>
@@ -139,12 +149,16 @@ const VirtualizedSelectItemList = ({ peers, selectedRole, selectedPeerId, search
 };
 
 export const ChatSelector = ({ role, peerId, onSelect }) => {
+  const { elements } = useRoomLayoutConferencingScreen();
   const peers = useHMSStore(selectRemotePeers);
   const [search, setSearch] = useState('');
 
+  const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
+  const public_chat_enabled = !!elements?.chat?.public_chat_enabled;
+
   return (
     <>
-      {peers.length > 0 && (
+      {peers.length > 0 && private_chat_enabled && (
         <Box css={{ px: '$4' }}>
           <ParticipantSearch onSearch={setSearch} placeholder="Search for participants" />
         </Box>
@@ -153,7 +167,8 @@ export const ChatSelector = ({ role, peerId, onSelect }) => {
         selectedRole={role}
         selectedPeerId={peerId}
         onSelect={onSelect}
-        peers={peers}
+        peers={private_chat_enabled ? peers : []}
+        public_chat_enabled={public_chat_enabled}
         searchValue={search}
       />
     </>

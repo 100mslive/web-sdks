@@ -8,12 +8,16 @@ import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, 
 import { IconButton } from '../../../IconButton';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore
+import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // import { ChatSelectorContainer } from './ChatSelectorContainer';
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
+// @ts-ignore
+import { useFilteredRoles } from '../../common/hooks';
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -73,11 +77,15 @@ export const ChatFooter = ({
   role,
   peerId,
   onSend,
+  onSelect,
+  selection,
   children /* onSelect, selection, screenType */,
 }: {
   role: any;
   peerId: string;
   onSend: any;
+  onSelect: ({ role, peerId, selection }: { role: any; peerId: string; selection: string }) => void;
+  selection: string;
   children: ReactNode;
 }) => {
   const hmsActions = useHMSActions();
@@ -89,6 +97,9 @@ export const ChatFooter = ({
   const localPeerName = useHMSStore(selectLocalPeerName);
   const isOverlayChat = elements?.chat?.is_overlay;
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const public_chat_enabled = !!elements?.chat?.public_chat_enabled;
+  const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
+  const roles = useFilteredRoles();
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -129,9 +140,9 @@ export const ChatFooter = ({
 
   return (
     <Box>
-      {/* {screenType !== 'hls_live_streaming' ? (
+      {private_chat_enabled || public_chat_enabled || roles.length > 0 ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
-      ) : null} */}
+      ) : null}
       {can_disable_chat ? (
         <Flex align="center" justify="end" css={{ w: '100%', mb: '$4' }}>
           <Popover.Root>

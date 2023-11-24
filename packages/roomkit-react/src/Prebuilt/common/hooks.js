@@ -12,6 +12,7 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
@@ -52,8 +53,10 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 };
 
 export const useFilteredRoles = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
   const roles = useHMSStore(selectAvailableRoleNames);
-  return roles;
+  console.log('elements ', elements, roles);
+  return elements?.chat?.roles_whitelist || roles;
 };
 
 export const useShowStreamingUI = () => {
