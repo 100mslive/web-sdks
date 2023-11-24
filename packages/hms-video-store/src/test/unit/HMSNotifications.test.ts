@@ -7,10 +7,10 @@ import {
   HMSStore,
   HMSTrack,
 } from '../../';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../hmsSDKStore/common/mapping';
-import { HMSNotifications } from '../../hmsSDKStore/HMSNotifications';
-import { HMSReactiveStore } from '../../hmsSDKStore/HMSReactiveStore';
 import * as sdkTypes from '../../internal';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../reactive-store/common/mapping';
+import { HMSNotifications } from '../../reactive-store/HMSNotifications';
+import { HMSReactiveStore } from '../../reactive-store/HMSReactiveStore';
 import { makeFakeStore } from '../fakeStore';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 

@@ -1,5 +1,5 @@
 import { HMSPeer, HMSPeerID, HMSTrack, HMSTrack as SDKTrack, HMSTrackID, HMSVideoTrack } from '../../';
-import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../hmsSDKStore/sdkUtils/storeMergeUtils';
+import { mergeNewPeersInDraft, mergeNewTracksInDraft } from '../../reactive-store/sdkUtils/storeMergeUtils';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 
 type trackMap = Record<HMSTrackID, HMSTrack>;
