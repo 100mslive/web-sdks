@@ -55,8 +55,22 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 export const useFilteredRoles = () => {
   const { elements } = useRoomLayoutConferencingScreen();
   const roles = useHMSStore(selectAvailableRoleNames);
-  console.log('elements ', elements, roles);
   return elements?.chat?.roles_whitelist || roles;
+};
+
+export const useDefaultChatSelection = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const roles = useFilteredRoles();
+  // default is everyone for public chat
+  if (elements?.chat?.public_chat_enabled) {
+    return 'Everyone';
+  }
+  // sending first role as default
+  if (roles.length > 0) {
+    return roles[0];
+  }
+  // sending empty
+  return '';
 };
 
 export const useShowStreamingUI = () => {

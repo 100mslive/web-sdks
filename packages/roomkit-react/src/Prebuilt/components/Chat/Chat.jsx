@@ -21,6 +21,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
+import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 export const Chat = () => {
@@ -30,10 +31,11 @@ export const Chat = () => {
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const peerName = useHMSStore(selectPeerNameByID(peerSelector));
   const localPeer = useHMSStore(selectLocalPeer);
+  const defaultSelection = useDefaultChatSelection();
   const [chatOptions, setChatOptions] = useState({
     role: roleSelector || '',
     peerId: peerSelector && peerName ? peerSelector : '',
-    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
+    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : defaultSelection,
   });
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
@@ -47,10 +49,10 @@ export const Chat = () => {
       setChatOptions({
         role: '',
         peerId: '',
-        selection: 'Everyone',
+        selection: defaultSelection,
       });
     }
-  }, [notification, peerSelector, setPeerSelector]);
+  }, [defaultSelection, notification, peerSelector, setPeerSelector]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);

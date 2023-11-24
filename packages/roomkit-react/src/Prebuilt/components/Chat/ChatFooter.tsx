@@ -140,116 +140,126 @@ export const ChatFooter = ({
 
   return (
     <Box>
-      {private_chat_enabled || public_chat_enabled || roles.length > 0 ? (
-        <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
-      ) : null}
-      {can_disable_chat ? (
-        <Flex align="center" justify="end" css={{ w: '100%', mb: '$4' }}>
-          <Popover.Root>
-            <Popover.Trigger asChild>
-              <IconButton css={{ border: '1px solid $border_bright' }}>
-                <VerticalMenuIcon height="16" width="16" />
-              </IconButton>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                align="end"
-                side="top"
-                onClick={() => {
-                  hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
-                    enabled: false,
-                    updatedBy: localPeerName,
-                  });
-                }}
-                css={{
-                  backgroundColor: '$surface_default',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '$4',
-                  borderRadius: '$1',
-                  color: '$on_surface_high',
-                  cursor: 'pointer',
-                  '&:hover': { backgroundColor: '$surface_dim' },
-                }}
-              >
-                <PauseCircleIcon />
-                <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
-                  Pause Chat
-                </Text>
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
-        </Flex>
-      ) : null}
-      <Flex align="center" css={{ gap: '$4', w: '100%' }}>
-        <Flex
-          align="center"
-          css={{
-            bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
-            minHeight: '$16',
-            maxHeight: '$24',
-            position: 'relative',
-            py: '$6',
-            pl: '$8',
-            flexGrow: 1,
-            r: '$1',
-            '@md': {
-              minHeight: 'unset',
-              h: '$14',
-              boxSizing: 'border-box',
-            },
-          }}
-        >
-          {children}
-          <TextArea
-            css={{
-              c: '$on_surface_high',
-              '&:valid ~ .send-msg': { color: '$on_surface_high' },
-              '& ~ .send-msg': { color: '$on_surface_low' },
-              '&::placeholder': { color: '$on_surface_medium' },
-            }}
-            placeholder={message_placeholder}
-            ref={inputRef}
-            required
-            autoFocus={!isMobile}
-            onKeyPress={async event => {
-              if (event.key === 'Enter') {
-                if (!event.shiftKey) {
-                  event.preventDefault();
-                  await sendMessage();
-                }
-              }
-            }}
-            autoComplete="off"
-            aria-autocomplete="none"
-            onPaste={e => e.stopPropagation()}
-            onCut={e => e.stopPropagation()}
-            onCopy={e => e.stopPropagation()}
+      <Flex>
+        {private_chat_enabled || public_chat_enabled || roles.length > 0 ? (
+          <ChatSelectorContainer
+            onSelect={onSelect}
+            role={role}
+            peerId={peerId}
+            selection={selection}
+            private_chat_enabled={private_chat_enabled}
           />
-          {!isMobile ? (
-            <EmojiPicker
-              onSelect={(emoji: any) => {
-                if (inputRef.current) {
-                  inputRef.current.value += ` ${emoji.native} `;
+        ) : null}
+        {can_disable_chat ? (
+          <Flex align="center" justify="end" css={{ mb: '$4' }}>
+            <Popover.Root>
+              <Popover.Trigger asChild>
+                <IconButton css={{ border: '1px solid $border_bright' }}>
+                  <VerticalMenuIcon height="16" width="16" />
+                </IconButton>
+              </Popover.Trigger>
+              <Popover.Portal>
+                <Popover.Content
+                  align="end"
+                  side="top"
+                  onClick={() => {
+                    hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
+                      enabled: false,
+                      updatedBy: localPeerName,
+                    });
+                  }}
+                  css={{
+                    backgroundColor: '$surface_default',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '$4',
+                    borderRadius: '$1',
+                    color: '$on_surface_high',
+                    cursor: 'pointer',
+                    '&:hover': { backgroundColor: '$surface_dim' },
+                  }}
+                >
+                  <PauseCircleIcon />
+                  <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+                    Pause Chat
+                  </Text>
+                </Popover.Content>
+              </Popover.Portal>
+            </Popover.Root>
+          </Flex>
+        ) : null}
+      </Flex>
+      {selection && (
+        <Flex align="center" css={{ gap: '$4', w: '100%' }}>
+          <Flex
+            align="center"
+            css={{
+              bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
+              minHeight: '$16',
+              maxHeight: '$24',
+              position: 'relative',
+              py: '$6',
+              pl: '$8',
+              flexGrow: 1,
+              r: '$1',
+              '@md': {
+                minHeight: 'unset',
+                h: '$14',
+                boxSizing: 'border-box',
+              },
+            }}
+          >
+            {children}
+            <TextArea
+              css={{
+                c: '$on_surface_high',
+                '&:valid ~ .send-msg': { color: '$on_surface_high' },
+                '& ~ .send-msg': { color: '$on_surface_low' },
+                '&::placeholder': { color: '$on_surface_medium' },
+              }}
+              placeholder={message_placeholder}
+              ref={inputRef}
+              required
+              autoFocus={!isMobile}
+              onKeyPress={async event => {
+                if (event.key === 'Enter') {
+                  if (!event.shiftKey) {
+                    event.preventDefault();
+                    await sendMessage();
+                  }
                 }
               }}
+              autoComplete="off"
+              aria-autocomplete="none"
+              onPaste={e => e.stopPropagation()}
+              onCut={e => e.stopPropagation()}
+              onCopy={e => e.stopPropagation()}
             />
-          ) : null}
-          <BaseIconButton
-            className="send-msg"
-            onClick={sendMessage}
-            css={{
-              ml: 'auto',
-              height: 'max-content',
-              mr: '$4',
-              '&:hover': { c: isMobile ? '' : '$on_surface_medium' },
-            }}
-            data-testid="send_msg_btn"
-          >
-            <SendIcon />
-          </BaseIconButton>
+            {!isMobile ? (
+              <EmojiPicker
+                onSelect={(emoji: any) => {
+                  if (inputRef.current) {
+                    inputRef.current.value += ` ${emoji.native} `;
+                  }
+                }}
+              />
+            ) : null}
+            <BaseIconButton
+              className="send-msg"
+              onClick={sendMessage}
+              css={{
+                ml: 'auto',
+                height: 'max-content',
+                mr: '$4',
+                '&:hover': { c: isMobile ? '' : '$on_surface_medium' },
+              }}
+              data-testid="send_msg_btn"
+            >
+              <SendIcon />
+            </BaseIconButton>
+          </Flex>
         </Flex>
-      </Flex>
+      )}
     </Box>
   );
 };
