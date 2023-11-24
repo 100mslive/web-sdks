@@ -12,6 +12,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private background: HMSEffectsBackground = '';
   private beautify = false;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
+  // private preset: 'balanced' | 'speed' | 'lightning' | 'quality' = 'balanced';
 
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
@@ -36,6 +37,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBlur(blur: number) {
+    // this.preset = 'speed';
     this.blurAmount = blur;
     this.background = '';
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
@@ -51,6 +53,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBackground(url: HMSEffectsBackground) {
+    // this.preset = 'balanced';
     this.background = url;
     this.blurAmount = 0;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
@@ -65,14 +68,15 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
+        this.effects.showFps();
         this.effects.run();
         // available preset mode = 'quality | balanced | speed | lightning'
-        this.effects.setSegmentationPreset('balanced');
+        // this.effects.setSegmentationPreset(this.preset);
         // available fit mode = 'fill | fit'
         this.effects.setBackgroundFitMode('fill');
+        this.effects.setSegmentationPreset('lightning');
         // Also ranges from 0 to 1
-        this.effects.setBeautificationLevel(0.5);
-        this.effects.disableBeautification();
+        // this.effects.setBeautificationLevel(0.5);
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {
@@ -87,7 +91,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     };
     this.effects.clear();
     this.effects.useStream(stream);
-
     // getStream potentially returns null
     return this.effects.getStream() || stream;
   }
