@@ -88,9 +88,7 @@ export const Chat = ({ screenType }) => {
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
         <>
-          {elements?.chat?.allow_pinning_messages ? (
-            <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
-          ) : null}
+          <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
         </>
       )}
 
@@ -107,7 +105,7 @@ export const Chat = ({ screenType }) => {
 
       {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
 
-      {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
+      {isMobile && elements?.chat?.is_overlay ? (
         <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
       ) : null}
 
