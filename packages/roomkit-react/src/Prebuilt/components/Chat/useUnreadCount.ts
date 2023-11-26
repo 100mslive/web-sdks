@@ -5,7 +5,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 
-export const useUnreadCount = ({ role, peerId }) => {
+export const useUnreadCount = ({ role, peerId }: { role?: string; peerId?: string }) => {
   const unreadCountSelector = role
     ? selectMessagesUnreadCountByRole(role)
     : peerId
