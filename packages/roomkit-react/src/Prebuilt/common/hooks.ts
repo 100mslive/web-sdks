@@ -53,8 +53,7 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 
 export const useFilteredRoles = () => {
   const { elements } = useRoomLayoutConferencingScreen();
-  const roles = useHMSStore(selectAvailableRoleNames);
-  return elements?.chat?.roles_whitelist || roles;
+  return elements?.chat?.roles_whitelist || [];
 };
 
 export const useDefaultChatSelection = () => {
