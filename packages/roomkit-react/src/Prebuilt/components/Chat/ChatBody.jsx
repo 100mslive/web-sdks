@@ -333,6 +333,7 @@ const ChatMessage = React.memo(
     onPin,
   }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+    const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef(null);
     useEffect(() => {
       if (rowRef.current) {
@@ -340,7 +341,7 @@ const ChatMessage = React.memo(
       }
     }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
-    const { elements } = useRoomLayoutConferencingScreen();
+    const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
@@ -445,7 +446,9 @@ const ChatMessage = React.memo(
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
               onReplyPrivately={onReplyPrivately}
-              showReplyPrivateAction={messageType !== 'private' && message.sender !== localPeerId}
+              showReplyPrivateAction={
+                messageType !== 'private' && message.sender !== localPeerId && private_chat_enabled
+              }
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}

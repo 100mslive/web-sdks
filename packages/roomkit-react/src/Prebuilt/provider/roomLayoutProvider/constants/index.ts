@@ -31,12 +31,12 @@ export const defaultLayout: Layout = {
       default: {
         elements: {
           chat: {
-            public_chat_enabled: true,
-            private_chat_enabled: true,
+            public_chat_enabled: false,
+            private_chat_enabled: false,
             chat_title: 'Chat',
             allow_pinning_messages: true,
             message_placeholder: 'Send a message...',
-            roles_whitelist: [],
+            roles_whitelist: ['guest'],
             real_time_controls: {
               can_disable_chat: true,
               can_block_user: true,
