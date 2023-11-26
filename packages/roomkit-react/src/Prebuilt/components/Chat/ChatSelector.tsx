@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import {
+  HMSPeer,
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
   selectRemotePeers,
@@ -7,7 +8,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../../';
+import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
+// @ts-ignore
 import { ParticipantSearch } from '../Footer/ParticipantList';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useFilteredRoles } from '../../common/hooks';
@@ -16,7 +18,17 @@ const ChatDotIcon = () => {
   return <Box css={{ size: '$6', bg: '$primary_default', mx: '$2', r: '$round' }} />;
 };
 
-const SelectorItem = ({ value, active, onClick, unreadCount }) => {
+const SelectorItem = ({
+  value,
+  active,
+  onClick,
+  unreadCount,
+}: {
+  value: string;
+  active: boolean;
+  onClick: () => void;
+  unreadCount: number;
+}) => {
   return (
     <Dropdown.Item
       data-testid="chat_members"
@@ -38,46 +50,76 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   );
 };
 
-const SelectorHeader = React.memo(({ isHorizontalDivider, children }) => {
-  return (
-    <Box css={{ flexShrink: 0 }}>
-      {isHorizontalDivider && <HorizontalDivider space={4} />}
-      <Text variant="overline" css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase' }}>
-        {children}
-      </Text>
-    </Box>
-  );
-});
+const SelectorHeader = React.memo(
+  ({ isHorizontalDivider, children }: { isHorizontalDivider: boolean; children: React.ReactNode }) => {
+    return (
+      <Box css={{ flexShrink: 0 }}>
+        {isHorizontalDivider && <HorizontalDivider space={4} />}
+        <Text variant="overline" css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase' }}>
+          {children}
+        </Text>
+      </Box>
+    );
+  },
+);
 
-const Everyone = React.memo(({ onSelect, active }) => {
-  const unreadCount = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
-  return (
-    <SelectorItem
-      value="Everyone"
-      active={active}
-      unreadCount={unreadCount}
-      onClick={() => {
-        onSelect({ role: '', peerId: '', selection: 'Everyone' });
-      }}
-    />
-  );
-});
+const Everyone = React.memo(
+  ({
+    onSelect,
+    active,
+  }: {
+    active: boolean;
+    onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
+  }) => {
+    const unreadCount = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
+    return (
+      <SelectorItem
+        value="Everyone"
+        active={active}
+        unreadCount={unreadCount}
+        onClick={() => {
+          onSelect({ role: '', peerId: '', selection: 'Everyone' });
+        }}
+      />
+    );
+  },
+);
 
-const RoleItem = React.memo(({ onSelect, role, active }) => {
-  const unreadCount = useHMSStore(selectMessagesUnreadCountByRole(role));
-  return (
-    <SelectorItem
-      value={role}
-      active={active}
-      unreadCount={unreadCount}
-      onClick={() => {
-        onSelect({ role: role, selection: role });
-      }}
-    />
-  );
-});
+const RoleItem = React.memo(
+  ({
+    onSelect,
+    role,
+    active,
+  }: {
+    role: string;
+    active: boolean;
+    onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
+  }) => {
+    const unreadCount = useHMSStore(selectMessagesUnreadCountByRole(role));
+    return (
+      <SelectorItem
+        value={role}
+        active={active}
+        unreadCount={unreadCount}
+        onClick={() => {
+          onSelect({ role: role, peerId: '', selection: role });
+        }}
+      />
+    );
+  },
+);
 
-const PeerItem = ({ onSelect, peerId, name, active }) => {
+const PeerItem = ({
+  onSelect,
+  peerId,
+  name,
+  active,
+}: {
+  name: string;
+  peerId: string;
+  active: boolean;
+  onSelect: ({ role, peerId, selection }: { role: any; peerId: string; selection: string }) => void;
+}) => {
   const unreadCount = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
   return (
     <SelectorItem
@@ -98,6 +140,13 @@ const VirtualizedSelectItemList = ({
   searchValue,
   public_chat_enabled,
   onSelect,
+}: {
+  peers: HMSPeer[];
+  selectedRole: string;
+  selectedPeerId: string;
+  searchValue: string;
+  public_chat_enabled: boolean;
+  onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
 }) => {
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
@@ -152,7 +201,15 @@ const VirtualizedSelectItemList = ({
   );
 };
 
-export const ChatSelector = ({ role, peerId, onSelect }) => {
+export const ChatSelector = ({
+  role,
+  peerId,
+  onSelect,
+}: {
+  role: string;
+  peerId: string;
+  onSelect: ({ role, peerId, selection }: { role: any; peerId: string; selection: string }) => void;
+}) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const peers = useHMSStore(selectRemotePeers);
   const [search, setSearch] = useState('');

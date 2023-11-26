@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect, useRef, useState } from 'react';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
@@ -80,7 +79,7 @@ export const useShowStreamingUI = () => {
 };
 
 // The search results should not have role name matches
-export const useParticipants = params => {
+export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }; role?: string; search?: string }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);

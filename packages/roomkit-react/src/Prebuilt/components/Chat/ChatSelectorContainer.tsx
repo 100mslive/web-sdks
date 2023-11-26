@@ -9,7 +9,19 @@ import { config as cssConfig } from '../../../Theme';
 import { ChatSelector } from './ChatSelector';
 import { textEllipsis } from '../../../utils';
 
-export const ChatSelectorContainer = ({ onSelect, role, peerId, private_chat_enabled, selection }) => {
+export const ChatSelectorContainer = ({
+  onSelect,
+  role,
+  peerId,
+  private_chat_enabled,
+  selection,
+}: {
+  role: string;
+  peerId: string;
+  selection: string;
+  private_chat_enabled: boolean;
+  onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
+}) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
 
