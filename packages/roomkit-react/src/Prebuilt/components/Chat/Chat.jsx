@@ -101,6 +101,17 @@ export const Chat = () => {
         peerId={chatOptions.peerId}
         ref={listRef}
         scrollToBottom={scrollToBottom}
+        onReplyPrivately={(peerId, peerName) => {
+          if (!peerId || !peerName) {
+            return;
+          }
+          setChatOptions({
+            role: '',
+            peerId,
+            selection: peerName,
+          });
+          setPeerSelector(peerId);
+        }}
         screenType={screenType}
         blacklistedPeerIDs={blacklistedPeerIDs}
       />
