@@ -7,10 +7,8 @@ import {
   selectHMSMessages,
   selectLocalPeerID,
   selectLocalPeerName,
-  selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
-  selectPeerNameByID,
   selectPermissions,
   selectSessionStore,
   useHMSActions,
@@ -56,51 +54,6 @@ const formatTime = date => {
     mins = '0' + mins;
   }
   return `${hours}:${mins} ${suffix}`;
-};
-
-const MessageTypeContainer = ({ left, right }) => {
-  return (
-    <Flex
-      align="center"
-      css={{
-        ml: 'auto',
-        mr: '$4',
-        p: '$2 $4',
-        border: '1px solid $border_bright',
-        r: '$0',
-      }}
-    >
-      {left && (
-        <SenderName variant="tiny" as="span" css={{ color: '$on_surface_medium' }}>
-          {left}
-        </SenderName>
-      )}
-      {left && right && <Box css={{ borderLeft: '1px solid $border_bright', mx: '$4', h: '$8' }} />}
-      {right && (
-        <SenderName as="span" variant="tiny" css={{ textTransform: 'uppercase' }}>
-          {right}
-        </SenderName>
-      )}
-    </Flex>
-  );
-};
-
-const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
-  const peerName = useHMSStore(selectPeerNameByID(receiver));
-  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
-  if (receiver) {
-    return (
-      <MessageTypeContainer
-        left={hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ''}` : 'TO YOU'}
-        right="PRIVATE"
-      />
-    );
-  }
-
-  if (roles && roles.length) {
-    return <MessageTypeContainer left="TO" right={hasCurrentUserSent ? roles.join(',') : localPeerRoleName} />;
-  }
-  return null;
 };
 
 const URL_REGEX =
@@ -443,11 +396,6 @@ const ChatMessage = React.memo(
                 </Text>
               ) : null}
             </Flex>
-            <MessageType
-              hasCurrentUserSent={message.sender === localPeerId}
-              receiver={message.recipientPeer}
-              roles={message.recipientRoles}
-            />
 
             <ChatActions
               onPin={onPin}
@@ -537,7 +485,6 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
     },
     [listRef],
   );
-  console.log('filtered message ', messages);
 
   return (
     <Box
@@ -576,6 +523,11 @@ export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blackl
     ? selectMessagesByPeerID(peerId)
     : selectHMSMessages;
   let messages = useHMSStore(storeMessageSelector) || [];
+  if (!(role || peerId)) {
+    messages = messages.filter(
+      value => !value.recipientPeer && !(value.recipientRoles && value.recipientRoles?.length > 0),
+    );
+  }
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);

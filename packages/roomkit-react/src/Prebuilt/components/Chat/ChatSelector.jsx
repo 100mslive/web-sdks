@@ -3,7 +3,7 @@ import {
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
   selectRemotePeers,
-  selectUnreadHMSMessagesCount,
+  selectUnreadHMSBroadcastMessagesCount,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
@@ -38,11 +38,11 @@ const SelectorItem = ({ value, active, onClick, unreadCount }) => {
   );
 };
 
-const SelectorHeader = React.memo(({ children }) => {
+const SelectorHeader = React.memo(({ isHorizontalDivider, children }) => {
   return (
     <Box css={{ flexShrink: 0 }}>
-      <HorizontalDivider space={4} />
-      <Text variant="md" css={{ p: '$4 $10', fontWeight: '$semiBold' }}>
+      {isHorizontalDivider && <HorizontalDivider space={4} />}
+      <Text variant="overline" css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase' }}>
         {children}
       </Text>
     </Box>
@@ -50,7 +50,7 @@ const SelectorHeader = React.memo(({ children }) => {
 });
 
 const Everyone = React.memo(({ onSelect, active }) => {
-  const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
+  const unreadCount = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
   return (
     <SelectorItem
       value="Everyone"
@@ -114,14 +114,18 @@ const VirtualizedSelectItemList = ({
       ? [<Everyone onSelect={onSelect} active={!selectedRole && !selectedPeerId} />]
       : [];
 
-    roles.length > 0 && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
+    roles.length > 0 &&
+      selectItems.push(<SelectorHeader isHorizontalDivider={public_chat_enabled}>Roles</SelectorHeader>);
     roles.forEach(userRole =>
       selectItems.push(
         <RoleItem key={userRole} active={selectedRole === userRole} role={userRole} onSelect={onSelect} />,
       ),
     );
 
-    filteredPeers.length > 0 && selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
+    filteredPeers.length > 0 &&
+      selectItems.push(
+        <SelectorHeader isHorizontalDivider={public_chat_enabled || roles.length > 0}>Participants</SelectorHeader>,
+      );
     filteredPeers.forEach(peer =>
       selectItems.push(
         <PeerItem
@@ -135,7 +139,7 @@ const VirtualizedSelectItemList = ({
     );
 
     return selectItems;
-  }, [onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [public_chat_enabled, onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
     <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
