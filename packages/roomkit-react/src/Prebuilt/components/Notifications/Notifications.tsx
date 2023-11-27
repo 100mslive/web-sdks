@@ -20,7 +20,6 @@ import { ToastBatcher } from '../Toast/ToastBatcher';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
-import { ChatNotifications } from './ChatNotification';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
@@ -187,7 +186,6 @@ export function Notifications() {
       <AutoplayBlockedModal />
       <PermissionErrorModal />
       <InitErrorModal />
-      <ChatNotifications />
     </>
   );
 }
