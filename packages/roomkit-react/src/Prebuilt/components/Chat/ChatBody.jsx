@@ -146,7 +146,7 @@ const getMessageType = ({ roles, receiver }) => {
 const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
-    can_hide_message: false,
+    can_hide_message: true,
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
@@ -160,15 +160,14 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
 
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
-  useEffect(() => {
-    if (!(blacklistedPeerIDs.length || blacklistedMessageIDs.length)) {
-      return;
-    }
-    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
-    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-
-    unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
-  }, [blacklistedMessageIDs, blacklistedPeerIDs, pinnedMessages, unpinBlacklistedMessages]);
+  const updatePinnedMessages = useCallback(
+    ({ messageID = '', peerID = '' }) => {
+      const blacklistedMessageIDSet = new Set([...blacklistedMessageIDs, messageID]);
+      const blacklistedPeerIDSet = new Set([...blacklistedPeerIDs, peerID]);
+      unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
+    },
+    [pinnedMessages, blacklistedMessageIDs, blacklistedPeerIDs],
+  );
 
   const copyMessageContent = useCallback(() => {
     try {
@@ -202,13 +201,19 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
     hide: {
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
-      onClick: async () => blacklistMessage(blacklistedMessageIDs, message.id),
+      onClick: async () => {
+        blacklistMessage(blacklistedMessageIDs, message.id);
+        updatePinnedMessages({ messageID: message.id });
+      },
       show: can_hide_message,
     },
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedPeerIDs, message?.senderUserId),
+      onClick: async () => {
+        blacklistPeer(blacklistedPeerIDs, message?.senderUserId);
+        updatePinnedMessages({ peerID: message?.senderUserId });
+      },
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
