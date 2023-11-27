@@ -31,8 +31,8 @@ export const defaultLayout: Layout = {
       default: {
         elements: {
           chat: {
-            public_chat_enabled: false,
-            private_chat_enabled: false,
+            public_chat_enabled: true,
+            private_chat_enabled: true,
             chat_title: 'Chat',
             allow_pinning_messages: true,
             message_placeholder: 'Send a message...',
