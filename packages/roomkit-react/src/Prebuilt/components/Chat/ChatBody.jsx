@@ -130,16 +130,17 @@ const ChatActions = ({
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
-
-  useEffect(() => {
-    if (!(blacklistedPeerIDs?.length || blacklistedMessageIDs?.length)) {
-      return;
-    }
-    const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
-    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-
-    unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
-  }, [blacklistedMessageIDs, blacklistedPeerIDs, pinnedMessages, unpinBlacklistedMessages]);
+  const updatePinnedMessages = useCallback(
+    ({ messageID = '', peerID = '' }) => {
+      if (!(blacklistedPeerIDs?.length || blacklistedMessageIDs?.length)) {
+        return;
+      }
+      const blacklistedMessageIDSet = new Set([...blacklistedMessageIDs, messageID]);
+      const blacklistedPeerIDSet = new Set([...blacklistedPeerIDs, peerID]);
+      unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
+    },
+    [blacklistedPeerIDs, blacklistedMessageIDs, unpinBlacklistedMessages, pinnedMessages],
+  );
 
   const copyMessageContent = useCallback(() => {
     try {
@@ -180,13 +181,19 @@ const ChatActions = ({
     hide: {
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
-      onClick: async () => blacklistMessage(blacklistedMessageIDs, message.id),
+      onClick: async () => {
+        blacklistMessage(blacklistedMessageIDs, message.id);
+        updatePinnedMessages({ messageID: message.id });
+      },
       show: can_hide_message,
     },
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => blacklistPeer(blacklistedPeerIDs, message.sender?.customerUserId),
+      onClick: async () => {
+        blacklistPeer(blacklistedPeerIDs, message?.senderUserId);
+        updatePinnedMessages({ peerID: message?.senderUserId });
+      },
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -581,7 +588,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom, blacklistedPeerIDs }
         message =>
           message.type === 'chat' &&
           !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message.sender?.customerUserId),
+          !blacklistedPeerIDSet.has(message?.senderUserId),
       ) || []
     );
   };
