@@ -79,7 +79,7 @@ export const VideoStreamingSection = ({
       return;
     }
     const type = isChatEnabled ? 'CHAT_RESUMED' : 'CHAT_PAUSED';
-    const notification = { id: uuid(), message: '', type, data: { name: localPeerName } };
+    const notification = { id: uuid(), message: '', type, data: { name: chatStateUpdatedBy } };
     ToastBatcher.showToast({ notification, type });
   }, [isChatEnabled, chatStateUpdatedBy, localPeerName]);
 
