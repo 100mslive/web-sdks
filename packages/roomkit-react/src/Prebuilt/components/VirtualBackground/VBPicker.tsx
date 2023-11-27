@@ -48,8 +48,9 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const addedPluginToVideoTrack = useRef(false);
   const mediaList = [...background_media.map((media: VirtualBackgroundMedia) => media?.url), ...defaultMedia];
 
+  const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
-  const showVideoTile = isVideoOn && isLargeRoom && roomState !== HMSRoomState.Preview;
+  const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
   const clearVBState = () => {
     setBackground(HMSVirtualBackgroundTypes.NONE);
@@ -116,8 +117,8 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   }
 
   return (
-    <Box css={{ maxHeight: '100%', overflowY: 'auto', pr: '$6' }}>
-      <Flex align="center" justify="between" css={{ w: '100%', position: 'sticky', top: 0 }}>
+    <Flex css={{ pr: '$6', size: '100%' }} direction="column">
+      <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
         <Text variant="h6" css={{ color: '$on_surface_high' }}>
           Virtual Background
         </Text>
@@ -134,41 +135,51 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
           trackId={localPeer?.videoTrack}
           data-testid="preview_tile"
-          css={{ width: '100%', height: '16rem', position: 'sticky', top: '$17' }}
+          css={{ width: '100%', height: '16rem' }}
         />
       ) : null}
 
-      <VBCollection
-        title="Effects"
-        options={[
-          {
-            title: 'No effect',
-            icon: <CrossCircleIcon style={iconDims} />,
-            type: HMSVirtualBackgroundTypes.NONE,
-            onClick: async () => await disableEffects(),
-          },
-          {
-            title: 'Blur',
-            icon: <BlurPersonHighIcon style={iconDims} />,
-            type: HMSVirtualBackgroundTypes.BLUR,
-            onClick: async () => await addPlugin({ blurPower: 0.5 }),
-          },
-        ]}
-        activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-        // @ts-ignore
-        activeBackground={vbPlugin.background?.src || vbPlugin.background || HMSVirtualBackgroundTypes.NONE}
-      />
+      <Box
+        css={{
+          mt: '$4',
+          overflowY: 'auto',
+          flex: '1 1 0',
+          mr: '-$10',
+          pr: '$10',
+        }}
+      >
+        <VBCollection
+          title="Effects"
+          options={[
+            {
+              title: 'No effect',
+              icon: <CrossCircleIcon style={iconDims} />,
+              type: HMSVirtualBackgroundTypes.NONE,
+              onClick: async () => await disableEffects(),
+            },
+            {
+              title: 'Blur',
+              icon: <BlurPersonHighIcon style={iconDims} />,
+              type: HMSVirtualBackgroundTypes.BLUR,
+              onClick: async () => await addPlugin({ blurPower: 0.5 }),
+            },
+          ]}
+          activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
+          // @ts-ignore
+          activeBackground={vbPlugin.background?.src || vbPlugin.background || HMSVirtualBackgroundTypes.NONE}
+        />
 
-      <VBCollection
-        title="Backgrounds"
-        options={mediaList.map(mediaURL => ({
-          type: HMSVirtualBackgroundTypes.IMAGE,
-          mediaURL,
-          onClick: async () => await addPlugin({ mediaURL }),
-        }))}
-        activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-        activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
-      />
-    </Box>
+        <VBCollection
+          title="Backgrounds"
+          options={mediaList.map(mediaURL => ({
+            type: HMSVirtualBackgroundTypes.IMAGE,
+            mediaURL,
+            onClick: async () => await addPlugin({ mediaURL }),
+          }))}
+          activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
+          activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
+        />
+      </Box>
+    </Flex>
   );
 };
