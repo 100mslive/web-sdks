@@ -309,6 +309,14 @@ const HLSView = () => {
                 opacity: controlsVisible ? `1` : '0',
               }}
             >
+              {hlsPlayer && (
+                <HMSVideoPlayer.Progress
+                  onValueChange={currentTime => {
+                    hlsPlayer?.seekTo(currentTime);
+                  }}
+                  hlsPlayer={hlsPlayer}
+                />
+              )}
               {!isMobile && (
                 <HMSVideoPlayer.Controls.Root
                   css={{
