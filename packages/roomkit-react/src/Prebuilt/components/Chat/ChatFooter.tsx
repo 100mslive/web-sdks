@@ -81,10 +81,10 @@ export const ChatFooter = ({
   selection,
   children /* onSelect, selection, screenType */,
 }: {
-  role: any;
+  role: string;
   peerId: string;
-  onSend: any;
-  onSelect: ({ role, peerId, selection }: { role: any; peerId: string; selection: string }) => void;
+  onSend: () => void;
+  onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
   selection: string;
   children: ReactNode;
 }) => {
@@ -97,8 +97,8 @@ export const ChatFooter = ({
   const localPeerName = useHMSStore(selectLocalPeerName);
   const isOverlayChat = elements?.chat?.is_overlay;
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
-  const public_chat_enabled = !!elements?.chat?.public_chat_enabled;
-  const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
   const roles = useFilteredRoles();
 
   const sendMessage = useCallback(async () => {
@@ -141,13 +141,13 @@ export const ChatFooter = ({
   return (
     <Box>
       <Flex>
-        {private_chat_enabled || public_chat_enabled || roles.length > 0 ? (
+        {isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0 ? (
           <ChatSelectorContainer
             onSelect={onSelect}
             role={role}
             peerId={peerId}
             selection={selection}
-            private_chat_enabled={private_chat_enabled}
+            isPrivateChatEnabled={isPrivateChatEnabled}
           />
         ) : null}
         {can_disable_chat ? (
@@ -237,7 +237,7 @@ export const ChatFooter = ({
             />
             {!isMobile ? (
               <EmojiPicker
-                onSelect={(emoji: any) => {
+                onSelect={emoji => {
                   if (inputRef.current) {
                     inputRef.current.value += ` ${emoji.native} `;
                   }

@@ -9,7 +9,7 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 export const ChatPaused = () => {
   const hmsActions = useHMSActions();
   const { elements } = useRoomLayoutConferencingScreen();
-  const can_disable_chat = elements?.chat?.real_time_controls?.can_disable_chat || false;
+  const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
     useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const localPeerName = useHMSStore(selectLocalPeerName);

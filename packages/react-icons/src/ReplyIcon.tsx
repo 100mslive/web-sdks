@@ -8,6 +8,7 @@ const SvgReplyIcon = (props: SVGProps<SVGSVGElement>) => (
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
+      fill="currentColor"
     />
     <path
       d="M5 8.385h7.11a3.724 3.724 0 0 1 0 7.448H9.74"
@@ -15,6 +16,7 @@ const SvgReplyIcon = (props: SVGProps<SVGSVGElement>) => (
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
+      fill="currentColor"
     />
   </svg>
 );

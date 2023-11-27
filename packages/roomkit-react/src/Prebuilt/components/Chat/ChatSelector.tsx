@@ -138,14 +138,14 @@ const VirtualizedSelectItemList = ({
   selectedRole,
   selectedPeerId,
   searchValue,
-  public_chat_enabled,
+  isPublicChatEnabled,
   onSelect,
 }: {
   peers: HMSPeer[];
   selectedRole: string;
   selectedPeerId: string;
   searchValue: string;
-  public_chat_enabled: boolean;
+  isPublicChatEnabled: boolean;
   onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
 }) => {
   const roles = useFilteredRoles();
@@ -159,12 +159,12 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems = public_chat_enabled
+    const selectItems = isPublicChatEnabled
       ? [<Everyone onSelect={onSelect} active={!selectedRole && !selectedPeerId} />]
       : [];
 
     roles.length > 0 &&
-      selectItems.push(<SelectorHeader isHorizontalDivider={public_chat_enabled}>Roles</SelectorHeader>);
+      selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
     roles.forEach(userRole =>
       selectItems.push(
         <RoleItem key={userRole} active={selectedRole === userRole} role={userRole} onSelect={onSelect} />,
@@ -173,7 +173,7 @@ const VirtualizedSelectItemList = ({
 
     filteredPeers.length > 0 &&
       selectItems.push(
-        <SelectorHeader isHorizontalDivider={public_chat_enabled || roles.length > 0}>Participants</SelectorHeader>,
+        <SelectorHeader isHorizontalDivider={isPublicChatEnabled || roles.length > 0}>Participants</SelectorHeader>,
       );
     filteredPeers.forEach(peer =>
       selectItems.push(
@@ -188,7 +188,7 @@ const VirtualizedSelectItemList = ({
     );
 
     return selectItems;
-  }, [public_chat_enabled, onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [isPublicChatEnabled, onSelect, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
     <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
@@ -214,12 +214,12 @@ export const ChatSelector = ({
   const peers = useHMSStore(selectRemotePeers);
   const [search, setSearch] = useState('');
 
-  const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
-  const public_chat_enabled = !!elements?.chat?.public_chat_enabled;
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
 
   return (
     <>
-      {peers.length > 0 && private_chat_enabled && (
+      {peers.length > 0 && isPrivateChatEnabled && (
         <Box css={{ px: '$4' }}>
           <ParticipantSearch onSearch={setSearch} placeholder="Search for participants" />
         </Box>
@@ -228,8 +228,8 @@ export const ChatSelector = ({
         selectedRole={role}
         selectedPeerId={peerId}
         onSelect={onSelect}
-        peers={private_chat_enabled ? peers : []}
-        public_chat_enabled={public_chat_enabled}
+        peers={isPrivateChatEnabled ? peers : []}
+        isPublicChatEnabled={isPublicChatEnabled}
         searchValue={search}
       />
     </>

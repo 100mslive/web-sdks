@@ -13,19 +13,19 @@ export const ChatSelectorContainer = ({
   onSelect,
   role,
   peerId,
-  private_chat_enabled,
+  isPrivateChatEnabled,
   selection,
 }: {
   role: string;
   peerId: string;
   selection: string;
-  private_chat_enabled: boolean;
+  isPrivateChatEnabled: boolean;
   onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
 }) => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
 
-  if (!private_chat_enabled && !selection) {
+  if (!isPrivateChatEnabled && !selection) {
     return null;
   }
   return (

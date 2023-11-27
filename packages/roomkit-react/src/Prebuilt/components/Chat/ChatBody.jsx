@@ -341,7 +341,7 @@ const ChatMessage = React.memo(
       }
     }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
-    const private_chat_enabled = !!elements?.chat?.private_chat_enabled;
+    const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
@@ -447,7 +447,7 @@ const ChatMessage = React.memo(
               sentByLocalPeer={message.sender === localPeerId}
               onReplyPrivately={onReplyPrivately}
               showReplyPrivateAction={
-                messageType !== 'private' && message.sender !== localPeerId && private_chat_enabled
+                messageType !== 'private' && message.sender !== localPeerId && isPrivateChatEnabled
               }
               isMobile={isMobile}
               openSheet={openSheet}
