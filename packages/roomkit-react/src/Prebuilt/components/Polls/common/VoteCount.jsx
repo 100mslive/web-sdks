@@ -19,10 +19,12 @@ export const VoteCount = ({ isQuiz, voteCount, isCorrectAnswer }) => {
           {isCorrectAnswer ? 'Correct' : 'Incorrect'}
         </Text>
       )}
-      <Text variant="sm" css={{ color: '$on_surface_medium' }}>
-        {voteCount}&nbsp;
-        {voteCount === 1 ? 'vote' : 'votes'}
-      </Text>
+      {voteCount ? (
+        <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+          {voteCount}&nbsp;
+          {voteCount === 1 ? 'vote' : 'votes'}
+        </Text>
+      ) : null}
     </Flex>
   );
 };
