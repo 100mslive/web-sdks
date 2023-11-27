@@ -5,7 +5,8 @@ import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { ErrorDialog } from '../primitives/DialogContent';
 import { useSetAppDataByKey } from './AppData/useUISettings';
-import { UserPreferencesKeys, useUserPreferences } from './hooks/useUserPreferences';
+import { useSessionStorage } from './hooks/useSessionStorage';
+import { UserPreferencesKeys } from './hooks/useUserPreferences';
 import { APP_DATA } from '../common/constants';
 
 /**
@@ -23,7 +24,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
   const [error, setError] = useState({ title: '', body: '' });
   let authToken = defaultAuthToken;
   const [, setAuthTokenInAppData] = useSetAppDataByKey(APP_DATA.authToken);
-  const [savedUserId, setSavedUserId] = useUserPreferences(UserPreferencesKeys.USER_ID);
+  const [savedUserId, setSavedUserId] = useSessionStorage(UserPreferencesKeys.USER_ID);
 
   useEffect(() => {
     if (!savedUserId && !userId) {
