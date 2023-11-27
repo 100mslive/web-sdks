@@ -146,7 +146,7 @@ const getMessageType = ({ roles, receiver }) => {
 const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
-    can_hide_message: true,
+    can_hide_message: false,
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
