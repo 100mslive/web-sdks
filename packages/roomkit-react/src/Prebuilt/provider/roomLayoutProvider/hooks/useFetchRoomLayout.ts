@@ -70,7 +70,7 @@ export const useFetchRoomLayout = ({
         );
         layoutForRole = defaultLayout;
       }
-      const layout = defaultLayout;
+      const layout = layoutForRole;
       setLayout(layout);
       isFetchInProgress.current = false;
     })();

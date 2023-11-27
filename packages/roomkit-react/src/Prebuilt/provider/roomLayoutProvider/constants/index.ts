@@ -36,7 +36,7 @@ export const defaultLayout: Layout = {
             chat_title: 'Chat',
             allow_pinning_messages: true,
             message_placeholder: 'Send a message...',
-            roles_whitelist: ['guest'],
+            roles_whitelist: [],
             real_time_controls: {
               can_disable_chat: true,
               can_block_user: true,
