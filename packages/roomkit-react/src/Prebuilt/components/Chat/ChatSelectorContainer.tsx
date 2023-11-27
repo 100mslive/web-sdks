@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
+import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, SearchIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
@@ -7,23 +8,24 @@ import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { ChatSelector } from './ChatSelector';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore
+import { useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useDefaultChatSelection } from '../../common/hooks';
 import { textEllipsis } from '../../../utils';
+import { CHAT_SELECTOR } from '../../common/constants';
 
-export const ChatSelectorContainer = ({
-  onSelect,
-  role,
-  peerId,
-  isPrivateChatEnabled,
-  selection,
-}: {
-  role: string;
-  peerId: string;
-  selection: string;
-  isPrivateChatEnabled: boolean;
-  onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
-}) => {
+export const ChatSelectorContainer = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+
+  const peerSelector = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const roleSelector = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const defaultSelection = useDefaultChatSelection();
+  const selectorPeerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const selection = selectorPeerName || roleSelector || defaultSelection;
 
   if (!isPrivateChatEnabled && !selection) {
     return null;
@@ -88,11 +90,11 @@ export const ChatSelectorContainer = ({
                     <CrossIcon />
                   </Sheet.Close>
                 </Sheet.Title>
-                <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+                <ChatSelector role={roleSelector} peerId={peerSelector} />
               </Sheet.Content>
             </Sheet.Root>
           ) : (
-            <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+            <ChatSelector role={roleSelector} peerId={peerSelector} />
           )}
         </Dropdown.Content>
       </Dropdown.Root>

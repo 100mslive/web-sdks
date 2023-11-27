@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeerName, selectPeerNameByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -15,11 +15,13 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
+import { useSubscribeChatSelector } from '../AppData/useUISettings';
+// @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 // @ts-ignore
-import { useFilteredRoles } from '../../common/hooks';
+import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
 // @ts-ignore
-import { SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -73,21 +75,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({
-  role,
-  peerId,
-  onSend,
-  onSelect,
-  selection,
-  children /* onSelect, selection, screenType */,
-}: {
-  role: string;
-  peerId: string;
-  onSend: () => void;
-  onSelect: ({ role, peerId, selection }: { role: string; peerId: string; selection: string }) => void;
-  selection: string;
-  children: ReactNode;
-}) => {
+export const ChatFooter = ({ onSend, children }: { onSend: () => void; children: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -100,6 +88,11 @@ export const ChatFooter = ({
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
   const roles = useFilteredRoles();
+  const peerSelector = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const roleSelector = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const defaultSelection = useDefaultChatSelection();
+  const selectorPeerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const selection = selectorPeerName || roleSelector || defaultSelection;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -107,10 +100,10 @@ export const ChatFooter = ({
       return;
     }
     try {
-      if (role) {
-        await hmsActions.sendGroupMessage(message, [role]);
-      } else if (peerId) {
-        await hmsActions.sendDirectMessage(message, peerId);
+      if (roleSelector) {
+        await hmsActions.sendGroupMessage(message, [roleSelector]);
+      } else if (peerSelector) {
+        await hmsActions.sendDirectMessage(message, peerSelector);
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
@@ -122,7 +115,7 @@ export const ChatFooter = ({
       const err = error as Error;
       ToastManager.addToast({ title: err.message });
     }
-  }, [role, peerId, hmsActions, onSend]);
+  }, [roleSelector, peerSelector, hmsActions, onSend]);
 
   useEffect(() => {
     const messageElement = inputRef.current;
@@ -141,15 +134,7 @@ export const ChatFooter = ({
   return (
     <Box>
       <Flex>
-        {isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0 ? (
-          <ChatSelectorContainer
-            onSelect={onSelect}
-            role={role}
-            peerId={peerId}
-            selection={selection}
-            isPrivateChatEnabled={isPrivateChatEnabled}
-          />
-        ) : null}
+        {isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0 ? <ChatSelectorContainer /> : null}
         {can_disable_chat ? (
           <Flex align="center" justify="end" css={{ mb: '$4' }}>
             <Popover.Root>

@@ -4,7 +4,6 @@ import { selectLocalPeer, selectSessionStore } from '@100mslive/hms-video-store'
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
-  selectPeerNameByID,
   useHMSActions,
   useHMSNotifications,
   useHMSStore,
@@ -21,7 +20,6 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
-import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 export const Chat = () => {
@@ -29,14 +27,7 @@ export const Chat = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
   const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const peerName = useHMSStore(selectPeerNameByID(peerSelector));
   const localPeer = useHMSStore(selectLocalPeer);
-  const defaultSelection = useDefaultChatSelection();
-  const [chatOptions, setChatOptions] = useState({
-    role: roleSelector || '',
-    peerId: peerSelector && peerName ? peerSelector : '',
-    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : defaultSelection,
-  });
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
@@ -46,13 +37,9 @@ export const Chat = () => {
   useEffect(() => {
     if (notification && notification.data && peerSelector === notification.data.id) {
       setPeerSelector('');
-      setChatOptions({
-        role: '',
-        peerId: '',
-        selection: defaultSelection,
-      });
+      setRoleSelector('');
     }
-  }, [defaultSelection, notification, peerSelector, setPeerSelector]);
+  }, [notification, peerSelector, setPeerSelector, setRoleSelector]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
@@ -97,21 +84,8 @@ export const Chat = () => {
       )}
 
       <ChatBody
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
         ref={listRef}
         scrollToBottom={scrollToBottom}
-        onReplyPrivately={(peerId, peerName) => {
-          if (!peerId || !peerName) {
-            return;
-          }
-          setChatOptions({
-            role: '',
-            peerId,
-            selection: peerName,
-          });
-          setPeerSelector(peerId);
-        }}
         screenType={screenType}
         blacklistedPeerIDs={blacklistedPeerIDs}
       />
@@ -125,24 +99,9 @@ export const Chat = () => {
       ) : null}
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
-        <ChatFooter
-          role={chatOptions.role}
-          onSend={() => scrollToBottom(1)}
-          selection={chatOptions.selection}
-          screenType={screenType}
-          onSelect={({ role, peerId, selection }) => {
-            setChatOptions({
-              role,
-              peerId,
-              selection,
-            });
-            setPeerSelector(peerId);
-            setRoleSelector(role);
-          }}
-          peerId={chatOptions.peerId}
-        >
+        <ChatFooter onSend={() => scrollToBottom(1)} screenType={screenType}>
           {!isSelectorOpen && !isScrolledToBottom && (
-            <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
+            <NewMessageIndicator role={roleSelector} peerId={peerSelector} scrollToBottom={scrollToBottom} />
           )}
         </ChatFooter>
       ) : null}
