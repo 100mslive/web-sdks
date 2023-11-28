@@ -10,15 +10,19 @@ import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage } from './ChatBody';
 // @ts-ignore
 import { Navigation } from './Navigation';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
-const PINNED_MESSAGE_LENGTH = 75;
+const PINNED_MESSAGE_LENGTH = 70;
 
 export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
   const isMobile = useMedia(cssConfig.media.md);
+
+  const { elements } = useRoomLayoutConferencingScreen();
+  const canUnpinMessage = elements?.chat?.allow_pinning_messages || false;
 
   const [hideOverflow, setHideOverflow] = useState(false);
   const canOverflow = pinnedMessages?.[pinnedMessageIndex]?.text?.length > PINNED_MESSAGE_LENGTH || false;
@@ -101,15 +105,17 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
           </Text>
         </Box>
 
-        <Flex
-          onClick={() => {
-            clearPinnedMessage(pinnedMessageIndex);
-            setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
-          }}
-          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-        >
-          <CrossIcon />
-        </Flex>
+        {canUnpinMessage ? (
+          <Flex
+            onClick={() => {
+              clearPinnedMessage(pinnedMessageIndex);
+              setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
+            }}
+            css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+          >
+            <CrossIcon />
+          </Flex>
+        ) : null}
       </Flex>
     </Flex>
   ) : null;
