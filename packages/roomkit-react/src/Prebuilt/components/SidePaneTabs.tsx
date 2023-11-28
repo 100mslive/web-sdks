@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
@@ -40,9 +40,8 @@ const ParticipantCount = ({ count }: { count: number }) => {
 
 export const SidePaneTabs = React.memo<{
   active: 'Participants | Chat';
-  screenType: keyof ConferencingScreen;
   hideControls?: boolean;
-}>(({ active = SIDE_PANE_OPTIONS.CHAT, screenType, hideControls }) => {
+}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideControls }) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const resetSidePane = useSidepaneReset();
@@ -103,7 +102,7 @@ export const SidePaneTabs = React.memo<{
       }}
     >
       {isOverlayChat && isChatOpen && showChat ? (
-        <Chat screenType={screenType} />
+        <Chat />
       ) : (
         <>
           {hideTabs ? (
@@ -118,11 +117,7 @@ export const SidePaneTabs = React.memo<{
                 )}
               </Text>
 
-              {showChat ? (
-                <Chat screenType={screenType} />
-              ) : (
-                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
-              )}
+              {showChat ? <Chat /> : <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />}
             </>
           ) : (
             <Tabs.Root
@@ -159,7 +154,7 @@ export const SidePaneTabs = React.memo<{
                 <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
-                <Chat screenType={screenType} />
+                <Chat />
               </Tabs.Content>
             </Tabs.Root>
           )}
