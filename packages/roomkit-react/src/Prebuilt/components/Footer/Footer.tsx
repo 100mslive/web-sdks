@@ -1,10 +1,6 @@
 import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
-import {
-  ConferencingScreen,
-  DefaultConferencingScreen_Elements,
-  HLSLiveStreamingScreen_Elements,
-} from '@100mslive/types-prebuilt';
+import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { Chat_ChatState } from '@100mslive/types-prebuilt/elements/chat';
 import { useAVToggle } from '@100mslive/react-sdk';
 import { config as cssConfig, Footer as AppFooter } from '../../..';
@@ -27,6 +23,7 @@ import { ChatToggle } from './ChatToggle';
 // @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
+import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -39,7 +36,7 @@ export const Footer = ({
   elements,
 }: {
   screenType: keyof ConferencingScreen;
-  elements: DefaultConferencingScreen_Elements | HLSLiveStreamingScreen_Elements;
+  elements: ConferencingScreenElements;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay;
@@ -82,7 +79,7 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        {isMobile ? null : <VBToggle />}
+        {!isMobile && elements.virtual_background ? <VBToggle /> : null}
       </AppFooter.Left>
       <AppFooter.Center
         css={{

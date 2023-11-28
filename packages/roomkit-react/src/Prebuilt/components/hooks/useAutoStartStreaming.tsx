@@ -42,7 +42,16 @@ export const useAutoStartStreaming = () => {
       streamStartedRef.current = false;
       setHLSStarted(false);
     }
-  }, [hmsActions, isHLSRunning, isHLSStarted, setHLSStarted, showStreamingUI, isRTMPRunning]);
+  }, [
+    hmsActions,
+    isHLSRunning,
+    isHLSStarted,
+    setHLSStarted,
+    showStreamingUI,
+    isRTMPRunning,
+    isHLSRecordingOn,
+    isBrowserRecordingOn,
+  ]);
 
   useEffect(() => {
     if (!isHLSStarted && !isHLSRunning) {

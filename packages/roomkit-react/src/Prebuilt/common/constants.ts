@@ -32,7 +32,6 @@ export const APP_DATA = {
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
-  tokenEndpoint: 'tokenEndpoint',
   appLayout: 'appLayout',
   hlsStarted: 'hlsStarted',
   rtmpStarted: 'rtmpStarted',
@@ -104,30 +103,33 @@ export const isIPadOS = false;
 // navigator?.maxTouchPoints > 2 &&
 // navigator?.userAgent?.match(/Mac/);
 
-export const SESSION_STORE_KEY = {
-  TRANSCRIPTION_STATE: 'transcriptionState',
-  PINNED_MESSAGE: 'pinnedMessage',
-  SPOTLIGHT: 'spotlight',
-};
+export enum SESSION_STORE_KEY {
+  TRANSCRIPTION_STATE = 'transcriptionState',
+  PINNED_MESSAGES = 'pinnedMessages',
+  SPOTLIGHT = 'spotlight',
+  CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
+  CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
+  CHAT_STATE = 'chatState',
+}
 
-export const INTERACTION_TYPE = {
-  POLL: 'Poll',
-  QUIZ: 'Quiz',
-};
+export enum INTERACTION_TYPE {
+  POLL = 'Poll',
+  QUIZ = 'Quiz',
+}
 
-export const QUESTION_TYPE_TITLE = {
-  'single-choice': 'Single Choice',
-  'multiple-choice': 'Multiple Choice',
+export enum QUESTION_TYPE_TITLE {
+  'single-choice' = 'Single Choice',
+  'multiple-choice' = 'Multiple Choice',
   // "short-answer": "Short Answer",
   // "long-answer": "Long Answer",
-};
+}
 
-export const QUESTION_TYPE = {
-  SINGLE_CHOICE: 'single-choice',
-  MULTIPLE_CHOICE: 'multiple-choice',
+export enum QUESTION_TYPE {
+  SINGLE_CHOICE = 'single-choice',
+  MULTIPLE_CHOICE = 'multiple-choice',
   // SHORT_ANSWER: "short-answer",
   // LONG_ANSWER: "long-answer",
-};
+}
 
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 

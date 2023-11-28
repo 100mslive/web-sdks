@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.12.0":
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.0.tgz#7057a01251606a03d4c6ac2c10f0e18ba189e3e9"
-  integrity sha512-vhmvWzfZhpyaYFew8UNRBzK38S4YgqjwbYV+KGhWwxb9Ny69bD8pMoHGQG2or1Eog3KVeepg1qG31pH2HWo90A==
+"@100mslive/types-prebuilt@0.12.4":
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.4.tgz#1b79f421a8ecb0d4ab47870e017a2fda17ef9c5f"
+  integrity sha512-MzqYyoEMNob+ffKp2pFCxNFC9ZQflpDF+GfKJIPW/FuwGKEouyp77mkQ2b5Hv6z7U1m0MoiqsgCgyakz8+23fg==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
@@ -9943,10 +9943,15 @@ flow-parser@0.*:
   resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.214.0.tgz#455efc841ec015c62f6dec022cf6c61480f231a2"
   integrity sha512-RW1Dh6BuT14DA7+gtNRKzgzvG3GTPdrceHCi4ddZ9VFGQ9HtO5L8wzxMGsor7XtInIrbWZZCSak0oxnBF7tApw==
 
-follow-redirects@^1.0.0, follow-redirects@^1.14.0, follow-redirects@^1.15.0:
+follow-redirects@^1.0.0, follow-redirects@^1.15.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
+
+follow-redirects@^1.14.0:
+  version "1.15.3"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.3.tgz#fe2f3ef2690afce7e82ed0b44db08165b207123a"
+  integrity sha512-1VzOtuEM8pC9SFU1E+8KfTjZyMztRsgEfwQl44z8A25uy13jSzTj6dyK2Df52iV0vgHCfBwLhDWevLn95w5v6Q==
 
 for-each@^0.3.3:
   version "0.3.3"
@@ -15046,6 +15051,11 @@ react-style-singleton@^2.2.1:
     get-nonce "^1.0.0"
     invariant "^2.2.4"
     tslib "^2.0.0"
+
+react-swipeable@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/react-swipeable/-/react-swipeable-7.0.1.tgz#cd299f5986c5e4a7ee979839658c228f660e1e0c"
+  integrity sha512-RKB17JdQzvECfnVj9yDZsiYn3vH0eyva/ZbrCZXZR0qp66PBRhtg4F9yJcJTWYT5Adadi+x4NoG53BxKHwIYLQ==
 
 react-universal-interface@^0.6.2:
   version "0.6.2"

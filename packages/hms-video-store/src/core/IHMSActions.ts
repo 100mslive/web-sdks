@@ -106,21 +106,21 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   /**
    * Send a plain text message to all the other participants in the room.
    * @param message - string message to broadcast
-   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   * @param type - type of message. For example: image, video etc. - optional defaults to chat
    */
   sendBroadcastMessage(message: string, type?: string): Promise<void>;
   /**
    *
    * @param message - string message to send
    * @param roles - roles to which to send the message
-   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   * @param type - type of message. For example: image, video etc. - optional defaults to chat
    */
   sendGroupMessage(message: string, roles: HMSRoleName[], type?: string): Promise<void>;
   /**
    *
    * @param message
    * @param peerID - id of the peer to which message has to be sent
-   * @param type - type of message eg: image, video etc. - optional defaults to chat
+   * @param type - type of message. For example: image, video etc. - optional defaults to chat
    */
   sendDirectMessage(message: string, peerID: HMSPeerID, type?: string): Promise<void>;
 
@@ -132,7 +132,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * found in store, no change in store will take place.
    *
    * @param readStatus boolean value which you want to set as read flag for message/messages.
-   * @param messageId message id whose read falg you want to set.
+   * @param messageId message id whose read flag you want to set.
    */
   setMessageRead(readStatus: boolean, messageId?: HMSMessageID): void;
 
@@ -295,7 +295,7 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setRemoteTrackEnabled(forRemoteTrackID: HMSTrackID | HMSTrackID[], enabled: boolean): Promise<void>;
 
   /**
-   * Use this to mute/unmute multipe tracks by source, role or type
+   * Use this to mute/unmute multiple tracks by source, role or type
    * @param {HMSChangeMultiTrackStateParams} params
    */
   setRemoteTracksEnabled(params: HMSChangeMultiTrackStateParams): Promise<void>;

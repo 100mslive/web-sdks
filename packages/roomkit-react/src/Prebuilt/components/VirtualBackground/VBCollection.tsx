@@ -1,13 +1,13 @@
 import React from 'react';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { Box } from '../../../Layout';
 import { Text } from '../../../Text';
 import { VBOption } from './VBOption';
-import { VB_EFFECT } from './constants';
 
 export const VBCollection = ({
   options,
   title,
-  activeBackgroundType = '',
+  activeBackgroundType = HMSVirtualBackgroundTypes.NONE,
   activeBackground = '',
 }: {
   options: {
@@ -19,7 +19,7 @@ export const VBCollection = ({
   }[];
   title: string;
   activeBackground: HTMLImageElement | string;
-  activeBackgroundType: string;
+  activeBackgroundType: HMSVirtualBackgroundTypes;
 }) => {
   if (options.length === 0) {
     return null;
@@ -35,7 +35,7 @@ export const VBCollection = ({
             key={option?.mediaURL || option?.title}
             {...option}
             isActive={
-              ([VB_EFFECT.NONE, VB_EFFECT.BLUR].includes(activeBackgroundType) &&
+              ([HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.BLUR].includes(activeBackgroundType) &&
                 option.type === activeBackgroundType) ||
               activeBackground === option?.mediaURL
             }
