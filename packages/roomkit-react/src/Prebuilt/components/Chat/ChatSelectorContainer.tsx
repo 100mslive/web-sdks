@@ -11,7 +11,7 @@ import { ChatSelector } from './ChatSelector';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
-import { useDefaultChatSelection } from '../../common/hooks';
+import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
 import { textEllipsis } from '../../../utils';
 import { CHAT_SELECTOR } from '../../common/constants';
 
@@ -20,14 +20,15 @@ export const ChatSelectorContainer = () => {
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-
-  const peerSelector = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const roleSelector = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
+  const roles = useFilteredRoles();
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
-  const selectorPeerName = useHMSStore(selectPeerNameByID(peerSelector));
-  const selection = selectorPeerName || roleSelector || defaultSelection;
+  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
+  const selection = selectorPeerName || selectedRole || defaultSelection;
 
-  if (!isPrivateChatEnabled && !selection) {
+  if (!(isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0) && !isPrivateChatEnabled && !selection) {
     return null;
   }
   return (
@@ -90,11 +91,11 @@ export const ChatSelectorContainer = () => {
                     <CrossIcon />
                   </Sheet.Close>
                 </Sheet.Title>
-                <ChatSelector role={roleSelector} peerId={peerSelector} />
+                <ChatSelector role={selectedRole} peerId={selectedPeer} />
               </Sheet.Content>
             </Sheet.Root>
           ) : (
-            <ChatSelector role={roleSelector} peerId={peerSelector} />
+            <ChatSelector role={selectedRole} peerId={selectedPeer} />
           )}
         </Dropdown.Content>
       </Dropdown.Root>

@@ -25,8 +25,8 @@ import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 export const Chat = () => {
   const { elements, screenType } = useRoomLayoutConferencingScreen();
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
-  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
-  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+  const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const localPeer = useHMSStore(selectLocalPeer);
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
@@ -35,11 +35,11 @@ export const Chat = () => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
   useEffect(() => {
-    if (notification && notification.data && peerSelector === notification.data.id) {
+    if (notification && notification.data && selectedPeer === notification.data.id) {
       setPeerSelector('');
       setRoleSelector('');
     }
-  }, [notification, peerSelector, setPeerSelector, setRoleSelector]);
+  }, [notification, selectedPeer, setPeerSelector, setRoleSelector]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
@@ -99,7 +99,7 @@ export const Chat = () => {
       {isChatEnabled && !isLocalPeerBlacklisted ? (
         <ChatFooter onSend={() => scrollToBottom(1)} screenType={screenType}>
           {!isSelectorOpen && !isScrolledToBottom && (
-            <NewMessageIndicator role={roleSelector} peerId={peerSelector} scrollToBottom={scrollToBottom} />
+            <NewMessageIndicator role={selectedRole} peerId={selectedPeer} scrollToBottom={scrollToBottom} />
           )}
         </ChatFooter>
       ) : null}

@@ -67,7 +67,7 @@ const SelectorHeader = React.memo(
 );
 
 const Everyone = React.memo(({ active }: { active: boolean }) => {
-  const unreadCount = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
+  const unreadCount: number = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   return (
@@ -84,7 +84,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
 });
 
 const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }) => {
-  const unreadCount = useHMSStore(selectMessagesUnreadCountByRole(role));
+  const unreadCount: number = useHMSStore(selectMessagesUnreadCountByRole(role));
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   return (
@@ -101,7 +101,7 @@ const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }
 });
 
 const PeerItem = ({ peerId, name, active }: { name: string; peerId: string; active: boolean }) => {
-  const unreadCount = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
+  const unreadCount: number = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
 

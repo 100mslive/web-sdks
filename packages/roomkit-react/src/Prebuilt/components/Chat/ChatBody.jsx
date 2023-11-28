@@ -4,7 +4,7 @@ import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
-  selectHMSMessages,
+  selectHMSBroadcastMessages,
   selectLocalPeerID,
   selectLocalPeerName,
   selectMessagesByPeerID,
@@ -563,22 +563,17 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
 });
 
 export const ChatBody = React.forwardRef(({ scrollToBottom, blacklistedPeerIDs }, listRef) => {
-  const peerSelector = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const roleSelector = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   let storeMessageSelector;
-  if (roleSelector) {
-    storeMessageSelector = selectMessagesByRole(roleSelector);
-  } else if (peerSelector) {
-    storeMessageSelector = selectMessagesByPeerID(peerSelector);
+  if (selectedRole) {
+    storeMessageSelector = selectMessagesByRole(selectedRole);
+  } else if (selectedPeer) {
+    storeMessageSelector = selectMessagesByPeerID(selectedPeer);
   } else {
-    storeMessageSelector = selectHMSMessages;
+    storeMessageSelector = selectHMSBroadcastMessages;
   }
   let messages = useHMSStore(storeMessageSelector) || [];
-  if (!(roleSelector || peerSelector)) {
-    messages = messages.filter(
-      value => !value.recipientPeer && !(value.recipientRoles && value.recipientRoles?.length > 0),
-    );
-  }
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
@@ -595,7 +590,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom, blacklistedPeerIDs }
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const unreadCount = useUnreadCount({ role: roleSelector, peerId: peerSelector });
+  const unreadCount = useUnreadCount({ role: selectedRole, peerId: selectedPeer });
 
   if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (

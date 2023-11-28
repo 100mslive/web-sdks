@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerName, selectPeerNameByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectPeerNameByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -18,9 +18,7 @@ import { useChatDraftMessage } from '../AppData/useChatState';
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-// @ts-ignore
-import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
-// @ts-ignore
+import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -82,17 +80,14 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
-  const localPeerName = useHMSStore(selectLocalPeerName);
+  const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
-  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
-  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-  const roles = useFilteredRoles();
-  const peerSelector = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const roleSelector = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
-  const selectorPeerName = useHMSStore(selectPeerNameByID(peerSelector));
-  const selection = selectorPeerName || roleSelector || defaultSelection;
+  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
+  const selection = selectorPeerName || selectedRole || defaultSelection;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -100,10 +95,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       return;
     }
     try {
-      if (roleSelector) {
-        await hmsActions.sendGroupMessage(message, [roleSelector]);
-      } else if (peerSelector) {
-        await hmsActions.sendDirectMessage(message, peerSelector);
+      if (selectedRole) {
+        await hmsActions.sendGroupMessage(message, [selectedRole]);
+      } else if (selectedPeer) {
+        await hmsActions.sendDirectMessage(message, selectedPeer);
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
@@ -115,7 +110,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       const err = error as Error;
       ToastManager.addToast({ title: err.message });
     }
-  }, [roleSelector, peerSelector, hmsActions, onSend]);
+  }, [selectedRole, selectedPeer, hmsActions, onSend]);
 
   useEffect(() => {
     const messageElement = inputRef.current;
@@ -134,7 +129,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   return (
     <Box>
       <Flex>
-        {isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0 ? <ChatSelectorContainer /> : null}
+        <ChatSelectorContainer />
         {can_disable_chat ? (
           <Flex align="center" justify="end" css={{ mb: '$4' }}>
             <Popover.Root>
@@ -148,10 +143,16 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
                   align="end"
                   side="top"
                   onClick={() => {
-                    hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
+                    const chatState = {
                       enabled: false,
-                      updatedBy: localPeerName,
-                    });
+                      updatedBy: {
+                        peerId: localPeer?.id,
+                        userId: localPeer?.customerUserId,
+                        userName: localPeer?.name,
+                      },
+                      updatedAt: Date.now(),
+                    };
+                    hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, chatState);
                   }}
                   css={{
                     backgroundColor: '$surface_default',
