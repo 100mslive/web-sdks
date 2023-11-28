@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -86,9 +86,9 @@ export const ChatFooter = ({
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
-  const localPeerName = useHMSStore(selectLocalPeerName);
+  const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
-  const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const can_disable_chat = !elements?.chat?.real_time_controls?.can_disable_chat;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -145,10 +145,16 @@ export const ChatFooter = ({
                 align="end"
                 side="top"
                 onClick={() => {
-                  hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
+                  const chatState = {
                     enabled: false,
-                    updatedBy: localPeerName,
-                  });
+                    updatedBy: {
+                      peerId: localPeer?.customerUserId,
+                      userId: localPeer?.id,
+                      userName: localPeer?.name,
+                    },
+                    updatedAt: new Date().getTime(),
+                  };
+                  hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, chatState);
                 }}
                 css={{
                   backgroundColor: '$surface_default',

@@ -1,29 +1,45 @@
 import React, { useEffect } from 'react';
-import { usePrevious } from 'react-use';
 import { v4 as uuid } from 'uuid';
-import { selectLocalPeerName, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
 import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
-export const ChatNotifications = () => {
-  const localPeerName = useHMSStore(selectLocalPeerName);
-  const { enabled: isChatEnabled, updatedBy: chatStateUpdatedBy = '' } =
-    useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
+const NOTIFICATION_TIME_DIFFERENCE = 10000;
 
-  const previousChatEnabled = usePrevious(isChatEnabled);
+export const ChatNotifications = () => {
+  const {
+    enabled: isChatEnabled,
+    updatedBy: chatStateUpdatedBy,
+    updatedAt,
+  } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {
+    enabled: true,
+    updatedBy: undefined,
+    updatedAt: 0,
+  };
+
+  const localPeerId = useHMSStore(selectLocalPeerID);
 
   useEffect(() => {
-    if (!chatStateUpdatedBy || chatStateUpdatedBy === localPeerName || previousChatEnabled === undefined) {
+    if (!chatStateUpdatedBy?.userId || localPeerId === chatStateUpdatedBy?.userId) {
       return;
     }
+
+    const showToast = new Date().getTime() - updatedAt < NOTIFICATION_TIME_DIFFERENCE;
+
+    if (!showToast) {
+      return;
+    }
+
     const notification = {
       id: uuid(),
       icon: isChatEnabled ? <ChatUnreadIcon /> : <ChatIcon />,
-      title: isChatEnabled ? `Chat resumed by ${chatStateUpdatedBy}` : `Chat paused by ${chatStateUpdatedBy}`,
+      title: isChatEnabled
+        ? `Chat resumed by ${chatStateUpdatedBy.userName}`
+        : `Chat paused by ${chatStateUpdatedBy.userName}`,
     };
     ToastManager.addToast(notification);
-  }, [isChatEnabled, chatStateUpdatedBy, localPeerName]);
+  }, [isChatEnabled, chatStateUpdatedBy]);
   return <></>;
 };
