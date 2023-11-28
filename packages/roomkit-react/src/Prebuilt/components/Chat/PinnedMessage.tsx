@@ -22,7 +22,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
   const isMobile = useMedia(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();
-  const canUnpinMessage = elements?.chat?.allow_pinning_messages || false;
+  const canUnpinMessage = !!elements?.chat?.allow_pinning_messages;
 
   const [hideOverflow, setHideOverflow] = useState(false);
   const canOverflow = pinnedMessages?.[pinnedMessageIndex]?.text?.length > PINNED_MESSAGE_LENGTH || false;
