@@ -11,7 +11,6 @@ import { AnnotisedMessage } from './ChatBody';
 // @ts-ignore
 import { Navigation } from './Navigation';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
