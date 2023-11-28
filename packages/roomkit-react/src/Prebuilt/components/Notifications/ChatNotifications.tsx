@@ -22,7 +22,7 @@ export const ChatNotifications = () => {
   const localPeerId = useHMSStore(selectLocalPeerID);
 
   useEffect(() => {
-    if (!chatStateUpdatedBy?.userId || localPeerId === chatStateUpdatedBy?.userId) {
+    if (!chatStateUpdatedBy?.userId || localPeerId === chatStateUpdatedBy?.peerId) {
       return;
     }
 

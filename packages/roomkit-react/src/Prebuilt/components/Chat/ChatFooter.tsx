@@ -148,8 +148,8 @@ export const ChatFooter = ({
                   const chatState = {
                     enabled: false,
                     updatedBy: {
-                      peerId: localPeer?.customerUserId,
-                      userId: localPeer?.id,
+                      peerId: localPeer?.id,
+                      userId: localPeer?.customerUserId,
                       userName: localPeer?.name,
                     },
                     updatedAt: new Date().getTime(),
