@@ -20,7 +20,7 @@ export const ChatPaused = () => {
       await hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
         enabled: true,
         updatedBy: { userName: localPeer.name, userId: localPeer?.customerUserId, peerId: localPeer.id },
-        updatedAt: new Date().now(),
+        updatedAt: Date.now(),
       }),
     [hmsActions, localPeer],
   );
@@ -39,7 +39,7 @@ export const ChatPaused = () => {
           variant="xs"
           css={{ color: '$on_surface_medium', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
-          Chat has been paused by {chatStateUpdatedBy?.peerId === localPeer.id ? 'you' : chatStateUpdatedBy.userName}
+          Chat has been paused by {chatStateUpdatedBy?.peerId === localPeer.id ? 'you' : chatStateUpdatedBy?.userName}
         </Text>
       </Box>
       {can_disable_chat ? (

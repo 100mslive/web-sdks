@@ -152,7 +152,7 @@ export const ChatFooter = ({
                       userId: localPeer?.customerUserId,
                       userName: localPeer?.name,
                     },
-                    updatedAt: new Date().getTime(),
+                    updatedAt: Date.now(),
                   };
                   hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, chatState);
                 }}

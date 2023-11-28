@@ -17,7 +17,7 @@ export const ChatNotifications = () => {
       return;
     }
 
-    const showToast = new Date().getTime() - chatState.updatedAt < NOTIFICATION_TIME_DIFFERENCE;
+    const showToast = Date.now() - chatState.updatedAt < NOTIFICATION_TIME_DIFFERENCE;
 
     if (!showToast) {
       return;
