@@ -96,6 +96,7 @@ export const AppData = React.memo(() => {
     const uiSettings = preferences || {};
     const updatedSettings = {
       ...uiSettings,
+      [UI_SETTINGS.isAudioOnly]: undefined,
       [UI_SETTINGS.uiViewMode]: uiSettings.uiViewMode || UI_MODE_GRID,
     };
     hmsActions.setAppData(APP_DATA.uiSettings, updatedSettings, true);
