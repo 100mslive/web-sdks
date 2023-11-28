@@ -88,7 +88,7 @@ export const ChatFooter = ({
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
-  const can_disable_chat = !elements?.chat?.real_time_controls?.can_disable_chat;
+  const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
 
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
@@ -132,7 +132,7 @@ export const ChatFooter = ({
       {/* {screenType !== 'hls_live_streaming' ? (
         <ChatSelectorContainer onSelect={onSelect} role={role} peerId={peerId} selection={selection} />
       ) : null} */}
-      {can_disable_chat ? (
+      {canDisableChat ? (
         <Flex align="center" justify="end" css={{ w: '100%', mb: '$4' }}>
           <Popover.Root>
             <Popover.Trigger asChild>

@@ -9,24 +9,15 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 const NOTIFICATION_TIME_DIFFERENCE = 5000;
 
 export const ChatNotifications = () => {
-  const {
-    enabled: isChatEnabled,
-    updatedBy: chatStateUpdatedBy,
-    updatedAt,
-  } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {
-    enabled: true,
-    updatedBy: undefined,
-    updatedAt: 0,
-  };
-
+  const chatState = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE));
   const localPeerId = useHMSStore(selectLocalPeerID);
 
   useEffect(() => {
-    if (!chatStateUpdatedBy?.userId || localPeerId === chatStateUpdatedBy?.peerId) {
+    if (!chatState || chatState.updatedBy?.peerId === localPeerId) {
       return;
     }
 
-    const showToast = new Date().getTime() - updatedAt < NOTIFICATION_TIME_DIFFERENCE;
+    const showToast = new Date().getTime() - chatState.updatedAt < NOTIFICATION_TIME_DIFFERENCE;
 
     if (!showToast) {
       return;
@@ -34,12 +25,10 @@ export const ChatNotifications = () => {
 
     const notification = {
       id: uuid(),
-      icon: isChatEnabled ? <ChatUnreadIcon /> : <ChatIcon />,
-      title: isChatEnabled
-        ? `Chat resumed by ${chatStateUpdatedBy.userName}`
-        : `Chat paused by ${chatStateUpdatedBy.userName}`,
+      icon: chatState.enabled ? <ChatUnreadIcon /> : <ChatIcon />,
+      title: `Chat ${chatState.enabled ? 'resumed' : 'paused'} by ${chatState.updatedBy?.userName}`,
     };
     ToastManager.addToast(notification);
-  }, [isChatEnabled, chatStateUpdatedBy]);
+  }, [chatState]);
   return <></>;
 };
