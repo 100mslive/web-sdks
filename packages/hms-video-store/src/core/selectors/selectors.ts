@@ -376,7 +376,7 @@ export const selectHMSMessages = createSelector(selectMessageIDsInOrder, selectM
 });
 
 export const selectHMSBroadcastMessages = createSelector(selectHMSMessages, messages => {
-  return Object.values(messages).filter(m => !m.recipientPeer && !(m.recipientRoles && m.recipientRoles?.length > 0));
+  return messages.filter(m => !m.recipientPeer && !(m.recipientRoles && m.recipientRoles?.length > 0));
 });
 /**
  * Select the nuber of unread broadcast messages
