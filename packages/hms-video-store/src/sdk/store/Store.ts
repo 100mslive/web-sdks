@@ -1,4 +1,4 @@
-import { KnownRoles, TrackStateEntry } from './IStore';
+import { KnownRoles, TrackStateEntry } from './StoreInterfaces';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
