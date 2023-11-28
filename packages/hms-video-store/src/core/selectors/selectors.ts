@@ -365,14 +365,6 @@ export const selectUnreadHMSMessagesCount = createSelector(selectMessagesMap, me
 });
 
 /**
- * Select the nuber of unread broadcast messages
- */
-export const selectUnreadHMSBroadcastMessagesCount = createSelector(selectMessagesMap, messages => {
-  return Object.values(messages).filter(
-    m => !m.read && !m.recipientPeer && !(m.recipientRoles && m.recipientRoles?.length > 0),
-  ).length;
-});
-/**
  * Select an array of messages in the room(sent and received).
  */
 export const selectHMSMessages = createSelector(selectMessageIDsInOrder, selectMessagesMap, (msgIDs, msgMap) => {
@@ -383,6 +375,14 @@ export const selectHMSMessages = createSelector(selectMessageIDsInOrder, selectM
   return messages;
 });
 
+/**
+ * Select the nuber of unread broadcast messages
+ */
+export const selectUnreadHMSBroadcastMessagesCount = createSelector(selectHMSMessages, messages => {
+  return Object.values(messages).filter(
+    m => !m.read && !m.recipientPeer && !(m.recipientRoles && m.recipientRoles?.length > 0),
+  ).length;
+});
 /**
  * Select the current state of the room.
  */
