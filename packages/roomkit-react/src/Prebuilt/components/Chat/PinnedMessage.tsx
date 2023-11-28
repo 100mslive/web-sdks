@@ -14,7 +14,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { SESSION_STORE_KEY } from '../../common/constants';
 
-const PINNED_MESSAGE_LENGTH = 70;
+const PINNED_MESSAGE_LENGTH = 75;
 
 export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
