@@ -1,5 +1,6 @@
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
 import { IStore } from '../../sdk/store';
+import { createHMSPollFromPollParams } from '../../session-store/interactivity-center/HMSInteractivityCenter';
 import { PollResult } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
@@ -37,27 +38,11 @@ export class PollsManager {
       }
 
       const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
-      const poll: HMSPoll = {
-        id: pollParams.poll_id,
-        title: pollParams.title,
-        startedBy: pollParams.started_by,
-        createdBy: pollParams.created_by,
-        anonymous: pollParams.anonymous,
-        type: pollParams.type,
-        duration: pollParams.duration,
-        locked: pollParams.locked, // poll is locked automatically when it starts
-        mode: pollParams.mode as HMSPoll['mode'],
-        visibility: pollParams.visibility,
-        rolesThatCanVote: pollParams.vote || [],
-        rolesThatCanViewResponses: pollParams.responses || [],
-        state: pollParams.state,
-        stoppedBy: pollParams.stopped_by,
-        startedAt: convertDateNumToDate(pollParams.started_at),
-        stoppedAt: convertDateNumToDate(pollParams.stopped_at),
-        createdAt: convertDateNumToDate(pollParams.created_at),
 
-        questions: questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer })),
-      };
+      const poll = createHMSPollFromPollParams(pollParams);
+      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
+
+      await this.updatePollResponses(poll, true);
 
       polls.push(poll);
       this.store.setPoll(poll);
@@ -95,40 +80,7 @@ export class PollsManager {
       }
 
       this.updatePollResult(savedPoll, updatedPoll);
-
-      const serverResponseParams = await this.transport.getPollResponses({
-        poll_id: updatedPoll.poll_id,
-        index: 0,
-        count: 50,
-        self: false,
-      });
-
-      serverResponseParams.responses?.forEach(({ response, peer, final }) => {
-        const question = savedPoll?.questions?.find(question => question.index === response.question);
-        if (!question) {
-          return;
-        }
-        const pollResponse: HMSPollQuestionResponse = {
-          id: response.response_id,
-          questionIndex: response.question,
-          option: response.option,
-          options: response.options,
-          text: response.text,
-          responseFinal: final,
-          peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
-          skipped: response.skipped,
-          type: response.type,
-          update: response.update,
-        };
-
-        if (Array.isArray(question.responses) && question.responses.length > 0) {
-          if (!question.responses.find(({ id }) => id === pollResponse.id)) {
-            question.responses.push(pollResponse);
-          }
-        } else {
-          question.responses = [pollResponse];
-        }
-      });
+      await this.updatePollResponses(savedPoll, false);
 
       updatedPolls.push(savedPoll);
     }
@@ -160,6 +112,42 @@ export class PollsManager {
           savedOption.voteCount = updatedVoteCount;
         }
       });
+    });
+  }
+
+  private async updatePollResponses(poll: HMSPoll, self: boolean) {
+    const serverResponseParams = await this.transport.getPollResponses({
+      poll_id: poll.id,
+      index: 0,
+      count: 50,
+      self,
+    });
+
+    serverResponseParams.responses?.forEach(({ response, peer, final }) => {
+      const question = poll?.questions?.find(question => question.index === response.question);
+      if (!question) {
+        return;
+      }
+      const pollResponse: HMSPollQuestionResponse = {
+        id: response.response_id,
+        questionIndex: response.question,
+        option: response.option,
+        options: response.options,
+        text: response.text,
+        responseFinal: final,
+        peer: { peerid: peer.peerid, userHash: peer.hash, userid: peer.userid, username: peer.username },
+        skipped: response.skipped,
+        type: response.type,
+        update: response.update,
+      };
+
+      if (Array.isArray(question.responses) && question.responses.length > 0) {
+        if (!question.responses.find(({ id }) => id === pollResponse.id)) {
+          question.responses.push(pollResponse);
+        }
+      } else {
+        question.responses = [pollResponse];
+      }
     });
   }
 }

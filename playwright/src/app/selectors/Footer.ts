@@ -74,10 +74,10 @@ export class Footer {
   dialoge_cross_icon = 'button[data-testid="dialoge_cross_icon"]';
 
   //bottom right corner
-  raise_hand_btn = 'button[data-testid="raise_hand_btn"]';
+  raise_hand_btn = 'button[data-testid="hand_raise_btn"]';
   brb_btn = '(//button[@data-testid="brb_btn"])[2]';
   chat_btn = '[data-testid="chat_btn"] >> visible=true';
-  chat_placeholder = 'css=[placeholder="Write something here"]';
+  chat_placeholder = 'css=[placeholder="Send a message...."]';
   emoji_btn = '[data-testid="emoji_reaction_btn"]';
   emoji_container = '[class="emoji-mart-emoji"]';
   expected_emoji_container_text = 'Reactions will be timed for Live Streaming viewers.';
@@ -90,6 +90,9 @@ export class Footer {
 
   chat_peer_selector = 'text=Everyone';
   chat_to_text = '[data-testid="chat_msg"] >> p >> nth=1';
+  chat_msg = '[data-testid="chat_msg"]';
+  chat_msg_options = '[data-testid="chat_msg"] >> button';
+  pin_message = 'text=Pin Message'
 
   //bottom left corner
   screenshare_audio = 'button[data-testid="screenshare_audio"]';

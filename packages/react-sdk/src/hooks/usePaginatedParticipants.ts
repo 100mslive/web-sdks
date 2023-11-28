@@ -8,7 +8,7 @@ export interface usePaginatedParticipantsResult {
    */
   loadPeers: Promise<void>;
   /**
-   * this function is to be called when loadPeers is called atleast once. This will fetch the next batch of peers
+   * this function is to be called when loadPeers is called at least once. This will fetch the next batch of peers
    */
   loadMorePeers: Promise<void>;
   hasNext: () => boolean;

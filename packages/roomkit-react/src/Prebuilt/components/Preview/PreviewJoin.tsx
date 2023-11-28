@@ -19,7 +19,6 @@ import { useHMSPrebuiltContext } from '../../AppContext';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 import SidePane from '../../layouts/SidePane';
-import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { AudioVideoToggle } from '../AudioVideoToggle';
 // @ts-ignore: No implicit Any
@@ -36,13 +35,13 @@ import SettingsModal from '../Settings/SettingsModal';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import PreviewForm from './PreviewForm';
+import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
-// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
@@ -111,9 +110,8 @@ const PreviewJoin = ({
     });
     join();
   }, [join, name, setPreviewPreference]);
-  const roomLayout = useRoomLayout();
-
-  const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+  const { elements = {} } = useRoomLayoutPreviewScreen();
+  const { preview_header: previewHeader = {}, virtual_background } = elements || {};
   const aspectRatio = useLocalTileAspectRatio();
   useEffect(() => {
     if (authToken) {
@@ -177,7 +175,7 @@ const PreviewJoin = ({
           </Flex>
         ) : null}
         <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
-          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} />
+          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
             onChange={setName}
@@ -188,7 +186,7 @@ const PreviewJoin = ({
           />
         </Box>
       </Container>
-      <Box css={{ position: 'absolute', right: '0', top: 0, height: '100%' }}>
+      <Box css={{ position: 'absolute', right: '0', top: 0, height: '100%', overflow: 'hidden' }}>
         <SidePane screenType="default" />
       </Box>
     </Flex>
@@ -266,7 +264,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
   );
 };
 
-export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => {
+export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boolean; vbEnabled: boolean }) => {
   const isMobile = useMedia(cssConfig.media.md);
 
   return (
@@ -279,7 +277,7 @@ export const PreviewControls = ({ hideSettings }: { hideSettings: boolean }) => 
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {!isMobile ? <VBToggle /> : null}
+        {!isMobile && vbEnabled ? <VBToggle /> : null}
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

@@ -58,6 +58,7 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
     </Button>
   );
 });
+
 export const ToastConfig = {
   PEER_LIST: {
     single: function (notification) {

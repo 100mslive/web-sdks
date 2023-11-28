@@ -8,7 +8,7 @@ import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMS
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -51,7 +51,13 @@ export const VideoStreamingSection = ({
     if (!isConnected) {
       return;
     }
-    hmsActions.sessionStore.observe([SESSION_STORE_KEY.PINNED_MESSAGE, SESSION_STORE_KEY.SPOTLIGHT]);
+    hmsActions.sessionStore.observe([
+      SESSION_STORE_KEY.PINNED_MESSAGES,
+      SESSION_STORE_KEY.SPOTLIGHT,
+      SESSION_STORE_KEY.CHAT_STATE,
+      SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
+      SESSION_STORE_KEY.CHAT_PEER_BLACKLIST,
+    ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, hmsActions]);
 
@@ -84,12 +90,14 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <SidePane
-          screenType={screenType}
-          // @ts-ignore
-          tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
-          hideControls={hideControls}
-        />
+        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
+          <SidePane
+            screenType={screenType}
+            // @ts-ignore
+            tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+            hideControls={hideControls}
+          />
+        </Box>
       </Flex>
     </Suspense>
   );
