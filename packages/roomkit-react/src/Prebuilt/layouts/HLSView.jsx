@@ -8,6 +8,7 @@ import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
+import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { IconButton } from '../../IconButton';
@@ -360,6 +361,10 @@ const HLSView = () => {
                   </HMSVideoPlayer.Controls.Left>
 
                   <HMSVideoPlayer.Controls.Right>
+                    <HLSCaptionSelector
+                      onClick={show => hlsPlayer?.setCaption(show)}
+                      isEnabled={hlsPlayer?.isCaptionEnabled()}
+                    />
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}

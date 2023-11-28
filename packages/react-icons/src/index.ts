@@ -45,6 +45,7 @@ export { default as CalculatorIcon } from './CalculatorIcon';
 export { default as CalculatorIconsIcon } from './CalculatorIconsIcon';
 export { default as CalendarIcon } from './CalendarIcon';
 export { default as CameraFlipIcon } from './CameraFlipIcon';
+export { default as CaptionIcon } from './CaptionIcon';
 export { default as CardIcon } from './CardIcon';
 export { default as CardWithCvcIcon } from './CardWithCvcIcon';
 export { default as CartIcon } from './CartIcon';
