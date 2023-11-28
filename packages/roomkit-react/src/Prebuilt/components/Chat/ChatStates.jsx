@@ -16,11 +16,11 @@ export const ChatPaused = () => {
   const localPeer = useHMSStore(selectLocalPeer);
 
   const unPauseChat = useCallback(
-    async timeStamp =>
+    async () =>
       await hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
         enabled: true,
         updatedBy: { userName: localPeer.name, userId: localPeer?.customerUserId, peerId: localPeer.id },
-        updatedAt: timeStamp,
+        updatedAt: new Date().now(),
       }),
     [hmsActions, localPeer],
   );
@@ -43,10 +43,7 @@ export const ChatPaused = () => {
         </Text>
       </Box>
       {can_disable_chat ? (
-        <Button
-          css={{ fontWeight: '$semiBold', fontSize: '$sm', borderRadius: '$2' }}
-          onClick={() => unPauseChat(new Date().getTime())}
-        >
+        <Button css={{ fontWeight: '$semiBold', fontSize: '$sm', borderRadius: '$2' }} onClick={unPauseChat}>
           Resume
         </Button>
       ) : (
