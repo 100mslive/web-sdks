@@ -15,7 +15,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
-import { useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection } from '../../common/hooks';
@@ -84,11 +84,15 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const isOverlayChat = elements?.chat?.is_overlay;
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
   const selection = selectorPeerName || selectedRole || defaultSelection;
-
+  useEffect(() => {
+    if (!selectedPeer && !selectedRole && defaultSelection !== 'Everyone') {
+      setRoleSelector(defaultSelection);
+    }
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
