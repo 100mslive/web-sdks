@@ -19,6 +19,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _isLive: boolean;
   private _volume: number;
   private _metaData: HMSHLSTimedMetadata;
+  private _isCaptionEnabled: boolean;
   private readonly TAG = '[HMSHLSPlayer]';
   /**
    * Initiliaze the player with hlsUrl and video element
@@ -40,6 +41,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._hls.attachMedia(this._videoEl);
     this._isLive = true;
     this._volume = this._videoEl.volume * 100;
+    this._isCaptionEnabled = true;
     this._hlsStats = new HlsStats(this._hls, this._videoEl);
     this.listenHLSEvent();
     this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emitEvent);
@@ -194,6 +196,33 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl.currentTime = seekValue;
   };
 
+  isCaptionEnabled = () => {
+    return this._isCaptionEnabled;
+  };
+  setCaption = (show: boolean) => {
+    if (this._isCaptionEnabled === show) {
+      return;
+    }
+    if (show) {
+      this.updateCaptionMode('showing');
+      this._isCaptionEnabled = true;
+    } else {
+      this.updateCaptionMode('hidden');
+      this._isCaptionEnabled = false;
+    }
+  };
+
+  private updateCaptionMode = (mode: TextTrackMode) => {
+    if (!this._videoEl) {
+      console.error('video element is undefined, unable to update caption');
+      return;
+    }
+    for (let textTrackIndex = 0; textTrackIndex < this._videoEl.textTracks.length; textTrackIndex++) {
+      if (this._videoEl.textTracks[textTrackIndex]) {
+        this._videoEl.textTracks[textTrackIndex].mode = mode;
+      }
+    }
+  };
   private playVideo = async () => {
     try {
       if (this._videoEl.paused) {
