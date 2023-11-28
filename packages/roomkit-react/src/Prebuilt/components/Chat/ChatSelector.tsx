@@ -165,11 +165,9 @@ const VirtualizedSelectItemList = ({
 
   return (
     <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
-      <Box>
-        {listItems.map((item, index) => (
-          <Box key={index}>{item}</Box>
-        ))}
-      </Box>
+      {listItems.map((item, index) => (
+        <Box key={index}>{item}</Box>
+      ))}
     </Dropdown.Group>
   );
 };
