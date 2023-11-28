@@ -1,22 +1,40 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
+import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, SearchIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { ChatSelector } from './ChatSelector';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore
+import { useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
 import { textEllipsis } from '../../../utils';
+import { CHAT_SELECTOR } from '../../common/constants';
 
-export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => {
+export const ChatSelectorContainer = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
+  const roles = useFilteredRoles();
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const defaultSelection = useDefaultChatSelection();
+  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
+  const selection = selectorPeerName || selectedRole || defaultSelection;
 
+  if (!(isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0) && !isPrivateChatEnabled && !selection) {
+    return null;
+  }
   return (
-    <Flex align="center" css={{ mb: '$8' }}>
+    <Flex align="center" css={{ mb: '$8', flex: '1 1 0' }}>
       <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
-        Send To
+        {selection ? 'To' : 'Choose Participant'}
       </Text>
 
       <Dropdown.Root open={open} onOpenChange={value => setOpen(value)}>
@@ -31,11 +49,16 @@ export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => 
           }}
           tabIndex={0}
         >
-          <Flex align="center" css={{ c: '$on_surface_medium' }}>
-            <Text variant="tiny" css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high' }}>
-              {selection}
+          <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
+            {!selection && <SearchIcon width={16} height={16} />}
+            <Text
+              variant="tiny"
+              css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}
+            >
+              {selection || 'Search'}
             </Text>
-            {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
+            {selection &&
+              (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
           </Flex>
         </Dropdown.Trigger>
 
@@ -68,11 +91,11 @@ export const ChatSelectorContainer = ({ onSelect, role, peerId, selection }) => 
                     <CrossIcon />
                   </Sheet.Close>
                 </Sheet.Title>
-                <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+                <ChatSelector role={selectedRole} peerId={selectedPeer} />
               </Sheet.Content>
             </Sheet.Root>
           ) : (
-            <ChatSelector onSelect={onSelect} role={role} peerId={peerId} />
+            <ChatSelector role={selectedRole} peerId={selectedPeer} />
           )}
         </Dropdown.Content>
       </Dropdown.Root>

@@ -10,7 +10,7 @@ import { config as cssConfig } from '../../../Theme';
 import { AnnotisedMessage } from './ChatBody';
 // @ts-ignore
 import { Navigation } from './Navigation';
-// @ts-ignore
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
@@ -19,6 +19,9 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
   const isMobile = useMedia(cssConfig.media.md);
+
+  const { elements } = useRoomLayoutConferencingScreen();
+  const canUnpinMessage = !!elements?.chat?.allow_pinning_messages;
 
   const [hideOverflow, setHideOverflow] = useState(false);
   const canOverflow = pinnedMessages?.[pinnedMessageIndex]?.text?.length > PINNED_MESSAGE_LENGTH || false;
@@ -95,21 +98,23 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             <AnnotisedMessage message={formattedPinnedMessage} />
             {canOverflow ? (
               <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>
-                $nbsp;{hideOverflow ? 'See more' : 'Collapse'}
+                &nbsp;{hideOverflow ? 'See more' : 'Collapse'}
               </span>
             ) : null}
           </Text>
         </Box>
 
-        <Flex
-          onClick={() => {
-            clearPinnedMessage(pinnedMessageIndex);
-            setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
-          }}
-          css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
-        >
-          <CrossIcon />
-        </Flex>
+        {canUnpinMessage ? (
+          <Flex
+            onClick={() => {
+              clearPinnedMessage(pinnedMessageIndex);
+              setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
+            }}
+            css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+          >
+            <CrossIcon />
+          </Flex>
+        ) : null}
       </Flex>
     </Flex>
   ) : null;
