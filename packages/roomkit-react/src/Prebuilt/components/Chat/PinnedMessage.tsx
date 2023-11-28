@@ -95,7 +95,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             <AnnotisedMessage message={formattedPinnedMessage} />
             {canOverflow ? (
               <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>
-                $nbsp;{hideOverflow ? 'See more' : 'Collapse'}
+                &nbsp;{hideOverflow ? 'See more' : 'Collapse'}
               </span>
             ) : null}
           </Text>
