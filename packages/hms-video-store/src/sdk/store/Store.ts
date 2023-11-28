@@ -1,4 +1,4 @@
-import { IStore, KnownRoles, TrackStateEntry } from './IStore';
+import { KnownRoles, TrackStateEntry } from './StoreInterfaces';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
@@ -29,7 +29,7 @@ import { createUserAgent } from '../../utils/user-agent';
 import HMSRoom from '../models/HMSRoom';
 import { HMSLocalPeer, HMSPeer, HMSRemotePeer } from '../models/peer';
 
-class Store implements IStore {
+class Store {
   private room?: HMSRoom;
   private knownRoles: KnownRoles = {};
   private localPeerId?: string;

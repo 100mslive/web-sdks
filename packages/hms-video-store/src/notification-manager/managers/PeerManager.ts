@@ -3,7 +3,7 @@ import { createRemotePeer } from './utils';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteVideoTrack } from '../../media/tracks';
 import { HMSPeer, HMSRemotePeer } from '../../sdk/models/peer';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { HAND_RAISE_GROUP_NAME } from '../../utils/constants';
 import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
@@ -22,7 +22,7 @@ import { PeerNotification } from '../HMSNotifications';
  */
 export class PeerManager {
   private readonly TAG = '[PeerManager]';
-  constructor(private store: IStore, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

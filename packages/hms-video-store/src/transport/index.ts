@@ -1,7 +1,6 @@
 import { JoinParameters } from './models/JoinParameters';
 import { TransportFailureCategory } from './models/TransportFailureCategory';
 import { TransportState } from './models/TransportState';
-import ITransport from './ITransport';
 import ITransportObserver from './ITransportObserver';
 import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
@@ -23,49 +22,14 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata, HMSRole, HMSRoleChangeRequest } from '../interfaces';
-import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
+import { HMSRole } from '../interfaces';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
-import Message from '../sdk/models/HMSMessage';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
-import {
-  findPeersRequestParams,
-  HLSRequestParams,
-  HLSTimedMetadataParams,
-  HLSVariant,
-  JoinLeaveGroupResponse,
-  MultiTrackUpdateRequestParams,
-  peerIterRequestParams,
-  PeersIterationResponse,
-  PollInfoGetParams,
-  PollInfoGetResponse,
-  PollInfoSetParams,
-  PollInfoSetResponse,
-  PollListParams,
-  PollListResponse,
-  PollQuestionsGetParams,
-  PollQuestionsGetResponse,
-  PollQuestionsSetParams,
-  PollQuestionsSetResponse,
-  PollResponseSetParams,
-  PollResponseSetResponse,
-  PollResponsesGetParams,
-  PollResponsesGetResponse,
-  PollResultParams,
-  PollResultResponse,
-  PollStartParams,
-  PollStartResponse,
-  PollStopParams,
-  SetSessionMetadataParams,
-  StartRTMPOrRecordingRequestParams,
-  TrackUpdateRequestParams,
-} from '../signal/interfaces';
-import { ISignal } from '../signal/ISignal';
 import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
@@ -100,7 +64,7 @@ interface NegotiateJoinParams {
   autoSubscribeVideo: boolean;
 }
 
-export default class HMSTransport implements ITransport {
+export default class HMSTransport {
   private state: TransportState = TransportState.Disconnected;
   private trackStates: Map<string, TrackState> = new Map();
   private publishConnection: HMSPublishConnection | null = null;
@@ -118,7 +82,7 @@ export default class HMSTransport implements ITransport {
   constructor(
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
-    private store: IStore,
+    private store: Store,
     private eventBus: EventBus,
     private analyticsEventsService: AnalyticsEventsService,
     private analyticsTimer: AnalyticsTimer,
@@ -244,7 +208,7 @@ export default class HMSTransport implements ITransport {
     },
   };
 
-  private signal: ISignal = new JsonRpcSignal(this.signalObserver);
+  public readonly signal = new JsonRpcSignal(this.signalObserver);
   private analyticsSignalTransport = new SignalAnalyticsTransport(this.signal);
 
   private publishConnectionObserver: IPublishConnectionObserver = {
@@ -543,10 +507,6 @@ export default class HMSTransport implements ITransport {
     }
   }
 
-  async sendMessage(message: Message) {
-    return await this.signal.broadcast(message);
-  }
-
   /**
    * TODO: check if track.publishedTrackId be used instead of the hack to match with track with same type and
    * source. The hack won't work if there are multiple tracks with same source and type.
@@ -565,210 +525,6 @@ export default class HMSTransport implements ITransport {
       HMSLogger.d(TAG, 'Track Update', this.trackStates, track);
       this.signal.trackUpdate(new Map([[originalTrackState.track_id, newTrackState]]));
     }
-  }
-
-  async changeRole(forPeerId: string, toRole: string, force = false) {
-    await this.signal.requestRoleChange({
-      requested_for: forPeerId,
-      role: toRole,
-      force,
-    });
-  }
-
-  async changeRoleOfPeer(forPeerId: string, toRole: string, force: boolean) {
-    await this.signal.requestRoleChange({
-      requested_for: forPeerId,
-      role: toRole,
-      force,
-    });
-  }
-
-  async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
-    await this.signal.requestBulkRoleChange({
-      roles: roles.map((role: HMSRole) => role.name),
-      role: toRole,
-      force: true,
-    });
-  }
-
-  async acceptRoleChange(request: HMSRoleChangeRequest) {
-    await this.signal.acceptRoleChangeRequest({
-      requested_by: request.requestedBy?.peerId,
-      role: request.role.name,
-      token: request.token,
-    });
-  }
-
-  async endRoom(lock: boolean, reason: string) {
-    await this.signal.endRoom(lock, reason);
-  }
-
-  async removePeer(peerId: string, reason: string) {
-    await this.signal.removePeer({ requested_for: peerId, reason });
-  }
-
-  async startRTMPOrRecording(params: RTMPRecordingConfig) {
-    const signalParams: StartRTMPOrRecordingRequestParams = {
-      meeting_url: params.meetingURL,
-      record: params.record,
-    };
-
-    if (params.rtmpURLs?.length) {
-      signalParams.rtmp_urls = params.rtmpURLs;
-    }
-
-    if (params.resolution) {
-      signalParams.resolution = params.resolution;
-    }
-
-    await this.signal.startRTMPOrRecording(signalParams);
-  }
-
-  async stopRTMPOrRecording() {
-    await this.signal.stopRTMPAndRecording();
-  }
-
-  async startHLSStreaming(params?: HLSConfig) {
-    const hlsParams: HLSRequestParams = {};
-    if (params && params.variants && params.variants.length > 0) {
-      hlsParams.variants = params.variants.map(variant => {
-        const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
-        if (variant.metadata) {
-          hlsVariant.metadata = variant.metadata;
-        }
-        return hlsVariant;
-      });
-    }
-    if (params?.recording) {
-      hlsParams.hls_recording = {
-        single_file_per_layer: params.recording.singleFilePerLayer,
-        hls_vod: params.recording.hlsVod,
-      };
-    }
-    await this.signal.startHLSStreaming(hlsParams);
-  }
-
-  async stopHLSStreaming(params?: HLSConfig) {
-    if (params) {
-      const hlsParams: HLSRequestParams = {
-        variants: params?.variants?.map(variant => {
-          const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
-          if (variant.metadata) {
-            hlsVariant.metadata = variant.metadata;
-          }
-          return hlsVariant;
-        }),
-      };
-      await this.signal.stopHLSStreaming(hlsParams);
-    }
-    await this.signal.stopHLSStreaming();
-  }
-
-  async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
-    if (metadataList.length > 0) {
-      const hlsMtParams: HLSTimedMetadataParams = {
-        metadata_objs: metadataList,
-      };
-
-      await this.signal.sendHLSTimedMetadata(hlsMtParams);
-    }
-  }
-  async changeName(name: string) {
-    const peer = this.store.getLocalPeer();
-    if (peer && peer.name !== name) {
-      await this.signal.updatePeer({
-        name: name,
-      });
-    }
-  }
-
-  async changeMetadata(metadata: string) {
-    await this.signal.updatePeer({
-      data: metadata,
-    });
-  }
-
-  getSessionMetadata(key?: string) {
-    return this.signal.getSessionMetadata(key);
-  }
-
-  setSessionMetadata(params: SetSessionMetadataParams) {
-    return this.signal.setSessionMetadata(params);
-  }
-
-  listenMetadataChange(keys: string[]): Promise<void> {
-    return this.signal.listenMetadataChange(keys);
-  }
-
-  setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
-    return this.signal.setPollInfo(params);
-  }
-
-  getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
-    return this.signal.getPollInfo(params);
-  }
-
-  setPollQuestions(params: PollQuestionsSetParams): Promise<PollQuestionsSetResponse> {
-    return this.signal.setPollQuestions(params);
-  }
-
-  getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
-    return this.signal.getPollQuestions(params);
-  }
-
-  startPoll(params: PollStartParams): Promise<PollStartResponse> {
-    return this.signal.startPoll(params);
-  }
-
-  stopPoll(params: PollStopParams): Promise<PollStartResponse> {
-    return this.signal.stopPoll(params);
-  }
-
-  setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
-    return this.signal.setPollResponses(params);
-  }
-
-  getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
-    return this.signal.getPollResponses(params);
-  }
-
-  getPollsList(params: PollListParams): Promise<PollListResponse> {
-    return this.signal.getPollsList(params);
-  }
-
-  getPollResult(params: PollResultParams): Promise<PollResultResponse> {
-    return this.signal.getPollResult(params);
-  }
-
-  async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
-    return this.signal.joinGroup(name);
-  }
-
-  async leaveGroup(name: string): Promise<JoinLeaveGroupResponse> {
-    return this.signal.leaveGroup(name);
-  }
-
-  async addToGroup(peerId: string, name: string) {
-    this.signal.addToGroup(peerId, name);
-  }
-
-  async removeFromGroup(peerId: string, name: string): Promise<void> {
-    this.signal.removeFromGroup(peerId, name);
-  }
-
-  findPeers(params: findPeersRequestParams): Promise<PeersIterationResponse> {
-    return this.signal.findPeers(params);
-  }
-  peerIterNext(params: peerIterRequestParams): Promise<PeersIterationResponse> {
-    return this.signal.peerIterNext(params);
-  }
-
-  async changeTrackState(trackUpdateRequest: TrackUpdateRequestParams) {
-    await this.signal.requestTrackStateChange(trackUpdateRequest);
-  }
-
-  async changeMultiTrackState(trackUpdateRequest: MultiTrackUpdateRequestParams) {
-    await this.signal.requestMultiTrackStateChange(trackUpdateRequest);
   }
 
   private async publishTrack(track: HMSLocalTrack): Promise<void> {

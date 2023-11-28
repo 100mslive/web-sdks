@@ -5,7 +5,7 @@ import { HMSRemoteStream, HMSSimulcastLayer } from '../../internal';
 import { HMSRemoteAudioTrack } from '../../media/tracks/HMSRemoteAudioTrack';
 import { HMSRemoteVideoTrack } from '../../media/tracks/HMSRemoteVideoTrack';
 import { InitFlags } from '../../signal/init/models';
-import { ISignal } from '../../signal/ISignal';
+import JsonRpcSignal from '../../signal/jsonrpc';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import { getSdpTrackIdForMid } from '../../utils/session-description';
@@ -112,7 +112,7 @@ export default class HMSSubscribeConnection extends HMSConnection {
   }
 
   constructor(
-    signal: ISignal,
+    signal: JsonRpcSignal,
     config: RTCConfiguration,
     private isFlagEnabled: (flag: InitFlags) => boolean,
     observer: ISubscribeConnectionObserver,

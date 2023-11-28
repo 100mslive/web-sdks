@@ -7,7 +7,7 @@
  */
 
 import { State, StateSelector, StoreApi, Subscribe } from 'zustand/vanilla';
-import { NamedSetState } from './hmsSDKStore/internalTypes';
+import { NamedSetState } from './reactive-store/internalTypes';
 import { HMSGenericTypes, HMSStatsStore, HMSStore } from './schema';
 
 /**

@@ -3,7 +3,7 @@ import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import { RTC_STATS_MONITOR_INTERVAL } from '../utils/constants';
 import HMSLogger from '../utils/logger';
 import { sleep } from '../utils/timer-utils';
@@ -15,7 +15,7 @@ export class HMSWebrtcInternals {
   private hmsStats?: HMSWebrtcStats;
 
   constructor(
-    private readonly store: IStore,
+    private readonly store: Store,
     private readonly eventBus: EventBus,
     private publishConnection?: RTCPeerConnection,
     private subscribeConnection?: RTCPeerConnection,

@@ -1,16 +1,16 @@
-import { IStore } from './store';
+import { Store } from './store';
 import { DeviceManager } from '../device-manager';
 import { HMSRole } from '../interfaces';
 import InitialSettings from '../interfaces/settings';
 import { SimulcastLayers } from '../interfaces/simulcast-layers';
 import { HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { HMSLocalTrack } from '../media/tracks';
-import ITransport from '../transport/ITransport';
+import HMSTransport from '../transport';
 
 export default class RoleChangeManager {
   constructor(
-    private store: IStore,
-    private transport: ITransport,
+    private store: Store,
+    private transport: HMSTransport,
     private deviceManager: DeviceManager,
     private publish: (settings: InitialSettings) => Promise<void>,
     private removeAuxiliaryTrack: (trackId: string) => void,

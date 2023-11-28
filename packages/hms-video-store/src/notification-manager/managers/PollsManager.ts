@@ -1,5 +1,5 @@
 import { HMSPoll, HMSPollQuestionResponse, HMSPollsUpdate, HMSUpdateListener } from '../../interfaces';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { createHMSPollFromPollParams } from '../../session-store/interactivity-center/HMSInteractivityCenter';
 import { PollResult } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
@@ -8,7 +8,7 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PollStartNotification, PollStatsNotification, PollStopNotification } from '../HMSNotifications';
 
 export class PollsManager {
-  constructor(private store: IStore, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {
@@ -37,7 +37,11 @@ export class PollsManager {
         return;
       }
 
-      const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
+      const questions = await this.transport.signal.getPollQuestions({
+        poll_id: pollParams.poll_id,
+        index: 0,
+        count: 50,
+      });
 
       const poll = createHMSPollFromPollParams(pollParams);
       poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
@@ -60,7 +64,7 @@ export class PollsManager {
         savedPoll.stoppedAt = convertDateNumToDate(poll.stopped_at);
         savedPoll.stoppedBy = poll.stopped_by;
 
-        const pollResult = await this.transport.getPollResult({ poll_id: poll.poll_id });
+        const pollResult = await this.transport.signal.getPollResult({ poll_id: poll.poll_id });
         this.updatePollResult(savedPoll, pollResult);
         stoppedPolls.push(savedPoll);
       }
@@ -116,7 +120,7 @@ export class PollsManager {
   }
 
   private async updatePollResponses(poll: HMSPoll, self: boolean) {
-    const serverResponseParams = await this.transport.getPollResponses({
+    const serverResponseParams = await this.transport.signal.getPollResponses({
       poll_id: poll.id,
       index: 0,
       count: 50,

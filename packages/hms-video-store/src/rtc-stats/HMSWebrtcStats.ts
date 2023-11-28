@@ -12,7 +12,7 @@ import { HMSAction } from '../error/HMSAction';
 import { EventBus } from '../events/EventBus';
 import { HMSPeerStats, HMSTrackStats, PeerConnectionType } from '../interfaces/webrtc-stats';
 import { HMSLocalTrack, HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack } from '../media/tracks';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 
 export class HMSWebrtcStats {
@@ -28,7 +28,7 @@ export class HMSWebrtcStats {
    */
   constructor(
     private getStats: Record<PeerConnectionType, RTCPeerConnection['getStats'] | undefined>,
-    private store: IStore,
+    private store: Store,
     private readonly eventBus: EventBus,
   ) {
     this.localPeerID = this.store.getLocalPeer()?.peerId;

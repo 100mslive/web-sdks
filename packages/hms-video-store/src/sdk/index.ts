@@ -5,7 +5,7 @@ import { HMSPeerListIterator } from './HMSPeerListIterator';
 import { LocalTrackManager } from './LocalTrackManager';
 import { NetworkTestManager } from './NetworkTestManager';
 import RoleChangeManager from './RoleChangeManager';
-import { IStore, Store } from './store';
+import { Store } from './store';
 import { WakeLockManager } from './WakeLockManager';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
@@ -62,6 +62,12 @@ import { NotificationManager } from '../notification-manager/NotificationManager
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
 import { InitConfig } from '../signal/init/models';
+import {
+  HLSRequestParams,
+  HLSTimedMetadataParams,
+  HLSVariant,
+  StartRTMPOrRecordingRequestParams,
+} from '../signal/interfaces';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
@@ -91,7 +97,7 @@ export class HMSSdk implements HMSInterface {
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
-  private store!: IStore;
+  private store!: Store;
   private notificationManager?: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
@@ -688,7 +694,7 @@ export class HMSSdk implements HMSInterface {
       time: new Date(),
     });
     HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
-    const response = await this.transport.sendMessage(hmsMessage);
+    const response = await this.transport.signal.broadcast(hmsMessage);
     hmsMessage.time = new Date(response.timestamp);
     hmsMessage.id = response.message_id;
     return hmsMessage;
@@ -816,30 +822,45 @@ export class HMSSdk implements HMSInterface {
   }
 
   async changeRole(forPeerId: string, toRole: string, force = false) {
-    await this.transport?.changeRoleOfPeer(forPeerId, toRole, force);
+    await this.transport?.signal.requestRoleChange({
+      requested_for: forPeerId,
+      role: toRole,
+      force,
+    });
   }
 
   async changeRoleOfPeer(forPeerId: string, toRole: string, force = false) {
-    await this.transport?.changeRoleOfPeer(forPeerId, toRole, force);
+    await this.transport?.signal.requestRoleChange({
+      requested_for: forPeerId,
+      role: toRole,
+      force,
+    });
   }
 
   async changeRoleOfPeersWithRoles(roles: HMSRole[], toRole: string) {
     if (roles.length <= 0 || !toRole) {
       return;
     }
-
-    await this.transport?.changeRoleOfPeersWithRoles(roles, toRole);
+    await this.transport?.signal.requestBulkRoleChange({
+      roles: roles.map((role: HMSRole) => role.name),
+      role: toRole,
+      force: true,
+    });
   }
 
   async acceptChangeRole(request: HMSRoleChangeRequest) {
-    await this.transport?.acceptRoleChange(request);
+    await this.transport?.signal.acceptRoleChangeRequest({
+      requested_by: request.requestedBy?.peerId,
+      role: request.role.name,
+      token: request.token,
+    });
   }
 
   async endRoom(lock: boolean, reason: string) {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot end room');
     }
-    await this.transport?.endRoom(lock, reason);
+    await this.transport?.signal.endRoom(lock, reason);
     await this.leave();
   }
 
@@ -847,7 +868,7 @@ export class HMSSdk implements HMSInterface {
     if (!this.localPeer) {
       throw ErrorFactory.GenericErrors.NotConnected(HMSAction.VALIDATION, 'No local peer present, cannot remove peer');
     }
-    await this.transport?.removePeer(peerId, reason);
+    await this.transport?.signal.removePeer({ requested_for: peerId, reason });
   }
 
   async startRTMPOrRecording(params: RTMPRecordingConfig) {
@@ -857,7 +878,20 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot start streaming or recording',
       );
     }
-    await this.transport?.startRTMPOrRecording(params);
+    const signalParams: StartRTMPOrRecordingRequestParams = {
+      meeting_url: params.meetingURL,
+      record: params.record,
+    };
+
+    if (params.rtmpURLs?.length) {
+      signalParams.rtmp_urls = params.rtmpURLs;
+    }
+
+    if (params.resolution) {
+      signalParams.resolution = params.resolution;
+    }
+
+    await this.transport?.signal.startRTMPOrRecording(signalParams);
   }
 
   async stopRTMPAndRecording() {
@@ -867,7 +901,8 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop streaming or recording',
       );
     }
-    await this.transport?.stopRTMPOrRecording();
+
+    await this.transport?.signal.stopRTMPAndRecording();
   }
 
   async startHLSStreaming(params?: HLSConfig) {
@@ -877,7 +912,23 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot start HLS streaming',
       );
     }
-    await this.transport?.startHLSStreaming(params);
+    const hlsParams: HLSRequestParams = {};
+    if (params && params.variants && params.variants.length > 0) {
+      hlsParams.variants = params.variants.map(variant => {
+        const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
+        if (variant.metadata) {
+          hlsVariant.metadata = variant.metadata;
+        }
+        return hlsVariant;
+      });
+    }
+    if (params?.recording) {
+      hlsParams.hls_recording = {
+        single_file_per_layer: params.recording.singleFilePerLayer,
+        hls_vod: params.recording.hlsVod,
+      };
+    }
+    await this.transport?.signal.startHLSStreaming(hlsParams);
   }
 
   async stopHLSStreaming(params?: HLSConfig) {
@@ -887,32 +938,56 @@ export class HMSSdk implements HMSInterface {
         'No local peer present, cannot stop HLS streaming',
       );
     }
-    await this.transport?.stopHLSStreaming(params);
+    if (params) {
+      const hlsParams: HLSRequestParams = {
+        variants: params?.variants?.map(variant => {
+          const hlsVariant: HLSVariant = { meeting_url: variant.meetingURL };
+          if (variant.metadata) {
+            hlsVariant.metadata = variant.metadata;
+          }
+          return hlsVariant;
+        }),
+      };
+      await this.transport?.signal.stopHLSStreaming(hlsParams);
+    }
+    await this.transport?.signal.stopHLSStreaming();
   }
 
   async sendHLSTimedMetadata(metadataList: HLSTimedMetadata[]) {
     this.validateJoined('sendHLSTimedMetadata');
-    await this.transport?.sendHLSTimedMetadata(metadataList);
+    if (metadataList.length > 0) {
+      const hlsMtParams: HLSTimedMetadataParams = {
+        metadata_objs: metadataList,
+      };
+      await this.transport?.signal.sendHLSTimedMetadata(hlsMtParams);
+    }
   }
 
   async changeName(name: string) {
     this.validateJoined('changeName');
-    await this.transport?.changeName(name);
-    this.notificationManager?.updateLocalPeer({ name });
+    const peer = this.store.getLocalPeer();
+    if (peer && peer.name !== name) {
+      await this.transport?.signal.updatePeer({
+        name: name,
+      });
+      this.notificationManager?.updateLocalPeer({ name });
+    }
   }
 
   async changeMetadata(metadata: string) {
     this.validateJoined('changeMetadata');
-    await this.transport?.changeMetadata(metadata);
+    await this.transport?.signal.updatePeer({
+      data: metadata,
+    });
     this.notificationManager?.updateLocalPeer({ metadata });
   }
 
   async setSessionMetadata(metadata: any) {
-    await this.transport.setSessionMetadata({ key: 'default', data: metadata });
+    await this.transport?.signal.setSessionMetadata({ key: 'default', data: metadata });
   }
 
   async getSessionMetadata() {
-    const response = await this.transport.getSessionMetadata('default');
+    const response = await this.transport?.signal.getSessionMetadata('default');
     return response.data;
   }
 
@@ -941,7 +1016,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.ValidationFailed('No peer found for change track state', forRemoteTrack);
     }
 
-    await this.transport?.changeTrackState({
+    await this.transport?.signal.requestTrackStateChange({
       requested_for: peer.peerId,
       track_id: forRemoteTrack.trackId,
       stream_id: forRemoteTrack.stream.id,
@@ -954,7 +1029,7 @@ export class HMSSdk implements HMSInterface {
       throw ErrorFactory.GenericErrors.ValidationFailed('Pass a boolean for enabled');
     }
     const { enabled, roles, type, source } = params;
-    await this.transport?.changeMultiTrackState({
+    await this.transport?.signal.requestMultiTrackStateChange({
       value: !enabled,
       type,
       source,
@@ -964,17 +1039,17 @@ export class HMSSdk implements HMSInterface {
 
   async raiseLocalPeerHand() {
     this.validateJoined('raiseLocalPeerHand');
-    await this.transport.joinGroup(HAND_RAISE_GROUP_NAME);
+    await this.transport?.signal.joinGroup(HAND_RAISE_GROUP_NAME);
   }
   async lowerLocalPeerHand() {
     this.validateJoined('lowerLocalPeerHand');
-    await this.transport.leaveGroup(HAND_RAISE_GROUP_NAME);
+    await this.transport?.signal.leaveGroup(HAND_RAISE_GROUP_NAME);
   }
   async raiseRemotePeerHand(peerId: string) {
-    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+    await this.transport?.signal.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
   async lowerRemotePeerHand(peerId: string) {
-    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+    await this.transport?.signal.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {

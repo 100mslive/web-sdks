@@ -7,7 +7,7 @@ import { EventBus } from '../events/EventBus';
 import { HMSDeviceChangeEvent, HMSTrackUpdate, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteAudioTrack } from '../media/tracks';
 import { HMSRemotePeer } from '../sdk/models/peer';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { isMobile } from '../utils/support';
 import { sleep } from '../utils/timer-utils';
@@ -41,7 +41,7 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
 
-  constructor(private store: IStore, private deviceManager: DeviceManager, private eventBus: EventBus) {
+  constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);

@@ -10,13 +10,13 @@ import {
   HMSPollQuestionType,
   HMSPollUserTrackingMode,
 } from '../../interfaces/session-store/polls';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { PollInfoParams, PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
-  constructor(private transport: HMSTransport, private store: IStore, private listener?: PollsListener) {}
+  constructor(private transport: HMSTransport, private store: Store, private listener?: PollsListener) {}
 
   setListener(listener?: PollsListener) {
     this.listener = listener;
@@ -29,7 +29,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       userName: 'username',
     };
 
-    const { poll_id: serverPollID } = await this.transport.setPollInfo({
+    const { poll_id: serverPollID } = await this.transport.signal.setPollInfo({
       ...pollParams,
       mode: pollParams.mode ? HMS_USER_TRACKING_MODE_MAP[pollParams.mode] : undefined,
       poll_id: pollParams.id,
@@ -45,7 +45,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       await this.addQuestionsToPoll(pollParams.id, pollParams.questions);
     }
 
-    const questions = await this.transport.getPollQuestions({ poll_id: pollParams.id, index: 0, count: 50 });
+    const questions = await this.transport.signal.getPollQuestions({ poll_id: pollParams.id, index: 0, count: 50 });
 
     const poll = createHMSPollFromPollParams({
       ...pollParams,
@@ -61,16 +61,16 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
   async startPoll(poll: string | HMSPollCreateParams): Promise<void> {
     if (typeof poll === 'string') {
-      await this.transport.startPoll({ poll_id: poll });
+      await this.transport.signal.startPoll({ poll_id: poll });
     } else {
       await this.createPoll(poll);
-      await this.transport.startPoll({ poll_id: poll.id });
+      await this.transport.signal.startPoll({ poll_id: poll.id });
     }
   }
 
   async addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void> {
     if (questions.length > 0) {
-      await this.transport.setPollQuestions({
+      await this.transport.signal.setPollQuestions({
         poll_id: pollID,
         questions: questions.map((question, index) => this.createQuestionSetParams(question, index)),
       });
@@ -78,7 +78,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async stopPoll(pollID: string): Promise<void> {
-    await this.transport.stopPoll({ poll_id: pollID });
+    await this.transport.signal.stopPoll({ poll_id: pollID });
   }
 
   async addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
@@ -110,14 +110,18 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       return { duration: 0, type: question.type, question: response.questionIndex, ...response };
     });
 
-    await this.transport.setPollResponses({ poll_id: pollID, responses: responsesParams });
+    await this.transport.signal.setPollResponses({ poll_id: pollID, responses: responsesParams });
   }
 
   async getPolls(): Promise<HMSPoll[]> {
-    const pollsList = await this.transport.getPollsList({ count: 50 });
+    const pollsList = await this.transport.signal.getPollsList({ count: 50 });
     const polls: HMSPoll[] = [];
     for (const pollParams of pollsList.polls) {
-      const questions = await this.transport.getPollQuestions({ poll_id: pollParams.poll_id, index: 0, count: 50 });
+      const questions = await this.transport.signal.getPollQuestions({
+        poll_id: pollParams.poll_id,
+        index: 0,
+        count: 50,
+      });
       const poll = createHMSPollFromPollParams(pollParams);
       poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
 

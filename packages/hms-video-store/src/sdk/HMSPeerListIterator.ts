@@ -1,17 +1,17 @@
 import { HMSRemotePeer } from './models/peer';
-import { IStore } from './store';
+import { Store } from './store';
 import { HMSPeerListIteratorOptions } from '../interfaces/peer-list-iterator';
 import { PeerNotificationInfo } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { PeersIterationResponse } from '../signal/interfaces';
-import ITransport from '../transport/ITransport';
+import HMSTransport from '../transport';
 
 export class HMSPeerListIterator {
   private isEnd = false;
   private iterator: string | null = null;
   private total = 0;
   private defaultPaginationLimit = 10;
-  constructor(private transport: ITransport, private store: IStore, private options?: HMSPeerListIteratorOptions) {}
+  constructor(private transport: HMSTransport, private store: Store, private options?: HMSPeerListIteratorOptions) {}
 
   private validateConnection() {
     if (!this.transport || !this.store) {
@@ -29,7 +29,7 @@ export class HMSPeerListIterator {
 
   async findPeers() {
     this.validateConnection();
-    const response = await this.transport.findPeers({
+    const response = await this.transport.signal.findPeers({
       ...(this.options || {}),
       limit: this.options?.limit || this.defaultPaginationLimit,
     });
@@ -43,7 +43,7 @@ export class HMSPeerListIterator {
     if (!this.iterator && !this.isEnd) {
       return await this.findPeers();
     } else if (this.iterator) {
-      response = await this.transport.peerIterNext({
+      response = await this.transport.signal.peerIterNext({
         iterator: this.iterator,
         limit: this.options?.limit || this.defaultPaginationLimit,
       });

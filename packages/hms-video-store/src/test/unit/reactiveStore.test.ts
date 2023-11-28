@@ -1,5 +1,5 @@
 import { createDefaultStoreState, HMSStore, IHMSStore, selectLocalPeer, selectPeers } from '../../';
-import { HMSReactiveStore } from '../../hmsSDKStore/HMSReactiveStore';
+import { HMSReactiveStore } from '../../reactive-store/HMSReactiveStore';
 import { localPeer, makeFakeStore } from '../fakeStore';
 
 let store: IHMSStore;

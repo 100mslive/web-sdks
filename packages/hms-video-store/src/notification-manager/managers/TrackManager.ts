@@ -4,7 +4,7 @@ import { EventBus } from '../../events/EventBus';
 import { HMSRemotePeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteAudioTrack, HMSRemoteTrack, HMSRemoteVideoTrack, HMSTrackType } from '../../media/tracks';
 import { HMSPeer } from '../../sdk/models/peer';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { OnTrackLayerUpdateNotification, TrackState, TrackStateNotification } from '../HMSNotifications';
 
@@ -27,7 +27,7 @@ export class TrackManager {
   public TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
-  constructor(public store: IStore, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
+  constructor(public store: Store, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
 
   /**
    * Add event from biz on track-add

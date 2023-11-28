@@ -10,7 +10,7 @@ import {
   HMSUpdateListener,
 } from '../../interfaces';
 import { ServerError } from '../../interfaces/internal';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { convertDateNumToDate } from '../../utils/date';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
@@ -31,7 +31,7 @@ import {
 export class RoomUpdateManager {
   private readonly TAG = '[RoomUpdateManager]';
 
-  constructor(private store: IStore, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, public listener?: HMSUpdateListener) {}
 
   // eslint-disable-next-line complexity
   handleNotification(method: HMSNotificationMethod, notification: any) {

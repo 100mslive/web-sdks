@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import { IStore } from './store';
+import { Store } from './store';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { DeviceManager } from '../device-manager';
@@ -21,7 +21,6 @@ import {
   HMSVideoTrackSettingsBuilder,
 } from '../media/settings';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
-import { IFetchAVTrackOptions } from '../transport/ITransport';
 import ITransportObserver from '../transport/ITransportObserver';
 import HMSLogger from '../utils/logger';
 import { HMSAudioContextHandler } from '../utils/media';
@@ -33,6 +32,11 @@ const defaultSettings = {
   audioOutputDeviceId: 'default',
   videoDeviceId: 'default',
 };
+type IFetchTrackOptions = boolean | 'empty';
+interface IFetchAVTrackOptions {
+  audio: IFetchTrackOptions;
+  video: IFetchTrackOptions;
+}
 
 let blankCanvas: HTMLCanvasElement | undefined;
 let intervalID: ReturnType<typeof setInterval> | undefined;
@@ -42,7 +46,7 @@ export class LocalTrackManager {
   private captureHandleIdentifier?: string;
 
   constructor(
-    private store: IStore,
+    private store: Store,
     private observer: ITransportObserver,
     private deviceManager: DeviceManager,
     private eventBus: EventBus,

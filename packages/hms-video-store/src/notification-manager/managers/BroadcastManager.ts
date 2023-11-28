@@ -1,14 +1,14 @@
 import { createRemotePeer } from './utils';
 import { HMSUpdateListener } from '../../interfaces';
 import Message from '../../sdk/models/HMSMessage';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSLogger from '../../utils/logger';
 import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { MessageNotification } from '../HMSNotifications';
 
 export class BroadcastManager {
   private readonly TAG = '[BroadcastManager]';
-  constructor(private store: IStore, public listener?: HMSUpdateListener) {}
+  constructor(private store: Store, public listener?: HMSUpdateListener) {}
 
   handleNotification(method: string, notification: any) {
     if (method !== HMSNotificationMethod.BROADCAST) {

@@ -4,7 +4,7 @@ import { HMSPeer, HMSTrackUpdate, HMSUpdateListener } from '../../interfaces';
 import { HMSRemoteStream } from '../../media/streams/HMSRemoteStream';
 import { HMSRemoteTrack, HMSRemoteVideoTrack } from '../../media/tracks';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import HMSTransport from '../../transport';
 import HMSLogger from '../../utils/logger';
 import { isEmptyTrack } from '../../utils/track';
@@ -13,7 +13,7 @@ import { TrackState, TrackStateNotification } from '../HMSNotifications';
 export class OnDemandTrackManager extends TrackManager {
   TAG = '[OnDemandTrackManager]';
 
-  constructor(store: IStore, eventBus: EventBus, private transport: HMSTransport, listener?: HMSUpdateListener) {
+  constructor(store: Store, eventBus: EventBus, private transport: HMSTransport, listener?: HMSUpdateListener) {
     super(store, eventBus, listener);
   }
 

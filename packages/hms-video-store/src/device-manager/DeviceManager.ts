@@ -6,7 +6,7 @@ import { EventBus } from '../events/EventBus';
 import { DeviceMap, HMSDeviceChangeEvent, SelectedDevices } from '../interfaces';
 import { HMSAudioTrackSettingsBuilder, HMSVideoTrackSettingsBuilder } from '../media/settings';
 import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import HMSLogger from '../utils/logger';
 import { debounce } from '../utils/timer-utils';
 
@@ -34,7 +34,7 @@ export class DeviceManager implements HMSDeviceManager {
   private videoInputChanged = false;
   private audioInputChanged = false;
 
-  constructor(private store: IStore, private eventBus: EventBus) {
+  constructor(private store: Store, private eventBus: EventBus) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
     this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {

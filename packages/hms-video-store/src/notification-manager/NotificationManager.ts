@@ -21,7 +21,7 @@ import {
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from '../interfaces';
 import { HMSRemoteTrack } from '../media/tracks';
-import { IStore } from '../sdk/store';
+import { Store } from '../sdk/store';
 import { InitFlags } from '../signal/init/models';
 import HMSTransport from '../transport';
 import HMSLogger from '../utils/logger';
@@ -47,7 +47,7 @@ export class NotificationManager {
   private hasConsistentRoomStateArrived = false;
 
   constructor(
-    private store: IStore,
+    private store: Store,
     eventBus: EventBus,
     private transport: HMSTransport,
     private listener?: HMSUpdateListener,

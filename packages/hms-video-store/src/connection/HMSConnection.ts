@@ -3,7 +3,7 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSLocalTrack, HMSLocalVideoTrack } from '../media/tracks';
 import { TrackState } from '../notification-manager';
-import { ISignal } from '../signal/ISignal';
+import JsonRpcSignal from '../signal/jsonrpc';
 import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
@@ -15,7 +15,7 @@ interface RTCIceCandidatePair {
 
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
-  protected readonly signal: ISignal;
+  protected readonly signal: JsonRpcSignal;
 
   abstract readonly nativeConnection: RTCPeerConnection;
   /**
@@ -32,7 +32,7 @@ export default abstract class HMSConnection {
 
   selectedCandidatePair?: RTCIceCandidatePair;
 
-  protected constructor(role: HMSConnectionRole, signal: ISignal) {
+  protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
     this.role = role;
     this.signal = signal;
   }

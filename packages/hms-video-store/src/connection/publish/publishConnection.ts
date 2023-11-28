@@ -1,5 +1,5 @@
 import { IPublishConnectionObserver } from './IPublishConnectionObserver';
-import { ISignal } from '../../signal/ISignal';
+import JsonRpcSignal from '../../signal/jsonrpc';
 import { API_DATA_CHANNEL } from '../../utils/constants';
 import HMSLogger from '../../utils/logger';
 import HMSConnection from '../HMSConnection';
@@ -10,7 +10,7 @@ export default class HMSPublishConnection extends HMSConnection {
   private readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
 
-  constructor(signal: ISignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
+  constructor(signal: JsonRpcSignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
 

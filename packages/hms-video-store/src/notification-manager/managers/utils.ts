@@ -1,8 +1,8 @@
 import { HMSRemotePeer } from '../../sdk/models/peer';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { PeerNotificationInfo } from '../HMSNotifications';
 
-export const createRemotePeer = (notifPeer: PeerNotificationInfo, store: IStore) => {
+export const createRemotePeer = (notifPeer: PeerNotificationInfo, store: Store) => {
   return new HMSRemotePeer({
     peerId: notifPeer.peer_id,
     name: notifPeer.info.name,
