@@ -6,7 +6,7 @@ import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
 import { ToastManager } from '../Toast/ToastManager';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
-const NOTIFICATION_TIME_DIFFERENCE = 10000;
+const NOTIFICATION_TIME_DIFFERENCE = 5000;
 
 export const ChatNotifications = () => {
   const {
