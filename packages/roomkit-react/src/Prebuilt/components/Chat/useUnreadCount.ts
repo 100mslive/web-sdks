@@ -15,6 +15,5 @@ export const useUnreadCount = ({ role, peerId }: { role?: string; peerId?: strin
     unreadCountSelector = selectUnreadHMSMessagesCount;
   }
 
-  const unreadCount = useHMSStore(unreadCountSelector);
-  return unreadCount;
+  return useHMSStore(unreadCountSelector);
 };
