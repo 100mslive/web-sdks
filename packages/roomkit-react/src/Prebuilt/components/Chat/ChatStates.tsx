@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { selectLocalPeerName, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -12,15 +12,17 @@ export const ChatPaused = () => {
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const { enabled: isChatEnabled = true, updatedBy: chatStateUpdatedBy = '' } =
     useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const localPeerName = useHMSStore(selectLocalPeerName);
+
+  const localPeer = useHMSStore(selectLocalPeer);
 
   const unPauseChat = useCallback(
     async () =>
       await hmsActions.sessionStore.set(SESSION_STORE_KEY.CHAT_STATE, {
         enabled: true,
-        updatedBy: localPeerName,
+        updatedBy: { userName: localPeer?.name, userId: localPeer?.customerUserId, peerId: localPeer?.id },
+        updatedAt: Date.now(),
       }),
-    [hmsActions, localPeerName],
+    [hmsActions, localPeer],
   );
 
   return isChatEnabled ? null : (
@@ -37,7 +39,7 @@ export const ChatPaused = () => {
           variant="xs"
           css={{ color: '$on_surface_medium', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}
         >
-          Chat has been paused by {chatStateUpdatedBy}
+          Chat has been paused by {chatStateUpdatedBy?.peerId === localPeer?.id ? 'you' : chatStateUpdatedBy?.userName}
         </Text>
       </Box>
       {can_disable_chat ? (
