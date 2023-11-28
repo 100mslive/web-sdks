@@ -13,7 +13,7 @@ test.afterEach(async ({ context }) => {
 });
 
 
-test(`Verify viewer is not getting removed from peer list on raising hand-LIVE-1736`, async ({ context }) => {
+test(`Verify viewer is not getting removed from peer list on raising hand-LIVE-173`, async ({ context }) => {
 
         const page_host = await context.newPage();
         await page_host.goto(hostUrl);
@@ -37,6 +37,12 @@ test(`Verify viewer is not getting removed from peer list on raising hand-LIVE-1
         await peer_list_dropdown.click();
 
         await page_host.getByText('new hls viewer',{ exact: true }).isVisible();
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+
 });
 
 test(`Verify Peer does not disappear from the list after moving offstage-LIVE-1737`,async ({ context }) => {
@@ -69,6 +75,7 @@ test(`Verify Peer does not disappear from the list after moving offstage-LIVE-17
         //Accpet invite
         await page.bringToFront();
         await page.getByText('Accept').click();
+        await page_host.waitForTimeout(5000);
 
         //Go back to broadcaster
         await page_host.bringToFront();
@@ -89,4 +96,43 @@ test(`Verify Peer does not disappear from the list after moving offstage-LIVE-17
 
         await page_host.getByTestId('participant_vnrt').isVisible();
 
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
 });
+
+test(`Verify HLS starts on room-LIVE-1856`,async ({ context }) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/phc-vxhk-bvz';
+        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dhl-gywb-xyc';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(10000);
+
+        await page_host.getByTestId('header').getByText('LIVE').isVisible();
+
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(viewerNRTUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        //Check if live status is shown or not
+        await page.getByTestId('header').getByText('LIVE').isVisible();
+        const player = page.locator("//div[@data-testid='hms-video']//video");
+        await player.isVisible();
+
+        await page.getByTestId('leave_room_btn').click();
+        await page.getByTestId('leave_room').click();
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+});
+
