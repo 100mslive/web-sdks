@@ -1,40 +1,20 @@
 import React from 'react';
 import { ChevronDownIcon, ChevronUpIcon } from '@100mslive/react-icons';
-import { Box, Flex } from '../../../Layout';
+import { Flex } from '../../../Layout';
 
 export const Navigation = ({
   total,
   index,
   showPrevious,
   showNext,
-  isMobile,
 }: {
   total: number;
   index: number;
   showPrevious: () => void;
   showNext: () => void;
-  isMobile: boolean;
 }) => {
-  const sticksCount = Math.min(3, total);
-
-  if (total < 2) {
-    return null;
-  }
-
-  return isMobile ? (
+  return total > 1 ? (
     <Flex direction="column" css={{ gap: '$1' }}>
-      {[...Array(sticksCount)].map((_, i) => (
-        <Box
-          css={{
-            borderLeft: '2px solid',
-            height: '$4',
-            borderColor: i === index ? '$on_surface_high' : '$on_surface_low',
-          }}
-        />
-      ))}
-    </Flex>
-  ) : (
-    <Flex direction="column" css={{ gap: '$4' }}>
       <Flex
         onClick={showPrevious}
         css={
@@ -56,5 +36,5 @@ export const Navigation = ({
         <ChevronDownIcon height={20} width={20} />
       </Flex>
     </Flex>
-  );
+  ) : null;
 };

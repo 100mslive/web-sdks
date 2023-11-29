@@ -2,13 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
-import { CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { UnpinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore
 import { AnnotisedMessage } from './ChatBody';
-// @ts-ignore
+import { MobileNavigation } from './MobileNavigation';
 import { Navigation } from './Navigation';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -58,6 +58,14 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
 
   return pinnedMessages?.[pinnedMessageIndex]?.text ? (
     <Flex ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
+      {!isMobile ? (
+        <Navigation
+          index={pinnedMessageIndex}
+          total={pinnedMessages.length}
+          showPrevious={showPreviousPinnedMessage}
+          showNext={showNextPinnedMessage}
+        />
+      ) : null}
       <Flex
         title={pinnedMessages[pinnedMessageIndex].text}
         css={{
@@ -73,14 +81,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         align="center"
         justify="between"
       >
-        <Navigation
-          index={pinnedMessageIndex}
-          total={pinnedMessages.length}
-          showPrevious={showPreviousPinnedMessage}
-          showNext={showNextPinnedMessage}
-          isMobile={isMobile}
-        />
-        <PinIcon />
+        {isMobile ? <MobileNavigation index={pinnedMessageIndex} total={pinnedMessages.length} /> : null}
 
         <Box
           css={{
@@ -112,7 +113,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             }}
             css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
           >
-            <CrossIcon />
+            <UnpinIcon height={20} width={20} />
           </Flex>
         ) : null}
       </Flex>
