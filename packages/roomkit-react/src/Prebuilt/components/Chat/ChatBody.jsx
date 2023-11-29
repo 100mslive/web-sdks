@@ -122,11 +122,13 @@ const ChatActions = ({
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
-  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
-  const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
+  const { blacklistItem: blacklistPeer, blacklistedIDs: blacklistedPeerIDs } = useChatBlacklist(
+    SESSION_STORE_KEY.CHAT_PEER_BLACKLIST,
+  );
 
-  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
+  const { blacklistItem: blacklistMessage, blacklistedIDs: blacklistedMessageIDs } = useChatBlacklist(
+    SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
+  );
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
@@ -182,7 +184,7 @@ const ChatActions = ({
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
       onClick: async () => {
-        blacklistMessage(blacklistedMessageIDs, message.id);
+        blacklistMessage(message.id);
         updatePinnedMessages({ messageID: message.id });
       },
       show: can_hide_message,
@@ -191,7 +193,7 @@ const ChatActions = ({
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
       onClick: async () => {
-        blacklistPeer(blacklistedPeerIDs, message?.senderUserId);
+        blacklistPeer(message?.senderUserId);
         updatePinnedMessages({ peerID: message?.senderUserId });
       },
       color: '$alert_error_default',
