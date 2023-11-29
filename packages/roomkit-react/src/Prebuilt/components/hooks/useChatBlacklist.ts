@@ -10,10 +10,11 @@ export const useChatBlacklist = (
   const hmsActions = useHMSActions();
 
   const blacklistItem = useCallback(
-    async (blacklistedIDs: string[], blacklistID: string) =>
+    async (blacklistedIDs: string[] = [], blacklistID: string) => {
       await hmsActions.sessionStore
         .set(sessionStoreKey, [...blacklistedIDs, blacklistID])
-        .catch(err => ToastManager.addToast({ title: err.description })),
+        .catch(err => ToastManager.addToast({ title: err.description }));
+    },
     [hmsActions, sessionStoreKey],
   );
 
