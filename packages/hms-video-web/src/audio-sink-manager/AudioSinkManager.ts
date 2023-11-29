@@ -267,10 +267,7 @@ export class AudioSinkManager {
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && device) {
         await localAudioTrack.setSettings({ deviceId: device?.deviceId });
-        const speaker = this.deviceManager.audioInput?.find(device =>
-          device.label.toLowerCase().includes('speakerphone'),
-        );
-        await localAudioTrack.setSettings({ deviceId: speaker?.deviceId || 'default' });
+        await localAudioTrack.setSettings({ deviceId: 'default' });
       }
     }
   };
