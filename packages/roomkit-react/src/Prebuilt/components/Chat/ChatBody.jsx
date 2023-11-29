@@ -70,7 +70,9 @@ const MessageTypeContainer = ({ left, right }) => {
     <Flex
       align="center"
       css={{
-        ml: 'auto',
+        position: 'absolute',
+        right: 0,
+        zIndex: 1,
         mr: '$4',
         p: '$2 $4',
         border: '1px solid $border_bright',
@@ -93,10 +95,7 @@ const MessageTypeContainer = ({ left, right }) => {
   );
 };
 
-const MessageType = ({ role, hasCurrentUserSent, receiver }) => {
-  if (hasCurrentUserSent) {
-    return null;
-  }
+const MessageType = ({ role, receiver }) => {
   if (receiver) {
     return <MessageTypeContainer left="Direct Message" />;
   }
@@ -293,7 +292,9 @@ const ChatActions = ({
           borderRadius: '$1',
           p: '$2',
           opacity: open ? 1 : 0,
-          display: open ? 'flex' : 'none',
+          position: 'absolute',
+          right: 0,
+          zIndex: 1,
           '@md': { opacity: 1 },
         }}
       >
@@ -421,7 +422,6 @@ const ChatMessage = React.memo(
           mt: '$4',
           '&:not(:hover} .chat_actions': { display: 'none' },
           '&:hover .chat_actions': { display: 'flex', opacity: 1 },
-          '&:hover .message_type_container': { display: 'none' },
         }}
         style={style}
       >
@@ -430,6 +430,7 @@ const ChatMessage = React.memo(
           align="center"
           css={{
             flexWrap: 'wrap',
+            position: 'relative',
             // Theme independent color, token should not be used for transparent chat
             bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
             r: '$1',
@@ -488,14 +489,7 @@ const ChatMessage = React.memo(
               ) : null}
             </Flex>
             {!(selectedPeer || selectedRole) && (
-              <MessageType
-                hasCurrentUserSent={
-                  message.sender === localPeerId ||
-                  !(message.recipientPeer || (message.recipientRoles && message.recipientRoles.length > 0))
-                }
-                receiver={message.recipientPeer}
-                role={message.senderRole}
-              />
+              <MessageType receiver={message.recipientPeer} role={message.senderRole} />
             )}
 
             <ChatActions
