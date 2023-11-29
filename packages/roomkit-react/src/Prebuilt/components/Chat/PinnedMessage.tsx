@@ -92,11 +92,11 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
               message={`${currentPinnedMessage.slice(
                 0,
                 hideOverflow ? PINNED_MESSAGE_LENGTH : currentPinnedMessage.length,
-              )}${hideOverflow ? '...' : ''}`}
+              )}`}
             />
             {canOverflow ? (
               <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>
-                &nbsp;{hideOverflow ? 'See more' : 'Collapse'}
+                &nbsp;{hideOverflow ? '... See more' : 'Collapse'}
               </span>
             ) : null}
           </Text>
