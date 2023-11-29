@@ -1,35 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
-import { CrossIcon, PinIcon } from '@100mslive/react-icons';
+import { UnpinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
+import { ArrowNavigation } from './ArrowNavigation';
 // @ts-ignore
 import { AnnotisedMessage } from './ChatBody';
-// @ts-ignore
-import { Navigation } from './Navigation';
+import { StickIndicator } from './StickIndicator';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
 
 export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
-  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
   const isMobile = useMedia(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();
   const canUnpinMessage = !!elements?.chat?.allow_pinning_messages;
 
-  const [hideOverflow, setHideOverflow] = useState(false);
-  const canOverflow = pinnedMessages?.[pinnedMessageIndex]?.text?.length > PINNED_MESSAGE_LENGTH || false;
-  const formattedPinnedMessage = hideOverflow
-    ? `${pinnedMessages?.[pinnedMessageIndex]?.text.slice(0, PINNED_MESSAGE_LENGTH)}... `
-    : pinnedMessages?.[pinnedMessageIndex]?.text;
+  const [hideOverflow, setHideOverflow] = useState(true);
+  const currentPinnedMessage = pinnedMessages?.[pinnedMessageIndex]?.text || '';
+  const canOverflow = currentPinnedMessage.length > PINNED_MESSAGE_LENGTH;
 
-  const pinnedMessageRef = useRef(null);
   const showPreviousPinnedMessage = () => {
     const previousIndex = Math.max(pinnedMessageIndex - 1, 0);
     setHideOverflow(pinnedMessages[previousIndex].text.length > PINNED_MESSAGE_LENGTH);
@@ -47,17 +44,20 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
     onSwipedDown: () => showPreviousPinnedMessage(),
   });
 
-  useEffect(() => {
-    setHideOverflow(
-      !!(
-        pinnedMessages?.[pinnedMessageIndex]?.text?.length &&
-        pinnedMessages?.[pinnedMessageIndex]?.text.length > PINNED_MESSAGE_LENGTH
-      ),
-    );
-  }, [pinnedMessageIndex, pinnedMessages]);
+  if (!(pinnedMessages?.length > 0)) {
+    return null;
+  }
 
-  return pinnedMessages?.[pinnedMessageIndex]?.text ? (
-    <Flex ref={pinnedMessageRef} align="center" css={{ w: '100%', gap: '$4' }}>
+  return (
+    <Flex align="center" css={{ w: '100%', gap: '$4' }}>
+      {!isMobile ? (
+        <ArrowNavigation
+          index={pinnedMessageIndex}
+          total={pinnedMessages.length}
+          showPrevious={showPreviousPinnedMessage}
+          showNext={showNextPinnedMessage}
+        />
+      ) : null}
       <Flex
         title={pinnedMessages[pinnedMessageIndex].text}
         css={{
@@ -73,14 +73,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         align="center"
         justify="between"
       >
-        <Navigation
-          index={pinnedMessageIndex}
-          total={pinnedMessages.length}
-          showPrevious={showPreviousPinnedMessage}
-          showNext={showNextPinnedMessage}
-          isMobile={isMobile}
-        />
-        <PinIcon />
+        {isMobile ? <StickIndicator index={pinnedMessageIndex} total={pinnedMessages.length} /> : null}
 
         <Box
           css={{
@@ -95,7 +88,12 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
           }}
         >
           <Text variant="sm" css={{ color: '$on_surface_medium' }} {...swipeHandlers}>
-            <AnnotisedMessage message={formattedPinnedMessage} />
+            <AnnotisedMessage
+              message={`${currentPinnedMessage.slice(
+                0,
+                hideOverflow ? PINNED_MESSAGE_LENGTH : currentPinnedMessage.length,
+              )}${hideOverflow ? '...' : ''}`}
+            />
             {canOverflow ? (
               <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>
                 &nbsp;{hideOverflow ? 'See more' : 'Collapse'}
@@ -112,10 +110,10 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             }}
             css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
           >
-            <CrossIcon />
+            <UnpinIcon height={20} width={20} />
           </Flex>
         ) : null}
       </Flex>
     </Flex>
-  ) : null;
+  );
 };

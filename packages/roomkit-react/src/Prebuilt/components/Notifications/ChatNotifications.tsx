@@ -29,6 +29,6 @@ export const ChatNotifications = () => {
       title: `Chat ${chatState.enabled ? 'resumed' : 'paused'} by ${chatState.updatedBy?.userName}`,
     };
     ToastManager.addToast(notification);
-  }, [chatState]);
+  }, [chatState, localPeerId]);
   return <></>;
 };
