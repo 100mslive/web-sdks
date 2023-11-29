@@ -41,7 +41,6 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       return;
     }
 
-    console.log('test', savedUserId, userId);
     hmsActions
       .getAuthTokenByRoomCode({ roomCode, userId: userId || savedUserId }, { endpoint: authTokenByRoomCodeEndpoint })
       .then(token => setAuthTokenInAppData(token))
