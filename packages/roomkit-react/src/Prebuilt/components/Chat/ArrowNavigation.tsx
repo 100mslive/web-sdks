@@ -13,7 +13,11 @@ export const ArrowNavigation = ({
   showPrevious: () => void;
   showNext: () => void;
 }) => {
-  return total > 1 ? (
+  if (total < 2) {
+    return null;
+  }
+
+  return (
     <Flex direction="column" css={{ gap: '$1' }}>
       <Flex
         onClick={showPrevious}
@@ -36,5 +40,5 @@ export const ArrowNavigation = ({
         <ChevronDownIcon height={20} width={20} />
       </Flex>
     </Flex>
-  ) : null;
+  );
 };
