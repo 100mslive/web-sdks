@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Flex } from '../../../Layout';
 
-export const MobileNavigation = ({ total, index }: { total: number; index: number }) => {
+export const StickIndicator = ({ total, index }: { total: number; index: number }) => {
   const sticksCount = Math.min(3, total);
 
   if (total < 2) {
