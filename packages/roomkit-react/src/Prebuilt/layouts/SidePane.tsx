@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
 import { SidePaneTabs } from '../components/SidePaneTabs';
@@ -55,11 +54,9 @@ const Wrapper = ({ css = {}, children }: { css?: CSS; children: React.ReactNode 
 };
 
 const SidePane = ({
-  screenType,
   tileProps,
   hideControls = false,
 }: {
-  screenType: keyof ConferencingScreen;
   tileProps?: TileCustomisationProps;
   hideControls?: boolean;
 }) => {
@@ -139,12 +136,12 @@ const SidePane = ({
                 : undefined
             }
           >
-            <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />
+            <SidePaneTabs hideControls={hideControls} active={sidepane} />
           </Wrapper>
         </ComponentWithState>
         <ComponentWithState state={sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS}>
           <Wrapper>
-            <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />
+            <SidePaneTabs hideControls={hideControls} active={sidepane} />
           </Wrapper>
         </ComponentWithState>
         <ComponentWithState state={sidepane === SIDE_PANE_OPTIONS.VB}>

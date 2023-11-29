@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { selectPeerByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import {
-  ChatIcon,
   ChatUnreadIcon,
   ConnectivityIcon,
   HandIcon,
@@ -141,24 +140,6 @@ export const ToastConfig = {
     multiple: notifications => {
       return {
         title: `${notifications.length} new messages`,
-        icon: <ChatUnreadIcon />,
-        action: <ChatAction />,
-      };
-    },
-  },
-  CHAT_PAUSED: {
-    single: notification => {
-      return {
-        title: `Chat paused by ${notification.data?.name}`,
-        icon: <ChatIcon />,
-        action: <ChatAction />,
-      };
-    },
-  },
-  CHAT_RESUMED: {
-    single: notification => {
-      return {
-        title: `Chat resumed by ${notification.data?.name}`,
         icon: <ChatUnreadIcon />,
         action: <ChatAction />,
       };

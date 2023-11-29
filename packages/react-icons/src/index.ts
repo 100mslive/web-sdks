@@ -204,6 +204,7 @@ export { default as RefreshIcon } from './RefreshIcon';
 export { default as RejectIcon } from './RejectIcon';
 export { default as RemoveUserIcon } from './RemoveUserIcon';
 export { default as RepeatIcon } from './RepeatIcon';
+export { default as ReplyIcon } from './ReplyIcon';
 export { default as ReportIcon } from './ReportIcon';
 export { default as RestApiIcon } from './RestApiIcon';
 export { default as RocketIcon } from './RocketIcon';
