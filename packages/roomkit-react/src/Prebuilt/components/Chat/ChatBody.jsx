@@ -4,7 +4,7 @@ import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
 import {
-  selectHMSBroadcastMessages,
+  selectHMSMessages,
   selectLocalPeerID,
   selectLocalPeerName,
   selectMessagesByPeerID,
@@ -63,6 +63,48 @@ const formatTime = date => {
     mins = '0' + mins;
   }
   return `${hours}:${mins} ${suffix}`;
+};
+
+const MessageTypeContainer = ({ left, right }) => {
+  return (
+    <Flex
+      align="center"
+      css={{
+        ml: 'auto',
+        mr: '$4',
+        p: '$2 $4',
+        border: '1px solid $border_bright',
+        r: '$0',
+        gap: '$1',
+      }}
+      className="message_type_container"
+    >
+      {left && (
+        <SenderName variant="tiny" as="span" css={{ color: '$on_surface_medium' }}>
+          {left}
+        </SenderName>
+      )}
+      {right && (
+        <SenderName as="span" variant="tiny" css={{ color: '$on_surface_high', textTransform: 'capitalize' }}>
+          {right}
+        </SenderName>
+      )}
+    </Flex>
+  );
+};
+
+const MessageType = ({ role, hasCurrentUserSent, receiver }) => {
+  if (hasCurrentUserSent) {
+    return null;
+  }
+  if (receiver) {
+    return <MessageTypeContainer left="Direct Message" />;
+  }
+
+  if (role) {
+    return <MessageTypeContainer left="To Group" right={role} />;
+  }
+  return null;
 };
 
 const URL_REGEX =
@@ -249,6 +291,7 @@ const ChatActions = ({
           borderRadius: '$1',
           p: '$2',
           opacity: open ? 1 : 0,
+          display: open ? 'flex' : 'none',
           '@md': { opacity: 1 },
         }}
       >
@@ -344,6 +387,8 @@ const ChatMessage = React.memo(
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
     const permissions = useHMSStore(selectPermissions);
+    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+    const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
     const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
     const messageType = getMessageType({
       roles: message.recipientRoles,
@@ -372,7 +417,9 @@ const ChatMessage = React.memo(
           mb: '$5',
           pr: '$10',
           mt: '$4',
-          '&:hover .chat_actions': { opacity: 1 },
+          '&:not(:hover} .chat_actions': { display: 'none' },
+          '&:hover .chat_actions': { display: 'flex', opacity: 1 },
+          '&:hover .message_type_container': { display: 'none' },
         }}
         style={style}
       >
@@ -438,6 +485,16 @@ const ChatMessage = React.memo(
                 </Text>
               ) : null}
             </Flex>
+            {!(selectedPeer || selectedRole) && (
+              <MessageType
+                hasCurrentUserSent={
+                  message.sender === localPeerId ||
+                  !(message.recipientPeer || (message.recipientRoles && message.recipientRoles.length > 0))
+                }
+                receiver={message.recipientPeer}
+                role={message.senderRole}
+              />
+            )}
 
             <ChatActions
               onPin={onPin}
@@ -445,9 +502,7 @@ const ChatMessage = React.memo(
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
               onReplyPrivately={() => setPeerSelector(message.sender)}
-              showReplyPrivateAction={
-                messageType !== 'private' && message.sender !== localPeerId && isPrivateChatEnabled
-              }
+              showReplyPrivateAction={!selectedPeer && message.sender !== localPeerId && isPrivateChatEnabled}
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
@@ -571,7 +626,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom, blacklistedPeerIDs }
   } else if (selectedPeer) {
     storeMessageSelector = selectMessagesByPeerID(selectedPeer);
   } else {
-    storeMessageSelector = selectHMSBroadcastMessages;
+    storeMessageSelector = selectHMSMessages;
   }
   let messages = useHMSStore(storeMessageSelector) || [];
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];

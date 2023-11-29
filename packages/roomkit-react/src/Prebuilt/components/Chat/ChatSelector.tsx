@@ -4,7 +4,7 @@ import {
   selectMessagesUnreadCountByPeerID,
   selectMessagesUnreadCountByRole,
   selectRemotePeers,
-  selectUnreadHMSBroadcastMessagesCount,
+  selectUnreadHMSMessagesCount,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
@@ -67,7 +67,7 @@ const SelectorHeader = React.memo(
 );
 
 const Everyone = React.memo(({ active }: { active: boolean }) => {
-  const unreadCount: number = useHMSStore(selectUnreadHMSBroadcastMessagesCount);
+  const unreadCount: number = useHMSStore(selectUnreadHMSMessagesCount);
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   return (
