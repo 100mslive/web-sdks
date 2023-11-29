@@ -89,7 +89,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
   const selection = selectorPeerName || selectedRole || defaultSelection;
   useEffect(() => {
-    if (!selectedPeer && !selectedRole && defaultSelection !== 'Everyone') {
+    if (!selectedPeer && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
