@@ -11,7 +11,7 @@ import { ChatSelector } from './ChatSelector';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
-import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
+import { useFilteredRoles } from '../../common/hooks';
 import { textEllipsis } from '../../../utils';
 import { CHAT_SELECTOR } from '../../common/constants';
 
@@ -24,9 +24,8 @@ export const ChatSelectorContainer = () => {
   const roles = useFilteredRoles();
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-  const defaultSelection = useDefaultChatSelection();
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || defaultSelection;
+  const selection = selectorPeerName || selectedRole || 'Everyone';
 
   if (!(isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0) && !isPrivateChatEnabled && !selection) {
     return null;

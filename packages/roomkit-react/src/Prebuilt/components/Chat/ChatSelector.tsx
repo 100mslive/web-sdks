@@ -54,7 +54,7 @@ const SelectorItem = ({
 };
 
 const SelectorHeader = React.memo(
-  ({ isHorizontalDivider, children }: { isHorizontalDivider: boolean; children: React.ReactNode }) => {
+  ({ isHorizontalDivider = true, children }: { isHorizontalDivider?: boolean; children: React.ReactNode }) => {
     return (
       <Box css={{ flexShrink: 0 }}>
         {isHorizontalDivider && <HorizontalDivider space={4} />}
@@ -142,21 +142,15 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems =
-      isPublicChatEnabled && !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
+    const selectItems = !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
 
-    roles.length > 0 &&
-      !searchValue &&
-      selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
+    roles.length > 0 && !searchValue && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
     !searchValue &&
       roles.forEach(userRole =>
         selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
       );
 
-    filteredPeers.length > 0 &&
-      selectItems.push(
-        <SelectorHeader isHorizontalDivider={isPublicChatEnabled || roles.length > 0}>Participants</SelectorHeader>,
-      );
+    filteredPeers.length > 0 && selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
     filteredPeers.forEach(peer =>
       selectItems.push(
         <PeerItem key={peer.id} name={peer.name} peerId={peer.id} active={peer.id === selectedPeerId} />,

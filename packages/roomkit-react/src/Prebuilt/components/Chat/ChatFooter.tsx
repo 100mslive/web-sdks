@@ -15,10 +15,9 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
-import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -83,16 +82,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
   const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const defaultSelection = useDefaultChatSelection();
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || defaultSelection;
-  useEffect(() => {
-    if (!selectedPeer && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
-      setRoleSelector(defaultSelection);
-    }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+  const selection = selectorPeerName || selectedRole || 'Everyone';
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -179,7 +173,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
           </Flex>
         ) : null}
       </Flex>
-      {selection && (
+      {!(selection === 'Everyone' && !isPublicChatEnabled) && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="center"
