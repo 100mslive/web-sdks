@@ -23,7 +23,7 @@ export const ChatSettings = () => {
         <Popover.Content
           align="end"
           side="bottom"
-          sideOffset={4}
+          sideOffset={2}
           onClick={() => {
             const chatState = {
               enabled: false,

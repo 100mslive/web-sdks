@@ -17,7 +17,6 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../common/utils';
-// @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
