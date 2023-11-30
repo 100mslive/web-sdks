@@ -44,7 +44,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
     onSwipedDown: () => showPreviousPinnedMessage(),
   });
 
-  if (!(pinnedMessages?.length > 0)) {
+  if (!pinnedMessages || pinnedMessages.length < 1) {
     return null;
   }
 
@@ -59,7 +59,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         />
       ) : null}
       <Flex
-        title={pinnedMessages[pinnedMessageIndex].text}
+        title={pinnedMessages[pinnedMessageIndex]?.text}
         css={{
           p: '$4',
           color: '$on_surface_medium',
