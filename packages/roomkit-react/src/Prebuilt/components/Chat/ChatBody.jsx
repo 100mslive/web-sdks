@@ -95,13 +95,13 @@ const MessageTypeContainer = ({ left, right }) => {
   );
 };
 
-const MessageType = ({ role, receiver }) => {
+const MessageType = ({ roles, receiver }) => {
   if (receiver) {
     return <MessageTypeContainer left="Direct Message" />;
   }
 
-  if (role) {
-    return <MessageTypeContainer left="To Group" right={role} />;
+  if (roles && roles.length > 0) {
+    return <MessageTypeContainer left="To Group" right={roles[0]} />;
   }
   return null;
 };
@@ -489,7 +489,7 @@ const ChatMessage = React.memo(
               ) : null}
             </Flex>
             {!(selectedPeer || selectedRole) && (
-              <MessageType receiver={message.recipientPeer} role={message.senderRole} />
+              <MessageType receiver={message.recipientPeer} roles={message.recipientRoles} />
             )}
 
             <ChatActions
