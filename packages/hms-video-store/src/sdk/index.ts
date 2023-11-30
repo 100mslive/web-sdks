@@ -97,7 +97,7 @@ export class HMSSdk implements HMSInterface {
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
-  private store!: Store;
+  public store!: Store;
   private notificationManager?: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
