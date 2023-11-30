@@ -8,7 +8,6 @@ import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, 
 import { IconButton } from '../../../IconButton';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // import { ChatSelectorContainer } from './ChatSelectorContainer';
@@ -18,7 +17,7 @@ import { useChatDraftMessage } from '../AppData/useChatState';
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { CHAT_SELECTOR, EVERYONE, SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -86,7 +85,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || EVERYONE;
+  const selection = selectorPeerName || selectedRole || CHAT_SELECTOR.EVERYONE;
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -173,7 +172,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
           </Flex>
         ) : null}
       </Flex>
-      {!(selection === EVERYONE && !isPublicChatEnabled) && (
+      {!(selection === CHAT_SELECTOR.EVERYONE && !isPublicChatEnabled) && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="center"

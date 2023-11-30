@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, HandRaiseIcon, PeopleIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, textEllipsis } from '../../../';
-import { EVERYONE } from '../../common/constants';
+import { CHAT_SELECTOR } from '../../common/constants';
 
 export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }) => {
   const [open, setOpen] = useState(false);
@@ -27,7 +27,7 @@ export const ParticipantFilter = ({ selection, onSelection, isConnected, roles }
       >
         <Flex align="center">
           <Text variant="sm" css={{ ...textEllipsis(80) }}>
-            {selectionValue || EVERYONE}
+            {selectionValue || CHAT_SELECTOR.EVERYONE}
           </Text>
           <Box css={{ ml: '$2', color: '$on_surface_low' }}>
             {open ? <ChevronUpIcon width={14} height={14} /> : <ChevronDownIcon width={14} height={14} />}

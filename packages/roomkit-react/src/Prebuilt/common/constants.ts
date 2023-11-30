@@ -19,6 +19,7 @@ export const EMOJI_REACTION_TYPE = 'EMOJI_REACTION';
 export const CHAT_SELECTOR = {
   PEER_ID: 'peer_id',
   ROLE: 'role',
+  EVERYONE: 'Everyone',
 };
 
 export const APP_DATA = {
@@ -134,5 +135,3 @@ export enum QUESTION_TYPE {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '#prebuilt-container';
-
-export const EVERYONE = 'Everyone';
