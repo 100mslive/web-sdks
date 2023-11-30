@@ -368,7 +368,7 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '24ch',
+  maxWidth: '16ch',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
