@@ -8,7 +8,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
+import { Box, CSS, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
 // @ts-ignore
 import { ParticipantSearch } from '../Footer/ParticipantList';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -26,18 +26,23 @@ const SelectorItem = ({
   active,
   onClick,
   unreadCount,
+  isDropdown,
 }: {
   value: string;
   active: boolean;
   onClick: () => void;
   unreadCount: number;
+  isDropdown: boolean;
 }) => {
+  const Root = isDropdown
+    ? Dropdown.Item
+    : ({ children, ...rest }: { children: React.ReactNode; css: CSS }) => (
+        <Flex {...rest} css={{ p: '$8', ...rest.css }}>
+          {children}
+        </Flex>
+      );
   return (
-    <Dropdown.Item
-      data-testid="chat_members"
-      css={{ align: 'center', px: '$10', bg: '$surface_default' }}
-      onClick={onClick}
-    >
+    <Root data-testid="chat_members" css={{ align: 'center', px: '$10', bg: '$surface_default' }} onClick={onClick}>
       <Text variant="sm">{value}</Text>
       <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
         {unreadCount > 0 && (
@@ -49,7 +54,7 @@ const SelectorItem = ({
         )}
         {active && <CheckIcon width={16} height={16} />}
       </Flex>
-    </Dropdown.Item>
+    </Root>
   );
 };
 
@@ -66,7 +71,7 @@ const SelectorHeader = React.memo(
   },
 );
 
-const Everyone = React.memo(({ active }: { active: boolean }) => {
+const Everyone = React.memo(({ active, isDropdown }: { active: boolean; isDropdown: boolean }) => {
   const unreadCount: number = useHMSStore(selectUnreadHMSMessagesCount);
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -75,6 +80,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
       value="Everyone"
       active={active}
       unreadCount={unreadCount}
+      isDropdown={isDropdown}
       onClick={() => {
         setPeerSelector('');
         setRoleSelector('');
@@ -83,7 +89,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
   );
 });
 
-const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }) => {
+const RoleItem = React.memo(({ role, active, isDropdown }: { role: string; active: boolean; isDropdown: boolean }) => {
   const unreadCount: number = useHMSStore(selectMessagesUnreadCountByRole(role));
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -92,6 +98,7 @@ const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }
       value={role}
       active={active}
       unreadCount={unreadCount}
+      isDropdown={isDropdown}
       onClick={() => {
         setPeerSelector('');
         setRoleSelector(role);
@@ -100,7 +107,17 @@ const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }
   );
 });
 
-const PeerItem = ({ peerId, name, active }: { name: string; peerId: string; active: boolean }) => {
+const PeerItem = ({
+  peerId,
+  name,
+  active,
+  isDropdown,
+}: {
+  name: string;
+  peerId: string;
+  active: boolean;
+  isDropdown: boolean;
+}) => {
   const unreadCount: number = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
   const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -110,6 +127,7 @@ const PeerItem = ({ peerId, name, active }: { name: string; peerId: string; acti
       value={name}
       active={active}
       unreadCount={unreadCount}
+      isDropdown={isDropdown}
       onClick={() => {
         setPeerSelector(peerId);
         setRoleSelector('');
@@ -123,13 +141,13 @@ const VirtualizedSelectItemList = ({
   selectedRole,
   selectedPeerId,
   searchValue,
-  isPublicChatEnabled,
+  isDropdown,
 }: {
   peers: HMSPeer[];
   selectedRole: string;
   selectedPeerId: string;
   searchValue: string;
-  isPublicChatEnabled: boolean;
+  isDropdown: boolean;
 }) => {
   const roles = useFilteredRoles();
   const filteredPeers = useMemo(
@@ -142,40 +160,66 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems = !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
+    const selectItems = !searchValue
+      ? [<Everyone active={!selectedRole && !selectedPeerId} isDropdown={isDropdown} />]
+      : [];
 
     roles.length > 0 && !searchValue && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
     !searchValue &&
       roles.forEach(userRole =>
-        selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
+        selectItems.push(
+          <RoleItem key={userRole} active={selectedRole === userRole} role={userRole} isDropdown={isDropdown} />,
+        ),
       );
 
     filteredPeers.length > 0 && selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
     filteredPeers.forEach(peer =>
       selectItems.push(
-        <PeerItem key={peer.id} name={peer.name} peerId={peer.id} active={peer.id === selectedPeerId} />,
+        <PeerItem
+          key={peer.id}
+          name={peer.name}
+          peerId={peer.id}
+          active={peer.id === selectedPeerId}
+          isDropdown={isDropdown}
+        />,
       ),
     );
 
     return selectItems;
-  }, [isPublicChatEnabled, searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [searchValue, selectedRole, selectedPeerId, isDropdown, roles, filteredPeers]);
 
+  if (isDropdown) {
+    return (
+      <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+        {listItems.map((item, index) => (
+          <Box key={index}>{item}</Box>
+        ))}
+      </Dropdown.Group>
+    );
+  }
   return (
-    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+    <>
       {listItems.map((item, index) => (
         <Box key={index}>{item}</Box>
       ))}
-    </Dropdown.Group>
+    </>
   );
 };
 
-export const ChatSelector = ({ role, peerId }: { role: string; peerId: string }) => {
+export const ChatSelector = ({
+  role,
+  peerId,
+  isDropdown = true,
+}: {
+  role: string;
+  peerId: string;
+  isDropdown?: boolean;
+}) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const peers = useHMSStore(selectRemotePeers);
   const [search, setSearch] = useState('');
 
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
 
   return (
     <>
@@ -188,8 +232,8 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
         selectedRole={role}
         selectedPeerId={peerId}
         peers={isPrivateChatEnabled ? peers : []}
-        isPublicChatEnabled={isPublicChatEnabled}
         searchValue={search}
+        isDropdown={isDropdown}
       />
     </>
   );
