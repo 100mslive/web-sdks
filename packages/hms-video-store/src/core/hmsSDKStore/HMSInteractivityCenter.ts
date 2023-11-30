@@ -38,5 +38,3 @@ export class HMSInteractivityCenter implements IHMSInteractivityCenter {
     return this.sdkInteractivityCenter.fetchLeaderboard(poll, offset, count);
   }
 }
-
-// Check on poll read permission
