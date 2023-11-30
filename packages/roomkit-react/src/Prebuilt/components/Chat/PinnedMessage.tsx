@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
@@ -44,7 +44,15 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
     onSwipedDown: () => showPreviousPinnedMessage(),
   });
 
-  if (!pinnedMessages || pinnedMessages.length < 1) {
+  // Scenario: User is on a particular index but an earlier message is removed by another peer
+  useEffect(() => {
+    const count = pinnedMessages?.length || 1;
+    if (pinnedMessageIndex >= count) {
+      setPinnedMessageIndex(count - 1);
+    }
+  }, [pinnedMessageIndex, pinnedMessages]);
+
+  if (!pinnedMessages || pinnedMessages.length === 0) {
     return null;
   }
 
