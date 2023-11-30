@@ -194,7 +194,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         score: question.score,
       };
     });
-    return { entries: leaderboardEntries, hasNext: pollLeaderboard.last };
+    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last };
   }
 }
 
