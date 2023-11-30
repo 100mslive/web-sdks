@@ -156,12 +156,14 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
               icon: <CrossCircleIcon style={iconDims} />,
               type: HMSVirtualBackgroundTypes.NONE,
               onClick: async () => await disableEffects(),
+              testID: 'virtual_bg_none',
             },
             {
               title: 'Blur',
               icon: <BlurPersonHighIcon style={iconDims} />,
               type: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => await addPlugin({ blurPower: 0.5 }),
+              testID: 'virtual_bg_blur',
             },
           ]}
           activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}

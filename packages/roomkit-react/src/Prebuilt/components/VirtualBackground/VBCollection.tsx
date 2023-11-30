@@ -17,10 +17,12 @@ export const VBCollection = ({
     onClick?: () => Promise<void>;
     mediaURL?: string;
     type: string;
+    testID?: string;
   }[];
   title: string;
   activeBackground: HTMLImageElement | string;
   activeBackgroundType: HMSVirtualBackgroundTypes;
+  assignID?: boolean;
 }) => {
   if (options.length === 0) {
     return null;
@@ -33,7 +35,7 @@ export const VBCollection = ({
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
         {options.map((option, index) => (
           <VBOption.Root
-            data-testid={`virtual_bg_option-${index}`}
+            testid={assignID ? `virtual_bg_option-${index}` : option?.testID || ''}
             key={option?.mediaURL || option?.title}
             {...option}
             isActive={
