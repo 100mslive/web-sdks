@@ -55,21 +55,6 @@ export const useFilteredRoles = () => {
   return elements?.chat?.roles_whitelist || [];
 };
 
-export const useDefaultChatSelection = () => {
-  const { elements } = useRoomLayoutConferencingScreen();
-  const roles = useFilteredRoles();
-  // default is everyone for public chat
-  if (elements?.chat?.public_chat_enabled) {
-    return 'Everyone';
-  }
-  // sending first role as default
-  if (roles.length > 0) {
-    return roles[0];
-  }
-  // sending empty
-  return '';
-};
-
 export const useShowStreamingUI = () => {
   const layout = useRoomLayout();
   const { join_form } = layout?.screens?.preview?.default?.elements || {};

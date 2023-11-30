@@ -18,7 +18,7 @@ import { useChatDraftMessage } from '../AppData/useChatState';
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, EVERYONE, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
   width: '100%',
@@ -86,7 +86,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || 'Everyone';
+  const selection = selectorPeerName || selectedRole || EVERYONE;
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -173,7 +173,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
           </Flex>
         ) : null}
       </Flex>
-      {!(selection === 'Everyone' && !isPublicChatEnabled) && (
+      {!(selection === EVERYONE && !isPublicChatEnabled) && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="center"
