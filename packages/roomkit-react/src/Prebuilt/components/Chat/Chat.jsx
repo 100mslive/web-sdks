@@ -81,12 +81,7 @@ export const Chat = () => {
         </>
       )}
 
-      <ChatBody
-        ref={listRef}
-        scrollToBottom={scrollToBottom}
-        screenType={screenType}
-        blacklistedPeerIDs={blacklistedPeerIDs}
-      />
+      <ChatBody ref={listRef} scrollToBottom={scrollToBottom} screenType={screenType} />
 
       <ChatPaused />
 
