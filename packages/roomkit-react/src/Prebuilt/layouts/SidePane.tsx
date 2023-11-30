@@ -14,7 +14,6 @@ import { config as cssConfig } from '../../Theme';
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
-// @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({

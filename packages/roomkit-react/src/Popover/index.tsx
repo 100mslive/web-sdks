@@ -16,9 +16,10 @@ const StyledArrow = styled(Arrow, {
 });
 
 const StyledTrigger = styled(Trigger, {});
+const StyledRoot = styled(Root, {});
 
 export const Popover = {
-  Root,
+  Root: StyledRoot,
   Content: StyledContent,
   Trigger: StyledTrigger,
   Portal: Portal,
