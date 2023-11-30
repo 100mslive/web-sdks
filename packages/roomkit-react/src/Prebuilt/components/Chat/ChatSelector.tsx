@@ -142,13 +142,16 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems = isPublicChatEnabled ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
+    const selectItems =
+      isPublicChatEnabled && !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
 
     roles.length > 0 &&
+      !searchValue &&
       selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
-    roles.forEach(userRole =>
-      selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
-    );
+    !searchValue &&
+      roles.forEach(userRole =>
+        selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
+      );
 
     filteredPeers.length > 0 &&
       selectItems.push(
@@ -161,7 +164,7 @@ const VirtualizedSelectItemList = ({
     );
 
     return selectItems;
-  }, [isPublicChatEnabled, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [isPublicChatEnabled, searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
 
   return (
     <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
