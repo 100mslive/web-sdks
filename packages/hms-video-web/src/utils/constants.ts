@@ -60,3 +60,7 @@ export const PROTOCOL_VERSION = '2.5';
 export const PROTOCOL_SPEC = '20231020';
 
 export const HAND_RAISE_GROUP_NAME = '_handraise';
+
+export const DEFAULT_PLAYLIST_VIDEO_BITRATE = 1000;
+
+export const DEFAULT_PLAYLIST_AUDIO_BITRATE = 64;
