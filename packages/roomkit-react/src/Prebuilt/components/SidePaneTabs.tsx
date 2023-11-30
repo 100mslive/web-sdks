@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
-import { selectPeerCount, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
+import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { Chat } from './Chat/Chat';
@@ -17,7 +17,7 @@ import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../common/utils';
-import { SESSION_STORE_KEY, SIDE_PANE_OPTIONS } from '../common/constants';
+import { SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
   color: '$on_surface_high',
@@ -55,12 +55,9 @@ export const SidePaneTabs = React.memo<{
   const hideTabs = !(showChat && showParticipants);
   const isMobile = useMedia(cssConfig.media.md);
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
-  const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
-  const canPauseChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  const showPauseChat =
-    showChat && canPauseChat && (!isMobile || (isMobile && !isOverlayChat)) && isChatEnabled && isChatOpen;
+  const showChatSettings = showChat && isChatOpen && (!isMobile || (isMobile && !isOverlayChat));
 
   useEffect(() => {
     if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat && showParticipants) {
@@ -155,7 +152,7 @@ export const SidePaneTabs = React.memo<{
                     Participants &nbsp; <ParticipantCount count={peerCount} />
                   </Tabs.Trigger>
                 </Tabs.List>
-                {showPauseChat ? <ChatSettings /> : null}
+                {showChatSettings ? <ChatSettings /> : null}
                 {isOverlayChat && isChatOpen ? null : (
                   <IconButton
                     css={{ my: '$1', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
