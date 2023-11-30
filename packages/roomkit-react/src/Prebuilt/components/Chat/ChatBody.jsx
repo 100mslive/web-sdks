@@ -154,6 +154,8 @@ const ChatActions = ({
   message,
   sentByLocalPeer,
   isMobile,
+  openDropdown,
+  setOpenDropdown,
   openSheet,
   setOpenSheet,
 }) => {
@@ -162,7 +164,6 @@ const ChatActions = ({
     can_hide_message: false,
     can_block_user: false,
   };
-  const [open, setOpen] = useState(false);
   const { blacklistItem: blacklistPeer, blacklistedIDs: blacklistedPeerIDs } = useChatBlacklist(
     SESSION_STORE_KEY.CHAT_PEER_BLACKLIST,
   );
@@ -284,14 +285,14 @@ const ChatActions = ({
   }
 
   return (
-    <Dropdown.Root open={open} onOpenChange={setOpen} css={{ '@md': { display: 'none' } }}>
+    <Dropdown.Root open={openDropdown} onOpenChange={setOpenDropdown} css={{ '@md': { display: 'none' } }}>
       <Flex
         className="chat_actions"
         css={{
           background: '$surface_bright',
           borderRadius: '$1',
           p: '$2',
-          opacity: open ? 1 : 0,
+          opacity: openDropdown ? 1 : 0,
           position: 'absolute',
           right: 0,
           zIndex: 1,
@@ -398,6 +399,8 @@ const ChatMessage = React.memo(
       receiver: message.recipientPeer,
     });
     const [openSheet, setOpenSheet] = useState(false);
+    const [openDropdown, setOpenDropdown] = useState(false);
+
     // show pin action only if peer has remove others permission and the message is of broadcast type
     const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
     useEffect(() => {
@@ -422,6 +425,8 @@ const ChatMessage = React.memo(
           mt: '$4',
           '&:not(:hover} .chat_actions': { display: 'none' },
           '&:hover .chat_actions': { display: 'flex', opacity: 1 },
+          '&:hover .message_type_container': { opacity: 0 },
+          '.message_type_container': openDropdown ? { opacity: 0 } : { opacity: 1 },
         }}
         style={style}
       >
@@ -500,6 +505,8 @@ const ChatMessage = React.memo(
               onReplyPrivately={() => setPeerSelector(message.sender)}
               showReplyPrivateAction={!selectedPeer && message.sender !== localPeerId && isPrivateChatEnabled}
               isMobile={isMobile}
+              openDropdown={openDropdown}
+              setOpenDropdown={setOpenDropdown}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
             />
