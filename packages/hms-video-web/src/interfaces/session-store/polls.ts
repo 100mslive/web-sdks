@@ -81,6 +81,12 @@ export enum HMSPollQuestionType {
   LONG_ANSWER = 'long-answer',
 }
 
+export enum HMSPollStates {
+  CREATED = 'created',
+  STARTED = 'started',
+  STOPPED = 'stopped',
+}
+
 export interface HMSPollQuestionOption {
   index: number;
   text: string;
@@ -134,4 +140,18 @@ export interface HMSPollQuestionResult {
   correctResponses?: number;
   skippedCount?: number;
   totalResponses?: number;
+}
+
+export interface HMSPollLeaderboardEntry {
+  position: number;
+  score: number;
+  totalResponses: number;
+  correctResponses: number;
+  duration: number;
+  peer: HMSPollResponsePeerInfo;
+}
+
+export interface HMSPollLeaderboardResponse {
+  entries: HMSPollLeaderboardEntry[];
+  hasNext: boolean;
 }
