@@ -178,6 +178,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           }))}
           activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
           activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
+          assignID
         />
       </Box>
     </Flex>
