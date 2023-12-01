@@ -359,6 +359,7 @@ export const ParticipantSearch = ({ onSearch, placeholder, inSidePane = false })
         color: '$on_surface_medium',
         mt: inSidePane ? '$4' : '',
       }}
+      onClick={e => e.stopPropagation()}
     >
       <SearchIcon style={{ position: 'absolute', left: '0.5rem' }} />
       <Input
