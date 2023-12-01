@@ -7,16 +7,22 @@ import {
   selectHMSMessages,
   selectLocalPeerID,
   selectLocalPeerName,
-  selectLocalPeerRoleName,
   selectMessagesByPeerID,
   selectMessagesByRole,
-  selectPeerNameByID,
   selectPermissions,
   selectSessionStore,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CopyIcon, CrossCircleIcon, CrossIcon, EyeCloseIcon, PinIcon, VerticalMenuIcon } from '@100mslive/react-icons';
+import {
+  CopyIcon,
+  CrossCircleIcon,
+  CrossIcon,
+  EyeCloseIcon,
+  PinIcon,
+  ReplyIcon,
+  VerticalMenuIcon,
+} from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -28,10 +34,11 @@ import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useChatBlacklist } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
-import { SESSION_STORE_KEY } from '../../common/constants';
+import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const iconStyle = { height: '1.125rem', width: '1.125rem' };
 const tooltipBoxCSS = {
@@ -63,21 +70,28 @@ const MessageTypeContainer = ({ left, right }) => {
     <Flex
       align="center"
       css={{
-        ml: 'auto',
+        position: 'absolute',
+        right: 0,
+        zIndex: 1,
         mr: '$4',
-        p: '$2 $4',
+        p: '$2',
         border: '1px solid $border_bright',
         r: '$0',
+        gap: '$3',
       }}
+      className="message_type_container"
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: '$on_surface_medium' }}>
+        <SenderName variant="caption" as="span" css={{ color: '$on_surface_medium' }}>
           {left}
         </SenderName>
       )}
-      {left && right && <Box css={{ borderLeft: '1px solid $border_bright', mx: '$4', h: '$8' }} />}
       {right && (
-        <SenderName as="span" variant="tiny" css={{ textTransform: 'uppercase' }}>
+        <SenderName
+          as="span"
+          variant="caption"
+          css={{ color: '$on_surface_high', textTransform: 'capitalize', fontWeight: '$semiBold' }}
+        >
           {right}
         </SenderName>
       )}
@@ -85,20 +99,13 @@ const MessageTypeContainer = ({ left, right }) => {
   );
 };
 
-const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
-  const peerName = useHMSStore(selectPeerNameByID(receiver));
-  const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
+const MessageType = ({ roles, receiver }) => {
   if (receiver) {
-    return (
-      <MessageTypeContainer
-        left={hasCurrentUserSent ? `${peerName ? `TO ${peerName}` : ''}` : 'TO YOU'}
-        right="PRIVATE"
-      />
-    );
+    return <MessageTypeContainer left="Direct Message" />;
   }
 
-  if (roles && roles.length) {
-    return <MessageTypeContainer left="TO" right={hasCurrentUserSent ? roles.join(',') : localPeerRoleName} />;
+  if (roles && roles.length > 0) {
+    return <MessageTypeContainer left="To Group" right={roles[0]} />;
   }
   return null;
 };
@@ -143,30 +150,37 @@ const getMessageType = ({ roles, receiver }) => {
   }
   return receiver ? 'private' : '';
 };
-const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile, openSheet, setOpenSheet }) => {
+const ChatActions = ({
+  onPin,
+  showPinAction,
+  onReplyPrivately,
+  showReplyPrivateAction,
+  message,
+  sentByLocalPeer,
+  isMobile,
+  openSheet,
+  setOpenSheet,
+}) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
     can_hide_message: false,
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
-  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
 
-  const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
-  const { blacklistItem: blacklistMessage } = useChatBlacklist(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST);
-
+  const { blacklistItem: blacklistMessage, blacklistedIDs: blacklistedMessageIDs = [] } = useChatBlacklist(
+    SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
+  );
   const { unpinBlacklistedMessages } = useSetPinnedMessages();
 
-  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
-
+  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const updatePinnedMessages = useCallback(
-    ({ messageID = '', peerID = '' }) => {
+    (messageID = '') => {
       const blacklistedMessageIDSet = new Set([...blacklistedMessageIDs, messageID]);
-      const blacklistedPeerIDSet = new Set([...blacklistedPeerIDs, peerID]);
-      unpinBlacklistedMessages(pinnedMessages, blacklistedPeerIDSet, blacklistedMessageIDSet);
+      unpinBlacklistedMessages(pinnedMessages, blacklistedMessageIDSet);
     },
-    [pinnedMessages, blacklistedMessageIDs, blacklistedPeerIDs],
+    [blacklistedMessageIDs, unpinBlacklistedMessages, pinnedMessages],
   );
 
   const copyMessageContent = useCallback(() => {
@@ -184,6 +198,13 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
   }, [message]);
 
   const options = {
+    reply: {
+      text: 'Reply Privately',
+      tooltipText: 'Reply privately',
+      icon: <ReplyIcon style={iconStyle} />,
+      onClick: onReplyPrivately,
+      show: showReplyPrivateAction,
+    },
     pin: {
       text: 'Pin message',
       tooltipText: 'Pin',
@@ -202,18 +223,15 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
       text: 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
       onClick: async () => {
-        blacklistMessage(blacklistedMessageIDs, message.id);
-        updatePinnedMessages({ messageID: message.id });
+        blacklistMessage(message.id);
+        updatePinnedMessages(message.id);
       },
       show: can_hide_message,
     },
     block: {
       text: 'Block from chat',
       icon: <CrossCircleIcon style={iconStyle} />,
-      onClick: async () => {
-        blacklistPeer(blacklistedPeerIDs, message?.senderUserId);
-        updatePinnedMessages({ peerID: message?.senderUserId });
-      },
+      onClick: async () => blacklistPeer(message?.senderUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
     },
@@ -269,9 +287,19 @@ const ChatActions = ({ onPin, showPinAction, message, sentByLocalPeer, isMobile,
           borderRadius: '$1',
           p: '$2',
           opacity: open ? 1 : 0,
+          position: 'absolute',
+          right: 0,
+          zIndex: 1,
           '@md': { opacity: 1 },
         }}
       >
+        {options.reply.show ? (
+          <Tooltip boxCss={tooltipBoxCSS} title={options.reply.tooltipText}>
+            <IconButton data-testid="reply_message_btn" onClick={options.reply.onClick}>
+              {options.reply.icon}
+            </IconButton>
+          </Tooltip>
+        ) : null}
         {options.pin.show ? (
           <Tooltip boxCss={tooltipBoxCSS} title={options.pin.tooltipText}>
             <IconButton data-testid="pin_message_btn" onClick={options.pin.onClick}>
@@ -335,7 +363,7 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '24ch',
+  maxWidth: '16ch',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
@@ -344,6 +372,7 @@ const SenderName = styled(Text, {
 const ChatMessage = React.memo(
   ({ index, style = {}, message, setRowHeight, isLast = false, unreadCount = 0, scrollToBottom, onPin }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+    const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef(null);
     useEffect(() => {
       if (rowRef.current) {
@@ -351,11 +380,14 @@ const ChatMessage = React.memo(
       }
     }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
-    const { elements } = useRoomLayoutConferencingScreen();
+    const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
     const permissions = useHMSStore(selectPermissions);
+    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+    const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+    const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
     const messageType = getMessageType({
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
@@ -383,7 +415,8 @@ const ChatMessage = React.memo(
           mb: '$5',
           pr: '$10',
           mt: '$4',
-          '&:hover .chat_actions': { opacity: 1 },
+          '&:not(:hover} .chat_actions': { display: 'none' },
+          '&:hover .chat_actions': { display: 'flex', opacity: 1 },
         }}
         style={style}
       >
@@ -392,10 +425,16 @@ const ChatMessage = React.memo(
           align="center"
           css={{
             flexWrap: 'wrap',
+            position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
+            bg:
+              messageType && !(selectedPeer || selectedRole)
+                ? isOverlay
+                  ? 'rgba(0, 0, 0, 0.64)'
+                  : '$surface_default'
+                : undefined,
             r: '$1',
-            p: '$1 $2',
+            p: '$4',
             userSelect: 'none',
             '@md': {
               cursor: 'pointer',
@@ -416,21 +455,29 @@ const ChatMessage = React.memo(
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',
               fontWeight: '$semiBold',
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              alignSelf: 'stretch',
               width: '100%',
             }}
             as="div"
           >
             <Flex align="baseline">
               {message.senderName === 'You' || !message.senderName ? (
-                <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                <SenderName
+                  as="span"
+                  variant="sub2"
+                  css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                >
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
                 <Tooltip title={message.senderName} side="top" align="start">
-                  <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                  <SenderName
+                    as="span"
+                    variant="sub2"
+                    css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                  >
                     {message.senderName}
                   </SenderName>
                 </Tooltip>
@@ -438,9 +485,9 @@ const ChatMessage = React.memo(
               {!isOverlay ? (
                 <Text
                   as="span"
-                  variant="xs"
+                  variant="caption"
                   css={{
-                    ml: '$4',
+                    ml: '$2',
                     color: '$on_surface_medium',
                     flexShrink: 0,
                   }}
@@ -449,17 +496,17 @@ const ChatMessage = React.memo(
                 </Text>
               ) : null}
             </Flex>
-            <MessageType
-              hasCurrentUserSent={message.sender === localPeerId}
-              receiver={message.recipientPeer}
-              roles={message.recipientRoles}
-            />
+            {!(selectedPeer || selectedRole) && (
+              <MessageType receiver={message.recipientPeer} roles={message.recipientRoles} />
+            )}
 
             <ChatActions
               onPin={onPin}
               showPinAction={showPinAction}
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
+              onReplyPrivately={() => setPeerSelector(message.sender)}
+              showReplyPrivateAction={!selectedPeer && message.sender !== localPeerId && isPrivateChatEnabled}
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
@@ -574,30 +621,28 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
   );
 });
 
-export const ChatBody = React.forwardRef(({ role, peerId, scrollToBottom, blacklistedPeerIDs }, listRef) => {
-  const storeMessageSelector = role
-    ? selectMessagesByRole(role)
-    : peerId
-    ? selectMessagesByPeerID(peerId)
-    : selectHMSMessages;
+export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  let storeMessageSelector;
+  if (selectedRole) {
+    storeMessageSelector = selectMessagesByRole(selectedRole);
+  } else if (selectedPeer) {
+    storeMessageSelector = selectMessagesByPeerID(selectedPeer);
+  } else {
+    storeMessageSelector = selectHMSMessages;
+  }
   let messages = useHMSStore(storeMessageSelector) || [];
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
-    const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
-    return (
-      messages?.filter(
-        message =>
-          message.type === 'chat' &&
-          !blacklistedMessageIDSet.has(message.id) &&
-          !blacklistedPeerIDSet.has(message?.senderUserId),
-      ) || []
-    );
+
+    return messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [];
   };
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const unreadCount = useUnreadCount({ role, peerId });
+  const unreadCount = useUnreadCount({ role: selectedRole, peerId: selectedPeer });
 
   if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (

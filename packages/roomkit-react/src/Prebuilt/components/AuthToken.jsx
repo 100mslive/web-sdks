@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSessionStorage } from 'react-use';
-import { v4 } from 'uuid';
+import { v4 as uuid } from 'uuid';
 import { useHMSActions } from '@100mslive/react-sdk';
 import { styled } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
@@ -27,12 +27,6 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
   const [savedUserId, setSavedUserId] = useSessionStorage(UserPreferencesKeys.USER_ID);
 
   useEffect(() => {
-    if (!savedUserId && !userId) {
-      setSavedUserId(v4());
-    }
-  }, [savedUserId, setSavedUserId, userId]);
-
-  useEffect(() => {
     if (authToken) {
       setAuthTokenInAppData(authToken);
       return;
@@ -42,11 +36,25 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
       return;
     }
 
+    if (!savedUserId && !userId) {
+      setSavedUserId(uuid());
+      return;
+    }
+
     hmsActions
       .getAuthTokenByRoomCode({ roomCode, userId: userId || savedUserId }, { endpoint: authTokenByRoomCodeEndpoint })
       .then(token => setAuthTokenInAppData(token))
       .catch(error => setError(convertError(error)));
-  }, [hmsActions, authToken, authTokenByRoomCodeEndpoint, setAuthTokenInAppData, roomCode, userId, savedUserId]);
+  }, [
+    hmsActions,
+    authToken,
+    authTokenByRoomCodeEndpoint,
+    setAuthTokenInAppData,
+    roomCode,
+    userId,
+    savedUserId,
+    setSavedUserId,
+  ]);
 
   if (error.title) {
     return <ErrorDialog title={error.title}>{error.body}</ErrorDialog>;

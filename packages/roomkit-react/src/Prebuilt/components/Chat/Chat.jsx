@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectSessionStore } from '@100mslive/hms-video-store';
+import { selectLocalPeer, selectPeerByID, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
-  selectPeerNameByID,
   useHMSActions,
   useHMSNotifications,
   useHMSStore,
@@ -23,38 +22,32 @@ import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
-export const Chat = ({ screenType }) => {
+export const Chat = () => {
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
-  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
-  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+  const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const localPeer = useHMSStore(selectLocalPeer);
-  const [chatOptions, setChatOptions] = useState({
-    role: roleSelector || '',
-    peerId: peerSelector && peerName ? peerSelector : '',
-    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
-  });
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { removePinnedMessage } = useSetPinnedMessages();
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+  const isPeerPresent = !!useHMSStore(selectPeerByID(selectedPeer));
 
   useEffect(() => {
-    if (notification && notification.data && peerSelector === notification.data.id) {
+    if (notification && notification.data && selectedPeer === notification.data.id) {
       setPeerSelector('');
-      setChatOptions({
-        role: '',
-        peerId: '',
-        selection: 'Everyone',
-      });
+      setRoleSelector('');
     }
-  }, [notification, peerSelector, setPeerSelector]);
+    if (selectedPeer && !isPeerPresent) {
+      setPeerSelector('');
+    }
+  }, [notification, selectedPeer, setPeerSelector, setRoleSelector, isPeerPresent]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
   const storeMessageSelector = selectHMSMessagesCount;
-  const { elements } = useRoomLayoutConferencingScreen();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
@@ -92,14 +85,7 @@ export const Chat = ({ screenType }) => {
         </>
       )}
 
-      <ChatBody
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
-        ref={listRef}
-        scrollToBottom={scrollToBottom}
-        screenType={screenType}
-        blacklistedPeerIDs={blacklistedPeerIDs}
-      />
+      <ChatBody ref={listRef} scrollToBottom={scrollToBottom} screenType={screenType} />
 
       <ChatPaused />
 
@@ -110,24 +96,9 @@ export const Chat = ({ screenType }) => {
       ) : null}
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
-        <ChatFooter
-          role={chatOptions.role}
-          onSend={() => scrollToBottom(1)}
-          selection={chatOptions.selection}
-          screenType={screenType}
-          onSelect={({ role, peerId, selection }) => {
-            setChatOptions({
-              role,
-              peerId,
-              selection,
-            });
-            setPeerSelector(peerId);
-            setRoleSelector(role);
-          }}
-          peerId={chatOptions.peerId}
-        >
+        <ChatFooter onSend={() => scrollToBottom(1)} screenType={screenType}>
           {!isSelectorOpen && !isScrolledToBottom && (
-            <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
+            <NewMessageIndicator role={selectedRole} peerId={selectedPeer} scrollToBottom={scrollToBottom} />
           )}
         </ChatFooter>
       ) : null}

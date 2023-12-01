@@ -30,8 +30,9 @@ export const VBCollection = ({
         {title}
       </Text>
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
-        {options.map(option => (
+        {options.map((option, index) => (
           <VBOption.Root
+            testid={option.type === HMSVirtualBackgroundTypes.IMAGE ? `virtual_bg_option-${index}` : option.type}
             key={option?.mediaURL || option?.title}
             {...option}
             isActive={
