@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PeopleIcon, PersonTwoIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PeopleIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -60,7 +60,7 @@ export const ChatSelectorContainer = () => {
               {selection === CHAT_SELECTOR.EVERYONE ? (
                 <PeopleIcon width={16} height={16} />
               ) : (
-                <PersonTwoIcon width={16} height={16} />
+                <PersonIcon width={16} height={16} />
               )}
               {selection || 'Search'}
             </Text>
@@ -95,7 +95,7 @@ export const ChatSelectorContainer = () => {
                   {selection === CHAT_SELECTOR.EVERYONE ? (
                     <PeopleIcon width={16} height={16} />
                   ) : (
-                    <PersonTwoIcon width={16} height={16} />
+                    <PersonIcon width={16} height={16} />
                   )}
                   {selection}
                 </Text>
