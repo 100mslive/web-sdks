@@ -80,7 +80,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
-  const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
@@ -127,7 +127,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
     <Box>
       <Flex>
         <ChatSelectorContainer />
-        {can_disable_chat ? (
+        {canDisableChat && isMobile && isOverlayChat ? (
           <Flex align="center" justify="end" css={{ mb: '$4' }}>
             <Popover.Root>
               <Popover.Trigger asChild>
