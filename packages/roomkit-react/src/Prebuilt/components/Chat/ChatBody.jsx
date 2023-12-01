@@ -74,20 +74,24 @@ const MessageTypeContainer = ({ left, right }) => {
         right: 0,
         zIndex: 1,
         mr: '$4',
-        p: '$2 $4',
+        p: '$2 $2',
         border: '1px solid $border_bright',
         r: '$0',
-        gap: '$1',
+        gap: '$3',
       }}
       className="message_type_container"
     >
       {left && (
-        <SenderName variant="tiny" as="span" css={{ color: '$on_surface_medium' }}>
+        <SenderName variant="caption" as="span" css={{ color: '$on_surface_medium' }}>
           {left}
         </SenderName>
       )}
       {right && (
-        <SenderName as="span" variant="tiny" css={{ color: '$on_surface_high', textTransform: 'capitalize' }}>
+        <SenderName
+          as="span"
+          variant="caption"
+          css={{ color: '$on_surface_high', textTransform: 'capitalize', fontWeight: '$semiBold' }}
+        >
           {right}
         </SenderName>
       )}
@@ -423,7 +427,12 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            bg: messageType ? (isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default') : undefined,
+            bg:
+              messageType && !(selectedPeer || selectedRole)
+                ? isOverlay
+                  ? 'rgba(0, 0, 0, 0.64)'
+                  : '$surface_default'
+                : undefined,
             r: '$1',
             p: '$1 $2',
             userSelect: 'none',
@@ -446,21 +455,29 @@ const ChatMessage = React.memo(
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',
               fontWeight: '$semiBold',
-              display: 'inline-flex',
+              display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              alignSelf: 'stretch',
               width: '100%',
             }}
             as="div"
           >
             <Flex align="baseline">
               {message.senderName === 'You' || !message.senderName ? (
-                <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                <SenderName
+                  as="span"
+                  variant="sub2"
+                  css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                >
                   {message.senderName || 'Anonymous'}
                 </SenderName>
               ) : (
                 <Tooltip title={message.senderName} side="top" align="start">
-                  <SenderName as="span" variant="sm" css={{ color: isOverlay ? '#FFF' : '$on_surface_high' }}>
+                  <SenderName
+                    as="span"
+                    variant="sub2"
+                    css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+                  >
                     {message.senderName}
                   </SenderName>
                 </Tooltip>
@@ -468,9 +485,9 @@ const ChatMessage = React.memo(
               {!isOverlay ? (
                 <Text
                   as="span"
-                  variant="xs"
+                  variant="caption"
                   css={{
-                    ml: '$4',
+                    ml: '$2',
                     color: '$on_surface_medium',
                     flexShrink: 0,
                   }}
