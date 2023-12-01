@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   HMSPeer,
   selectMessagesUnreadCountByPeerID,
@@ -8,7 +9,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { CheckIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
+import { Box, CSS, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
+import { config as cssConfig } from '../../../Theme';
 // @ts-ignore
 import { ParticipantSearch } from '../Footer/ParticipantList';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
@@ -32,12 +34,17 @@ const SelectorItem = ({
   onClick: () => void;
   unreadCount: number;
 }) => {
+  const isMobile = useMedia(cssConfig.media.md);
+
+  const Root = !isMobile
+    ? Dropdown.Item
+    : ({ children, ...rest }: { children: React.ReactNode; css: CSS }) => (
+        <Flex {...rest} css={{ p: '$8', ...rest.css }}>
+          {children}
+        </Flex>
+      );
   return (
-    <Dropdown.Item
-      data-testid="chat_members"
-      css={{ align: 'center', px: '$10', bg: '$surface_default' }}
-      onClick={onClick}
-    >
+    <Root data-testid="chat_members" css={{ align: 'center', px: '$10', bg: '$surface_default' }} onClick={onClick}>
       <Text variant="sm">{value}</Text>
       <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
         {unreadCount > 0 && (
@@ -49,7 +56,7 @@ const SelectorItem = ({
         )}
         {active && <CheckIcon width={16} height={16} />}
       </Flex>
-    </Dropdown.Item>
+    </Root>
   );
 };
 
@@ -123,15 +130,14 @@ const VirtualizedSelectItemList = ({
   selectedRole,
   selectedPeerId,
   searchValue,
-  isPublicChatEnabled,
 }: {
   peers: HMSPeer[];
   selectedRole: string;
   selectedPeerId: string;
   searchValue: string;
-  isPublicChatEnabled: boolean;
 }) => {
   const roles = useFilteredRoles();
+  const isMobile = useMedia(cssConfig.media.md);
   const filteredPeers = useMemo(
     () =>
       peers.filter(
@@ -158,14 +164,23 @@ const VirtualizedSelectItemList = ({
     );
 
     return selectItems;
-  }, [isPublicChatEnabled, searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
 
+  if (!isMobile) {
+    return (
+      <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+        {listItems.map((item, index) => (
+          <Box key={index}>{item}</Box>
+        ))}
+      </Dropdown.Group>
+    );
+  }
   return (
-    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
+    <>
       {listItems.map((item, index) => (
         <Box key={index}>{item}</Box>
       ))}
-    </Dropdown.Group>
+    </>
   );
 };
 
@@ -175,7 +190,6 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
   const [search, setSearch] = useState('');
 
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
 
   return (
     <>
@@ -188,7 +202,6 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
         selectedRole={role}
         selectedPeerId={peerId}
         peers={isPrivateChatEnabled ? peers : []}
-        isPublicChatEnabled={isPublicChatEnabled}
         searchValue={search}
       />
     </>
