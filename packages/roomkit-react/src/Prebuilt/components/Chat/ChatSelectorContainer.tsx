@@ -125,7 +125,6 @@ export const ChatSelectorContainer = () => {
             </Sheet.Title>
             <Box
               onClick={e => {
-                console.log(e.target, e.currentTarget);
                 setOpen(false);
               }}
             >
