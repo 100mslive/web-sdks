@@ -124,7 +124,7 @@ export const ChatSelectorContainer = () => {
               </Sheet.Close>
             </Sheet.Title>
             <Box
-              onClick={e => {
+              onClick={() => {
                 setOpen(false);
               }}
             >
