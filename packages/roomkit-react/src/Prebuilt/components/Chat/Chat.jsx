@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectSessionStore } from '@100mslive/hms-video-store';
+import { selectLocalPeer, selectPeerByID, selectSessionStore } from '@100mslive/hms-video-store';
 import {
   HMSNotificationTypes,
   selectHMSMessagesCount,
@@ -33,13 +33,17 @@ export const Chat = () => {
   const hmsActions = useHMSActions();
   const { removePinnedMessage } = useSetPinnedMessages();
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+  const isPeerPresent = !!useHMSStore(selectPeerByID(selectedPeer));
 
   useEffect(() => {
     if (notification && notification.data && selectedPeer === notification.data.id) {
       setPeerSelector('');
       setRoleSelector('');
     }
-  }, [notification, selectedPeer, setPeerSelector, setRoleSelector]);
+    if (selectedPeer && !isPeerPresent) {
+      setPeerSelector('');
+    }
+  }, [notification, selectedPeer, setPeerSelector, setRoleSelector, isPeerPresent]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
