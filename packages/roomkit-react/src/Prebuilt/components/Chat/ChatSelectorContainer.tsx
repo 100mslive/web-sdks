@@ -81,8 +81,23 @@ export const ChatSelectorContainer = () => {
               tabIndex={0}
             >
               <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
-                <Text variant="tiny" css={{ textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}>
-                  {selection}
+                <Text
+                  variant="xs"
+                  css={{
+                    c: '$on_surface_high',
+                    pr: '$2',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '$1',
+                    textTransform: 'capitalize',
+                  }}
+                >
+                  {selection === CHAT_SELECTOR.EVERYONE ? (
+                    <PeopleIcon width={16} height={16} />
+                  ) : (
+                    <PersonIcon width={16} height={16} />
+                  )}
+                  {selection || 'Search'}
                 </Text>
                 {selection &&
                   (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
