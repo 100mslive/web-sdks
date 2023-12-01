@@ -121,7 +121,7 @@ export const ChatSelectorContainer = () => {
                 setOpen(false);
               }}
             >
-              <ChatSelector role={selectedRole} peerId={selectedPeer} isDropdown={false} />
+              <ChatSelector role={selectedRole} peerId={selectedPeer} />
             </Box>
           </Sheet.Content>
         </Sheet.Root>
