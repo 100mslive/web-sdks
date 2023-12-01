@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon, SearchIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PeopleIcon, PersonIcon, SearchIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -12,14 +12,13 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useFilteredRoles } from '../../common/hooks';
-import { textEllipsis } from '../../../utils';
 import { CHAT_SELECTOR } from '../../common/constants';
 
 export const ChatSelectorContainer = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+  const isPrivateChatEnabled = !elements?.chat?.private_chat_enabled;
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const roles = useFilteredRoles();
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
@@ -31,8 +30,8 @@ export const ChatSelectorContainer = () => {
     return null;
   }
   return (
-    <Flex align="center" css={{ mb: '$8', flex: '1 1 0' }}>
-      <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
+    <Flex align="center" css={{ mb: '$8', flex: '1 1 0', pl: '$2' }}>
+      <Text variant="xs" css={{ color: '$on_surface_medium' }}>
         {selection ? 'To' : 'Choose Participant'}
       </Text>
 
@@ -51,9 +50,21 @@ export const ChatSelectorContainer = () => {
           <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
             {!selection && <SearchIcon width={16} height={16} />}
             <Text
-              variant="tiny"
-              css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}
+              variant="xs"
+              css={{
+                c: '$on_surface_high',
+                pr: '$2',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '$1',
+                textTransform: 'capitalize',
+              }}
             >
+              {selection === CHAT_SELECTOR.EVERYONE ? (
+                <PeopleIcon width={16} height={16} />
+              ) : (
+                <PersonIcon width={16} height={16} />
+              )}
               {selection || 'Search'}
             </Text>
             {selection &&

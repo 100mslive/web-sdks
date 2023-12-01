@@ -7,7 +7,7 @@ import {
   selectUnreadHMSMessagesCount,
   useHMSStore,
 } from '@100mslive/react-sdk';
-import { CheckIcon } from '@100mslive/react-icons';
+import { CheckIcon, PeopleIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
 // @ts-ignore
 import { ParticipantSearch } from '../Footer/ParticipantList';
@@ -26,19 +26,27 @@ const SelectorItem = ({
   active,
   onClick,
   unreadCount,
+  icon = undefined,
 }: {
   value: string;
   active: boolean;
   onClick: () => void;
   unreadCount: number;
+  icon?: React.JSX.Element;
 }) => {
   return (
     <Dropdown.Item
       data-testid="chat_members"
-      css={{ align: 'center', px: '$10', bg: '$surface_default' }}
+      css={{ align: 'center', px: '$10', py: '$5', bg: '$surface_default' }}
       onClick={onClick}
     >
-      <Text variant="sm">{value}</Text>
+      <Text
+        variant="sm"
+        css={{ display: 'flex', alignItems: 'center', gap: '$4', fontWeight: '$semiBold', color: '$on_surface_high' }}
+      >
+        {icon}
+        {value}
+      </Text>
       <Flex align="center" css={{ ml: 'auto', color: '$on_primary_high' }}>
         {unreadCount > 0 && (
           <Tooltip title={`${unreadCount} unread`}>
@@ -58,7 +66,10 @@ const SelectorHeader = React.memo(
     return (
       <Box css={{ flexShrink: 0 }}>
         {isHorizontalDivider && <HorizontalDivider space={4} />}
-        <Text variant="overline" css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase' }}>
+        <Text
+          variant="overline"
+          css={{ p: '$4 $10', fontWeight: '$semiBold', textTransform: 'uppercase', color: '$on_surface_medium' }}
+        >
           {children}
         </Text>
       </Box>
@@ -73,6 +84,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
   return (
     <SelectorItem
       value="Everyone"
+      icon={<PeopleIcon />}
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
