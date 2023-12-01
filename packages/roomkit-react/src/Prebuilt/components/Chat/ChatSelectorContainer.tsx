@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PeopleIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -12,7 +12,6 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useFilteredRoles } from '../../common/hooks';
-import { textEllipsis } from '../../../utils';
 import { CHAT_SELECTOR } from '../../common/constants';
 
 export const ChatSelectorContainer = () => {
@@ -32,9 +31,9 @@ export const ChatSelectorContainer = () => {
   }
   return (
     <>
-      <Flex align="center" css={{ mb: '$8', flex: '1 1 0' }}>
-        <Text variant="tiny" css={{ color: '$on_surface_medium', textTransform: 'uppercase' }}>
-          To
+      <Flex align="center" css={{ mb: '$8', flex: '1 1 0', pl: '$2' }}>
+        <Text variant="xs" css={{ color: '$on_surface_medium' }}>
+          {selection ? 'To' : 'Choose Participant'}
         </Text>
 
         {isMobile ? (
@@ -48,10 +47,22 @@ export const ChatSelectorContainer = () => {
             }}
           >
             <Text
-              variant="tiny"
-              css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}
+              variant="xs"
+              css={{
+                c: '$on_surface_high',
+                pr: '$2',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '$1',
+                textTransform: 'capitalize',
+              }}
             >
-              {selection}
+              {selection === CHAT_SELECTOR.EVERYONE ? (
+                <PeopleIcon width={16} height={16} />
+              ) : (
+                <PersonIcon width={16} height={16} />
+              )}
+              {selection || 'Search'}
             </Text>
             {selection &&
               (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
@@ -70,10 +81,7 @@ export const ChatSelectorContainer = () => {
               tabIndex={0}
             >
               <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
-                <Text
-                  variant="tiny"
-                  css={{ ...textEllipsis(80), textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}
-                >
+                <Text variant="tiny" css={{ textTransform: 'uppercase', c: '$on_surface_high', pr: '$2' }}>
                   {selection}
                 </Text>
                 {selection &&

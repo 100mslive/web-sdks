@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useMedia } from 'react-use';
 import { selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
-import { UnpinIcon } from '@100mslive/react-icons';
+import { PinIcon, UnpinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
@@ -116,9 +116,16 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
               clearPinnedMessage(pinnedMessageIndex);
               setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
             }}
-            css={{ cursor: 'pointer', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+            css={{
+              cursor: 'pointer',
+              color: '$on_surface_medium',
+              '&:hover': { color: '$on_surface_high' },
+              '&:hover .hide-on-hover': { display: 'none !important' },
+              '&:hover .show-on-hover': { display: 'block !important' },
+            }}
           >
-            <UnpinIcon height={20} width={20} />
+            <UnpinIcon className="show-on-hover" style={{ display: 'none' }} height={20} width={20} />
+            <PinIcon className="hide-on-hover" style={{ display: 'block' }} height={20} width={20} />
           </Flex>
         ) : null}
       </Flex>
