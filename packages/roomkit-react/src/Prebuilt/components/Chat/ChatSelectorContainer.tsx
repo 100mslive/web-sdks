@@ -97,7 +97,7 @@ export const ChatSelectorContainer = () => {
                   ) : (
                     <PersonIcon width={16} height={16} />
                   )}
-                  {selection || 'Search'}
+                  {selection}
                 </Text>
                 {selection &&
                   (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
