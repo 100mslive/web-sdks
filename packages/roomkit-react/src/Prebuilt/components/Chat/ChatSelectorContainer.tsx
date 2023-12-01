@@ -18,7 +18,7 @@ export const ChatSelectorContainer = () => {
   const [open, setOpen] = useState(false);
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const isPrivateChatEnabled = !elements?.chat?.private_chat_enabled;
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const roles = useFilteredRoles();
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
