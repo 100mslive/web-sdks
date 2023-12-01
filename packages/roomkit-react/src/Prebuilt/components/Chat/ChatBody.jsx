@@ -74,7 +74,7 @@ const MessageTypeContainer = ({ left, right }) => {
         right: 0,
         zIndex: 1,
         mr: '$4',
-        p: '$4',
+        p: '$2',
         border: '1px solid $border_bright',
         r: '$0',
         gap: '$3',
@@ -434,7 +434,7 @@ const ChatMessage = React.memo(
                   : '$surface_default'
                 : undefined,
             r: '$1',
-            p: '$1 $2',
+            p: '$4',
             userSelect: 'none',
             '@md': {
               cursor: 'pointer',
