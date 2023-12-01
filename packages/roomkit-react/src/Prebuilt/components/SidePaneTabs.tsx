@@ -57,7 +57,7 @@ export const SidePaneTabs = React.memo<{
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
   const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  const showChatSettings = showChat && isChatOpen && (!isMobile || (isMobile && !isOverlayChat));
+  const showChatSettings = showChat && isChatOpen && (!isMobile || !isOverlayChat);
 
   useEffect(() => {
     if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat && showParticipants) {
