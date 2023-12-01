@@ -1,6 +1,10 @@
 import React, { Fragment } from 'react';
 import { useMedia } from 'react-use';
+import { HMSException } from '@100mslive/hms-video';
 import {
+  HMSSimulcastLayerDefinition,
+  HMSTrackID,
+  HMSVideoTrack,
   selectPermissions,
   selectSessionStore,
   selectTrackByID,
@@ -27,13 +31,24 @@ import { Slider } from '../../../Slider';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { StyledMenuTile } from '../../../TileMenu';
+import { useHMSPrebuiltContext } from '../../AppContext';
+// @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore
 import { useSetAppDataByKey } from '../AppData/useUISettings';
+// @ts-ignore
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
-export const isSameTile = ({ trackId, videoTrackID, audioTrackID }) =>
-  trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
+export const isSameTile = ({
+  trackId,
+  videoTrackID,
+  audioTrackID,
+}: {
+  trackId: HMSTrackID;
+  videoTrackID: string;
+  audioTrackID: string;
+}) => trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
@@ -42,15 +57,18 @@ const SpotlightActions = ({
   onSpotLightClick = () => {
     return;
   },
+}: {
+  peerId: string;
+  onSpotLightClick: () => void;
 }) => {
   const hmsActions = useHMSActions();
   const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const isTileSpotlighted = spotlightPeerId === peerId;
 
-  const setSpotlightPeerId = peer =>
+  const setSpotlightPeerId = (peerIdToSpotlight?: string) =>
     hmsActions.sessionStore
-      .set(SESSION_STORE_KEY.SPOTLIGHT, peer)
-      .catch(err => ToastManager.addToast({ title: err.description }));
+      .set(SESSION_STORE_KEY.SPOTLIGHT, peerIdToSpotlight)
+      .catch((err: HMSException) => ToastManager.addToast({ title: err.description }));
 
   return (
     <StyledMenuTile.ItemButton
@@ -70,7 +88,7 @@ const SpotlightActions = ({
   );
 };
 
-const PinActions = ({ audioTrackID, videoTrackID }) => {
+const PinActions = ({ audioTrackID, videoTrackID }: { videoTrackID: string; audioTrackID: string }) => {
   const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
 
   const isTilePinned = isSameTile({
@@ -105,20 +123,20 @@ const MinimiseInset = () => {
   );
 };
 
-const SimulcastLayers = ({ trackId }) => {
-  const track = useHMSStore(selectTrackByID(trackId));
+const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
+  const track: HMSVideoTrack = useHMSStore(selectTrackByID(trackId)) as HMSVideoTrack;
   const actions = useHMSActions();
   const bg = useDropdownSelection();
   if (!track?.layerDefinitions?.length || track.degraded || !track.enabled) {
     return null;
   }
-  const currentLayer = track.layerDefinitions.find(layer => layer.layer === track.layer);
+  const currentLayer = track.layerDefinitions.find((layer: HMSSimulcastLayerDefinition) => layer.layer === track.layer);
   return (
     <Fragment>
       <StyledMenuTile.ItemButton css={{ color: '$on_surface_medium', cursor: 'default' }}>
         Select maximum resolution
       </StyledMenuTile.ItemButton>
-      {track.layerDefinitions.map(layer => {
+      {track.layerDefinitions.map((layer: HMSSimulcastLayerDefinition) => {
         return (
           <StyledMenuTile.ItemButton
             key={layer.layer}
@@ -183,25 +201,36 @@ const SimulcastLayers = ({ trackId }) => {
   );
 };
 
-export const TileMenuContent = props => {
+export const TileMenuContent = ({
+  videoTrackID,
+  audioTrackID,
+  isLocal,
+  isScreenshare,
+  showSpotlight,
+  showPinAction,
+  peerID,
+  canMinimise,
+  closeSheetOnClick = () => {
+    return;
+  },
+  openNameChangeModal = () => {
+    return;
+  },
+}: {
+  videoTrackID: string;
+  audioTrackID: string;
+  isLocal: boolean;
+  isScreenshare: boolean;
+  showSpotlight: boolean;
+  showPinAction: boolean;
+  peerID: string;
+  canMinimise: boolean;
+  closeSheetOnClick: () => void;
+  openNameChangeModal: () => void;
+}) => {
   const actions = useHMSActions();
-  const { removeOthers } = useHMSStore(selectPermissions);
-  const {
-    videoTrackID,
-    audioTrackID,
-    isLocal,
-    isScreenshare,
-    showSpotlight,
-    showPinAction,
-    peerID,
-    canMinimise,
-    closeSheetOnClick = () => {
-      return;
-    },
-    openNameChangeModal = () => {
-      return;
-    },
-  } = props;
+  const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
+  const { userName } = useHMSPrebuiltContext();
 
   const { isAudioEnabled, isVideoEnabled, setVolume, toggleAudio, toggleVideo, volume } = useRemoteAVToggle(
     audioTrackID,
@@ -215,22 +244,24 @@ export const TileMenuContent = props => {
   const isMobile = useMedia(cssConfig.media.md);
 
   return isLocal ? (
-    (showPinAction || canMinimise) && (
+    (showPinAction || canMinimise || !userName || showSpotlight) && (
       <>
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
         {canMinimise && <MinimiseInset />}
-        <StyledMenuTile.ItemButton
-          onClick={() => {
-            openNameChangeModal();
-            closeSheetOnClick();
-          }}
-        >
-          <PencilIcon height={20} width={20} />
-          <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
-            Change Name
-          </Text>
-        </StyledMenuTile.ItemButton>
+        {!userName && (
+          <StyledMenuTile.ItemButton
+            onClick={() => {
+              openNameChangeModal();
+              closeSheetOnClick();
+            }}
+          >
+            <PencilIcon height={20} width={20} />
+            <Text variant="sm" css={{ '@md': { fontWeight: '$semiBold' }, c: '$on_surface_high' }}>
+              Change Name
+            </Text>
+          </StyledMenuTile.ItemButton>
+        )}
       </>
     )
   ) : (
@@ -271,7 +302,7 @@ export const TileMenuContent = props => {
               Volume ({volume})
             </Box>
           </Flex>
-          <Slider css={{ my: '0.5rem' }} step={5} value={[volume]} onValueChange={e => setVolume(e[0])} />
+          <Slider css={{ my: '0.5rem' }} step={5} value={[volume || 100]} onValueChange={e => setVolume?.(e[0])} />
         </StyledMenuTile.VolumeItem>
       ) : null}
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
@@ -10,13 +10,13 @@ import { PaginatedParticipants } from './Footer/PaginatedParticipants';
 import { ParticipantList } from './Footer/ParticipantList';
 import { Box, config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 import { Tooltip } from '../../Tooltip';
+import { ChatSettings } from './ChatSettings';
 // @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../common/utils';
-// @ts-ignore: No implicit Any
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
@@ -40,9 +40,8 @@ const ParticipantCount = ({ count }: { count: number }) => {
 
 export const SidePaneTabs = React.memo<{
   active: 'Participants | Chat';
-  screenType: keyof ConferencingScreen;
   hideControls?: boolean;
-}>(({ active = SIDE_PANE_OPTIONS.CHAT, screenType, hideControls }) => {
+}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideControls }) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const resetSidePane = useSidepaneReset();
@@ -58,6 +57,7 @@ export const SidePaneTabs = React.memo<{
   const isOverlayChat = !!elements?.chat?.is_overlay && isMobile;
   const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
+  const showChatSettings = showChat && isChatOpen && (!isMobile || !isOverlayChat);
 
   useEffect(() => {
     if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat && showParticipants) {
@@ -103,7 +103,7 @@ export const SidePaneTabs = React.memo<{
       }}
     >
       {isOverlayChat && isChatOpen && showChat ? (
-        <Chat screenType={screenType} />
+        <Chat />
       ) : (
         <>
           {hideTabs ? (
@@ -118,11 +118,7 @@ export const SidePaneTabs = React.memo<{
                 )}
               </Text>
 
-              {showChat ? (
-                <Chat screenType={screenType} />
-              ) : (
-                <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
-              )}
+              {showChat ? <Chat /> : <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />}
             </>
           ) : (
             <Tabs.Root
@@ -133,54 +129,56 @@ export const SidePaneTabs = React.memo<{
                 size: '100%',
               }}
             >
-              <Tabs.List css={{ w: 'calc(100% - $12)', p: '$2', borderRadius: '$2', bg: '$surface_default' }}>
-                <Tabs.Trigger
-                  value={SIDE_PANE_OPTIONS.CHAT}
-                  onClick={toggleChat}
-                  css={{
-                    ...tabTriggerCSS,
-                    color: activeTab !== SIDE_PANE_OPTIONS.CHAT ? '$on_surface_low' : '$on_surface_high',
-                  }}
-                >
-                  {chat_title}
-                </Tabs.Trigger>
-                <Tabs.Trigger
-                  value={SIDE_PANE_OPTIONS.PARTICIPANTS}
-                  onClick={toggleParticipants}
-                  css={{
-                    ...tabTriggerCSS,
-                    color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
-                  }}
-                >
-                  Participants &nbsp; <ParticipantCount count={peerCount} />
-                </Tabs.Trigger>
-              </Tabs.List>
+              <Flex css={{ w: '100%' }}>
+                <Tabs.List css={{ flexGrow: 1, borderRadius: '$2', bg: '$surface_default' }}>
+                  <Tabs.Trigger
+                    value={SIDE_PANE_OPTIONS.CHAT}
+                    onClick={toggleChat}
+                    css={{
+                      ...tabTriggerCSS,
+                      color: activeTab !== SIDE_PANE_OPTIONS.CHAT ? '$on_surface_low' : '$on_surface_high',
+                    }}
+                  >
+                    {chat_title}
+                  </Tabs.Trigger>
+                  <Tabs.Trigger
+                    value={SIDE_PANE_OPTIONS.PARTICIPANTS}
+                    onClick={toggleParticipants}
+                    css={{
+                      ...tabTriggerCSS,
+                      color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
+                    }}
+                  >
+                    Participants &nbsp; <ParticipantCount count={peerCount} />
+                  </Tabs.Trigger>
+                </Tabs.List>
+                {showChatSettings ? <ChatSettings /> : null}
+                {isOverlayChat && isChatOpen ? null : (
+                  <IconButton
+                    css={{ my: '$1', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
+                        toggleChat();
+                      } else {
+                        toggleParticipants();
+                      }
+                    }}
+                    data-testid="close_chat"
+                  >
+                    <CrossIcon />
+                  </IconButton>
+                )}
+              </Flex>
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
                 <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
               </Tabs.Content>
               <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0 }}>
-                <Chat screenType={screenType} />
+                <Chat />
               </Tabs.Content>
             </Tabs.Root>
           )}
         </>
-      )}
-
-      {isOverlayChat && isChatOpen ? null : (
-        <IconButton
-          css={{ position: 'absolute', right: '$9', top: '$11', '@md': { top: '$8', right: '$6' } }}
-          onClick={e => {
-            e.stopPropagation();
-            if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
-              toggleChat();
-            } else {
-              toggleParticipants();
-            }
-          }}
-          data-testid="close_chat"
-        >
-          <CrossIcon />
-        </IconButton>
       )}
     </Flex>
   );
