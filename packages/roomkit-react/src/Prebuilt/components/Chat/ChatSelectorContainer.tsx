@@ -99,8 +99,13 @@ export const ChatSelectorContainer = () => {
                   )}
                   {selection}
                 </Text>
-                {selection &&
-                  (open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />)}
+                {selection && (
+                  <ChevronDownIcon
+                    style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 150ms ease' }}
+                    width={12}
+                    height={12}
+                  />
+                )}
               </Flex>
             </Dropdown.Trigger>
 
