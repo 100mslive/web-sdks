@@ -1,4 +1,4 @@
-import { InteractivityListener } from '../../interfaces';
+import { HMSWhiteboard, InteractivityListener } from '../../interfaces';
 import { HMSWhiteboardInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
 import { Store } from '../../sdk/store';
 import { HMSWhiteboardCreateOptions } from '../../signal/interfaces';
@@ -11,7 +11,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     private listener?: InteractivityListener,
   ) {}
 
-  async openWhiteboard(createOptions?: HMSWhiteboardCreateOptions) {
+  async open(createOptions?: HMSWhiteboardCreateOptions) {
     let id = createOptions?.id || this.store.getWhiteboard()?.id;
 
     if (!id) {
@@ -26,8 +26,21 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
       throw new Error(`Whiteboard ID: ${id} not found`);
     }
 
-    const whiteboard = await this.transport.signal.getWhiteboard({ id });
+    const response = await this.transport.signal.getWhiteboard({ id });
+    const whiteboard = { ...response, open: true };
 
-    this.listener?.onWhiteboardUpdate({ ...whiteboard, open: true });
+    this.store.setWhiteboard(whiteboard);
+    this.listener?.onWhiteboardUpdate(whiteboard);
+  }
+
+  async close(id?: string) {
+    const prevWhiteboard = this.store.getWhiteboard(id);
+    if (!prevWhiteboard) {
+      throw new Error(`Whiteboard ID: ${id} not found`);
+    }
+    const whiteboard: HMSWhiteboard = { id: prevWhiteboard.id, title: prevWhiteboard.title, open: false };
+
+    this.store.setWhiteboard(whiteboard);
+    this.listener?.onWhiteboardUpdate(whiteboard);
   }
 }

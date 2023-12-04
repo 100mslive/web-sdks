@@ -1,17 +1,27 @@
-import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponseCreateParams } from '../internal';
-import { IHMSInteractivityCenter, IHMSWhiteboardInteractivityCenter } from '../schema';
+import { HMSWhiteboardInteractivityCenter } from '../interfaces/session-store/interactivity-center';
+import {
+  HMSPollCreateParams,
+  HMSPollQuestionCreateParams,
+  HMSPollQuestionResponseCreateParams,
+  HMSWhiteboardCreateOptions,
+} from '../internal';
+import { IHMSInteractivityCenter } from '../schema';
 import { HMSSdk } from '../sdk';
 
-class HMSWHiteboardInteractivityCenter implements IHMSWhiteboardInteractivityCenter {
+class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
   constructor(private sdk: HMSSdk) {}
 
-  async openWhiteboard() {
-    this.sdk.getInteractivityCenter().whiteboard.openWhiteboard();
+  async open(createOptions?: HMSWhiteboardCreateOptions) {
+    this.sdk.getInteractivityCenter().whiteboard.open(createOptions);
+  }
+
+  async close(id?: string) {
+    this.sdk.getInteractivityCenter().whiteboard.close(id);
   }
 }
 
 export class HMSInteractivityCenter implements IHMSInteractivityCenter {
-  whiteboard = new HMSWHiteboardInteractivityCenter(this.sdk);
+  whiteboard = new WhiteboardInteractivityCenter(this.sdk);
   constructor(private sdk: HMSSdk) {}
 
   private get sdkInteractivityCenter() {

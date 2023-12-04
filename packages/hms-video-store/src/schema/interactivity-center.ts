@@ -1,11 +1,8 @@
 import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponseCreateParams } from '../interfaces';
-
-export interface IHMSWhiteboardInteractivityCenter {
-  openWhiteboard(): Promise<void>;
-}
+import { HMSWhiteboardInteractivityCenter } from '../interfaces/session-store/interactivity-center';
 
 export interface IHMSInteractivityCenter {
-  whiteboard: IHMSWhiteboardInteractivityCenter;
+  whiteboard: HMSWhiteboardInteractivityCenter;
 
   createPoll(poll: HMSPollCreateParams): Promise<void>;
   startPoll(poll: string | HMSPollCreateParams): Promise<void>;

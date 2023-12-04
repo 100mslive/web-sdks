@@ -9,7 +9,7 @@ import {
   isVideoPlaylist,
 } from './selectorUtils';
 // noinspection ES6PreferShortImport
-import { HMSRole } from '../internal';
+import { HMSRole, HMSWhiteboard } from '../internal';
 import {
   HMSException,
   HMSMessage,
@@ -456,3 +456,11 @@ export const selectPolls = (store: HMSStore) => {
 export const selectHandRaisedPeers = createSelector(selectPeers, peers => {
   return peers.filter(peer => peer.isHandRaised);
 });
+
+/** select a map of all the whiteboards in the session */
+export const selectWhiteboards = (store: HMSStore) => store.whiteboards;
+/** select the primary/first whiteboard of a session */
+export const selectWhiteboard = createSelector(
+  selectWhiteboards,
+  whiteboards => Object.values(whiteboards)[0] as HMSWhiteboard | undefined,
+);

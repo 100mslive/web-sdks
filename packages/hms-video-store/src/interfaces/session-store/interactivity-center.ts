@@ -2,7 +2,8 @@ import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionRespon
 import { HMSWhiteboardCreateOptions } from './whiteboard';
 
 export interface HMSWhiteboardInteractivityCenter {
-  openWhiteboard(createOptions?: HMSWhiteboardCreateOptions): Promise<void>;
+  open(createOptions?: HMSWhiteboardCreateOptions): Promise<void>;
+  close(id?: string): Promise<void>;
 }
 
 export interface HMSInteractivityCenter {
