@@ -68,7 +68,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
-        this.effects.showFps();
         this.effects.run();
         // available preset mode = 'quality | balanced | speed | lightning'
         // this.effects.setSegmentationPreset(this.preset);
