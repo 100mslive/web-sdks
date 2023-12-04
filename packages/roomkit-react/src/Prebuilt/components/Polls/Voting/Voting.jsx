@@ -96,7 +96,7 @@ export const Voting = ({ id, toggleVoting }) => {
         {poll.state === 'stopped' && isLocalPeerCreator ? (
           <Button
             css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={async () => console.log(await actions.interactivityCenter.fetchLeaderboard(poll, 0, 50))}
+            onClick={() => setPollView(POLL_VIEWS.RESULTS)}
           >
             View Leaderboard
           </Button>
