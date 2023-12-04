@@ -32,6 +32,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._emitter = new HMSHLSPlayerEventEmitter();
     this._hlsUrl = hlsUrl;
     this._videoEl = videoEl || this.createVideoElement();
+    // apply cue css
+    this.applyTextTrackCss();
     if (!hlsUrl) {
       throw HMSHLSErrorFactory.HLSMediaError.hlsURLNotFound();
     } else if (!hlsUrl.endsWith('m3u8')) {
@@ -61,6 +63,19 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     video.controls = false;
     video.autoplay = true;
     return video;
+  }
+  /**
+   *
+   */
+  private applyTextTrackCss() {
+    if (!this._videoEl) {
+      return;
+    }
+    this._videoEl.classList.add('__hmshlsplayer_video');
+    const styles = `.__hmshlsplayer_video::cue { background-color: '#000'; opacity: .75; white-space: pre-line; color: white; font-size: 16px; font-style: normal; font-weight: 400; line-height: 24px; letter-spacing: 0.5px;} __hmshlsplayer_video::-webkit-media-text-track-display-backdrop { background-color: '#000'; opacity: .75; }`;
+    const styleSheet = document.createElement('style');
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
   }
   /**
    * @returns get html video element
@@ -196,19 +211,15 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl.currentTime = seekValue;
   };
 
-  isCaptionEnabled = () => {
-    return this._isCaptionEnabled;
-  };
-  setCaption = (show: boolean) => {
-    if (this._isCaptionEnabled === show) {
-      return;
-    }
-    if (show) {
+  toggleCaption = () => {
+    if (!this._isCaptionEnabled) {
       this.updateCaptionMode('showing');
       this._isCaptionEnabled = true;
+      this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, true);
     } else {
       this.updateCaptionMode('hidden');
       this._isCaptionEnabled = false;
+      this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, false);
     }
   };
 

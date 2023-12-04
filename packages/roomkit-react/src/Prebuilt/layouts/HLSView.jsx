@@ -34,6 +34,7 @@ const HLSView = () => {
   const [availableLayers, setAvailableLayers] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
+  const [isCaptionEnabled, setIsCaptionEnabled] = useState(true);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -130,6 +131,9 @@ const HLSView = () => {
     };
 
     const playbackEventHandler = data => setIsPaused(data.state === HLSPlaybackState.paused);
+    const captionEnabledEventHandler = data => {
+      setIsCaptionEnabled(data);
+    };
 
     const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
     if (videoEl && hlsUrl) {
@@ -138,6 +142,7 @@ const HLSView = () => {
       hlsPlayer.on(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
       hlsPlayer.on(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.CAPTION_ENABLED, captionEnabledEventHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
 
       hlsPlayer.on(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
@@ -147,6 +152,8 @@ const HLSView = () => {
         hlsPlayer.off(HMSHLSPlayerEvents.ERROR, handleError);
         hlsPlayer.off(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
         hlsPlayer.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+        hlsPlayer.off(HMSHLSPlayerEvents.CAPTION_ENABLED, captionEnabledEventHandler);
+
         hlsPlayer.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
         hlsPlayer.off(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
         hlsPlayer.off(HMSHLSPlayerEvents.LAYER_UPDATED, layerUpdatedHandler);
@@ -361,10 +368,7 @@ const HLSView = () => {
                   </HMSVideoPlayer.Controls.Left>
 
                   <HMSVideoPlayer.Controls.Right>
-                    <HLSCaptionSelector
-                      onClick={show => hlsPlayer?.setCaption(show)}
-                      isEnabled={hlsPlayer?.isCaptionEnabled()}
-                    />
+                    <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}
