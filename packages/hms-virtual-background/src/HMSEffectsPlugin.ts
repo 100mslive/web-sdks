@@ -10,9 +10,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   // Ranges from 0 to 1
   private blurAmount = 0;
   private background: HMSEffectsBackground = '';
-  private beautify = false;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
-  // private preset: 'balanced' | 'speed' | 'lightning' | 'quality' = 'balanced';
 
   constructor() {
     this.effects = new tsvb(EFFECTS_SDK_KEY);
@@ -37,12 +35,11 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBlur(blur: number) {
-    // this.preset = 'speed';
     this.blurAmount = blur;
     this.background = '';
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.effects.clearBackground();
     this.effects.setBlur(blur);
+    this.effects.clearBackground();
   }
 
   removeEffects() {
@@ -53,7 +50,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   setBackground(url: HMSEffectsBackground) {
-    // this.preset = 'balanced';
     this.background = url;
     this.blurAmount = 0;
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
@@ -69,22 +65,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.onReady = () => {
       if (this.effects) {
         this.effects.run();
-        // available preset mode = 'quality | balanced | speed | lightning'
-        // this.effects.setSegmentationPreset(this.preset);
-        // available fit mode = 'fill | fit'
         this.effects.setBackgroundFitMode('fill');
         this.effects.setSegmentationPreset('lightning');
         // Also ranges from 0 to 1
-        // this.effects.setBeautificationLevel(0.5);
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {
           this.setBackground(this.background);
-        }
-        if (this.beautify) {
-          this.effects.enableBeautification();
-        } else {
-          this.effects.disableBeautification();
         }
       }
     };
