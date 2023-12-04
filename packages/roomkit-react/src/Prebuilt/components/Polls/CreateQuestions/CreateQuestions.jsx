@@ -56,6 +56,9 @@ export function CreateQuestions() {
               index={index}
               length={questions.length}
               onSave={questionParams => {
+                if (isQuiz && questionParams.weight) {
+                  questionParams.options[0].weight = questionParams.weight;
+                }
                 setQuestions(questions => [
                   ...questions.slice(0, index),
                   questionParams,
