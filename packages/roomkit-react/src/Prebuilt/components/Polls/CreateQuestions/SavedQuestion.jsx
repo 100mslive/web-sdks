@@ -15,8 +15,8 @@ export const SavedQuestion = ({ question, index, length, convertToDraft, removeQ
       <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>
         {question.text}
       </Text>
-      {question.options.map(option => (
-        <Flex css={{ alignItems: 'center', my: '$xs' }}>
+      {question.options.map((option, index) => (
+        <Flex key={`${option.text}-${index}`} css={{ alignItems: 'center', my: '$xs' }}>
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             {option.text}
           </Text>

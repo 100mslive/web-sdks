@@ -31,6 +31,7 @@ export function CreateQuestions() {
         type: question.type,
         options: question.options,
         skippable: question.skippable,
+        weight: question.weight,
       }));
     await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
@@ -56,14 +57,6 @@ export function CreateQuestions() {
               index={index}
               length={questions.length}
               onSave={questionParams => {
-                const weight = questionParams.weight;
-                if (isQuiz && weight) {
-                  questionParams.options.forEach(option => {
-                    if (option.isCorrectAnswer) {
-                      option.weight = weight;
-                    }
-                  });
-                }
                 setQuestions(questions => [
                   ...questions.slice(0, index),
                   questionParams,

@@ -184,6 +184,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       count,
       offset,
     });
+
     const leaderboardEntries = pollLeaderboard.questions.map(question => {
       return {
         position: question.place,

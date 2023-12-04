@@ -57,6 +57,7 @@ export interface PollQuestionParams {
   question: PollQuestionInfoParams;
   options?: HMSPollQuestionOption[];
   answer?: HMSPollQuestionAnswer;
+  weight?: number;
 }
 
 export interface PollQuestionsSetParams {

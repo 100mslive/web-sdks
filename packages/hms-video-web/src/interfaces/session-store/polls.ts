@@ -63,6 +63,7 @@ export interface HMSPollQuestion {
 export interface HMSPollQuestionCreateParams extends Pick<HMSPollQuestion, 'text' | 'skippable' | 'type' | 'answer'> {
   index?: number;
   options?: HMSPollQuestionOptionCreateParams[];
+  weight?: number;
 }
 
 export interface HMSPollQuestionAnswer {
