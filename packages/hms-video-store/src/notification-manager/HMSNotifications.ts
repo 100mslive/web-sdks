@@ -313,3 +313,10 @@ export interface SessionInfo {
   peer_count: number;
   track_count: number;
 }
+
+export interface WhiteboardInfo {
+  id: string;
+  title?: string;
+  owner?: string;
+  state?: string;
+}

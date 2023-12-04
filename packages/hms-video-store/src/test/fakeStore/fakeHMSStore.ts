@@ -289,6 +289,7 @@ export const makeFakeStore = (): HMSStore => {
     errors: [],
     sessionStore: {},
     polls: {},
+    whiteboards: {},
     hideLocalPeer: false,
   };
 

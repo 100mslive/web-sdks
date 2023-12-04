@@ -3,7 +3,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -49,6 +49,7 @@ class Store {
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
+  private whiteboards = new Map<string, HMSWhiteboard>();
 
   getConfig() {
     return this.config;
@@ -365,6 +366,14 @@ class Store {
 
   getPoll(id: string): HMSPoll | undefined {
     return this.polls.get(id);
+  }
+
+  setWhiteboard(whiteboard: HMSWhiteboard) {
+    this.whiteboards.set(whiteboard.id, whiteboard);
+  }
+
+  getWhiteboard(id?: string): HMSWhiteboard | undefined {
+    return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
   }
 
   getErrorListener() {

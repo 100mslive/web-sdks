@@ -1,8 +1,17 @@
 import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponseCreateParams } from '../internal';
-import { IHMSInteractivityCenter } from '../schema';
+import { IHMSInteractivityCenter, IHMSWhiteboardInteractivityCenter } from '../schema';
 import { HMSSdk } from '../sdk';
 
+class HMSWHiteboardInteractivityCenter implements IHMSWhiteboardInteractivityCenter {
+  constructor(private sdk: HMSSdk) {}
+
+  async openWhiteboard() {
+    this.sdk.getInteractivityCenter().whiteboard.openWhiteboard();
+  }
+}
+
 export class HMSInteractivityCenter implements IHMSInteractivityCenter {
+  whiteboard = new HMSWHiteboardInteractivityCenter(this.sdk);
   constructor(private sdk: HMSSdk) {}
 
   private get sdkInteractivityCenter() {

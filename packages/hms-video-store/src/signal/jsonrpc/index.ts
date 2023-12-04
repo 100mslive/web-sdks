@@ -19,11 +19,14 @@ import { workerSleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
+  CreateWhiteboardResponse,
   findPeersRequestParams,
   getPeerRequestParams,
   GetSessionMetadataResponse,
+  GetWhiteboardResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
+  HMSWhiteboardCreateOptions,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
@@ -57,6 +60,7 @@ import {
   Track,
   TrackUpdateRequestParams,
   UpdatePeerRequestParams,
+  WhiteboardPermissionType,
 } from '../interfaces';
 import { ISignalEventsObserver } from '../ISignalEventsObserver';
 
@@ -472,6 +476,16 @@ export default class JsonRpcSignal {
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
     this.valiateConnection();
     return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { ...params });
+  }
+
+  createWhiteboard(params: HMSWhiteboardCreateOptions) {
+    this.valiateConnection();
+    return this.call<CreateWhiteboardResponse>(HMSSignalMethod.WHITEBOARD_CREATE, { ...params });
+  }
+
+  getWhiteboard(params: { id: string; permission?: Array<WhiteboardPermissionType> }) {
+    this.valiateConnection();
+    return this.call<GetWhiteboardResponse>(HMSSignalMethod.WHITEBOARD_GET, { ...params });
   }
 
   private valiateConnection() {

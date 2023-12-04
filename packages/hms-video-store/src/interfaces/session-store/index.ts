@@ -14,3 +14,4 @@ export interface SessionStoreUpdate {
 }
 
 export * from './polls';
+export * from './whiteboard';
