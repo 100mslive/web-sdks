@@ -17,6 +17,7 @@ class PeersSorter {
   }
 
   setPeersAndTilesPerPage = ({ peers, tilesPerPage }: { peers: HMSPeer[]; tilesPerPage: number }) => {
+    this.speaker = undefined;
     this.tilesPerPage = tilesPerPage;
     const peerIds = new Set(peers.map(peer => peer.id));
     // remove existing peers which are no longer provided
@@ -46,6 +47,8 @@ class PeersSorter {
     this.updateListeners();
     this.listeners.clear();
     this.storeUnsubscribe?.();
+    this.storeUnsubscribe = undefined;
+    this.speaker = undefined;
   };
 
   moveSpeakerToFront = (speaker?: HMSPeer) => {
@@ -68,10 +71,16 @@ class PeersSorter {
   };
 
   onDominantSpeakerChange = (speaker: HMSPeer | null) => {
-    if (speaker && speaker.id !== this?.speaker?.id) {
-      this.speaker = speaker;
-      this.moveSpeakerToFront(speaker);
+    // no speaker or is current speaker do nothing
+    if (!speaker || speaker.id === this.speaker?.id) {
+      return;
     }
+    // if the active speaker is not from the peers passed ignore
+    if (!this.peers.has(speaker.id)) {
+      return;
+    }
+    this.speaker = speaker;
+    this.moveSpeakerToFront(speaker);
   };
 
   updateListeners = () => {
