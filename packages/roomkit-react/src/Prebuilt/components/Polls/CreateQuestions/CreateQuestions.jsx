@@ -56,8 +56,13 @@ export function CreateQuestions() {
               index={index}
               length={questions.length}
               onSave={questionParams => {
-                if (isQuiz && questionParams.weight) {
-                  questionParams.options[0].weight = questionParams.weight;
+                const weight = questionParams.weight;
+                if (isQuiz && weight) {
+                  questionParams.options.forEach(option => {
+                    if (option.isCorrectAnswer) {
+                      option.weight = weight;
+                    }
+                  });
                 }
                 setQuestions(questions => [
                   ...questions.slice(0, index),
