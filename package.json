@@ -56,9 +56,9 @@
     "cypress:open": "cypress open",
     "app": "cd apps/100ms-web && yarn start",
     "app:custom": "cd apps/100ms-custom-app && yarn start",
-    "sdk": "cd packages/hms-video-web && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
+    "prebuilt": "cd packages/roomkit-react && yarn start",
     "controller": "cd packages/hls-controller && yarn start",
     "storybook": "cd packages/roomkit-react && yarn storybook",
     "build-storybook": "cd packages/roomkit-react && yarn build-storybook",
@@ -79,14 +79,6 @@
     "*.(js|ts|jsx|tsx)": "eslint"
   },
   "size-limit": [
-    {
-      "path": "packages/hms-video-web/dist/index.cjs.js",
-      "limit": "80 KB"
-    },
-    {
-      "path": "packages/hms-video-web/dist/index.js",
-      "limit": "80 KB"
-    },
     {
       "path": "packages/hms-video-store/dist/index.cjs.js",
       "limit": "20 KB"
