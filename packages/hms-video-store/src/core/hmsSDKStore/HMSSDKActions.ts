@@ -134,6 +134,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
   }
+  setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
+    this.sdk.updatePlaylistSettings(settings);
+  }
 
   async refreshDevices() {
     await this.sdk.refreshDevices();

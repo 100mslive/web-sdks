@@ -17,7 +17,7 @@ export const VBToggle = () => {
 
   return (
     <Tooltip side="top" disabled={isVBOpen} title="Configure Virtual Background">
-      <IconButton active={!isVBOpen} onClick={toggleVB}>
+      <IconButton active={!isVBOpen} onClick={toggleVB} data-testid="virtual_bg_btn">
         <VirtualBackgroundIcon />
       </IconButton>
     </Tooltip>
