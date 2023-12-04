@@ -7,13 +7,16 @@ const Root = ({
   mediaURL,
   isActive,
   children,
+  testid = '',
 }: {
   onClick?: () => Promise<void>;
   mediaURL?: string;
   isActive: boolean;
   children?: React.JSX.Element[];
+  testid: string;
 }) => (
   <Flex
+    data-testid={testid}
     direction="column"
     align="center"
     css={{
