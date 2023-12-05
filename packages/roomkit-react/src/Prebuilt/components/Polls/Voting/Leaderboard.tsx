@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { HMSPollLeaderboardEntry } from '@100mslive/hms-video';
-import {
-  HMSPollLeaderboardResponse,
-  HMSPollQuestion,
-  selectPollByID,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { HMSPollLeaderboardResponse, selectPollByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Loading } from '../../../../Loading';
@@ -23,17 +16,20 @@ import { POLL_VIEWS } from '../../../common/constants';
 export const Leaderboard = ({ pollID }: { pollID: string }) => {
   const hmsActions = useHMSActions();
   const poll = useHMSStore(selectPollByID(pollID));
-  const [pollLeaderboard, setPollLeaderboard] = useState<HMSPollLeaderboardResponse>();
+  const [pollLeaderboard, setPollLeaderboard] = useState<HMSPollLeaderboardResponse | undefined>();
   const { setPollView } = usePollViewState();
   const toggleSidepane = useSidepaneToggle();
-  // const sharedLeaderboardRef = useRef(false);
-  // const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
-  // const { sendEvent } = useCustomEvent({
-  //   type: HMSNotificationTypes.POLL_LEADERBOARD_SHARED,
-  //   onEvent: () => {
-  //     return;
-  //   },
-  // });
+
+  /*
+  const sharedLeaderboardRef = useRef(false);
+  const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
+  const { sendEvent } = useCustomEvent({
+    type: HMSNotificationTypes.POLL_LEADERBOARD_SHARED,
+    onEvent: () => {
+      return;
+    },
+  });
+   */
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -46,18 +42,11 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
   }, [poll, hmsActions.interactivityCenter]);
 
   if (!poll || !pollLeaderboard) return <Loading />;
-  const maxPossibleScore = poll.questions.reduce(
-    (total: number, question: HMSPollQuestion) => (total += question.weight || 0),
-    0,
-  );
+  const maxPossibleScore = poll.questions?.reduce((total: number, question) => (total += question.weight || 0), 0) || 0;
 
   return (
     <Box>
-      <Flex
-        justify="between"
-        align="center"
-        css={{ flexGrow: 1, py: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}
-      >
+      <Flex justify="between" align="center" css={{ py: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
         <Flex align="center" css={{ gap: '$4' }}>
           <Flex
             css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
@@ -85,7 +74,7 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
       </Text>
       <Box css={{ mt: '$8' }}>
         {pollLeaderboard?.entries &&
-          pollLeaderboard.entries.map((question: HMSPollLeaderboardEntry) => (
+          pollLeaderboard.entries.map(question => (
             <LeaderboardEntry
               key={question.position}
               position={question.position}
