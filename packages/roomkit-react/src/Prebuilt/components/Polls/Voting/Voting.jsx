@@ -3,6 +3,7 @@ import React from 'react';
 import {
   selectLocalPeerID,
   selectPeerNameByID,
+  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -23,6 +24,7 @@ export const Voting = ({ id, toggleVoting }) => {
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
+  const permissions = useHMSStore(selectPermissions);
 
   // const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
 
@@ -31,7 +33,8 @@ export const Voting = ({ id, toggleVoting }) => {
   }
 
   // const isLeaderboardShared = (sharedLeaderboards || []).includes(id);
-  const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous && isLocalPeerCreator;
+  const canViewLeaderboard =
+    poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous && permissions?.pollWrite;
 
   // Sets view - linear or vertical, toggles timer indicator
   const isTimed = (poll.duration || 0) > 0;

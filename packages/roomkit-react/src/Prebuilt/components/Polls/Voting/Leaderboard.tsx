@@ -52,7 +52,7 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
-      <Flex justify="between" align="center" css={{ py: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
+      <Flex justify="between" align="center" css={{ pb: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
         <Flex align="center" css={{ gap: '$4' }}>
           <Flex
             css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
