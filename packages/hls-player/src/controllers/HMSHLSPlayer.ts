@@ -1,5 +1,5 @@
 import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
-import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
+import Hls, { ErrorData, HlsConfig, Level, LevelParsed, MediaPlaylist } from 'hls.js';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import { HMSHLSException } from '../error/HMSHLSException';
@@ -199,27 +199,16 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
 
   toggleCaption = () => {
     if (!this._isCaptionEnabled) {
-      this.updateCaptionMode('showing');
+      this._hls.subtitleDisplay = true;
       this._isCaptionEnabled = true;
       this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, true);
     } else {
-      this.updateCaptionMode('hidden');
+      this._hls.subtitleDisplay = false;
       this._isCaptionEnabled = false;
       this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, false);
     }
   };
 
-  private updateCaptionMode = (mode: TextTrackMode) => {
-    if (!this._videoEl) {
-      console.error('video element is undefined, unable to update caption');
-      return;
-    }
-    for (let textTrackIndex = 0; textTrackIndex < this._videoEl.textTracks.length; textTrackIndex++) {
-      if (this._videoEl.textTracks[textTrackIndex]) {
-        this._videoEl.textTracks[textTrackIndex].mode = mode;
-      }
-    }
-  };
   private playVideo = async () => {
     try {
       if (this._videoEl.paused) {
@@ -316,11 +305,16 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       }
     }
   };
-  private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
+  private manifestLoadedHandler = (
+    _: any,
+    { levels, subtitles }: { levels: LevelParsed[]; subtitles?: MediaPlaylist[] },
+  ) => {
     const layers: HMSHLSLayer[] = mapLayers(this.removeAudioLevels(levels));
     this.emitEvent(HMSHLSPlayerEvents.MANIFEST_LOADED, {
       layers,
     });
+    this._isCaptionEnabled = subtitles && subtitles.length > 0 ? true : false;
+    this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, this._isCaptionEnabled);
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLayer: HMSHLSLayer = mapLayer(this._hls.levels[level]);
