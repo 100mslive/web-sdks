@@ -10,12 +10,14 @@ import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
+import { Button } from '../../Button';
 import { IconButton } from '../../IconButton';
 import { Box, Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { config, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
+import { usePollViewToggle } from '../components/AppData/useSidepane';
 import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;
@@ -43,6 +45,7 @@ const HLSView = () => {
   const controlsTimerRef = useRef();
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const lastHlsUrl = usePrevious(hlsUrl);
+  const togglePollView = usePollViewToggle();
 
   const isMobile = useMedia(config.media.md);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -103,9 +106,31 @@ const HLSView = () => {
           return str;
         }
       };
-      // parse payload and extract start_time and payload
       const duration = rest.duration;
       const parsedPayload = parsePayload(payload);
+      // check if poll happened
+      if (parsedPayload.startsWith('poll:')) {
+        const pollId = parsedPayload.substr(parsedPayload.indexOf(':') + 1);
+        // launch poll
+        ToastManager.addToast({
+          title: `Poll Added`,
+          action: (
+            <Button
+              onClick={() => togglePollView(pollId)}
+              variant="standard"
+              css={{
+                backgroundColor: '$surface_bright',
+                fontWeight: '$semiBold',
+                color: '$on_surface_high',
+                p: '$xs $md',
+              }}
+            >
+              Vote
+            </Button>
+          ),
+        });
+        return;
+      }
       switch (parsedPayload.type) {
         case EMOJI_REACTION_TYPE:
           window.showFlyingEmoji?.({ emojiId: parsedPayload?.emojiId, senderId: parsedPayload?.senderId });

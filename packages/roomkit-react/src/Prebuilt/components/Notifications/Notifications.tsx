@@ -28,6 +28,7 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -43,6 +44,7 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
+  const screenProps = useRoomLayoutConferencingScreen();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
@@ -146,7 +148,7 @@ export function Notifications() {
         break;
 
       case HMSNotificationTypes.POLL_STARTED:
-        if (notification.data.startedBy !== localPeerID) {
+        if (notification.data.startedBy !== localPeerID && screenProps.screenType !== 'hls_live_streaming') {
           const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy)) || 'Participant';
           ToastManager.addToast({
             title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
