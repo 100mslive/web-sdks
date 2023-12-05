@@ -19,13 +19,14 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           fontWeight: '$semiBold',
           lineHeight: '$sm',
           letterSpacing: '0.5px',
-          backgroundClip: 'text',
-          '-webkit-background-clip': 'text',
         },
-        '& video::-webkit-media-text-track-display-backdrop': {
+        '& video::-webkit-media-text-track-display': {
           backgroundColor: '#000',
           opacity: 0.75,
-          maxWidth: '50%',
+          padding: '0 $4',
+        },
+        '& video::-webkit-media-text-track-container': {
+          fontSize: '$space$10 !important',
         },
       }}
       direction="column"
