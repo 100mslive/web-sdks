@@ -14,7 +14,7 @@ const useWhiteboardEmbed = () => {
     if (!whiteboard?.token || !iframeRef.current) {
       return;
     }
-    iframeRef.current.src = `https://whiteboard.100ms.live/?token=${whiteboard.token}`;
+    iframeRef.current.src = `https://whiteboard-qa.100ms.live/?token=${whiteboard.token}`;
   }, [whiteboard?.token]);
 
   return iframeRef;
@@ -36,7 +36,7 @@ const EmbedComponent = () => {
       }}
     >
       <iframe
-        title="Embed View"
+        title="Whiteboard View"
         ref={iframeRef}
         style={{
           width: '100%',
