@@ -8,14 +8,14 @@ const positionColorMap: Record<number, string> = { 1: '#D69516', 2: '#3E3E3E', 3
 export const LeaderboardEntry = ({
   position,
   score,
-  totalResponses,
+  questionCount,
   correctResponses,
   userName,
   maxPossibleScore,
 }: {
   position: number;
   score: number;
-  totalResponses: number;
+  questionCount: number;
   correctResponses: number;
   userName: string;
   maxPossibleScore: number;
@@ -52,9 +52,11 @@ export const LeaderboardEntry = ({
       <Flex align="center" css={{ gap: '$6', color: '$on_surface_medium' }}>
         {position === 1 ? <TrophyFilledIcon /> : null}
         <CheckCircleIcon height={16} width={16} />
-        <Text variant="xs">
-          {correctResponses}/{totalResponses}
-        </Text>
+        {questionCount ? (
+          <Text variant="xs">
+            {correctResponses}/{questionCount}
+          </Text>
+        ) : null}
       </Flex>
     </Flex>
   );
