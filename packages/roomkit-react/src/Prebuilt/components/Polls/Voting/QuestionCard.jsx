@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useCallback, useMemo, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, IconButton, Input, styled, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
@@ -72,6 +72,8 @@ export const QuestionCard = ({
 
   const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
 
+  const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
+
   const isValidVote = useMemo(() => {
     if (stringAnswerExpected) {
       return textAnswer.length > 0;
@@ -113,14 +115,21 @@ export const QuestionCard = ({
         borderRadius: '$1',
         p: '$md',
         mt: '$md',
-        border:
-          isQuiz && localPeerResponse && !localPeerResponse.skipped
-            ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}`
-            : 'none',
+        border: respondedToQuiz ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}` : 'none',
       }}
     >
       <Flex align="center" justify="between">
-        <Text variant="caption" css={{ color: '$on_surface_low', fontWeight: '$semiBold' }}>
+        <Text
+          variant="caption"
+          css={{
+            color: respondedToQuiz ? (isCorrectAnswer ? '$alert_success' : '$alert_error_default') : '$on_surface_low',
+            fontWeight: '$semiBold',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {respondedToQuiz && isCorrectAnswer ? <CheckCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && !isCorrectAnswer ? <CrossCircleIcon height={20} width={20} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
 

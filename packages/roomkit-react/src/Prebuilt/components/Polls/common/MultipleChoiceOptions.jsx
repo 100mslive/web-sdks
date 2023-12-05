@@ -8,9 +8,7 @@ import { VoteProgress } from './VoteProgress';
 
 export const MultipleChoiceOptions = ({
   questionIndex,
-  isQuiz,
   options,
-  correctOptionIndexes,
   canRespond,
   response,
   totalResponses,
@@ -31,8 +29,6 @@ export const MultipleChoiceOptions = ({
   return (
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map(option => {
-        const isCorrectAnswer = isQuiz && correctOptionIndexes?.includes(option.index);
-
         return (
           <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$9' }}>
             <Checkbox.Root
@@ -54,9 +50,7 @@ export const MultipleChoiceOptions = ({
                 <Text css={{ display: 'flex', flexGrow: '1' }}>
                   <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
                 </Text>
-                {showVoteCount && (
-                  <VoteCount isQuiz={isQuiz} isCorrectAnswer={isCorrectAnswer} voteCount={option.voteCount} />
-                )}
+                {showVoteCount && <VoteCount voteCount={option.voteCount} />}
               </Flex>
               {showVoteCount && <VoteProgress option={option} totalResponses={totalResponses} />}
             </Flex>
