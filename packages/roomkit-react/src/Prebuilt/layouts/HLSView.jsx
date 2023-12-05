@@ -35,6 +35,7 @@ const HLSView = () => {
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
   const [isCaptionEnabled, setIsCaptionEnabled] = useState(true);
+  const [hasCaptions, setHasCaptions] = useState(false);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -51,16 +52,6 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
-  const applyTextTrackCss = videoElem => {
-    if (!videoElem) {
-      return;
-    }
-    videoElem.classList.add('__prebuilt_videoplayer');
-    const styles = `.__prebuilt_videoplayer::cue { background-color: '#000'; color: var(--base-white, #FFF); opacity: .75; text-shadow: 0px 0px 4px #000; white-space: pre-line; font-size: 18px; font-style: normal; font-weight: 600; line-height: 20px; letter-spacing: 0.5px;} __prebuilt_videoplayer::-webkit-media-text-track-display-backdrop { background-color: '#000'; opacity: .75; }`;
-    const styleSheet = document.createElement('style');
-    styleSheet.innerText = styles;
-    document.head.appendChild(styleSheet);
-  };
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
     /**
@@ -84,7 +75,6 @@ const HLSView = () => {
 
   useEffect(() => {
     const videoElem = videoRef.current;
-    applyTextTrackCss(videoElem);
     const setStreamEndedCallback = () => {
       setStreamEnded(true);
       // no point keeping the callback attached once the streaming is ended
@@ -103,6 +93,7 @@ const HLSView = () => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = ({ layers }) => {
       setAvailableLayers(layers);
+      setHasCaptions(hlsPlayer?.hasCaptions());
     };
     const layerUpdatedHandler = ({ layer }) => {
       setCurrentSelectedQuality(layer);
@@ -378,7 +369,9 @@ const HLSView = () => {
                   </HMSVideoPlayer.Controls.Left>
 
                   <HMSVideoPlayer.Controls.Right>
-                    <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                    {hasCaptions && (
+                      <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                    )}
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}

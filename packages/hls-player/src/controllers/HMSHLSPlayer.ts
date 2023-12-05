@@ -1,5 +1,5 @@
 import { HlsPlayerStats, HlsStats } from '@100mslive/hls-stats';
-import Hls, { ErrorData, HlsConfig, Level, LevelParsed, MediaPlaylist } from 'hls.js';
+import Hls, { ErrorData, HlsConfig, Level, LevelParsed } from 'hls.js';
 import { HMSHLSTimedMetadata } from './HMSHLSTimedMetadata';
 import { HMSHLSErrorFactory } from '../error/HMSHLSErrorFactory';
 import { HMSHLSException } from '../error/HMSHLSException';
@@ -19,7 +19,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private _isLive: boolean;
   private _volume: number;
   private _metaData: HMSHLSTimedMetadata;
-  private _isCaptionEnabled: boolean;
   private readonly TAG = '[HMSHLSPlayer]';
   /**
    * Initiliaze the player with hlsUrl and video element
@@ -41,7 +40,6 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._hls.attachMedia(this._videoEl);
     this._isLive = true;
     this._volume = this._videoEl.volume * 100;
-    this._isCaptionEnabled = true;
     this._hlsStats = new HlsStats(this._hls, this._videoEl);
     this.listenHLSEvent();
     this._metaData = new HMSHLSTimedMetadata(this._hls, this._videoEl, this.emitEvent);
@@ -197,16 +195,17 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     this._videoEl.currentTime = seekValue;
   };
 
+  hasCaptions = () => {
+    return this._hls.subtitleTracks.length > 0;
+  };
+
   toggleCaption = () => {
-    if (!this._isCaptionEnabled) {
-      this._hls.subtitleDisplay = true;
-      this._isCaptionEnabled = true;
-      this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, true);
-    } else {
-      this._hls.subtitleDisplay = false;
-      this._isCaptionEnabled = false;
-      this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, false);
+    // no subtitles, do nothing
+    if (!this.hasCaptions()) {
+      return;
     }
+    this._hls.subtitleDisplay = !this._hls.subtitleDisplay;
+    this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, this._hls.subtitleDisplay);
   };
 
   private playVideo = async () => {
@@ -305,16 +304,11 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
       }
     }
   };
-  private manifestLoadedHandler = (
-    _: any,
-    { levels, subtitles }: { levels: LevelParsed[]; subtitles?: MediaPlaylist[] },
-  ) => {
+  private manifestLoadedHandler = (_: any, { levels }: { levels: LevelParsed[] }) => {
     const layers: HMSHLSLayer[] = mapLayers(this.removeAudioLevels(levels));
     this.emitEvent(HMSHLSPlayerEvents.MANIFEST_LOADED, {
       layers,
     });
-    this._isCaptionEnabled = subtitles && subtitles.length > 0 ? true : false;
-    this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, this._isCaptionEnabled);
   };
   private levelUpdatedHandler = (_: any, { level }: { level: number }) => {
     const qualityLayer: HMSHLSLayer = mapLayer(this._hls.levels[level]);
