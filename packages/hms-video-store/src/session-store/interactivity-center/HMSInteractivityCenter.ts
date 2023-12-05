@@ -1,9 +1,6 @@
 import { WhiteboardInteractivityCenter } from './HMSWhiteboardCenter';
 import { HMSPollQuestionCreateParams, HMSPollsUpdate, InteractivityListener } from '../../interfaces';
-import {
-  HMSInteractivityCenter,
-  HMSWhiteboardInteractivityCenter,
-} from '../../interfaces/session-store/interactivity-center';
+import { HMSInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
 import {
   HMSPoll,
   HMSPollCreateParams,
@@ -20,13 +17,14 @@ import HMSTransport from '../../transport';
 import { convertDateNumToDate } from '../../utils/date';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
-  whiteboard: HMSWhiteboardInteractivityCenter;
+  whiteboard: WhiteboardInteractivityCenter;
   constructor(private transport: HMSTransport, private store: Store, private listener?: InteractivityListener) {
     this.whiteboard = new WhiteboardInteractivityCenter(transport, store, listener);
   }
 
   setListener(listener?: InteractivityListener) {
     this.listener = listener;
+    this.whiteboard.setListener(listener);
   }
 
   async createPoll(pollParams: HMSPollCreateParams) {

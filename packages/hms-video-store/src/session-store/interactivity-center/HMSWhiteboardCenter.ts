@@ -43,4 +43,8 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     this.store.setWhiteboard(whiteboard);
     this.listener?.onWhiteboardUpdate(whiteboard);
   }
+
+  setListener(listener?: InteractivityListener) {
+    this.listener = listener;
+  }
 }
