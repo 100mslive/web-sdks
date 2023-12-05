@@ -1,13 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
-import { selectPeers, selectPeerScreenSharing, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  selectLocalPeerRoleName,
+  selectPeers,
+  selectPeerScreenSharing,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { EqualProminence } from './EqualProminence';
 import { RoleProminence } from './RoleProminence';
 import { ScreenshareLayout } from './ScreenshareLayout';
 // @ts-ignore: No implicit Any
-import { usePinnedTrack } from '../AppData/useUISettings';
+import { usePinnedTrack, useSetAppDataByKey } from '../AppData/useUISettings';
 import { VideoTileContext } from '../hooks/useVideoTileLayout';
 import PeersSorter from '../../common/PeersSorter';
+import { APP_DATA } from '../../common/constants';
 
 export type TileCustomisationProps = {
   hide_participant_name_on_tile: boolean;
@@ -34,6 +41,8 @@ export const GridLayout = ({
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const pinnedTrack = usePinnedTrack();
   const peers = useHMSStore(selectPeers);
+  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const [activeScreensharePeerId] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const isRoleProminence =
     (prominentRoles.length &&
       peers.some(
@@ -41,11 +50,20 @@ export const GridLayout = ({
       )) ||
     pinnedTrack;
   const updatedPeers = useMemo(() => {
-    if (isInsetEnabled && !isRoleProminence && !peerSharing) {
-      return peers.filter(peer => !peer.isLocal);
+    // remove screenshare peer from active speaker sorting
+    if (activeScreensharePeerId) {
+      return peers.filter(peer => peer.id !== activeScreensharePeerId);
+    }
+    if (isInsetEnabled) {
+      // if localPeer role is prominent role, it shows up in the center, so allow it in active speaker sorting
+      if (localPeerRole && prominentRoles.includes(localPeerRole)) {
+        return peers;
+      } else {
+        return peers.filter(peer => !peer.isLocal);
+      }
     }
     return peers;
-  }, [isInsetEnabled, isRoleProminence, peerSharing, peers]);
+  }, [isInsetEnabled, activeScreensharePeerId, localPeerRole, prominentRoles, peers]);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(updatedPeers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
@@ -61,7 +79,7 @@ export const GridLayout = ({
   };
 
   useEffect(() => {
-    if (mainPage !== 0) {
+    if (mainPage !== 0 || pageSize === 0) {
       return;
     }
     peersSorter.setPeersAndTilesPerPage({

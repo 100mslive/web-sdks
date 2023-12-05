@@ -63,6 +63,7 @@ export interface HMSPollQuestion {
 export interface HMSPollQuestionCreateParams extends Pick<HMSPollQuestion, 'text' | 'skippable' | 'type' | 'answer'> {
   index?: number;
   options?: HMSPollQuestionOptionCreateParams[];
+  weight?: number;
 }
 
 export interface HMSPollQuestionAnswer {
@@ -79,6 +80,12 @@ export enum HMSPollQuestionType {
   MULTIPLE_CHOICE = 'multiple-choice',
   SHORT_ANSWER = 'short-answer',
   LONG_ANSWER = 'long-answer',
+}
+
+export enum HMSPollStates {
+  CREATED = 'created',
+  STARTED = 'started',
+  STOPPED = 'stopped',
 }
 
 export interface HMSPollQuestionOption {
@@ -134,4 +141,18 @@ export interface HMSPollQuestionResult {
   correctResponses?: number;
   skippedCount?: number;
   totalResponses?: number;
+}
+
+export interface HMSPollLeaderboardEntry {
+  position: number;
+  score: number;
+  totalResponses: number;
+  correctResponses: number;
+  duration: number;
+  peer: HMSPollResponsePeerInfo;
+}
+
+export interface HMSPollLeaderboardResponse {
+  entries: HMSPollLeaderboardEntry[];
+  hasNext: boolean;
 }
