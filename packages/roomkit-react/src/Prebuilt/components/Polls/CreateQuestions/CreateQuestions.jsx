@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { selectPollByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectPollByID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';
 import { Button, Flex, Text } from '../../../../';
 import { Container, ContentHeader } from '../../Streaming/Common';
@@ -14,6 +14,7 @@ import { POLL_VIEWS } from '../../../common/constants';
 export function CreateQuestions() {
   const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
+  const { isHLSRunning } = useRecordingStreaming();
   const togglePollView = usePollViewToggle();
   const { pollInView: id, setPollView } = usePollViewState();
   const interaction = useHMSStore(selectPollByID(id));
@@ -35,8 +36,26 @@ export function CreateQuestions() {
       }));
     await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
+    await sendTimedMetadata(id);
     setPollView(POLL_VIEWS.VOTE);
   };
+
+  const sendTimedMetadata = async poll_id => {
+    // send hls timedmetadata when it is running
+    if (poll_id && isHLSRunning) {
+      try {
+        await actions.sendHLSTimedMetadata([
+          {
+            payload: `poll:${poll_id}`,
+            duration: 100,
+          },
+        ]);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   const headingTitle = interaction?.type
     ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
     : 'Polls and Quizzes';
