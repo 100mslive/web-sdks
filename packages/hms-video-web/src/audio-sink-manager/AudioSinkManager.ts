@@ -261,6 +261,9 @@ export class AudioSinkManager {
     }
   };
 
+  /**
+   * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
+   */
   private autoSelectAudio = async () => {
     if (this.audioSink?.children.length === 0) {
       const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
