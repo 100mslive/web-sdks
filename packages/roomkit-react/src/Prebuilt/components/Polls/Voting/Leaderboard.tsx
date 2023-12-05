@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { selectPollByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSPollLeaderboardEntry } from '@100mslive/hms-video';
+import {
+  HMSPollLeaderboardResponse,
+  HMSPollQuestion,
+  selectPollByID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Loading } from '../../../../Loading';
@@ -16,7 +23,7 @@ import { POLL_VIEWS } from '../../../common/constants';
 export const Leaderboard = ({ pollID }: { pollID: string }) => {
   const hmsActions = useHMSActions();
   const poll = useHMSStore(selectPollByID(pollID));
-  const [pollLeaderboard, setPollLeaderboard] = useState<any>();
+  const [pollLeaderboard, setPollLeaderboard] = useState<HMSPollLeaderboardResponse>();
   const { setPollView } = usePollViewState();
   const toggleSidepane = useSidepaneToggle();
   // const sharedLeaderboardRef = useRef(false);
@@ -39,6 +46,10 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
   }, [poll, hmsActions.interactivityCenter]);
 
   if (!poll || !pollLeaderboard) return <Loading />;
+  const maxPossibleScore = poll.questions.reduce(
+    (total: number, question: HMSPollQuestion) => (total += question.weight || 0),
+    0,
+  );
 
   return (
     <Box>
@@ -73,16 +84,18 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
         Based on score and time taken to cast the correct answer
       </Text>
       <Box css={{ mt: '$8' }}>
-        {pollLeaderboard?.entries.map((question: any) => (
-          <LeaderboardEntry
-            key={question.position}
-            position={question.position}
-            score={question.score}
-            totalResponses={question.totalResponses}
-            correctResponses={question.correctResponses}
-            userName={question.peer.username || ''}
-          />
-        ))}
+        {pollLeaderboard?.entries &&
+          pollLeaderboard.entries.map((question: HMSPollLeaderboardEntry) => (
+            <LeaderboardEntry
+              key={question.position}
+              position={question.position}
+              score={question.score}
+              totalResponses={question.totalResponses}
+              correctResponses={question.correctResponses}
+              userName={question.peer.username || ''}
+              maxPossibleScore={maxPossibleScore}
+            />
+          ))}
       </Box>
 
       {/* {!sharedLeaderboardRef.current ? (
