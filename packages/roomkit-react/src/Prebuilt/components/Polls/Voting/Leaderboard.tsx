@@ -79,17 +79,18 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
         Based on score and time taken to cast the correct answer
       </Text>
       <Box css={{ mt: '$8', gap: '$4', overflowY: 'auto', flex: '1 1 0', mr: '-$6', pr: '$6' }}>
-        {pollLeaderboard.entries.map(question => (
-          <LeaderboardEntry
-            key={question.position}
-            position={question.position}
-            score={question.score}
-            questionCount={questionCount}
-            correctResponses={question.correctResponses}
-            userName={question.peer.username || ''}
-            maxPossibleScore={maxPossibleScore}
-          />
-        ))}
+        {pollLeaderboard?.entries &&
+          pollLeaderboard.entries.map(question => (
+            <LeaderboardEntry
+              key={question.position}
+              position={question.position}
+              score={question.score}
+              questionCount={questionCount}
+              correctResponses={question.correctResponses}
+              userName={question.peer.username || ''}
+              maxPossibleScore={maxPossibleScore}
+            />
+          ))}
       </Box>
 
       {/* {!sharedLeaderboardRef.current ? (

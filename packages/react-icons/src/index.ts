@@ -244,6 +244,7 @@ export { default as TranscriptIcon } from './TranscriptIcon';
 export { default as TrashIcon } from './TrashIcon';
 export { default as TrophyFilledIcon } from './TrophyFilledIcon';
 export { default as TwitterIcon } from './TwitterIcon';
+export { default as UnpinIcon } from './UnpinIcon';
 export { default as UploadIcon } from './UploadIcon';
 export { default as VerifiedIcon } from './VerifiedIcon';
 export { default as VerticalMenuIcon } from './VerticalMenuIcon';

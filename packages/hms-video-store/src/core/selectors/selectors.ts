@@ -379,7 +379,7 @@ export const selectHMSBroadcastMessages = createSelector(selectHMSMessages, mess
   return messages.filter(m => !m.recipientPeer && !(m.recipientRoles && m.recipientRoles?.length > 0));
 });
 /**
- * Select the nuber of unread broadcast messages
+ * Select the number of unread broadcast messages
  */
 export const selectUnreadHMSBroadcastMessagesCount = createSelector(selectHMSBroadcastMessages, messages => {
   return messages.filter(m => !m.read).length;

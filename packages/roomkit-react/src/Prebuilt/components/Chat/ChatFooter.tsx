@@ -8,17 +8,15 @@ import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, 
 import { IconButton } from '../../../IconButton';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
-// @ts-ignore
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // import { ChatSelectorContainer } from './ChatSelectorContainer';
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
-import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSubscribeChatSelector } from '../AppData/useUISettings';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -82,17 +80,12 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
-  const can_disable_chat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const defaultSelection = useDefaultChatSelection();
+  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || defaultSelection;
-  useEffect(() => {
-    if (!selectedPeer && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
-      setRoleSelector(defaultSelection);
-    }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+  const selection = selectorPeerName || selectedRole || CHAT_SELECTOR.EVERYONE;
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -134,7 +127,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
     <Box>
       <Flex>
         <ChatSelectorContainer />
-        {can_disable_chat ? (
+        {canDisableChat && isMobile && isOverlayChat ? (
           <Flex align="center" justify="end" css={{ mb: '$4' }}>
             <Popover.Root>
               <Popover.Trigger asChild>
@@ -179,7 +172,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
           </Flex>
         ) : null}
       </Flex>
-      {selection && (
+      {!(selection === CHAT_SELECTOR.EVERYONE && !isPublicChatEnabled) && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="center"
