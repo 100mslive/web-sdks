@@ -57,7 +57,7 @@ export const Voting = ({ id, toggleVoting }) => {
         >
           <ChevronLeftIcon />
         </Flex>
-        <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
+        <Text variant="h6">{poll.title}</Text>
         <StatusIndicator isLive={isLive} />
         <Box
           css={{
