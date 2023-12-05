@@ -157,7 +157,7 @@ export class AudioSinkManager {
     track.setVolume(this.volume);
     HMSLogger.d(this.TAG, 'Audio track added', `${track}`);
     this.init(); // call to create sink element if not already created
-    await this.autoSelectAudio();
+    await this.autoSelectAudioOutput();
     this.audioSink?.append(audioEl);
     this.outputDevice && (await track.setOutputDevice(this.outputDevice));
     audioEl.srcObject = new MediaStream([track.nativeTrack]);
@@ -264,7 +264,7 @@ export class AudioSinkManager {
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
-  private autoSelectAudio = async () => {
+  private autoSelectAudioOutput = async () => {
     if (this.audioSink?.children.length === 0) {
       const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
