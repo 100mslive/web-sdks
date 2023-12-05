@@ -221,14 +221,14 @@ export const QuestionCard = ({
           onSkip={handleSkip}
           onVote={handleVote}
           response={localPeerResponse}
-          stringAnswerExpected={stringAnswerExpected}
+          isQuiz={isQuiz}
         />
       )}
     </Box>
   );
 };
 
-const QuestionActions = ({ isValidVote, skippable, response, stringAnswerExpected, onVote, onSkip }) => {
+const QuestionActions = ({ isValidVote, skippable, response, isQuiz, onVote, onSkip }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
       {skippable && !response ? (
@@ -239,11 +239,13 @@ const QuestionActions = ({ isValidVote, skippable, response, stringAnswerExpecte
 
       {response ? (
         <Text css={{ fontWeight: '$semiBold', color: '$on_surface_medium' }}>
-          {response.skipped ? 'Skipped' : stringAnswerExpected ? 'Submitted' : 'Voted'}
+          {response.skipped ? 'Skipped' : null}
+          {isQuiz && !response.skipped ? 'Answered' : null}
+          {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
         <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
-          {stringAnswerExpected ? 'Submit' : 'Vote'}
+          {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}
     </Flex>
