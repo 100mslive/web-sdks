@@ -41,8 +41,13 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
     fetchLeaderboardData();
   }, [poll, hmsActions.interactivityCenter]);
 
-  if (!poll || !pollLeaderboard) return <Loading />;
-  const maxPossibleScore = poll.questions?.reduce((total: number, question) => (total += question.weight || 0), 0) || 0;
+  if (!poll || !pollLeaderboard)
+    return (
+      <Flex align="center" justify="center" css={{ size: '100%' }}>
+        <Loading />
+      </Flex>
+    );
+  const maxPossibleScore = poll.questions?.reduce((total, question) => (total += question.weight || 0), 0) || 0;
 
   return (
     <Box>

@@ -3,6 +3,8 @@ import { CheckCircleIcon, TrophyFilledIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Text } from '../../../../Text';
 
+const positionColorMap: Record<number, string> = { 1: '#D69516', 2: '#3E3E3E', 3: '#583B0F' };
+
 export const LeaderboardEntry = ({
   position,
   score,
@@ -18,7 +20,6 @@ export const LeaderboardEntry = ({
   userName: string;
   maxPossibleScore: number;
 }) => {
-  const positionColorMap: Record<number, string> = { 1: '#D69516', 2: '#3E3E3E', 3: '#583B0F' };
   return (
     <Flex align="center" justify="between">
       <Flex align="center" css={{ gap: '$6' }}>
