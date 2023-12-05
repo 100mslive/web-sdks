@@ -71,7 +71,7 @@ export class NotificationManager {
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
     this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
     this.pollsManager = new PollsManager(this.store, this.transport, this.listener);
-    this.whiteboardManager = new WhiteboardManager(this.store, this.listener);
+    this.whiteboardManager = new WhiteboardManager(this.store, this.transport, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {

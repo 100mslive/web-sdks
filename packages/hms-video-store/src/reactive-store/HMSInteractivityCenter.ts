@@ -12,11 +12,11 @@ class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter 
   constructor(private sdk: HMSSdk) {}
 
   async open(createOptions?: HMSWhiteboardCreateOptions) {
-    this.sdk.getInteractivityCenter().whiteboard.open(createOptions);
+    await this.sdk.getInteractivityCenter().whiteboard.open(createOptions);
   }
 
   async close(id?: string) {
-    this.sdk.getInteractivityCenter().whiteboard.close(id);
+    await this.sdk.getInteractivityCenter().whiteboard.close(id);
   }
 }
 

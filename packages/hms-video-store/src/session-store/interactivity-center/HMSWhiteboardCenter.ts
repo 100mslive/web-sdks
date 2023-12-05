@@ -12,9 +12,10 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
   ) {}
 
   async open(createOptions?: HMSWhiteboardCreateOptions) {
-    let id = createOptions?.id || this.store.getWhiteboard()?.id;
+    const prevWhiteboard = this.store.getWhiteboard(createOptions?.id);
+    let id = prevWhiteboard?.id;
 
-    if (!id) {
+    if (!prevWhiteboard) {
       const response = await this.transport.signal.createWhiteboard(
         createOptions || {
           title: `${this.store.getRoom()?.id} Whiteboard`,
@@ -27,7 +28,17 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     }
 
     const response = await this.transport.signal.getWhiteboard({ id });
-    const whiteboard = { ...response, open: true };
+    const whiteboard: HMSWhiteboard = {
+      ...prevWhiteboard,
+      title: createOptions?.title,
+      attributes: createOptions?.attributes,
+      id: response.id,
+      token: response.token,
+      addr: response.addr,
+      owner: response.owner,
+      permissions: response.permissions || [],
+      open: true,
+    };
 
     this.store.setWhiteboard(whiteboard);
     this.listener?.onWhiteboardUpdate(whiteboard);

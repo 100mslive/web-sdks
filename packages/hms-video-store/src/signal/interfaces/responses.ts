@@ -42,7 +42,7 @@ export interface GetWhiteboardResponse {
   addr: string;
   token: string;
   owner: string;
-  permission: Array<WhiteboardPermissionType>;
+  permissions: Array<WhiteboardPermissionType>;
 }
 
 export type { WhiteboardPermissionType };

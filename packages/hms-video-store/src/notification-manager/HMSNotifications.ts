@@ -319,4 +319,5 @@ export interface WhiteboardInfo {
   title?: string;
   owner?: string;
   state?: string;
+  attributes?: Array<{ name: string; value: unknown }>;
 }
