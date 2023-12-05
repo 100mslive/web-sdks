@@ -1,4 +1,5 @@
 import {
+  HMSPoll,
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
@@ -31,5 +32,9 @@ export class HMSInteractivityCenter implements IHMSInteractivityCenter {
 
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]) {
     return this.sdkInteractivityCenter.addResponsesToPoll(pollID, responses);
+  }
+
+  fetchLeaderboard(poll: HMSPoll, offset: number, count: number) {
+    return this.sdkInteractivityCenter.fetchLeaderboard(poll, offset, count);
   }
 }

@@ -32,6 +32,8 @@ import {
   PollInfoGetResponse,
   PollInfoSetParams,
   PollInfoSetResponse,
+  PollLeaderboardGetParams,
+  PollLeaderboardGetResponse,
   PollListParams,
   PollListResponse,
   PollQuestionsGetParams,
@@ -426,56 +428,50 @@ export default class JsonRpcSignal implements ISignal {
   }
 
   setPollInfo(params: PollInfoSetParams) {
-    this.valiateConnection();
     return this.call<PollInfoSetResponse>(HMSSignalMethod.POLL_INFO_SET, { ...params });
   }
 
   getPollInfo(params: PollInfoGetParams) {
-    this.valiateConnection();
     return this.call<PollInfoGetResponse>(HMSSignalMethod.POLL_INFO_GET, { ...params });
   }
 
   setPollQuestions(params: PollQuestionsSetParams) {
-    this.valiateConnection();
     return this.call<PollQuestionsSetResponse>(HMSSignalMethod.POLL_QUESTIONS_SET, { ...params });
   }
 
   startPoll(params: PollStartParams) {
-    this.valiateConnection();
     return this.call<PollStartResponse>(HMSSignalMethod.POLL_START, { ...params });
   }
 
   stopPoll(params: PollStopParams) {
-    this.valiateConnection();
     return this.call<PollStopResponse>(HMSSignalMethod.POLL_STOP, { ...params });
   }
 
   getPollQuestions(params: PollQuestionsGetParams): Promise<PollQuestionsGetResponse> {
-    this.valiateConnection();
     return this.call<PollQuestionsGetResponse>(HMSSignalMethod.POLL_QUESTIONS_GET, { ...params });
   }
 
   setPollResponses(params: PollResponseSetParams): Promise<PollResponseSetResponse> {
-    this.valiateConnection();
     return this.call<PollResponseSetResponse>(HMSSignalMethod.POLL_RESPONSE_SET, { ...params });
   }
 
   getPollResponses(params: PollResponsesGetParams): Promise<PollResponsesGetResponse> {
-    this.valiateConnection();
     return this.call<PollResponsesGetResponse>(HMSSignalMethod.POLL_RESPONSES, { ...params });
   }
 
   getPollsList(params: PollListParams): Promise<PollListResponse> {
-    this.valiateConnection();
     return this.call<PollListResponse>(HMSSignalMethod.POLL_LIST, { ...params });
   }
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
-    this.valiateConnection();
     return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { ...params });
   }
 
-  private valiateConnection() {
+  fetchPollLeaderboard(params: PollLeaderboardGetParams): Promise<PollLeaderboardGetResponse> {
+    return this.call<PollLeaderboardGetResponse>(HMSSignalMethod.POLL_LEADERBOARD, { ...params });
+  }
+
+  private validateConnection() {
     if (!this.isConnected) {
       throw ErrorFactory.WebSocketConnectionErrors.WebSocketConnectionLost(
         HMSAction.RECONNECT_SIGNAL,
@@ -586,7 +582,7 @@ export default class JsonRpcSignal implements ISignal {
   private async call<T>(method: HMSSignalMethod, params: Record<string, any>): Promise<T> {
     const MAX_RETRIES = 3;
     let error: HMSException = ErrorFactory.WebsocketMethodErrors.ServerErrors(500, method, `Default ${method} error`);
-
+    this.validateConnection();
     let retry;
     for (retry = 1; retry <= MAX_RETRIES; retry++) {
       try {

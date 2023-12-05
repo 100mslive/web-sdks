@@ -31,6 +31,7 @@ export function CreateQuestions() {
         type: question.type,
         options: question.options,
         skippable: question.skippable,
+        weight: question.weight,
       }));
     await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);

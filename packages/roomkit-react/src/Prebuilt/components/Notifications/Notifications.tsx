@@ -53,7 +53,36 @@ export function Notifications() {
     });
   }, []);
 
+  /*
+  const leaderboardResultsShared = useCallback(
+    (stringifiedPollDetails: string) => {
+      const pollDetails = JSON.parse(stringifiedPollDetails);
+      if (pollDetails.startedBy !== localPeerID) {
+        const pollStartedBy = pollDetails.initiatorName;
+        ToastManager.addToast({
+          title: `${pollStartedBy} shared leaderboard for the quiz`,
+          action: (
+            <Button
+              onClick={() => togglePollView(pollDetails.id)}
+              variant="standard"
+              css={{
+                backgroundColor: '$surface_bright',
+                fontWeight: '$semiBold',
+                color: '$on_surface_high',
+                p: '$xs $md',
+              }}
+            >
+              View
+            </Button>
+          ),
+        });
+      }
+    },
+    [localPeerID, togglePollView],
+  );  */
+
   useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
+  // useCustomEvent({ type: 'POLL_LEADERBOARD_SHARED', onEvent: leaderboardResultsShared });
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {
