@@ -4,6 +4,7 @@ import {
   selectLocalPeerID,
   selectPeerNameByID,
   selectPollByID,
+  selectSessionStore,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -15,7 +16,7 @@ import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 import { usePollViewState } from '../../AppData/useUISettings';
 import { StatusIndicator } from '../common/StatusIndicator';
-import { POLL_VIEWS } from '../../../common/constants';
+import { POLL_VIEWS, SESSION_STORE_KEY } from '../../../common/constants';
 
 export const Voting = ({ id, toggleVoting }) => {
   const actions = useHMSActions();
@@ -24,9 +25,15 @@ export const Voting = ({ id, toggleVoting }) => {
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
 
+  const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
+
   if (!poll) {
     return null;
   }
+
+  const isLeaderboardShared = (sharedLeaderboards || []).includes(id);
+  const canViewLeaderboard =
+    poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous && (isLocalPeerCreator || isLeaderboardShared);
 
   // Sets view - linear or vertical, toggles timer indicator
   const isTimed = (poll.duration || 0) > 0;
@@ -93,7 +100,7 @@ export const Voting = ({ id, toggleVoting }) => {
           </Button>
         )}
 
-        {poll.state === 'stopped' && isLocalPeerCreator ? (
+        {canViewLeaderboard ? (
           <Button
             css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
             onClick={() => setPollView(POLL_VIEWS.RESULTS)}

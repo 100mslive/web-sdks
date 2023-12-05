@@ -169,7 +169,7 @@ export interface PollLeaderboardGetParams {
 }
 
 export interface PollLeaderboardEntry {
-  place: number; // leaderboard position
+  position: number; // leaderboard position
   score: number; // sum of weights of correct answers
   total_responses: number;
   correct_responses: number;

@@ -187,7 +187,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
 
     const leaderboardEntries = pollLeaderboard.questions.map(question => {
       return {
-        position: question.place,
+        position: question.position,
         totalResponses: question.total_responses,
         correctResponses: question.correct_responses,
         duration: question.duration,
@@ -195,6 +195,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         score: question.score,
       };
     });
+
     return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last };
   }
 }
