@@ -16,6 +16,7 @@ import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
+import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
@@ -43,6 +44,8 @@ const HLSView = () => {
   const [availableLayers, setAvailableLayers] = useState([]);
   const [isVideoLive, setIsVideoLive] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
+  const [isCaptionEnabled, setIsCaptionEnabled] = useState(true);
+  const [hasCaptions, setHasCaptions] = useState(false);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -61,7 +64,6 @@ const HLSView = () => {
     onClose: () => toggle(false),
   });
   const [showLoader, setShowLoader] = useState(false);
-
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
     /**
@@ -103,6 +105,7 @@ const HLSView = () => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = ({ layers }) => {
       setAvailableLayers(layers);
+      setHasCaptions(hlsPlayer?.hasCaptions());
     };
     const layerUpdatedHandler = ({ layer }) => {
       setCurrentSelectedQuality(layer);
@@ -165,6 +168,9 @@ const HLSView = () => {
     };
 
     const playbackEventHandler = data => setIsPaused(data.state === HLSPlaybackState.paused);
+    const captionEnabledEventHandler = isCaptionEnabled => {
+      setIsCaptionEnabled(isCaptionEnabled);
+    };
 
     const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
     if (videoEl && hlsUrl) {
@@ -173,6 +179,7 @@ const HLSView = () => {
       hlsPlayer.on(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
       hlsPlayer.on(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+      hlsPlayer.on(HMSHLSPlayerEvents.CAPTION_ENABLED, captionEnabledEventHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
 
       hlsPlayer.on(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
@@ -182,6 +189,8 @@ const HLSView = () => {
         hlsPlayer.off(HMSHLSPlayerEvents.ERROR, handleError);
         hlsPlayer.off(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
         hlsPlayer.off(HMSHLSPlayerEvents.PLAYBACK_STATE, playbackEventHandler);
+        hlsPlayer.off(HMSHLSPlayerEvents.CAPTION_ENABLED, captionEnabledEventHandler);
+
         hlsPlayer.off(HMSHLSPlayerEvents.AUTOPLAY_BLOCKED, handleAutoplayBlock);
         hlsPlayer.off(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
         hlsPlayer.off(HMSHLSPlayerEvents.LAYER_UPDATED, layerUpdatedHandler);
@@ -396,6 +405,9 @@ const HLSView = () => {
                   </HMSVideoPlayer.Controls.Left>
 
                   <HMSVideoPlayer.Controls.Right>
+                    {hasCaptions && (
+                      <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                    )}
                     {availableLayers.length > 0 ? (
                       <HLSQualitySelector
                         layers={availableLayers}
