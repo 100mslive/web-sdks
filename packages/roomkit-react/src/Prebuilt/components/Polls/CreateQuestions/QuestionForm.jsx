@@ -192,6 +192,8 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
                 <Input
                   type="number"
                   value={weight}
+                  min={1}
+                  max={999}
                   onChange={e => setWeight(Math.min(e.target.value, 999))}
                   css={{
                     backgroundColor: '$surface_bright',
@@ -271,6 +273,7 @@ export const isValidQuestion = ({ text, type, options, weight, isQuiz = false })
     return everyOptionHasText;
   }
 
+  // The minimum acceptable value of weight is 1
   if (isQuiz && weight < 1) {
     return false;
   }
