@@ -132,8 +132,8 @@ const HLSView = () => {
     };
 
     const playbackEventHandler = data => setIsPaused(data.state === HLSPlaybackState.paused);
-    const captionEnabledEventHandler = data => {
-      setIsCaptionEnabled(data);
+    const captionEnabledEventHandler = isCaptionEnabled => {
+      setIsCaptionEnabled(isCaptionEnabled);
     };
 
     const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
