@@ -126,6 +126,7 @@ export const QuestionCard = ({
             fontWeight: '$semiBold',
             display: 'flex',
             alignItems: 'center',
+            gap: '$4',
           }}
         >
           {respondedToQuiz && isCorrectAnswer ? <CheckCircleIcon height={20} width={20} /> : null}
