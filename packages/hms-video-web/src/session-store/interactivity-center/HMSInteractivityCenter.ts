@@ -60,27 +60,11 @@ export class InteractivityCenter implements HMSInteractivityCenter {
   }
 
   async startPoll(poll: string | HMSPollCreateParams): Promise<void> {
-    let poll_id = '';
     if (typeof poll === 'string') {
       await this.transport.startPoll({ poll_id: poll });
-      poll_id = poll;
     } else {
       await this.createPoll(poll);
       await this.transport.startPoll({ poll_id: poll.id });
-      poll_id = poll.id;
-    }
-    // send hls timedmetadata when it is running
-    if (poll_id && this.store.getRoom()?.hls.running) {
-      try {
-        this.transport.sendHLSTimedMetadata([
-          {
-            payload: `poll:${poll_id}`,
-            duration: 100,
-          },
-        ]);
-      } catch (e) {
-        console.error(e);
-      }
     }
   }
 

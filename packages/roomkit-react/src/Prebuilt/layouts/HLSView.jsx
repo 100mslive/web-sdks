@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
-import { selectAppData, selectHLSState, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectAppData,
+  selectHLSState,
+  selectPeerNameByID,
+  selectPollByID,
+  useHMSActions,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import { ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -46,6 +54,7 @@ const HLSView = () => {
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const lastHlsUrl = usePrevious(hlsUrl);
   const togglePollView = usePollViewToggle();
+  const vanillaStore = useHMSVanillaStore();
 
   const isMobile = useMedia(config.media.md);
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -111,9 +120,11 @@ const HLSView = () => {
       // check if poll happened
       if (parsedPayload.startsWith('poll:')) {
         const pollId = parsedPayload.substr(parsedPayload.indexOf(':') + 1);
+        const poll = vanillaStore.getState(selectPollByID(pollId));
+        const pollStartedBy = vanillaStore.getState(selectPeerNameByID(poll.startedBy)) || 'Participant';
         // launch poll
         ToastManager.addToast({
-          title: `Poll Added`,
+          title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
           action: (
             <Button
               onClick={() => togglePollView(pollId)}
