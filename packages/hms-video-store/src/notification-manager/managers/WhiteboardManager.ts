@@ -20,10 +20,23 @@ export class WhiteboardManager {
 
   private async handleWhiteboardUpdate(notification: WhiteboardInfo) {
     const localPeer = this.store.getLocalPeer();
-    if (notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId) {
+    const prev = this.store.getWhiteboard(notification.id);
+    const isOwner = notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId;
+
+    // store already existing whiteboard id in the session to prevent creating a new whiteboard
+    if (!prev) {
+      this.store.setWhiteboard({
+        id: notification.id,
+        title: notification.title,
+        owner: notification.owner,
+        attributes: notification.attributes,
+      });
+    }
+
+    if (isOwner) {
       return;
     }
-    const prev = this.store.getWhiteboard(notification.id);
+
     const open = notification.state === 'open';
     let whiteboard: HMSWhiteboard;
     if (open) {
