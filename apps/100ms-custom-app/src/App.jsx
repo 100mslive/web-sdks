@@ -36,7 +36,11 @@ const App = () => {
     if ((authToken || roomCode) && hmsPrebuiltRef.current && isHeadless) {
       const { hmsActions } = hmsPrebuiltRef.current;
       hmsActions?.enableBeamSpeakerLabelsLogging?.();
-      hmsActions?.ignoreMessageTypes?.(['chat', 'EMOJI_REACTION']);
+      hmsActions?.ignoreMessageTypes?.([
+        'chat',
+        'EMOJI_REACTION',
+        'POLL_STARTED',
+      ]);
       hmsActions?.setAppData?.('disableNotifications', true);
     }
   }, [authToken, roomCode, isHeadless]);
