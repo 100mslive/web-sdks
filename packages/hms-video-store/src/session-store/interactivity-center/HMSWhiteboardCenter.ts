@@ -16,11 +16,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     let id = prevWhiteboard?.id;
 
     if (!prevWhiteboard) {
-      const response = await this.transport.signal.createWhiteboard(
-        createOptions || {
-          title: `${this.store.getRoom()?.id} Whiteboard`,
-        },
-      );
+      const response = await this.transport.signal.createWhiteboard(this.getCreateOptionsWithDefaults(createOptions));
       id = response.id;
     }
     if (!id) {
@@ -57,5 +53,16 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
 
   setListener(listener?: InteractivityListener) {
     this.listener = listener;
+  }
+
+  // @TODO: change after RBAC is introduced for whiteboard
+  private getCreateOptionsWithDefaults(createOptions?: HMSWhiteboardCreateOptions): HMSWhiteboardCreateOptions {
+    const roles = Object.keys(this.store.getKnownRoles());
+    return {
+      title: createOptions?.title || `${this.store.getRoom()?.id} Whiteboard`,
+      reader: createOptions?.reader || roles,
+      writer: createOptions?.writer || roles,
+      admin: createOptions?.admin || roles,
+    };
   }
 }
