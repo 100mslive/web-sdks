@@ -46,6 +46,7 @@ jobs:
       REACT_APP_ROOM_LAYOUT_ENDPOINT: https://api-nonprod.100ms.live/v2/layouts/ui
       REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT: https://auth-nonprod.100ms.live/v2/token
       REACT_APP_DASHBOARD_BASE_ENDPOINT: https://qa-in2-ipv6.100ms.live/hmsapi/
+      REACT_APP_DASHBOARD_LINK: https://app-qa.100ms.live/
 
     steps:
       - name: log inputs
