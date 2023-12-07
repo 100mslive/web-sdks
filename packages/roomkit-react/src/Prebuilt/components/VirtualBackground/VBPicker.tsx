@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
@@ -39,6 +39,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const [background, setBackground] = useState<string | HMSVirtualBackgroundTypes>(
     VBEffectsPlugin.getBackground() as string | HMSVirtualBackgroundTypes,
   );
+  const modelInitialised = useRef(false);
   const mediaList = [
     ...background_media.filter(media => !!media.url).map((media: VirtualBackgroundMedia) => media.url || ''),
     ...defaultMedia,
@@ -55,21 +56,31 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
     }
   }
 
-  function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    if (!localPeer?.videoTrack) {
-      console.error('Video track is not available yet');
-      return;
+  const addPlugin = useCallback(
+    ({ mediaURL = '', blurPower = 0 }) => {
+      if (!localPeer?.videoTrack) {
+        console.error('Video track is not available yet');
+        return;
+      }
+      if (!isPluginAdded) {
+        hmsActions.addPluginsToVideoStream([VBEffectsPlugin]);
+      }
+      if (mediaURL) {
+        VBEffectsPlugin.setBackground(mediaURL);
+      } else if (blurPower) {
+        VBEffectsPlugin.setBlur(blurPower);
+      }
+      setBackground(VBEffectsPlugin.getBackground() as string);
+    },
+    [hmsActions, isPluginAdded, localPeer?.videoTrack],
+  );
+
+  useEffect(() => {
+    if (!modelInitialised.current) {
+      addPlugin({ blurPower: 0 });
+      modelInitialised.current = true;
     }
-    if (!isPluginAdded) {
-      hmsActions.addPluginsToVideoStream([VBEffectsPlugin]);
-    }
-    if (mediaURL) {
-      VBEffectsPlugin.setBackground(mediaURL);
-    } else if (blurPower) {
-      VBEffectsPlugin.setBlur(blurPower);
-    }
-    setBackground(VBEffectsPlugin.getBackground() as string);
-  }
+  }, [addPlugin]);
 
   useEffect(() => {
     if (!isVideoOn) {
@@ -121,7 +132,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
               title: 'Blur',
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
-              onClick: async () => await addPlugin({ blurPower: 0.5 }),
+              onClick: async () => addPlugin({ blurPower: 0.5 }),
             },
           ]}
           activeBackground={background}
@@ -132,7 +143,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           options={mediaList.map(mediaURL => ({
             mediaURL,
             value: mediaURL,
-            onClick: async () => await addPlugin({ mediaURL }),
+            onClick: async () => addPlugin({ mediaURL }),
           }))}
           activeBackground={background}
         />
