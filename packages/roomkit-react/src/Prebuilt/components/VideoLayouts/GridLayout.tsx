@@ -80,6 +80,7 @@ export const GridLayout = ({
 
   useEffect(() => {
     if (mainPage !== 0 || pageSize === 0) {
+      setSortedPeers(updatedPeers);
       return;
     }
     peersSorter.setPeersAndTilesPerPage({

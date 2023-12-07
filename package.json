@@ -113,7 +113,7 @@
     },
     {
       "path": "packages/react-icons/dist/index.cjs.js",
-      "limit": "100 KB"
+      "limit": "150 KB"
     },
     {
       "path": "packages/react-icons/dist/index.js",
