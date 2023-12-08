@@ -165,7 +165,7 @@ export const getPeerParticipationSummary = (poll, localPeerID, localCustomerUser
       questions[peerResponse[0].questionIndex - 1].answer?.options;
     const isCorrect = isEqual(submission, answer);
     if (isCorrect) {
-      score += questions[peerResponse[0].questionIndex].weight || 0;
+      score += questions[peerResponse[0].questionIndex - 1]?.weight || 0;
       correctResponses++;
     }
   });
