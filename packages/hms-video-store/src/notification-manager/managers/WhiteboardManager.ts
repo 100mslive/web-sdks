@@ -22,38 +22,20 @@ export class WhiteboardManager {
     const localPeer = this.store.getLocalPeer();
     const prev = this.store.getWhiteboard(notification.id);
     const isOwner = notification.owner === localPeer?.peerId || notification.owner === localPeer?.customerUserId;
-
-    // store already existing whiteboard id in the session to prevent creating a new whiteboard
-    if (!prev) {
-      this.store.setWhiteboard({
-        id: notification.id,
-        title: notification.title,
-        owner: notification.owner,
-        attributes: notification.attributes,
-      });
-    }
-
-    if (isOwner) {
-      return;
-    }
-
     const open = notification.state === 'open';
-    let whiteboard: HMSWhiteboard;
-    if (open) {
+    const whiteboard: HMSWhiteboard = {
+      id: notification.id,
+      title: notification.title,
+      attributes: notification.attributes,
+    };
+    whiteboard.open = isOwner ? prev?.open : open;
+    whiteboard.owner = whiteboard.open ? notification.owner : undefined;
+
+    if (!isOwner && whiteboard.open) {
       const response = await this.transport.signal.getWhiteboard({ id: notification.id });
-      whiteboard = {
-        ...prev,
-        open,
-        id: notification.id,
-        title: notification.title,
-        owner: notification.owner,
-        attributes: notification.attributes,
-        token: response.token,
-        addr: response.addr,
-        permissions: response.permissions || [],
-      };
-    } else {
-      whiteboard = { id: notification.id, title: notification.title, open };
+      whiteboard.token = response.token;
+      whiteboard.addr = response.addr;
+      whiteboard.permissions = response.permissions;
     }
 
     this.store.setWhiteboard(whiteboard);
