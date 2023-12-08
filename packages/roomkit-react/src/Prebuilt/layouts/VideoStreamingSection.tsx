@@ -7,6 +7,7 @@ import {
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
+  selectPeerScreenSharing,
   selectWhiteboard,
   useHMSActions,
   useHMSStore,
@@ -48,6 +49,7 @@ export const VideoStreamingSection = ({
 }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const peerSharing = useHMSStore(selectPeerScreenSharing);
   const isWhiteboardOpen = useHMSStore(selectWhiteboard)?.open;
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
@@ -82,6 +84,10 @@ export const VideoStreamingSection = ({
     ViewComponent = <PDFView />;
   } else if (urlToIframe) {
     ViewComponent = <EmbedView />;
+  } else if (peerSharing) {
+    // screen share should take preference over whiteboard
+    //@ts-ignore
+    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
   } else if (isWhiteboardOpen) {
     ViewComponent = <WhiteboardView />;
   } else {
