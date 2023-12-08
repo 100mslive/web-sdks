@@ -11,11 +11,11 @@ const useWhiteboardEmbed = () => {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const whiteboard = useHMSStore(selectWhiteboard);
   useEffect(() => {
-    if (!whiteboard?.token || !iframeRef.current) {
+    if (!whiteboard?.addr || !whiteboard?.token || !iframeRef.current) {
       return;
     }
-    iframeRef.current.src = `https://whiteboard-qa.100ms.live/?token=${whiteboard.token}`;
-  }, [whiteboard?.token]);
+    iframeRef.current.src = `https://whiteboard-qa.100ms.live/?endpoint=https://${whiteboard.addr}&token=${whiteboard.token}`;
+  }, [whiteboard?.addr, whiteboard?.token]);
 
   return iframeRef;
 };
