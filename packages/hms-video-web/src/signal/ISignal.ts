@@ -13,6 +13,8 @@ import {
   PollInfoGetResponse,
   PollInfoSetParams,
   PollInfoSetResponse,
+  PollLeaderboardGetParams,
+  PollLeaderboardGetResponse,
   PollListParams,
   PollListResponse,
   PollQuestionsGetParams,
@@ -127,6 +129,8 @@ export interface ISignal extends IAnalyticsTransportProvider {
   getPollsList(params: PollListParams): Promise<PollListResponse>;
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse>;
+
+  fetchPollLeaderboard(params: PollLeaderboardGetParams): Promise<PollLeaderboardGetResponse>;
 
   joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
 

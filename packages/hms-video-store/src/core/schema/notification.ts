@@ -75,6 +75,7 @@ export interface HMSReconnectionNotification extends BaseNotification {
 
 export interface HMSPollNotification extends BaseNotification {
   type: HMSNotificationTypes.POLL_STARTED | HMSNotificationTypes.POLL_STOPPED | HMSNotificationTypes.POLL_VOTES_UPDATED;
+  // | HMSNotificationTypes.POLL_LEADERBOARD_SHARED;
   data: HMSPoll;
 }
 
@@ -124,6 +125,7 @@ export enum HMSNotificationTypes {
   POLL_STARTED = 'POLL_STARTED',
   POLL_STOPPED = 'POLL_STOPPED',
   POLL_VOTES_UPDATED = 'POLL_VOTES_UPDATED',
+  // POLL_LEADERBOARD_SHARED = 'POLL_LEADERBOARD_SHARED',
   HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
 }
 
@@ -155,6 +157,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_STARTED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_STOPPED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_VOTES_UPDATED]: HMSPollNotification;
+  // [HMSNotificationTypes.POLL_LEADERBOARD_SHARED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;
 }[T];

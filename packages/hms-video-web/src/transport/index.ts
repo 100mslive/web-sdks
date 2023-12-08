@@ -46,6 +46,8 @@ import {
   PollInfoGetResponse,
   PollInfoSetParams,
   PollInfoSetResponse,
+  PollLeaderboardGetParams,
+  PollLeaderboardGetResponse,
   PollListParams,
   PollListResponse,
   PollQuestionsGetParams,
@@ -702,6 +704,10 @@ export default class HMSTransport implements ITransport {
 
   setPollInfo(params: PollInfoSetParams): Promise<PollInfoSetResponse> {
     return this.signal.setPollInfo(params);
+  }
+
+  async fetchLeaderboard(params: PollLeaderboardGetParams): Promise<PollLeaderboardGetResponse> {
+    return this.signal.fetchPollLeaderboard(params);
   }
 
   getPollInfo(params: PollInfoGetParams): Promise<PollInfoGetResponse> {
