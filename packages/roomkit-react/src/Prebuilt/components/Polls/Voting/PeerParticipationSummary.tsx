@@ -1,13 +1,17 @@
 import React from 'react';
-import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
+import { HMSPoll, selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { Box } from '../../../../Layout';
 import { Text } from '../../../../Text';
 // @ts-ignore
 import { getPeerParticipationSummary } from '../../../common/utils';
 
 export const PeerParticipationSummary = ({ poll }: { poll: HMSPoll }) => {
-  const localPeerID = useHMSStore(selectLocalPeerID);
-  const { totalResponses, correctResponses, score } = getPeerParticipationSummary(poll, localPeerID);
+  const localPeer = useHMSStore(selectLocalPeer);
+  const { totalResponses, correctResponses, score } = getPeerParticipationSummary(
+    poll,
+    localPeer?.id,
+    localPeer?.customerUserId,
+  );
 
   const boxes = [
     { title: 'Points', value: score },
