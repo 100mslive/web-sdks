@@ -1,5 +1,6 @@
 // @ts-check
 import React from 'react';
+import { CheckCircleIcon } from '@100mslive/react-icons';
 import { Flex, Label, RadioGroup, Text } from '../../../../';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
@@ -13,42 +14,54 @@ export const SingleChoiceOptions = ({
   setAnswer,
   totalResponses,
   showVoteCount,
+  correctOptionIndex,
+  isStopped,
+  isQuiz,
+  localPeerResponse,
 }) => {
   return (
     <RadioGroup.Root value={response?.option} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (
-            <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$5' }}>
-              <RadioGroup.Item
-                css={{
-                  background: 'none',
-                  h: '$9',
-                  w: '$9',
-                  border: '2px solid',
-                  borderColor: '$on_surface_high',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  cursor: canRespond ? 'pointer' : 'not-allowed',
-                  '&[data-state="checked"]': {
-                    borderColor: '$primary_bright',
-                    borderWidth: '2px',
-                  },
-                }}
-                disabled={!canRespond}
-                value={option.index}
-                id={`${questionIndex}-${option.index}`}
-              >
-                <RadioGroup.Indicator
+            <Flex align="start" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$5' }}>
+              {!isStopped || !isQuiz ? (
+                <RadioGroup.Item
                   css={{
-                    h: '80%',
-                    w: '80%',
-                    background: '$primary_bright',
-                    borderRadius: '$round',
+                    background: 'none',
+                    h: '$9',
+                    w: '$9',
+                    border: '2px solid',
+                    borderColor: '$on_surface_high',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    cursor: canRespond ? 'pointer' : 'not-allowed',
+                    '&[data-state="checked"]': {
+                      borderColor: '$primary_bright',
+                      borderWidth: '2px',
+                    },
                   }}
-                />
-              </RadioGroup.Item>
+                  disabled={!canRespond}
+                  value={option.index}
+                  id={`${questionIndex}-${option.index}`}
+                >
+                  <RadioGroup.Indicator
+                    css={{
+                      h: '80%',
+                      w: '80%',
+                      background: '$primary_bright',
+                      borderRadius: '$round',
+                    }}
+                  />
+                </RadioGroup.Item>
+              ) : null}
+
+              {isStopped && correctOptionIndex === option.index && isQuiz ? (
+                <Flex css={{ color: '$on_surface_high' }}>
+                  <CheckCircleIcon />
+                </Flex>
+              ) : null}
 
               <Flex direction="column" css={{ flexGrow: '1' }}>
                 <Flex css={{ w: '100%' }}>
@@ -59,6 +72,11 @@ export const SingleChoiceOptions = ({
                 </Flex>
                 {showVoteCount && <VoteProgress option={option} totalResponses={totalResponses} />}
               </Flex>
+              {isStopped && isQuiz && localPeerResponse?.option === option.index ? (
+                <Text variant="sm" css={{ color: '$on_surface_medium', maxWidth: 'max-content' }}>
+                  Your Answer
+                </Text>
+              ) : null}
             </Flex>
           );
         })}

@@ -48,7 +48,8 @@ export const QuestionCard = ({
     !rolesThatCanViewResponses ||
     rolesThatCanViewResponses.length === 0 ||
     rolesThatCanViewResponses.includes(localPeerRoleName || '');
-  const showVoteCount = roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped'));
+  const showVoteCount =
+    roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
 
   const isLive = pollState === 'started';
   const canRespond = isLive && !localPeerResponse;
@@ -206,6 +207,8 @@ export const QuestionCard = ({
           setAnswer={setSingleOptionAnswer}
           totalResponses={result?.totalResponses}
           showVoteCount={showVoteCount}
+          localPeerResponse={localPeerResponse}
+          isStopped={pollState === 'stopped'}
         />
       ) : null}
 
@@ -221,6 +224,8 @@ export const QuestionCard = ({
           setSelectedOptions={setMultipleOptionAnswer}
           totalResponses={result?.totalResponses}
           showVoteCount={showVoteCount}
+          localPeerResponse={localPeerResponse}
+          isStopped={pollState === 'stopped'}
         />
       ) : null}
 
