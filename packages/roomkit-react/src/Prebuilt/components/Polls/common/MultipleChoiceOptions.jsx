@@ -1,6 +1,6 @@
 // @ts-check
 import React from 'react';
-import { CheckIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, CheckIcon } from '@100mslive/react-icons';
 import { Checkbox, Flex, Label, Text } from '../../../../';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
@@ -15,6 +15,10 @@ export const MultipleChoiceOptions = ({
   selectedOptions,
   setSelectedOptions,
   showVoteCount,
+  isQuiz,
+  correctOptionIndexes,
+  localPeerResponse,
+  isStopped,
 }) => {
   const handleCheckedChange = (checked, index) => {
     const newSelected = new Set(selectedOptions);
@@ -25,25 +29,33 @@ export const MultipleChoiceOptions = ({
     }
     setSelectedOptions(newSelected);
   };
-
+  console.log(options, 'ollo');
   return (
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map(option => {
         return (
           <Flex align="center" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$9' }}>
-            <Checkbox.Root
-              id={`${questionIndex}-${option.index}`}
-              disabled={!canRespond}
-              checked={response?.options?.includes(option.index)}
-              onCheckedChange={checked => handleCheckedChange(checked, option.index)}
-              css={{
-                cursor: canRespond ? 'pointer' : 'not-allowed',
-              }}
-            >
-              <Checkbox.Indicator>
-                <CheckIcon width={16} height={16} />
-              </Checkbox.Indicator>
-            </Checkbox.Root>
+            {!isStopped || !isQuiz ? (
+              <Checkbox.Root
+                id={`${questionIndex}-${option.index}`}
+                disabled={!canRespond}
+                checked={response?.options?.includes(option.index)}
+                onCheckedChange={checked => handleCheckedChange(checked, option.index)}
+                css={{
+                  cursor: canRespond ? 'pointer' : 'not-allowed',
+                }}
+              >
+                <Checkbox.Indicator>
+                  <CheckIcon width={16} height={16} />
+                </Checkbox.Indicator>
+              </Checkbox.Root>
+            ) : null}
+
+            {isStopped && correctOptionIndexes.includes(option.index) ? (
+              <Flex css={{ color: '$on_surface_high' }}>
+                <CheckCircleIcon />
+              </Flex>
+            ) : null}
 
             <Flex direction="column" css={{ flexGrow: '1' }}>
               <Flex css={{ w: '100%' }}>
@@ -54,6 +66,12 @@ export const MultipleChoiceOptions = ({
               </Flex>
               {showVoteCount && <VoteProgress option={option} totalResponses={totalResponses} />}
             </Flex>
+
+            {isStopped && isQuiz && localPeerResponse?.options.includes(option.index) ? (
+              <Text variant="sm" css={{ color: '$on_surface_medium', maxWidth: 'max-content' }}>
+                Your Answer
+              </Text>
+            ) : null}
           </Flex>
         );
       })}

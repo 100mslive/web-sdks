@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash';
 import { QUESTION_TYPE } from './constants';
 
 // eslint-disable-next-line complexity
@@ -137,3 +138,25 @@ export const calculateAvatarAndAttribBoxSize = (calculatedWidth, calculatedHeigh
 };
 
 export const isMobileUserAgent = /Mobi|Android|iPhone/i.test(navigator.userAgent);
+
+export const getPeerParticipationSummary = (poll, localPeerID) => {
+  let totalResponses = 0;
+  let correctResponses = 0;
+  let score = 0;
+  const questions = poll.questions || [];
+  questions.forEach(question => {
+    const localPeerResponses =
+      question.responses?.filter(response => response.peer?.peerid === localPeerID && !response.skipped) || [];
+    totalResponses += localPeerResponses.length;
+    localPeerResponses.forEach(response => {
+      const submission = [response.option] || response.options;
+      const answer = [question.answer?.option] || question.answer?.options;
+      const isCorrect = isEqual(submission, answer);
+      if (isCorrect) {
+        score += question.weight || 0;
+        correctResponses++;
+      }
+    });
+  });
+  return { totalResponses, correctResponses, score };
+};

@@ -1,5 +1,6 @@
 // @ts-check
 import React from 'react';
+import { PeerParticipationSummary } from './PeerParticipationSummary';
 import { QuestionCard } from './QuestionCard';
 
 /**
@@ -11,12 +12,17 @@ export const StandardView = ({ poll }) => {
   if (!poll?.questions) {
     return null;
   }
+
+  const isQuiz = poll.type === 'quiz';
+  const isStopped = poll.state === 'stopped';
+
   return (
     <>
+      {isQuiz && isStopped ? <PeerParticipationSummary poll={poll} /> : null}
       {poll.questions?.map((question, index) => (
         <QuestionCard
           pollID={poll.id}
-          isQuiz={poll.type === 'quiz'}
+          isQuiz={isQuiz}
           startedBy={poll.startedBy}
           pollState={poll.state}
           key={`${question.text}-${index}`}
