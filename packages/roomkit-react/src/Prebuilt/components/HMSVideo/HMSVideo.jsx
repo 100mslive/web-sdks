@@ -10,7 +10,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         position: 'relative',
         '& video::cue': {
           color: 'white',
-          textShadow: '0px 0px 4px #000',
+          // textShadow: '0px 0px 4px #000',
           whiteSpace: 'pre-line',
           fontSize: '$lg',
           fontStyle: 'normal',
