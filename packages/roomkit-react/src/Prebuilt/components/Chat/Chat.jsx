@@ -129,6 +129,7 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
         icon
         css={{
           p: '$3 $4',
+          pl: '$6',
           '& > svg': { ml: '$4' },
           borderRadius: '$round',
           position: 'relative',
