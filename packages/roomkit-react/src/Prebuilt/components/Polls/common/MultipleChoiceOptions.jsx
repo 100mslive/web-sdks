@@ -29,7 +29,7 @@ export const MultipleChoiceOptions = ({
     }
     setSelectedOptions(newSelected);
   };
-  console.log(options, 'ollo');
+
   return (
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map(option => {
