@@ -242,7 +242,7 @@ const ChatActions = ({
       text: 'Remove Partipant',
       icon: <PeopleRemoveIcon style={iconStyle} />,
       color: '$alert_error_default',
-      show: canRemoveOthers,
+      show: canRemoveOthers && !sentByLocalPeer,
       onClick: async () => {
         try {
           await actions.removePeer(message.sender, '');
@@ -332,7 +332,7 @@ const ChatActions = ({
           </Tooltip>
         ) : null}
 
-        {options.block.show || options.hide.show ? (
+        {options.block.show || options.hide.show || options.remove.show ? (
           <Tooltip boxCss={tooltipBoxCSS} title="More actions">
             <Dropdown.Trigger asChild>
               <IconButton>
@@ -366,6 +366,18 @@ const ChatActions = ({
               {options.block.icon}
               <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
                 {options.block.text}
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+          {options.remove.show ? (
+            <Dropdown.Item
+              data-testid="remove_peer_btn"
+              onClick={options.remove.onClick}
+              css={{ color: options.remove.color }}
+            >
+              {options.remove.icon}
+              <Text variant="sm" css={{ ml: '$4', color: 'inherit', fontWeight: '$semiBold' }}>
+                {options.remove.text}
               </Text>
             </Dropdown.Item>
           ) : null}
