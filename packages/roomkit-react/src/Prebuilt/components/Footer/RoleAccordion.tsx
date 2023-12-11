@@ -6,7 +6,6 @@ import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-// @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
 // @ts-ignore: No implicit Any
@@ -39,12 +38,14 @@ export const RoleAccordion = ({
 }: ItemData & {
   roleName: string;
   isHandRaisedAccordion?: boolean;
-  filter?: { search: string };
+  filter?: { search?: string };
   offStageRoles: string[];
   onActive?: (role: string) => void;
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-  const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
+  const showAcordion = filter?.search
+    ? peerList.some(peer => peer.name.toLowerCase().includes(filter?.search || ''))
+    : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 10 });
   const isOffStageRole = roleName && offStageRoles.includes(roleName);

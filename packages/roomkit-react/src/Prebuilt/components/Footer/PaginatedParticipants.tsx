@@ -9,7 +9,7 @@ import { Box, Flex } from '../../../Layout';
 import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit Any
-import { Participant, ParticipantSearch } from './ParticipantList';
+import { Participant, ParticipantSearch } from './ParticipantList.tsx';
 import { ItemData, itemKey, ROW_HEIGHT } from './RoleAccordion';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../AppData/useSidepane';
