@@ -128,9 +128,8 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
         }}
         icon
         css={{
-          p: '$4',
-          pl: '$8',
-          pr: '$6',
+          p: '$3 $4',
+          pl: '$6',
           '& > svg': { ml: '$4' },
           borderRadius: '$round',
           position: 'relative',
@@ -141,7 +140,7 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
         }}
       >
         New {unreadCount === 1 ? 'message' : 'messages'}
-        <ChevronDownIcon />
+        <ChevronDownIcon height={16} width={16} />
       </Button>
     </Flex>
   );

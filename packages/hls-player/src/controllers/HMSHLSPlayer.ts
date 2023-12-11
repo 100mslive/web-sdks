@@ -60,6 +60,7 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
     video.autoplay = true;
     return video;
   }
+
   /**
    * @returns get html video element
    */
@@ -192,6 +193,19 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
    */
   seekTo = (seekValue: number) => {
     this._videoEl.currentTime = seekValue;
+  };
+
+  hasCaptions = () => {
+    return this._hls.subtitleTracks.length > 0;
+  };
+
+  toggleCaption = () => {
+    // no subtitles, do nothing
+    if (!this.hasCaptions()) {
+      return;
+    }
+    this._hls.subtitleDisplay = !this._hls.subtitleDisplay;
+    this.emitEvent(HMSHLSPlayerEvents.CAPTION_ENABLED, this._hls.subtitleDisplay);
   };
 
   private playVideo = async () => {

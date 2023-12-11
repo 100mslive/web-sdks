@@ -17,6 +17,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(question.type || QUESTION_TYPE.SINGLE_CHOICE);
   const [text, setText] = useState(question.text);
+  const [weight, setWeight] = useState(isQuiz ? 10 : 1);
   const [options, setOptions] = useState(
     question?.options || [
       { text: '', isCorrectAnswer: false },
@@ -28,6 +29,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
     text,
     type,
     options,
+    weight,
     isQuiz,
   });
 
@@ -182,12 +184,31 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
             </Flex>
           )}
           {isQuiz ? (
-            <Flex css={{ mt: '$md', gap: '$6' }}>
-              <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
-              <Text variant="sm" css={{ color: '$on_surface_medium' }}>
-                Not required to answer
-              </Text>
-            </Flex>
+            <>
+              <Flex justify="between" align="center" css={{ mt: '$md', gap: '$6', w: '100%' }}>
+                <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+                  Point Weightage
+                </Text>
+                <Input
+                  type="number"
+                  value={weight}
+                  min={1}
+                  max={999}
+                  onChange={e => setWeight(Math.min(e.target.value, 999))}
+                  css={{
+                    backgroundColor: '$surface_bright',
+                    border: '1px solid $border_bright',
+                    maxWidth: '$20',
+                  }}
+                />
+              </Flex>
+              <Flex justify="between" css={{ mt: '$md', gap: '$6', w: '100%' }}>
+                <Text variant="sm" css={{ color: '$on_surface_medium' }}>
+                  Allow to skip
+                </Text>
+                <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
+              </Flex>
+            </>
           ) : null}
         </>
       ) : null}
@@ -222,6 +243,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
                 options,
                 skippable,
                 draftID: question.draftID,
+                weight,
               });
             }}
           >
@@ -235,7 +257,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   );
 };
 
-export const isValidQuestion = ({ text, type, options, isQuiz = false }) => {
+export const isValidQuestion = ({ text, type, options, weight, isQuiz = false }) => {
   if (!isValidTextInput(text) || !type) {
     return false;
   }
@@ -249,6 +271,11 @@ export const isValidQuestion = ({ text, type, options, isQuiz = false }) => {
 
   if (!isQuiz) {
     return everyOptionHasText;
+  }
+
+  // The minimum acceptable value of weight is 1
+  if (isQuiz && weight < 1) {
+    return false;
   }
 
   return everyOptionHasText && hasCorrectAnswer;

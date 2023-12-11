@@ -3,6 +3,7 @@ import React from 'react';
 import { PollsQuizMenu } from './CreatePollQuiz/PollsQuizMenu';
 // @ts-ignore: No implicit Any
 import { CreateQuestions } from './CreateQuestions/CreateQuestions';
+import { Leaderboard } from './Voting/Leaderboard';
 // @ts-ignore: No implicit Any
 import { Voting } from './Voting/Voting';
 // @ts-ignore: No implicit Any
@@ -22,6 +23,8 @@ export const Polls = () => {
     return <CreateQuestions />;
   } else if (view === POLL_VIEWS.VOTE) {
     return <Voting toggleVoting={togglePollView} id={pollID} />;
+  } else if (view === POLL_VIEWS.RESULTS) {
+    return <Leaderboard pollID={pollID} />;
   } else {
     return null;
   }

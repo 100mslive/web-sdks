@@ -9,6 +9,7 @@ export enum HMSHLSPlayerEvents {
 
   MANIFEST_LOADED = 'manifest-loaded',
   LAYER_UPDATED = 'layer-updated',
+  CAPTION_ENABLED = 'caption-enabled',
 
   ERROR = 'error',
   PLAYBACK_STATE = 'playback-state',

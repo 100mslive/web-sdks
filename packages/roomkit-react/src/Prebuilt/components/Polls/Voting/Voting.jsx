@@ -3,6 +3,7 @@ import React from 'react';
 import {
   selectLocalPeerID,
   selectPeerNameByID,
+  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -23,10 +24,17 @@ export const Voting = ({ id, toggleVoting }) => {
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
+  const permissions = useHMSStore(selectPermissions);
+
+  // const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
 
   if (!poll) {
     return null;
   }
+
+  // const isLeaderboardShared = (sharedLeaderboards || []).includes(id);
+  const canViewLeaderboard =
+    poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous && permissions?.pollWrite;
 
   // Sets view - linear or vertical, toggles timer indicator
   const isTimed = (poll.duration || 0) > 0;
@@ -52,8 +60,8 @@ export const Voting = ({ id, toggleVoting }) => {
         >
           <ChevronLeftIcon />
         </Flex>
-        <Text variant="h6">{poll?.type?.toUpperCase()}</Text>
-        <StatusIndicator isLive={isLive} shouldShowTimer={isLive && isTimed} />
+        <Text variant="h6">{poll.title}</Text>
+        <StatusIndicator isLive={isLive} />
         <Box
           css={{
             marginLeft: 'auto',
@@ -72,18 +80,8 @@ export const Voting = ({ id, toggleVoting }) => {
               {pollCreatorName || 'Participant'} started a {poll.type}
             </Text>
           </Box>
-          {poll.state === 'started' && isLocalPeerCreator && (
-            <Box css={{ flex: 'initial' }}>
-              <Button
-                variant="danger"
-                css={{ fontSize: '$sm', fontWeight: '$semiBold', p: '$3 $6' }}
-                onClick={() => actions.interactivityCenter.stopPoll(id)}
-              >
-                End {poll.type}
-              </Button>
-            </Box>
-          )}
         </Flex>
+
         {/* {poll.state === "stopped" && (
           <PollResultSummary
             pollResult={poll.result}
@@ -92,7 +90,27 @@ export const Voting = ({ id, toggleVoting }) => {
             isAdmin={isLocalPeerCreator}
           />
         )} */}
+
         {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
+
+        {poll.state === 'started' && isLocalPeerCreator && (
+          <Button
+            variant="danger"
+            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
+            onClick={() => actions.interactivityCenter.stopPoll(id)}
+          >
+            End {poll.type}
+          </Button>
+        )}
+
+        {canViewLeaderboard ? (
+          <Button
+            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
+            onClick={() => setPollView(POLL_VIEWS.RESULTS)}
+          >
+            View Leaderboard
+          </Button>
+        ) : null}
       </Flex>
     </Container>
   );

@@ -10,7 +10,6 @@ import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
-// @ts-ignore: No implicit Any
 import { APP_DATA } from '../../common/constants';
 
 export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {

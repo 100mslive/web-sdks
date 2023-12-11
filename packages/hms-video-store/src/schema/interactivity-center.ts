@@ -1,4 +1,10 @@
-import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponseCreateParams } from '../interfaces';
+import {
+  HMSPoll,
+  HMSPollCreateParams,
+  HMSPollLeaderboardResponse,
+  HMSPollQuestionCreateParams,
+  HMSPollQuestionResponseCreateParams,
+} from '../interfaces';
 
 export interface IHMSInteractivityCenter {
   createPoll(poll: HMSPollCreateParams): Promise<void>;
@@ -6,4 +12,5 @@ export interface IHMSInteractivityCenter {
   stopPoll(poll: string): Promise<void>;
   addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void>;
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
+  fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSPollLeaderboardResponse>;
 }
