@@ -291,6 +291,7 @@ const ParticipantMoreActions = ({
     remove_from_stage_label,
     on_stage_role,
     off_stage_roles = [],
+    skip_preview_for_role_change = false,
   } = elements.on_stage_exp || {};
   const isInStage = role === on_stage_role;
   const shouldShowStageRoleChange =
@@ -303,7 +304,7 @@ const ParticipantMoreActions = ({
     if (isInStage) {
       prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
     } else if (on_stage_role) {
-      await hmsActions.changeRoleOfPeer(peerId, on_stage_role);
+      await hmsActions.changeRoleOfPeer(peerId, on_stage_role, skip_preview_for_role_change);
     }
     setOpen(false);
   };
