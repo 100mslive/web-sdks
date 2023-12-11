@@ -23,9 +23,18 @@ export function itemKey(index: number, data: ItemData) {
   return data.peerList[index]?.id;
 }
 
-export const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
-  return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
-});
+export const VirtualizedParticipantItem = React.memo(
+  ({ index, data, style }: { index: number; data: ItemData; style: React.CSSProperties }) => {
+    return (
+      <Participant
+        key={data.peerList[index].id}
+        peer={data.peerList[index]}
+        isConnected={data.isConnected}
+        style={style}
+      />
+    );
+  },
+);
 
 export const RoleAccordion = ({
   peerList = [],

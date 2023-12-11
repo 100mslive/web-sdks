@@ -131,7 +131,15 @@ export const ParticipantCount = () => {
   );
 };
 
-export const Participant = ({ peer, isConnected }: { peer: HMSPeer; isConnected: boolean }) => {
+export const Participant = ({
+  peer,
+  isConnected,
+  style,
+}: {
+  peer: HMSPeer;
+  isConnected: boolean;
+  style: React.CSSProperties;
+}) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
   return (
     <Flex
@@ -146,6 +154,7 @@ export const Participant = ({ peer, isConnected }: { peer: HMSPeer; isConnected:
       align="center"
       justify="between"
       data-testid={'participant_' + peer.name}
+      style={style}
     >
       <Text
         variant="sm"
