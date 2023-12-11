@@ -19,6 +19,7 @@ import {
   CrossCircleIcon,
   CrossIcon,
   EyeCloseIcon,
+  PeopleRemoveIcon,
   PinIcon,
   ReplyIcon,
   VerticalMenuIcon,
@@ -167,6 +168,8 @@ const ChatActions = ({
     can_block_user: false,
   };
   const [open, setOpen] = useState(false);
+  const actions = useHMSActions();
+  const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
   const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
 
   const { blacklistItem: blacklistMessage, blacklistedIDs: blacklistedMessageIDs = [] } = useChatBlacklist(
@@ -234,6 +237,19 @@ const ChatActions = ({
       onClick: async () => blacklistPeer(message?.senderUserId),
       color: '$alert_error_default',
       show: can_block_user && !sentByLocalPeer,
+    },
+    remove: {
+      text: 'Remove Partipant',
+      icon: <PeopleRemoveIcon style={iconStyle} />,
+      color: '$alert_error_default',
+      show: canRemoveOthers,
+      onClick: async () => {
+        try {
+          await actions.removePeer(message.sender, '');
+        } catch (error) {
+          ToastManager.addToast({ title: error.message, variant: 'error' });
+        }
+      },
     },
   };
 
