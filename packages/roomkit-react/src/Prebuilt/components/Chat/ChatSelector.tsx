@@ -11,7 +11,6 @@ import {
 import { CheckIcon, PeopleIcon } from '@100mslive/react-icons';
 import { Box, CSS, Dropdown, Flex, HorizontalDivider, Text, Tooltip } from '../../..';
 import { config as cssConfig } from '../../../Theme';
-// @ts-ignore
 import { ParticipantSearch } from '../Footer/ParticipantList.tsx';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
