@@ -9,10 +9,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         size: '100%',
         position: 'relative',
         '& video::cue': {
-          backgroundColor: '#000',
           color: 'white',
-          opacity: 0.75,
-          textShadow: '0px 0px 4px #000',
+          // textShadow: '0px 0px 4px #000',
           whiteSpace: 'pre-line',
           fontSize: '$lg',
           fontStyle: 'normal',
@@ -21,8 +19,6 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           letterSpacing: '0.5px',
         },
         '& video::-webkit-media-text-track-display': {
-          backgroundColor: '#000',
-          opacity: 0.75,
           padding: '0 $4',
         },
         '& video::-webkit-media-text-track-container': {

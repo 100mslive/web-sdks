@@ -191,13 +191,7 @@ const PrevMenu = () => {
         </Text>
         <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
           {polls.map(poll => (
-            <InteractionCard
-              key={poll.id}
-              id={poll.id}
-              title={poll.title}
-              isLive={poll.state === 'started'}
-              isTimed={(poll.duration || 0) > 0}
-            />
+            <InteractionCard key={poll.id} id={poll.id} title={poll.title} isLive={poll.state === 'started'} />
           ))}
         </Flex>
       </Flex>
@@ -205,7 +199,7 @@ const PrevMenu = () => {
   ) : null;
 };
 
-const InteractionCard = ({ id, title, isLive, isTimed }) => {
+const InteractionCard = ({ id, title, isLive }) => {
   const { setPollState } = usePollViewState();
 
   const goToVote = id => {
@@ -221,7 +215,7 @@ const InteractionCard = ({ id, title, isLive, isTimed }) => {
         <Text variant="sub1" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
           {title}
         </Text>
-        <StatusIndicator isLive={isLive} shouldShowTimer={isLive && isTimed} />
+        <StatusIndicator isLive={isLive} />
       </Flex>
       <Flex css={{ w: '100%', gap: '$4' }} justify="end">
         <Button variant="primary" onClick={() => goToVote(id)}>

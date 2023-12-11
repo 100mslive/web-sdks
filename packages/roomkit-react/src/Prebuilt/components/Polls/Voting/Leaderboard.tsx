@@ -48,10 +48,11 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
       </Flex>
     );
   const maxPossibleScore = poll.questions?.reduce((total, question) => (total += question.weight || 0), 0) || 0;
+  const questionCount = poll.questions?.length || 0;
 
   return (
-    <Box>
-      <Flex justify="between" align="center" css={{ py: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
+    <Flex direction="column" css={{ size: '100%' }}>
+      <Flex justify="between" align="center" css={{ pb: '$6', borderBottom: '1px solid $border_bright', mb: '$8' }}>
         <Flex align="center" css={{ gap: '$4' }}>
           <Flex
             css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
@@ -77,14 +78,14 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
       <Text variant="xs" css={{ color: '$on_surface_medium' }}>
         Based on score and time taken to cast the correct answer
       </Text>
-      <Box css={{ mt: '$8' }}>
+      <Box css={{ mt: '$8', gap: '$4', overflowY: 'auto', flex: '1 1 0', mr: '-$6', pr: '$6' }}>
         {pollLeaderboard?.entries &&
           pollLeaderboard.entries.map(question => (
             <LeaderboardEntry
               key={question.position}
               position={question.position}
               score={question.score}
-              totalResponses={question.totalResponses}
+              questionCount={questionCount}
               correctResponses={question.correctResponses}
               userName={question.peer.username || ''}
               maxPossibleScore={maxPossibleScore}
@@ -109,6 +110,6 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
           Share Results
         </Button>
       ) : null} */}
-    </Box>
+    </Flex>
   );
 };

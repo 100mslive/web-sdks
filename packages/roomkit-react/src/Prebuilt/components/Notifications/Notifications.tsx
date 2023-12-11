@@ -192,7 +192,7 @@ export function Notifications() {
                   p: '$xs $md',
                 }}
               >
-                Vote
+                {notification.data.type === 'quiz' ? 'Answer' : 'Vote'}
               </Button>
             ),
           });

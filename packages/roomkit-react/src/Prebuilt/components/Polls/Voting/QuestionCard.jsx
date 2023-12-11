@@ -1,7 +1,7 @@
 // @ts-check
 import React, { useCallback, useMemo, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronLeftIcon, ChevronRightIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, IconButton, Input, styled, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
@@ -48,7 +48,8 @@ export const QuestionCard = ({
     !rolesThatCanViewResponses ||
     rolesThatCanViewResponses.length === 0 ||
     rolesThatCanViewResponses.includes(localPeerRoleName || '');
-  const showVoteCount = roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped'));
+  const showVoteCount =
+    roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
 
   const isLive = pollState === 'started';
   const canRespond = isLive && !localPeerResponse;
@@ -71,6 +72,8 @@ export const QuestionCard = ({
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
 
   const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
+
+  const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
 
   const isValidVote = useMemo(() => {
     if (stringAnswerExpected) {
@@ -113,14 +116,22 @@ export const QuestionCard = ({
         borderRadius: '$1',
         p: '$md',
         mt: '$md',
-        border:
-          isQuiz && localPeerResponse && !localPeerResponse.skipped
-            ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}`
-            : 'none',
+        border: respondedToQuiz ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}` : 'none',
       }}
     >
       <Flex align="center" justify="between">
-        <Text variant="caption" css={{ color: '$on_surface_low', fontWeight: '$semiBold' }}>
+        <Text
+          variant="caption"
+          css={{
+            color: respondedToQuiz ? (isCorrectAnswer ? '$alert_success' : '$alert_error_default') : '$on_surface_low',
+            fontWeight: '$semiBold',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '$4',
+          }}
+        >
+          {respondedToQuiz && isCorrectAnswer ? <CheckCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && !isCorrectAnswer ? <CrossCircleIcon height={20} width={20} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
 
@@ -196,6 +207,8 @@ export const QuestionCard = ({
           setAnswer={setSingleOptionAnswer}
           totalResponses={result?.totalResponses}
           showVoteCount={showVoteCount}
+          localPeerResponse={localPeerResponse}
+          isStopped={pollState === 'stopped'}
         />
       ) : null}
 
@@ -211,6 +224,8 @@ export const QuestionCard = ({
           setSelectedOptions={setMultipleOptionAnswer}
           totalResponses={result?.totalResponses}
           showVoteCount={showVoteCount}
+          localPeerResponse={localPeerResponse}
+          isStopped={pollState === 'stopped'}
         />
       ) : null}
 
@@ -221,14 +236,14 @@ export const QuestionCard = ({
           onSkip={handleSkip}
           onVote={handleVote}
           response={localPeerResponse}
-          stringAnswerExpected={stringAnswerExpected}
+          isQuiz={isQuiz}
         />
       )}
     </Box>
   );
 };
 
-const QuestionActions = ({ isValidVote, skippable, response, stringAnswerExpected, onVote, onSkip }) => {
+const QuestionActions = ({ isValidVote, skippable, response, isQuiz, onVote, onSkip }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
       {skippable && !response ? (
@@ -239,11 +254,13 @@ const QuestionActions = ({ isValidVote, skippable, response, stringAnswerExpecte
 
       {response ? (
         <Text css={{ fontWeight: '$semiBold', color: '$on_surface_medium' }}>
-          {response.skipped ? 'Skipped' : stringAnswerExpected ? 'Submitted' : 'Voted'}
+          {response.skipped ? 'Skipped' : null}
+          {isQuiz && !response.skipped ? 'Answered' : null}
+          {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
         <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
-          {stringAnswerExpected ? 'Submit' : 'Vote'}
+          {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}
     </Flex>

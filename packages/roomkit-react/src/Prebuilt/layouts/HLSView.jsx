@@ -139,7 +139,7 @@ const HLSView = () => {
                 p: '$xs $md',
               }}
             >
-              Vote
+              {poll.type === 'quiz' ? 'Answer' : 'Vote'}
             </Button>
           ),
         });
