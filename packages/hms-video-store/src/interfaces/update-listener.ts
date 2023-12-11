@@ -53,6 +53,7 @@ export enum HMSPollsUpdate {
   POLL_STARTED,
   POLL_STOPPED,
   POLL_STATS_UPDATED,
+  // POLL_LEADERBOARD_SHARED,
 }
 
 export interface HMSAudioListener {

@@ -28,6 +28,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSPlaylistSettings,
   HMSPlaylistType,
   HMSPreviewConfig,
   HMSRole,
@@ -71,7 +72,11 @@ import {
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
-import { HAND_RAISE_GROUP_NAME } from '../utils/constants';
+import {
+  DEFAULT_PLAYLIST_AUDIO_BITRATE,
+  DEFAULT_PLAYLIST_VIDEO_BITRATE,
+  HAND_RAISE_GROUP_NAME,
+} from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
@@ -97,7 +102,7 @@ export class HMSSdk implements HMSInterface {
   private errorListener?: IErrorListener;
   private deviceChangeListener?: DeviceChangeListener;
   private audioListener?: HMSAudioListener;
-  private store!: Store;
+  public store!: Store;
   private notificationManager?: NotificationManager;
   private deviceManager!: DeviceManager;
   private audioSinkManager!: AudioSinkManager;
@@ -115,6 +120,14 @@ export class HMSSdk implements HMSInterface {
   private interactivityCenter!: InteractivityCenter;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private playlistSettings: HMSPlaylistSettings = {
+    video: {
+      bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
+    },
+    audio: {
+      bitrate: DEFAULT_PLAYLIST_AUDIO_BITRATE,
+    },
+  };
 
   private initNotificationManager() {
     if (!this.notificationManager) {
@@ -228,6 +241,15 @@ export class HMSSdk implements HMSInterface {
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     return new HMSPeerListIterator(this.transport, this.store, options);
+  }
+
+  updatePlaylistSettings(options: HMSPlaylistSettings) {
+    if (options.video) {
+      Object.assign(this.playlistSettings.video, options.video);
+    }
+    if (options.audio) {
+      Object.assign(this.playlistSettings.audio, options.audio);
+    }
   }
 
   private handleAutoplayError = (error: HMSException) => {
@@ -1226,9 +1248,9 @@ export class HMSSdk implements HMSInterface {
     if (source === 'videoplaylist') {
       const settings: { maxBitrate?: number; width?: number; height?: number } = {};
       if (track.kind === 'audio') {
-        settings.maxBitrate = 64;
+        settings.maxBitrate = this.playlistSettings.audio?.bitrate || DEFAULT_PLAYLIST_AUDIO_BITRATE;
       } else {
-        settings.maxBitrate = 1000;
+        settings.maxBitrate = this.playlistSettings.video?.bitrate || DEFAULT_PLAYLIST_VIDEO_BITRATE;
         const { width, height } = track.getSettings();
         settings.width = width;
         settings.height = height;

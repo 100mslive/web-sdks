@@ -6,6 +6,7 @@ import {
   HMSConfig,
   HMSLogLevel,
   HMSMidCallPreviewConfig,
+  HMSPlaylistSettings,
   HMSPluginSupportResult,
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
@@ -515,4 +516,9 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   lowerRemotePeerHand(peerId: string): Promise<void>;
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
+  /**
+   * Method to override the default settings for playlist tracks
+   * @param {HMSPlaylistSettings} settings
+   */
+  setPlaylistSettings(settings: HMSPlaylistSettings): void;
 }

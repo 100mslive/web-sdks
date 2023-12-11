@@ -19,6 +19,7 @@ export const EMOJI_REACTION_TYPE = 'EMOJI_REACTION';
 export const CHAT_SELECTOR = {
   PEER_ID: 'peer_id',
   ROLE: 'role',
+  EVERYONE: 'Everyone',
 };
 
 export const APP_DATA = {
@@ -110,6 +111,7 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
+  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {

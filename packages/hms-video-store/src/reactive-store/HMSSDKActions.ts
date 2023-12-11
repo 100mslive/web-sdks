@@ -112,7 +112,6 @@ import {
 export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<string, any> }>
   implements IHMSActions<T>
 {
-  private hmsSDKTracks: Record<string, SDKHMSTrack> = {};
   private readonly sdk: HMSSdk;
   private readonly store: IHMSStore<T>;
   private isRoomJoinCalled = false;
@@ -133,6 +132,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
+  }
+  setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
+    this.sdk.updatePlaylistSettings(settings);
   }
 
   async refreshDevices() {
@@ -162,7 +164,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
-    const track = this.hmsSDKTracks[trackId];
+    const track = this.sdk.store.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         //@ts-ignore
@@ -358,7 +360,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   async switchCamera(): Promise<void> {
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+      const sdkTrack = this.sdk.store
+        .getLocalPeerTracks()
+        .find(track => track.trackId === trackID) as SDKHMSLocalVideoTrack;
       if (sdkTrack) {
         await sdkTrack.switchCamera();
         this.syncRoomState('switchCamera');
@@ -441,7 +445,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
+    const sdkTrack = this.sdk.store.getTrackById(trackID);
     if (sdkTrack?.type === 'video') {
       await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -473,7 +477,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has video track';
       return result;
     }
-    const sdkTrack = this.hmsSDKTracks[trackID];
+    const sdkTrack = this.sdk.store.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
     } else {
@@ -498,7 +502,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has audio track';
       return result;
     }
-    const sdkTrack = this.hmsSDKTracks[trackID];
+    const sdkTrack = this.sdk.store.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
     } else {
@@ -685,7 +689,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
-      const track = this.hmsSDKTracks[trackID];
+      const track = this.sdk.store.getTrackById(trackID);
       if (track && isRemoteTrack(track)) {
         await this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
       } else {
@@ -740,7 +744,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private resetState(reason = 'resetState') {
     this.isRoomJoinCalled = false;
-    this.hmsSDKTracks = {};
     HMSLogger.cleanup();
     this.setState(store => {
       Object.assign(store, createDefaultStoreState());
@@ -897,7 +900,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.hmsSDKTracks[trackID];
+    const sdkTrack = this.sdk.store.getTrackById(trackID);
     if (sdkTrack && sdkTrack.type === 'video') {
       await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -973,7 +976,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
       Object.assign(draftStore.connectionQualities, newNetworkQuality);
-      this.hmsSDKTracks = newHmsSDkTracks;
 
       /**
        * if preview is already present merge,
@@ -1272,12 +1274,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
       }
       delete draftTracks[trackId];
-      delete this.hmsSDKTracks[trackId];
     }, 'trackRemoved');
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
-    const track = this.hmsSDKTracks[trackID];
+    const track = this.sdk.store.getTrackById(trackID);
     if (track) {
       await track.setEnabled(enabled);
     } else {
@@ -1286,7 +1287,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalVideoTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
-    const track = this.hmsSDKTracks[trackID] as SDKHMSLocalVideoTrack;
+    const track = this.sdk.store.getTrackById(trackID) as SDKHMSLocalVideoTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1295,7 +1296,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalAudioTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
-    const track = this.hmsSDKTracks[trackID] as SDKHMSLocalAudioTrack;
+    const track = this.sdk.store.getTrackById(trackID) as SDKHMSLocalAudioTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1331,7 +1332,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
-    const track = this.hmsSDKTracks[trackId];
+    const track = this.sdk.store.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
         await track.setVolume(value);
@@ -1374,7 +1375,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
+      const sdkTrack = this.sdk.store.getTrackById(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin, pluginFrameRate);
@@ -1394,7 +1395,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const sdkTrack = this.hmsSDKTracks[trackID];
+      const sdkTrack = this.sdk.store.getTrackById(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
@@ -1416,7 +1417,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (!storeTrackID) {
       return false;
     }
-    return this.hmsSDKTracks[storeTrackID]?.trackId === sdkTrackID;
+    return this.sdk.store.getTrackById(storeTrackID)?.trackId === sdkTrackID;
   }
 
   /**
@@ -1448,7 +1449,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
     const trackIDs = this.store.getState(selectLocalTrackIDs);
-    return trackIDs.find(trackID => this.hmsSDKTracks[trackID].trackId === sdkTrack.trackId);
+    return trackIDs.find(trackID => this.sdk.store.getTrackById(trackID)?.trackId === sdkTrack.trackId);
   }
 
   private setProgress = ({ type, progress }: sdkTypes.HMSPlaylistProgressEvent) => {

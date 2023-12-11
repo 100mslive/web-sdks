@@ -57,6 +57,7 @@ export interface PollQuestionParams {
   question: PollQuestionInfoParams;
   options?: HMSPollQuestionOption[];
   answer?: HMSPollQuestionAnswer;
+  weight?: number;
 }
 
 export interface PollQuestionsSetParams {
@@ -125,18 +126,20 @@ interface PollResponse
   response_id: string;
 }
 
+export interface PollResponsePeerInfo {
+  hash: string;
+  peerid: string;
+  userid: string;
+  username: string;
+}
+
 export interface PollResponsesGetResponse {
   poll_id: string;
   last?: boolean;
   responses?: {
     final?: boolean;
     response: PollResponse;
-    peer: {
-      hash: string;
-      peerid: string;
-      userid: string;
-      username: string;
-    };
+    peer: PollResponsePeerInfo;
   }[];
 }
 
@@ -157,3 +160,30 @@ export interface PollResult {
 export type PollResultParams = PollID;
 
 export type PollResultResponse = PollResult & PollID;
+
+export interface PollLeaderboardGetParams {
+  poll_id: string;
+  question?: number; // Question index
+  count?: number; // Number of peers to be included, sorted by duration in ascending order. Default: 10
+  offset: number; // Position to start (response is paginated)
+}
+
+export interface PollLeaderboardEntry {
+  position: number; // leaderboard position
+  score: number; // sum of weights of correct answers
+  total_responses: number;
+  correct_responses: number;
+  duration: number; // sum of ms to answer correct questions
+  peer: PollResponsePeerInfo;
+}
+
+export interface PollLeaderboardGetResponse {
+  poll_id: string;
+  total_users: number;
+  voted_users: number;
+  correct_users: number;
+  avg_time: number;
+  avg_score: number;
+  questions: PollLeaderboardEntry[];
+  last: boolean;
+}

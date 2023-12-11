@@ -54,14 +54,9 @@ export const useSetPinnedMessages = () => {
   );
 
   const unpinBlacklistedMessages = useCallback(
-    async (
-      pinnedMessages: PinnedMessage[] = [],
-      blacklistedPeerIDSet: Set<string>,
-      blacklistedMessageIDSet: Set<string>,
-    ) => {
+    async (pinnedMessages: PinnedMessage[] = [], blacklistedMessageIDSet: Set<string>) => {
       const filteredPinnedMessages = pinnedMessages?.filter(
-        pinnedMessage =>
-          !blacklistedMessageIDSet?.has(pinnedMessage.id) && !blacklistedPeerIDSet.has(pinnedMessage.authorId),
+        pinnedMessage => !blacklistedMessageIDSet?.has(pinnedMessage.id),
       );
 
       await hmsActions.sessionStore

@@ -10,7 +10,6 @@ import { LayoutProps } from './interface';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
-// @ts-ignore: No implicit Any
 import { UI_SETTINGS } from '../../common/constants';
 
 export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) {
@@ -23,10 +22,12 @@ export function EqualProminence({ isInsetEnabled = false, peers, onPageChange, o
     maxTileCount,
   });
   // useMemo is needed to prevent recursion as new array is created for localPeer
-  const inputPeers = useMemo(
-    () => (pageList.length === 0 ? (localPeer ? [localPeer] : []) : peers),
-    [pageList.length, peers, localPeer],
-  );
+  const inputPeers = useMemo(() => {
+    if (pageList.length === 0) {
+      return localPeer ? [localPeer] : [];
+    }
+    return peers;
+  }, [pageList.length, peers, localPeer]);
   // Pass local peer to main grid if no other peer has tiles
   pageList = usePagesWithTiles({
     peers: inputPeers,

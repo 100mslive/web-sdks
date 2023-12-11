@@ -4,11 +4,13 @@ import { HMSInteractivityCenter } from '../../interfaces/session-store/interacti
 import {
   HMSPoll,
   HMSPollCreateParams,
+  HMSPollLeaderboardResponse,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
+  HMSPollStates,
   HMSPollUserTrackingMode,
 } from '../../interfaces/session-store/polls';
 import { Store } from '../../sdk/store';
@@ -178,6 +180,32 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     }
 
     return question;
+  }
+
+  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSPollLeaderboardResponse> {
+    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
+
+    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
+      return { entries: [], hasNext: false };
+    }
+    const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
+      poll_id: poll.id,
+      count,
+      offset,
+    });
+
+    const leaderboardEntries = pollLeaderboard.questions.map(question => {
+      return {
+        position: question.position,
+        totalResponses: question.total_responses,
+        correctResponses: question.correct_responses,
+        duration: question.duration,
+        peer: question.peer,
+        score: question.score,
+      };
+    });
+
+    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last };
   }
 }
 
