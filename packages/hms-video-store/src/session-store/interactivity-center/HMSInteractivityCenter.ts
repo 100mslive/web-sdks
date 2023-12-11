@@ -183,7 +183,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
       return { entries: [], hasNext: false };
     }
-    const pollLeaderboard = await this.transport.fetchLeaderboard({
+    const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
       poll_id: poll.id,
       count,
       offset,
