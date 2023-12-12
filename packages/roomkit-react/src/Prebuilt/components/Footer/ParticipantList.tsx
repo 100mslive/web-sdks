@@ -305,6 +305,9 @@ const ParticipantMoreActions = ({
       prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
     } else if (on_stage_role) {
       await hmsActions.changeRoleOfPeer(peerId, on_stage_role, skip_preview_for_role_change);
+      if (skip_preview_for_role_change) {
+        await hmsActions.lowerRemotePeerHand(peerId);
+      }
     }
     setOpen(false);
   };
