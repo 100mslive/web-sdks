@@ -3,7 +3,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPermissionType, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -198,6 +198,7 @@ class Store {
 
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
+    this.addPluginsToRoles(params.plugins);
     this.roleDetailsArrived = true;
     this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
@@ -402,6 +403,36 @@ class Store {
         return;
       }
       peer.role = this.getPolicyForRole(peer.role.name);
+    });
+  }
+
+  private addPluginsToRoles(plugins: PolicyParams['plugins']) {
+    if (!plugins) {
+      return;
+    }
+
+    const addPermissionToRole = (
+      role: string,
+      pluginName: keyof PolicyParams['plugins'],
+      permission: HMSPermissionType,
+    ) => {
+      const rolePermissions = this.knownRoles[role].permissions;
+      if (!rolePermissions[pluginName]) {
+        rolePermissions[pluginName] = [];
+      }
+      rolePermissions[pluginName]?.push(permission);
+    };
+
+    Object.keys(plugins).forEach(plugin => {
+      const pluginName = plugin as keyof PolicyParams['plugins'];
+      if (!plugins[pluginName]) {
+        return;
+      }
+
+      const permissions = plugins[pluginName].permissions;
+      permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
+      permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
+      permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
     });
   }
 

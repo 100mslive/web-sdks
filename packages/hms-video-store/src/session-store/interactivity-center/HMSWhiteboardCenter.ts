@@ -55,14 +55,29 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     this.listener = listener;
   }
 
-  // @TODO: change after RBAC is introduced for whiteboard
   private getCreateOptionsWithDefaults(createOptions?: HMSWhiteboardCreateOptions): HMSWhiteboardCreateOptions {
-    const roles = Object.keys(this.store.getKnownRoles());
+    const roles = Object.values(this.store.getKnownRoles());
+    const reader: Array<string> = [];
+    const writer: Array<string> = [];
+    const admin: Array<string> = [];
+
+    roles.forEach(role => {
+      if (role.permissions.whiteboard?.includes('read')) {
+        reader.push(role.name);
+      }
+      if (role.permissions.whiteboard?.includes('write')) {
+        writer.push(role.name);
+      }
+      if (role.permissions.whiteboard?.includes('admin')) {
+        admin.push(role.name);
+      }
+    });
+
     return {
       title: createOptions?.title || `${this.store.getRoom()?.id} Whiteboard`,
-      reader: createOptions?.reader || roles,
-      writer: createOptions?.writer || roles,
-      admin: createOptions?.admin || roles,
+      reader: createOptions?.reader || reader,
+      writer: createOptions?.writer || writer,
+      admin: createOptions?.admin || admin,
     };
   }
 }

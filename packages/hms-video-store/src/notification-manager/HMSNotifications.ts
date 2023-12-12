@@ -59,10 +59,22 @@ export enum HMSStreamingState {
   FAILED = 'failed',
 }
 
+interface PluginPermissions {
+  permissions?: {
+    // list of roles
+    admin?: Array<string>;
+    writer?: Array<string>;
+    reader?: Array<string>;
+  };
+}
+
 export interface PolicyParams {
   name: string;
   known_roles: {
     [role: string]: HMSRole;
+  };
+  plugins: {
+    [plugin in 'whiteboard']?: PluginPermissions;
   };
   template_id: string;
   app_data?: Record<string, string>;
