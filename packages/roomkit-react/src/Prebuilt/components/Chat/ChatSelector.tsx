@@ -164,7 +164,7 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    let selectItems = [];
+    let selectItems: React.ReactNode[] = [];
     if (isPublicChatEnabled && !searchValue) {
       selectItems = [<Everyone active={!selectedRole && !selectedPeerId} />];
     }
