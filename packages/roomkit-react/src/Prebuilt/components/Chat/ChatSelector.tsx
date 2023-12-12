@@ -170,8 +170,6 @@ const VirtualizedSelectItemList = ({
     }
     if (roles.length > 0 && !searchValue) {
       selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
-    }
-    if (!searchValue) {
       roles.forEach(userRole =>
         selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
       );
