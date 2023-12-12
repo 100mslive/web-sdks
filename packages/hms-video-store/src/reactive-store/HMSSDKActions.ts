@@ -893,7 +893,11 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    let sdkTrack = this.sdk.store.getTrackById(trackID);
+    // preview tracks are not added to the sdk store, so access from local peer.
+    if (!sdkTrack) {
+      sdkTrack = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+    }
     if (sdkTrack && sdkTrack.type === 'video') {
       await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -919,7 +923,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const newHmsPeers: Record<HMSPeerID, Partial<HMSPeer>> = {};
     const newHmsPeerIDs: HMSPeerID[] = []; // to add in room.peers
     const newHmsTracks: Record<HMSTrackID, Partial<HMSTrack>> = {};
-    const newHmsSDkTracks: Record<HMSTrackID, SDKHMSTrack> = {};
     const newMediaSettings: Partial<HMSMediaSettings> = {};
     const newNetworkQuality: Record<HMSPeerID, sdkTypes.HMSConnectionQuality> = {};
     let newPreview: HMSStore['preview'];
@@ -943,7 +946,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         const hmsTrack = SDKToHMS.convertTrack(sdkTrack);
         newHmsTracks[hmsTrack.id] = hmsTrack;
-        newHmsSDkTracks[sdkTrack.trackId] = sdkTrack;
       }
 
       if (sdkPeer.isLocal) {
@@ -1271,7 +1273,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
-    const track = this.sdk.store.getTrackById(trackID);
+    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
     if (track) {
       await track.setEnabled(enabled);
     } else {
@@ -1280,7 +1282,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalVideoTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
-    const track = this.sdk.store.getTrackById(trackID) as SDKHMSLocalVideoTrack;
+    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalVideoTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1289,7 +1291,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalAudioTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
-    const track = this.sdk.store.getTrackById(trackID) as SDKHMSLocalAudioTrack;
+    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalAudioTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
