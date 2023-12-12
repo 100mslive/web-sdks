@@ -35,7 +35,7 @@ export const ChatToggle = () => {
             position: 'absolute',
             top: '-$4',
             right: '-$4',
-            borderRadius: '2.5rem',
+            borderRadius: '$space$14',
             background: '$primary_default',
           }}
         >
