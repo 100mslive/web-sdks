@@ -606,7 +606,8 @@ export class HMSSdk implements HMSInterface {
     if (room) {
       // Wait for preview or join to finish to prevent any race conditions happening because preview/join are called multiple times
       // This can happen when useEffects are not properly handled in case of react apps
-      while (this.sdkState.isPreviewInProgress || this.sdkState.isJoinInProgress) {
+      // when error is terminal this will go into infinite loop so error?.isTerminal check is needed
+      while ((this.sdkState.isPreviewInProgress || this.sdkState.isJoinInProgress) && !error?.isTerminal) {
         await workerSleep(100);
       }
       const roomId = room.id;
