@@ -115,6 +115,7 @@ export { default as GraduationIcon } from './GraduationIcon';
 export { default as GridFourIcon } from './GridFourIcon';
 export { default as GridIcon } from './GridIcon';
 export { default as GridSixIcon } from './GridSixIcon';
+export { default as GroupIcon } from './GroupIcon';
 export { default as GuageIcon } from './GuageIcon';
 export { default as HamburgerMenuIcon } from './HamburgerMenuIcon';
 export { default as HandIcon } from './HandIcon';
