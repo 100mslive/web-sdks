@@ -41,9 +41,12 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
     skip_preview_for_role_change = false,
   } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
 
-  const onClickHandler = useCallback(() => {
+  const onClickHandler = useCallback(async () => {
     if (isSingleHandRaise) {
       hmsActions.changeRoleOfPeer(id, on_stage_role, skip_preview_for_role_change);
+      if (skip_preview_for_role_change) {
+        await hmsActions.lowerRemotePeerHand(id);
+      }
     } else {
       !isParticipantsOpen && toggleSidepane();
     }
