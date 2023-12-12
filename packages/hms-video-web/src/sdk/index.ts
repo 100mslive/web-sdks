@@ -997,7 +997,7 @@ export class HMSSdk implements HMSInterface {
     await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
   async lowerRemotePeerHand(peerId: string) {
-    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+    await this.transport.removeFromGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
