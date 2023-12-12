@@ -74,7 +74,7 @@ export const ChatSelectorContainer = () => {
               asChild
               data-testid="participant_list_filter"
               css={{
-                border: '1px solid $border_bright',
+                background: '$primary_default',
                 r: '$0',
                 p: '$1 $2',
                 ml: '$6',
