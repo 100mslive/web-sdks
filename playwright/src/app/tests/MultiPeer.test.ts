@@ -75,7 +75,7 @@ test(`Verify Peer does not disappear from the list after moving offstage-LIVE-17
         //Accpet invite
         await page.bringToFront();
         await page.getByText('Accept').click();
-        await page_host.waitForTimeout(5000);
+        await page.waitForTimeout(5000);
 
         //Go back to broadcaster
         await page_host.bringToFront();
@@ -130,9 +130,298 @@ test(`Verify HLS starts on room-LIVE-1856`,async ({ context }) => {
         await page.getByTestId('leave_room_btn').click();
         await page.getByTestId('leave_room').click();
 
+        await page.getByTestId('join_again_btn').isVisible();
+
         await page_host.bringToFront();
         await page_host.getByTestId('leave_end_dropdown_trigger').click();
         await page_host.getByTestId('end_room_btn').click();
         await page_host.getByTestId('stop_stream_btn').click();
 });
+
+test(`Verify Webrtc viewer can join room and leave`, async({context}) => {
+        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lni-ylib-xho';
+        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vfi-zkyi-gzj';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(cobroadcaster);
+        await page_host.getByPlaceholder('Enter name').fill('co-broadcaster');
+        await page_host.getByText("Join Now").click();
+        await page_host.waitForTimeout(5000);
+ 
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(webrtcviewer);
+        await page.getByPlaceholder('Enter name').fill('vrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('participant_video_tile').isVisible();
+        await page.getByTestId('leave_room_btn').click();
+        await page.getByTestId('leave_room').click();
+
+        await page.getByTestId('join_again_btn').isVisible();
+        await page.getByTestId('join_again_btn').click();
+
+        await page.getByPlaceholder('Enter name').fill('vrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('participant_video_tile').isVisible();
+});
+
+test(`Verify co-broadcaster can end room`, async({context}) => {
+        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lni-ylib-xho';
+        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vfi-zkyi-gzj';
+
+        const page_host = await context.newPage();
+
+         //Join as broadcaster
+         await page_host.goto(cobroadcaster);
+         await page_host.getByPlaceholder('Enter name').fill('co-broadcaster');
+         await page_host.getByText("Join Now").click();
+         await page_host.waitForTimeout(5000);
+  
+  
+         //Join as vnrt
+         const page = await context.newPage();
+         await page.goto(webrtcviewer);
+         await page.getByPlaceholder('Enter name').fill('vrt');
+         await page.getByText(JoinBtn).click();
+         await page.waitForTimeout(5000);
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click(); 
+
+        await page_host.getByTestId('join_again_btn').isVisible();
+
+        await page.bringToFront();
+        await page.getByTestId('join_again_btn').isVisible();
+});
+
+test(`Verify broadcaster can end the session`, async({context}) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(10000);
+ 
+        await page_host.getByTestId('header').getByText('LIVE').isVisible();
+
+        const page_host2 = await context.newPage();
+
+        //Join as broadcaster
+        await page_host2.goto(broadcasterUrl);
+        await page_host2.getByPlaceholder('Enter name').fill('broadcaster2');
+        await page_host2.getByText("Join Now").click();
+        await page_host2.waitForTimeout(5000);
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(viewerNRTUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click(); 
+        await page.waitForTimeout(1000);
+
+        await page_host2.bringToFront();
+        await page_host2.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host2.getByTestId('end_room_btn').click();
+        await page_host2.getByTestId('stop_stream_btn').click(); 
+        await page.waitForTimeout(1000);
+        
+        await page.bringToFront();
+        await page.getByTestId('join_again_btn').isVisible();
+});
+
+test(`Verify broadcaster and co-broadcaster can leave and rejoin room` , async({context}) => {
+
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/adg-mwom-fcm';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(10000);
+ 
+        await page_host.getByTestId('header').getByText('LIVE').isVisible();
+
+        const page_host2 = await context.newPage();
+
+        //Join as co-broadcaster
+        await page_host2.goto(cobroadcasterUrl);
+        await page_host2.getByPlaceholder('Enter name').fill('co-broadcaster');
+        await page_host2.getByText("Join Now").click();
+        await page_host2.waitForTimeout(2000);
+        
+        await page_host2.getByTestId('leave_room_btn').click();
+        await page_host2.getByTestId('leave_room').click();
+
+        await page_host2.getByTestId('join_again_btn').isVisible();
+        await page_host2.getByTestId('join_again_btn').click();
+
+        await page_host2.getByPlaceholder('Enter name').fill('co-broadcaster');
+        await page_host2.getByText("Join Now").click();
+        await page_host2.waitForTimeout(1000);
+        await page_host2.getByTestId('header').getByText('LIVE').isVisible();
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_room_btn').click();
+        await page_host.getByTestId('leave_room').click();
+
+        await page_host.getByTestId('join_again_btn').isVisible();
+        await page_host.getByTestId('join_again_btn').click();
+
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(10000);
+ 
+        await page_host.getByTestId('header').getByText('LIVE').isVisible();
+
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+        
+});
+
+test(`Verify hls viewer can join room and leave`, async({context}) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(5000);
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(hlsviewerUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('hms-video').isVisible();
+        await page.getByTestId('leave_room_btn').click();
+        await page.getByTestId('leave_room').click();
+
+        await page.getByTestId('join_again_btn').isVisible();
+        await page.getByTestId('join_again_btn').click();
+
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('hms-video').isVisible();
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+});
+
+
+test(`Verify on-stage can join room and leave`, async({context}) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(5000);
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(hlsviewerUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('hms-video').isVisible();
+
+         //Hand raise for vnrt
+         await page.getByTestId('hand_raise_btn').click();
+         await page.waitForTimeout(2000);
+ 
+         //Go to broadcaster and click brint to stage notification
+         await page_host.bringToFront();
+         await page_host.getByText('Bring to stage').click();
+ 
+         //Accpet invite
+         await page.bringToFront();
+         await page.getByText('Accept').click();
+         await page.waitForTimeout(5000);
+
+        await page.getByTestId('leave_room_btn').click();
+        await page.getByTestId('leave_room').click();
+
+        await page.getByTestId('join_again_btn').isVisible();
+        await page.getByTestId('join_again_btn').click();
+
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('hms-video').isVisible();
+
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+});
+
+
+test(`Verify stream is running in highest quality @vrt`, async({context}) => {
+
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(5000);
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(hlsviewerUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(5000);
+
+        await page.getByTestId('hms-video').isVisible();
+        await page.getByTestId('hms-video').hover();
+        
+        page.locator("//div[@data-testid='quality_selector']//p[contains(.,'720')]").isVisible();
+        await page_host.bringToFront();
+        await page_host.getByTestId('leave_end_dropdown_trigger').click();
+        await page_host.getByTestId('end_room_btn').click();
+        await page_host.getByTestId('stop_stream_btn').click();
+});
+
+
+
 
