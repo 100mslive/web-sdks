@@ -421,8 +421,8 @@ const ChatMessage = React.memo(
       receiver: message.recipientPeer,
     });
     const [openSheet, setOpenSheet] = useState(false);
-    // show pin action only if peer has remove others permission and the message is of broadcast type
-    const showPinAction = permissions.removeOthers && !messageType && elements?.chat?.allow_pinning_messages;
+    // show pin action only if peer has remove others permission
+    const showPinAction = permissions.removeOthers && elements?.chat?.allow_pinning_messages;
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
