@@ -48,7 +48,7 @@ export const ChatSelectorContainer = () => {
             }}
           >
             <Text
-              variant="xs"
+              variant="caption"
               css={{
                 c: '$on_surface_high',
                 pr: '$2',
@@ -83,7 +83,7 @@ export const ChatSelectorContainer = () => {
             >
               <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
                 <Text
-                  variant="xs"
+                  variant="caption"
                   css={{
                     c: '$on_surface_high',
                     pr: '$2',
@@ -98,7 +98,7 @@ export const ChatSelectorContainer = () => {
                   ) : (
                     <PersonIcon width={16} height={16} />
                   )}
-                  {selection}
+                  {selection || 'Search'}
                 </Text>
                 {selection && (
                   <ChevronDownIcon

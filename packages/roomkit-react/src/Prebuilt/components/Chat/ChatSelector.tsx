@@ -164,21 +164,24 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems =
-      isPublicChatEnabled && !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
-
-    roles.length > 0 &&
-      !searchValue &&
+    let selectItems = [];
+    if (isPublicChatEnabled && !searchValue) {
+      selectItems = [<Everyone active={!selectedRole && !selectedPeerId} />];
+    }
+    if (roles.length > 0 && !searchValue) {
       selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
-    !searchValue &&
+    }
+    if (!searchValue) {
       roles.forEach(userRole =>
         selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
       );
+    }
 
-    filteredPeers.length > 0 &&
+    if (filteredPeers.length > 0) {
       selectItems.push(
         <SelectorHeader isHorizontalDivider={isPublicChatEnabled || roles.length > 0}>Participants</SelectorHeader>,
       );
+    }
     filteredPeers.forEach(peer =>
       selectItems.push(
         <PeerItem key={peer.id} name={peer.name} peerId={peer.id} active={peer.id === selectedPeerId} />,

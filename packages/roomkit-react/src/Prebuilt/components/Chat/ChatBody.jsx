@@ -73,11 +73,15 @@ const MessageTypeContainer = ({ left, right }) => {
       css={{
         ml: 'auto',
         mr: '$4',
+        gap: '$space$2',
       }}
-      gap="$1"
     >
       {left && (
-        <SenderName variant="xs" as="span" css={{ color: '$on_surface_medium', pl: '$1', textTransform: 'capitalize' }}>
+        <SenderName
+          variant="xs"
+          as="span"
+          css={{ color: '$on_surface_medium', pl: '$1', textTransform: 'capitalize', fontWeight: '$regular' }}
+        >
           {left}
         </SenderName>
       )}
@@ -658,7 +662,7 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
 export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-  let messages = useHMSStore(selectHMSMessages) || [];
+  let messages = useHMSStore(selectHMSMessages);
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const getFilteredMessages = () => {
     const blacklistedMessageIDSet = new Set(blacklistedMessageIDs);
