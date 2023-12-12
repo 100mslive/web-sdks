@@ -13,7 +13,8 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { Button } from '../../..';
+import { GroupIcon } from '@100mslive/react-icons';
+import { Box, Button } from '../../..';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -122,6 +123,16 @@ export function Notifications() {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
+            });
+          } else if (notification.data?.message === 'role limit reached') {
+            ToastManager.addToast({
+              title: 'The room is currently full, try joining later',
+              close: true,
+              icon: (
+                <Box css={{ color: '$alert_error_default' }}>
+                  <GroupIcon />
+                </Box>
+              ),
             });
           } else {
             ToastManager.addToast({
