@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
-import { ChevronDownIcon, ChevronUpIcon, CrossIcon, PeopleIcon, PersonIcon } from '@100mslive/react-icons';
+import { ChevronDownIcon, ChevronUpIcon, CrossIcon, GroupIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -11,7 +11,7 @@ import { ChatSelector } from './ChatSelector';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useSubscribeChatSelector } from '../AppData/useUISettings';
-import { useFilteredRoles } from '../../common/hooks';
+import { useDefaultChatSelection, useFilteredRoles } from '../../common/hooks';
 import { CHAT_SELECTOR } from '../../common/constants';
 
 export const ChatSelectorContainer = () => {
@@ -23,8 +23,9 @@ export const ChatSelectorContainer = () => {
   const roles = useFilteredRoles();
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
+  const defaultSelection = useDefaultChatSelection();
   const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || CHAT_SELECTOR.EVERYONE;
+  const selection = selectorPeerName || selectedRole || defaultSelection;
 
   if (!(isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0) && !isPrivateChatEnabled && !selection) {
     return null;
@@ -47,7 +48,7 @@ export const ChatSelectorContainer = () => {
             }}
           >
             <Text
-              variant="xs"
+              variant="caption"
               css={{
                 c: '$on_surface_high',
                 pr: '$2',
@@ -58,7 +59,7 @@ export const ChatSelectorContainer = () => {
               }}
             >
               {selection === CHAT_SELECTOR.EVERYONE ? (
-                <PeopleIcon width={16} height={16} />
+                <GroupIcon width={16} height={16} />
               ) : (
                 <PersonIcon width={16} height={16} />
               )}
@@ -73,7 +74,7 @@ export const ChatSelectorContainer = () => {
               asChild
               data-testid="participant_list_filter"
               css={{
-                border: '1px solid $border_bright',
+                background: '$primary_default',
                 r: '$0',
                 p: '$1 $2',
                 ml: '$6',
@@ -82,7 +83,7 @@ export const ChatSelectorContainer = () => {
             >
               <Flex align="center" css={{ c: '$on_surface_medium' }} gap="1">
                 <Text
-                  variant="xs"
+                  variant="caption"
                   css={{
                     c: '$on_surface_high',
                     pr: '$2',
@@ -93,11 +94,11 @@ export const ChatSelectorContainer = () => {
                   }}
                 >
                   {selection === CHAT_SELECTOR.EVERYONE ? (
-                    <PeopleIcon width={16} height={16} />
+                    <GroupIcon width={16} height={16} />
                   ) : (
                     <PersonIcon width={16} height={16} />
                   )}
-                  {selection}
+                  {selection || 'Search'}
                 </Text>
                 {selection && (
                   <ChevronDownIcon
