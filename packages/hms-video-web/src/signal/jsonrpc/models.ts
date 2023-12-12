@@ -60,7 +60,7 @@ export enum HMSSignalMethod {
   GROUP_JOIN = 'group-join',
   GROUP_LEAVE = 'group-leave',
   GROUP_ADD = 'group-add',
-  GROUP_REMOVE = 'group-leave',
+  GROUP_REMOVE = 'group-remove',
 }
 
 export function convertSignalMethodtoErrorAction(method: HMSSignalMethod): HMSAction {
