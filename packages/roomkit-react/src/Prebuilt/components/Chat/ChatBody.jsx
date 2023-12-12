@@ -108,9 +108,7 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   }
 
   if (roles && roles.length) {
-    return (
-      <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles.join(',') : localPeerRoleName}`} right="ROLE" />
-    );
+    return <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles?.[0] : localPeerRoleName}`} right="ROLE" />;
   }
   return null;
 };
