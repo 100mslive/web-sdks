@@ -21,6 +21,7 @@ import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
+import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
@@ -175,6 +176,7 @@ export const ConferenceScreen = () => {
         <RoleChangeRequestModal />
         <HLSFailureModal />
         <ActivatedPIP />
+        <PreviousRoleInMetadata />
       </Flex>
     </>
   );
