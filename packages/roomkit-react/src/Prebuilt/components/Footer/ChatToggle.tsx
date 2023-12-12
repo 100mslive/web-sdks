@@ -1,7 +1,7 @@
 import React from 'react';
 import { selectUnreadHMSMessagesCount, useHMSStore } from '@100mslive/react-sdk';
-import { ChatIcon, ChatUnreadIcon } from '@100mslive/react-icons';
-import { Tooltip } from '../../..';
+import { ChatIcon } from '@100mslive/react-icons';
+import { Box, Flex, Text, Tooltip } from '../../..';
 // @ts-ignore: No implicit Any
 import IconButton from '../../IconButton';
 // @ts-ignore: No implicit Any
@@ -15,10 +15,33 @@ export const ChatToggle = () => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
 
   return (
-    <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
-      <IconButton onClick={toggleChat} active={!isChatOpen} data-testid="chat_btn">
-        {countUnreadMessages === 0 ? <ChatIcon /> : <ChatUnreadIcon data-testid="chat_unread_btn" />}
-      </IconButton>
-    </Tooltip>
+    <Box
+      css={{
+        position: 'relative',
+      }}
+    >
+      <Tooltip key="chat" title={`${isChatOpen ? 'Close' : 'Open'} chat`}>
+        <IconButton onClick={toggleChat} active={!isChatOpen} data-testid="chat_btn">
+          <ChatIcon />
+        </IconButton>
+      </Tooltip>
+      {countUnreadMessages > 0 && (
+        <Flex
+          css={{
+            height: '$8',
+            p: '$4 4.5px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'absolute',
+            top: '-$4',
+            right: '-$4',
+            borderRadius: '2.5rem',
+            background: '$primary_default',
+          }}
+        >
+          <Text variant="overline">{countUnreadMessages > 99 ? '99+' : countUnreadMessages}</Text>
+        </Flex>
+      )}
+    </Box>
   );
 };
