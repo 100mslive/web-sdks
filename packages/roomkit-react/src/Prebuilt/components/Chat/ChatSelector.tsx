@@ -145,14 +145,15 @@ const VirtualizedSelectItemList = ({
   selectedRole,
   selectedPeerId,
   searchValue,
+  isPublicChatEnabled,
 }: {
   peers: HMSPeer[];
   selectedRole: string;
   selectedPeerId: string;
   searchValue: string;
+  isPublicChatEnabled: boolean;
 }) => {
   const roles = useFilteredRoles();
-  const isMobile = useMedia(cssConfig.media.md);
   const filteredPeers = useMemo(
     () =>
       peers.filter(
@@ -163,15 +164,21 @@ const VirtualizedSelectItemList = ({
   );
 
   const listItems = useMemo(() => {
-    const selectItems = !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
+    const selectItems =
+      isPublicChatEnabled && !searchValue ? [<Everyone active={!selectedRole && !selectedPeerId} />] : [];
 
-    roles.length > 0 && !searchValue && selectItems.push(<SelectorHeader>Roles</SelectorHeader>);
+    roles.length > 0 &&
+      !searchValue &&
+      selectItems.push(<SelectorHeader isHorizontalDivider={isPublicChatEnabled}>Roles</SelectorHeader>);
     !searchValue &&
       roles.forEach(userRole =>
         selectItems.push(<RoleItem key={userRole} active={selectedRole === userRole} role={userRole} />),
       );
 
-    filteredPeers.length > 0 && selectItems.push(<SelectorHeader>Participants</SelectorHeader>);
+    filteredPeers.length > 0 &&
+      selectItems.push(
+        <SelectorHeader isHorizontalDivider={isPublicChatEnabled || roles.length > 0}>Participants</SelectorHeader>,
+      );
     filteredPeers.forEach(peer =>
       selectItems.push(
         <PeerItem key={peer.id} name={peer.name} peerId={peer.id} active={peer.id === selectedPeerId} />,
@@ -179,23 +186,14 @@ const VirtualizedSelectItemList = ({
     );
 
     return selectItems;
-  }, [searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
+  }, [isPublicChatEnabled, searchValue, selectedRole, selectedPeerId, roles, filteredPeers]);
 
-  if (!isMobile) {
-    return (
-      <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
-        {listItems.map((item, index) => (
-          <Box key={index}>{item}</Box>
-        ))}
-      </Dropdown.Group>
-    );
-  }
   return (
-    <>
+    <Dropdown.Group css={{ overflowY: 'auto', maxHeight: '$64', bg: '$surface_default' }}>
       {listItems.map((item, index) => (
         <Box key={index}>{item}</Box>
       ))}
-    </>
+    </Dropdown.Group>
   );
 };
 
@@ -205,6 +203,7 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
   const [search, setSearch] = useState('');
 
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
 
   return (
     <>
@@ -217,6 +216,7 @@ export const ChatSelector = ({ role, peerId }: { role: string; peerId: string })
         selectedRole={role}
         selectedPeerId={peerId}
         peers={isPrivateChatEnabled ? peers : []}
+        isPublicChatEnabled={isPublicChatEnabled}
         searchValue={search}
       />
     </>
