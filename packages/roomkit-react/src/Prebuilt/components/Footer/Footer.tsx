@@ -20,7 +20,6 @@ import { ScreenshareToggle } from '../ScreenShareToggle';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
-// @ts-ignore: No implicit Any
 import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
 import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
