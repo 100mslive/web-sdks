@@ -412,7 +412,6 @@ const ChatMessage = React.memo(
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const permissions = useHMSStore(selectPermissions);
     const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
     const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
     const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
@@ -421,8 +420,7 @@ const ChatMessage = React.memo(
       receiver: message.recipientPeer,
     });
     const [openSheet, setOpenSheet] = useState(false);
-    // show pin action only if peer has remove others permission
-    const showPinAction = permissions.removeOthers && elements?.chat?.allow_pinning_messages;
+    const showPinAction = !!elements?.chat?.allow_pinning_messages;
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
