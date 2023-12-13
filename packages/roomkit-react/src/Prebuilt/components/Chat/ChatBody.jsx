@@ -156,8 +156,8 @@ const getMessageType = ({ roles, receiver }) => {
 const ChatActions = ({
   onPin,
   showPinAction,
-  onReplyPrivately,
-  showReplyPrivateAction,
+  onReply,
+  showReply,
   message,
   sentByLocalPeer,
   isMobile,
@@ -204,11 +204,11 @@ const ChatActions = ({
 
   const options = {
     reply: {
-      text: 'Reply Privately',
-      tooltipText: 'Reply privately',
+      text: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
+      tooltipText: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
       icon: <ReplyIcon style={iconStyle} />,
-      onClick: onReplyPrivately,
-      show: showReplyPrivateAction,
+      onClick: onReply,
+      show: showReply,
     },
     pin: {
       text: 'Pin message',
@@ -411,6 +411,7 @@ const ChatMessage = React.memo(
     }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+    const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
@@ -422,6 +423,13 @@ const ChatMessage = React.memo(
     });
     const [openSheet, setOpenSheet] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
+    let showReply = false;
+    if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
+      showReply = true;
+    } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
+      showReply = true;
+    }
+
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
@@ -538,13 +546,16 @@ const ChatMessage = React.memo(
               showPinAction={showPinAction}
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
-              onReplyPrivately={() => {
-                setRoleSelector('');
-                setPeerSelector({ id: message.sender, name: message.senderName });
+              onReply={() => {
+                if (message.recipientRoles?.length) {
+                  setRoleSelector(message.recipientRoles[0]);
+                  setPeerSelector({});
+                } else {
+                  setRoleSelector('');
+                  setPeerSelector({ id: message.sender, name: message.senderName });
+                }
               }}
-              showReplyPrivateAction={
-                selectedPeer.id !== message.sender && message.sender !== localPeerId && isPrivateChatEnabled
-              }
+              showReply={showReply}
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
