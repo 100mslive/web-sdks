@@ -393,6 +393,7 @@ test(`Verify on-stage can join room and leave`, async({context}) => {
 
 
 test(`Verify stream is running in highest quality`, async({context}) => {
+test(`Verify stream is running in highest quality`, async({context}) => {
 
         const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
         const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
@@ -425,6 +426,38 @@ test(`Verify stream is running in highest quality`, async({context}) => {
 test(`Verify peer can remove other peer @ignore`, async({context}) => {
         const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ped-ztfm-rai';
         const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ldm-kuwn-ybe';
+
+        const page_host = await context.newPage();
+
+        //Join as broadcaster
+        await page_host.goto(broadcasterUrl);
+        await page_host.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_host.getByText("Go Live").click();
+        await page_host.waitForTimeout(5000);
+ 
+        //Join as vnrt
+        const page = await context.newPage();
+        await page.goto(hlsviewerUrl);
+        await page.getByPlaceholder('Enter name').fill('vnrt');
+        await page.getByText(JoinBtn).click();
+        await page.waitForTimeout(2000);
+        
+        await page_host.bringToFront();
+        await page_host.getByTestId('participant_list').click();
+        await page_host.locator("//div[contains(@id,'Participants')]//h3[contains(.,'viewer-near-realtime')]").click();
+
+        await page_host.getByTestId('participant_vnrt').hover();
+        const peer_menu = page_host.locator("//div[@data-testid='participant_vnrt']//div[@data-testid='participant_more_actions']");
+        await peer_menu.click();
+        await page_host.getByText('Remove Participant').click();
+
+        await page.bringToFront();
+        await page.getByTestId('join_again_btn').isVisible();
+
+});
+test(`Verify peer can remove other peer`, async({context}) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
 
         const page_host = await context.newPage();
 

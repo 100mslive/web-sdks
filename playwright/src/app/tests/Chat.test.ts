@@ -8,9 +8,9 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Test peer can send and receive chat message @ignore`, async ({ context }) => {
+test(`Test peer can send and receive chat message`, async ({ context }) => {
 
-    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ldm-kuwn-ybe';
+    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/kwq-tstr-tji';
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/wuu-xevt-jfv';
     const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/off-okil-uiy';
     const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tiv-dsbn-kpt';
