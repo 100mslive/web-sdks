@@ -203,9 +203,9 @@ test(`Verify co-broadcaster can end room`, async({context}) => {
         await page.getByTestId('join_again_btn').isVisible();
 });
 
-test.skip(`Verify broadcaster can end the session @ignore`, async({context}) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+test(`Verify broadcaster can end the session`, async({context}) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dtr-ndny-sug';
+        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/byc-pkcu-qjn';
 
         const page_host = await context.newPage();
 
@@ -248,10 +248,10 @@ test.skip(`Verify broadcaster can end the session @ignore`, async({context}) => 
         await page.getByTestId('join_again_btn').isVisible();
 });
 
-test.skip(`Verify broadcaster and co-broadcaster can leave and rejoin room @ignore` , async({context}) => {
+test(`Verify broadcaster and co-broadcaster can leave and rejoin room` , async({context}) => {
 
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-        const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/adg-mwom-fcm';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dtr-ndny-sug';
+        const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gsg-hneq-lmy';
 
         const page_host = await context.newPage();
 
@@ -422,7 +422,7 @@ test(`Verify stream is running in highest quality`, async({context}) => {
         await page_host.getByTestId('stop_stream_btn').click();
 });
 
-test.skip(`Verify peer can remove other peer @ignore`, async({context}) => {
+test(`Verify peer can remove other peer`, async({context}) => {
         const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ped-ztfm-rai';
         const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ldm-kuwn-ybe';
 
