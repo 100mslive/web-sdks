@@ -29,8 +29,6 @@ export const HandRaisedNotifications = () => {
     if (hasPeerHandRaised) {
       ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
     }
-
-    ToastBatcher.showToast({ notification });
   }, [notification, on_stage_exp, roomState, vanillaStore]);
 
   return null;
