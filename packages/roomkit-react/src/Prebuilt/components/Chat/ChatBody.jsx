@@ -36,7 +36,7 @@ import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useChatBlacklist } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
@@ -414,9 +414,8 @@ const ChatMessage = React.memo(
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
-    const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-    const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
+    const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+    const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
@@ -539,8 +538,13 @@ const ChatMessage = React.memo(
               showPinAction={showPinAction}
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
-              onReplyPrivately={() => setPeerSelector({ id: message.sender, name: message.senderName })}
-              showReplyPrivateAction={!selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled}
+              onReplyPrivately={() => {
+                setRoleSelector('');
+                setPeerSelector({ id: message.sender, name: message.senderName });
+              }}
+              showReplyPrivateAction={
+                selectedPeer.id !== message.sender && message.sender !== localPeerId && isPrivateChatEnabled
+              }
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
