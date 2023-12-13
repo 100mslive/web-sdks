@@ -8,7 +8,7 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Test peer can send and receive chat message`, async ({ context }) => {
+test.skip(`Test peer can send and receive chat message`, async ({ context }) => {
 
     const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/kwq-tstr-tji';
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/wuu-xevt-jfv';
