@@ -53,7 +53,7 @@ export const ChatSelectorContainer = () => {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '$1',
-                textTransform: 'capitalize',
+                textTransform: selection !== selectedPeer.name ? 'capitalize' : undefined,
               }}
             >
               {selection === CHAT_SELECTOR.EVERYONE ? (
@@ -88,7 +88,7 @@ export const ChatSelectorContainer = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '$1',
-                    textTransform: 'capitalize',
+                    textTransform: selection !== selectedPeer.name ? 'capitalize' : undefined,
                   }}
                 >
                   {selection === CHAT_SELECTOR.EVERYONE ? (
