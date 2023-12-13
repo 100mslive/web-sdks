@@ -23,6 +23,7 @@ export { useParticipants } from './hooks/useParticipants';
 export { useEmbedShare } from './hooks/useEmbedShare';
 export { usePDFShare } from './hooks/usePDFShare';
 export { usePaginatedParticipants } from './hooks/usePaginatedParticipants';
+export { useWhiteboard } from './hooks/useWhiteboard';
 
 // types
 export type { hooksErrHandler } from './hooks/types';

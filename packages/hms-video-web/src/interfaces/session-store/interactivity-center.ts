@@ -1,4 +1,10 @@
 import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionResponse } from './polls';
+import { HMSWhiteboardCreateOptions } from './whiteboard';
+
+export interface HMSWhiteboardInteractivityCenter {
+  open(createOptions?: HMSWhiteboardCreateOptions): Promise<void>;
+  close(id?: string): Promise<void>;
+}
 
 export interface HMSInteractivityCenter {
   createPoll(poll: HMSPollCreateParams): Promise<void>;
@@ -7,4 +13,7 @@ export interface HMSInteractivityCenter {
   stopPoll(pollID: string): Promise<void>;
   addResponsesToPoll(pollID: string, response: HMSPollQuestionResponse[]): Promise<void>;
   getResponses(pollID: string): Promise<Array<HMSPollQuestionResponse>>;
+
+  /** @alpha */
+  whiteboard: HMSWhiteboardInteractivityCenter;
 }

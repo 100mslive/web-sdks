@@ -4,10 +4,25 @@ import {
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
   HMSSdk,
+  HMSWhiteboardCreateOptions,
+  HMSWhiteboardInteractivityCenter,
 } from '@100mslive/hms-video';
 import { IHMSInteractivityCenter } from '../schema';
 
+class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
+  constructor(private sdk: HMSSdk) {}
+
+  async open(createOptions?: HMSWhiteboardCreateOptions) {
+    await this.sdk.getInteractivityCenter().whiteboard.open(createOptions);
+  }
+
+  async close(id?: string) {
+    await this.sdk.getInteractivityCenter().whiteboard.close(id);
+  }
+}
+
 export class HMSInteractivityCenter implements IHMSInteractivityCenter {
+  whiteboard = new WhiteboardInteractivityCenter(this.sdk);
   constructor(private sdk: HMSSdk) {}
 
   private get sdkInteractivityCenter() {

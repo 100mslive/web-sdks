@@ -34,4 +34,5 @@ export enum HMSNotificationMethod {
   POLL_STATS = 'on-poll-stats',
   ROOM_INFO = 'room-info',
   SESSION_INFO = 'session-info',
+  WHITEBOARD_UPDATE = 'on-whiteboard-update',
 }

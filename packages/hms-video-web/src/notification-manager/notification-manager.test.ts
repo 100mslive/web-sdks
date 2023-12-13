@@ -28,6 +28,7 @@ let removedFromRoomHandler: jest.Mock<any, any>;
 let audioUpdateHandler: jest.Mock<any, any>;
 let sessionStoreUpdateHandler: jest.Mock<any, any>;
 let pollsUpdateHandler: jest.Mock<any, any>;
+let whiteboardUpdateHandler: jest.Mock<any, any>;
 
 let listener: HMSUpdateListener;
 let audioListener: HMSAudioListener;
@@ -54,6 +55,7 @@ beforeEach(() => {
   audioUpdateHandler = jest.fn();
   sessionStoreUpdateHandler = jest.fn();
   pollsUpdateHandler = jest.fn();
+  whiteboardUpdateHandler = jest.fn();
   eventBus = new EventBus();
   const mockMediaStream = {
     id: 'native-stream-id',
@@ -113,6 +115,7 @@ beforeEach(() => {
     onRemovedFromRoom: removedFromRoomHandler,
     onSessionStoreUpdate: sessionStoreUpdateHandler,
     onPollsUpdate: pollsUpdateHandler,
+    onWhiteboardUpdate: whiteboardUpdateHandler,
   };
 
   audioListener = { onAudioLevelUpdate: audioUpdateHandler };
