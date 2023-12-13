@@ -1,6 +1,6 @@
 import Message from './models/HMSMessage';
 import HMSRoom from './models/HMSRoom';
-import { HMSLocalPeer, HMSPeer } from './models/peer';
+import { HMSLocalPeer } from './models/peer';
 import { HMSPeerListIterator } from './HMSPeerListIterator';
 import { LocalTrackManager } from './LocalTrackManager';
 import { NetworkTestManager } from './NetworkTestManager';
@@ -28,6 +28,7 @@ import {
   HMSDeviceChangeEvent,
   HMSFrameworkInfo,
   HMSMessageInput,
+  HMSPlaylistSettings,
   HMSPlaylistType,
   HMSPreviewConfig,
   HMSRole,
@@ -57,6 +58,7 @@ import {
   HMSVideoTrack,
 } from '../media/tracks';
 import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
+import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { PlaylistManager } from '../playlist-manager';
 import { SessionStore } from '../session-store';
@@ -65,7 +67,11 @@ import { InitConfig } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
-import { HAND_RAISE_GROUP_NAME } from '../utils/constants';
+import {
+  DEFAULT_PLAYLIST_AUDIO_BITRATE,
+  DEFAULT_PLAYLIST_VIDEO_BITRATE,
+  HAND_RAISE_GROUP_NAME,
+} from '../utils/constants';
 import { fetchWithRetry } from '../utils/fetch';
 import decodeJWT from '../utils/jwt';
 import HMSLogger, { HMSLogLevel } from '../utils/logger';
@@ -109,6 +115,14 @@ export class HMSSdk implements HMSInterface {
   private interactivityCenter!: InteractivityCenter;
   private sdkState = { ...INITIAL_STATE };
   private frameworkInfo?: HMSFrameworkInfo;
+  private playlistSettings: HMSPlaylistSettings = {
+    video: {
+      bitrate: DEFAULT_PLAYLIST_VIDEO_BITRATE,
+    },
+    audio: {
+      bitrate: DEFAULT_PLAYLIST_AUDIO_BITRATE,
+    },
+  };
 
   private initNotificationManager() {
     if (!this.notificationManager) {
@@ -222,6 +236,15 @@ export class HMSSdk implements HMSInterface {
 
   getPeerListIterator(options?: HMSPeerListIteratorOptions) {
     return new HMSPeerListIterator(this.transport, this.store, options);
+  }
+
+  updatePlaylistSettings(options: HMSPlaylistSettings) {
+    if (options.video) {
+      Object.assign(this.playlistSettings.video, options.video);
+    }
+    if (options.audio) {
+      Object.assign(this.playlistSettings.audio, options.audio);
+    }
   }
 
   private handleAutoplayError = (error: HMSException) => {
@@ -584,7 +607,8 @@ export class HMSSdk implements HMSInterface {
     if (room) {
       // Wait for preview or join to finish to prevent any race conditions happening because preview/join are called multiple times
       // This can happen when useEffects are not properly handled in case of react apps
-      while (this.sdkState.isPreviewInProgress || this.sdkState.isJoinInProgress) {
+      // when error is terminal this will go into infinite loop so error?.isTerminal check is needed
+      while ((this.sdkState.isPreviewInProgress || this.sdkState.isJoinInProgress) && !error?.isTerminal) {
         await workerSleep(100);
       }
       const roomId = room.id;
@@ -663,15 +687,25 @@ export class HMSSdk implements HMSInterface {
     return await this.sendMessageInternal({ message, recipientRoles: roles, type });
   }
 
-  async sendDirectMessage(message: string, peer: HMSPeer, type?: string) {
-    const recipientPeer = this.store.getPeerById(peer.peerId);
-    if (!recipientPeer) {
-      throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peer);
-    }
-    if (this.localPeer?.peerId === peer.peerId) {
+  async sendDirectMessage(message: string, peerId: string, type?: string) {
+    if (this.localPeer?.peerId === peerId) {
       throw ErrorFactory.GenericErrors.ValidationFailed('Cannot send message to self');
     }
-    return await this.sendMessageInternal({ message, recipientPeer: peer, type });
+    const isLargeRoom = !!this.store.getRoom()?.large_room_optimization;
+    let recipientPeer = this.store.getPeerById(peerId);
+    if (!recipientPeer) {
+      if (isLargeRoom) {
+        const { peers } = await this.transport.findPeers({ peers: [peerId], limit: 1 });
+        if (peers.length === 0) {
+          throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
+        }
+        recipientPeer = createRemotePeer(peers[0], this.store);
+      } else {
+        throw ErrorFactory.GenericErrors.ValidationFailed('Invalid peer - peer not present in the room', peerId);
+      }
+    }
+
+    return await this.sendMessageInternal({ message, recipientPeer, type });
   }
 
   private async sendMessageInternal({ recipientRoles, recipientPeer, type = 'chat', message }: HMSMessageInput) {
@@ -974,7 +1008,7 @@ export class HMSSdk implements HMSInterface {
     await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
   async lowerRemotePeerHand(peerId: string) {
-    await this.transport.addToGroup(peerId, HAND_RAISE_GROUP_NAME);
+    await this.transport.removeFromGroup(peerId, HAND_RAISE_GROUP_NAME);
   }
 
   setFrameworkInfo(frameworkInfo: HMSFrameworkInfo) {
@@ -1151,9 +1185,9 @@ export class HMSSdk implements HMSInterface {
     if (source === 'videoplaylist') {
       const settings: { maxBitrate?: number; width?: number; height?: number } = {};
       if (track.kind === 'audio') {
-        settings.maxBitrate = 64;
+        settings.maxBitrate = this.playlistSettings.audio?.bitrate || DEFAULT_PLAYLIST_AUDIO_BITRATE;
       } else {
-        settings.maxBitrate = 1000;
+        settings.maxBitrate = this.playlistSettings.video?.bitrate || DEFAULT_PLAYLIST_VIDEO_BITRATE;
         const { width, height } = track.getSettings();
         settings.width = width;
         settings.height = height;

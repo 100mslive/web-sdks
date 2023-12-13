@@ -135,6 +135,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     // this.actionBatcher = new ActionBatcher(store);
   }
+  setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
+    this.sdk.updatePlaylistSettings(settings);
+  }
 
   async refreshDevices() {
     await this.sdk.refreshDevices();
@@ -386,13 +389,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const hmsPeer = this.getSDKHMSPeer(peerID);
-    if (!hmsPeer) {
-      HMSLogger.w('sendMessage', 'Failed to send message');
-      throw Error(`sendMessage Failed - peer ${peerID} not found`);
-    }
-    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
-    this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
+    const sdkMessage = await this.sdk.sendDirectMessage(message, peerID, type);
+    this.updateMessageInStore(sdkMessage, { message, recipientPeer: peerID, type });
   }
 
   private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {

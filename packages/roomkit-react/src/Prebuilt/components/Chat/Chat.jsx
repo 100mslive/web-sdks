@@ -1,14 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectLocalPeer, selectSessionStore } from '@100mslive/hms-video-store';
-import {
-  HMSNotificationTypes,
-  selectHMSMessagesCount,
-  selectPeerNameByID,
-  useHMSActions,
-  useHMSNotifications,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectLocalPeer, selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
+import { selectHMSMessagesCount, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
@@ -18,43 +11,22 @@ import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
 import { PinnedMessage } from './PinnedMessage';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
-import { useUnreadCount } from './useUnreadCount';
-import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
-export const Chat = ({ screenType }) => {
-  const notification = useHMSNotifications(HMSNotificationTypes.PEER_LEFT);
-  const [peerSelector, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
-  const [roleSelector, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-  const peerName = useHMSStore(selectPeerNameByID(peerSelector));
+export const Chat = () => {
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const localPeer = useHMSStore(selectLocalPeer);
-  const [chatOptions, setChatOptions] = useState({
-    role: roleSelector || '',
-    peerId: peerSelector && peerName ? peerSelector : '',
-    selection: roleSelector ? roleSelector : peerSelector && peerName ? peerName : 'Everyone',
-  });
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
   const { removePinnedMessage } = useSetPinnedMessages();
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
-  useEffect(() => {
-    if (notification && notification.data && peerSelector === notification.data.id) {
-      setPeerSelector('');
-      setChatOptions({
-        role: '',
-        peerId: '',
-        selection: 'Everyone',
-      });
-    }
-  }, [notification, peerSelector, setPeerSelector]);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
   const storeMessageSelector = selectHMSMessagesCount;
-  const { elements } = useRoomLayoutConferencingScreen();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
@@ -88,57 +60,31 @@ export const Chat = ({ screenType }) => {
     >
       {isMobile && elements?.chat?.is_overlay ? null : (
         <>
-          {elements?.chat?.allow_pinning_messages ? (
-            <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
-          ) : null}
+          <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
         </>
       )}
 
-      <ChatBody
-        role={chatOptions.role}
-        peerId={chatOptions.peerId}
-        ref={listRef}
-        scrollToBottom={scrollToBottom}
-        screenType={screenType}
-        blacklistedPeerIDs={blacklistedPeerIDs}
-      />
+      <ChatBody ref={listRef} scrollToBottom={scrollToBottom} screenType={screenType} />
 
       <ChatPaused />
 
       {isLocalPeerBlacklisted ? <ChatBlocked /> : null}
 
-      {isMobile && elements?.chat?.is_overlay && elements?.chat?.allow_pinning_messages ? (
+      {isMobile && elements?.chat?.is_overlay ? (
         <PinnedMessage clearPinnedMessage={index => removePinnedMessage(pinnedMessages, index)} />
       ) : null}
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
-        <ChatFooter
-          role={chatOptions.role}
-          onSend={() => scrollToBottom(1)}
-          selection={chatOptions.selection}
-          screenType={screenType}
-          onSelect={({ role, peerId, selection }) => {
-            setChatOptions({
-              role,
-              peerId,
-              selection,
-            });
-            setPeerSelector(peerId);
-            setRoleSelector(role);
-          }}
-          peerId={chatOptions.peerId}
-        >
-          {!isSelectorOpen && !isScrolledToBottom && (
-            <NewMessageIndicator role={chatOptions.role} peerId={chatOptions.peerId} scrollToBottom={scrollToBottom} />
-          )}
+        <ChatFooter onSend={() => scrollToBottom(1)} screenType={screenType}>
+          {!isSelectorOpen && !isScrolledToBottom && <NewMessageIndicator scrollToBottom={scrollToBottom} />}
         </ChatFooter>
       ) : null}
     </Flex>
   );
 };
 
-const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
-  const unreadCount = useUnreadCount({ role, peerId });
+const NewMessageIndicator = ({ scrollToBottom }) => {
+  const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
   if (!unreadCount) {
     return null;
   }
@@ -159,9 +105,8 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
         }}
         icon
         css={{
-          p: '$4',
-          pl: '$8',
-          pr: '$6',
+          p: '$3 $4',
+          pl: '$6',
           '& > svg': { ml: '$4' },
           borderRadius: '$round',
           position: 'relative',
@@ -172,7 +117,7 @@ const NewMessageIndicator = ({ role, peerId, scrollToBottom }) => {
         }}
       >
         New {unreadCount === 1 ? 'message' : 'messages'}
-        <ChevronDownIcon />
+        <ChevronDownIcon height={16} width={16} />
       </Button>
     </Flex>
   );

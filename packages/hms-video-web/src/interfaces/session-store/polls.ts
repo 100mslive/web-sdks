@@ -63,6 +63,7 @@ export interface HMSPollQuestion {
 export interface HMSPollQuestionCreateParams extends Pick<HMSPollQuestion, 'text' | 'skippable' | 'type' | 'answer'> {
   index?: number;
   options?: HMSPollQuestionOptionCreateParams[];
+  weight?: number;
 }
 
 export interface HMSPollQuestionAnswer {
@@ -79,6 +80,12 @@ export enum HMSPollQuestionType {
   MULTIPLE_CHOICE = 'multiple-choice',
   SHORT_ANSWER = 'short-answer',
   LONG_ANSWER = 'long-answer',
+}
+
+export enum HMSPollStates {
+  CREATED = 'created',
+  STARTED = 'started',
+  STOPPED = 'stopped',
 }
 
 export interface HMSPollQuestionOption {
@@ -101,9 +108,9 @@ export interface HMSPollQuestionResponse {
   option?: number;
   options?: number[];
   text?: string;
-  update?: boolean; // SDK Needs to track wether we previously answered and set accordingly
+  update?: boolean; // SDK Needs to track whether we previously answered and set accordingly
   duration?: number; // Time it took to answer the question for leaderboard
-  responseFinal?: boolean; // Indicates wether this is last update when fetching responses
+  responseFinal?: boolean; // Indicates whether this is last update when fetching responses
 }
 
 export type HMSPollQuestionResponseCreateParams = Omit<
@@ -134,4 +141,18 @@ export interface HMSPollQuestionResult {
   correctResponses?: number;
   skippedCount?: number;
   totalResponses?: number;
+}
+
+export interface HMSPollLeaderboardEntry {
+  position: number;
+  score: number;
+  totalResponses: number;
+  correctResponses: number;
+  duration: number;
+  peer: HMSPollResponsePeerInfo;
+}
+
+export interface HMSPollLeaderboardResponse {
+  entries: HMSPollLeaderboardEntry[];
+  hasNext: boolean;
 }

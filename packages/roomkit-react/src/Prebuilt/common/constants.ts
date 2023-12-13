@@ -17,8 +17,9 @@ export const RTMP_RECORD_DEFAULT_RESOLUTION = {
 export const EMOJI_REACTION_TYPE = 'EMOJI_REACTION';
 
 export const CHAT_SELECTOR = {
-  PEER_ID: 'peer_id',
+  PEER: 'peer',
   ROLE: 'role',
+  EVERYONE: 'Everyone',
 };
 
 export const APP_DATA = {
@@ -32,7 +33,6 @@ export const APP_DATA = {
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
-  appLayout: 'appLayout',
   hlsStarted: 'hlsStarted',
   rtmpStarted: 'rtmpStarted',
   recordingStarted: 'recordingStarted',
@@ -110,6 +110,7 @@ export enum SESSION_STORE_KEY {
   CHAT_PEER_BLACKLIST = 'chatPeerBlacklist',
   CHAT_MESSAGE_BLACKLIST = 'chatMessageBlacklist',
   CHAT_STATE = 'chatState',
+  SHARED_LEADERBOARDS = 'sharedLeaderboards',
 }
 
 export enum INTERACTION_TYPE {

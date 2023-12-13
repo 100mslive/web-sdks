@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
 import { SidePaneTabs } from '../components/SidePaneTabs';
@@ -15,15 +14,12 @@ import { config as cssConfig } from '../../Theme';
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
-// @ts-ignore: No implicit Any
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
 const SidePane = ({
-  screenType,
   tileProps,
   hideControls = false,
 }: {
-  screenType: keyof ConferencingScreen;
   tileProps?: TileCustomisationProps;
   hideControls?: boolean;
 }) => {
@@ -38,7 +34,7 @@ const SidePane = ({
     ViewComponent = <Polls />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <SidePaneTabs screenType={screenType} hideControls={hideControls} active={sidepane} />;
+    ViewComponent = <SidePaneTabs hideControls={hideControls} active={sidepane} />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
     ViewComponent = <VBPicker {...elements.virtual_background} />;

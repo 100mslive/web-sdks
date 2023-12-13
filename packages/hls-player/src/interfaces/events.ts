@@ -9,6 +9,7 @@ type HMSHLSListenerDataMapping = {
   [HMSHLSPlayerEvents.TIMED_METADATA_LOADED]: HMSHLSCue;
   [HMSHLSPlayerEvents.STATS]: HlsPlayerStats;
   [HMSHLSPlayerEvents.PLAYBACK_STATE]: HMSHLSPlaybackState;
+  [HMSHLSPlayerEvents.CAPTION_ENABLED]: boolean;
 
   [HMSHLSPlayerEvents.ERROR]: HMSHLSException;
   [HMSHLSPlayerEvents.CURRENT_TIME]: number;

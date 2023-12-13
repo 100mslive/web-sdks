@@ -13,13 +13,15 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { Button } from '../../..';
+import { GroupIcon } from '@100mslive/react-icons';
+import { Box, Button } from '../../..';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
+import { ChatNotifications } from './ChatNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
@@ -27,6 +29,7 @@ import { ReconnectNotifications } from './ReconnectNotifications';
 import { TrackBulkUnmuteModal } from './TrackBulkUnmuteModal';
 import { TrackNotifications } from './TrackNotifications';
 import { TrackUnmuteModal } from './TrackUnmuteModal';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -42,6 +45,7 @@ export function Notifications() {
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
+  const screenProps = useRoomLayoutConferencingScreen();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
 
@@ -52,7 +56,36 @@ export function Notifications() {
     });
   }, []);
 
+  /*
+  const leaderboardResultsShared = useCallback(
+    (stringifiedPollDetails: string) => {
+      const pollDetails = JSON.parse(stringifiedPollDetails);
+      if (pollDetails.startedBy !== localPeerID) {
+        const pollStartedBy = pollDetails.initiatorName;
+        ToastManager.addToast({
+          title: `${pollStartedBy} shared leaderboard for the quiz`,
+          action: (
+            <Button
+              onClick={() => togglePollView(pollDetails.id)}
+              variant="standard"
+              css={{
+                backgroundColor: '$surface_bright',
+                fontWeight: '$semiBold',
+                color: '$on_surface_high',
+                p: '$xs $md',
+              }}
+            >
+              View
+            </Button>
+          ),
+        });
+      }
+    },
+    [localPeerID, togglePollView],
+  );  */
+
   useCustomEvent({ type: ROLE_CHANGE_DECLINED, onEvent: handleRoleChangeDenied });
+  // useCustomEvent({ type: 'POLL_LEADERBOARD_SHARED', onEvent: leaderboardResultsShared });
 
   useEffect(() => {
     if (!notification || isNotificationDisabled) {
@@ -90,6 +123,16 @@ export function Notifications() {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
+            });
+          } else if (notification.data?.message === 'role limit reached') {
+            ToastManager.addToast({
+              title: 'The room is currently full, try joining later',
+              close: true,
+              icon: (
+                <Box css={{ color: '$alert_error_default' }}>
+                  <GroupIcon />
+                </Box>
+              ),
             });
           } else {
             ToastManager.addToast({
@@ -145,7 +188,7 @@ export function Notifications() {
         break;
 
       case HMSNotificationTypes.POLL_STARTED:
-        if (notification.data.startedBy !== localPeerID) {
+        if (notification.data.startedBy !== localPeerID && screenProps.screenType !== 'hls_live_streaming') {
           const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy)) || 'Participant';
           ToastManager.addToast({
             title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
@@ -160,7 +203,7 @@ export function Notifications() {
                   p: '$xs $md',
                 }}
               >
-                Vote
+                {notification.data.type === 'quiz' ? 'Answer' : 'Vote'}
               </Button>
             ),
           });
@@ -186,6 +229,7 @@ export function Notifications() {
       <AutoplayBlockedModal />
       <PermissionErrorModal />
       <InitErrorModal />
+      <ChatNotifications />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import {
+  HMSPoll,
   HMSPollCreateParams,
+  HMSPollLeaderboardResponse,
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
 } from '@100mslive/hms-video';
@@ -10,4 +12,5 @@ export interface IHMSInteractivityCenter {
   stopPoll(poll: string): Promise<void>;
   addQuestionsToPoll(pollID: string, questions: HMSPollQuestionCreateParams[]): Promise<void>;
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
+  fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSPollLeaderboardResponse>;
 }

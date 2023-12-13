@@ -1,4 +1,3 @@
-// @ts-check
 import { useEffect, useRef, useState } from 'react';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
@@ -12,7 +11,8 @@ import {
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
-
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { CHAT_SELECTOR } from './constants';
 /**
  * Hook to execute a callback when alone in room(after a certain 5d of time)
  * @param {number} thresholdMs The threshold(in ms) after which the callback is executed,
@@ -52,8 +52,23 @@ export const useWhenAloneInRoom = (thresholdMs = 5 * 60 * 1000) => {
 };
 
 export const useFilteredRoles = () => {
-  const roles = useHMSStore(selectAvailableRoleNames);
-  return roles;
+  const { elements } = useRoomLayoutConferencingScreen();
+  return elements?.chat?.roles_whitelist || [];
+};
+
+export const useDefaultChatSelection = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const roles = useFilteredRoles();
+  // default is everyone for public chat
+  if (elements?.chat?.public_chat_enabled) {
+    return CHAT_SELECTOR.EVERYONE;
+  }
+  // sending first role as default
+  if (roles.length > 0) {
+    return roles[0];
+  }
+  // sending empty
+  return '';
 };
 
 export const useShowStreamingUI = () => {
@@ -63,7 +78,7 @@ export const useShowStreamingUI = () => {
 };
 
 // The search results should not have role name matches
-export const useParticipants = params => {
+export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }; role?: string; search?: string }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerCount = useHMSStore(selectPeerCount);
   const availableRoles = useHMSStore(selectAvailableRoleNames);
