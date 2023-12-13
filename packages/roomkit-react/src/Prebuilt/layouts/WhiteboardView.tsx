@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { selectPeers, selectWhiteboard, useHMSStore } from '@100mslive/react-sdk';
+import React, { useEffect, useMemo } from 'react';
+import { selectPeers, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { SecondaryTiles } from '../components/SecondaryTiles';
 import { ProminenceLayout } from '../components/VideoLayouts/ProminenceLayout';
 import { Box } from '../../Layout';
@@ -7,21 +7,8 @@ import { Box } from '../../Layout';
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
-const useWhiteboardEmbed = () => {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const whiteboard = useHMSStore(selectWhiteboard);
-  useEffect(() => {
-    if (!whiteboard?.addr || !whiteboard?.token || !iframeRef.current) {
-      return;
-    }
-    iframeRef.current.src = `https://whiteboard-qa.100ms.live/?endpoint=https://${whiteboard.addr}&token=${whiteboard.token}`;
-  }, [whiteboard?.addr, whiteboard?.token]);
-
-  return iframeRef;
-};
-
 const EmbedComponent = () => {
-  const iframeRef = useWhiteboardEmbed();
+  const { iframeRef } = useWhiteboard();
 
   return (
     <Box
