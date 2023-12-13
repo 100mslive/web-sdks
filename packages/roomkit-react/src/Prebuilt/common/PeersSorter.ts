@@ -53,6 +53,7 @@ class PeersSorter {
 
   moveSpeakerToFront = (speaker?: HMSPeer) => {
     if (!speaker) {
+      this.maintainLruSize(this.tilesPerPage);
       this.updateListeners();
       return;
     }
@@ -62,11 +63,9 @@ class PeersSorter {
     }
     // delete to insert at beginning
     this.lruPeers.delete(speaker.id);
-    const lruPeerArray = Array.from(this.lruPeers);
-    while (lruPeerArray.length >= this.tilesPerPage && lruPeerArray.length) {
-      lruPeerArray.pop();
-    }
-    this.lruPeers = new Set([speaker.id, ...lruPeerArray]);
+    // - 1 as we are going to insert the new speaker
+    this.maintainLruSize(this.tilesPerPage - 1);
+    this.lruPeers = new Set([speaker.id, ...this.lruPeers]);
     this.updateListeners();
   };
 
@@ -97,6 +96,14 @@ class PeersSorter {
       }
     });
     this.listeners.forEach(listener => listener?.(orderedPeers));
+  };
+
+  private maintainLruSize = (size: number) => {
+    const lruPeerArray = Array.from(this.lruPeers);
+    while (lruPeerArray.length > size && lruPeerArray.length) {
+      lruPeerArray.pop();
+    }
+    this.lruPeers = new Set(lruPeerArray);
   };
 }
 
