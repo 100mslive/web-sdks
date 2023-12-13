@@ -34,6 +34,7 @@ import { StopRecordingInSheet } from '../../Header/StreamActions';
 import SettingsModal from '../../Settings/SettingsModal';
 // @ts-ignore: No implicit any
 import { ToastManager } from '../../Toast/ToastManager';
+import { VBToggle } from '../../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit any
 import { ActionTile } from '../ActionTile';
 // @ts-ignore: No implicit any
@@ -50,10 +51,7 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 import { useMyMetadata } from '../../hooks/useMetadata';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
-// @ts-ignore: No implicit any
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
-
-// const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -65,6 +63,19 @@ const MODALS = {
   BULK_ROLE_CHANGE: 'bulkRoleChange',
   MUTE_ALL: 'muteAll',
   EMBED_URL: 'embedUrl',
+};
+
+const getRecordingText = ({
+  isBrowserRecordingOn,
+  isRecordingLoading,
+}: {
+  isBrowserRecordingOn: boolean;
+  isRecordingLoading: boolean;
+}) => {
+  if (isBrowserRecordingOn) {
+    return 'Recording On';
+  }
+  return isRecordingLoading ? 'Starting Recording' : 'Start Recording';
 };
 
 export const MwebOptions = ({
@@ -92,7 +103,6 @@ export const MwebOptions = ({
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
-  // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -179,11 +189,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {/* {isVideoOn ? (
-              <Suspense fallback="">
-                <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
-              </Suspense>
-            ) : null} */}
+            <VBToggle asActionTile onClick={() => setOpenOptionsSheet(false)} />
 
             {elements?.emoji_reactions && (
               <ActionTile.Root
@@ -274,13 +280,7 @@ export const MwebOptions = ({
                 }}
               >
                 {isRecordingLoading ? <Loading /> : <RecordIcon />}
-                <ActionTile.Title>
-                  {isBrowserRecordingOn
-                    ? 'Recording On'
-                    : isRecordingLoading
-                    ? 'Starting Recording'
-                    : 'Start Recording'}
-                </ActionTile.Title>
+                <ActionTile.Title>{getRecordingText({ isBrowserRecordingOn, isRecordingLoading })}</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
           </Box>
