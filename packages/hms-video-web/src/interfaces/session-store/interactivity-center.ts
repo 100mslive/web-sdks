@@ -2,6 +2,7 @@ import { HMSPollCreateParams, HMSPollQuestionCreateParams, HMSPollQuestionRespon
 import { HMSWhiteboardCreateOptions } from './whiteboard';
 
 export interface HMSWhiteboardInteractivityCenter {
+  isEnabled: boolean;
   open(createOptions?: HMSWhiteboardCreateOptions): Promise<void>;
   close(id?: string): Promise<void>;
 }

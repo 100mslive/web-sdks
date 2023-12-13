@@ -1,17 +1,28 @@
 import { HMSWhiteboard, InteractivityListener } from '../../interfaces';
 import { HMSWhiteboardInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
 import { IStore } from '../../sdk/store';
+import { InitFlags } from '../../signal/init/models';
 import { HMSWhiteboardCreateOptions } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
+import HMSLogger from '../../utils/logger';
 
 export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
+  private TAG = '[HMSWhiteboardInteractivityCenter]';
   constructor(
     private readonly transport: HMSTransport,
     private store: IStore,
     private listener?: InteractivityListener,
   ) {}
 
+  // @TODO: remove when whiteboard released for general audience
+  get isEnabled() {
+    return this.transport.isFlagEnabled(InitFlags.FLAG_WHITEBOARD_ENABLED);
+  }
+
   async open(createOptions?: HMSWhiteboardCreateOptions) {
+    if (!this.isEnabled) {
+      return HMSLogger.w(this.TAG, 'Whiteboard is not enabled for customer');
+    }
     const prevWhiteboard = this.store.getWhiteboard(createOptions?.id);
     let id = prevWhiteboard?.id;
 
@@ -41,6 +52,10 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
   }
 
   async close(id?: string) {
+    if (!this.isEnabled) {
+      return HMSLogger.w(this.TAG, 'Whiteboard is not enabled for customer');
+    }
+
     const prevWhiteboard = this.store.getWhiteboard(id);
     if (!prevWhiteboard) {
       throw new Error(`Whiteboard ID: ${id} not found`);

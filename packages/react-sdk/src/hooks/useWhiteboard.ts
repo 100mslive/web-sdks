@@ -38,6 +38,6 @@ export const useWhiteboard = () => {
     isOwner,
     isAdmin,
     iframeRef,
-    toggle: isAdmin ? toggle : undefined,
+    toggle: actions.isEnabled && isAdmin ? toggle : undefined,
   };
 };
