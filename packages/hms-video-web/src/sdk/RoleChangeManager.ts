@@ -52,13 +52,16 @@ export default class RoleChangeManager {
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
 
-    const initialSettings = this.store.getConfig()?.settings || {
-      isAudioMuted: true,
-      isVideoMuted: true,
-      audioInputDeviceId: 'default',
-      videoDeviceId: 'default',
-      audioOutputDeviceId: 'default',
-    };
+    const initialSettings = Object.assign(
+      { ...this.store.getConfig()?.settings },
+      {
+        isAudioMuted: true,
+        isVideoMuted: true,
+        audioInputDeviceId: 'default',
+        videoDeviceId: 'default',
+        audioOutputDeviceId: 'default',
+      },
+    );
 
     if (videoHasSimulcastDifference) {
       initialSettings.isVideoMuted = !prevVideoEnabled;
