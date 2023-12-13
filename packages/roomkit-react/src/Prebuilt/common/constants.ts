@@ -17,7 +17,7 @@ export const RTMP_RECORD_DEFAULT_RESOLUTION = {
 export const EMOJI_REACTION_TYPE = 'EMOJI_REACTION';
 
 export const CHAT_SELECTOR = {
-  PEER_ID: 'peer_id',
+  PEER: 'peer',
   ROLE: 'role',
   EVERYONE: 'Everyone',
 };

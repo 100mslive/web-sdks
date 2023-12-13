@@ -89,7 +89,7 @@ const SelectorHeader = React.memo(
 
 const Everyone = React.memo(({ active }: { active: boolean }) => {
   const unreadCount: number = useHMSStore(selectUnreadHMSMessagesCount);
-  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   return (
     <SelectorItem
@@ -98,7 +98,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
-        setPeerSelector('');
+        setPeerSelector({});
         setRoleSelector('');
       }}
     />
@@ -107,7 +107,7 @@ const Everyone = React.memo(({ active }: { active: boolean }) => {
 
 const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }) => {
   const unreadCount: number = useHMSStore(selectMessagesUnreadCountByRole(role));
-  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   return (
     <SelectorItem
@@ -115,7 +115,7 @@ const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
-        setPeerSelector('');
+        setPeerSelector({});
         setRoleSelector(role);
       }}
     />
@@ -124,7 +124,7 @@ const RoleItem = React.memo(({ role, active }: { role: string; active: boolean }
 
 const PeerItem = ({ peerId, name, active }: { name: string; peerId: string; active: boolean }) => {
   const unreadCount: number = useHMSStore(selectMessagesUnreadCountByPeerID(peerId));
-  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+  const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
   const [, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
 
   return (
@@ -133,7 +133,7 @@ const PeerItem = ({ peerId, name, active }: { name: string; peerId: string; acti
       active={active}
       unreadCount={unreadCount}
       onClick={() => {
-        setPeerSelector(peerId);
+        setPeerSelector({ id: peerId, name });
         setRoleSelector('');
       }}
     />

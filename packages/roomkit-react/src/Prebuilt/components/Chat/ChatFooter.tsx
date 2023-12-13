@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeer, selectPeerNameByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -82,13 +82,13 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
   const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
-  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
+  console.log({ selectedPeer });
   const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
-  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || defaultSelection;
+  const selection = selectedPeer.name || selectedRole || defaultSelection;
   useEffect(() => {
-    if (!selectedPeer && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
+    if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
@@ -100,8 +100,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
     try {
       if (selectedRole) {
         await hmsActions.sendGroupMessage(message, [selectedRole]);
-      } else if (selectedPeer) {
-        await hmsActions.sendDirectMessage(message, selectedPeer);
+      } else if (selectedPeer.id) {
+        await hmsActions.sendDirectMessage(message, selectedPeer.id);
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }

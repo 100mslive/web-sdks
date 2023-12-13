@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
-import { selectPeerNameByID, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon, ChevronUpIcon, CrossIcon, GroupIcon, PersonIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
@@ -21,11 +20,10 @@ export const ChatSelectorContainer = () => {
   const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
   const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
   const roles = useFilteredRoles();
-  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
   const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
-  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || defaultSelection;
+  const selection = selectedPeer.name || selectedRole || defaultSelection;
 
   if (!(isPrivateChatEnabled || isPublicChatEnabled || roles.length > 0) && !isPrivateChatEnabled && !selection) {
     return null;
@@ -120,7 +118,7 @@ export const ChatSelectorContainer = () => {
               align="start"
               sideOffset={8}
             >
-              <ChatSelector role={selectedRole} peerId={selectedPeer} />
+              <ChatSelector role={selectedRole} peerId={selectedPeer.id} />
             </Dropdown.Content>
           </Dropdown.Root>
         )}
@@ -149,7 +147,7 @@ export const ChatSelectorContainer = () => {
                 setOpen(false);
               }}
             >
-              <ChatSelector role={selectedRole} peerId={selectedPeer} />
+              <ChatSelector role={selectedRole} peerId={selectedPeer.id} />
             </Box>
           </Sheet.Content>
         </Sheet.Root>

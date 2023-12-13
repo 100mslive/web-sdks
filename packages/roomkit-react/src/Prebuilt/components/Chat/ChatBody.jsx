@@ -11,6 +11,7 @@ import {
   selectPeerNameByID,
   selectPermissions,
   selectSessionStore,
+  selectUnreadHMSMessagesCount,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -38,7 +39,6 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useChatBlacklist } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
-import { useUnreadCount } from './useUnreadCount';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const iconStyle = { height: '1.125rem', width: '1.125rem' };
@@ -414,9 +414,9 @@ const ChatMessage = React.memo(
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
+    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
     const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-    const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER_ID);
+    const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
@@ -456,7 +456,7 @@ const ChatMessage = React.memo(
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
             bg:
-              messageType && !(selectedPeer || selectedRole)
+              messageType && !(selectedPeer.id || selectedRole)
                 ? isOverlay
                   ? 'rgba(0, 0, 0, 0.64)'
                   : '$surface_default'
@@ -539,8 +539,8 @@ const ChatMessage = React.memo(
               showPinAction={showPinAction}
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
-              onReplyPrivately={() => setPeerSelector(message.sender)}
-              showReplyPrivateAction={!selectedPeer && message.sender !== localPeerId && isPrivateChatEnabled}
+              onReplyPrivately={() => setPeerSelector({ id: message.sender, name: message.senderName })}
+              showReplyPrivateAction={!selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled}
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}
@@ -656,8 +656,6 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
 });
 
 export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
-  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
   let messages = useHMSStore(selectHMSMessages);
   const blacklistedMessageIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST)) || [];
   const getFilteredMessages = () => {
@@ -667,7 +665,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const unreadCount = useUnreadCount({ role: selectedRole, peerId: selectedPeer });
+  const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
 
   if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (

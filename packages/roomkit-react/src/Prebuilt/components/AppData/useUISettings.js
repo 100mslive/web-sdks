@@ -142,6 +142,7 @@ const useSetAppData = ({ key1, key2 }) => {
       if (!key1) {
         return;
       }
+      debugger; //eslint-disable-line
       actions.setAppData(
         key1,
         key2
