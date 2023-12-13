@@ -83,7 +83,6 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const isOverlayChat = elements?.chat?.is_overlay;
   const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
   const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
-  console.log({ selectedPeer });
   const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
