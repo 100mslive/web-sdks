@@ -33,7 +33,6 @@ export const APP_DATA = {
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
-  appLayout: 'appLayout',
   hlsStarted: 'hlsStarted',
   rtmpStarted: 'rtmpStarted',
   recordingStarted: 'recordingStarted',
