@@ -80,7 +80,7 @@ export interface HMSInterface {
   sendMessage(type: string, message: string): HMSMessage | void;
   sendBroadcastMessage(message: string, type?: string): Promise<HMSMessage>;
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
-  sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
+  sendDirectMessage(message: string, peerId: string, type?: string): Promise<HMSMessage>;
 
   startScreenShare(onStop: () => void, config?: HMSScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;

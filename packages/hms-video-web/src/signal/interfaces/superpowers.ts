@@ -86,7 +86,7 @@ export interface getPeerRequestParams {
 }
 
 export interface findPeersRequestParams {
-  peerIds?: string[];
+  peers?: string[];
   role?: string;
   group?: string;
   limit: number;
