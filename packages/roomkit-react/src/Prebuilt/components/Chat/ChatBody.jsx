@@ -71,7 +71,7 @@ const MessageTypeContainer = ({ left, right }) => {
     <Flex
       align="center"
       css={{
-        ml: 'auto',
+        ml: '$2',
         mr: '$4',
         gap: '$space$2',
       }}
@@ -89,7 +89,13 @@ const MessageTypeContainer = ({ left, right }) => {
         <SenderName
           as="span"
           variant="overline"
-          css={{ textTransform: 'uppercase', background: '$primary_dim', p: '$1 $2', r: '$1', fontWeight: '$semiBold' }}
+          css={{
+            textTransform: 'uppercase',
+            background: '$primary_dim',
+            p: '$1 $2',
+            r: '$1',
+            fontWeight: '$semiBold',
+          }}
         >
           {right}
         </SenderName>
@@ -393,7 +399,7 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '16ch',
+  maxWidth: '14ch',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
