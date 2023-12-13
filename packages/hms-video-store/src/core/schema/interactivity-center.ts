@@ -4,9 +4,12 @@ import {
   HMSPollLeaderboardResponse,
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
+  HMSWhiteboardInteractivityCenter,
 } from '@100mslive/hms-video';
 
 export interface IHMSInteractivityCenter {
+  whiteboard: HMSWhiteboardInteractivityCenter;
+
   createPoll(poll: HMSPollCreateParams): Promise<void>;
   startPoll(poll: string | HMSPollCreateParams): Promise<void>;
   stopPoll(poll: string): Promise<void>;

@@ -54,6 +54,7 @@ import {
   HMSVideoTrackSettings,
   HMSWebrtcInternals,
   HMSWebrtcStats,
+  HMSWhiteboard,
   parsedUserAgent,
   RID,
   RTMPRecordingConfig,
@@ -129,4 +130,5 @@ export type {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionCreateParams,
+  HMSWhiteboard,
 };
