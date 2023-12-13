@@ -79,8 +79,7 @@ export const GridLayout = ({
   };
 
   useEffect(() => {
-    if (mainPage !== 0 || pageSize === 0) {
-      setSortedPeers(updatedPeers);
+    if (mainPage !== 0) {
       return;
     }
     peersSorter.setPeersAndTilesPerPage({
