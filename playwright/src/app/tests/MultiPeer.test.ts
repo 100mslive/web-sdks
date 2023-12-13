@@ -393,7 +393,6 @@ test(`Verify on-stage can join room and leave`, async({context}) => {
 
 
 test(`Verify stream is running in highest quality`, async({context}) => {
-test(`Verify stream is running in highest quality`, async({context}) => {
 
         const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
         const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
@@ -455,6 +454,7 @@ test(`Verify peer can remove other peer @ignore`, async({context}) => {
         await page.getByTestId('join_again_btn').isVisible();
 
 });
+
 test(`Verify peer can remove other peer`, async({context}) => {
         const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
         const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
