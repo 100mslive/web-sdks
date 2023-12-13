@@ -75,12 +75,12 @@ export const RoleAccordion = ({
     return () => clearInterval(interval);
   }, [isOffStageRole, isLargeRoom]); //eslint-disable-line
 
-  if (peersInAccordion.length > 0 || (isHandRaisedAccordion && filter?.search)) {
+  if (peersInAccordion.length === 0 || (isHandRaisedAccordion && filter?.search)) {
     return null;
   }
 
   const height = ROW_HEIGHT * peersInAccordion.length;
-  const hasNext = total > peersInAccordion.length;
+  const hasNext = total > peersInAccordion.length && !filter?.search;
 
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>
