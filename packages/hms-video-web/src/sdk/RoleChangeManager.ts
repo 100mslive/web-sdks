@@ -52,24 +52,15 @@ export default class RoleChangeManager {
     await this.removeVideoTracks(removeVideo || videoHasSimulcastDifference);
     await this.removeScreenTracks(removeScreen || screenHasSimulcastDifference);
 
-    const initialSettings = Object.assign(
-      { ...this.store.getConfig()?.settings },
-      {
-        isAudioMuted: true,
-        isVideoMuted: true,
-        audioInputDeviceId: 'default',
-        videoDeviceId: 'default',
-        audioOutputDeviceId: 'default',
-      },
-    );
+    const settings = this.getSettings();
 
     if (videoHasSimulcastDifference) {
-      initialSettings.isVideoMuted = !prevVideoEnabled;
+      settings.isVideoMuted = !prevVideoEnabled;
     }
 
     // call publish with new settings, local track manager will diff policies
-    await this.publish(initialSettings);
-    await this.syncDevices(initialSettings, newRole);
+    await this.publish(settings);
+    await this.syncDevices(settings, newRole);
   };
 
   private async syncDevices(initialSettings: InitialSettings, newRole: HMSRole) {
@@ -150,5 +141,17 @@ export default class RoleChangeManager {
       const newLayer = newLayers?.layers?.find(newLayer => newLayer.rid === layer.rid);
       return newLayer?.maxBitrate !== layer.maxBitrate || newLayer?.maxFramerate !== layer.maxFramerate;
     });
+  }
+
+  private getSettings(): InitialSettings {
+    const initialSettings = this.store.getConfig()?.settings;
+
+    return {
+      isAudioMuted: initialSettings?.isAudioMuted ?? true,
+      isVideoMuted: initialSettings?.isVideoMuted ?? true,
+      audioInputDeviceId: initialSettings?.audioInputDeviceId || 'default',
+      audioOutputDeviceId: initialSettings?.audioOutputDeviceId || 'default',
+      videoDeviceId: initialSettings?.videoDeviceId || 'default',
+    };
   }
 }
