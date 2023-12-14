@@ -287,7 +287,7 @@ export const TileMenuContent = ({
             toggleAudio();
             closeSheetOnClick();
           }}
-          data-testid={isVideoEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
+          data-testid={isAudioEnabled ? 'mute_audio_participant_btn' : 'unmute_audio_participant_btn'}
         >
           {isAudioEnabled ? <MicOnIcon height={20} width={20} /> : <MicOffIcon height={20} width={20} />}
           <span>{isAudioEnabled ? 'Mute' : 'Request Unmute'}</span>
