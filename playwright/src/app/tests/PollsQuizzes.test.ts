@@ -18,13 +18,15 @@ test.beforeEach(async () => {});
     await pageActions.goLive(broadcaster_page, 'Automation User');
     await broadcaster_page.getByTestId('participant_video_tile').isVisible();
 
+     await pageActions.createNewPoll('Test Poll', broadcaster_page);
+    
     // new poll assertions
     await broadcaster_page.getByText('Live').isVisible();
     await broadcaster_page.getByText(selectors.EndPollBtn).isVisible();
     await broadcaster_page.getByText('Automation User started a new poll');
   
 
-    await pageActions.createNewPollorQuiz(true, 'Test Poll', broadcaster_page);
+   
 
 
     const vnrt_page = await context.newPage();
@@ -49,13 +51,14 @@ test.beforeEach(async () => {});
     await pageActions.goLive(broadcaster_page, 'Automation User');
     await broadcaster_page.getByTestId('participant_video_tile').isVisible();
 
+    await pageActions.createNewQuiz('Test Poll', broadcaster_page);
     // new quiz assertions
     await broadcaster_page.getByText('Live').isVisible();
     await broadcaster_page.getByText(selectors.EndQuizBtn).isVisible();
     await broadcaster_page.getByText('Automation User started a new quiz');
   
 
-    await pageActions.createNewQuiz('Test Poll', broadcaster_page);
+    
 
 
     const vnrt_page = await context.newPage();
