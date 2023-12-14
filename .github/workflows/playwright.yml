@@ -10,7 +10,7 @@ on:
         required: true
         default: 'prod-in'
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/50 * * * *'
 
   push:
     branches: [main]
