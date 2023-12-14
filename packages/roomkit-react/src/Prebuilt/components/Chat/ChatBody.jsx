@@ -80,7 +80,7 @@ const MessageTypeContainer = ({ left, right }) => {
         <SenderName
           variant="xs"
           as="span"
-          css={{ color: '$on_surface_medium', pl: '$1', textTransform: 'capitalize', fontWeight: '$regular' }}
+          css={{ color: '$on_surface_medium', textTransform: 'capitalize', fontWeight: '$regular' }}
         >
           {left}
         </SenderName>
@@ -90,11 +90,8 @@ const MessageTypeContainer = ({ left, right }) => {
           as="span"
           variant="overline"
           css={{
-            textTransform: 'uppercase',
-            background: '$primary_dim',
-            p: '$1 $2',
-            r: '$1',
-            fontWeight: '$semiBold',
+            color: '$on_surface_medium',
+            fontWeight: '$regular',
           }}
         >
           {right}
@@ -109,12 +106,12 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   if (receiver) {
     return (
-      <MessageTypeContainer left={hasCurrentUserSent ? `${peerName ? `to ${peerName}` : ''}` : 'to You'} right="DM" />
+      <MessageTypeContainer left={hasCurrentUserSent ? `${peerName ? `to ${peerName}` : ''}` : 'to You'} right="(DM)" />
     );
   }
 
   if (roles && roles.length) {
-    return <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles[0] : localPeerRoleName}`} right="ROLE" />;
+    return <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles[0] : localPeerRoleName}`} right="(Group)" />;
   }
   return null;
 };
