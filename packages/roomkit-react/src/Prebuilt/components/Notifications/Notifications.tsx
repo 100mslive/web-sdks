@@ -4,7 +4,6 @@ import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
   HMSRoomState,
-  selectHasPeerHandRaised,
   selectLocalPeerID,
   selectPeerNameByID,
   selectRoomState,
@@ -22,6 +21,7 @@ import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
+import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
@@ -92,16 +92,6 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
-      case HMSNotificationTypes.HAND_RAISE_CHANGED: {
-        if (roomState !== HMSRoomState.Connected || notification.data.isLocal) {
-          return;
-        }
-        const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
-        if (hasPeerHandRaised) {
-          ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
-        }
-        break;
-      }
       case HMSNotificationTypes.METADATA_UPDATED:
         if (roomState !== HMSRoomState.Connected) {
           return;
@@ -230,6 +220,7 @@ export function Notifications() {
       <PermissionErrorModal />
       <InitErrorModal />
       <ChatNotifications />
+      <HandRaisedNotifications />
     </>
   );
 }

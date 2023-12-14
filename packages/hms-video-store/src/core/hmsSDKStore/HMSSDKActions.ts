@@ -765,6 +765,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
       onPollsUpdate: this.onPollsUpdate.bind(this),
+      onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -865,6 +866,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, actionName);
 
     polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
+  }
+
+  private onWhiteboardUpdate(whiteboard: sdkTypes.HMSWhiteboard) {
+    this.setState(draftStore => {
+      draftStore.whiteboards[whiteboard.id] = whiteboard;
+    }, 'whiteboardUpdate');
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {

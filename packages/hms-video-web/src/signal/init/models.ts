@@ -49,4 +49,5 @@ export enum InitFlags {
   FLAG_ON_DEMAND_TRACKS = 'onDemandTracks',
   // Don't unsubscribe for beam to prevent a/v sync in case of active speaker
   FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE = 'disableVideoTrackAutoUnsubscribe',
+  FLAG_WHITEBOARD_ENABLED = 'whiteboardEnabled',
 }

@@ -1,8 +1,10 @@
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
+  CreateWhiteboardResponse,
   findPeersRequestParams,
   GetSessionMetadataResponse,
+  GetWhiteboardResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
   JoinLeaveGroupResponse,
@@ -43,7 +45,7 @@ import {
 } from './interfaces';
 import { IAnalyticsTransportProvider } from '../analytics/IAnalyticsTransportProvider';
 import { HMSConnectionRole } from '../connection/model';
-import { HMSMessage } from '../interfaces';
+import { HMSMessage, HMSPermissionType, HMSWhiteboardCreateOptions } from '../interfaces';
 
 export interface ISignal extends IAnalyticsTransportProvider {
   isConnected: boolean;
@@ -131,6 +133,10 @@ export interface ISignal extends IAnalyticsTransportProvider {
   getPollResult(params: PollResultParams): Promise<PollResultResponse>;
 
   fetchPollLeaderboard(params: PollLeaderboardGetParams): Promise<PollLeaderboardGetResponse>;
+
+  getWhiteboard(params: { id: string; permission?: Array<HMSPermissionType> }): Promise<GetWhiteboardResponse>;
+
+  createWhiteboard(params: HMSWhiteboardCreateOptions): Promise<CreateWhiteboardResponse>;
 
   joinGroup(name: string): Promise<JoinLeaveGroupResponse>;
 
