@@ -10,10 +10,10 @@ test.afterEach(async ({ context }) => {
 
 test(`Test peer can send and receive chat message`, async ({ context }) => {
 
-    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/adg-mwom-fcm';
-    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
-    const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/igh-gtqq-fvj';
+    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/kwq-tstr-tji';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/wuu-xevt-jfv';
+    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/off-okil-uiy';
+    const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tiv-dsbn-kpt';
 
     const page_b = await context.newPage();
     await page_b.goto(broadcasterUrl);
