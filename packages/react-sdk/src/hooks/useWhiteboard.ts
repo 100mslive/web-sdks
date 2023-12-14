@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  selectAppData,
   selectIsConnectedToRoom,
   selectLocalPeer,
   selectPermissions,
@@ -13,6 +14,7 @@ export const useWhiteboard = () => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
   const whiteboard = useHMSStore(selectWhiteboard);
+  const isHeadless = useHMSStore(selectAppData('disableNotifications'));
   const open = !!whiteboard?.open;
   const isOwner = whiteboard?.owner === localPeerUserId;
   const actions = useHMSActions();
@@ -25,8 +27,14 @@ export const useWhiteboard = () => {
     if (!whiteboard?.addr || !whiteboard?.token || !iframeRef.current) {
       return;
     }
-    iframeRef.current.src = `${WHITEBOARD_ORIGIN}/?endpoint=https://${whiteboard.addr}&token=${whiteboard.token}`;
-  }, [whiteboard?.addr, whiteboard?.token]);
+    const url = new URL(WHITEBOARD_ORIGIN);
+    url.searchParams.set('endpoint', `https://${whiteboard.addr}`);
+    url.searchParams.set('token', whiteboard.token);
+    if (isHeadless) {
+      url.searchParams.set('zoom_to_content', 'true');
+    }
+    iframeRef.current.src = url.toString();
+  }, [whiteboard?.addr, whiteboard?.token, isHeadless]);
 
   useEffect(() => {
     if (isConnected) {
