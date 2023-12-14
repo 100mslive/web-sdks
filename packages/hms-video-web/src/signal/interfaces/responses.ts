@@ -1,3 +1,4 @@
+import { HMSPermissionType } from '../../interfaces';
 import { PeerNotificationInfo } from '../../notification-manager';
 
 export interface BroadcastResponse {
@@ -30,3 +31,18 @@ export interface PeersIterationResponse {
   eof: boolean;
   peers: PeerNotificationInfo[];
 }
+
+export interface CreateWhiteboardResponse {
+  id: string;
+  owner: string;
+}
+
+export interface GetWhiteboardResponse {
+  id: string;
+  addr: string;
+  token: string;
+  owner: string;
+  permissions: Array<HMSPermissionType>;
+}
+
+export type { HMSPermissionType };

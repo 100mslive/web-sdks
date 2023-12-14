@@ -22,6 +22,7 @@ import { VBToggle } from '../VirtualBackground/VBToggle';
 import { ChatToggle } from './ChatToggle';
 import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
+import { WhiteboardToggle } from './WhiteboardToggle';
 import { ConferencingScreenElements } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
@@ -104,6 +105,7 @@ export const Footer = ({
         )}
       </AppFooter.Center>
       <AppFooter.Right>
+        <WhiteboardToggle />
         {showPolls && <PollsToggle />}
         {!isMobile && elements?.chat && <ChatToggle />}
         {elements?.participant_list && <ParticipantCount />}

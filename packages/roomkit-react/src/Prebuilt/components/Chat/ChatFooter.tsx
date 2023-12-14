@@ -89,6 +89,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
+    } else {
+      inputRef.current?.focus();
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
   const sendMessage = useCallback(async () => {

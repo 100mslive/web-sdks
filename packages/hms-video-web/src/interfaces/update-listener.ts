@@ -5,7 +5,7 @@ import { HMSMessage } from './message';
 import { HMSConnectionQuality } from './peer';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSRoom } from './room';
-import { HMSPoll, SessionStoreUpdate } from './session-store';
+import { HMSPoll, HMSWhiteboard, SessionStoreUpdate } from './session-store';
 import { HMSSpeaker } from './speaker';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
@@ -68,11 +68,12 @@ export interface SessionStoreListener {
   onSessionStoreUpdate(values: SessionStoreUpdate[]): void;
 }
 
-export interface PollsListener {
+export interface InteractivityListener {
   onPollsUpdate(type: HMSPollsUpdate, polls: HMSPoll[]): void;
+  onWhiteboardUpdate(whiteboard: HMSWhiteboard): void;
 }
 
-export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener, PollsListener {
+export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreListener, InteractivityListener {
   onJoin(room: HMSRoom): void;
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;

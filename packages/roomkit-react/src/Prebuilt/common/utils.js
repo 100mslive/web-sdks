@@ -1,4 +1,3 @@
-import { isEqual } from 'lodash';
 import { QUESTION_TYPE } from './constants';
 
 // eslint-disable-next-line complexity
@@ -159,11 +158,11 @@ export const getPeerParticipationSummary = (poll, localPeerID, localCustomerUser
     if (!peerResponse?.[0]) {
       return;
     }
-    const submission = [peerResponse[0].option] || peerResponse[0].options;
-    const answer =
-      [questions[peerResponse[0].questionIndex - 1].answer?.option] ||
-      questions[peerResponse[0].questionIndex - 1].answer?.options;
-    const isCorrect = isEqual(submission, answer);
+    const isCorrect = checkCorrectAnswer(
+      questions[peerResponse[0].questionIndex - 1].answer,
+      peerResponse[0],
+      questions[peerResponse[0].questionIndex - 1].type,
+    );
     if (isCorrect) {
       score += questions[peerResponse[0].questionIndex - 1]?.weight || 0;
       correctResponses++;

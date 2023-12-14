@@ -1,4 +1,13 @@
-import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSRole, HMSRoom, HMSSpeaker, PublishParams } from '../../interfaces';
+import {
+  HMSConfig,
+  HMSFrameworkInfo,
+  HMSPoll,
+  HMSRole,
+  HMSRoom,
+  HMSSpeaker,
+  HMSWhiteboard,
+  PublishParams,
+} from '../../interfaces';
 import { IErrorListener } from '../../interfaces/error-listener';
 import { HMSSimulcastLayerDefinition, SimulcastLayer } from '../../interfaces/simulcast-layers';
 import {
@@ -79,6 +88,9 @@ export interface IStore {
 
   setPoll(poll: HMSPoll): void;
   getPoll(id: string): HMSPoll | undefined;
+
+  setWhiteboard(whiteboard: HMSWhiteboard): void;
+  getWhiteboard(id?: string): HMSWhiteboard | undefined;
 
   cleanup(): void;
 }

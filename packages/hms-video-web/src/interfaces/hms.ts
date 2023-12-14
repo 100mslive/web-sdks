@@ -1,4 +1,3 @@
-import { HMSInteractivityCenter } from './session-store/interactivity-center';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
@@ -12,7 +11,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSSessionStore } from './session-store';
+import { HMSInteractivityCenter, HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
