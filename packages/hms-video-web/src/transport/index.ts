@@ -263,7 +263,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
-      if (state === 'failed') {
+      if (state === 'failed' && this.publishConnection?.iceConnectionState === 'connected') {
         this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
         this.observer.onFailure(
           ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, 'DTLS transport state failed', true),
