@@ -33,6 +33,17 @@ export default class HMSPublishConnection extends HMSConnection {
     this.nativeConnection.onconnectionstatechange = () => {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
     };
+
+    if (this.nativeConnection.sctp) {
+      this.nativeConnection.sctp.transport.onstatechange = () => {
+        this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
+      };
+      this.nativeConnection.sctp.transport.onerror = (event: Event) => {
+        this.observer.onDTLSTransportError(
+          new Error((event as RTCErrorEvent)?.error?.errorDetail) || 'DTLS Transport failed',
+        );
+      };
+    }
   }
 
   initAfterJoin() {

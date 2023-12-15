@@ -262,6 +262,19 @@ export default class HMSTransport implements ITransport {
       await this.performPublishRenegotiation();
     },
 
+    onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
+      if (state === 'failed') {
+        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
+        this.observer.onFailure(
+          ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, 'DTLS transport state failed', true),
+        );
+      }
+    },
+
+    onDTLSTransportError: (error: Error) => {
+      this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
+    },
+
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
       const log = newState === 'disconnected' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
       log(TAG, `Publish ice connection state change: ${newState}`);
