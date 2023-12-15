@@ -116,14 +116,22 @@ export const QuestionCard = ({
         borderRadius: '$1',
         p: '$md',
         mt: '$md',
-        border: respondedToQuiz ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}` : 'none',
+        border:
+          respondedToQuiz && !isLive
+            ? `1px solid ${isCorrectAnswer ? '$alert_success' : '$alert_error_default'}`
+            : 'none',
       }}
     >
       <Flex align="center" justify="between">
         <Text
           variant="caption"
           css={{
-            color: respondedToQuiz ? (isCorrectAnswer ? '$alert_success' : '$alert_error_default') : '$on_surface_low',
+            color:
+              respondedToQuiz && !isLive
+                ? isCorrectAnswer
+                  ? '$alert_success'
+                  : '$alert_error_default'
+                : '$on_surface_low',
             fontWeight: '$semiBold',
             display: 'flex',
             alignItems: 'center',

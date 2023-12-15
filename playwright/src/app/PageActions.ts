@@ -27,9 +27,8 @@ export class PageActions {
         await page.waitForTimeout(2000);
     }
 
-    async createNewPollorQuiz(isPoll: boolean, name: string, page:any) {
+    async createNewPoll(name: string, page:any) {
         await page.getByTestId(selectors.PollsMenuBtn).click();
-        if(!isPoll) await page.getByText('Quiz').nth(0).click();
         await page.locator(selectors.PollName).fill(name);
         await page.getByText(selectors.CreatePollBtn).click();
         await page.getByPlaceholder(selectors.QuestionName).fill('question no 1');
