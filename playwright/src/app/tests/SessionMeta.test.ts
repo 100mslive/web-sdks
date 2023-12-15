@@ -8,7 +8,7 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Verify BRB and hand raise is displayed for other peers`, async({context}) => {
+test(`Verify BRB and hand raise is displayed for other peers @meta`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
     const cb_1 = await context.newPage();
@@ -40,7 +40,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
     await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='brb_icon_onTile']/svg");
 });
 
-test(`Verify pin tile works for peer`, async({context}) => {
+test(`Verify pin tile works for peer @meta`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
     const cb_1 = await context.newPage();
@@ -68,9 +68,12 @@ test(`Verify pin tile works for peer`, async({context}) => {
     await cb_1.getByText("Unpin Tile for myself").click();
 
     await cb_1.locator("//div[@data-testid='participant_tile_cb2']/div/div[3]/div/div").isHidden();
+    await cb_1.getByTestId('leave_end_dropdown_trigger').click();
+    await cb_1.getByTestId('end_room_btn').click();
+    await cb_1.getByTestId('stop_stream_btn').click();
 });
 
-test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
+test(`Verify spotlight reflect to local and remote peer @meta`,async({context}) => {
 
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
@@ -106,4 +109,8 @@ test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
 
     await cb_2.bringToFront();
     await cb_2.locator("//div[@data-testid='participant_tile_cb2']/div/div[3]/div/div").isHidden();
+
+    await cb_2.getByTestId('leave_end_dropdown_trigger').click();
+    await cb_2.getByTestId('end_room_btn').click();
+    await cb_2.getByTestId('stop_stream_btn').click();
 });
