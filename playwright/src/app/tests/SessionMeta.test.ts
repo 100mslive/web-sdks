@@ -8,7 +8,8 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Verify BRB and hand raise is displayed for other peers @meta`, async({context}) => {
+
+test(`Verify BRB and hand raise is displayed for other peers`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
     const cb_1 = await context.newPage();
@@ -40,7 +41,7 @@ test(`Verify BRB and hand raise is displayed for other peers @meta`, async({cont
     await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='brb_icon_onTile']/svg");
 });
 
-test(`Verify pin tile works for peer @meta`, async({context}) => {
+test(`Verify pin tile works for peer`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
     const cb_1 = await context.newPage();
