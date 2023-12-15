@@ -10,7 +10,7 @@ test.afterEach(async ({ context }) => {
 
 
 test(`Verify BRB and hand raise is displayed for other peers`, async({context}) => {
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/xgv-oagw-ahp';
 
     const cb_1 = await context.newPage();
 
@@ -42,7 +42,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
 });
 
 test(`Verify pin tile works for peer`, async({context}) => {
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/xgv-oagw-ahp';
 
     const cb_1 = await context.newPage();
 

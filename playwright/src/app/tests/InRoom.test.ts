@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import { Selectors } from '../selectors/Selectors';
 import { PageActions } from '../PageActions';
 
-const URL = 'https://automation2.app.100ms.live/meeting/lnt-vqbj-sxl';
+const URL = 'https://automation2.app.100ms.live/meeting/dgr-agfs-hcj';
 
 let selectors = new Selectors();
 let pageActions = new PageActions();

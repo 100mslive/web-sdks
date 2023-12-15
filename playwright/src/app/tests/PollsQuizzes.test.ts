@@ -2,8 +2,8 @@ import { test } from '@playwright/test';
 import { Selectors } from '../selectors/Selectors';
 import { PageActions } from '../PageActions';
 
-const URL = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vtf-ypzy-swn';
-const VNRT_URL = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vat-suuw-twk'; 
+const URL = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dwg-ncjo-isa';
+const VNRT_URL = 'https://automation-live-stream.app.100ms.live/streaming/meeting/xhi-lgbp-czy'; 
 
 let selectors = new Selectors();
 let pageActions = new PageActions();

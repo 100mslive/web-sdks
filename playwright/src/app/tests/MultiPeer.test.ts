@@ -45,9 +45,9 @@ test(`Verify viewer is not getting removed from peer list on raising hand-LIVE-1
 
 });
 
-test(`Verify Peer does not disappear from the list after moving offstage-LIVE-1737`,async ({ context }) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lni-ylib-xho';
-        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/jay-mnzo-czl';
+test(`Verify Peer does not disappear from the list after moving offstage-LIVE-1737 @p0`,async ({ context }) => {
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/mac-yrau-iix';
+        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/apt-lbxo-pns';
 
         const page_host = await context.newPage();
 
@@ -139,8 +139,8 @@ test(`Verify HLS starts on room-LIVE-1856`,async ({ context }) => {
 });
 
 test(`Verify Webrtc viewer can join room and leave`, async({context}) => {
-        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lni-ylib-xho';
-        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vfi-zkyi-gzj';
+        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/mac-yrau-iix';
+        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/fsl-qati-prm';
 
         const page_host = await context.newPage();
 
@@ -173,8 +173,8 @@ test(`Verify Webrtc viewer can join room and leave`, async({context}) => {
 });
 
 test(`Verify co-broadcaster can end room`, async({context}) => {
-        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lni-ylib-xho';
-        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/vfi-zkyi-gzj';
+        const cobroadcaster = 'https://automation-live-stream.app.100ms.live/streaming/meeting/mac-yrau-iix';
+        const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/fsl-qati-prm';
 
         const page_host = await context.newPage();
 
@@ -204,8 +204,8 @@ test(`Verify co-broadcaster can end room`, async({context}) => {
 });
 
 test(`Verify broadcaster can end the session`, async({context}) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dtr-ndny-sug';
-        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/byc-pkcu-qjn';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/acd-ocop-ndy';
+        const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pem-rtpb-cjs';
 
         const page_host = await context.newPage();
 
@@ -250,8 +250,8 @@ test(`Verify broadcaster can end the session`, async({context}) => {
 
 test(`Verify broadcaster and co-broadcaster can leave and rejoin room` , async({context}) => {
 
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/dtr-ndny-sug';
-        const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gsg-hneq-lmy';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/acd-ocop-ndy';
+        const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/mjm-ttnf-rdl';
 
         const page_host = await context.newPage();
 
@@ -302,8 +302,8 @@ test(`Verify broadcaster and co-broadcaster can leave and rejoin room` , async({
 });
 
 test(`Verify hls viewer can join room and leave`, async({context}) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tje-xmvj-smd';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pav-cftd-qkk';
 
         const page_host = await context.newPage();
 
@@ -340,8 +340,8 @@ test(`Verify hls viewer can join room and leave`, async({context}) => {
 
 
 test(`Verify on-stage can join room and leave`, async({context}) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tje-xmvj-smd';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pav-cftd-qkk';
 
         const page_host = await context.newPage();
 
@@ -394,8 +394,8 @@ test(`Verify on-stage can join room and leave`, async({context}) => {
 
 test(`Verify stream is running in highest quality`, async({context}) => {
 
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hih-ovsh-xru';
-        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/eqe-gdip-nyp';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tje-xmvj-smd';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pav-cftd-qkk';
 
         const page_host = await context.newPage();
 
@@ -423,8 +423,8 @@ test(`Verify stream is running in highest quality`, async({context}) => {
 });
 
 test(`Verify peer can remove other peer`, async({context}) => {
-        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ped-ztfm-rai';
-        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ldm-kuwn-ybe';
+        const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tje-xmvj-smd';
+        const hlsviewerUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pav-cftd-qkk';
 
         const page_host = await context.newPage();
 

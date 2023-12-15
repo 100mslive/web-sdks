@@ -11,7 +11,7 @@ test.afterEach(async ({ context }) => {
 
 
   test(`Verify Virtual background button on preview and in Room`, async ({ page: nativePage }) => {
-    const URL = baseUrl + 'ufx-vfgw-yge';
+    const URL = baseUrl + 'ifw-ixbs-xbj';
     console.log(`URL - `, URL);
     await nativePage.goto(URL);
     await nativePage.getByPlaceholder('Enter name').fill('Automation User');

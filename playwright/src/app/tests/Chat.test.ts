@@ -8,12 +8,12 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Test peer can send and receive chat message`, async ({ context }) => {
+test(`Test peer can send and receive chat message @p0`, async ({ context }) => {
 
-    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/kwq-tstr-tji';
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/wuu-xevt-jfv';
-    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/off-okil-uiy';
-    const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/tiv-dsbn-kpt';
+    const broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/xtv-hlfr-obc';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/fxx-elys-htl';
+    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hho-giok-kxz';
+    const webrtcviewer = 'https://automation-live-stream.app.100ms.live/streaming/meeting/arg-fbnc-iez';
 
     const page_b = await context.newPage();
     await page_b.goto(broadcasterUrl);
@@ -81,10 +81,10 @@ test(`Test peer can send and receive chat message`, async ({ context }) => {
 });
 
 
-test(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
+test(`Verify pin/unpin chat reflect to local+remote peer @p0`, async({context}) => {
 
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lqh-lcej-ong';
-    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ylx-frpu-klf';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/jae-hkfd-mwb';
+    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/hgy-gxur-oxk';
 
     const page_cb = await context.newPage();
     await page_cb.goto(cobroadcasterUrl);
