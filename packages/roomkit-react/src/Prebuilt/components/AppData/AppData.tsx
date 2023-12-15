@@ -1,19 +1,14 @@
 import React, { useEffect } from 'react';
 import {
   HMSRoomState,
-  selectAvailableRoleNames,
   selectFullAppData,
   selectHLSState,
-  selectLocalPeerRoleName,
-  selectRolesMap,
   selectRoomState,
   selectRTMPState,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
-//@ts-ignore
-import { normalizeAppPolicyConfig } from '../init/initUtils';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -49,7 +44,7 @@ const initialAppData = {
   [APP_DATA.chatOpen]: false,
   [APP_DATA.chatSelector]: {
     [CHAT_SELECTOR.ROLE]: '',
-    [CHAT_SELECTOR.PEER_ID]: '',
+    [CHAT_SELECTOR.PEER]: {},
   },
   [APP_DATA.chatDraft]: '',
   [APP_DATA.sidePane]: '',
@@ -73,9 +68,6 @@ const initialAppData = {
 export const AppData = React.memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
-  const roleNames = useHMSStore(selectAvailableRoleNames);
-  const rolesMap = useHMSStore(selectRolesMap);
-  const localPeerRole = useHMSStore(selectLocalPeerRoleName);
   const appData = useHMSStore(selectFullAppData);
 
   useEffect(() => {
@@ -108,13 +100,6 @@ export const AppData = React.memo(() => {
     }
     hmsActions.setAppData(APP_DATA.subscribedNotifications, preferences.subscribedNotifications, true);
   }, [preferences.subscribedNotifications, hmsActions]);
-
-  useEffect(() => {
-    if (localPeerRole) {
-      const config = normalizeAppPolicyConfig(roleNames, rolesMap);
-      hmsActions.setAppData(APP_DATA.appLayout, config[localPeerRole]);
-    }
-  }, [roleNames, rolesMap, localPeerRole, hmsActions]);
 
   return <ResetStreamingStart />;
 });

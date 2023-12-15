@@ -1,4 +1,3 @@
-import { HMSInteractivityCenter } from './session-store/interactivity-center';
 import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
@@ -12,7 +11,7 @@ import { HMSRole } from './role';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSHLS, HMSRecording, HMSRTMP } from './room';
 import { RTMPRecordingConfig } from './rtmp-recording-config';
-import { HMSSessionStore } from './session-store';
+import { HMSInteractivityCenter, HMSSessionStore } from './session-store';
 import { HMSScreenShareConfig } from './track-settings';
 import { HMSAudioListener, HMSConnectionQualityListener, HMSUpdateListener } from './update-listener';
 import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
@@ -80,7 +79,7 @@ export interface HMSInterface {
   sendMessage(type: string, message: string): HMSMessage | void;
   sendBroadcastMessage(message: string, type?: string): Promise<HMSMessage>;
   sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
-  sendDirectMessage(message: string, peer: HMSPeer, type?: string): Promise<HMSMessage>;
+  sendDirectMessage(message: string, peerId: string, type?: string): Promise<HMSMessage>;
 
   startScreenShare(onStop: () => void, config?: HMSScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;

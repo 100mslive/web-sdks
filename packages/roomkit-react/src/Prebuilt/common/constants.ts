@@ -17,7 +17,7 @@ export const RTMP_RECORD_DEFAULT_RESOLUTION = {
 export const EMOJI_REACTION_TYPE = 'EMOJI_REACTION';
 
 export const CHAT_SELECTOR = {
-  PEER_ID: 'peer_id',
+  PEER: 'peer',
   ROLE: 'role',
   EVERYONE: 'Everyone',
 };
@@ -33,7 +33,6 @@ export const APP_DATA = {
   waitingViewerRole: 'waitingViewerRole',
   subscribedNotifications: 'subscribedNotifications',
   logo: 'logo',
-  appLayout: 'appLayout',
   hlsStarted: 'hlsStarted',
   rtmpStarted: 'rtmpStarted',
   recordingStarted: 'recordingStarted',
@@ -122,15 +121,15 @@ export enum INTERACTION_TYPE {
 export enum QUESTION_TYPE_TITLE {
   'single-choice' = 'Single Choice',
   'multiple-choice' = 'Multiple Choice',
-  // "short-answer": "Short Answer",
-  // "long-answer": "Long Answer",
+  'short-answer' = 'Short Answer',
+  'long-answer' = 'Long Answer',
 }
 
 export enum QUESTION_TYPE {
   SINGLE_CHOICE = 'single-choice',
   MULTIPLE_CHOICE = 'multiple-choice',
-  // SHORT_ANSWER: "short-answer",
-  // LONG_ANSWER: "long-answer",
+  SHORT_ANSWER = 'short-answer',
+  LONG_ANSWER = 'long-answer',
 }
 
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';

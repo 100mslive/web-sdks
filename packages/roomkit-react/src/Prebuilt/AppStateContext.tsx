@@ -55,7 +55,7 @@ export const useAppStateManager = () => {
       setActiveState(PrebuiltStates.MEETING);
     } else if (
       prevRoomState &&
-      [HMSRoomState.Reconnecting, HMSRoomState.Connected].includes(prevRoomState) &&
+      [HMSRoomState.Reconnecting, HMSRoomState.Connected, HMSRoomState.Connecting].includes(prevRoomState) &&
       [HMSRoomState.Disconnecting, HMSRoomState.Disconnected].includes(roomState)
     ) {
       const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;

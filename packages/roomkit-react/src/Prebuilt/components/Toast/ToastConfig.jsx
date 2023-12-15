@@ -38,15 +38,27 @@ const HandRaiseAction = React.forwardRef(({ id = '', isSingleHandRaise = true },
     bring_to_stage_label,
     on_stage_role,
     off_stage_roles = [],
+    skip_preview_for_role_change = false,
   } = layout?.screens?.conferencing?.default?.elements.on_stage_exp || {};
 
-  const onClickHandler = useCallback(() => {
+  const onClickHandler = useCallback(async () => {
     if (isSingleHandRaise) {
-      hmsActions.changeRoleOfPeer(id, on_stage_role);
+      hmsActions.changeRoleOfPeer(id, on_stage_role, skip_preview_for_role_change);
+      if (skip_preview_for_role_change) {
+        await hmsActions.lowerRemotePeerHand(id);
+      }
     } else {
       !isParticipantsOpen && toggleSidepane();
     }
-  }, [hmsActions, id, isParticipantsOpen, isSingleHandRaise, on_stage_role, toggleSidepane]);
+  }, [
+    hmsActions,
+    id,
+    isParticipantsOpen,
+    isSingleHandRaise,
+    on_stage_role,
+    toggleSidepane,
+    skip_preview_for_role_change,
+  ]);
 
   // show nothing if handRaise is single and peer role is not hls
   if (isSingleHandRaise && (!peer || !off_stage_roles.includes(peer.roleName))) {
