@@ -79,3 +79,28 @@ test(`Test peer can send and receive chat message`, async ({ context }) => {
     await page_b.getByTestId('end_room_btn').click();
     await page_b.getByTestId('stop_stream_btn').click();
 });
+
+
+test(`Verify pin/unpin chat reflect to local+remote peer @chat`, async({context}) => {
+
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lqh-lcej-ong';
+    const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ylx-frpu-klf';
+
+    const page_cb = await context.newPage();
+    await page_cb.goto(cobroadcasterUrl);
+    await page_cb.getByPlaceholder('Enter name').fill('co-broadcaster');
+    await page_cb.getByText("Join Now").click();
+    await page_cb.waitForTimeout(2000);
+
+    const page_vnrt = await context.newPage();
+    await page_vnrt.goto(viewerNRTUrl);
+    await page_vnrt.getByPlaceholder('Enter name').fill('vnrt');
+    await page_vnrt.getByText("Join Now").click();
+    await page_vnrt.waitForTimeout(2000);
+
+    await page_cb.bringToFront();
+    await page_cb.locator("//textarea").fill('co-broadcastermsg');
+    await page_cb.getByTestId('send_msg_btn').click();
+
+
+});
