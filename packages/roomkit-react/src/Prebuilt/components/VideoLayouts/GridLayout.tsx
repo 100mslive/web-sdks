@@ -79,8 +79,8 @@ export const GridLayout = ({
   };
 
   useEffect(() => {
-    if (mainPage !== 0 || pageSize === 0) {
-      setSortedPeers(updatedPeers);
+    if (mainPage !== 0) {
+      peersSorter.stop();
       return;
     }
     peersSorter.setPeersAndTilesPerPage({
@@ -88,6 +88,9 @@ export const GridLayout = ({
       tilesPerPage: pageSize,
     });
     peersSorter.onUpdate(setSortedPeers);
+    return () => {
+      peersSorter.stop();
+    };
   }, [mainPage, peersSorter, updatedPeers, pageSize]);
 
   if (peerSharing) {
