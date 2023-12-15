@@ -6,7 +6,6 @@ import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Accordion } from '../../../Accordion';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
-// @ts-ignore: No implicit Any
 import { Participant } from './ParticipantList';
 import { RoleOptions } from './RoleOptions';
 // @ts-ignore: No implicit Any
@@ -24,9 +23,18 @@ export function itemKey(index: number, data: ItemData) {
   return data.peerList[index]?.id;
 }
 
-export const VirtualizedParticipantItem = React.memo(({ index, data }: { index: number; data: ItemData }) => {
-  return <Participant key={data.peerList[index].id} peer={data.peerList[index]} isConnected={data.isConnected} />;
-});
+export const VirtualizedParticipantItem = React.memo(
+  ({ index, data, style }: { index: number; data: ItemData; style: React.CSSProperties }) => {
+    return (
+      <Participant
+        key={data.peerList[index].id}
+        peer={data.peerList[index]}
+        isConnected={data.isConnected}
+        style={style}
+      />
+    );
+  },
+);
 
 export const RoleAccordion = ({
   peerList = [],
@@ -39,15 +47,22 @@ export const RoleAccordion = ({
 }: ItemData & {
   roleName: string;
   isHandRaisedAccordion?: boolean;
-  filter?: { search: string };
+  filter?: { search?: string };
   offStageRoles: string[];
   onActive?: (role: string) => void;
 }) => {
   const [ref, { width }] = useMeasure<HTMLDivElement>();
-  const showAcordion = filter?.search ? peerList.some(peer => peer.name.toLowerCase().includes(filter.search)) : true;
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const { peers, total, loadPeers } = usePaginatedParticipants({ role: roleName, limit: 10 });
   const isOffStageRole = roleName && offStageRoles.includes(roleName);
+  let peersInAccordion = peerList;
+  // for large rooms, peer list would be empty
+  if (isOffStageRole && isLargeRoom) {
+    peersInAccordion = peers;
+    if (filter?.search) {
+      peersInAccordion = peersInAccordion.filter(peer => peer.name.toLowerCase().includes(filter.search || ''));
+    }
+  }
 
   useEffect(() => {
     if (!isOffStageRole || !isLargeRoom) {
@@ -60,17 +75,12 @@ export const RoleAccordion = ({
     return () => clearInterval(interval);
   }, [isOffStageRole, isLargeRoom]); //eslint-disable-line
 
-  if (!showAcordion || (isHandRaisedAccordion && filter?.search) || (peerList.length === 0 && filter?.search)) {
+  if (peersInAccordion.length === 0 || (isHandRaisedAccordion && filter?.search)) {
     return null;
   }
 
-  const peersInAccordion = isOffStageRole && isLargeRoom ? peers : peerList;
   const height = ROW_HEIGHT * peersInAccordion.length;
-  const hasNext = total > peersInAccordion.length;
-
-  if (peersInAccordion.length === 0) {
-    return null;
-  }
+  const hasNext = total > peersInAccordion.length && !filter?.search;
 
   return (
     <Accordion.Item value={roleName} css={{ '&:hover .role_actions': { visibility: 'visible' }, mb: '$8' }} ref={ref}>

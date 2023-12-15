@@ -3,7 +3,7 @@ import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
-import { HMSConfig, HMSFrameworkInfo, HMSPoll, HMSSpeaker } from '../../interfaces';
+import { HMSConfig, HMSFrameworkInfo, HMSPermissionType, HMSPoll, HMSSpeaker, HMSWhiteboard } from '../../interfaces';
 import { SelectedDevices } from '../../interfaces/devices';
 import { IErrorListener } from '../../interfaces/error-listener';
 import {
@@ -49,6 +49,7 @@ class Store implements IStore {
   private simulcastEnabled = false;
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
+  private whiteboards = new Map<string, HMSWhiteboard>();
 
   getConfig() {
     return this.config;
@@ -197,6 +198,7 @@ class Store implements IStore {
 
   setKnownRoles(params: PolicyParams) {
     this.knownRoles = params.known_roles;
+    this.addPluginsToRoles(params.plugins);
     this.roleDetailsArrived = true;
     this.templateAppData = params.app_data;
     if (!this.simulcastEnabled) {
@@ -367,6 +369,14 @@ class Store implements IStore {
     return this.polls.get(id);
   }
 
+  setWhiteboard(whiteboard: HMSWhiteboard) {
+    this.whiteboards.set(whiteboard.id, whiteboard);
+  }
+
+  getWhiteboard(id?: string): HMSWhiteboard | undefined {
+    return id ? this.whiteboards.get(id) : this.whiteboards.values().next().value;
+  }
+
   getErrorListener() {
     return this.errorListener;
   }
@@ -395,7 +405,35 @@ class Store implements IStore {
       peer.role = this.getPolicyForRole(peer.role.name);
     });
   }
+  private addPluginsToRoles(plugins: PolicyParams['plugins']) {
+    if (!plugins) {
+      return;
+    }
 
+    const addPermissionToRole = (
+      role: string,
+      pluginName: keyof PolicyParams['plugins'],
+      permission: HMSPermissionType,
+    ) => {
+      const rolePermissions = this.knownRoles[role].permissions;
+      if (!rolePermissions[pluginName]) {
+        rolePermissions[pluginName] = [];
+      }
+      rolePermissions[pluginName]?.push(permission);
+    };
+
+    Object.keys(plugins).forEach(plugin => {
+      const pluginName = plugin as keyof PolicyParams['plugins'];
+      if (!plugins[pluginName]) {
+        return;
+      }
+
+      const permissions = plugins[pluginName].permissions;
+      permissions?.admin?.forEach(role => addPermissionToRole(role, pluginName, 'admin'));
+      permissions?.reader?.forEach(role => addPermissionToRole(role, pluginName, 'read'));
+      permissions?.writer?.forEach(role => addPermissionToRole(role, pluginName, 'write'));
+    });
+  }
   private setEnv() {
     const endPoint = this.config?.initEndpoint!;
     const url = endPoint.split('https://')[1];

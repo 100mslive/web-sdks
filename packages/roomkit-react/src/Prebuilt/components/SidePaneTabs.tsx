@@ -6,7 +6,6 @@ import { CrossIcon } from '@100mslive/react-icons';
 // @ts-ignore: No implicit Any
 import { Chat } from './Chat/Chat';
 import { PaginatedParticipants } from './Footer/PaginatedParticipants';
-// @ts-ignore: No implicit Any
 import { ParticipantList } from './Footer/ParticipantList';
 import { Box, config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 import { Tooltip } from '../../Tooltip';

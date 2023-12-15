@@ -429,7 +429,7 @@ export const ErrorFactory = {
 
     ValidationFailed(message: string, entity?: any) {
       return new HMSException(
-        ErrorCodes.GenericErrors.INVALID_ROLE,
+        ErrorCodes.GenericErrors.VALIDATION_FAILED,
         'ValidationFailed',
         HMSAction.VALIDATION,
         message,

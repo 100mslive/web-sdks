@@ -67,7 +67,6 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         />
       ) : null}
       <Flex
-        title={pinnedMessages[pinnedMessageIndex]?.text}
         css={{
           p: '$4',
           color: '$on_surface_medium',
@@ -95,7 +94,12 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             },
           }}
         >
-          <Text variant="sm" css={{ color: '$on_surface_medium' }} {...swipeHandlers}>
+          <Text
+            variant="sm"
+            css={{ color: '$on_surface_medium' }}
+            {...swipeHandlers}
+            title={pinnedMessages[pinnedMessageIndex]?.text}
+          >
             <AnnotisedMessage
               message={`${currentPinnedMessage.slice(
                 0,
@@ -123,6 +127,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
               '&:hover .hide-on-hover': { display: 'none !important' },
               '&:hover .show-on-hover': { display: 'block !important' },
             }}
+            title="Unpin Message"
           >
             <UnpinIcon className="show-on-hover" style={{ display: 'none' }} height={20} width={20} />
             <PinIcon className="hide-on-hover" style={{ display: 'block' }} height={20} width={20} />

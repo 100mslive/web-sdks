@@ -170,7 +170,7 @@ export const RoleChangeModal = ({ peerId, onOpenChange }) => {
                 variant="primary"
                 css={{ width: '100%' }}
                 onClick={async () => {
-                  await hmsActions.changeRole(peerId, selectedRole, peer.isLocal ? true : !requestPermission);
+                  await hmsActions.changeRoleOfPeer(peerId, selectedRole, peer.isLocal ? true : !requestPermission);
                   onOpenChange(false);
                 }}
               >

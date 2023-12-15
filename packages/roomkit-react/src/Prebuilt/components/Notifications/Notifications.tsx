@@ -4,7 +4,6 @@ import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
   HMSRoomState,
-  selectHasPeerHandRaised,
   selectLocalPeerID,
   selectPeerNameByID,
   selectRoomState,
@@ -13,7 +12,8 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { Button } from '../../..';
+import { GroupIcon } from '@100mslive/react-icons';
+import { Box, Button } from '../../..';
 import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
@@ -21,6 +21,7 @@ import { ToastBatcher } from '../Toast/ToastBatcher';
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
+import { HandRaisedNotifications } from './HandRaisedNotifications';
 import { InitErrorModal } from './InitErrorModal';
 import { PeerNotifications } from './PeerNotifications';
 import { PermissionErrorModal } from './PermissionErrorModal';
@@ -91,16 +92,6 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
-      case HMSNotificationTypes.HAND_RAISE_CHANGED: {
-        if (roomState !== HMSRoomState.Connected || notification.data.isLocal) {
-          return;
-        }
-        const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
-        if (hasPeerHandRaised) {
-          ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
-        }
-        break;
-      }
       case HMSNotificationTypes.METADATA_UPDATED:
         if (roomState !== HMSRoomState.Connected) {
           return;
@@ -122,6 +113,16 @@ export function Notifications() {
           if ([500, 6008].includes(notification.data?.code)) {
             ToastManager.addToast({
               title: `Error: ${notification.data?.message}`,
+            });
+          } else if (notification.data?.message === 'role limit reached') {
+            ToastManager.addToast({
+              title: 'The room is currently full, try joining later',
+              close: true,
+              icon: (
+                <Box css={{ color: '$alert_error_default' }}>
+                  <GroupIcon />
+                </Box>
+              ),
             });
           } else {
             ToastManager.addToast({
@@ -219,6 +220,7 @@ export function Notifications() {
       <PermissionErrorModal />
       <InitErrorModal />
       <ChatNotifications />
+      <HandRaisedNotifications />
     </>
   );
 }
