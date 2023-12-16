@@ -74,7 +74,7 @@ test(`Verify pin tile works for peer`, async({context}) => {
     await cb_1.getByTestId('stop_stream_btn').click();
 });
 
-test(`Verify spotlight reflect to local and remote peer @meta`,async({context}) => {
+test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
 
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
