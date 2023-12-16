@@ -110,7 +110,7 @@ test(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
     await page_vnrt.locator("//div[@title='cb1: Hello']").isVisible();
 
     await page_cb.bringToFront();
-    await page_cb.locator("//div[@title='cb1: Hello']/div[2]").click();
+    await page_cb.locator("//div[@title='Unpin Message']").click();
     await page_vnrt.locator("//div[@title='cb1: Hello']").isHidden();
 
     await page_vnrt.bringToFront();
