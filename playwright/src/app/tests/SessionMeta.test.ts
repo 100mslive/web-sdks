@@ -29,7 +29,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
     await cb_1.bringToFront();
 
     await cb_1.getByText("cb1 raised hand").isVisible();
-    await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='raiseHand_icon_onTile']/svg");
+    await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='raiseHand_icon_onTile']/svg").isVisible();
 
     await cb_2.bringToFront();
     await cb_2.getByTestId("hand_raise_btn").click();
@@ -38,7 +38,11 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
     await cb_2.getByTestId("brb_btn").click();
 
     await cb_1.bringToFront();
-    await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='brb_icon_onTile']/svg");
+    await cb_1.locator("//div[@data-testid='participant_tile_cb2']//div[@data-testid='brb_icon_onTile']/svg").isVisible();
+
+    await cb_1.getByTestId('leave_end_dropdown_trigger').click();
+    await cb_1.getByTestId('end_room_btn').click();
+    await cb_1.getByTestId('stop_stream_btn').click();
 });
 
 test(`Verify pin tile works for peer`, async({context}) => {
