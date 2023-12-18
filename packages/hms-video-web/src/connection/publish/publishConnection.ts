@@ -32,18 +32,20 @@ export default class HMSPublishConnection extends HMSConnection {
     // @TODO(eswar): Remove this. Use iceconnectionstate change with interval and threshold.
     this.nativeConnection.onconnectionstatechange = () => {
       this.observer.onConnectionStateChange(this.nativeConnection.connectionState);
-    };
 
-    if (this.nativeConnection.sctp) {
-      this.nativeConnection.sctp.transport.onstatechange = () => {
-        this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
-      };
-      this.nativeConnection.sctp.transport.onerror = (event: Event) => {
-        this.observer.onDTLSTransportError(
-          new Error((event as RTCErrorEvent)?.error?.errorDetail) || 'DTLS Transport failed',
-        );
-      };
-    }
+      // here it replaces the original listener if already present and
+      // handles cases where sctp transport is reinitialised
+      if (this.nativeConnection.sctp) {
+        this.nativeConnection.sctp.transport.onstatechange = () => {
+          this.observer.onDTLSTransportStateChange(this.nativeConnection.sctp?.transport.state);
+        };
+        this.nativeConnection.sctp.transport.onerror = (event: Event) => {
+          this.observer.onDTLSTransportError(
+            new Error((event as RTCErrorEvent)?.error?.errorDetail) || 'DTLS Transport failed',
+          );
+        };
+      }
+    };
   }
 
   initAfterJoin() {

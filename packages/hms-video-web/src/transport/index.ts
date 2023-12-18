@@ -262,8 +262,19 @@ export default class HMSTransport implements ITransport {
       await this.performPublishRenegotiation();
     },
 
-    onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
-      if (state === 'failed' && this.publishConnection?.iceConnectionState === 'connected') {
+    onDTLSTransportStateChange: async (state?: RTCDtlsTransportState) => {
+      const stats = await this.publishConnection?.nativeConnection.getStats();
+      if (stats === undefined) {
+        return;
+      }
+
+      let haveDataChannel = false;
+      stats.forEach(value => {
+        haveDataChannel = haveDataChannel || value['type'] === 'data-channel';
+      });
+
+      // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
+      if (state === 'failed' && !haveDataChannel) {
         this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
         this.observer.onFailure(
           ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, 'DTLS transport state failed', true),
@@ -272,6 +283,7 @@ export default class HMSTransport implements ITransport {
     },
 
     onDTLSTransportError: (error: Error) => {
+      HMSLogger.e(TAG, `onDTLSTransportError ${error.name} ${error.message}`, error);
       this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
     },
 
