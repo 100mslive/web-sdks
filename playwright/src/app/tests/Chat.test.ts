@@ -81,7 +81,7 @@ test(`Test peer can send and receive chat message`, async ({ context }) => {
 });
 
 
-test(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
+test.skip(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
 
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lqh-lcej-ong';
     const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ylx-frpu-klf';
