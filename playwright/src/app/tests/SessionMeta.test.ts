@@ -46,7 +46,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
 });
 
 test(`Verify pin tile works for peer`, async({context}) => {
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/nyx-qmia-mna';
 
     const cb_1 = await context.newPage();
 
@@ -80,7 +80,7 @@ test(`Verify pin tile works for peer`, async({context}) => {
 
 test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
 
-    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
+    const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/slq-lfhh-hjv';
 
     const cb_1 = await context.newPage();
 
