@@ -34,6 +34,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
     await cb_2.bringToFront();
     await cb_2.getByTestId("hand_raise_btn").click();
 
+    await cb_2.getByTestId("chat_btn").click();
     await cb_2.getByTestId("more_settings_btn").click();
     await cb_2.getByTestId("brb_btn").click();
 
