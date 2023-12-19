@@ -228,7 +228,7 @@ const ChatActions = ({
       show: true,
     },
     hide: {
-      text: 'Hide for everyone',
+      text: message.recipientPeer ? 'Hide for both' : 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
       onClick: async () => {
         blacklistMessage(message.id);

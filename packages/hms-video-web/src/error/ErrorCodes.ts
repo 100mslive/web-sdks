@@ -145,6 +145,8 @@ export const ErrorCodes = {
 
     MISSING_RTCPEERCONNECTION: 6011,
     LOCAL_STORAGE_ACCESS_DENIED: 6012,
+    // peer not present or role not present or any general validation
+    VALIDATION_FAILED: 6013,
   },
 
   PlaylistErrors: {

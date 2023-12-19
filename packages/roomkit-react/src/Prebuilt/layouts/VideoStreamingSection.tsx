@@ -30,6 +30,7 @@ import {
   useWaitingViewerRole,
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
+import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -55,6 +56,7 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  useCloseScreenshareWhiteboard();
 
   useEffect(() => {
     if (!isConnected) {
