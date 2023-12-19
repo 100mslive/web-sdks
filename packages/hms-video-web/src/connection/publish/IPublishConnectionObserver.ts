@@ -6,4 +6,8 @@ export interface IPublishConnectionObserver extends IConnectionObserver {
    * - A new data-channel is added/removed
    */
   onRenegotiationNeeded(): Promise<void>;
+
+  onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => void;
+
+  onDTLSTransportError: (error: Error) => void;
 }
