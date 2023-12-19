@@ -455,9 +455,8 @@ test(`Verify peer can remove other peer`, async({context}) => {
 
 });
 
-//ToDo: Update url
 test(`Verify peer mute and unmute peers`, async({context}) => {
-        const co_broadcasterUrl = 'https://ketul-livestream-1633.qa-app.100ms.live/streaming/meeting/rnx-estq-ivy';
+        const co_broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gno-sbuc-lyw';
         
         const page_b = await context.newPage();
 
@@ -509,10 +508,9 @@ test(`Verify peer mute and unmute peers`, async({context}) => {
         await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_avatar_icon']").isHidden();
 });
 
-//ToDo: Update url
 test(`Check role limit test`, async({context}) => {
 
-        const hostUrl = "https://hms-8515.qa-app.100ms.live/streaming/meeting/lcl-xtfy-iuf"
+        const hostUrl = "https://role-limit-check.app.100ms.live/meeting/ifb-edpm-pcv"
 
         const page_b = await context.newPage();
 
