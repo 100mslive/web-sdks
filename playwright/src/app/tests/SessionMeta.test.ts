@@ -9,7 +9,7 @@ test.afterEach(async ({ context }) => {
 });
 
 
-test(`Verify BRB and hand raise is displayed for other peers`, async({context}) => {
+test(`Verify BRB and hand raise is displayed for other peers @brb`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/pjk-bqfv-yhv';
 
     const cb_1 = await context.newPage();
@@ -34,6 +34,7 @@ test(`Verify BRB and hand raise is displayed for other peers`, async({context}) 
     await cb_2.bringToFront();
     await cb_2.getByTestId("hand_raise_btn").click();
 
+    await cb_2.getByTestId("chat_btn").click();
     await cb_2.getByTestId("more_settings_btn").click();
     await cb_2.getByTestId("brb_btn").click();
 
