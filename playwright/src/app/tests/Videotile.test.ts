@@ -29,13 +29,13 @@ test(`Verify simulcast layer getting published as set in template @sim`, async({
     //await page_cb1.getByText("Currently streaming: High (1270x720)").click();
 
     await page_cb1.getByText("Remove Participant").scrollIntoViewIfNeeded;
-    await page_cb1.getByText("low");
-    await page_cb1.getByText("medium");
-    await page_cb1.getByText("high");
+    await page_cb1.getByText("low").isVisible();
+    await page_cb1.getByText("medium").isVisible();
+    await page_cb1.getByText("high").isVisible();
 
-    await page_cb1.getByText("320x180");
-    await page_cb1.getByText("640x360");
-    await page_cb1.getByText("1280x720");
+    await page_cb1.getByText("320x180").isVisible();
+    await page_cb1.getByText("640x360").isVisible();
+    await page_cb1.getByText("1280x720").isVisible();
 
     await page_cb1.getByTestId('leave_end_dropdown_trigger').click();
     await page_cb1.getByTestId('end_room_btn').click();
