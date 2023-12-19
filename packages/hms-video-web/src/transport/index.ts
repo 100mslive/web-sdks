@@ -257,29 +257,46 @@ export default class HMSTransport implements ITransport {
   private signal: ISignal = new JsonRpcSignal(this.signalObserver);
   private analyticsSignalTransport = new SignalAnalyticsTransport(this.signal);
 
+  private publishDtlsStateTimer = 0;
+  private lastPublishDtlsState: RTCDtlsTransportState = 'new';
+
   private publishConnectionObserver: IPublishConnectionObserver = {
     onRenegotiationNeeded: async () => {
       await this.performPublishRenegotiation();
     },
 
-    onDTLSTransportStateChange: async (state?: RTCDtlsTransportState) => {
-      const stats = await this.publishConnection?.nativeConnection.getStats();
-      if (stats === undefined) {
+    // eslint-disable-next-line complexity
+    onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
+      const dataChannelState = this.publishConnection?.channel.readyState;
+      const log = state === 'failed' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Publisher on dtls transport state change: ${state}, data-channel state: ${dataChannelState}`);
+
+      if (!state || this.lastPublishDtlsState === state) {
         return;
       }
 
-      let haveDataChannel = false;
-      stats.forEach(value => {
-        haveDataChannel = haveDataChannel || value['type'] === 'data-channel';
-      });
-
-      // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
-      if (state === 'failed' && !haveDataChannel) {
-        this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
-        this.observer.onFailure(
-          ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, 'DTLS transport state failed', true),
-        );
+      this.lastPublishDtlsState = state;
+      if (this.publishDtlsStateTimer !== 0) {
+        clearTimeout(this.publishDtlsStateTimer);
+        this.publishDtlsStateTimer = 0;
       }
+
+      if (state !== 'connecting' && state !== 'failed') {
+        return;
+      }
+
+      // if we're in connecting check again after timeout
+      // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
+      this.publishDtlsStateTimer = window.setTimeout(() => {
+        const newState = this.publishConnection?.nativeConnection.connectionState;
+        if (newState && state && newState === state) {
+          // stuck in either `connecting` or `failed` state for long time
+          this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
+          this.observer.onFailure(
+            ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, `DTLS transport state ${state}`, true),
+          );
+        }
+      }, 50 * 1000);
     },
 
     onDTLSTransportError: (error: Error) => {

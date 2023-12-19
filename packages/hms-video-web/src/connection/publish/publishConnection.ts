@@ -9,15 +9,17 @@ export default class HMSPublishConnection extends HMSConnection {
   private readonly TAG = '[HMSPublishConnection]';
   private readonly observer: IPublishConnectionObserver;
   readonly nativeConnection: RTCPeerConnection;
+  readonly channel: RTCDataChannel;
 
   constructor(signal: ISignal, config: RTCConfiguration, observer: IPublishConnectionObserver) {
     super(HMSConnectionRole.Publish, signal);
     this.observer = observer;
 
     this.nativeConnection = new RTCPeerConnection(config);
-    this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
+    this.channel = this.nativeConnection.createDataChannel(API_DATA_CHANNEL, {
       protocol: 'SCTP',
     });
+    this.channel.onerror = ev => HMSLogger.e(this.TAG, `publish data channel onerror ${ev}`, ev);
 
     this.nativeConnection.onicecandidate = ({ candidate }) => {
       if (candidate) {
