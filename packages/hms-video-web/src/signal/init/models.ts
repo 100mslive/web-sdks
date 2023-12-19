@@ -37,6 +37,10 @@ export interface InitConfig {
       readonly maxSampleWindowSize: number;
       readonly maxSamplePushInterval: number;
     };
+    readonly dtlsStateTimeouts?: {
+      readonly connecting: number;
+      readonly failed: number;
+    };
   };
 }
 

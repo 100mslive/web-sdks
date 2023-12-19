@@ -267,9 +267,8 @@ export default class HMSTransport implements ITransport {
 
     // eslint-disable-next-line complexity
     onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
-      const dataChannelState = this.publishConnection?.channel.readyState;
       const log = state === 'failed' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
-      log(TAG, `Publisher on dtls transport state change: ${state}, data-channel state: ${dataChannelState}`);
+      log(TAG, `Publisher on dtls transport state change: ${state}`);
 
       if (!state || this.lastPublishDtlsState === state) {
         return;
@@ -285,18 +284,26 @@ export default class HMSTransport implements ITransport {
         return;
       }
 
+      const timeout = this.initConfig?.config?.dtlsStateTimeouts?.[state];
+      if (!timeout || timeout <= 0) {
+        return;
+      }
+
       // if we're in connecting check again after timeout
       // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
       this.publishDtlsStateTimer = window.setTimeout(() => {
         const newState = this.publishConnection?.nativeConnection.connectionState;
         if (newState && state && newState === state) {
           // stuck in either `connecting` or `failed` state for long time
-          this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(new Error('DTLS transport state failed')));
-          this.observer.onFailure(
-            ErrorFactory.WebrtcErrors.ICEFailure(HMSAction.PUBLISH, `DTLS transport state ${state}`, true),
+          const err = ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.PUBLISH,
+            `DTLS transport state ${state} timeout:${timeout}ms`,
+            true,
           );
+          this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
+          this.observer.onFailure(err);
         }
-      }, 50 * 1000);
+      }, timeout);
     },
 
     onDTLSTransportError: (error: Error) => {
