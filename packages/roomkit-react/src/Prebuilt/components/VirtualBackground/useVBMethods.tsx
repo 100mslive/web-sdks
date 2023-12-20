@@ -10,10 +10,10 @@ export const useVBMethods = () => {
   const HMSVBPluginRef = useRef(HMSVBPluginObject);
 
   return {
-    // @ts-ignore
     background: useEffectsVB
-      ? EffectsVBPluginRef.current.getBackground()
-      : HMSVBPluginRef.current.background?.src || HMSVBPluginRef.current.background,
+      ? EffectsVBPluginRef.current?.getBackground()
+      : // @ts-ignore
+        HMSVBPluginRef.current.background?.src || HMSVBPluginRef.current.background,
     setBlur: async (blurPower: number) => {
       if (useEffectsVB) {
         EffectsVBPluginRef.current?.setBlur(blurPower);
