@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -89,6 +89,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
+    } else {
+      inputRef.current?.focus();
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
   const sendMessage = useCallback(async () => {
@@ -109,8 +111,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
         onSend();
       }, 0);
     } catch (error) {
-      const err = error as Error;
-      ToastManager.addToast({ title: err.message });
+      const err = error as HMSException;
+      ToastManager.addToast({
+        title: err.message.startsWith('Invalid peer') ? `${selectedPeer.name} is not in this room` : err.message,
+      });
     }
   }, [selectedRole, selectedPeer, hmsActions, onSend]);
 

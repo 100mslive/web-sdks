@@ -4,7 +4,14 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import { selectIsConnectedToRoom, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  selectIsConnectedToRoom,
+  selectLocalPeerRoleName,
+  selectPeerScreenSharing,
+  selectWhiteboard,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
@@ -16,13 +23,14 @@ import { PDFView } from './PDFView';
 import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
-// import { useWhiteboardMetadata } from '../plugins/whiteboard';
+import { WhiteboardView } from './WhiteboardView';
 import {
   usePDFConfig,
   useUrlToEmbed,
   useWaitingViewerRole,
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
+import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -40,12 +48,15 @@ export const VideoStreamingSection = ({
   hideControls: boolean;
 }) => {
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
-  // const { whiteboardOwner: whiteboardShared } = useWhiteboardMetadata();
   const isConnected = useHMSStore(selectIsConnectedToRoom);
+  const peerSharing = useHMSStore(selectPeerScreenSharing);
+  const isWhiteboardOpen = useHMSStore(selectWhiteboard)?.open;
+
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  useCloseScreenshareWhiteboard();
 
   useEffect(() => {
     if (!isConnected) {
@@ -75,6 +86,12 @@ export const VideoStreamingSection = ({
     ViewComponent = <PDFView />;
   } else if (urlToIframe) {
     ViewComponent = <EmbedView />;
+  } else if (peerSharing) {
+    // screen share should take preference over whiteboard
+    //@ts-ignore
+    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
+  } else if (isWhiteboardOpen) {
+    ViewComponent = <WhiteboardView />;
   } else {
     //@ts-ignore
     ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;

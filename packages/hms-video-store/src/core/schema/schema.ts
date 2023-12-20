@@ -6,7 +6,14 @@ import { HMSRoleChangeStoreRequest } from './requests';
 import { HMSRole } from './role';
 import { HMSRoom, HMSRoomState } from './room';
 import { HMSMediaSettings } from './settings';
-import { DeviceMap, HMSConnectionQuality, HMSPeerStats, HMSPoll, HMSTrackStats } from '../hmsSDKStore/sdkTypes';
+import {
+  DeviceMap,
+  HMSConnectionQuality,
+  HMSPeerStats,
+  HMSPoll,
+  HMSTrackStats,
+  HMSWhiteboard,
+} from '../hmsSDKStore/sdkTypes';
 
 export interface HMSGenericTypes {
   sessionStore: Record<string, any>;
@@ -46,6 +53,8 @@ export interface HMSStore<T extends HMSGenericTypes = { sessionStore: Record<str
   polls: Record<string, HMSPoll>;
   /** @internal */
   hideLocalPeer: boolean;
+  /** @alpha */
+  whiteboards: Record<string, HMSWhiteboard>;
 }
 
 export interface HMSStatsStore {
@@ -128,6 +137,7 @@ export const createDefaultStoreState = <T extends HMSGenericTypes>(): HMSStore<T
     sessionStore: {},
     templateAppData: {},
     polls: {},
+    whiteboards: {},
     hideLocalPeer: false,
   };
 };

@@ -36,7 +36,7 @@ import emptyChat from '../../images/empty-chat.svg';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
 import { useChatBlacklist } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
@@ -71,7 +71,7 @@ const MessageTypeContainer = ({ left, right }) => {
     <Flex
       align="center"
       css={{
-        ml: 'auto',
+        ml: '$2',
         mr: '$4',
         gap: '$space$2',
       }}
@@ -80,7 +80,7 @@ const MessageTypeContainer = ({ left, right }) => {
         <SenderName
           variant="xs"
           as="span"
-          css={{ color: '$on_surface_medium', pl: '$1', textTransform: 'capitalize', fontWeight: '$regular' }}
+          css={{ color: '$on_surface_medium', textTransform: 'capitalize', fontWeight: '$regular' }}
         >
           {left}
         </SenderName>
@@ -89,7 +89,10 @@ const MessageTypeContainer = ({ left, right }) => {
         <SenderName
           as="span"
           variant="overline"
-          css={{ textTransform: 'uppercase', background: '$primary_dim', p: '$1 $2', r: '$1', fontWeight: '$semiBold' }}
+          css={{
+            color: '$on_surface_medium',
+            fontWeight: '$regular',
+          }}
         >
           {right}
         </SenderName>
@@ -103,12 +106,12 @@ const MessageType = ({ roles, hasCurrentUserSent, receiver }) => {
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   if (receiver) {
     return (
-      <MessageTypeContainer left={hasCurrentUserSent ? `${peerName ? `to ${peerName}` : ''}` : 'to You'} right="DM" />
+      <MessageTypeContainer left={hasCurrentUserSent ? `${peerName ? `to ${peerName}` : ''}` : 'to You'} right="(DM)" />
     );
   }
 
   if (roles && roles.length) {
-    return <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles[0] : localPeerRoleName}`} right="ROLE" />;
+    return <MessageTypeContainer left={`to ${hasCurrentUserSent ? roles[0] : localPeerRoleName}`} right="(Group)" />;
   }
   return null;
 };
@@ -156,8 +159,8 @@ const getMessageType = ({ roles, receiver }) => {
 const ChatActions = ({
   onPin,
   showPinAction,
-  onReplyPrivately,
-  showReplyPrivateAction,
+  onReply,
+  showReply,
   message,
   sentByLocalPeer,
   isMobile,
@@ -204,11 +207,11 @@ const ChatActions = ({
 
   const options = {
     reply: {
-      text: 'Reply Privately',
-      tooltipText: 'Reply privately',
+      text: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
+      tooltipText: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
       icon: <ReplyIcon style={iconStyle} />,
-      onClick: onReplyPrivately,
-      show: showReplyPrivateAction,
+      onClick: onReply,
+      show: showReply,
     },
     pin: {
       text: 'Pin message',
@@ -225,7 +228,7 @@ const ChatActions = ({
       show: true,
     },
     hide: {
-      text: 'Hide for everyone',
+      text: message.recipientPeer ? 'Hide for both' : 'Hide for everyone',
       icon: <EyeCloseIcon style={iconStyle} />,
       onClick: async () => {
         blacklistMessage(message.id);
@@ -393,7 +396,7 @@ const SenderName = styled(Text, {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  maxWidth: '16ch',
+  maxWidth: '14ch',
   minWidth: 0,
   color: '$on_surface_high',
   fontWeight: '$semiBold',
@@ -411,18 +414,25 @@ const ChatMessage = React.memo(
     }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+    const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
-    const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-    const [, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
+    const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+    const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
     });
     const [openSheet, setOpenSheet] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
+    let showReply = false;
+    if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
+      showReply = true;
+    } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
+      showReply = true;
+    }
+
     useEffect(() => {
       if (message.id && !message.read && inView) {
         hmsActions.setMessageRead(true, message.id);
@@ -539,8 +549,16 @@ const ChatMessage = React.memo(
               showPinAction={showPinAction}
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
-              onReplyPrivately={() => setPeerSelector({ id: message.sender, name: message.senderName })}
-              showReplyPrivateAction={!selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled}
+              onReply={() => {
+                if (message.recipientRoles?.length) {
+                  setRoleSelector(message.recipientRoles[0]);
+                  setPeerSelector({});
+                } else {
+                  setRoleSelector('');
+                  setPeerSelector({ id: message.sender, name: message.senderName });
+                }
+              }}
+              showReply={showReply}
               isMobile={isMobile}
               openSheet={openSheet}
               setOpenSheet={setOpenSheet}

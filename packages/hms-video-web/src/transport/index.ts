@@ -23,7 +23,14 @@ import { ErrorFactory } from '../error/ErrorFactory';
 import { HMSAction } from '../error/HMSAction';
 import { HMSException } from '../error/HMSException';
 import { EventBus } from '../events/EventBus';
-import { HLSConfig, HLSTimedMetadata, HMSRole, HMSRoleChangeRequest } from '../interfaces';
+import {
+  HLSConfig,
+  HLSTimedMetadata,
+  HMSPermissionType,
+  HMSRole,
+  HMSRoleChangeRequest,
+  HMSWhiteboardCreateOptions,
+} from '../interfaces';
 import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import { HMSLocalTrack, HMSLocalVideoTrack, HMSTrack } from '../media/tracks';
@@ -34,6 +41,7 @@ import { IStore } from '../sdk/store';
 import InitService from '../signal/init';
 import { InitConfig, InitFlags } from '../signal/init/models';
 import {
+  CreateWhiteboardResponse,
   findPeersRequestParams,
   HLSRequestParams,
   HLSTimedMetadataParams,
@@ -249,9 +257,58 @@ export default class HMSTransport implements ITransport {
   private signal: ISignal = new JsonRpcSignal(this.signalObserver);
   private analyticsSignalTransport = new SignalAnalyticsTransport(this.signal);
 
+  private publishDtlsStateTimer = 0;
+  private lastPublishDtlsState: RTCDtlsTransportState = 'new';
+
   private publishConnectionObserver: IPublishConnectionObserver = {
     onRenegotiationNeeded: async () => {
       await this.performPublishRenegotiation();
+    },
+
+    // eslint-disable-next-line complexity
+    onDTLSTransportStateChange: (state?: RTCDtlsTransportState) => {
+      const log = state === 'failed' ? HMSLogger.w.bind(HMSLogger) : HMSLogger.d.bind(HMSLogger);
+      log(TAG, `Publisher on dtls transport state change: ${state}`);
+
+      if (!state || this.lastPublishDtlsState === state) {
+        return;
+      }
+
+      this.lastPublishDtlsState = state;
+      if (this.publishDtlsStateTimer !== 0) {
+        clearTimeout(this.publishDtlsStateTimer);
+        this.publishDtlsStateTimer = 0;
+      }
+
+      if (state !== 'connecting' && state !== 'failed') {
+        return;
+      }
+
+      const timeout = this.initConfig?.config?.dtlsStateTimeouts?.[state];
+      if (!timeout || timeout <= 0) {
+        return;
+      }
+
+      // if we're in connecting check again after timeout
+      // hotfix: mitigate https://100ms.atlassian.net/browse/LIVE-1924
+      this.publishDtlsStateTimer = window.setTimeout(() => {
+        const newState = this.publishConnection?.nativeConnection.connectionState;
+        if (newState && state && newState === state) {
+          // stuck in either `connecting` or `failed` state for long time
+          const err = ErrorFactory.WebrtcErrors.ICEFailure(
+            HMSAction.PUBLISH,
+            `DTLS transport state ${state} timeout:${timeout}ms`,
+            true,
+          );
+          this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(err));
+          this.observer.onFailure(err);
+        }
+      }, timeout);
+    },
+
+    onDTLSTransportError: (error: Error) => {
+      HMSLogger.e(TAG, `onDTLSTransportError ${error.name} ${error.message}`, error);
+      this.eventBus.analytics.publish(AnalyticsEventFactory.disconnect(error));
     },
 
     onIceConnectionChange: async (newState: RTCIceConnectionState) => {
@@ -744,6 +801,14 @@ export default class HMSTransport implements ITransport {
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
     return this.signal.getPollResult(params);
+  }
+
+  getWhiteboard(params: { id: string; permission?: Array<HMSPermissionType> }) {
+    return this.signal.getWhiteboard(params);
+  }
+
+  createWhiteboard(params: HMSWhiteboardCreateOptions): Promise<CreateWhiteboardResponse> {
+    return this.signal.createWhiteboard(params);
   }
 
   async joinGroup(name: string): Promise<JoinLeaveGroupResponse> {
