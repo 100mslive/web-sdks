@@ -455,7 +455,7 @@ test(`Verify peer can remove other peer`, async({context}) => {
 
 });
 
-test(`Verify peer mute and unmute peers`, async({context}) => {
+test(`Verify peer mute and unmute peers @mute`, async({context}) => {
         const co_broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gno-sbuc-lyw';
         
         const page_b = await context.newPage();
@@ -481,6 +481,7 @@ test(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.getByTestId('participant_tile_broadcaster').hover();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').hover();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('mute_audio_participant_btn').click();
 
@@ -489,6 +490,7 @@ test(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.getByTestId('participant_tile_broadcaster').hover();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').hover();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('unmute_video_participant_btn').click();
 
@@ -497,6 +499,7 @@ test(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.bringToFront();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').hover();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('unmute_audio_participant_btn').click();
 
