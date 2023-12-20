@@ -40,7 +40,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
 
   const { vbObject, setBlur, setBackground, removeEffects, isVideoStreamPlugin, background } = useVBMethods();
-  console.log('ollo', background);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(vbObject.getName()));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
     background as string | HMSVirtualBackgroundTypes,

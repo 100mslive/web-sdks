@@ -1,17 +1,21 @@
 import { useRef } from 'react';
 import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 
+const HMSVBPluginObject = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
+const EffectsVBPluginObject = new HMSEffectsPlugin();
+
 export const useVBMethods = () => {
   const useEffectsVB = true;
-  const EffectsVBPluginRef = useRef(useEffectsVB ? new HMSEffectsPlugin() : null);
-  const HMSVBPluginRef = useRef(new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE));
+  const EffectsVBPluginRef = useRef(useEffectsVB ? EffectsVBPluginObject : null);
+  const HMSVBPluginRef = useRef(HMSVBPluginObject);
 
   return {
     // @ts-ignore
-    background: useEffectsVB ? EffectsVBPluginRef.current.getBackground() : HMSVBPluginRef.current.background,
+    background: useEffectsVB
+      ? EffectsVBPluginRef.current.getBackground()
+      : HMSVBPluginRef.current.background?.src || HMSVBPluginRef.current.background,
     setBlur: async (blurPower: number) => {
       if (useEffectsVB) {
-        console.log('ollo blur', blurPower);
         EffectsVBPluginRef.current?.setBlur(blurPower);
       } else {
         await HMSVBPluginRef.current.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
@@ -19,7 +23,6 @@ export const useVBMethods = () => {
     },
     setBackground: async (mediaURL: string) => {
       if (useEffectsVB) {
-        console.log('ollo setbg', mediaURL);
         EffectsVBPluginRef.current?.setBackground(mediaURL);
       } else {
         const img = document.createElement('img');
@@ -39,7 +42,6 @@ export const useVBMethods = () => {
     },
     removeEffects: async () => {
       if (useEffectsVB) {
-        console.log('ollo remove');
         EffectsVBPluginRef.current?.removeEffects();
       } else {
         await HMSVBPluginRef.current.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
