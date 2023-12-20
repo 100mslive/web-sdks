@@ -78,7 +78,6 @@ export const DesktopLeaveRoom = ({
                   color: '$on_surface_medium',
                   '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
                 }}
-                onClick={async () => await leaveRoom()}
                 data-testid="just_leave_btn"
               >
                 <LeaveCard
