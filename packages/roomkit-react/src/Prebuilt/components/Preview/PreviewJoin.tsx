@@ -175,7 +175,7 @@ const PreviewJoin = ({
           </Flex>
         ) : null}
         <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
-          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!virtual_background} />
+          <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
             name={name}
             disabled={!!initialName}
@@ -278,7 +278,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {!isMobile && (vbEnabled || true) ? <VBToggle /> : null}
+        {!isMobile && vbEnabled ? <VBToggle /> : null}
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>

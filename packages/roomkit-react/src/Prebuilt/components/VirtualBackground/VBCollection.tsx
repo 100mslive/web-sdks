@@ -14,7 +14,7 @@ export const VBCollection = ({
     icon?: React.JSX.Element;
     onClick?: () => Promise<void>;
     mediaURL?: string;
-    value: string | HMSVirtualBackgroundTypes.BLUR | HMSVirtualBackgroundTypes.NONE;
+    value: string | HMSVirtualBackgroundTypes;
   }[];
   title: string;
   activeBackground: string;
