@@ -5,7 +5,7 @@ const HMSVBPluginObject = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVir
 const EffectsVBPluginObject = new HMSEffectsPlugin();
 
 export const useVBMethods = () => {
-  const useEffectsVB = true;
+  const useEffectsVB = false;
   const EffectsVBPluginRef = useRef(useEffectsVB ? EffectsVBPluginObject : null);
   const HMSVBPluginRef = useRef(HMSVBPluginObject);
 

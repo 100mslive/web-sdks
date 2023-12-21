@@ -1,4 +1,5 @@
 import { HMSMediaStreamPlugin } from './HMSMediaStreamPlugin';
+import HMSLogger from '../../utils/logger';
 
 export class HMSMediaStreamPluginsManager {
   private plugins = new Set<HMSMediaStreamPlugin>();
@@ -17,10 +18,9 @@ export class HMSMediaStreamPluginsManager {
     let processedStream = inputStream;
     for (const plugin of this.plugins) {
       try {
-        console.log('ps', processedStream.getVideoTracks()[0]);
         processedStream = plugin.apply(processedStream);
       } catch (e) {
-        console.error('could not apply plugin', e, plugin);
+        HMSLogger.e('Could not apply plugin', e, plugin);
       }
     }
     return processedStream;
