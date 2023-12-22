@@ -16,6 +16,7 @@ import {
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
+import { useHMSPrebuiltContext } from '../../AppContext';
 import { VBCollection } from './VBCollection';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
@@ -39,6 +40,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsSDKEnabled = useHMSStore(selectAppData('isEffectsSDKEnabled'));
+  const { effectsSDKKey } = useHMSPrebuiltContext();
   const vbPluginRef = useRef<VBPlugin | null>(null);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(vbPluginRef.current?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
@@ -81,8 +83,8 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       return;
     }
 
-    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled);
-  }, [isEffectsSDKEnabled]);
+    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled, effectsSDKKey);
+  }, [isEffectsSDKEnabled, effectsSDKKey]);
 
   useEffect(() => {
     if (!isPluginAdded) {
