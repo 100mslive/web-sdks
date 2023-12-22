@@ -1,6 +1,6 @@
 import { tsvb } from 'effects-sdk';
 import { HMSMediaStreamPlugin } from '@100mslive/hms-video';
-import { EFFECTS_SDK_ASSETS, EFFECTS_SDK_KEY } from './constants';
+import { EFFECTS_SDK_ASSETS } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 
 export type HMSEffectsBackground = string | MediaStream | MediaStreamTrack | HTMLVideoElement;
@@ -12,8 +12,8 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private background: HMSEffectsBackground = '';
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
 
-  constructor() {
-    this.effects = new tsvb(EFFECTS_SDK_KEY);
+  constructor(effectsSDKKey: string) {
+    this.effects = new tsvb(effectsSDKKey);
     this.effects.config({
       sdk_url: EFFECTS_SDK_ASSETS,
       models: {

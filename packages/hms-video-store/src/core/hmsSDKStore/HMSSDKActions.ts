@@ -1003,6 +1003,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
+      if (!store.appData) {
+        store.appData = {};
+      }
+      store.appData.isEffectsSDKEnabled = sdkRoom.isEffectsSDKEnabled;
       store.room.roomState = HMSRoomState.Preview;
     }, 'previewStart');
     this.syncRoomState('previewSync');
@@ -1027,7 +1031,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
+      if (!store.appData) {
+        store.appData = {};
+      }
+      store.appData.isEffectsSDKEnabled = sdkRoom.isEffectsSDKEnabled;
     }, 'joined');
+
     playlistManager.onProgress(this.setProgress);
     playlistManager.onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
       this.syncPlaylistState(`${item.type}PlaylistUpdate`);

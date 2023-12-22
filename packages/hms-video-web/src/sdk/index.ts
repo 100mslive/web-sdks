@@ -63,7 +63,7 @@ import { NotificationManager } from '../notification-manager/NotificationManager
 import { PlaylistManager } from '../playlist-manager';
 import { SessionStore } from '../session-store';
 import { InteractivityCenter } from '../session-store/interactivity-center';
-import { InitConfig } from '../signal/init/models';
+import { InitConfig, InitFlags } from '../signal/init/models';
 import HMSTransport from '../transport';
 import ITransportObserver from '../transport/ITransportObserver';
 import { TransportState } from '../transport/models/TransportState';
@@ -387,6 +387,7 @@ export class HMSSdk implements HMSInterface {
         this.analyticsTimer.end(TimedEvent.PREVIEW);
         const room = this.store.getRoom();
         if (room) {
+          room.isEffectsSDKEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
           listener.onPreview(room, tracks);
         }
         this.sendPreviewAnalyticsEvent();
@@ -1130,6 +1131,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     room.joinedAt = new Date();
+    room.isEffectsSDKEnabled = this.transport.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
     if (localPeer) {
       localPeer.joinedAt = room.joinedAt;
     }

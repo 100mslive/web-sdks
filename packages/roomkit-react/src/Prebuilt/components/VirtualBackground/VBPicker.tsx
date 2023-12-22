@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { selectLocalPeerRole } from '@100mslive/hms-video-store';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
@@ -21,7 +21,7 @@ import { VBCollection } from './VBCollection';
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-import { useVBMethods } from './useVBMethods';
+import { VBPlugin } from './useVBMethods';
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia } from './constants';
 
@@ -38,11 +38,11 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-
-  const { vbObject, setBlur, setBackground, removeEffects, isVideoStreamPlugin, background } = useVBMethods();
-  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(vbObject.getName()));
+  const isEffectsSDKEnabled = useHMSStore(selectAppData('isEffectsSDKEnabled'));
+  const vbPluginRef = useRef<VBPlugin | null>(null);
+  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(vbPluginRef.current?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
-    background as string | HMSVirtualBackgroundTypes,
+    vbPluginRef.current?.getBackground() as string | HMSVirtualBackgroundTypes,
   );
 
   const mediaList = [
@@ -55,7 +55,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
 
   async function disableEffects() {
     if (isPluginAdded) {
-      removeEffects();
+      vbPluginRef.current?.removeEffects();
       setActiveBackground(HMSVirtualBackgroundTypes.NONE);
     }
   }
@@ -67,18 +67,28 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
         return;
       }
       if (mediaURL) {
-        setBackground(mediaURL);
+        vbPluginRef.current?.setBackground(mediaURL);
       } else if (blurPower) {
-        setBlur(blurPower);
+        vbPluginRef.current?.setBlur(blurPower);
       }
       setActiveBackground(mediaURL || (blurPower ? HMSVirtualBackgroundTypes.BLUR : HMSVirtualBackgroundTypes.NONE));
     },
-    [localPeer?.videoTrack, setBackground, setBlur],
+    [localPeer?.videoTrack],
   );
 
   useEffect(() => {
+    if (vbPluginRef.current) {
+      return;
+    }
+
+    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled);
+  }, [isEffectsSDKEnabled]);
+
+  useEffect(() => {
     if (!isPluginAdded) {
-      if (isVideoStreamPlugin) {
+      const vbObject = vbPluginRef.current?.getVBObject();
+      if (!vbObject || !role) return;
+      if (isEffectsSDKEnabled) {
         // @ts-ignore
         hmsActions.addPluginsToVideoStream([vbObject]);
       } else {
@@ -86,7 +96,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
         hmsActions.addPluginToVideoTrack(vbObject, Math.floor(role.publishParams.video.frameRate / 2));
       }
     }
-  }, [hmsActions, role, vbObject, isPluginAdded, isVideoStreamPlugin]);
+  }, [hmsActions, role, isPluginAdded, isEffectsSDKEnabled]);
 
   useEffect(() => {
     if (!isVideoOn) {
