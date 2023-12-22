@@ -15,7 +15,7 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test('Broadcaster is able to invite VNRT on stage with one click/force.', async({context}) =>  {
+test('Broadcaster is able to invite VNRT on stage with one click/force. @qaonly', async({context}) =>  {
     const broadcasterUrl = 'https://sahil-livestream-1207.app.100ms.live/streaming/meeting/sim-sbtw-svm';
     const hlsviewerUrl = 'https://sahil-livestream-1207.app.100ms.live/streaming/meeting/cfn-mafp-ewd';
 
@@ -60,7 +60,7 @@ test('Broadcaster is able to invite VNRT on stage with one click/force.', async(
 
 })
 
-test('Broadcaster is able to invite VRT on stage with one click/force.', async({context}) =>  {
+test('Broadcaster is able to invite VRT on stage with one click/force. @qaonly', async({context}) =>  {
     const broadcasterUrl = 'https://sahil-livestream-1207.app.100ms.live/streaming/meeting/sim-sbtw-svm';
     const hlsviewerUrl = 'https://sahil-livestream-1207.app.100ms.live/streaming/meeting/cbg-ojjo-usk';
 
