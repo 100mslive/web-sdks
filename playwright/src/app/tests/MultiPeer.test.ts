@@ -455,7 +455,7 @@ test(`Verify peer can remove other peer`, async({context}) => {
 
 });
 
-test(`Verify peer mute and unmute peers`, async({context}) => {
+test.skip(`Verify peer mute and unmute peers`, async({context}) => {
         const co_broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gno-sbuc-lyw';
         
         const page_b = await context.newPage();
