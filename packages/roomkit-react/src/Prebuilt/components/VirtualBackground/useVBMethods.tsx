@@ -4,9 +4,9 @@ export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: HMSEffectsPlugin;
 
-  constructor(private useEffectsVB = false, private effectsSDKKey = '') {
+  constructor(private useEffectsVB = false, private effectsSDKKey: string) {
     if (useEffectsVB) {
-      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey || '');
+      this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey || '');
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
