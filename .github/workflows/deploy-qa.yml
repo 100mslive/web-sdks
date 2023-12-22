@@ -47,7 +47,7 @@ jobs:
       REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT: https://auth-nonprod.100ms.live/v2/token
       REACT_APP_DASHBOARD_BASE_ENDPOINT: https://qa-in2-ipv6.100ms.live/hmsapi/
       REACT_APP_DASHBOARD_LINK: https://app-qa.100ms.live/
-      REACT_APP_EFFECTS_SDK_KEY: '22d268435824179e93a2e3da317306dfb0c72f7a';
+      REACT_APP_EFFECTS_SDK_KEY: '22d268435824179e93a2e3da317306dfb0c72f7a'
     steps:
       - name: log inputs
         run: |
