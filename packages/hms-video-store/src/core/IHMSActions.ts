@@ -4,6 +4,7 @@ import {
   HMSAudioTrackSettings,
   HMSConfig,
   HMSLogLevel,
+  HMSMediaStreamPlugin,
   HMSMidCallPreviewConfig,
   HMSPlaylistSettings,
   HMSPluginSupportResult,
@@ -218,6 +219,22 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    * @see HMSVideoPlugin
    */
   addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void>;
+
+  /**
+   * Add  video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
+   * Video plugins can be added/removed at any time after the video track is available.
+   * @param plugin HMSMediaStreamPlugin
+   * @see HMSMediaStreamPlugin
+   */
+  addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
+
+  /**
+   * Remove video plugins to the local peer video stream. Eg. Virtual Background, Face Filters etc.
+   * Video plugins can be added/removed at any time after the video track is available.
+   * @param plugin HMSMediaStreamPlugin
+   * @see HMSMediaStreamPlugin
+   */
+  removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void>;
 
   /**
    * To check the support of the plugin, based on browser, os and audio devices
