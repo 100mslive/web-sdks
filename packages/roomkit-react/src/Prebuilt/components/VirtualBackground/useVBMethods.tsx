@@ -2,24 +2,24 @@ import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100ms
 
 export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
-  private effectsPlugin?: HMSEffectsPlugin;
+  private effectsPlugin?: HMSEffectsPlugin | undefined;
 
-  constructor(private effectsSDKKey?: string) {
-    if (this.effectsSDKKey) {
-      this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey);
+  constructor(effectsSDKKey?: string) {
+    if (effectsSDKKey) {
+      this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey);
     } else {
       console.error(
         'The API key for using Effects virtual background is missing. Defaulting to standard virtual background',
       );
     }
 
-    if (!this.effectsSDKKey) {
+    if (!this.effectsPlugin) {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
   }
 
   getBackground = () => {
-    if (this.effectsSDKKey) {
+    if (this.effectsPlugin) {
       return this.effectsPlugin?.getBackground();
     } else {
       // @ts-ignore
@@ -28,15 +28,15 @@ export class VBPlugin {
   };
 
   getVBObject = () => {
-    return this.effectsSDKKey ? this.effectsPlugin : this.hmsPlugin;
+    return this.effectsPlugin || this.hmsPlugin;
   };
 
   getName = () => {
-    return this.effectsSDKKey ? this.effectsPlugin?.getName() : this.hmsPlugin?.getName();
+    return this.effectsPlugin ? this.effectsPlugin?.getName() : this.hmsPlugin?.getName();
   };
 
   setBlur = async (blurPower: number) => {
-    if (this.effectsSDKKey) {
+    if (this.effectsPlugin) {
       this.effectsPlugin?.setBlur(blurPower);
     } else {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
@@ -44,7 +44,7 @@ export class VBPlugin {
   };
 
   setBackground = async (mediaURL: string) => {
-    if (this.effectsSDKKey) {
+    if (this.effectsPlugin) {
       this.effectsPlugin?.setBackground(mediaURL);
     } else {
       const img = document.createElement('img');
@@ -64,7 +64,7 @@ export class VBPlugin {
   };
 
   removeEffects = async () => {
-    if (this.effectsSDKKey) {
+    if (this.effectsPlugin) {
       this.effectsPlugin?.removeEffects();
     } else {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
