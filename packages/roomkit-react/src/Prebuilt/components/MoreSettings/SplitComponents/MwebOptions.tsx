@@ -18,6 +18,7 @@ import {
   HandIcon,
   HandRaiseSlashedIcon,
   PeopleIcon,
+  QuizActiveIcon,
   QuizIcon,
   RecordIcon,
   SettingsIcon,
@@ -48,6 +49,7 @@ import { useShowPolls } from '../../AppData/useUISettings';
 import { useDropdownList } from '../../hooks/useDropdownList';
 // @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
+import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
@@ -92,6 +94,7 @@ export const MwebOptions = ({
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
+  const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
@@ -202,9 +205,10 @@ export const MwebOptions = ({
                 onClick={() => {
                   togglePollView();
                   setOpenOptionsSheet(false);
+                  setUnreadPollQuiz(false);
                 }}
               >
-                <QuizIcon />
+                {unreadPollQuiz ? <QuizActiveIcon /> : <QuizIcon />}
                 <ActionTile.Title>Polls and Quizzes</ActionTile.Title>
               </ActionTile.Root>
             )}

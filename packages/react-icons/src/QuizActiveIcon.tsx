@@ -10,7 +10,7 @@ const SvgQuizActiveIcon = (props: SVGProps<SVGSVGElement>) => (
     />
     <path
       d="m12.4 16.4 2.4 2.4 4.8-4.8"
-      stroke="#EFF0FA"
+      stroke="currentColor"
       strokeWidth={1.5}
       strokeLinecap="round"
       strokeLinejoin="round"
