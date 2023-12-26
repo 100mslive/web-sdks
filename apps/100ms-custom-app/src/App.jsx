@@ -59,8 +59,6 @@ const App = () => {
     }
   }, [authToken, role, roomCode, roomId, subdomain]);
 
-  console.log('ollo', process.env.REACT_APP_EFFECTS_SDK_KEY);
-
   return (
     <Flex
       className="prebuilt-wrapper"

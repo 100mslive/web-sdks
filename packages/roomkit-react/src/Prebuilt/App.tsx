@@ -68,6 +68,7 @@ export type HMSPrebuiltProps = {
    * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
    */
   containerSelector?: string;
+  effectsSDKKey?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -90,6 +91,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       screens,
       onLeave,
       onJoin,
+      effectsSDKKey,
     },
     ref,
   ) => {
@@ -176,6 +178,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
+            effectsSDKKey,
           }}
         >
           <HMSRoomProvider

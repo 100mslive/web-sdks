@@ -31,6 +31,7 @@ export const useHMSPrebuiltContext = () => {
   if (!context) {
     throw Error('Make sure HMSPrebuiltContext.Provider is present at the top level of your application');
   }
+  console.log('ollo', HMSPrebuiltContext);
   console.log('ollo', context);
   return context;
 };
