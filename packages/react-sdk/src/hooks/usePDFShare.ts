@@ -87,10 +87,11 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       };
       inProgress.current = true;
       setSharing(true);
+      const isInsideIframe = iframeRef.current.ownerDocument !== window.document;
       await toggleScreenShare?.({
-        forceCurrentTab: isChromiumBased,
+        forceCurrentTab: isChromiumBased && !isInsideIframe,
         cropElement: iframeRef.current,
-        preferCurrentTab: isChromiumBased,
+        preferCurrentTab: isChromiumBased && !isInsideIframe,
       });
     },
     [amIScreenSharing, sendDataToPDFIframe, toggleScreenShare],
