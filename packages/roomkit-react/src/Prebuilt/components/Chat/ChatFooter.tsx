@@ -72,7 +72,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: () => void; children: ReactNode }) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -108,7 +108,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       }
       inputRef.current.value = '';
       setTimeout(() => {
-        onSend();
+        onSend(1);
       }, 0);
     } catch (error) {
       const err = error as HMSException;

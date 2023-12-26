@@ -14,6 +14,7 @@ import {
   selectUnreadHMSMessagesCount,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import {
   CopyIcon,
@@ -403,9 +404,10 @@ const SenderName = styled(Text, {
 });
 
 const ChatMessage = React.memo(
-  ({ index, style = {}, message, setRowHeight, isLast = false, unreadCount = 0, scrollToBottom, onPin }) => {
+  ({ index, style = {}, message, setRowHeight, isLast = false, scrollToBottom, onPin }) => {
     const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const { elements } = useRoomLayoutConferencingScreen();
+    const vanillaStore = useHMSVanillaStore();
     const rowRef = useRef(null);
     useEffect(() => {
       if (rowRef.current) {
@@ -440,10 +442,11 @@ const ChatMessage = React.memo(
     }, [message.read, hmsActions, inView, message.id]);
 
     useEffect(() => {
-      if (isLast && inView && unreadCount >= 1) {
-        scrollToBottom(1);
+      if (isLast && inView) {
+        const unreadCount = vanillaStore.getState(selectUnreadHMSMessagesCount);
+        scrollToBottom(unreadCount);
       }
-    }, [inView, isLast, scrollToBottom, unreadCount]);
+    }, [inView, isLast, scrollToBottom, vanillaStore]);
 
     return (
       <Box
@@ -587,7 +590,7 @@ const ChatMessage = React.memo(
   },
 );
 const ChatList = React.forwardRef(
-  ({ width, height, setRowHeight, getRowHeight, messages, unreadCount = 0, scrollToBottom }, listRef) => {
+  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom }, listRef) => {
     const { setPinnedMessages } = useSetPinnedMessages();
     const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
     const localPeerName = useHMSStore(selectLocalPeerName);
@@ -616,7 +619,6 @@ const ChatList = React.forwardRef(
             key={messages[index].id}
             message={messages[index]}
             setRowHeight={setRowHeight}
-            unreadCount={unreadCount}
             isLast={index >= messages.length - 2}
             scrollToBottom={scrollToBottom}
             onPin={() => setPinnedMessages(pinnedMessages, messages[index], localPeerName)}
@@ -626,7 +628,7 @@ const ChatList = React.forwardRef(
     );
   },
 );
-const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, scrollToBottom }, listRef) => {
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
   const rowHeights = useRef({});
 
   function getRowHeight(index) {
@@ -665,7 +667,6 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, unreadCount = 0, s
             getRowHeight={getRowHeight}
             scrollToBottom={scrollToBottom}
             ref={listRef}
-            unreadCount={unreadCount}
           />
         )}
       </AutoSizer>
@@ -683,7 +684,6 @@ export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
 
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
-  const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
 
   if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
@@ -715,12 +715,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
 
   return (
     <Fragment>
-      <VirtualizedChatMessages
-        messages={getFilteredMessages()}
-        scrollToBottom={scrollToBottom}
-        unreadCount={unreadCount}
-        ref={listRef}
-      />
+      <VirtualizedChatMessages messages={getFilteredMessages()} scrollToBottom={scrollToBottom} ref={listRef} />
     </Fragment>
   );
 });
