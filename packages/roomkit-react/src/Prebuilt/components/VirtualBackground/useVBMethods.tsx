@@ -5,7 +5,6 @@ export class VBPlugin {
   private effectsPlugin?: HMSEffectsPlugin;
 
   constructor(private useEffectsVB = false, private effectsSDKKey?: string) {
-    console.log('ollo', this.useEffectsVB, this.effectsSDKKey);
     if (useEffectsVB) {
       this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey || '');
     } else {
