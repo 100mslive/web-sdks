@@ -29,7 +29,7 @@ const TextArea = styled("textarea", {
   },
 });
 
-const EmojiPicker = React.memo(({ onSelect }) => {
+function EmojiPicker({ onSelect }) {
   const [showEmoji, setShowEmoji] = useState(false);
   const ref = useEmojiPickerStyles(showEmoji);
   return (
@@ -66,9 +66,9 @@ const EmojiPicker = React.memo(({ onSelect }) => {
       </Popover.Portal>
     </Popover.Root>
   );
-});
+}
 
-export const ChatFooter = React.memo(({ role, peerId, onSend, children }) => {
+export const ChatFooter = ({ role, peerId, onSend, children }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -92,7 +92,7 @@ export const ChatFooter = React.memo(({ role, peerId, onSend, children }) => {
       }
       inputRef.current.value = "";
       setTimeout(() => {
-        onSend(1); // 1 to scroll to the new message
+        onSend();
       }, 0);
     } catch (error) {
       ToastManager.addToast({ title: error.message });
@@ -156,4 +156,4 @@ export const ChatFooter = React.memo(({ role, peerId, onSend, children }) => {
       </IconButton>
     </Flex>
   );
-});
+};
