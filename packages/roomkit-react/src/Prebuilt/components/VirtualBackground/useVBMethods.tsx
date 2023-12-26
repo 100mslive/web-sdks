@@ -6,6 +6,7 @@ export class VBPlugin {
 
   constructor(private useEffectsVB = false, private effectsSDKKey?: string) {
     if (useEffectsVB) {
+      console.log('ollo', this.effectsSDKKey, this.useEffectsVB);
       this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey || '');
     } else {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
@@ -38,6 +39,7 @@ export class VBPlugin {
   };
 
   setBackground = async (mediaURL: string) => {
+    console.log('ollo', mediaURL);
     if (this.useEffectsVB) {
       this.effectsPlugin?.setBackground(mediaURL);
     } else {
