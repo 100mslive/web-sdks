@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeer, selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
-import { selectHMSMessagesCount, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectHMSMessagesCount, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
@@ -20,13 +20,13 @@ export const Chat = () => {
   const [isSelectorOpen] = useState(false);
   const listRef = useRef(null);
   const hmsActions = useHMSActions();
+  const vanillaStore = useHMSVanillaStore();
   const { removePinnedMessage } = useSetPinnedMessages();
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
 
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
   const blacklistedPeerIDSet = new Set(blacklistedPeerIDs);
   const isLocalPeerBlacklisted = blacklistedPeerIDSet.has(localPeer?.customerUserId);
-  const storeMessageSelector = selectHMSMessagesCount;
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
 
@@ -36,10 +36,10 @@ export const Chat = () => {
     isScrolledToBottom = currentRef.scrollHeight - currentRef.clientHeight - currentRef.scrollTop < 10;
   }
 
-  const messagesCount = useHMSStore(storeMessageSelector) || 0;
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
       if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
+        const messagesCount = vanillaStore.getState(selectHMSMessagesCount);
         listRef.current?.scrollToItem(messagesCount, 'end');
         requestAnimationFrame(() => {
           listRef.current?.scrollToItem(messagesCount, 'end');
@@ -47,7 +47,7 @@ export const Chat = () => {
         hmsActions.setMessageRead(true);
       }
     },
-    [hmsActions, messagesCount],
+    [hmsActions, vanillaStore],
   );
 
   return (
@@ -75,7 +75,7 @@ export const Chat = () => {
       ) : null}
 
       {isChatEnabled && !isLocalPeerBlacklisted ? (
-        <ChatFooter onSend={() => scrollToBottom(1)} screenType={screenType}>
+        <ChatFooter onSend={scrollToBottom} screenType={screenType}>
           {!isSelectorOpen && !isScrolledToBottom && <NewMessageIndicator scrollToBottom={scrollToBottom} />}
         </ChatFooter>
       ) : null}

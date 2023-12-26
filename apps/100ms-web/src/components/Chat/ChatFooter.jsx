@@ -29,7 +29,7 @@ const TextArea = styled("textarea", {
   },
 });
 
-function EmojiPicker({ onSelect }) {
+const EmojiPicker = React.memo(({ onSelect }) => {
   const [showEmoji, setShowEmoji] = useState(false);
   const ref = useEmojiPickerStyles(showEmoji);
   return (
@@ -66,12 +66,16 @@ function EmojiPicker({ onSelect }) {
       </Popover.Portal>
     </Popover.Root>
   );
-}
+});
 
-export const ChatFooter = ({ role, peerId, onSend, children }) => {
+export const ChatFooter = React.memo(({ role, peerId, onSend, children }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
+
+  const handleEmojiSelection = useCallback(emoji => {
+    inputRef.current.value += ` ${emoji.native} `;
+  }, []);
 
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
@@ -88,7 +92,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
       }
       inputRef.current.value = "";
       setTimeout(() => {
-        onSend();
+        onSend(1); // 1 to scroll to the new message
       }, 0);
     } catch (error) {
       ToastManager.addToast({ title: error.message });
@@ -142,11 +146,7 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         onCut={e => e.stopPropagation()}
         onCopy={e => e.stopPropagation()}
       />
-      <EmojiPicker
-        onSelect={emoji => {
-          inputRef.current.value += ` ${emoji.native} `;
-        }}
-      />
+      <EmojiPicker onSelect={handleEmojiSelection} />
       <IconButton
         onClick={sendMessage}
         css={{ ml: "auto", height: "max-content", mr: "$4" }}
@@ -156,4 +156,4 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
       </IconButton>
     </Flex>
   );
-};
+});
