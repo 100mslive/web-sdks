@@ -8,12 +8,14 @@ import {
   HMSPeerID,
   HMSRoleName,
   selectHMSMessages,
+  selectHMSMessagesCount,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeerNameByID,
   selectSessionStore,
   useHMSActions,
   useHMSStore,
+  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -366,7 +368,7 @@ const VirtualizedChatMessages = React.forwardRef<
             itemSize={getRowHeight}
             itemData={messages}
             width={width}
-            height={height - 1}
+            height={height}
             style={{
               overflowX: 'hidden',
             }}
@@ -390,6 +392,23 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
 
     const isMobile = useMedia(cssConfig.media.md);
     const { elements } = useRoomLayoutConferencingScreen();
+    const vanillaStore = useHMSVanillaStore();
+
+    useEffect(() => {
+      const unsubscribe = vanillaStore.subscribe(() => {
+        // @ts-ignore
+        if (!listRef?.current) {
+          return;
+        }
+        // @ts-ignore
+        const outerElement = listRef.current._outerRef;
+        // @ts-ignore
+        if (outerElement.scrollHeight - (listRef.current.state.scrollOffset + outerElement.offsetHeight) <= 10) {
+          scrollToBottom(1);
+        }
+      }, selectHMSMessagesCount);
+      return unsubscribe;
+    }, [vanillaStore, listRef, scrollToBottom]);
 
     if (filteredMessages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
       return (

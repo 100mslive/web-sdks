@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { MutableRefObject, useCallback, useRef } from 'react';
 import { useMedia } from 'react-use';
 import { VariableSizeList } from 'react-window';
 import { selectSessionStore, selectUnreadHMSMessagesCount } from '@100mslive/hms-video-store';
@@ -16,20 +16,11 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 
 export const Chat = () => {
   const { elements } = useRoomLayoutConferencingScreen();
-  const [isSelectorOpen] = useState(false);
   const listRef = useRef<VariableSizeList | null>(null);
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
   const { enabled: isChatEnabled = true } = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_STATE)) || {};
   const isMobile = useMedia(cssConfig.media.md);
-
-  let isScrolledToBottom = false;
-  if (listRef.current) {
-    // @ts-ignore
-    const currentRef = listRef.current._outerRef;
-    isScrolledToBottom = currentRef.scrollHeight - currentRef.clientHeight - currentRef.scrollTop < 10;
-  }
-
   const scrollToBottom = useCallback(
     (unreadCount = 0) => {
       if (listRef.current && listRef.current.scrollToItem && unreadCount > 0) {
@@ -59,16 +50,28 @@ export const Chat = () => {
       {isMobile && elements?.chat?.is_overlay ? <PinnedMessage /> : null}
       {isChatEnabled ? (
         <ChatFooter onSend={scrollToBottom}>
-          {!isSelectorOpen && !isScrolledToBottom && <NewMessageIndicator scrollToBottom={scrollToBottom} />}
+          <NewMessageIndicator scrollToBottom={scrollToBottom} listRef={listRef} />
         </ChatFooter>
       ) : null}
     </Flex>
   );
 };
 
-const NewMessageIndicator = ({ scrollToBottom }: { scrollToBottom: (count: number) => void }) => {
+const NewMessageIndicator = ({
+  scrollToBottom,
+  listRef,
+}: {
+  scrollToBottom: (count: number) => void;
+  listRef: MutableRefObject<VariableSizeList | null>;
+}) => {
   const unreadCount = useHMSStore(selectUnreadHMSMessagesCount);
-  if (!unreadCount) {
+  if (!unreadCount || !listRef.current) {
+    return null;
+  }
+  // @ts-ignore
+  const outerElement = listRef.current._outerRef;
+  // @ts-ignore
+  if (outerElement.scrollHeight === listRef.current.state.scrollOffset + outerElement.offsetHeight) {
     return null;
   }
   return (
