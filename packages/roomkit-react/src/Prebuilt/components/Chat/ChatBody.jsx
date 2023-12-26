@@ -146,11 +146,6 @@ const ChatMessage = React.memo(
     const { elements } = useRoomLayoutConferencingScreen();
     const vanillaStore = useHMSVanillaStore();
     const rowRef = useRef(null);
-    useEffect(() => {
-      if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight);
-      }
-    }, [index, setRowHeight]);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
     const roleWhiteList = elements?.chat?.roles_whitelist || [];
@@ -171,6 +166,12 @@ const ChatMessage = React.memo(
     } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
       showReply = true;
     }
+
+    useEffect(() => {
+      if (rowRef.current) {
+        setRowHeight(index, rowRef.current.clientHeight);
+      }
+    }, [index, setRowHeight]);
 
     useEffect(() => {
       if (message.id && !message.read && inView) {

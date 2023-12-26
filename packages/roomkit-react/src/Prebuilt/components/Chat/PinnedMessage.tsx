@@ -11,13 +11,15 @@ import { ArrowNavigation } from './ArrowNavigation';
 import { AnnotisedMessage } from './ChatBody';
 import { StickIndicator } from './StickIndicator';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
 
-export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
+export const PinnedMessage = () => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
+  const { removePinnedMessage } = useSetPinnedMessages();
   const isMobile = useMedia(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();
@@ -117,7 +119,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         {canUnpinMessage ? (
           <Flex
             onClick={() => {
-              clearPinnedMessage(pinnedMessageIndex);
+              removePinnedMessage(pinnedMessageIndex);
               setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
             }}
             css={{

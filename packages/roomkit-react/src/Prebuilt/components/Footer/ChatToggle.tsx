@@ -25,7 +25,7 @@ export const ChatToggle = () => {
           <ChatIcon />
         </IconButton>
       </Tooltip>
-      {countUnreadMessages > 0 && (
+      {isChatOpen && countUnreadMessages > 0 && (
         <Flex
           css={{
             height: '$8',
