@@ -1003,9 +1003,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   protected onPreview(sdkRoom: sdkTypes.HMSRoom) {
     this.setState(store => {
       Object.assign(store.room, SDKToHMS.convertRoom(sdkRoom, this.sdk.getLocalPeer()?.peerId));
-      if (!store.appData) {
-        store.appData = {};
-      }
+      // if (!store.appData) {
+      //   store.appData = {};
+      // }
       store.appData.isEffectsSDKEnabled = sdkRoom.isEffectsSDKEnabled;
       store.room.roomState = HMSRoomState.Preview;
     }, 'previewStart');

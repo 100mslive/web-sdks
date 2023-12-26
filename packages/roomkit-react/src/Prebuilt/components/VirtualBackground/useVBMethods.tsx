@@ -36,6 +36,7 @@ export class VBPlugin {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
     }
   };
+
   setBackground = async (mediaURL: string) => {
     if (this.useEffectsVB) {
       this.effectsPlugin?.setBackground(mediaURL);
@@ -55,6 +56,7 @@ export class VBPlugin {
       }
     }
   };
+
   removeEffects = async () => {
     if (this.useEffectsVB) {
       this.effectsPlugin?.removeEffects();
