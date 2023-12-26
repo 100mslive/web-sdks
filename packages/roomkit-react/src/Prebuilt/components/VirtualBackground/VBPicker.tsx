@@ -83,7 +83,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
       return;
     }
 
-    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled, effectsSDKKey);
+    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled ? effectsSDKKey : '');
   }, [isEffectsSDKEnabled, effectsSDKKey]);
 
   useEffect(() => {

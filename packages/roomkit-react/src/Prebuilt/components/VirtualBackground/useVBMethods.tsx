@@ -4,16 +4,22 @@ export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: HMSEffectsPlugin;
 
-  constructor(private useEffectsVB = false, private effectsSDKKey?: string) {
-    if (useEffectsVB) {
-      this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey || '');
+  constructor(private effectsSDKKey?: string) {
+    if (this.effectsSDKKey) {
+      this.effectsPlugin = new HMSEffectsPlugin(this.effectsSDKKey);
     } else {
+      console.error(
+        'The API key for using Effects virtual background is missing. Defaulting to standard virtual background',
+      );
+    }
+
+    if (!this.effectsSDKKey) {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
   }
 
   getBackground = () => {
-    if (this.useEffectsVB) {
+    if (this.effectsSDKKey) {
       return this.effectsPlugin?.getBackground();
     } else {
       // @ts-ignore
@@ -22,15 +28,15 @@ export class VBPlugin {
   };
 
   getVBObject = () => {
-    return this.useEffectsVB ? this.effectsPlugin : this.hmsPlugin;
+    return this.effectsSDKKey ? this.effectsPlugin : this.hmsPlugin;
   };
 
   getName = () => {
-    return this.useEffectsVB ? this.effectsPlugin?.getName() : this.hmsPlugin?.getName();
+    return this.effectsSDKKey ? this.effectsPlugin?.getName() : this.hmsPlugin?.getName();
   };
 
   setBlur = async (blurPower: number) => {
-    if (this.useEffectsVB) {
+    if (this.effectsSDKKey) {
       this.effectsPlugin?.setBlur(blurPower);
     } else {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
@@ -38,7 +44,7 @@ export class VBPlugin {
   };
 
   setBackground = async (mediaURL: string) => {
-    if (this.useEffectsVB) {
+    if (this.effectsSDKKey) {
       this.effectsPlugin?.setBackground(mediaURL);
     } else {
       const img = document.createElement('img');
@@ -58,7 +64,7 @@ export class VBPlugin {
   };
 
   removeEffects = async () => {
-    if (this.useEffectsVB) {
+    if (this.effectsSDKKey) {
       this.effectsPlugin?.removeEffects();
     } else {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
