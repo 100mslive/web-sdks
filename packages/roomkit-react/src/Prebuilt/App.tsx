@@ -51,6 +51,7 @@ export type HMSPrebuiltOptions = {
   userName?: string;
   userId?: string;
   endpoints?: object;
+  effectsSDKKey?: string;
 };
 
 export type HMSPrebuiltProps = {
@@ -68,7 +69,6 @@ export type HMSPrebuiltProps = {
    * Specify css selectors for the HTML element to be used as container for dialogs. Affects the positioning and focus of dialogs.
    */
   containerSelector?: string;
-  effectsSDKKey?: string;
 };
 
 export type HMSPrebuiltRefType = {
@@ -87,11 +87,10 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints } = {},
+      options: { userName = '', userId = '', endpoints, effectsSDKKey = '' } = {},
       screens,
       onLeave,
       onJoin,
-      effectsSDKKey,
     },
     ref,
   ) => {
