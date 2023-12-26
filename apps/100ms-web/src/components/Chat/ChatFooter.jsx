@@ -73,10 +73,6 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
   const inputRef = useRef(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
 
-  const handleEmojiSelection = useCallback(emoji => {
-    inputRef.current.value += ` ${emoji.native} `;
-  }, []);
-
   const sendMessage = useCallback(async () => {
     const message = inputRef.current.value;
     if (!message || !message.trim().length) {
@@ -146,7 +142,11 @@ export const ChatFooter = ({ role, peerId, onSend, children }) => {
         onCut={e => e.stopPropagation()}
         onCopy={e => e.stopPropagation()}
       />
-      <EmojiPicker onSelect={handleEmojiSelection} />
+      <EmojiPicker
+        onSelect={emoji => {
+          inputRef.current.value += ` ${emoji.native} `;
+        }}
+      />
       <IconButton
         onClick={sendMessage}
         css={{ ml: "auto", height: "max-content", mr: "$4" }}
