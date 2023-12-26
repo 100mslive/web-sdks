@@ -8,7 +8,6 @@ import { SESSION_STORE_KEY } from '../../common/constants';
 type PinnedMessage = {
   text: string;
   id: string;
-  authorId: string;
   pinnedBy: string;
 };
 
@@ -22,7 +21,7 @@ export const useSetPinnedMessages = () => {
   const setPinnedMessages = useCallback(
     async (pinnedMessages: PinnedMessage[] = [], message: HMSMessage, pinnedBy: string) => {
       const peerName = vanillaStore.getState(selectPeerNameByID(message?.sender)) || message?.senderName;
-      const newPinnedMessage = { text: '', id: message.id, pinnedBy, authorId: message?.senderUserId || '' };
+      const newPinnedMessage = { text: '', id: message.id, pinnedBy };
 
       if (message && peerName) {
         newPinnedMessage['text'] = `${peerName}: ${message.message}`;
