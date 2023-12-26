@@ -1,12 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import {
-  HMSMessage,
-  selectLocalPeerName,
-  selectPermissions,
-  selectSessionStore,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { HMSMessage, selectLocalPeerName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import {
   CopyIcon,
   CrossCircleIcon,
@@ -68,7 +61,6 @@ export const ChatActions = ({
   const actions = useHMSActions();
   const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
   const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
-  const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const localPeerName = useHMSStore(selectLocalPeerName);
   const { setPinnedMessages, unpinBlacklistedMessages } = useSetPinnedMessages();
 
@@ -79,9 +71,9 @@ export const ChatActions = ({
   const updatePinnedMessages = useCallback(
     (messageID = '') => {
       const blacklistedMessageIDSet = new Set([...(blacklistedMessageIDs || []), messageID]);
-      unpinBlacklistedMessages(pinnedMessages, blacklistedMessageIDSet);
+      unpinBlacklistedMessages(blacklistedMessageIDSet);
     },
-    [blacklistedMessageIDs, unpinBlacklistedMessages, pinnedMessages],
+    [blacklistedMessageIDs, unpinBlacklistedMessages],
   );
 
   const copyMessageContent = useCallback(() => {
@@ -120,7 +112,7 @@ export const ChatActions = ({
       text: 'Pin message',
       tooltipText: 'Pin',
       icon: <PinIcon style={iconStyle} />,
-      onClick: () => setPinnedMessages(pinnedMessages, message, localPeerName || ''),
+      onClick: () => setPinnedMessages(message, localPeerName || ''),
       show: showPinAction,
     },
     copy: {

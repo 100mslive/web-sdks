@@ -1,5 +1,11 @@
 import { useCallback } from 'react';
-import { HMSMessage, selectPeerNameByID, useHMSActions, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  HMSMessage,
+  selectPeerNameByID,
+  selectSessionStore,
+  useHMSActions,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 // @ts-ignore
@@ -20,7 +26,7 @@ export const useSetPinnedMessages = () => {
   const vanillaStore = useHMSVanillaStore();
 
   const setPinnedMessages = useCallback(
-    async (pinnedMessages: PinnedMessage[] = [], message: HMSMessage, pinnedBy: string) => {
+    async (message: HMSMessage, pinnedBy: string) => {
       const peerName = vanillaStore.getState(selectPeerNameByID(message?.sender)) || message?.senderName;
       const newPinnedMessage = { text: '', id: message.id, pinnedBy, authorId: message?.senderUserId || '' };
 
@@ -30,7 +36,8 @@ export const useSetPinnedMessages = () => {
         newPinnedMessage['text'] = message.message;
       }
 
-      if (newPinnedMessage && !pinnedMessages.find(pinnedMessage => pinnedMessage.id === newPinnedMessage.id)) {
+      const pinnedMessages = vanillaStore.getState(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+      if (!pinnedMessages?.find((pinnedMessage: PinnedMessage) => pinnedMessage.id === newPinnedMessage.id)) {
         await hmsActions.sessionStore
           .set(SESSION_STORE_KEY.PINNED_MESSAGES, [...pinnedMessages, newPinnedMessage].slice(-3)) // Limiting to maximum of 3 messages - FIFO
           .catch(err => ToastManager.addToast({ title: err.description }));
@@ -40,30 +47,32 @@ export const useSetPinnedMessages = () => {
   );
 
   const removePinnedMessage = useCallback(
-    async (pinnedMessages: PinnedMessage[] = [], indexToRemove: number) => {
+    async (indexToRemove: number) => {
+      const pinnedMessages = vanillaStore.getState(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
       if (pinnedMessages[indexToRemove]) {
         await hmsActions.sessionStore
           .set(
             SESSION_STORE_KEY.PINNED_MESSAGES,
-            pinnedMessages.filter((_, index: number) => index !== indexToRemove),
+            pinnedMessages.filter((_: PinnedMessage, index: number) => index !== indexToRemove),
           )
           .catch(err => ToastManager.addToast({ title: err.description }));
       }
     },
-    [hmsActions],
+    [hmsActions, vanillaStore],
   );
 
   const unpinBlacklistedMessages = useCallback(
-    async (pinnedMessages: PinnedMessage[] = [], blacklistedMessageIDSet: Set<string>) => {
+    async (blacklistedMessageIDSet: Set<string>) => {
+      const pinnedMessages = vanillaStore.getState(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
       const filteredPinnedMessages = pinnedMessages?.filter(
-        pinnedMessage => !blacklistedMessageIDSet?.has(pinnedMessage.id),
+        (pinnedMessage: PinnedMessage) => !blacklistedMessageIDSet?.has(pinnedMessage.id),
       );
 
       await hmsActions.sessionStore
         .set(SESSION_STORE_KEY.PINNED_MESSAGES, filteredPinnedMessages)
         .catch(err => ToastManager.addToast({ title: err.description }));
     },
-    [hmsActions],
+    [hmsActions, vanillaStore],
   );
 
   return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages };
