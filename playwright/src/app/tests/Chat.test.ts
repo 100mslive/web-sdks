@@ -81,7 +81,7 @@ test(`Test peer can send and receive chat message`, async ({ context }) => {
 });
 
 
-test.skip(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
+test(`Verify pin/unpin chat reflect to local+remote peer`, async({context}) => {
 
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lqh-lcej-ong';
     const viewerNRTUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/ylx-frpu-klf';
@@ -103,6 +103,7 @@ test.skip(`Verify pin/unpin chat reflect to local+remote peer`, async({context})
     await page_cb.getByTestId('send_msg_btn').click();
 
     await page_cb.getByTestId('chat_msg').hover();
+    await page_cb.getByTestId('pin_message_btn').waitFor();
     await page_cb.getByTestId('pin_message_btn').click();
     await page_cb.locator("//div[@title='cb1: Hello']").isVisible();
 

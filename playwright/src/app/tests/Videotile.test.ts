@@ -8,7 +8,7 @@ test.afterEach(async ({ context }) => {
     await context.close();
 });
 
-test(`Verify simulcast layer getting published as set in template @sim`, async({context}) => {
+test(`Verify simulcast layer getting published as set in template`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/lnw-zfmy-rzo';
 
     const page_cb1 = await context.newPage();
@@ -25,6 +25,7 @@ test(`Verify simulcast layer getting published as set in template @sim`, async({
 
     await page_cb1.bringToFront();
     await page_cb1.getByTestId("participant_tile_cb2").hover();
+    await page_cb1.getByTestId("participant_menu_btn").waitFor();
     await page_cb1.getByTestId("participant_menu_btn").click();
     //await page_cb1.getByText("Currently streaming: High (1270x720)").click();
 
@@ -43,7 +44,7 @@ test(`Verify simulcast layer getting published as set in template @sim`, async({
 
 });
 
-test(`Verify simulcast layer getting published as set in template`, async({context}) => {
+test(`Verify enable/disable virtual background`, async({context}) => {
     const cobroadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/jsw-bywh-usa';
 
     const page_cb1 = await context.newPage();

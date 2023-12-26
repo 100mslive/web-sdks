@@ -455,7 +455,7 @@ test(`Verify peer can remove other peer`, async({context}) => {
 
 });
 
-test.skip(`Verify peer mute and unmute peers`, async({context}) => {
+test(`Verify peer mute and unmute peers`, async({context}) => {
         const co_broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gno-sbuc-lyw';
         
         const page_b = await context.newPage();
@@ -476,11 +476,14 @@ test.skip(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.bringToFront();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').waitFor();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('mute_video_participant_btn').click();
 
         await page_b.getByTestId('participant_tile_broadcaster').hover();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').waitFor();
+
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('mute_audio_participant_btn').click();
 
@@ -489,6 +492,7 @@ test.skip(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.getByTestId('participant_tile_broadcaster').hover();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').waitFor();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('unmute_video_participant_btn').click();
 
@@ -497,6 +501,7 @@ test.skip(`Verify peer mute and unmute peers`, async({context}) => {
 
         await page_b.bringToFront();
         await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').waitFor();
         await page_b.getByTestId('participant_menu_btn').click();
         await page_b.getByTestId('unmute_audio_participant_btn').click();
 
@@ -506,6 +511,15 @@ test.skip(`Verify peer mute and unmute peers`, async({context}) => {
         await page_b.bringToFront();
         await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_audio_mute_icon']").isHidden();
         await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_avatar_icon']").isHidden();
+
+        await page_b.getByTestId('leave_end_dropdown_trigger').click();
+        await page_b.getByTestId('end_room_btn').click();
+        await page_b.getByTestId('stop_stream_btn').click();
+
+        await page_cb.bringToFront();
+        await page_cb.getByTestId('leave_end_dropdown_trigger').click();
+        await page_cb.getByTestId('end_room_btn').click();
+        await page_cb.getByTestId('stop_stream_btn').click();
 });
 
 test(`Check role limit test`, async({context}) => {

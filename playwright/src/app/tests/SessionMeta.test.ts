@@ -64,12 +64,14 @@ test(`Verify pin tile works for peer`, async({context}) => {
 
     await cb_1.bringToFront();
     await cb_1.getByTestId("participant_tile_cb2").hover();
+    await cb_1.getByTestId("participant_menu_btn").waitFor();
     await cb_1.getByTestId("participant_menu_btn").click();
     await cb_1.getByText("Pin Tile for myself").click();
 
     await cb_1.locator("//div[@data-testid='participant_tile_cb2']/div/div[3]/div/div").isVisible();
 
     await cb_1.getByTestId("participant_tile_cb2").hover();
+    await cb_1.getByTestId("participant_menu_btn").waitFor();
     await cb_1.getByTestId("participant_menu_btn").click();
     await cb_1.getByText("Unpin Tile for myself").click();
 
@@ -98,6 +100,7 @@ test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
 
     await cb_1.bringToFront();
     await cb_1.getByTestId("participant_tile_cb2").hover();
+    await cb_1.getByTestId("participant_menu_btn").waitFor();
     await cb_1.getByTestId("participant_menu_btn").click();
     await cb_1.getByText("Spotlight Tile for everyone").click();
 
@@ -108,6 +111,7 @@ test(`Verify spotlight reflect to local and remote peer`,async({context}) => {
 
     await cb_1.bringToFront();
     await cb_1.getByTestId("participant_tile_cb2").hover();
+    await cb_1.getByTestId("participant_menu_btn").waitFor();
     await cb_1.getByTestId("participant_menu_btn").click();
     await cb_1.getByText("Remove from Spotlight").click();
 
