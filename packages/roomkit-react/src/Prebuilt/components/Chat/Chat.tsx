@@ -7,7 +7,6 @@ import { ChevronDownIcon } from '@100mslive/react-icons';
 import { Button } from '../../../Button';
 import { Flex } from '../../../Layout';
 import { config as cssConfig } from '../../../Theme';
-// @ts-ignore
 import { ChatBody } from './ChatBody';
 import { ChatFooter } from './ChatFooter';
 import { ChatBlocked, ChatPaused } from './ChatStates';
@@ -16,7 +15,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 export const Chat = () => {
-  const { elements, screenType } = useRoomLayoutConferencingScreen();
+  const { elements } = useRoomLayoutConferencingScreen();
   const [isSelectorOpen] = useState(false);
   const listRef = useRef<VariableSizeList | null>(null);
   const hmsActions = useHMSActions();
@@ -54,7 +53,7 @@ export const Chat = () => {
       }}
     >
       {isMobile && elements?.chat?.is_overlay ? null : <PinnedMessage />}
-      <ChatBody ref={listRef} scrollToBottom={scrollToBottom} screenType={screenType} />
+      <ChatBody ref={listRef} scrollToBottom={scrollToBottom} />
       <ChatPaused />
       <ChatBlocked />
       {isMobile && elements?.chat?.is_overlay ? <PinnedMessage /> : null}
