@@ -94,7 +94,7 @@ const NewMessageIndicator = ({ scrollToBottom }) => {
       css={{
         width: '100%',
         left: 0,
-        bottom: '100%',
+        bottom: '$28',
         position: 'absolute',
       }}
     >
@@ -109,8 +109,6 @@ const NewMessageIndicator = ({ scrollToBottom }) => {
           pl: '$6',
           '& > svg': { ml: '$4' },
           borderRadius: '$round',
-          position: 'relative',
-          bottom: '$16',
           fontSize: '$xs',
           fontWeight: '$semiBold',
           c: '$on_secondary_high',
