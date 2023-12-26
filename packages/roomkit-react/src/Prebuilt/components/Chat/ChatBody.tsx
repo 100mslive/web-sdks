@@ -34,7 +34,7 @@ const formatTime = (date: Date) => {
   const hours = date.getHours();
   const minutes = date.getMinutes();
   const suffix = hours > 11 ? 'PM' : 'AM';
-  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}}`;
+  return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}`;
 };
 
 const rowHeights: Record<number, number> = {};
