@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -9,10 +9,8 @@ import {
   selectLocalPeerRoleName,
   selectPeerNameByID,
   selectSessionStore,
-  selectUnreadHMSMessagesCount,
   useHMSActions,
   useHMSStore,
-  useHMSVanillaStore,
 } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -38,6 +36,17 @@ const formatTime = date => {
     mins = '0' + mins;
   }
   return `${hours}:${mins} ${suffix}`;
+};
+
+const rowHeights = {};
+function getRowHeight(index) {
+  // 72 will be default row height for any message length
+  // 16 will add margin value as clientHeight don't include margin
+  return rowHeights[index] + 16 || 72;
+}
+
+const setRowHeight = (index, size) => {
+  Object.assign(rowHeights, { [index]: size });
 };
 
 const MessageTypeContainer = ({ left, right }) => {
@@ -140,251 +149,196 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const ChatMessage = React.memo(
-  ({ index, style = {}, message, setRowHeight, isLast = false, scrollToBottom, onPin }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
-    const { elements } = useRoomLayoutConferencingScreen();
-    const vanillaStore = useHMSVanillaStore();
-    const rowRef = useRef(null);
-    const isMobile = useMedia(cssConfig.media.md);
-    const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-    const roleWhiteList = elements?.chat?.roles_whitelist || [];
-    const isOverlay = elements?.chat?.is_overlay && isMobile;
-    const hmsActions = useHMSActions();
-    const localPeerId = useHMSStore(selectLocalPeerID);
-    const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
-    const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
-    const messageType = getMessageType({
-      roles: message.recipientRoles,
-      receiver: message.recipientPeer,
-    });
-    const [openSheet, setOpenSheet] = useState(false);
-    const showPinAction = !!elements?.chat?.allow_pinning_messages;
-    let showReply = false;
-    if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
-      showReply = true;
-    } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
-      showReply = true;
+const ChatMessage = React.memo(({ index, style = {}, message }) => {
+  const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
+  const { elements } = useRoomLayoutConferencingScreen();
+  const rowRef = useRef(null);
+  const isMobile = useMedia(cssConfig.media.md);
+  const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+  const roleWhiteList = elements?.chat?.roles_whitelist || [];
+  const isOverlay = elements?.chat?.is_overlay && isMobile;
+  const hmsActions = useHMSActions();
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+  const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
+  const messageType = getMessageType({
+    roles: message.recipientRoles,
+    receiver: message.recipientPeer,
+  });
+  const [openSheet, setOpenSheet] = useState(false);
+  const showPinAction = !!elements?.chat?.allow_pinning_messages;
+  let showReply = false;
+  if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
+    showReply = true;
+  } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
+    showReply = true;
+  }
+
+  useEffect(() => {
+    if (rowRef.current) {
+      setRowHeight(index, rowRef.current.clientHeight);
     }
+  }, [index]);
 
-    useEffect(() => {
-      if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight);
-      }
-    }, [index, setRowHeight]);
+  useEffect(() => {
+    if (message.id && !message.read && inView) {
+      hmsActions.setMessageRead(true, message.id);
+    }
+  }, [message.read, hmsActions, inView, message.id]);
 
-    useEffect(() => {
-      if (message.id && !message.read && inView) {
-        hmsActions.setMessageRead(true, message.id);
-      }
-    }, [message.read, hmsActions, inView, message.id]);
-
-    useEffect(() => {
-      if (isLast && inView) {
-        const unreadCount = vanillaStore.getState(selectUnreadHMSMessagesCount);
-        scrollToBottom(unreadCount);
-      }
-    }, [inView, isLast, scrollToBottom, vanillaStore]);
-
-    return (
-      <Box
-        ref={ref}
-        as="div"
+  return (
+    <Box
+      ref={ref}
+      as="div"
+      css={{
+        mb: '$5',
+        pr: '$10',
+        mt: '$4',
+        '&:not(:hover} .chat_actions': { display: 'none' },
+        '&:hover .chat_actions': { display: 'flex', opacity: 1 },
+      }}
+      style={style}
+    >
+      <Flex
+        ref={rowRef}
+        align="center"
         css={{
-          mb: '$5',
-          pr: '$10',
-          mt: '$4',
-          '&:not(:hover} .chat_actions': { display: 'none' },
-          '&:hover .chat_actions': { display: 'flex', opacity: 1 },
+          flexWrap: 'wrap',
+          position: 'relative',
+          // Theme independent color, token should not be used for transparent chat
+          bg:
+            messageType && !(selectedPeer.id || selectedRole)
+              ? isOverlay
+                ? 'rgba(0, 0, 0, 0.64)'
+                : '$surface_default'
+              : undefined,
+          r: '$1',
+          p: '$4',
+          userSelect: 'none',
+          '@md': {
+            cursor: 'pointer',
+          },
+          '&:hover': {
+            background: 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)',
+          },
         }}
-        style={style}
+        data-testid="chat_msg"
+        onClick={() => {
+          if (isMobile) {
+            setOpenSheet(true);
+          }
+        }}
       >
-        <Flex
-          ref={rowRef}
-          align="center"
+        <Text
           css={{
-            flexWrap: 'wrap',
-            position: 'relative',
-            // Theme independent color, token should not be used for transparent chat
-            bg:
-              messageType && !(selectedPeer.id || selectedRole)
-                ? isOverlay
-                  ? 'rgba(0, 0, 0, 0.64)'
-                  : '$surface_default'
-                : undefined,
-            r: '$1',
-            p: '$4',
-            userSelect: 'none',
-            '@md': {
-              cursor: 'pointer',
-            },
-            '&:hover': {
-              background: 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)',
-            },
+            color: isOverlay ? '#FFF' : '$on_surface_high',
+            fontWeight: '$semiBold',
+            display: 'flex',
+            alignItems: 'center',
+            alignSelf: 'stretch',
+            width: '100%',
           }}
-          key={message.time}
-          data-testid="chat_msg"
-          onClick={() => {
-            if (isMobile) {
-              setOpenSheet(true);
-            }
-          }}
+          as="div"
         >
-          <Text
-            css={{
-              color: isOverlay ? '#FFF' : '$on_surface_high',
-              fontWeight: '$semiBold',
-              display: 'flex',
-              alignItems: 'center',
-              alignSelf: 'stretch',
-              width: '100%',
-            }}
-            as="div"
-          >
-            <Flex align="baseline">
-              {message.senderName === 'You' || !message.senderName ? (
+          <Flex align="baseline">
+            {message.senderName === 'You' || !message.senderName ? (
+              <SenderName
+                as="span"
+                variant="sub2"
+                css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
+              >
+                {message.senderName || 'Anonymous'}
+              </SenderName>
+            ) : (
+              <Tooltip title={message.senderName} side="top" align="start">
                 <SenderName
                   as="span"
                   variant="sub2"
                   css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
                 >
-                  {message.senderName || 'Anonymous'}
+                  {message.senderName}
                 </SenderName>
-              ) : (
-                <Tooltip title={message.senderName} side="top" align="start">
-                  <SenderName
-                    as="span"
-                    variant="sub2"
-                    css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
-                  >
-                    {message.senderName}
-                  </SenderName>
-                </Tooltip>
-              )}
-              <MessageType
-                hasCurrentUserSent={message.sender === localPeerId}
-                receiver={message.recipientPeer}
-                roles={message.recipientRoles}
-              />
-            </Flex>
-
-            {!isOverlay ? (
-              <Text
-                as="span"
-                variant="caption"
-                css={{
-                  color: '$on_surface_medium',
-                  flexShrink: 0,
-                  position: 'absolute',
-                  right: 0,
-                  zIndex: 1,
-                  mr: '$4',
-                  p: '$2',
-                }}
-              >
-                {formatTime(message.time)}
-              </Text>
-            ) : null}
-            <ChatActions
-              onPin={onPin}
-              showPinAction={showPinAction}
-              message={message}
-              sentByLocalPeer={message.sender === localPeerId}
-              onReply={() => {
-                if (message.recipientRoles?.length) {
-                  setRoleSelector(message.recipientRoles[0]);
-                  setPeerSelector({});
-                } else {
-                  setRoleSelector('');
-                  setPeerSelector({ id: message.sender, name: message.senderName });
-                }
-              }}
-              showReply={showReply}
-              isMobile={isMobile}
-              openSheet={openSheet}
-              setOpenSheet={setOpenSheet}
+              </Tooltip>
+            )}
+            <MessageType
+              hasCurrentUserSent={message.sender === localPeerId}
+              receiver={message.recipientPeer}
+              roles={message.recipientRoles}
             />
-          </Text>
-          <Text
-            variant="sm"
-            css={{
-              w: '100%',
-              mt: '$2',
-              wordBreak: 'break-word',
-              whiteSpace: 'pre-wrap',
-              userSelect: 'all',
-              color: isOverlay ? '#FFF' : '$on_surface_high',
-            }}
-            onClick={e => {
-              e.stopPropagation();
-              setOpenSheet(true);
-            }}
-          >
-            <AnnotisedMessage message={message.message} />
-          </Text>
-        </Flex>
-      </Box>
-    );
-  },
-);
-const ChatList = React.forwardRef(
-  ({ width, height, setRowHeight, getRowHeight, messages, scrollToBottom }, listRef) => {
-    useLayoutEffect(() => {
-      if (listRef.current && listRef.current.scrollToItem) {
-        scrollToBottom(1);
-      }
-    }, [listRef, scrollToBottom]);
+          </Flex>
 
-    return (
-      <VariableSizeList
-        ref={listRef}
-        itemCount={messages.length}
-        itemSize={getRowHeight}
-        width={width}
-        height={height - 1}
-        style={{
-          overflowX: 'hidden',
-        }}
-      >
-        {({ index, style }) => (
-          <ChatMessage
-            style={style}
-            index={index}
-            key={messages[index].id}
-            message={messages[index]}
-            setRowHeight={setRowHeight}
-            isLast={index >= messages.length - 2}
-            scrollToBottom={scrollToBottom}
+          {!isOverlay ? (
+            <Text
+              as="span"
+              variant="caption"
+              css={{
+                color: '$on_surface_medium',
+                flexShrink: 0,
+                position: 'absolute',
+                right: 0,
+                zIndex: 1,
+                mr: '$4',
+                p: '$2',
+              }}
+            >
+              {formatTime(message.time)}
+            </Text>
+          ) : null}
+          <ChatActions
+            showPinAction={showPinAction}
+            message={message}
+            sentByLocalPeer={message.sender === localPeerId}
+            onReply={() => {
+              if (message.recipientRoles?.length) {
+                setRoleSelector(message.recipientRoles[0]);
+                setPeerSelector({});
+              } else {
+                setRoleSelector('');
+                setPeerSelector({ id: message.sender, name: message.senderName });
+              }
+            }}
+            showReply={showReply}
+            isMobile={isMobile}
+            openSheet={openSheet}
+            setOpenSheet={setOpenSheet}
           />
-        )}
-      </VariableSizeList>
-    );
-  },
-);
-const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
-  const rowHeights = useRef({});
-
-  function getRowHeight(index) {
-    // 72 will be default row height for any message length
-    // 16 will add margin value as clientHeight don't include margin
-    return rowHeights.current[index] + 16 || 72;
-  }
-
-  const setRowHeight = useCallback(
-    (index, size) => {
-      listRef.current.resetAfterIndex(0);
-      rowHeights.current = { ...rowHeights.current, [index]: size };
-    },
-    [listRef],
+        </Text>
+        <Text
+          variant="sm"
+          css={{
+            w: '100%',
+            mt: '$2',
+            wordBreak: 'break-word',
+            whiteSpace: 'pre-wrap',
+            userSelect: 'all',
+            color: isOverlay ? '#FFF' : '$on_surface_high',
+          }}
+          onClick={e => {
+            e.stopPropagation();
+            setOpenSheet(true);
+          }}
+        >
+          <AnnotisedMessage message={message.message} />
+        </Text>
+      </Flex>
+    </Box>
   );
+});
 
+const MessageWrapper = React.memo(({ index, style, data }) => {
+  return <ChatMessage style={style} index={index} key={data[index].id} message={data[index]} />;
+});
+
+const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, listRef) => {
+  useEffect(() => {
+    requestAnimationFrame(() => scrollToBottom(1));
+  }, [scrollToBottom]);
   return (
     <Box
       css={{
         mr: '-$10',
         h: '100%',
       }}
-      as="div"
     >
       <AutoSizer
         style={{
@@ -392,15 +346,19 @@ const VirtualizedChatMessages = React.forwardRef(({ messages, scrollToBottom }, 
         }}
       >
         {({ height, width }) => (
-          <ChatList
-            width={width}
-            height={height}
-            messages={messages}
-            setRowHeight={setRowHeight}
-            getRowHeight={getRowHeight}
-            scrollToBottom={scrollToBottom}
+          <VariableSizeList
             ref={listRef}
-          />
+            itemCount={messages.length}
+            itemSize={getRowHeight}
+            itemData={messages}
+            width={width}
+            height={height - 1}
+            style={{
+              overflowX: 'hidden',
+            }}
+          >
+            {MessageWrapper}
+          </VariableSizeList>
         )}
       </AutoSizer>
     </Box>
@@ -418,7 +376,7 @@ export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
   const isMobile = useMedia(cssConfig.media.md);
   const { elements } = useRoomLayoutConferencingScreen();
 
-  if (messages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
+  if (filteredMessages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
     return (
       <Flex
         css={{
@@ -446,9 +404,5 @@ export const ChatBody = React.forwardRef(({ scrollToBottom }, listRef) => {
     );
   }
 
-  return (
-    <Fragment>
-      <VirtualizedChatMessages messages={filteredMessages} scrollToBottom={scrollToBottom} ref={listRef} />
-    </Fragment>
-  );
+  return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
 });
