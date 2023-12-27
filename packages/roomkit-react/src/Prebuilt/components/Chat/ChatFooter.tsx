@@ -10,11 +10,11 @@ import { IconButton } from '../../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// import { ChatSelectorContainer } from './ChatSelectorContainer';
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useIsLocalPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection } from '../../common/hooks';
@@ -86,6 +86,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
+  const isLocalPeerBlacklisted = useIsLocalPeerBlacklisted();
+
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
@@ -131,6 +133,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       setDraftMessage(messageElement?.value || '');
     };
   }, [setDraftMessage]);
+
+  if (isLocalPeerBlacklisted) {
+    return null;
+  }
 
   return (
     <Box>
