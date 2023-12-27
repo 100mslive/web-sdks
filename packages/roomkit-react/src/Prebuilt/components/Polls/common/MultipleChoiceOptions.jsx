@@ -51,7 +51,7 @@ export const MultipleChoiceOptions = ({
               </Checkbox.Root>
             ) : null}
 
-            {isStopped && correctOptionIndexes.includes(option.index) ? (
+            {isStopped && correctOptionIndexes?.includes(option.index) ? (
               <Flex css={{ color: '$on_surface_high' }}>
                 <CheckCircleIcon />
               </Flex>
