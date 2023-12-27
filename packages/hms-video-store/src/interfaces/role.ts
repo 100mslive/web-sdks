@@ -2,6 +2,8 @@ import { SimulcastLayers } from './simulcast-layers';
 
 export type HMSRoleName = string;
 
+export type HMSPermissionType = 'read' | 'write' | 'admin';
+
 export interface HMSRole {
   name: string;
   publishParams: PublishParams;
@@ -20,6 +22,7 @@ export interface HMSRole {
     browserRecording: boolean;
     pollRead: boolean;
     pollWrite: boolean;
+    whiteboard?: Array<HMSPermissionType>;
   };
   priority: number;
 }

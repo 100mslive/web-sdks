@@ -85,6 +85,9 @@ const policyParams: PolicyParams = {
       },
     },
   },
+  plugins: {
+    whiteboard: {},
+  },
 };
 
 const hostRole = policyParams.known_roles[policyParams.name];

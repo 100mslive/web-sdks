@@ -389,13 +389,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const hmsPeer = this.getSDKHMSPeer(peerID);
-    if (!hmsPeer) {
-      HMSLogger.w('sendMessage', 'Failed to send message');
-      throw Error(`sendMessage Failed - peer ${peerID} not found`);
-    }
-    const sdkMessage = await this.sdk.sendDirectMessage(message, hmsPeer, type);
-    this.updateMessageInStore(sdkMessage, { message, recipientPeer: hmsPeer.peerId, type });
+    const sdkMessage = await this.sdk.sendDirectMessage(message, peerID, type);
+    this.updateMessageInStore(sdkMessage, { message, recipientPeer: peerID, type });
   }
 
   private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {
@@ -770,6 +765,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       onNetworkQuality: this.onNetworkQuality.bind(this),
       onSessionStoreUpdate: this.onSessionStoreUpdate.bind(this),
       onPollsUpdate: this.onPollsUpdate.bind(this),
+      onWhiteboardUpdate: this.onWhiteboardUpdate.bind(this),
     });
     this.sdk.addAudioListener({
       onAudioLevelUpdate: this.onAudioLevelUpdate.bind(this),
@@ -870,6 +866,12 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }, actionName);
 
     polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
+  }
+
+  private onWhiteboardUpdate(whiteboard: sdkTypes.HMSWhiteboard) {
+    this.setState(draftStore => {
+      draftStore.whiteboards[whiteboard.id] = whiteboard;
+    }, 'whiteboardUpdate');
   }
 
   private async startScreenShare(config?: HMSScreenShareConfig) {

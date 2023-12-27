@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { selectLocalPeer, selectSessionStore, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { SESSION_STORE_KEY } from '../../common/constants';
@@ -20,4 +20,10 @@ export const useChatBlacklist = (
   );
 
   return { blacklistItem, blacklistedIDs };
+};
+
+export const useIsLocalPeerBlacklisted = () => {
+  const localPeer = useHMSStore(selectLocalPeer);
+  const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
+  return blacklistedPeerIDs?.includes(localPeer?.customerUserId);
 };

@@ -295,13 +295,14 @@ export const ErrorFactory = {
       );
     },
 
-    ICEFailure(action: HMSAction, description = '') {
+    ICEFailure(action: HMSAction, description = '', isTerminal = false) {
       return new HMSException(
         ErrorCodes.WebrtcErrors.ICE_FAILURE,
         'ICEFailure',
         action,
         `[${action.toString()}]: Ice connection state FAILED`,
         description,
+        isTerminal,
       );
     },
 
@@ -429,7 +430,7 @@ export const ErrorFactory = {
 
     ValidationFailed(message: string, entity?: any) {
       return new HMSException(
-        ErrorCodes.GenericErrors.INVALID_ROLE,
+        ErrorCodes.GenericErrors.VALIDATION_FAILED,
         'ValidationFailed',
         HMSAction.VALIDATION,
         message,

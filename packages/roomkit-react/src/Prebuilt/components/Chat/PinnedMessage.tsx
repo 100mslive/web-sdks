@@ -11,13 +11,15 @@ import { ArrowNavigation } from './ArrowNavigation';
 import { AnnotisedMessage } from './ChatBody';
 import { StickIndicator } from './StickIndicator';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
 
-export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (index: number) => void }) => {
+export const PinnedMessage = () => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
+  const { removePinnedMessage } = useSetPinnedMessages();
   const isMobile = useMedia(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();
@@ -67,7 +69,6 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         />
       ) : null}
       <Flex
-        title={pinnedMessages[pinnedMessageIndex]?.text}
         css={{
           p: '$4',
           color: '$on_surface_medium',
@@ -95,7 +96,12 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
             },
           }}
         >
-          <Text variant="sm" css={{ color: '$on_surface_medium' }} {...swipeHandlers}>
+          <Text
+            variant="sm"
+            css={{ color: '$on_surface_medium' }}
+            {...swipeHandlers}
+            title={pinnedMessages[pinnedMessageIndex]?.text}
+          >
             <AnnotisedMessage
               message={`${currentPinnedMessage.slice(
                 0,
@@ -113,7 +119,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
         {canUnpinMessage ? (
           <Flex
             onClick={() => {
-              clearPinnedMessage(pinnedMessageIndex);
+              removePinnedMessage(pinnedMessageIndex);
               setPinnedMessageIndex(Math.max(0, pinnedMessageIndex - 1));
             }}
             css={{
@@ -123,6 +129,7 @@ export const PinnedMessage = ({ clearPinnedMessage }: { clearPinnedMessage: (ind
               '&:hover .hide-on-hover': { display: 'none !important' },
               '&:hover .show-on-hover': { display: 'block !important' },
             }}
+            title="Unpin Message"
           >
             <UnpinIcon className="show-on-hover" style={{ display: 'none' }} height={20} width={20} />
             <PinIcon className="hide-on-hover" style={{ display: 'block' }} height={20} width={20} />

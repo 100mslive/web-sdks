@@ -79,13 +79,14 @@ export const ParticipantList = ({
 
   return (
     <Fragment>
-      <Flex direction="column" css={{ size: '100%', gap: '$4' }}>
+      <Flex
+        direction="column"
+        css={{
+          size: '100%',
+          gap: '$4',
+        }}
+      >
         {!filter?.search && participants.length === 0 ? null : <ParticipantSearch onSearch={onSearch} inSidePane />}
-        {participants.length === 0 ? (
-          <Flex align="center" justify="center" css={{ w: '100%', p: '$8 0' }}>
-            <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
-          </Flex>
-        ) : null}
         <VirtualizedParticipants
           peersOrderedByRoles={peersOrderedByRoles}
           handRaisedList={handRaisedPeers}
@@ -94,7 +95,18 @@ export const ParticipantList = ({
           offStageRoles={offStageRoles}
           isLargeRoom={isLargeRoom}
           onActive={onActive}
-        />
+        >
+          {participants.length === 0 ? (
+            <Flex
+              align="center"
+              justify="center"
+              className="emptyParticipants"
+              css={{ w: '100%', p: '$8 0', display: 'none' }}
+            >
+              <Text variant="sm">{!filter ? 'No participants' : 'No matching participants'}</Text>
+            </Flex>
+          ) : null}
+        </VirtualizedParticipants>
       </Flex>
     </Fragment>
   );
@@ -177,6 +189,7 @@ const VirtualizedParticipants = ({
   offStageRoles,
   isLargeRoom,
   onActive,
+  children,
 }: {
   peersOrderedByRoles: Record<string, HMSPeer[]>;
   isConnected: boolean;
@@ -185,6 +198,7 @@ const VirtualizedParticipants = ({
   offStageRoles: HMSRoleName[];
   isLargeRoom: boolean;
   onActive: (role: string) => void;
+  children: React.ReactNode;
 }) => {
   return (
     <Flex
@@ -196,6 +210,9 @@ const VirtualizedParticipants = ({
         pr: '$10',
         mr: '-$10',
         flex: '1 1 0',
+        '& > div:empty ~ .emptyParticipants': {
+          display: 'flex',
+        },
       }}
     >
       <Accordion.Root type={isLargeRoom ? 'single' : 'multiple'} collapsible>
@@ -221,6 +238,7 @@ const VirtualizedParticipants = ({
           />
         ))}
       </Accordion.Root>
+      {children}
     </Flex>
   );
 };
@@ -305,6 +323,9 @@ const ParticipantMoreActions = ({
       prevRole && hmsActions.changeRoleOfPeer(peerId, prevRole, true);
     } else if (on_stage_role) {
       await hmsActions.changeRoleOfPeer(peerId, on_stage_role, skip_preview_for_role_change);
+      if (skip_preview_for_role_change) {
+        await hmsActions.lowerRemotePeerHand(peerId);
+      }
     }
     setOpen(false);
   };

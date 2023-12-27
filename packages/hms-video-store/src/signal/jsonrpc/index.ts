@@ -19,11 +19,15 @@ import { workerSleep } from '../../utils/timer-utils';
 import {
   AcceptRoleChangeParams,
   BroadcastResponse,
+  CreateWhiteboardResponse,
   findPeersRequestParams,
   getPeerRequestParams,
   GetSessionMetadataResponse,
+  GetWhiteboardResponse,
   HLSRequestParams,
   HLSTimedMetadataParams,
+  HMSPermissionType,
+  HMSWhiteboardCreateOptions,
   JoinLeaveGroupResponse,
   MultiTrackUpdateRequestParams,
   peerIterRequestParams,
@@ -464,6 +468,16 @@ export default class JsonRpcSignal {
 
   getPollResult(params: PollResultParams): Promise<PollResultResponse> {
     return this.call<PollResultResponse>(HMSSignalMethod.POLL_RESULT, { ...params });
+  }
+
+  createWhiteboard(params: HMSWhiteboardCreateOptions) {
+    this.validateConnection();
+    return this.call<CreateWhiteboardResponse>(HMSSignalMethod.WHITEBOARD_CREATE, { ...params });
+  }
+
+  getWhiteboard(params: { id: string; permission?: Array<HMSPermissionType> }) {
+    this.validateConnection();
+    return this.call<GetWhiteboardResponse>(HMSSignalMethod.WHITEBOARD_GET, { ...params });
   }
 
   fetchPollLeaderboard(params: PollLeaderboardGetParams): Promise<PollLeaderboardGetResponse> {

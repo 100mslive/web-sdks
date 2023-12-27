@@ -10,6 +10,7 @@ import { RequestManager } from './managers/RequestManager';
 import { RoomUpdateManager } from './managers/RoomUpdateManager';
 import { SessionMetadataManager } from './managers/SessionMetadataManager';
 import { TrackManager } from './managers/TrackManager';
+import { WhiteboardManager } from './managers/WhiteboardManager';
 import { HMSNotificationMethod } from './HMSNotificationMethod';
 import {
   ConnectionQualityList,
@@ -39,6 +40,7 @@ export class NotificationManager {
   private roomUpdateManager: RoomUpdateManager;
   private sessionMetadataManager: SessionMetadataManager;
   private pollsManager: PollsManager;
+  private whiteboardManager: WhiteboardManager;
   /**
    * room state can be sent before join in preview stage as well but that is outdated, based on
    * eventual consistency and doesn't have all data. If we get at least one consistent room update
@@ -69,6 +71,7 @@ export class NotificationManager {
     this.roomUpdateManager = new RoomUpdateManager(this.store, this.listener);
     this.sessionMetadataManager = new SessionMetadataManager(this.store, this.listener);
     this.pollsManager = new PollsManager(this.store, this.transport, this.listener);
+    this.whiteboardManager = new WhiteboardManager(this.store, this.transport, this.listener);
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -82,6 +85,7 @@ export class NotificationManager {
     this.roomUpdateManager.listener = listener;
     this.sessionMetadataManager.listener = listener;
     this.pollsManager.listener = listener;
+    this.whiteboardManager.listener = listener;
   }
 
   setAudioListener(audioListener?: HMSAudioListener) {
@@ -125,6 +129,7 @@ export class NotificationManager {
     this.broadcastManager.handleNotification(method, notification);
     this.sessionMetadataManager.handleNotification(method, notification);
     this.pollsManager.handleNotification(method, notification);
+    this.whiteboardManager.handleNotification(method, notification);
     this.handleIsolatedMethods(method, notification);
   }
 

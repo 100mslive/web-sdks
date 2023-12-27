@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { selectLocalPeer, selectPeerNameByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
@@ -10,13 +10,14 @@ import { IconButton } from '../../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// import { ChatSelectorContainer } from './ChatSelectorContainer';
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
-import { useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useIsLocalPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
+import { useDefaultChatSelection } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -71,7 +72,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: () => void; children: ReactNode }) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -81,11 +82,19 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
   const canDisableChat = !!elements?.chat?.real_time_controls?.can_disable_chat;
-  const isPublicChatEnabled = !!elements?.chat?.public_chat_enabled;
-  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER_ID);
-  const selectedRole = useSubscribeChatSelector(CHAT_SELECTOR.ROLE);
-  const selectorPeerName = useHMSStore(selectPeerNameByID(selectedPeer));
-  const selection = selectorPeerName || selectedRole || CHAT_SELECTOR.EVERYONE;
+  const selectedPeer = useSubscribeChatSelector(CHAT_SELECTOR.PEER);
+  const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
+  const defaultSelection = useDefaultChatSelection();
+  const selection = selectedPeer.name || selectedRole || defaultSelection;
+  const isLocalPeerBlacklisted = useIsLocalPeerBlacklisted();
+
+  useEffect(() => {
+    if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
+      setRoleSelector(defaultSelection);
+    } else {
+      inputRef.current?.focus();
+    }
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -94,18 +103,20 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
     try {
       if (selectedRole) {
         await hmsActions.sendGroupMessage(message, [selectedRole]);
-      } else if (selectedPeer) {
-        await hmsActions.sendDirectMessage(message, selectedPeer);
+      } else if (selectedPeer.id) {
+        await hmsActions.sendDirectMessage(message, selectedPeer.id);
       } else {
         await hmsActions.sendBroadcastMessage(message);
       }
       inputRef.current.value = '';
       setTimeout(() => {
-        onSend();
+        onSend(1);
       }, 0);
     } catch (error) {
-      const err = error as Error;
-      ToastManager.addToast({ title: err.message });
+      const err = error as HMSException;
+      ToastManager.addToast({
+        title: err.message.startsWith('Invalid peer') ? `${selectedPeer.name} is not in this room` : err.message,
+      });
     }
   }, [selectedRole, selectedPeer, hmsActions, onSend]);
 
@@ -122,6 +133,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       setDraftMessage(messageElement?.value || '');
     };
   }, [setDraftMessage]);
+
+  if (isLocalPeerBlacklisted) {
+    return null;
+  }
 
   return (
     <Box>
@@ -172,7 +187,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
           </Flex>
         ) : null}
       </Flex>
-      {!(selection === CHAT_SELECTOR.EVERYONE && !isPublicChatEnabled) && (
+      {selection && (
         <Flex align="center" css={{ gap: '$4', w: '100%' }}>
           <Flex
             align="center"
