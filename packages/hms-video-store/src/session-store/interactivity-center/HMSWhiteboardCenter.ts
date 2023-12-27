@@ -1,6 +1,6 @@
 import { HMSWhiteboard, InteractivityListener } from '../../interfaces';
 import { HMSWhiteboardInteractivityCenter } from '../../interfaces/session-store/interactivity-center';
-import { IStore } from '../../sdk/store';
+import { Store } from '../../sdk/store';
 import { InitFlags } from '../../signal/init/models';
 import { HMSWhiteboardCreateOptions } from '../../signal/interfaces';
 import HMSTransport from '../../transport';
@@ -10,7 +10,7 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
   private TAG = '[HMSWhiteboardInteractivityCenter]';
   constructor(
     private readonly transport: HMSTransport,
-    private store: IStore,
+    private store: Store,
     private listener?: InteractivityListener,
   ) {}
 
@@ -27,14 +27,14 @@ export class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivity
     let id = prevWhiteboard?.id;
 
     if (!prevWhiteboard) {
-      const response = await this.transport.createWhiteboard(this.getCreateOptionsWithDefaults(createOptions));
+      const response = await this.transport.signal.createWhiteboard(this.getCreateOptionsWithDefaults(createOptions));
       id = response.id;
     }
     if (!id) {
       throw new Error(`Whiteboard ID: ${id} not found`);
     }
 
-    const response = await this.transport.getWhiteboard({ id });
+    const response = await this.transport.signal.getWhiteboard({ id });
     const whiteboard: HMSWhiteboard = {
       ...prevWhiteboard,
       title: createOptions?.title,
