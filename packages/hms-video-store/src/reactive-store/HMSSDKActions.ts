@@ -400,7 +400,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
-    // const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     const hmsMessage: HMSMessage = {
       read: true,
       id: messageInput.id,
