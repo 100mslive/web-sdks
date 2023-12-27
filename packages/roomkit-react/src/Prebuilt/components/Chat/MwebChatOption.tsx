@@ -11,7 +11,7 @@ export const MwebChatOption = ({
   icon: any;
   text: string;
   onClick: () => void | Promise<void>;
-  color: string;
+  color?: string;
 }) => {
   return (
     <Flex align="center" css={{ w: '100%', color, cursor: 'pointer', gap: '$4', p: '$8' }} onClick={onClick}>
