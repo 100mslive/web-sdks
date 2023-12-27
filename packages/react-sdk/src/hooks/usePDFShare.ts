@@ -87,7 +87,7 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       };
       inProgress.current = true;
       setSharing(true);
-      const isInsideIframe = window.document.location.ancestorOrigins.length > 0;
+      const isInsideIframe = window.self !== window.top;
       await toggleScreenShare?.({
         forceCurrentTab: isChromiumBased && !isInsideIframe,
         cropElement: iframeRef.current,
