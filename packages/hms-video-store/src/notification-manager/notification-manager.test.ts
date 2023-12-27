@@ -7,7 +7,7 @@ import { DeviceManager } from '../device-manager';
 import { EventBus } from '../events/EventBus';
 import { HMSAudioListener, HMSPeerUpdate, HMSRoomUpdate, HMSUpdateListener } from '../interfaces';
 import HMSRoom from '../sdk/models/HMSRoom';
-import { HMSPeer, HMSRemotePeer } from '../sdk/models/peer';
+import { HMSRemotePeer } from '../sdk/models/peer';
 import { Store } from '../sdk/store';
 import HMSTransport from '../transport';
 
@@ -220,8 +220,7 @@ describe('Notification Manager', () => {
       notificationManager.handleNotification({ method: HMSNotificationMethod.BROADCAST, params: fakeMessage });
 
       expect(messageReceivedHandler).toBeCalled();
-      expect(messageReceivedHandler.mock.calls[0][0].sender).toBeInstanceOf(HMSPeer);
-      expect(messageReceivedHandler.mock.calls[0][0].sender.peerId).toBe(FAKE_PEER_ID);
+      expect(messageReceivedHandler.mock.calls[0][0].peer.peer_id).toBe(FAKE_PEER_ID);
     });
   });
 });
