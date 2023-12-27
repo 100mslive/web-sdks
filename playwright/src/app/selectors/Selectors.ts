@@ -25,5 +25,12 @@ export class Selectors {
     EndPollBtn = 'End poll';
     EndQuizBtn = 'End quiz';
 
+    //settings
+    MoreSettingsBtn = 'more_settings_btn';
+    ShowStatsBtn =  'button:near(:text("Show Stats on Tiles"))';
+    StatsForNerdsMenu = 'Stats for Nerds';
+    StatsForNerdsCloseBtn = 'stats_dialog_close_icon';
+
+
 
 }

@@ -59,4 +59,11 @@ export class PageActions {
         else
         await page.getByText(selectors.VoteBtn).click();
     }
+
+    async turnOnStatsForNerds(page: any){
+        await page.getByTestId(selectors.MoreSettingsBtn).click();
+        await page.getByText(selectors.StatsForNerdsMenu).click();
+        await page.locator(selectors.ShowStatsBtn).click();
+        await page.getByTestId(selectors.StatsForNerdsCloseBtn).click();
+    }
 }
