@@ -403,7 +403,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     // const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
     const hmsMessage: HMSMessage = {
       read: true,
-      id: messageInput.id!,
+      id: messageInput.id,
       time: new Date(messageInput.time),
       message: messageInput.message,
       type: messageInput.type || 'chat',
