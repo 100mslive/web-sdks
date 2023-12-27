@@ -36,4 +36,6 @@ export interface HMSMessageInput {
   recipientRoles?: HMSRoleName[];
   type?: string;
   message: any;
+  id: string;
+  time: number;
 }

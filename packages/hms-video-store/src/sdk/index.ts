@@ -1,4 +1,3 @@
-import Message from './models/HMSMessage';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
 import { HMSPeerListIterator } from './HMSPeerListIterator';
@@ -58,7 +57,7 @@ import {
   HMSTrackType,
   HMSVideoTrack,
 } from '../media/tracks';
-import { HMSNotificationMethod, PeerLeaveRequestNotification } from '../notification-manager';
+import { HMSNotificationMethod, PeerLeaveRequestNotification, SendMessage } from '../notification-manager';
 import { createRemotePeer } from '../notification-manager/managers/utils';
 import { NotificationManager } from '../notification-manager/NotificationManager';
 import { SessionStore } from '../session-store';
@@ -719,19 +718,20 @@ export class HMSSdk implements HMSInterface {
       HMSLogger.w(this.TAG, 'sendMessage', 'Ignoring empty message send');
       throw ErrorFactory.GenericErrors.ValidationFailed('Empty message not allowed');
     }
-    const hmsMessage = new Message({
-      sender: this.localPeer!,
-      type,
-      message,
-      recipientPeer,
-      recipientRoles,
-      time: new Date(),
-    });
-    HMSLogger.d(this.TAG, 'Sending Message: ', hmsMessage);
-    const response = await this.transport.signal.broadcast(hmsMessage);
-    hmsMessage.time = new Date(response.timestamp);
-    hmsMessage.id = response.message_id;
-    return hmsMessage;
+    const sendParams: SendMessage = {
+      info: {
+        message,
+        type,
+      },
+    };
+    if (recipientRoles?.length) {
+      sendParams.roles = recipientRoles.map(role => role.name);
+    }
+    if (recipientPeer?.peerId) {
+      sendParams.peer_id = recipientPeer.peerId;
+    }
+    HMSLogger.d(this.TAG, 'Sending Message: ', sendParams);
+    return await this.transport.signal.broadcast(sendParams);
   }
 
   async startScreenShare(onStop: () => void, config?: HMSScreenShareConfig) {

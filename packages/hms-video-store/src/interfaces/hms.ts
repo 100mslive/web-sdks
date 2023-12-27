@@ -2,7 +2,6 @@ import { HMSChangeMultiTrackStateParams } from './change-track-state';
 import { HMSConfig, HMSPreviewConfig } from './config';
 import { TokenRequest, TokenRequestOptions } from './get-token';
 import { HLSConfig } from './hls-config';
-import { HMSMessage } from './message';
 import { HMSLocalPeer, HMSPeer } from './peer';
 import { HMSPeerListIteratorOptions } from './peer-list-iterator';
 import { HMSPlaylistManager, HMSPlaylistSettings } from './playlist';
@@ -19,6 +18,7 @@ import { IAudioOutputManager } from '../device-manager/AudioOutputManager';
 import { HMSRemoteTrack, HMSTrackSource } from '../media/tracks';
 import { HMSWebrtcInternals } from '../rtc-stats/HMSWebrtcInternals';
 import { HMSPeerListIterator } from '../sdk/HMSPeerListIterator';
+import { BroadcastResponse } from '../signal/interfaces';
 import { HMSLogLevel } from '../utils/logger';
 
 export interface HMSInterface {
@@ -76,10 +76,10 @@ export interface HMSInterface {
    * @deprecated The method should not be used
    * @see sendBroadcastMessage
    */
-  sendMessage(type: string, message: string): HMSMessage | void;
-  sendBroadcastMessage(message: string, type?: string): Promise<HMSMessage>;
-  sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<HMSMessage>;
-  sendDirectMessage(message: string, peerId: string, type?: string): Promise<HMSMessage>;
+  sendMessage(type: string, message: string): BroadcastResponse | void;
+  sendBroadcastMessage(message: string, type?: string): Promise<BroadcastResponse>;
+  sendGroupMessage(message: string, roles: HMSRole[], type?: string): Promise<BroadcastResponse>;
+  sendDirectMessage(message: string, peerId: string, type?: string): Promise<BroadcastResponse>;
 
   startScreenShare(onStop: () => void, config?: HMSScreenShareConfig): Promise<void>;
   stopScreenShare(): Promise<void>;

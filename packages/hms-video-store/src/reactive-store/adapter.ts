@@ -8,6 +8,7 @@ import {
   HMSRoleChangeRequest as SDKHMSRoleChangeRequest,
   HMSTrack as SDKHMSTrack,
 } from '../internal';
+import { MessageNotification } from '../notification-manager';
 import {
   HMSAudioTrack,
   HMSDeviceChangeEvent,
@@ -157,18 +158,21 @@ export class SDKToHMS {
     };
   }
 
-  static convertMessage(sdkMessage: sdkTypes.HMSMessage): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
+  static convertMessage(
+    sdkMessage: MessageNotification,
+    localPeerId: HMSPeerID,
+  ): Partial<HMSMessage> & Pick<HMSMessage, 'sender'> {
     return {
-      sender: sdkMessage.sender?.peerId,
-      senderName: sdkMessage.sender?.name,
-      senderRole: sdkMessage.sender?.role?.name,
-      senderUserId: sdkMessage.sender?.customerUserId,
-      recipientPeer: sdkMessage.recipientPeer?.peerId,
-      recipientRoles: sdkMessage.recipientRoles?.map(role => role.name),
-      time: sdkMessage.time,
-      type: sdkMessage.type,
-      message: sdkMessage.message,
-      id: sdkMessage.id,
+      sender: sdkMessage.peer?.peer_id,
+      senderName: sdkMessage.peer?.info.name,
+      senderRole: sdkMessage.peer?.role,
+      senderUserId: sdkMessage.peer?.info.user_id,
+      recipientPeer: sdkMessage.private ? localPeerId : undefined,
+      recipientRoles: sdkMessage.roles,
+      time: new Date(sdkMessage.timestamp),
+      type: sdkMessage.info.type,
+      message: sdkMessage.info.message,
+      id: sdkMessage.message_id,
     };
   }
 
