@@ -404,7 +404,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsMessage: HMSMessage = {
       read: true,
       id: messageInput.id!,
-      time: new Date(),
+      time: new Date(messageInput.time),
       message: messageInput.message,
       type: messageInput.type || 'chat',
       recipientPeer: messageInput.recipientPeer,
