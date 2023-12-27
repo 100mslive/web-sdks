@@ -107,16 +107,37 @@ export const SidePaneTabs = React.memo<{
         <>
           {hideTabs ? (
             <>
-              <Text variant="sm" css={{ fontWeight: '$semiBold', p: '$4', c: '$on_surface_high', pr: '$12' }}>
-                {showChat ? (
-                  chat_title
-                ) : (
-                  <span>
-                    Participants <ParticipantCount count={peerCount} />
-                  </span>
-                )}
-              </Text>
-
+              <Flex justify="between" css={{ w: '100%' }}>
+                <Text variant="sm" css={{ fontWeight: '$semiBold', p: '$4', c: '$on_surface_high', pr: '$12' }}>
+                  {showChat ? (
+                    chat_title
+                  ) : (
+                    <span>
+                      Participants&nbsp;
+                      <ParticipantCount count={peerCount} />
+                    </span>
+                  )}
+                </Text>
+                <Flex>
+                  {showChatSettings ? <ChatSettings /> : null}
+                  {isOverlayChat && isChatOpen ? null : (
+                    <IconButton
+                      css={{ my: '$1', color: '$on_surface_medium', '&:hover': { color: '$on_surface_high' } }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        if (activeTab === SIDE_PANE_OPTIONS.CHAT) {
+                          toggleChat();
+                        } else {
+                          toggleParticipants();
+                        }
+                      }}
+                      data-testid="close_chat"
+                    >
+                      <CrossIcon />
+                    </IconButton>
+                  )}
+                </Flex>
+              </Flex>
               {showChat ? <Chat /> : <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />}
             </>
           ) : (
@@ -148,7 +169,8 @@ export const SidePaneTabs = React.memo<{
                       color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
                     }}
                   >
-                    Participants&nbsp; <ParticipantCount count={peerCount} />
+                    Participants&nbsp;
+                    <ParticipantCount count={peerCount} />
                   </Tabs.Trigger>
                 </Tabs.List>
                 {showChatSettings ? <ChatSettings /> : null}
