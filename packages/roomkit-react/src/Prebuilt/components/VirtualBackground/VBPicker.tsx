@@ -43,7 +43,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const { effectsSDKKey } = useHMSPrebuiltContext();
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
-    VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes,
+    (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
   );
 
   const mediaList = [
