@@ -1,5 +1,4 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { useInView } from 'react-intersection-observer';
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
@@ -160,14 +159,12 @@ const SenderName = styled(Text, {
 
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
-    const { ref, inView } = useInView({ threshold: 0.5, triggerOnce: true });
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
     const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
-    const hmsActions = useHMSActions();
     const localPeerId = useHMSStore(selectLocalPeerID);
     const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
     const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
@@ -190,16 +187,8 @@ const ChatMessage = React.memo(
       }
     }, [index]);
 
-    useEffect(() => {
-      if (message.id && !message.read && inView) {
-        hmsActions.setMessageRead(true, message.id);
-      }
-    }, [message.read, hmsActions, inView, message.id]);
-
     return (
       <Box
-        ref={ref}
-        as="div"
         css={{
           mb: '$5',
           pr: '$10',
@@ -346,6 +335,10 @@ const VirtualizedChatMessages = React.forwardRef<
   VariableSizeList,
   { messages: HMSMessage[]; scrollToBottom: (count: number) => void }
 >(({ messages, scrollToBottom }, listRef) => {
+  const hmsActions = useHMSActions();
+  const itemKey = useCallback((index: number, data: HMSMessage[]) => {
+    return data[index].id;
+  }, []);
   useEffect(() => {
     requestAnimationFrame(() => scrollToBottom(1));
   }, [scrollToBottom]);
@@ -371,6 +364,14 @@ const VirtualizedChatMessages = React.forwardRef<
             height={height}
             style={{
               overflowX: 'hidden',
+            }}
+            itemKey={itemKey}
+            onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
+              for (let i = visibleStartIndex; i <= visibleStopIndex; i++) {
+                if (!messages[i].read) {
+                  hmsActions.setMessageRead(true, messages[i].id);
+                }
+              }
             }}
           >
             {MessageWrapper}
