@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
@@ -18,11 +18,11 @@ import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { VBCollection } from './VBCollection';
+import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-import { VBPlugin } from './useVBMethods';
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia } from './constants';
 
@@ -41,10 +41,9 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsSDKEnabled = useHMSStore(selectAppData('isEffectsSDKEnabled'));
   const { effectsSDKKey } = useHMSPrebuiltContext();
-  const vbPluginRef = useRef<VBPlugin | null>(null);
-  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(vbPluginRef.current?.getName() || ''));
+  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
-    vbPluginRef.current?.getBackground() as string | HMSVirtualBackgroundTypes,
+    VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes,
   );
 
   const mediaList = [
@@ -57,21 +56,21 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
 
   async function disableEffects() {
     if (isPluginAdded) {
-      vbPluginRef.current?.removeEffects();
+      VBHandler?.removeEffects();
       setActiveBackground(HMSVirtualBackgroundTypes.NONE);
     }
   }
 
-  const addPlugin = useCallback(
+  const applyEffect = useCallback(
     async ({ mediaURL = '', blurPower = 0 }) => {
       if (!localPeer?.videoTrack) {
         console.error('Video track is not available yet');
         return;
       }
       if (mediaURL) {
-        vbPluginRef.current?.setBackground(mediaURL);
+        VBHandler?.setBackground(mediaURL);
       } else if (blurPower) {
-        vbPluginRef.current?.setBlur(blurPower);
+        VBHandler?.setBlur(blurPower);
       }
       setActiveBackground(mediaURL || (blurPower ? HMSVirtualBackgroundTypes.BLUR : HMSVirtualBackgroundTypes.NONE));
     },
@@ -79,26 +78,24 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   );
 
   useEffect(() => {
-    if (vbPluginRef.current) {
-      return;
-    }
-
-    vbPluginRef.current = new VBPlugin(isEffectsSDKEnabled ? effectsSDKKey : '');
-  }, [isEffectsSDKEnabled, effectsSDKKey]);
-
-  useEffect(() => {
     if (!isPluginAdded) {
-      const vbObject = vbPluginRef.current?.getVBObject();
-      if (!vbObject || !role) return;
-      if (isEffectsSDKEnabled) {
-        // @ts-ignore
-        hmsActions.addPluginsToVideoStream([vbObject]);
-      } else {
-        // @ts-ignore
-        hmsActions.addPluginToVideoTrack(vbObject, Math.floor(role.publishParams.video.frameRate / 2));
+      let vbObject = VBHandler.getVBObject();
+      if (!vbObject) {
+        VBHandler.initialisePlugin(isEffectsSDKEnabled ? effectsSDKKey : '');
+        vbObject = VBHandler.getVBObject();
+        if (isEffectsSDKEnabled && effectsSDKKey) {
+          // @ts-ignore
+          hmsActions.addPluginsToVideoStream([vbObject]);
+        } else {
+          if (!role) {
+            return;
+          }
+          // @ts-ignore
+          hmsActions.addPluginToVideoTrack(vbObject, Math.floor(role.publishParams.video.frameRate / 2));
+        }
       }
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsSDKEnabled]);
+  }, [hmsActions, role, isPluginAdded, isEffectsSDKEnabled, effectsSDKKey]);
 
   useEffect(() => {
     if (!isVideoOn) {
@@ -150,7 +147,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
               title: 'Blur',
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
-              onClick: async () => addPlugin({ blurPower: 0.5 }),
+              onClick: async () => applyEffect({ blurPower: 0.5 }),
             },
           ]}
           activeBackground={activeBackground}
@@ -161,7 +158,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           options={mediaList.map(mediaURL => ({
             mediaURL,
             value: mediaURL,
-            onClick: async () => addPlugin({ mediaURL }),
+            onClick: async () => applyEffect({ mediaURL }),
           }))}
           activeBackground={activeBackground}
         />

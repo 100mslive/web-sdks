@@ -4,19 +4,16 @@ export class VBPlugin {
   private hmsPlugin?: HMSVBPlugin;
   private effectsPlugin?: HMSEffectsPlugin | undefined;
 
-  constructor(effectsSDKKey?: string) {
+  initialisePlugin = (effectsSDKKey?: string) => {
+    if (this.getVBObject()) {
+      return;
+    }
     if (effectsSDKKey) {
       this.effectsPlugin = new HMSEffectsPlugin(effectsSDKKey);
     } else {
-      console.error(
-        'The API key for using Effects virtual background is missing. Defaulting to standard virtual background',
-      );
-    }
-
-    if (!this.effectsPlugin) {
       this.hmsPlugin = new HMSVBPlugin(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
-  }
+  };
 
   getBackground = () => {
     if (this.effectsPlugin) {
@@ -71,3 +68,5 @@ export class VBPlugin {
     }
   };
 }
+
+export const VBHandler = new VBPlugin();
