@@ -14,7 +14,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
-import { useIsLocalPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection } from '../../common/hooks';
@@ -86,7 +86,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
-  const isLocalPeerBlacklisted = useIsLocalPeerBlacklisted();
+  const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
