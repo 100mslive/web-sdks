@@ -78,7 +78,15 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
       <Text variant="xs" css={{ color: '$on_surface_medium' }}>
         Based on score and time taken to cast the correct answer
       </Text>
-      <Box css={{ mt: '$8', gap: '$4', overflowY: 'auto', flex: '1 1 0', mr: '-$6', pr: '$6' }}>
+      <Box
+        css={{
+          mt: '$8',
+          overflowY: 'auto',
+          flex: '1 1 0',
+          mr: '-$6',
+          pr: '$6',
+        }}
+      >
         {pollLeaderboard?.entries &&
           pollLeaderboard.entries.map(question => (
             <LeaderboardEntry
