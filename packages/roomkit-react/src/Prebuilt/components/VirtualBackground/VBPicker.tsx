@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
@@ -43,7 +43,7 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const { effectsSDKKey } = useHMSPrebuiltContext();
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
-    VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes,
+    (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
   );
 
   const mediaList = [
@@ -53,29 +53,6 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
-
-  async function disableEffects() {
-    if (isPluginAdded) {
-      VBHandler?.removeEffects();
-      setActiveBackground(HMSVirtualBackgroundTypes.NONE);
-    }
-  }
-
-  const applyEffect = useCallback(
-    async ({ mediaURL = '', blurPower = 0 }) => {
-      if (!localPeer?.videoTrack) {
-        console.error('Video track is not available yet');
-        return;
-      }
-      if (mediaURL) {
-        VBHandler?.setBackground(mediaURL);
-      } else if (blurPower) {
-        VBHandler?.setBlur(blurPower);
-      }
-      setActiveBackground(mediaURL || (blurPower ? HMSVirtualBackgroundTypes.BLUR : HMSVirtualBackgroundTypes.NONE));
-    },
-    [localPeer?.videoTrack],
-  );
 
   useEffect(() => {
     if (!isPluginAdded) {
@@ -141,13 +118,19 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
               title: 'No effect',
               icon: <CrossCircleIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.NONE,
-              onClick: async () => await disableEffects(),
+              onClick: async () => {
+                VBHandler.removeEffects();
+                setActiveBackground(HMSVirtualBackgroundTypes.NONE);
+              },
             },
             {
               title: 'Blur',
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
-              onClick: async () => applyEffect({ blurPower: 0.5 }),
+              onClick: async () => {
+                VBHandler?.setBlur(0.5);
+                setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
+              },
             },
           ]}
           activeBackground={activeBackground}
@@ -158,7 +141,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
           options={mediaList.map(mediaURL => ({
             mediaURL,
             value: mediaURL,
-            onClick: async () => applyEffect({ mediaURL }),
+            onClick: async () => {
+              VBHandler?.setBackground(mediaURL);
+              setActiveBackground(mediaURL);
+            },
           }))}
           activeBackground={activeBackground}
         />
