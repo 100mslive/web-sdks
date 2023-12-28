@@ -36,7 +36,7 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
   const [sharing, setSharing] = useState(false);
 
   const handleScreenShareError = useCallback(() => {
-    throw new Error('unable to start screen share');
+    new Error('unable to start screen share');
   }, []);
   const inProgress = useRef(false);
   const { amIScreenSharing, toggleScreenShare } = useScreenShare(handleScreenShareError);
@@ -87,7 +87,7 @@ export const usePDFShare = (resetConfig?: () => void): usePDFShareResult => {
       };
       inProgress.current = true;
       setSharing(true);
-      const isInsideIframe = window.self !== window.top;
+      const isInsideIframe = false;
       await toggleScreenShare?.({
         forceCurrentTab: isChromiumBased && !isInsideIframe,
         cropElement: iframeRef.current,
