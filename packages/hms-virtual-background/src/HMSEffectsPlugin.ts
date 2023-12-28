@@ -9,7 +9,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1
   private blurAmount = 0;
-  private background: HMSEffectsBackground = '';
+  private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
 
   constructor(effectsSDKKey: string) {
