@@ -1,4 +1,5 @@
 import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { ActionBatcher } from './sdkUtils/ActionBatcher';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
@@ -119,7 +120,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
-  // private actionBatcher: ActionBatcher;
+  private actionBatcher: ActionBatcher<T>;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
@@ -133,7 +134,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
-    // this.actionBatcher = new ActionBatcher(store);
+    this.actionBatcher = new ActionBatcher(store);
   }
   setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
     this.sdk.updatePlaylistSettings(settings);
@@ -1117,7 +1118,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (hmsMessage.ignored) {
       return;
     }
-    this.setState(store => {
+    this.actionBatcher.setState(store => {
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     }, 'newMessage');
