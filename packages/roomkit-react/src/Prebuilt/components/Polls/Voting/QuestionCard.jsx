@@ -2,22 +2,22 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, CrossCircleIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, IconButton, Input, styled, Text } from '../../../../';
+import { Box, Button, Flex, IconButton, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptions } from '../common/SingleChoiceOptions';
 import { QUESTION_TYPE } from '../../../common/constants';
 
-const TextArea = styled('textarea', {
-  backgroundColor: '$surface_brighter',
-  border: '1px solid $border_bright',
-  borderRadius: '$1',
-  mb: '$md',
-  color: '$on_surface_high',
-  resize: 'none',
-  p: '$2',
-  w: '100%',
-});
+// const TextArea = styled('textarea', {
+//   backgroundColor: '$surface_brighter',
+//   border: '1px solid $border_bright',
+//   borderRadius: '$1',
+//   mb: '$md',
+//   color: '$on_surface_high',
+//   resize: 'none',
+//   p: '$2',
+//   w: '100%',
+// });
 
 export const QuestionCard = ({
   pollID,
@@ -67,23 +67,21 @@ export const QuestionCard = ({
     setCurrentIndex(curr => Math.max(1, curr - 1));
   };
 
-  const [textAnswer, setTextAnswer] = useState('');
+  // const [textAnswer, setTextAnswer] = useState('');
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
 
-  const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
+  // const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
 
   const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
 
   const isValidVote = useMemo(() => {
-    if (stringAnswerExpected) {
-      return textAnswer.length > 0;
-    } else if (type === QUESTION_TYPE.SINGLE_CHOICE) {
+    if (type === QUESTION_TYPE.SINGLE_CHOICE) {
       return singleOptionAnswer !== undefined;
     } else if (type === QUESTION_TYPE.MULTIPLE_CHOICE) {
       return multipleOptionAnswer.size > 0;
     }
-  }, [textAnswer, singleOptionAnswer, multipleOptionAnswer, type, stringAnswerExpected]);
+  }, [singleOptionAnswer, multipleOptionAnswer, type]);
 
   const handleVote = useCallback(async () => {
     if (!isValidVote) {
@@ -92,12 +90,11 @@ export const QuestionCard = ({
     await actions.interactivityCenter.addResponsesToPoll(pollID, [
       {
         questionIndex: index,
-        text: textAnswer,
         option: singleOptionAnswer,
         options: Array.from(multipleOptionAnswer),
       },
     ]);
-  }, [actions, index, pollID, isValidVote, textAnswer, singleOptionAnswer, multipleOptionAnswer]);
+  }, [actions, index, pollID, isValidVote, singleOptionAnswer, multipleOptionAnswer]);
 
   const handleSkip = useCallback(async () => {
     await actions.interactivityCenter.addResponsesToPoll(pollID, [
@@ -181,7 +178,7 @@ export const QuestionCard = ({
         <Text css={{ color: '$on_surface_high' }}>{text}</Text>
       </Box>
 
-      {type === QUESTION_TYPE.SHORT_ANSWER ? (
+      {/* {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
           disabled={!canRespond}
           placeholder="Enter your answer"
@@ -194,15 +191,15 @@ export const QuestionCard = ({
             cursor: localPeerResponse ? 'not-allowed' : 'text',
           }}
         />
-      ) : null}
+      ) : null} */}
 
-      {type === QUESTION_TYPE.LONG_ANSWER ? (
+      {/* {type === QUESTION_TYPE.LONG_ANSWER ? (
         <TextArea
           disabled={!canRespond}
           placeholder="Enter your answer"
           onChange={e => setTextAnswer(e.target.value)}
         />
-      ) : null}
+      ) : null} */}
 
       {type === QUESTION_TYPE.SINGLE_CHOICE ? (
         <SingleChoiceOptions
