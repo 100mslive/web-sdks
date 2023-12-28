@@ -16,7 +16,6 @@ test.beforeEach(async () => {});
     const broadcaster_page = await context.newPage();
     await broadcaster_page.goto(URL);
     await pageActions.goLive(broadcaster_page, 'Automation User');
-    await broadcaster_page.getByTestId('participant_video_tile').isVisible();
 
      await pageActions.createNewPoll('Test Poll', broadcaster_page);
     
@@ -49,7 +48,6 @@ test.beforeEach(async () => {});
     const broadcaster_page = await context.newPage();
     await broadcaster_page.goto(URL);
     await pageActions.goLive(broadcaster_page, 'Automation User');
-    await broadcaster_page.getByTestId('participant_video_tile').isVisible();
 
     await pageActions.createNewQuiz('Test Poll', broadcaster_page);
     // new quiz assertions

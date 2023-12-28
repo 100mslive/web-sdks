@@ -455,5 +455,80 @@ test(`Verify peer can remove other peer`, async({context}) => {
 
 });
 
+test.skip(`Verify peer mute and unmute peers`, async({context}) => {
+        const co_broadcasterUrl = 'https://automation-live-stream.app.100ms.live/streaming/meeting/gno-sbuc-lyw';
+        
+        const page_b = await context.newPage();
+
+        //Join as broadcaster
+        await page_b.goto(co_broadcasterUrl);
+        await page_b.getByPlaceholder('Enter name').fill('broadcaster');
+        await page_b.getByText("Join Now").click();
+        await page_b.waitForTimeout(5000);
+
+        const page_cb = await context.newPage();
+
+        //Join as co_broadcaster
+        await page_cb.goto(co_broadcasterUrl);
+        await page_cb.getByPlaceholder('Enter name').fill('cobroadcaster');
+        await page_cb.getByText("Join Now").click();
+        await page_cb.waitForTimeout(5000);
+
+        await page_b.bringToFront();
+        await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').click();
+        await page_b.getByTestId('mute_video_participant_btn').click();
+
+        await page_b.getByTestId('participant_tile_broadcaster').hover();
+        await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').click();
+        await page_b.getByTestId('mute_audio_participant_btn').click();
+
+        await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_audio_mute_icon']").isVisible();
+        await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_avatar_icon']").isVisible();
+
+        await page_b.getByTestId('participant_tile_broadcaster').hover();
+        await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').click();
+        await page_b.getByTestId('unmute_video_participant_btn').click();
+
+        await page_cb.bringToFront();
+        await page_cb.getByText('Accept').click();
+
+        await page_b.bringToFront();
+        await page_b.getByTestId('participant_tile_cobroadcaster').hover();
+        await page_b.getByTestId('participant_menu_btn').click();
+        await page_b.getByTestId('unmute_audio_participant_btn').click();
+
+        await page_cb.bringToFront();
+        await page_cb.getByText('Accept').click();
+
+        await page_b.bringToFront();
+        await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_audio_mute_icon']").isHidden();
+        await page_b.locator("//div[@data-testid='participant_audio_mute_icon']//div[@data-testid='participant_avatar_icon']").isHidden();
+});
+
+test(`Check role limit test`, async({context}) => {
+
+        const hostUrl = "https://role-limit-check.app.100ms.live/meeting/ifb-edpm-pcv"
+
+        const page_b = await context.newPage();
+
+        //Join as broadcaster
+        await page_b.goto(hostUrl);
+        await page_b.getByPlaceholder('Enter name').fill('host1');
+        await page_b.getByText("Join Now").click();
+        await page_b.waitForTimeout(1000);
+
+        const page_a = await context.newPage();
+
+        //Join as broadcaster
+        await page_a.goto(hostUrl);
+        await page_a.getByPlaceholder('Enter name').fill('host1');
+        await page_a.getByText("Join Now").click();
+        await page_a.getByText('The room is currently full,try joining later').isVisible();
+        
+        await page_a.getByTestId('join_again_btn').isVisible();
+});
 
 
