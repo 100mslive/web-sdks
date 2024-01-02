@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
@@ -181,7 +181,7 @@ const ChatMessage = React.memo(
       showReply = true;
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, rowRef.current.clientHeight);
       }
