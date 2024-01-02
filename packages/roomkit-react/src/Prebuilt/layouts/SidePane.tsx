@@ -12,7 +12,10 @@ import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../components/AppData/useSidepane';
-import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import {
+  useRoomLayoutConferencingScreen,
+  useRoomLayoutPreviewScreen,
+} from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -28,8 +31,7 @@ const SidePane = ({
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
-  // eslint-disable-next-line
-  console.log('alpha-debug props', elements?.virtual_background);
+  const { elements: preview_elements } = useRoomLayoutPreviewScreen();
   const resetSidePane = useSidepaneReset();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
@@ -39,7 +41,7 @@ const SidePane = ({
     ViewComponent = <SidePaneTabs hideControls={hideControls} active={sidepane} />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
-    ViewComponent = <VBPicker background_media={elements.virtual_background?.background_media || []} />;
+    ViewComponent = <VBPicker background_media={preview_elements?.virtual_background?.background_media || []} />;
   }
 
   useEffect(() => {

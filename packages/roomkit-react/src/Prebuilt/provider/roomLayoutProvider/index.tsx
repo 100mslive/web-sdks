@@ -20,8 +20,6 @@ export const RoomLayoutContext = React.createContext<
 
 function customizer(objValue: any, srcValue: any) {
   if (isArray(objValue) && isArray(srcValue)) {
-    // eslint-disable-next-line
-    console.log('alpha-debug: customizer worked', objValue, srcValue);
     return srcValue;
   }
   // default mergeWith behaviour is followed
@@ -36,8 +34,6 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
   const authToken: string = useAuthToken();
   const { layout, updateRoomLayoutForRole } = useFetchRoomLayout({ authToken, endpoint: roomLayoutEndpoint });
   const mergedLayout = authToken && layout ? mergeWith(layout, overrideLayout, customizer) : layout;
-  // eslint-disable-next-line
-  console.log('alpha-debug: mergedLayout', mergedLayout, overrideLayout);
   return (
     <RoomLayoutContext.Provider value={{ layout: mergedLayout, updateRoomLayoutForRole }}>
       {children}
