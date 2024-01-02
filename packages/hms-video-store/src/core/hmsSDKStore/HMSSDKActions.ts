@@ -1109,10 +1109,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (hmsMessage.ignored) {
       return;
     }
-    this.actionBatcher.setState(store => {
-      store.messages.byID[hmsMessage.id] = hmsMessage;
-      store.messages.allIDs.push(hmsMessage.id);
-    }, 'newMessage');
+    this.actionBatcher.setState(
+      store => {
+        store.messages.byID[hmsMessage.id] = hmsMessage;
+        store.messages.allIDs.push(hmsMessage.id);
+      },
+      'newMessage',
+      150,
+    );
   }
 
   /*
