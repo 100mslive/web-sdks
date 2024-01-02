@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Layout } from '@100mslive/types-prebuilt';
 import merge from 'lodash.merge';
 // @ts-ignore: fix types
@@ -23,9 +23,16 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
   roomLayoutEndpoint,
   overrideLayout,
 }) => {
+  // Log and check here
   const authToken: string = useAuthToken();
   const { layout, updateRoomLayoutForRole } = useFetchRoomLayout({ authToken, endpoint: roomLayoutEndpoint });
-  const mergedLayout = authToken && layout ? merge(layout, overrideLayout) : layout;
+  const [mergedLayout, setMergedLayout] = useState(layout);
+  console.log('fixed props');
+
+  useEffect(() => {
+    setMergedLayout(authToken && layout ? merge(layout, overrideLayout) : layout);
+  }, [authToken, layout, overrideLayout]);
+
   return (
     <RoomLayoutContext.Provider value={{ layout: mergedLayout, updateRoomLayoutForRole }}>
       {children}
