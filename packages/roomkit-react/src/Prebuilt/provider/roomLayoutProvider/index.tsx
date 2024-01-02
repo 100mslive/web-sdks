@@ -31,7 +31,6 @@ export const RoomLayoutProvider: React.FC<React.PropsWithChildren<RoomLayoutProv
   roomLayoutEndpoint,
   overrideLayout,
 }) => {
-  // Log and check here
   const authToken: string = useAuthToken();
   const { layout, updateRoomLayoutForRole } = useFetchRoomLayout({ authToken, endpoint: roomLayoutEndpoint });
   const mergedLayout = authToken && layout ? mergeWith(layout, overrideLayout, customizer) : layout;
