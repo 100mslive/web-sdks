@@ -194,6 +194,14 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       offset,
     });
 
+    const summary = {
+      avgScore: pollLeaderboard.avg_score,
+      avgTime: pollLeaderboard.avg_time,
+      votedUsers: pollLeaderboard.voted_users,
+      totalUsers: pollLeaderboard.total_users,
+      correctAnswers: pollLeaderboard.correct_users,
+    };
+
     const leaderboardEntries = pollLeaderboard.questions.map(question => {
       return {
         position: question.position,
@@ -205,7 +213,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       };
     });
 
-    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last };
+    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
   }
 }
 

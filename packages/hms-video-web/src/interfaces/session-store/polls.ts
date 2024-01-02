@@ -155,4 +155,11 @@ export interface HMSPollLeaderboardEntry {
 export interface HMSPollLeaderboardResponse {
   entries: HMSPollLeaderboardEntry[];
   hasNext: boolean;
+  summary?: {
+    avgScore: number;
+    avgTime: number;
+    votedUsers: number;
+    totalUsers: number;
+    correctAnswers: number;
+  };
 }
