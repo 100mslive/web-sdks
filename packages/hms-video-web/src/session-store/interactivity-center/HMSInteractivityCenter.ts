@@ -8,7 +8,6 @@ import {
 import {
   HMSPoll,
   HMSPollCreateParams,
-  HMSPollLeaderboardResponse,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
@@ -16,6 +15,7 @@ import {
   HMSPollQuestionType,
   HMSPollStates,
   HMSPollUserTrackingMode,
+  HMSQuizLeaderboardResponse,
 } from '../../interfaces/session-store/polls';
 import { IStore } from '../../sdk/store';
 import { PollInfoParams, PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
@@ -182,7 +182,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return question;
   }
 
-  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSPollLeaderboardResponse> {
+  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSQuizLeaderboardResponse> {
     const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
 
     if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {

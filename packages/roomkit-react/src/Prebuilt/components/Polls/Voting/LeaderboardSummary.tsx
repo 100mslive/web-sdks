@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { HMSPollLeaderboardResponse, selectPollByID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSQuizLeaderboardResponse,
+  HMSQuizLeaderboardSummary,
+  selectPollByID,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { ChevronLeftIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Loading } from '../../../../Loading';
@@ -16,10 +22,10 @@ import { POLL_VIEWS } from '../../../common/constants';
 
 export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
   const hmsActions = useHMSActions();
-  const poll = useHMSStore(selectPollByID(pollID));
-  const [pollLeaderboard, setPollLeaderboard] = useState<HMSPollLeaderboardResponse | undefined>();
+  const quiz = useHMSStore(selectPollByID(pollID));
+  const [quizLeaderboard, setQuizLeaderboard] = useState<HMSQuizLeaderboardResponse | undefined>();
   const [viewAllEntries, setViewAllEntries] = useState(false);
-  const summary = pollLeaderboard?.summary || {
+  const summary: HMSQuizLeaderboardSummary = quizLeaderboard?.summary || {
     totalUsers: 0,
     votedUsers: 0,
     avgScore: 0,
@@ -32,15 +38,15 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
-      if (poll) {
-        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(poll, 0, 50);
-        setPollLeaderboard(leaderboardData);
+      if (!quizLeaderboard && quiz) {
+        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz, 0, 50);
+        setQuizLeaderboard(leaderboardData);
       }
     };
     fetchLeaderboardData();
-  }, [poll, hmsActions.interactivityCenter]);
+  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard]);
 
-  if (!poll || !pollLeaderboard)
+  if (!quiz || !quizLeaderboard)
     return (
       <Flex align="center" justify="center" css={{ size: '100%' }}>
         <Loading />
@@ -49,13 +55,13 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
 
   const defaultCalculations = { maxPossibleScore: 0, totalResponses: 0 };
   const { maxPossibleScore, totalResponses } =
-    poll.questions?.reduce((accumulator, question) => {
+    quiz.questions?.reduce((accumulator, question) => {
       accumulator.maxPossibleScore += question.weight || 0;
       accumulator.totalResponses += question?.responses?.length || 0;
       return accumulator;
     }, defaultCalculations) || defaultCalculations;
 
-  const questionCount = poll.questions?.length || 0;
+  const questionCount = quiz.questions?.length || 0;
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
@@ -68,7 +74,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
             <ChevronLeftIcon />
           </Flex>
           <Text variant="lg" css={{ fontWeight: '$semiBold' }}>
-            {poll.title}
+            {quiz.title}
           </Text>
           <StatusIndicator isLive={false} />
         </Flex>
@@ -120,8 +126,8 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
           borderRadius: '$1',
         }}
       >
-        {pollLeaderboard?.entries &&
-          pollLeaderboard.entries
+        {quizLeaderboard?.entries &&
+          quizLeaderboard.entries
             .slice(0, viewAllEntries ? undefined : 5)
             .map(question => (
               <LeaderboardEntry
@@ -134,7 +140,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
                 maxPossibleScore={maxPossibleScore}
               />
             ))}
-        {pollLeaderboard?.entries?.length > 5 && !viewAllEntries ? (
+        {quizLeaderboard?.entries?.length > 5 && !viewAllEntries ? (
           <Flex
             align="center"
             justify="end"
