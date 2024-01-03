@@ -145,7 +145,7 @@ export const ChatActions = ({
       show: !!can_block_user && !sentByLocalPeer && !isSenderBlocked,
     },
     remove: {
-      text: 'Remove Partipant',
+      text: 'Remove Participant',
       icon: <PeopleRemoveIcon style={iconStyle} />,
       color: '$alert_error_default',
       show: !!canRemoveOthers && !sentByLocalPeer,
