@@ -18,11 +18,14 @@ export const RoomLayoutContext = React.createContext<
   | undefined
 >(undefined);
 
+// The default merge in lodash merges the values of current layout and the changes.
+// This behaviour makes changes in array based values inconsistent since a union happens.
+// The customizer uses the new value provided if one of the values is an array
 function customizer(objValue: any, srcValue: any) {
-  if (isArray(objValue) && isArray(srcValue)) {
+  if (isArray(objValue) || isArray(srcValue)) {
     return srcValue;
   }
-  // default mergeWith behaviour is followed
+  // default merge behaviour is followed
   return undefined;
 }
 
