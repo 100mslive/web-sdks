@@ -41,7 +41,7 @@ const SidePane = ({
     ViewComponent = <SidePaneTabs hideControls={hideControls} active={sidepane} />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
-    ViewComponent = <VBPicker background_media={preview_elements?.virtual_background?.background_media || []} />;
+    ViewComponent = <VBPicker backgroundMedia={preview_elements?.virtual_background?.background_media || []} />;
   }
 
   useEffect(() => {

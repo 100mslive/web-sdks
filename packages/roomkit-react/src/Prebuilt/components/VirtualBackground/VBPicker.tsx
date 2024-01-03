@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
+import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLargeRoom,
@@ -28,7 +28,7 @@ import { defaultMedia, vbPlugin } from './constants';
 const iconDims = { height: '40px', width: '40px' };
 const MAX_RETRIES = 2;
 
-export const VBPicker = ({ background_media: backgroundMedia = [] }: VirtualBackground = {}) => {
+export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
