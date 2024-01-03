@@ -90,13 +90,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       const newTrack = await getAudioTrack(settings);
       newTrack.enabled = this.enabled;
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
-      console.log('track ', prevTrack, newTrack);
+      console.log('track ', prevTrack, newTrack, this.enabled);
 
       const localStream = this.stream as HMSLocalStream;
       // change nativeTrack so plugin can start its work
       await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
       localStream.replaceStreamTrack(prevTrack, this.processedTrack || newTrack);
       this.nativeTrack = newTrack;
+      console.log('after track ', this.nativeTrack);
       isLevelMonitored && this.initAudioLevelMonitor();
     } catch (e) {
       if (this.isPublished) {
@@ -115,6 +116,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     }
   }
 
+  private async replaceDisableSender(newTrack: MediaStreamTrack) {
+    const localStream = this.stream as HMSLocalStream;
+    await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+  }
+
   async setEnabled(value: boolean) {
     if (value === this.enabled) {
       return;
@@ -122,8 +128,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
     // Replace silent empty track with an actual audio track, if enabled.
     console.log('replace native track ', this.nativeTrack, value);
-    if (value) {
+    if (value && isEmptyTrack(this.nativeTrack)) {
       await this.replaceTrackWith(this.settings);
+    }
+    if (!value) {
+      const newTrack = await getAudioTrack(this.settings);
+      this.replaceDisableSender(newTrack);
+      this.nativeTrack = newTrack;
     }
     await super.setEnabled(value);
     if (value) {

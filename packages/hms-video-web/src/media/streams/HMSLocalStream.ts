@@ -61,6 +61,7 @@ export class HMSLocalStream extends HMSMediaStream {
     }
     const sender = this.connection.getSenders().find(sender => sender.track && sender.track.id === track.id);
 
+    console.log('hey ', sender, this.connection.getSenders());
     if (sender === undefined) {
       HMSLogger.w(this.TAG, `No sender found for trackId=${track.id}`);
       return;
