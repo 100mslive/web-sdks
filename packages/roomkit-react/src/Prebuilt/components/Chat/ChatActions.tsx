@@ -104,8 +104,8 @@ export const ChatActions = ({
     }
   > = {
     reply: {
-      text: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
-      tooltipText: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
+      text: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
+      tooltipText: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
       icon: <ReplyIcon style={iconStyle} />,
       onClick: onReply,
       show: showReply,
@@ -145,7 +145,7 @@ export const ChatActions = ({
       show: !!can_block_user && !sentByLocalPeer && !isSenderBlocked,
     },
     remove: {
-      text: 'Remove Participant',
+      text: 'Remove participant',
       icon: <PeopleRemoveIcon style={iconStyle} />,
       color: '$alert_error_default',
       show: !!canRemoveOthers && !sentByLocalPeer,
