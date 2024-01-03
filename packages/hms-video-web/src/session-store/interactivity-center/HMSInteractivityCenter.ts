@@ -8,7 +8,6 @@ import {
 import {
   HMSPoll,
   HMSPollCreateParams,
-  HMSPollLeaderboardResponse,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
   HMSPollQuestionResponse,
@@ -16,6 +15,7 @@ import {
   HMSPollQuestionType,
   HMSPollStates,
   HMSPollUserTrackingMode,
+  HMSQuizLeaderboardResponse,
 } from '../../interfaces/session-store/polls';
 import { IStore } from '../../sdk/store';
 import { PollInfoParams, PollQuestionParams, PollResponseParams } from '../../signal/interfaces';
@@ -182,7 +182,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     return question;
   }
 
-  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSPollLeaderboardResponse> {
+  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSQuizLeaderboardResponse> {
     const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
 
     if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
@@ -193,6 +193,14 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       count,
       offset,
     });
+
+    const summary = {
+      avgScore: pollLeaderboard.avg_score,
+      avgTime: pollLeaderboard.avg_time,
+      votedUsers: pollLeaderboard.voted_users,
+      totalUsers: pollLeaderboard.total_users,
+      correctAnswers: pollLeaderboard.correct_users,
+    };
 
     const leaderboardEntries = pollLeaderboard.questions.map(question => {
       return {
@@ -205,7 +213,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       };
     });
 
-    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last };
+    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
   }
 }
 

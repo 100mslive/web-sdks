@@ -44,13 +44,13 @@ export const LeaderboardEntry = ({
             {userName}
           </Text>
 
-          <Text variant="sm" css={{ mt: '$2' }}>
+          <Text variant="sm" css={{ mt: '$1' }}>
             {score} / {maxPossibleScore} points
           </Text>
         </Box>
       </Flex>
       <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
-        {position === 1 ? <TrophyFilledIcon height={18} width={18} /> : null}
+        {position === 1 ? <TrophyFilledIcon height={16} width={16} /> : null}
         <CheckCircleIcon height={16} width={16} />
         {questionCount ? (
           <Text variant="xs">
