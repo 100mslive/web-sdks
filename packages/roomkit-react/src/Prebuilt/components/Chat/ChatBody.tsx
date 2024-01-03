@@ -7,11 +7,11 @@ import {
   HMSPeerID,
   HMSRoleName,
   selectHMSMessages,
-  selectHMSMessagesCount,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeerNameByID,
   selectSessionStore,
+  selectUnreadHMSMessagesCount,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -38,15 +38,19 @@ const formatTime = (date: Date) => {
   return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}`;
 };
 
-const rowHeights: Record<number, number> = {};
+const rowHeights: Record<number, { size: number; id: string }> = {};
+let listInstance: VariableSizeList | null = null; //eslint-disable-line 
 function getRowHeight(index: number) {
   // 72 will be default row height for any message length
-  // 16 will add margin value as clientHeight don't include margin
-  return rowHeights[index] + 16 || 72;
+  return rowHeights[index]?.size || 72;
 }
 
-const setRowHeight = (index: number, size: number) => {
-  Object.assign(rowHeights, { [index]: size });
+const setRowHeight = (index: number, id: string, size: number) => {
+  if (rowHeights[index]?.id === id && rowHeights[index]?.size) {
+    return;
+  }
+  listInstance?.resetAfterIndex(Math.max(index - 1, 0));
+  Object.assign(rowHeights, { [index]: { size, id } });
 };
 
 const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }) => {
@@ -183,9 +187,9 @@ const ChatMessage = React.memo(
 
     useLayoutEffect(() => {
       if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight);
+        setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index]);
+    }, [index, message.id]);
 
     return (
       <Box
@@ -356,7 +360,13 @@ const VirtualizedChatMessages = React.forwardRef<
       >
         {({ height, width }: { height: number; width: number }) => (
           <VariableSizeList
-            ref={listRef}
+            ref={node => {
+              if (node) {
+                // @ts-ignore
+                listRef.current = node;
+                listInstance = node;
+              }
+            }}
             itemCount={messages.length}
             itemSize={getRowHeight}
             itemData={messages}
@@ -398,16 +408,15 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
         // @ts-ignore
-        if (!listRef?.current) {
+        if (!listRef.current) {
           return;
         }
         // @ts-ignore
         const outerElement = listRef.current._outerRef;
-        // @ts-ignore
-        if (outerElement.scrollHeight - (listRef.current.state.scrollOffset + outerElement.offsetHeight) <= 10) {
-          scrollToBottom(1);
+        if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
+          requestAnimationFrame(() => scrollToBottom(1));
         }
-      }, selectHMSMessagesCount);
+      }, selectUnreadHMSMessagesCount);
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
