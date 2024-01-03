@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
+import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLargeRoom,
@@ -28,7 +28,7 @@ import { defaultMedia, vbPlugin } from './constants';
 const iconDims = { height: '40px', width: '40px' };
 const MAX_RETRIES = 2;
 
-export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
+export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
@@ -46,7 +46,9 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const addedPluginToVideoTrack = useRef(false);
-  const mediaList = [...background_media.map((media: VirtualBackgroundMedia) => media?.url), ...defaultMedia];
+  const mediaList = backgroundMedia.length
+    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media?.url)
+    : defaultMedia;
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
