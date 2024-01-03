@@ -28,7 +28,7 @@ import { defaultMedia, vbPlugin } from './constants';
 const iconDims = { height: '40px', width: '40px' };
 const MAX_RETRIES = 2;
 
-export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
+export const VBPicker = ({ background_media: backgroundMedia = [] }: VirtualBackground = {}) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
   const role = useHMSStore(selectLocalPeerRole);
@@ -46,8 +46,8 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const addedPluginToVideoTrack = useRef(false);
-  const mediaList = background_media.length
-    ? background_media.map((media: VirtualBackgroundMedia) => media?.url)
+  const mediaList = backgroundMedia.length
+    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media?.url)
     : defaultMedia;
 
   const inPreview = roomState === HMSRoomState.Preview;
