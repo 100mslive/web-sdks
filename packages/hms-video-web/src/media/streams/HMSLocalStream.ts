@@ -4,7 +4,7 @@ import { SimulcastLayer } from '../../interfaces';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
-import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
+import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
 export class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
@@ -28,6 +28,9 @@ export class HMSLocalStream extends HMSMediaStream {
 
   async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
     await this.connection?.setMaxBitrateAndFramerate(track);
+    if (track instanceof HMSLocalAudioTrack) {
+      await track.correctSenderTrack();
+    }
   }
 
   // @ts-ignore
