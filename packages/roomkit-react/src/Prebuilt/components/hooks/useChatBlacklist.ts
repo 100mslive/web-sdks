@@ -22,8 +22,8 @@ export const useChatBlacklist = (
   return { blacklistItem, blacklistedIDs };
 };
 
-export const useIsLocalPeerBlacklisted = () => {
+export const useIsPeerBlacklisted = ({ local = false, peerCustomerUserId = '' }) => {
   const localPeer = useHMSStore(selectLocalPeer);
   const blacklistedPeerIDs = useHMSStore(selectSessionStore(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST)) || [];
-  return blacklistedPeerIDs?.includes(localPeer?.customerUserId);
+  return blacklistedPeerIDs?.includes(local ? localPeer?.customerUserId : peerCustomerUserId);
 };

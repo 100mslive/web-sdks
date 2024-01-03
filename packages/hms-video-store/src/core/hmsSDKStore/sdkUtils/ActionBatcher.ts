@@ -1,6 +1,6 @@
 import { HMSLogger } from '../../../common/ui-logger';
 import { IHMSStore } from '../../IHMSStore';
-import { HMSStore } from '../../schema';
+import { HMSGenericTypes, HMSStore } from '../../schema';
 
 type ActionName = string;
 type SetTimeOutId = number;
@@ -11,16 +11,16 @@ type SetState = (store: HMSStore) => void;
  * store updates are limited to only one action in a time interval
  *
  */
-export class ActionBatcher {
+export class ActionBatcher<T extends HMSGenericTypes = { sessionStore: Record<string, any> }> {
   private queuedUpdates: Record<ActionName, SetState[]> = {};
   private timers: Record<ActionName, SetTimeOutId> = {};
   private DEFAULT_INTERVAL_MS = 50;
-  private store: IHMSStore;
-  constructor(store: IHMSStore) {
+  private store: IHMSStore<T>;
+  constructor(store: IHMSStore<T>) {
     this.store = store;
   }
 
-  setState(fn: SetState, action: ActionName) {
+  setState(fn: SetState, action: ActionName, timeout = this.DEFAULT_INTERVAL_MS) {
     this.queuedUpdates[action] = this.queuedUpdates[action] || [];
     this.queuedUpdates[action].push(fn);
     if (this.timers[action]) {
@@ -28,7 +28,7 @@ export class ActionBatcher {
     }
     // set a future timeout if a timer is not there already
     if (window) {
-      this.timers[action] = window.setTimeout(() => this.setStateBatched(action), this.DEFAULT_INTERVAL_MS);
+      this.timers[action] = window.setTimeout(() => this.setStateBatched(action), timeout);
     } else {
       // nodejs, ignore batching for now
       this.setStateBatched(action);

@@ -20,7 +20,7 @@ import { Tooltip } from '../../../Tooltip';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useChatBlacklist } from '../hooks/useChatBlacklist';
+import { useChatBlacklist, useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -67,6 +67,8 @@ export const ChatActions = ({
   const { blacklistItem: blacklistMessage, blacklistedIDs: blacklistedMessageIDs } = useChatBlacklist(
     SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
   );
+
+  const isSenderBlocked = useIsPeerBlacklisted({ peerCustomerUserId: message.senderUserId });
 
   const updatePinnedMessages = useCallback(
     (messageID = '') => {
@@ -140,7 +142,7 @@ export const ChatActions = ({
         }
       },
       color: '$alert_error_default',
-      show: !!can_block_user && !sentByLocalPeer,
+      show: !!can_block_user && !sentByLocalPeer && !isSenderBlocked,
     },
     remove: {
       text: 'Remove Partipant',
