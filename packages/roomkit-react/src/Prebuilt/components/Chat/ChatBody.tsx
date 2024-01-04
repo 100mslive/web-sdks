@@ -20,13 +20,11 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-// @ts-ignore
-import emptyChat from '../../images/empty-chat.svg';
 import { ChatActions } from './ChatActions';
+import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const formatTime = (date: Date) => {
@@ -402,16 +400,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [];
     }, [blacklistedMessageIDs, messages]);
 
-    const isMobile = useMedia(cssConfig.media.md);
-    const { elements } = useRoomLayoutConferencingScreen();
     const vanillaStore = useHMSVanillaStore();
-    const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
-    const canSendMessages =
-      elements.chat &&
-      (elements.chat.public_chat_enabled ||
-        elements.chat.private_chat_enabled ||
-        (elements.chat.roles_whitelist && elements.chat.roles_whitelist.length)) &&
-      !isLocalPeerBlacklisted;
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -428,34 +417,8 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
-      return (
-        <Flex
-          css={{
-            width: '100%',
-            flex: '1 1 0',
-            textAlign: 'center',
-            px: '$4',
-          }}
-          align="center"
-          justify="center"
-        >
-          <Box>
-            <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
-            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
-              {canSendMessages ? 'Start a conversation' : 'No messages yet'}
-            </Text>
-            {canSendMessages ? (
-              <Text
-                variant="sm"
-                css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
-              >
-                There are no messages here yet. Start a conversation by sending a message.
-              </Text>
-            ) : null}
-          </Box>
-        </Flex>
-      );
+    if (filteredMessages.length === 0) {
+      return <EmptyChat />;
     }
 
     return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
