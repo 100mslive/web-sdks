@@ -1,4 +1,3 @@
-// @ts-check
 import React from 'react';
 import {
   selectLocalPeerID,
@@ -8,15 +7,17 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, Button, Flex, Text } from '../../../../';
+import { Box, Button, Flex, Text } from '../../../..';
+// @ts-ignore
 import { Container } from '../../Streaming/Common';
 import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
+// @ts-ignore
 import { usePollViewState } from '../../AppData/useUISettings';
 import { StatusIndicator } from '../common/StatusIndicator';
 import { POLL_VIEWS } from '../../../common/constants';
 
-export const Voting = ({ id, toggleVoting }) => {
+export const Voting = ({ id, toggleVoting }: { id: number; toggleVoting: () => void }) => {
   const actions = useHMSActions();
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
@@ -81,7 +82,7 @@ export const Voting = ({ id, toggleVoting }) => {
           <Button
             variant="danger"
             css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={() => actions.interactivityCenter.stopPoll(id)}
+            onClick={() => actions.interactivityCenter.stopPoll(id.toString())}
           >
             End {poll.type}
           </Button>

@@ -14,17 +14,6 @@ import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptions } from '../common/SingleChoiceOptions';
 import { QUESTION_TYPE } from '../../../common/constants';
 
-// const TextArea = styled('textarea', {
-//   backgroundColor: '$surface_brighter',
-//   border: '1px solid $border_bright',
-//   borderRadius: '$1',
-//   mb: '$md',
-//   color: '$on_surface_high',
-//   resize: 'none',
-//   p: '$2',
-//   w: '100%',
-// });
-
 export const QuestionCard = ({
   pollID,
   isQuiz,
@@ -194,29 +183,6 @@ export const QuestionCard = ({
       </Flex>
 
       <Box css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'hidden' }}>
-        {/* {type === QUESTION_TYPE.SHORT_ANSWER ? (
-        <Input
-          disabled={!canRespond}
-          placeholder="Enter your answer"
-          onChange={e => setTextAnswer(e.target.value)}
-          css={{
-            w: '100%',
-            backgroundColor: '$surface_brighter',
-            mb: '$md',
-            border: '1px solid $border_default',
-            cursor: localPeerResponse ? 'not-allowed' : 'text',
-          }}
-        />
-      ) : null} */}
-
-        {/* {type === QUESTION_TYPE.LONG_ANSWER ? (
-        <TextArea
-          disabled={!canRespond}
-          placeholder="Enter your answer"
-          onChange={e => setTextAnswer(e.target.value)}
-        />
-      ) : null} */}
-
         {type === QUESTION_TYPE.SINGLE_CHOICE ? (
           <SingleChoiceOptions
             questionIndex={index}
@@ -232,7 +198,6 @@ export const QuestionCard = ({
             isStopped={pollState === 'stopped'}
           />
         ) : null}
-
         {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
           <MultipleChoiceOptions
             questionIndex={index}
@@ -249,7 +214,6 @@ export const QuestionCard = ({
             isStopped={pollState === 'stopped'}
           />
         ) : null}
-
         {isLive && (
           <QuestionActions
             isValidVote={isValidVote}
