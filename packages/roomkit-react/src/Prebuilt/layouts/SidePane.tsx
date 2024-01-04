@@ -32,6 +32,11 @@ const SidePane = ({
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   const { elements: preview_elements } = useRoomLayoutPreviewScreen();
+
+  const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
+    ? preview_elements?.virtual_background?.background_media
+    : elements?.virtual_background?.background_media || [];
+
   const resetSidePane = useSidepaneReset();
   let ViewComponent;
   if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
@@ -41,7 +46,7 @@ const SidePane = ({
     ViewComponent = <SidePaneTabs hideControls={hideControls} active={sidepane} />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
-    ViewComponent = <VBPicker backgroundMedia={preview_elements?.virtual_background?.background_media || []} />;
+    ViewComponent = <VBPicker backgroundMedia={backgroundMedia} />;
   }
 
   useEffect(() => {
