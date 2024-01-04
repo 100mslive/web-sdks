@@ -19,7 +19,7 @@ import { POLL_VIEWS } from '../../../common/constants';
 
 export const Voting = ({ id, toggleVoting }: { id: number; toggleVoting: () => void }) => {
   const actions = useHMSActions();
-  const poll = useHMSStore(selectPollByID(id));
+  const poll = useHMSStore(selectPollByID(id.toString()));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
