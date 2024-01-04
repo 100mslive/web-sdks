@@ -36,7 +36,9 @@ export default App() {
         <HMSPrebuilt authToken={<auth-token>} />
     );
 }
+```
 
+For additional props, refer the [docs](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart#props-for-hmsprebuilt)
 
 
 Prebuilt customisations are available on [100ms dashboard](https://dashboard.100ms.live)
