@@ -1,12 +1,25 @@
-// @ts-check
 import React, { useState } from 'react';
+import { HMSPollQuestion } from '@100mslive/react-sdk';
 import { CheckCircleIcon, TrashIcon } from '@100mslive/react-icons';
 import { Button, Flex, Text } from '../../../../';
+// @ts-ignore
 import IconButton from '../../../IconButton';
 import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { QUESTION_TYPE_TITLE } from '../../../common/constants';
 
-export const SavedQuestion = ({ question, index, length, convertToDraft, removeQuestion }) => {
+export const SavedQuestion = ({
+  question,
+  index,
+  length,
+  convertToDraft,
+  removeQuestion,
+}: {
+  question: HMSPollQuestion & { draftID: number };
+  index: number;
+  length: number;
+  convertToDraft: (draftID: number) => void;
+  removeQuestion: (draftID: number) => void;
+}) => {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   return (
     <>
@@ -16,11 +29,12 @@ export const SavedQuestion = ({ question, index, length, convertToDraft, removeQ
       <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>
         {question.text}
       </Text>
-      {question.options.map((option, index) => (
+      {question.options?.map((option, index) => (
         <Flex key={`${option.text}-${index}`} css={{ alignItems: 'center', my: '$xs' }}>
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             {option.text}
           </Text>
+          {/* @ts-ignore */}
           {option.isCorrectAnswer && (
             <Flex css={{ color: '$alert_success', mx: '$xs' }}>
               <CheckCircleIcon height={24} width={24} />

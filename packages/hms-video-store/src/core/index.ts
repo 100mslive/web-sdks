@@ -41,6 +41,7 @@ export type {
   RID,
   HMSPoll,
   HMSPollCreateParams,
+  HMSPollQuestion,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionType,
