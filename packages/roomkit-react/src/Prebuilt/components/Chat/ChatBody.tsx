@@ -26,6 +26,7 @@ import { ChatActions } from './ChatActions';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const formatTime = (date: Date) => {
@@ -404,7 +405,13 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     const isMobile = useMedia(cssConfig.media.md);
     const { elements } = useRoomLayoutConferencingScreen();
     const vanillaStore = useHMSVanillaStore();
-    const canSendMessages = !!elements.chat?.public_chat_enabled;
+    const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+    const canSendMessages =
+      elements.chat &&
+      (elements.chat.public_chat_enabled ||
+        elements.chat.private_chat_enabled ||
+        (elements.chat.roles_whitelist && elements.chat.roles_whitelist.length)) &&
+      !isLocalPeerBlacklisted;
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
