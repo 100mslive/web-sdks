@@ -30,7 +30,9 @@ import {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionCreateParams,
+  HMSPollQuestionOption,
   HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionResponse,
   HMSPollQuestionType,
   HMSPollsUpdate,
   HMSPreferredSimulcastLayer,
@@ -134,5 +136,7 @@ export type {
   HMSPollQuestionType,
   HMSPollQuestionCreateParams,
   HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionOption,
+  HMSPollQuestionResponse,
   HMSWhiteboard,
 };

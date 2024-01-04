@@ -1,7 +1,7 @@
 // @ts-check
 import React from 'react';
 import { CheckCircleIcon } from '@100mslive/react-icons';
-import { Flex, Label, RadioGroup, Text } from '../../../../';
+import { Flex, Label, RadioGroup, Text } from '../../../..';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
 import { VoteProgress } from './VoteProgress';
@@ -98,8 +98,7 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handle
                 <RadioGroup.Item
                   css={{
                     background: 'none',
-                    w: '$8',
-                    flexShrink: '0',
+                    w: '$9',
                     border: '2px solid',
                     borderColor: '$on_surface_high',
                     display: 'flex',

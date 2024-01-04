@@ -1,8 +1,7 @@
-// @ts-check
 import React from 'react';
 import { Flex, Text } from '../../../../';
 
-export const StatusIndicator = ({ isLive }) => {
+export const StatusIndicator = ({ isLive }: { isLive: boolean }) => {
   return (
     <Flex align="center">
       <Flex
