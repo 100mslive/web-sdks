@@ -91,7 +91,6 @@ const App = () => {
               roomLayout: process.env.REACT_APP_ROOM_LAYOUT_ENDPOINT,
               init: process.env.REACT_APP_INIT_ENDPOINT,
             },
-            effectsSDKKey: process.env.REACT_APP_EFFECTS_SDK_KEY,
           }}
           ref={hmsPrebuiltRef}
         />

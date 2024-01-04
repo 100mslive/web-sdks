@@ -41,6 +41,9 @@ export interface InitConfig {
       readonly connecting: number;
       readonly failed: number;
     };
+    readonly vb?: {
+      readonly effectsKey: string;
+    };
   };
 }
 

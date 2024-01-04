@@ -87,7 +87,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints, effectsSDKKey = '' } = {},
+      options: { userName = '', userId = '', endpoints } = {},
       screens,
       onLeave,
       onJoin,
@@ -177,7 +177,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
               init: initEndpoint,
               roomLayout: roomLayoutEndpoint,
             },
-            effectsSDKKey,
           }}
         >
           <HMSRoomProvider

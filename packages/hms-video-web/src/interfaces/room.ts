@@ -36,7 +36,11 @@ export interface HMSRoom {
   /**
    * @alpha
    */
-  isEffectsSDKEnabled?: boolean;
+  isEffectsEnabled?: boolean;
+  /**
+   * @alpha
+   */
+  effectsKey?: string;
 }
 
 export interface HMSRecording {

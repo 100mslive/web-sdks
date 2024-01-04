@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import { selectEffectsKey, selectIsEffectsEnabled, selectLocalPeerRole } from '@100mslive/hms-video-store';
+import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
@@ -16,7 +16,6 @@ import {
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
-import { useHMSPrebuiltContext } from '../../AppContext';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
 // @ts-ignore
@@ -39,8 +38,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const isEffectsSDKEnabled = useHMSStore(selectAppData('isEffectsSDKEnabled'));
-  const { effectsSDKKey } = useHMSPrebuiltContext();
+  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+  const effectsKey = useHMSStore(selectEffectsKey);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
     (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
@@ -57,21 +56,19 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     if (!isPluginAdded) {
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
-        VBHandler.initialisePlugin(isEffectsSDKEnabled ? effectsSDKKey : '');
+        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
         vbObject = VBHandler.getVBObject();
-        if (isEffectsSDKEnabled && effectsSDKKey) {
-          // @ts-ignore
-          hmsActions.addPluginsToVideoStream([vbObject]);
+        if (isEffectsEnabled && effectsKey) {
+          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
         } else {
           if (!role) {
             return;
           }
-          // @ts-ignore
-          hmsActions.addPluginToVideoTrack(vbObject, Math.floor(role.publishParams.video.frameRate / 2));
+          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
       }
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsSDKEnabled, effectsSDKKey]);
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey]);
 
   useEffect(() => {
     if (!isVideoOn) {

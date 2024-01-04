@@ -10,7 +10,6 @@ type HMSPrebuiltContextType = {
   endpoints?: Record<string, string>;
   onLeave?: () => void;
   onJoin?: () => void;
-  effectsSDKKey?: string;
 };
 
 export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
@@ -21,7 +20,6 @@ export const HMSPrebuiltContext = React.createContext<HMSPrebuiltContextType>({
   endpoints: {},
   onLeave: undefined,
   onJoin: undefined,
-  effectsSDKKey: '',
 });
 
 HMSPrebuiltContext.displayName = 'HMSPrebuiltContext';
