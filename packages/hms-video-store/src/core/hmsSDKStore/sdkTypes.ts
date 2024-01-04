@@ -30,6 +30,7 @@ import {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionCreateParams,
+  HMSPollQuestionOptionCreateParams,
   HMSPollQuestionType,
   HMSPollsUpdate,
   HMSPreferredSimulcastLayer,
@@ -79,7 +80,6 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
-  HMSPollQuestionType,
   HMSPeerListIterator,
 };
 
@@ -131,6 +131,8 @@ export type {
   HMSQuizLeaderboardSummary,
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
+  HMSPollQuestionType,
   HMSPollQuestionCreateParams,
+  HMSPollQuestionOptionCreateParams,
   HMSWhiteboard,
 };

@@ -1,22 +1,47 @@
 // @ts-check
 import React, { useCallback, useRef, useState } from 'react';
+import {
+  HMSPollQuestionCreateParams,
+  HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionType,
+} from '@100mslive/react-sdk';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
-import { Button, Dropdown, Flex, IconButton, Input, Switch, Text, TextArea, Tooltip } from '../../../../';
+import { Button, Dropdown, Flex, IconButton, Input, Switch, Text, TextArea, Tooltip } from '../../../..';
+// @ts-ignore
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
+// @ts-ignore
 import { DeleteQuestionModal } from './DeleteQuestionModal';
+// @ts-ignore
 import { useDropdownSelection } from '../../hooks/useDropdownSelection';
+// @ts-ignore
 import { isValidTextInput } from '../../../common/utils';
 import { Line } from '../common/Line';
+// @ts-ignore
 import { MultipleChoiceOptionInputs } from '../common/MultipleChoiceOptions';
+// @ts-ignore
 import { SingleChoiceOptionInputs } from '../common/SingleChoiceOptions';
 import { QUESTION_TYPE, QUESTION_TYPE_TITLE } from '../../../common/constants';
 
-export const QuestionForm = ({ question, index, length, onSave, removeQuestion, isQuiz }) => {
+export const QuestionForm = ({
+  question,
+  index,
+  length,
+  onSave,
+  removeQuestion,
+  isQuiz,
+}: {
+  question: HMSPollQuestionCreateParams & { draftID: number };
+  index: number;
+  length: number;
+  onSave: (optionParams: HMSPollQuestionCreateParams & { draftID: number; saved: boolean }) => void;
+  removeQuestion: () => void;
+  isQuiz: boolean;
+}) => {
   const ref = useRef(null);
   const selectionBg = useDropdownSelection();
   const [openDelete, setOpenDelete] = useState(false);
   const [open, setOpen] = useState(false);
-  const [type, setType] = useState(question.type || QUESTION_TYPE.SINGLE_CHOICE);
+  const [type, setType] = useState<HMSPollQuestionType>(question.type || QUESTION_TYPE.SINGLE_CHOICE);
   const [text, setText] = useState(question.text);
   const [weight, setWeight] = useState(isQuiz ? 10 : 1);
   const [options, setOptions] = useState(
@@ -35,14 +60,14 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   });
 
   const handleOptionTextChange = useCallback(
-    (index, text) => {
+    (index: number, text: string) => {
       setOptions(options => [...options.slice(0, index), { ...options[index], text }, ...options.slice(index + 1)]);
     },
     [setOptions],
   );
 
   const removeOption = useCallback(
-    index =>
+    (index: number) =>
       setOptions(options => {
         const newOptions = [...options];
         newOptions.splice(index, 1);
@@ -52,7 +77,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   );
 
   const selectSingleChoiceAnswer = useCallback(
-    answerIndex => {
+    (answerIndex: number) => {
       if (!isQuiz) {
         return;
       }
@@ -67,7 +92,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   );
 
   const selectMultipleChoiceAnswer = useCallback(
-    (checked, index) => {
+    (checked: boolean, index: number) => {
       if (!isQuiz) {
         return;
       }
@@ -91,6 +116,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
       <Dropdown.Root open={open} onOpenChange={setOpen}>
         <DialogDropdownTrigger
           ref={ref}
+          // @ts-ignore
           title={QUESTION_TYPE_TITLE[type]}
           css={{
             backgroundColor: '$surface_bright',
@@ -99,17 +125,20 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           open={open}
         />
         <Dropdown.Portal>
+          {/* @ts-ignore */}
           <Dropdown.Content align="start" sideOffset={8} css={{ w: ref.current?.clientWidth, zIndex: 1000 }}>
             {Object.keys(QUESTION_TYPE_TITLE).map(value => {
               return (
                 <Dropdown.Item
                   key={value}
+                  // @ts-ignore
                   onSelect={() => setType(value)}
                   css={{
                     px: '$9',
                     bg: type === value ? selectionBg : undefined,
                   }}
                 >
+                  {/* @ts-ignore */}
                   {QUESTION_TYPE_TITLE[value]}
                 </Dropdown.Item>
               );
@@ -135,6 +164,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
         {text?.length || 0}/1024
       </Text>
       <Line />
+      {/* @ts-ignore */}
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
           <Text variant="body2" css={{ mb: '$6', c: '$on_surface_medium' }}>
@@ -181,7 +211,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
               <AddCircleIcon style={{ position: 'relative', left: '-2px' }} />
 
               <Text
-                variant="SM"
+                variant="sm"
                 css={{
                   ml: '$4',
                   c: 'inherit',
@@ -203,7 +233,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
                   value={weight}
                   min={1}
                   max={999}
-                  onChange={e => setWeight(Math.min(e.target.value, 999))}
+                  onChange={e => setWeight(Math.min(Number(e.target.value), 999))}
                   css={{
                     backgroundColor: '$surface_bright',
                     border: '1px solid $border_bright',
@@ -260,14 +290,22 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
   );
 };
 
-export const isValidQuestion = ({ text, type, options, weight, isQuiz = false }) => {
+export const isValidQuestion = ({
+  text,
+  type,
+  options,
+  weight,
+  isQuiz = false,
+}: {
+  text: string;
+  type: string;
+  options: HMSPollQuestionOptionCreateParams[];
+  weight: number;
+  isQuiz?: boolean;
+}) => {
   if (!isValidTextInput(text) || !type) {
     return false;
   }
-
-  // if (![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)) {
-  //   return true;
-  // }
 
   const everyOptionHasText = options.length > 0 && options.every(option => option && isValidTextInput(option.text, 1));
   const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
