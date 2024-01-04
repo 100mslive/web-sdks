@@ -5,7 +5,7 @@ import { HMSConnectionRole, HMSTrickle } from '../../connection/model';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { HMSException } from '../../error/HMSException';
-import Message from '../../sdk/models/HMSMessage';
+import { SendMessage } from '../../notification-manager';
 import {
   DEFAULT_SIGNAL_PING_INTERVAL,
   DEFAULT_SIGNAL_PING_TIMEOUT,
@@ -291,8 +291,8 @@ export default class JsonRpcSignal {
     this.notify(HMSSignalMethod.TRACK_UPDATE, { tracks: Object.fromEntries(tracks) });
   }
 
-  async broadcast(message: Message) {
-    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, message.toSignalParams());
+  async broadcast(message: SendMessage) {
+    return await this.call<BroadcastResponse>(HMSSignalMethod.BROADCAST, message);
   }
 
   leave() {

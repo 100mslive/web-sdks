@@ -1,4 +1,5 @@
 import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { ActionBatcher } from './sdkUtils/ActionBatcher';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
@@ -42,6 +43,7 @@ import {
   SessionStoreUpdate,
 } from '../internal';
 import * as sdkTypes from '../internal';
+import { MessageNotification } from '../notification-manager';
 import {
   createDefaultStoreState,
   HMSChangeMultiTrackStateParams,
@@ -75,6 +77,7 @@ import {
   selectLocalAudioTrackID,
   selectLocalMediaSettings,
   selectLocalPeer,
+  selectLocalPeerID,
   selectLocalTrackIDs,
   selectLocalVideoTrackID,
   selectPeerByID,
@@ -117,7 +120,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
-  // private actionBatcher: ActionBatcher;
+  private actionBatcher: ActionBatcher<T>;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
@@ -131,7 +134,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
-    // this.actionBatcher = new ActionBatcher(store);
+    this.actionBatcher = new ActionBatcher(store);
   }
   setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
     this.sdk.updatePlaylistSettings(settings);
@@ -375,8 +378,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async sendBroadcastMessage(message: string, type?: string) {
-    const sdkMessage = await this.sdk.sendBroadcastMessage(message, type);
-    this.updateMessageInStore(sdkMessage, { message, type });
+    const { message_id: id, timestamp: time } = await this.sdk.sendBroadcastMessage(message, type);
+    this.updateMessageInStore({ message, type, id, time });
   }
 
   async sendGroupMessage(message: string, roles: string[], type?: string) {
@@ -384,26 +387,32 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     const hmsRoles = roles.map(roleName => {
       return storeRoles[roleName];
     });
-    const sdkMessage = await this.sdk.sendGroupMessage(message, hmsRoles, type);
-    this.updateMessageInStore(sdkMessage, { message, recipientRoles: roles, type });
+    const { message_id: id, timestamp: time } = await this.sdk.sendGroupMessage(message, hmsRoles, type);
+    this.updateMessageInStore({ message, recipientRoles: roles, type, id, time });
   }
 
   async sendDirectMessage(message: string, peerID: string, type?: string) {
-    const sdkMessage = await this.sdk.sendDirectMessage(message, peerID, type);
-    this.updateMessageInStore(sdkMessage, { message, recipientPeer: peerID, type });
+    const { message_id: id, timestamp: time } = await this.sdk.sendDirectMessage(message, peerID, type);
+    this.updateMessageInStore({ message, recipientPeer: peerID, type, id, time });
   }
 
-  private updateMessageInStore(sdkMessage: sdkTypes.HMSMessage | void, messageInput: string | HMSMessageInput) {
-    if (!sdkMessage) {
+  private updateMessageInStore(messageInput: HMSMessageInput) {
+    if (!messageInput.message) {
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
-    const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
-    hmsMessage.read = true;
-    hmsMessage.senderName = `${this.sdk.getLocalPeer()?.name} (You)`;
-    hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
+    const hmsMessage: HMSMessage = {
+      read: true,
+      id: messageInput.id,
+      time: new Date(messageInput.time),
+      message: messageInput.message,
+      type: messageInput.type || 'chat',
+      recipientPeer: messageInput.recipientPeer,
+      recipientRoles: messageInput.recipientRoles,
+      senderName: `${this.sdk.getLocalPeer()?.name} (You)`,
+      ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
+    };
     this.putMessageInStore(hmsMessage);
-    return hmsMessage;
   }
 
   setMessageRead(readStatus: boolean, messageId?: string) {
@@ -1097,8 +1106,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  protected onMessageReceived(sdkMessage: sdkTypes.HMSMessage) {
-    const hmsMessage = SDKToHMS.convertMessage(sdkMessage) as HMSMessage;
+  protected onMessageReceived(message: MessageNotification) {
+    const hmsMessage = SDKToHMS.convertMessage(message, this.store.getState(selectLocalPeerID)) as HMSMessage;
     hmsMessage.read = false;
     hmsMessage.ignored = this.ignoredMessageTypes.includes(hmsMessage.type);
     this.putMessageInStore(hmsMessage);
@@ -1109,7 +1118,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (hmsMessage.ignored) {
       return;
     }
-    this.setState(store => {
+    this.actionBatcher.setState(store => {
       store.messages.byID[hmsMessage.id] = hmsMessage;
       store.messages.allIDs.push(hmsMessage.id);
     }, 'newMessage');

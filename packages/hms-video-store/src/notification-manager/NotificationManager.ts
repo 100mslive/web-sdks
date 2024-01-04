@@ -63,7 +63,7 @@ export class NotificationManager {
 
     this.peerManager = new PeerManager(this.store, this.trackManager, this.listener);
     this.peerListManager = new PeerListManager(this.store, this.peerManager, this.trackManager, this.listener);
-    this.broadcastManager = new BroadcastManager(this.store, this.listener);
+    this.broadcastManager = new BroadcastManager(this.listener);
     this.policyChangeManager = new PolicyChangeManager(this.store, eventBus);
     this.requestManager = new RequestManager(this.store, this.listener);
     this.activeSpeakerManager = new ActiveSpeakerManager(this.store, this.listener, this.audioListener);

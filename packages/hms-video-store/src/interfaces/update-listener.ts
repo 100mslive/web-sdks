@@ -1,7 +1,6 @@
 import { HMSChangeMultiTrackStateRequest, HMSChangeTrackStateRequest } from './change-track-state';
 import { DeviceChangeListener } from './devices';
 import { HMSLeaveRoomRequest } from './leave-room-request';
-import { HMSMessage } from './message';
 import { HMSConnectionQuality } from './peer';
 import { HMSRoleChangeRequest } from './role-change-request';
 import { HMSRoom } from './room';
@@ -9,6 +8,7 @@ import { HMSPoll, HMSWhiteboard, SessionStoreUpdate } from './session-store';
 import { HMSSpeaker } from './speaker';
 import { HMSException } from '../error/HMSException';
 import { HMSTrack } from '../media/tracks/HMSTrack';
+import { MessageNotification } from '../notification-manager';
 import { HMSPeer } from '../sdk/models/peer';
 
 export enum HMSRoomUpdate {
@@ -78,7 +78,7 @@ export interface HMSUpdateListener extends DeviceChangeListener, SessionStoreLis
   onRoomUpdate(type: HMSRoomUpdate, room: HMSRoom): void;
   onPeerUpdate(type: HMSPeerUpdate, peer: HMSPeer | HMSPeer[] | null): void;
   onTrackUpdate(type: HMSTrackUpdate, track: HMSTrack, peer: HMSPeer): void;
-  onMessageReceived(message: HMSMessage): void;
+  onMessageReceived(message: MessageNotification): void;
   onError(error: HMSException): void;
   onReconnecting(error: HMSException): void;
   onReconnected(): void;
