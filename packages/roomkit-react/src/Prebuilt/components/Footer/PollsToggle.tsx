@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QuizActiveIcon, QuizIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../..';
 // @ts-ignore: No implicit Any
@@ -13,6 +13,12 @@ export const PollsToggle = () => {
   const isPollsOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.POLLS);
   const togglePollView = usePollViewToggle();
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
+
+  useEffect(() => {
+    if (unreadPollQuiz && isPollsOpen) {
+      setUnreadPollQuiz(false);
+    }
+  }, [isPollsOpen, unreadPollQuiz, setUnreadPollQuiz]);
 
   return (
     <Tooltip key="polls" title={`${isPollsOpen ? 'Close' : 'Open'} polls and quizzes`}>
