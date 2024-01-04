@@ -1,6 +1,6 @@
 ## Web sdks
 
-This monorepo will contain all packages required to integrate 100ms on web
+This monorepo contains all the packages required to integrate 100ms on web
 
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
