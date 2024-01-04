@@ -445,6 +445,9 @@ export const selectHLSState = createSelector(selectRoom, room => room.hls);
 export const selectSessionId = createSelector(selectRoom, room => room.sessionId);
 export const selectRoomStartTime = createSelector(selectRoom, room => room.startedAt);
 export const selectIsLargeRoom = createSelector(selectRoom, room => !!room.isLargeRoom);
+export const selectIsEffectsEnabled = createSelector(selectRoom, room => !!room.isEffectsEnabled);
+export const selectEffectsKey = createSelector(selectRoom, room => room.effectsKey);
+
 export const selectTemplateAppData = (store: HMSStore) => store.templateAppData;
 /** @deprecated - use `selectSessionStore` instead */
 export const selectSessionMetadata = (store: HMSStore) => store.sessionMetadata;

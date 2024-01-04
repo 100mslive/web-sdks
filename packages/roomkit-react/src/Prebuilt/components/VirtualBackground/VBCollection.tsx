@@ -7,7 +7,6 @@ import { VBOption } from './VBOption';
 export const VBCollection = ({
   options,
   title,
-  activeBackgroundType = HMSVirtualBackgroundTypes.NONE,
   activeBackground = '',
 }: {
   options: {
@@ -15,11 +14,10 @@ export const VBCollection = ({
     icon?: React.JSX.Element;
     onClick?: () => Promise<void>;
     mediaURL?: string;
-    type: string;
+    value: string | HMSVirtualBackgroundTypes;
   }[];
   title: string;
-  activeBackground: HTMLImageElement | string;
-  activeBackgroundType: HMSVirtualBackgroundTypes;
+  activeBackground: string;
 }) => {
   if (options.length === 0) {
     return null;
@@ -32,14 +30,10 @@ export const VBCollection = ({
       <Box css={{ py: '$4', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '$8' }}>
         {options.map((option, index) => (
           <VBOption.Root
-            testid={option.type === HMSVirtualBackgroundTypes.IMAGE ? `virtual_bg_option-${index}` : option.type}
-            key={option?.mediaURL || option?.title}
+            key={option.value}
+            testid={option.value === HMSVirtualBackgroundTypes.IMAGE ? `virtual_bg_option-${index}` : option.value}
             {...option}
-            isActive={
-              ([HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.BLUR].includes(activeBackgroundType) &&
-                option.type === activeBackgroundType) ||
-              activeBackground === option?.mediaURL
-            }
+            isActive={activeBackground === option.value}
           >
             <VBOption.Icon>{option?.icon}</VBOption.Icon>
             <VBOption.Title>{option?.title}</VBOption.Title>

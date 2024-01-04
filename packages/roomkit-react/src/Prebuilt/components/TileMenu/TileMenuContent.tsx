@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { useMedia } from 'react-use';
-import { HMSException } from '@100mslive/hms-video';
 import {
+  HMSException,
   HMSSimulcastLayerDefinition,
   HMSTrackID,
   HMSVideoTrack,

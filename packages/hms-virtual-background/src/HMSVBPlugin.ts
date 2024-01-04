@@ -11,7 +11,7 @@ import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } f
 
 export class HMSVBPlugin implements HMSVideoPlugin {
   private TAG = '[HMSVBPlugin]';
-  private background: HMSVirtualBackground;
+  private background: HMSVirtualBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType: HMSVirtualBackgroundTypes = HMSVirtualBackgroundTypes.NONE;
   private segmentation!: SelfieSegmentation;
   private outputCanvas?: HTMLCanvasElement;

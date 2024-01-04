@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
+import React, { useEffect, useState } from 'react';
+import { selectEffectsKey, selectIsEffectsEnabled, selectLocalPeerRole } from '@100mslive/hms-video-store';
+import { HMSEffectsPlugin, HMSVBPlugin, HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLargeRoom,
   selectIsLocalVideoEnabled,
+  selectIsLocalVideoPluginPresent,
   selectLocalPeer,
-  selectLocalPeerRole,
-  selectLocalVideoTrackID,
   selectRoomState,
   selectVideoTrackByID,
   useHMSActions,
@@ -17,106 +17,64 @@ import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react
 import { Box, Flex, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
+import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
-// @ts-ignore
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia, vbPlugin } from './constants';
+import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
-const MAX_RETRIES = 2;
 
 export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
-  const role = useHMSStore(selectLocalPeerRole);
-  const [isVBSupported, setIsVBSupported] = useState(false);
-  const localPeerVideoTrackID = useHMSStore(selectLocalVideoTrackID);
   const localPeer = useHMSStore(selectLocalPeer);
-  // @ts-ignore
-  const [background, setBackground] = useState(vbPlugin.background);
-  // @ts-ignore
-  const [backgroundType, setBackgroundType] = useState(vbPlugin.backgroundType);
+  const role = useHMSStore(selectLocalPeerRole);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const addedPluginToVideoTrack = useRef(false);
+  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+  const effectsKey = useHMSStore(selectEffectsKey);
+  const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
+  const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
+    (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
+  );
   const mediaList = backgroundMedia.length
-    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media?.url)
+    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
 
   const inPreview = roomState === HMSRoomState.Preview;
-  // Hidden in preview as the effect will be visible in the preview tile. Needed inside the room because the peer might not be on-screen
+  // Hidden in preview as the effect will be visible in the preview tile
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
-  const clearVBState = () => {
-    setBackground(HMSVirtualBackgroundTypes.NONE);
-    setBackgroundType(HMSVirtualBackgroundTypes.NONE);
-  };
-
   useEffect(() => {
-    if (!localPeerVideoTrackID) {
-      return;
-    }
-
-    //check support of plugin
-    if (vbPlugin) {
-      const pluginSupport = hmsActions.validateVideoPluginSupport(vbPlugin);
-      setIsVBSupported(pluginSupport.isSupported);
-    }
-  }, [hmsActions, localPeerVideoTrackID]);
-
-  async function disableEffects() {
-    if (vbPlugin) {
-      vbPlugin.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
-      clearVBState();
-    }
-  }
-
-  async function addPlugin({ mediaURL = '', blurPower = 0 }) {
-    let retries = 0;
-    try {
-      if (mediaURL) {
-        const img = document.createElement('img');
-        img.alt = 'VB';
-        img.src = mediaURL;
-        try {
-          await vbPlugin.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
-        } catch (e) {
-          console.error(e);
-          if (retries++ < MAX_RETRIES) {
-            await vbPlugin.setBackground(img, HMSVirtualBackgroundTypes.IMAGE);
+    if (!isPluginAdded) {
+      let vbObject = VBHandler.getVBObject();
+      if (!vbObject) {
+        VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
+        vbObject = VBHandler.getVBObject();
+        if (isEffectsEnabled && effectsKey) {
+          hmsActions.addPluginsToVideoStream([vbObject as HMSEffectsPlugin]);
+        } else {
+          if (!role) {
+            return;
           }
+          hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
-      } else if (blurPower) {
-        await vbPlugin.setBackground(HMSVirtualBackgroundTypes.BLUR, HMSVirtualBackgroundTypes.BLUR);
       }
-      setBackground(mediaURL || HMSVirtualBackgroundTypes.BLUR);
-      setBackgroundType(mediaURL ? HMSVirtualBackgroundTypes.IMAGE : HMSVirtualBackgroundTypes.BLUR);
-      if (role && !addedPluginToVideoTrack.current) {
-        await hmsActions.addPluginToVideoTrack(vbPlugin, Math.floor(role.publishParams.video.frameRate / 2));
-        addedPluginToVideoTrack.current = true;
-      }
-    } catch (err) {
-      console.error('Failed to apply VB', err);
-      disableEffects();
     }
-  }
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey]);
 
   useEffect(() => {
     if (!isVideoOn) {
       toggleVB();
     }
   }, [isVideoOn, toggleVB]);
-
-  if (!isVBSupported) {
-    return null;
-  }
 
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
@@ -140,7 +98,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           css={{ width: '100%', height: '16rem' }}
         />
       ) : null}
-
       <Box
         css={{
           mt: '$4',
@@ -156,30 +113,36 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             {
               title: 'No effect',
               icon: <CrossCircleIcon style={iconDims} />,
-              type: HMSVirtualBackgroundTypes.NONE,
-              onClick: async () => await disableEffects(),
+              value: HMSVirtualBackgroundTypes.NONE,
+              onClick: async () => {
+                await VBHandler.removeEffects();
+                setActiveBackground(HMSVirtualBackgroundTypes.NONE);
+              },
             },
             {
               title: 'Blur',
               icon: <BlurPersonHighIcon style={iconDims} />,
-              type: HMSVirtualBackgroundTypes.BLUR,
-              onClick: async () => await addPlugin({ blurPower: 0.5 }),
+              value: HMSVirtualBackgroundTypes.BLUR,
+              onClick: async () => {
+                await VBHandler?.setBlur(0.5);
+                setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
+              },
             },
           ]}
-          activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-          // @ts-ignore
-          activeBackground={vbPlugin.background?.src || vbPlugin.background || HMSVirtualBackgroundTypes.NONE}
+          activeBackground={activeBackground}
         />
 
         <VBCollection
           title="Backgrounds"
           options={mediaList.map(mediaURL => ({
-            type: HMSVirtualBackgroundTypes.IMAGE,
             mediaURL,
-            onClick: async () => await addPlugin({ mediaURL }),
+            value: mediaURL,
+            onClick: async () => {
+              await VBHandler?.setBackground(mediaURL);
+              setActiveBackground(mediaURL);
+            },
           }))}
-          activeBackgroundType={backgroundType || HMSVirtualBackgroundTypes.NONE}
-          activeBackground={background?.src || background || HMSVirtualBackgroundTypes.NONE}
+          activeBackground={activeBackground}
         />
       </Box>
     </Flex>
