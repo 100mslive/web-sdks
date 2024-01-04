@@ -41,6 +41,9 @@ export interface InitConfig {
       readonly connecting: number;
       readonly failed: number;
     };
+    readonly vb?: {
+      readonly effectsKey: string;
+    };
   };
 }
 
@@ -54,4 +57,5 @@ export enum InitFlags {
   // Don't unsubscribe for beam to prevent a/v sync in case of active speaker
   FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE = 'disableVideoTrackAutoUnsubscribe',
   FLAG_WHITEBOARD_ENABLED = 'whiteboardEnabled',
+  FLAG_EFFECTS_SDK_ENABLED = 'effectsSDKEnabled',
 }
