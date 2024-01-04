@@ -15,7 +15,7 @@ export class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+  async addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
       direction: 'sendonly',
@@ -23,14 +23,14 @@ export class HMSLocalStream extends HMSMediaStream {
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     track.transceiver = transceiver;
+    if (track instanceof HMSLocalAudioTrack) {
+      await track.correctSenderTrack();
+    }
     return transceiver;
   }
 
   async setMaxBitrateAndFramerate(track: HMSLocalTrack): Promise<void> {
     await this.connection?.setMaxBitrateAndFramerate(track);
-    if (track instanceof HMSLocalAudioTrack) {
-      await track.correctSenderTrack();
-    }
   }
 
   // @ts-ignore
