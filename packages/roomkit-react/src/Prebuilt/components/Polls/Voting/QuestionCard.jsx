@@ -1,7 +1,13 @@
 // @ts-check
 import React, { useCallback, useMemo, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon, CrossCircleIcon } from '@100mslive/react-icons';
+import {
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CrossCircleIcon,
+} from '@100mslive/react-icons';
 import { Box, Button, Flex, IconButton, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
@@ -70,6 +76,7 @@ export const QuestionCard = ({
   // const [textAnswer, setTextAnswer] = useState('');
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
+  const [showOptions, setShowOptions] = useState(true);
 
   // const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
 
@@ -174,11 +181,20 @@ export const QuestionCard = ({
         ) : null}
       </Flex>
 
-      <Box css={{ my: '$md' }}>
+      <Flex justify="between" css={{ my: '$md' }}>
         <Text css={{ color: '$on_surface_high' }}>{text}</Text>
-      </Box>
+        <Box
+          css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
+          onClick={() => setShowOptions(prev => !prev)}
+        >
+          <ChevronDownIcon
+            style={{ transform: showOptions ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}
+          />
+        </Box>
+      </Flex>
 
-      {/* {type === QUESTION_TYPE.SHORT_ANSWER ? (
+      <Box css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'hidden' }}>
+        {/* {type === QUESTION_TYPE.SHORT_ANSWER ? (
         <Input
           disabled={!canRespond}
           placeholder="Enter your answer"
@@ -193,7 +209,7 @@ export const QuestionCard = ({
         />
       ) : null} */}
 
-      {/* {type === QUESTION_TYPE.LONG_ANSWER ? (
+        {/* {type === QUESTION_TYPE.LONG_ANSWER ? (
         <TextArea
           disabled={!canRespond}
           placeholder="Enter your answer"
@@ -201,49 +217,50 @@ export const QuestionCard = ({
         />
       ) : null} */}
 
-      {type === QUESTION_TYPE.SINGLE_CHOICE ? (
-        <SingleChoiceOptions
-          questionIndex={index}
-          isQuiz={isQuiz}
-          canRespond={canRespond}
-          response={localPeerResponse}
-          correctOptionIndex={answer?.option}
-          options={options}
-          setAnswer={setSingleOptionAnswer}
-          totalResponses={result?.totalResponses}
-          showVoteCount={showVoteCount}
-          localPeerResponse={localPeerResponse}
-          isStopped={pollState === 'stopped'}
-        />
-      ) : null}
+        {type === QUESTION_TYPE.SINGLE_CHOICE ? (
+          <SingleChoiceOptions
+            questionIndex={index}
+            isQuiz={isQuiz}
+            canRespond={canRespond}
+            response={localPeerResponse}
+            correctOptionIndex={answer?.option}
+            options={options}
+            setAnswer={setSingleOptionAnswer}
+            totalResponses={result?.totalResponses}
+            showVoteCount={showVoteCount}
+            localPeerResponse={localPeerResponse}
+            isStopped={pollState === 'stopped'}
+          />
+        ) : null}
 
-      {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
-        <MultipleChoiceOptions
-          questionIndex={index}
-          isQuiz={isQuiz}
-          canRespond={canRespond}
-          response={localPeerResponse}
-          correctOptionIndexes={answer?.options}
-          options={options}
-          selectedOptions={multipleOptionAnswer}
-          setSelectedOptions={setMultipleOptionAnswer}
-          totalResponses={result?.totalResponses}
-          showVoteCount={showVoteCount}
-          localPeerResponse={localPeerResponse}
-          isStopped={pollState === 'stopped'}
-        />
-      ) : null}
+        {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
+          <MultipleChoiceOptions
+            questionIndex={index}
+            isQuiz={isQuiz}
+            canRespond={canRespond}
+            response={localPeerResponse}
+            correctOptionIndexes={answer?.options}
+            options={options}
+            selectedOptions={multipleOptionAnswer}
+            setSelectedOptions={setMultipleOptionAnswer}
+            totalResponses={result?.totalResponses}
+            showVoteCount={showVoteCount}
+            localPeerResponse={localPeerResponse}
+            isStopped={pollState === 'stopped'}
+          />
+        ) : null}
 
-      {isLive && (
-        <QuestionActions
-          isValidVote={isValidVote}
-          skippable={skippable}
-          onSkip={handleSkip}
-          onVote={handleVote}
-          response={localPeerResponse}
-          isQuiz={isQuiz}
-        />
-      )}
+        {isLive && (
+          <QuestionActions
+            isValidVote={isValidVote}
+            skippable={skippable}
+            onSkip={handleSkip}
+            onVote={handleVote}
+            response={localPeerResponse}
+            isQuiz={isQuiz}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

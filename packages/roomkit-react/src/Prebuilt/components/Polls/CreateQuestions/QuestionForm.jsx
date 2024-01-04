@@ -1,11 +1,12 @@
 // @ts-check
 import React, { useCallback, useRef, useState } from 'react';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
-import { Box, Button, Dropdown, Flex, Input, Switch, Text, Tooltip } from '../../../../';
+import { Button, Dropdown, Flex, IconButton, Input, Switch, Text, TextArea, Tooltip } from '../../../../';
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
 import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { useDropdownSelection } from '../../hooks/useDropdownSelection';
 import { isValidTextInput } from '../../../common/utils';
+import { Line } from '../common/Line';
 import { MultipleChoiceOptionInputs } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptionInputs } from '../common/SingleChoiceOptions';
 import { QUESTION_TYPE, QUESTION_TYPE_TITLE } from '../../../common/constants';
@@ -116,20 +117,27 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
           </Dropdown.Content>
         </Dropdown.Portal>
       </Dropdown.Root>
-      <Input
+      <TextArea
+        maxLength={1024}
         placeholder="Ask a question"
         css={{
           mt: '$md',
           backgroundColor: '$surface_bright',
           border: '1px solid $border_bright',
+          minHeight: '$14',
+          resize: 'vertical',
+          maxHeight: '$32',
         }}
-        type="text"
         value={text}
         onChange={event => setText(event.target.value)}
       />
+      <Text variant="xs" css={{ color: '$on_surface_medium', textAlign: 'end', mt: '$4' }}>
+        {text?.length || 0}/1024
+      </Text>
+      <Line />
       {type === QUESTION_TYPE.SINGLE_CHOICE || type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
         <>
-          <Text variant="body2" css={{ my: '$6', c: '$on_surface_medium' }}>
+          <Text variant="body2" css={{ mb: '$6', c: '$on_surface_medium' }}>
             Options
           </Text>
 
@@ -173,7 +181,7 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
               <AddCircleIcon style={{ position: 'relative', left: '-2px' }} />
 
               <Text
-                variant="body1"
+                variant="SM"
                 css={{
                   ml: '$4',
                   c: 'inherit',
@@ -183,9 +191,10 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
               </Text>
             </Flex>
           )}
+          <Line />
           {isQuiz ? (
             <>
-              <Flex justify="between" align="center" css={{ mt: '$md', gap: '$6', w: '100%' }}>
+              <Flex justify="between" align="center" css={{ gap: '$6', w: '100%' }}>
                 <Text variant="sm" css={{ color: '$on_surface_medium' }}>
                   Point Weightage
                 </Text>
@@ -213,16 +222,10 @@ export const QuestionForm = ({ question, index, length, onSave, removeQuestion, 
         </>
       ) : null}
 
-      <Flex justify="between" align="center" css={{ mt: '$12' }}>
-        <Box
-          css={{
-            color: '$on_surface_medium',
-            cursor: 'pointer',
-            '&:hover': { color: '$on_surface_high' },
-          }}
-        >
+      <Flex justify="end" align="center" css={{ mt: '$12', gap: '$8' }}>
+        <IconButton css={{ border: '1px solid $border_bright' }}>
           <TrashIcon onClick={() => setOpenDelete(!open)} />
-        </Box>
+        </IconButton>
         <Tooltip
           disabled={isValid}
           title={

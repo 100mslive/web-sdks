@@ -139,10 +139,10 @@ const StyledButton = styled('button', {
   variants: {
     variant: {
       standard: getButtonVariants(
-        '$surface_brighter',
-        '$surface_bright',
-        '$surface_default',
-        '$surface_dim',
+        '$secondary_default',
+        '$secondary_bright',
+        '$secondary_dim',
+        '$secondary_disabled',
         '$on_surface_high',
         '$on_surface_low',
       ),
