@@ -39,7 +39,7 @@ const formatTime = (date: Date) => {
 };
 
 const rowHeights: Record<number, { size: number; id: string }> = {};
-let listInstance: VariableSizeList | null = null; //eslint-disable-line 
+let listInstance: VariableSizeList | null = null; //eslint-disable-line
 function getRowHeight(index: number) {
   // 72 will be default row height for any message length
   return rowHeights[index]?.size || 72;
@@ -404,6 +404,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     const isMobile = useMedia(cssConfig.media.md);
     const { elements } = useRoomLayoutConferencingScreen();
     const vanillaStore = useHMSVanillaStore();
+    const canSendMessages = !!elements.chat?.public_chat_enabled;
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
@@ -435,14 +436,16 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
           <Box>
             <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
             <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
-              Start a conversation
+              {canSendMessages ? 'Start a conversation' : 'No messages yet'}
             </Text>
-            <Text
-              variant="sm"
-              css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
-            >
-              There are no messages here yet. Start a conversation by sending a message.
-            </Text>
+            {canSendMessages ? (
+              <Text
+                variant="sm"
+                css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
+              >
+                There are no messages here yet. Start a conversation by sending a message.
+              </Text>
+            ) : null}
           </Box>
         </Flex>
       );
