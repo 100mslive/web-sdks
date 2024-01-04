@@ -24,6 +24,7 @@ export const SavedQuestion = ({
   return (
     <>
       <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
+        {/* @ts-ignore */}
         Question {index + 1} of {length}: {QUESTION_TYPE_TITLE[question.type]}
       </Text>
       <Text variant="body2" css={{ mt: '$4', mb: '$md' }}>
