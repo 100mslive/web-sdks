@@ -51,6 +51,7 @@ export type HMSPrebuiltOptions = {
   userName?: string;
   userId?: string;
   endpoints?: object;
+  effectsSDKKey?: string;
 };
 
 export type HMSPrebuiltProps = {
