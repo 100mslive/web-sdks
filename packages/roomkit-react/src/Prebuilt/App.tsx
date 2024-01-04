@@ -215,7 +215,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
-                          id={DEFAULT_PORTAL_CONTAINER.slice(1)} //Skips the #
+                          className={DEFAULT_PORTAL_CONTAINER.slice(1)} // Skips the '.' in the selector
                           css={{
                             bg: '$background_dim',
                             size: '100%',
