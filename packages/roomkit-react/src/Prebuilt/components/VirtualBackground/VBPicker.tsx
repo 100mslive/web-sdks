@@ -115,7 +115,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               icon: <CrossCircleIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.NONE,
               onClick: async () => {
-                VBHandler.removeEffects();
+                await VBHandler.removeEffects();
                 setActiveBackground(HMSVirtualBackgroundTypes.NONE);
               },
             },
@@ -124,7 +124,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => {
-                VBHandler?.setBlur(0.5);
+                await VBHandler?.setBlur(0.5);
                 setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
               },
             },
@@ -138,7 +138,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             mediaURL,
             value: mediaURL,
             onClick: async () => {
-              VBHandler?.setBackground(mediaURL);
+              await VBHandler?.setBackground(mediaURL);
               setActiveBackground(mediaURL);
             },
           }))}
