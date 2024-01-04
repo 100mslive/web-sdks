@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { selectAppData, selectLocalPeerRole } from '@100mslive/hms-video-store';
 import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-import { VirtualBackground, VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
+import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLargeRoom,
@@ -28,7 +28,7 @@ import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
-export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
+export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const hmsActions = useHMSActions();
   const localPeer = useHMSStore(selectLocalPeer);
@@ -45,11 +45,10 @@ export const VBPicker = ({ background_media = [] }: VirtualBackground = {}) => {
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
     (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
   );
+  const mediaList = backgroundMedia.length
+    ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
+    : defaultMedia;
 
-  const mediaList = [
-    ...background_media.filter(media => !!media.url).map((media: VirtualBackgroundMedia) => media.url || ''),
-    ...defaultMedia,
-  ];
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;

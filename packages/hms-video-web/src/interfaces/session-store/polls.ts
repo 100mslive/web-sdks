@@ -143,7 +143,7 @@ export interface HMSPollQuestionResult {
   totalResponses?: number;
 }
 
-export interface HMSPollLeaderboardEntry {
+export interface HMSQuizLeaderboardEntry {
   position: number;
   score: number;
   totalResponses: number;
@@ -152,7 +152,16 @@ export interface HMSPollLeaderboardEntry {
   peer: HMSPollResponsePeerInfo;
 }
 
-export interface HMSPollLeaderboardResponse {
-  entries: HMSPollLeaderboardEntry[];
+export interface HMSQuizLeaderboardSummary {
+  avgScore: number;
+  avgTime: number;
+  votedUsers: number;
+  totalUsers: number;
+  correctAnswers: number;
+}
+
+export interface HMSQuizLeaderboardResponse {
+  entries: HMSQuizLeaderboardEntry[];
   hasNext: boolean;
+  summary?: HMSQuizLeaderboardSummary;
 }

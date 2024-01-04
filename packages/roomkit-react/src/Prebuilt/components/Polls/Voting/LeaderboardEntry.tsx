@@ -21,7 +21,7 @@ export const LeaderboardEntry = ({
   maxPossibleScore: number;
 }) => {
   return (
-    <Flex align="center" justify="between">
+    <Flex align="center" justify="between" css={{ my: '$4' }}>
       <Flex align="center" css={{ gap: '$6' }}>
         <Flex
           align="center"
@@ -44,17 +44,17 @@ export const LeaderboardEntry = ({
             {userName}
           </Text>
 
-          <Text variant="sm">
-            {score}/{maxPossibleScore} points
+          <Text variant="sm" css={{ mt: '$1' }}>
+            {score} / {maxPossibleScore} points
           </Text>
         </Box>
       </Flex>
-      <Flex align="center" css={{ gap: '$6', color: '$on_surface_medium' }}>
-        {position === 1 ? <TrophyFilledIcon /> : null}
+      <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
+        {position === 1 ? <TrophyFilledIcon height={16} width={16} /> : null}
         <CheckCircleIcon height={16} width={16} />
         {questionCount ? (
           <Text variant="xs">
-            {correctResponses}/{questionCount}
+            {correctResponses} / {questionCount}
           </Text>
         ) : null}
       </Flex>

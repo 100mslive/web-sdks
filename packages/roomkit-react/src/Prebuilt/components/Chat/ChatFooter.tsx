@@ -10,11 +10,11 @@ import { IconButton } from '../../../IconButton';
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// import { ChatSelectorContainer } from './ChatSelectorContainer';
 // @ts-ignore
 import { useChatDraftMessage } from '../AppData/useChatState';
 // @ts-ignore
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection } from '../../common/hooks';
@@ -72,7 +72,7 @@ function EmojiPicker({ onSelect }: { onSelect: (emoji: any) => void }) {
   );
 }
 
-export const ChatFooter = ({ onSend, children }: { onSend: () => void; children: ReactNode }) => {
+export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => void; children: ReactNode }) => {
   const hmsActions = useHMSActions();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
@@ -86,6 +86,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
   const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
+  const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
@@ -108,7 +110,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       }
       inputRef.current.value = '';
       setTimeout(() => {
-        onSend();
+        onSend(1);
       }, 0);
     } catch (error) {
       const err = error as HMSException;
@@ -131,6 +133,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: () => void; children:
       setDraftMessage(messageElement?.value || '');
     };
   }, [setDraftMessage]);
+
+  if (isLocalPeerBlacklisted) {
+    return null;
+  }
 
   return (
     <Box>

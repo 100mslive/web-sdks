@@ -84,7 +84,7 @@ const App = () => {
           authToken={authToken}
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
-            userName: isHeadless ? 'Beam' : paramUserName,
+            userName: isHeadless && !paramUserName ? 'Beam' : paramUserName,
             endpoints: {
               tokenByRoomCode:
                 process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,

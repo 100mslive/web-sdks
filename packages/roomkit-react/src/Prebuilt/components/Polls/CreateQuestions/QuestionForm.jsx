@@ -262,9 +262,9 @@ export const isValidQuestion = ({ text, type, options, weight, isQuiz = false })
     return false;
   }
 
-  if (![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)) {
-    return true;
-  }
+  // if (![QUESTION_TYPE.SINGLE_CHOICE, QUESTION_TYPE.MULTIPLE_CHOICE].includes(type)) {
+  //   return true;
+  // }
 
   const everyOptionHasText = options.length > 0 && options.every(option => option && isValidTextInput(option.text, 1));
   const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
