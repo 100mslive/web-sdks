@@ -8787,7 +8787,7 @@ ee-first@1.1.1:
   resolved "https://registry.yarnpkg.com/ee-first/-/ee-first-1.1.1.tgz#590c61156b0ae2f4f0255732a158b266bc56b21d"
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
-effects-sdk@^2.5.3:
+effects-sdk@2.6.8:
   version "2.6.8"
   resolved "https://registry.yarnpkg.com/effects-sdk/-/effects-sdk-2.6.8.tgz#ab34f9c83ce28d6b2d5db9fe522611db697009d4"
   integrity sha512-zNJxruPxmbyTc+T43PBmCqQ4m//FvSr90DzYnuWu7r8C78tle9Ile35xmFfNBuKixbEt0ul4IDAmpqQkO3IrcQ==

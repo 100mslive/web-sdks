@@ -53,6 +53,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
 
   useEffect(() => {
+    if (!track?.id) {
+      return;
+    }
     if (!isPluginAdded) {
       let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
@@ -68,7 +71,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         }
       }
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey]);
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id]);
 
   useEffect(() => {
     if (!isVideoOn) {
