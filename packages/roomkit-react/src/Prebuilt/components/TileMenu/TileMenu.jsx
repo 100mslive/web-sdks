@@ -75,7 +75,7 @@ const TileMenu = ({
           data-testid="participant_menu_btn"
           css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
           onClick={e => e.stopPropagation()}
-          className={isMobile ? '__cancel-drag-event' : ''}
+          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
         >
           <VerticalMenuIcon width={20} height={20} />
         </StyledMenuTile.Trigger>
