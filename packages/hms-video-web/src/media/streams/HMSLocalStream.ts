@@ -4,7 +4,7 @@ import { SimulcastLayer } from '../../interfaces';
 import { stringifyMediaStreamTrack } from '../../utils/json';
 import HMSLogger from '../../utils/logger';
 import { isNode } from '../../utils/support';
-import { HMSLocalAudioTrack, HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
+import { HMSLocalTrack, HMSLocalVideoTrack } from '../tracks';
 
 export class HMSLocalStream extends HMSMediaStream {
   /** Connection set when publish is called for the first track */
@@ -15,7 +15,7 @@ export class HMSLocalStream extends HMSMediaStream {
     this.connection = connection;
   }
 
-  async addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
+  addTransceiver(track: HMSLocalTrack, simulcastLayers: SimulcastLayer[]) {
     const transceiver = this.connection!.addTransceiver(track.getTrackBeingSent(), {
       streams: [this.nativeStream],
       direction: 'sendonly',
@@ -23,9 +23,6 @@ export class HMSLocalStream extends HMSMediaStream {
     });
     this.setPreferredCodec(transceiver, track.nativeTrack.kind);
     track.transceiver = transceiver;
-    if (track instanceof HMSLocalAudioTrack) {
-      await track.correctSenderTrack();
-    }
     return transceiver;
   }
 
