@@ -251,15 +251,12 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   correctSenderTrack = async () => {
-    if (!this.transceiver || !this.transceiver.sender.track) {
+    console.log('before correction', this.transceiver?.sender.track?.id, this.nativeTrack.id);
+    if (!this.transceiver) {
       return;
     }
-    const currentSenderTrack = this.transceiver.sender.track;
-    if (currentSenderTrack.id !== this.nativeTrack.id) {
-      const localStream = this.stream as HMSLocalStream;
-      // change nativeTrack so plugin can start its work
-      await localStream.replaceSenderTrack(currentSenderTrack, this.nativeTrack);
-    }
+    await this.transceiver.sender.replaceTrack(this.nativeTrack);
+    console.log('after correction', this.transceiver?.sender.track?.id, this.nativeTrack.id);
   };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
