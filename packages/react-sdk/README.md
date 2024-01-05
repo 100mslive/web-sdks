@@ -24,7 +24,7 @@ Add `HMSRoomProvider` from `@100mslive/react-sdk` at the top level of your compo
 ```
 
 By default, when using `HMSRoomProvider` room leave will be called when you are leaving/closing the tab.
-To disable this behaviour, you can pass `leaveOnUnload` as false`
+To disable this behaviour, you can pass `leaveOnUnload` as `false`
 
 > NOTE: The above leave might or might not be successfully sent to server as it depends on the browser implementation. This works on chromium based browsers.
 
