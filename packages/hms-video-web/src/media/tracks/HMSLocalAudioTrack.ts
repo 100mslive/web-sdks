@@ -95,6 +95,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
       await localStream.replaceStreamTrack(prevTrack, newTrack);
       this.nativeTrack = newTrack;
+      await this.correctSenderTrack();
       isLevelMonitored && this.initAudioLevelMonitor();
     } catch (e) {
       if (this.isPublished) {
@@ -121,7 +122,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     // Replace silent empty track with an actual audio track, if enabled.
     if (value && isEmptyTrack(this.nativeTrack)) {
       await this.replaceTrackWith(this.settings);
-      await this.correctSenderTrack();
     }
     await super.setEnabled(value);
     if (value) {
@@ -255,7 +255,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (!this.transceiver) {
       return;
     }
-    await this.transceiver.sender.replaceTrack(this.nativeTrack);
+    await this.transceiver.sender.replaceTrack(this.processedTrack || this.nativeTrack);
     console.log('after correction', this.transceiver?.sender.track?.id, this.nativeTrack.id);
   };
 
