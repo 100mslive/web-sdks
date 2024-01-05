@@ -7,6 +7,7 @@ import {
   HMSPeerID,
   HMSRoleName,
   selectHMSMessages,
+  selectIsLargeRoom,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeerNameByID,
@@ -403,9 +404,13 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     const vanillaStore = useHMSVanillaStore();
 
     useEffect(() => {
+      const isLargeRoom = vanillaStore.getState(selectIsLargeRoom);
+      if (isLargeRoom) {
+        return;
+      }
       const unsubscribe = vanillaStore.subscribe(() => {
         // @ts-ignore
-        if (!listRef.current) {
+        if (!listRef.current || isLargeRoom) {
           return;
         }
         // @ts-ignore

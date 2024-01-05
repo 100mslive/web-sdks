@@ -70,10 +70,10 @@ const NewMessageIndicator = ({
   }
   // @ts-ignore
   const outerElement = listRef.current._outerRef;
-  // @ts-ignore
-  if (outerElement.scrollHeight === listRef.current.state.scrollOffset + outerElement.offsetHeight) {
+  if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
     return null;
   }
+
   return (
     <Flex
       justify="center"
