@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { GridVideoTileLayout } from '@100mslive/types-prebuilt/elements/video_tile_layout';
 import {
+  selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeers,
   selectPeerScreenSharing,
@@ -42,6 +43,8 @@ export const GridLayout = ({
   const pinnedTrack = usePinnedTrack();
   const peers = useHMSStore(selectPeers);
   const localPeerRole = useHMSStore(selectLocalPeerRoleName);
+  const localPeerID = useHMSStore(selectLocalPeerID);
+
   const [activeScreensharePeerId] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const isRoleProminence =
     (prominentRoles.length &&
@@ -58,12 +61,14 @@ export const GridLayout = ({
       // if localPeer role is prominent role, it shows up in the center, so allow it in active speaker sorting
       if (localPeerRole && prominentRoles.includes(localPeerRole)) {
         return peers;
+      } else if (localPeerID === pinnedTrack?.peerId) {
+        return peers;
       } else {
         return peers.filter(peer => !peer.isLocal);
       }
     }
     return peers;
-  }, [isInsetEnabled, activeScreensharePeerId, localPeerRole, prominentRoles, peers]);
+  }, [isInsetEnabled, activeScreensharePeerId, localPeerRole, localPeerID, prominentRoles, peers, pinnedTrack]);
   const vanillaStore = useHMSVanillaStore();
   const [sortedPeers, setSortedPeers] = useState(updatedPeers);
   const peersSorter = useMemo(() => new PeersSorter(vanillaStore), [vanillaStore]);
