@@ -410,7 +410,7 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       }
       const unsubscribe = vanillaStore.subscribe(() => {
         // @ts-ignore
-        if (!listRef.current || isLargeRoom) {
+        if (!listRef.current) {
           return;
         }
         // @ts-ignore
