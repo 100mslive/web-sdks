@@ -2,6 +2,7 @@ import React from 'react';
 import { HMSPoll, selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { Box } from '../../../../Layout';
 import { Text } from '../../../../Text';
+import { StatisticBox } from './StatisticBox';
 // @ts-ignore
 import { getPeerParticipationSummary } from '../../../common/utils';
 
@@ -22,15 +23,7 @@ export const PeerParticipationSummary = ({ poll }: { poll: HMSPoll }) => {
       <Text css={{ fontWeight: '$semiBold', my: '$8' }}>Participation Summary</Text>
       <Box css={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '$4' }}>
         {boxes.map(box => (
-          <Box key={box.title} css={{ p: '$8', background: '$surface_default', borderRadius: '$1' }}>
-            <Text
-              variant="tiny"
-              css={{ textTransform: 'uppercase', color: '$on_surface_medium', fontWeight: '$semiBold', my: '$4' }}
-            >
-              {box.title}
-            </Text>
-            <Text css={{ fontWeight: '$semiBold' }}>{box.value}</Text>
-          </Box>
+          <StatisticBox key={box.title} title={box.title} value={box.value} />
         ))}
       </Box>
     </Box>

@@ -20,7 +20,7 @@ import { Tooltip } from '../../../Tooltip';
 import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useChatBlacklist } from '../hooks/useChatBlacklist';
+import { useChatBlacklist, useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
@@ -68,6 +68,8 @@ export const ChatActions = ({
     SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
   );
 
+  const isSenderBlocked = useIsPeerBlacklisted({ peerCustomerUserId: message.senderUserId });
+
   const updatePinnedMessages = useCallback(
     (messageID = '') => {
       const blacklistedMessageIDSet = new Set([...(blacklistedMessageIDs || []), messageID]);
@@ -102,8 +104,8 @@ export const ChatActions = ({
     }
   > = {
     reply: {
-      text: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
-      tooltipText: message.recipientRoles?.length ? 'Reply to Group' : 'Reply Privately',
+      text: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
+      tooltipText: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
       icon: <ReplyIcon style={iconStyle} />,
       onClick: onReply,
       show: showReply,
@@ -140,10 +142,10 @@ export const ChatActions = ({
         }
       },
       color: '$alert_error_default',
-      show: !!can_block_user && !sentByLocalPeer,
+      show: !!can_block_user && !sentByLocalPeer && !isSenderBlocked,
     },
     remove: {
-      text: 'Remove Partipant',
+      text: 'Remove participant',
       icon: <PeopleRemoveIcon style={iconStyle} />,
       color: '$alert_error_default',
       show: !!canRemoveOthers && !sentByLocalPeer,

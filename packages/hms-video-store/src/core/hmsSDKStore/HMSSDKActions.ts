@@ -10,6 +10,7 @@ import {
   HMSLocalTrack as SDKHMSLocalTrack,
   HMSLocalVideoTrack as SDKHMSLocalVideoTrack,
   HMSLogLevel,
+  HMSMediaStreamPlugin,
   HMSPluginSupportResult,
   HMSRemoteTrack as SDKHMSRemoteTrack,
   HMSRemoteVideoTrack as SDKHMSRemoteVideoTrack,
@@ -23,6 +24,7 @@ import {
   SessionStoreUpdate,
 } from '@100mslive/hms-video';
 import { PEER_NOTIFICATION_TYPES, POLL_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from './common/mapping';
+import { ActionBatcher } from './sdkUtils/ActionBatcher';
 import { isRemoteTrack } from './sdkUtils/sdkUtils';
 import {
   areArraysEqual,
@@ -118,7 +120,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private isRoomJoinCalled = false;
   private hmsNotifications: HMSNotifications<T>;
   private ignoredMessageTypes: string[] = [];
-  // private actionBatcher: ActionBatcher;
+  private actionBatcher: ActionBatcher<T>;
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
@@ -132,7 +134,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
     this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
-    // this.actionBatcher = new ActionBatcher(store);
+    this.actionBatcher = new ActionBatcher(store);
   }
   setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
     this.sdk.updatePlaylistSettings(settings);
@@ -453,6 +455,15 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   async addPluginToVideoTrack(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
     return this.addRemoveVideoPlugin(plugin, 'add', pluginFrameRate);
   }
+
+  async addPluginsToVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void> {
+    return this.addRemoveMediaStreamVideoPlugins(plugins, 'add');
+  }
+
+  async removePluginsFromVideoStream(plugins: HMSMediaStreamPlugin[]): Promise<void> {
+    return this.addRemoveMediaStreamVideoPlugins(plugins, 'remove');
+  }
+
   async addPluginToAudioTrack(plugin: HMSAudioPlugin): Promise<void> {
     return this.addRemoveAudioPlugin(plugin, 'add');
   }
@@ -1018,6 +1029,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       store.room.isConnected = true;
       store.room.roomState = HMSRoomState.Connected;
     }, 'joined');
+
     playlistManager.onProgress(this.setProgress);
     playlistManager.onNewTrackStart((item: sdkTypes.HMSPlaylistItem<any>) => {
       this.syncPlaylistState(`${item.type}PlaylistUpdate`);
@@ -1108,10 +1120,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     if (hmsMessage.ignored) {
       return;
     }
-    this.setState(store => {
-      store.messages.byID[hmsMessage.id] = hmsMessage;
-      store.messages.allIDs.push(hmsMessage.id);
-    }, 'newMessage');
+    this.actionBatcher.setState(
+      store => {
+        store.messages.byID[hmsMessage.id] = hmsMessage;
+        store.messages.allIDs.push(hmsMessage.id);
+      },
+      'newMessage',
+      150,
+    );
   }
 
   /*
@@ -1385,6 +1401,28 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       }
     }
   }
+
+  private async addRemoveMediaStreamVideoPlugins(plugins: HMSMediaStreamPlugin[], action: 'add' | 'remove') {
+    if (plugins.length === 0) {
+      HMSLogger.w('Invalid plugin received in store');
+      return;
+    }
+    const trackID = this.store.getState(selectLocalVideoTrackID);
+    if (trackID) {
+      const sdkTrack = this.hmsSDKTracks[trackID];
+      if (sdkTrack) {
+        if (action === 'add') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins(plugins);
+        } else if (action === 'remove') {
+          await (sdkTrack as SDKHMSLocalVideoTrack).removeStreamPlugins(plugins);
+        }
+        this.syncRoomState(`${action}MediaStreamPlugin`);
+      } else {
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+      }
+    }
+  }
+
   private async addRemoveAudioPlugin(plugin: HMSAudioPlugin, action: 'add' | 'remove') {
     if (!plugin) {
       HMSLogger.w('Invalid plugin received in store');

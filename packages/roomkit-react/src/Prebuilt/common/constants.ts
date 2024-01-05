@@ -121,17 +121,17 @@ export enum INTERACTION_TYPE {
 export enum QUESTION_TYPE_TITLE {
   'single-choice' = 'Single Choice',
   'multiple-choice' = 'Multiple Choice',
-  'short-answer' = 'Short Answer',
-  'long-answer' = 'Long Answer',
+  // 'short-answer' = 'Short Answer',
+  // 'long-answer' = 'Long Answer',
 }
 
 export enum QUESTION_TYPE {
   SINGLE_CHOICE = 'single-choice',
   MULTIPLE_CHOICE = 'multiple-choice',
-  SHORT_ANSWER = 'short-answer',
-  LONG_ANSWER = 'long-answer',
+  // SHORT_ANSWER = 'short-answer',
+  // LONG_ANSWER = 'long-answer',
 }
 
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
-export const DEFAULT_PORTAL_CONTAINER = '#prebuilt-container';
+export const DEFAULT_PORTAL_CONTAINER = '.prebuilt-container';

@@ -3,7 +3,6 @@ import React from 'react';
 import {
   selectLocalPeerID,
   selectPeerNameByID,
-  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -11,7 +10,6 @@ import {
 import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
 import { Container } from '../../Streaming/Common';
-// import { PollResultSummary } from "./PollResultSummary";
 import { StandardView } from './StandardVoting';
 import { TimedView } from './TimedVoting';
 import { usePollViewState } from '../../AppData/useUISettings';
@@ -24,17 +22,12 @@ export const Voting = ({ id, toggleVoting }) => {
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
-  const permissions = useHMSStore(selectPermissions);
-
-  // const sharedLeaderboards = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SHARED_LEADERBOARDS));
 
   if (!poll) {
     return null;
   }
 
-  // const isLeaderboardShared = (sharedLeaderboards || []).includes(id);
-  const canViewLeaderboard =
-    poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous && permissions?.pollWrite;
+  const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 
   // Sets view - linear or vertical, toggles timer indicator
   const isTimed = (poll.duration || 0) > 0;
@@ -81,15 +74,6 @@ export const Voting = ({ id, toggleVoting }) => {
             </Text>
           </Box>
         </Flex>
-
-        {/* {poll.state === "stopped" && (
-          <PollResultSummary
-            pollResult={poll.result}
-            questions={poll.questions}
-            isQuiz={poll.type === "quiz"}
-            isAdmin={isLocalPeerCreator}
-          />
-        )} */}
 
         {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
 

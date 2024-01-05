@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { VariableSizeList } from 'react-window';
@@ -7,11 +7,11 @@ import {
   HMSPeerID,
   HMSRoleName,
   selectHMSMessages,
-  selectHMSMessagesCount,
   selectLocalPeerID,
   selectLocalPeerRoleName,
   selectPeerNameByID,
   selectSessionStore,
+  selectUnreadHMSMessagesCount,
   useHMSActions,
   useHMSStore,
   useHMSVanillaStore,
@@ -20,9 +20,8 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
-// @ts-ignore
-import emptyChat from '../../images/empty-chat.svg';
 import { ChatActions } from './ChatActions';
+import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
@@ -38,15 +37,19 @@ const formatTime = (date: Date) => {
   return `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes} ${suffix}`;
 };
 
-const rowHeights: Record<number, number> = {};
+const rowHeights: Record<number, { size: number; id: string }> = {};
+let listInstance: VariableSizeList | null = null; //eslint-disable-line
 function getRowHeight(index: number) {
   // 72 will be default row height for any message length
-  // 16 will add margin value as clientHeight don't include margin
-  return rowHeights[index] + 16 || 72;
+  return rowHeights[index]?.size || 72;
 }
 
-const setRowHeight = (index: number, size: number) => {
-  Object.assign(rowHeights, { [index]: size });
+const setRowHeight = (index: number, id: string, size: number) => {
+  if (rowHeights[index]?.id === id && rowHeights[index]?.size) {
+    return;
+  }
+  listInstance?.resetAfterIndex(Math.max(index - 1, 0));
+  Object.assign(rowHeights, { [index]: { size, id } });
 };
 
 const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }) => {
@@ -181,11 +184,11 @@ const ChatMessage = React.memo(
       showReply = true;
     }
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight);
+        setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index]);
+    }, [index, message.id]);
 
     return (
       <Box
@@ -356,7 +359,13 @@ const VirtualizedChatMessages = React.forwardRef<
       >
         {({ height, width }: { height: number; width: number }) => (
           <VariableSizeList
-            ref={listRef}
+            ref={node => {
+              if (node) {
+                // @ts-ignore
+                listRef.current = node;
+                listInstance = node;
+              }
+            }}
             itemCount={messages.length}
             itemSize={getRowHeight}
             itemData={messages}
@@ -391,52 +400,25 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return messages?.filter(message => message.type === 'chat' && !blacklistedMessageIDSet.has(message.id)) || [];
     }, [blacklistedMessageIDs, messages]);
 
-    const isMobile = useMedia(cssConfig.media.md);
-    const { elements } = useRoomLayoutConferencingScreen();
     const vanillaStore = useHMSVanillaStore();
 
     useEffect(() => {
       const unsubscribe = vanillaStore.subscribe(() => {
         // @ts-ignore
-        if (!listRef?.current) {
+        if (!listRef.current) {
           return;
         }
         // @ts-ignore
         const outerElement = listRef.current._outerRef;
-        // @ts-ignore
-        if (outerElement.scrollHeight - (listRef.current.state.scrollOffset + outerElement.offsetHeight) <= 10) {
-          scrollToBottom(1);
+        if (outerElement.clientHeight + outerElement.scrollTop + outerElement.offsetTop >= outerElement.scrollHeight) {
+          requestAnimationFrame(() => scrollToBottom(1));
         }
-      }, selectHMSMessagesCount);
+      }, selectUnreadHMSMessagesCount);
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0 && !(isMobile && elements?.chat?.is_overlay)) {
-      return (
-        <Flex
-          css={{
-            width: '100%',
-            flex: '1 1 0',
-            textAlign: 'center',
-            px: '$4',
-          }}
-          align="center"
-          justify="center"
-        >
-          <Box>
-            <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
-            <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
-              Start a conversation
-            </Text>
-            <Text
-              variant="sm"
-              css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
-            >
-              There are no messages here yet. Start a conversation by sending a message.
-            </Text>
-          </Box>
-        </Flex>
-      );
+    if (filteredMessages.length === 0) {
+      return <EmptyChat />;
     }
 
     return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;

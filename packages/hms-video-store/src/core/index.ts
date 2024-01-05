@@ -43,5 +43,6 @@ export type {
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
-  HMSPollLeaderboardResponse,
+  HMSQuizLeaderboardResponse,
+  HMSQuizLeaderboardSummary,
 } from './hmsSDKStore/sdkTypes';
