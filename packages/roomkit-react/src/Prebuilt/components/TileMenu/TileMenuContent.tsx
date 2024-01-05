@@ -72,6 +72,7 @@ const SpotlightActions = ({
 
   return (
     <StyledMenuTile.ItemButton
+      className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
       css={spacingCSS}
       onClick={() => {
         if (isTileSpotlighted) {
@@ -100,6 +101,7 @@ const PinActions = ({ audioTrackID, videoTrackID }: { videoTrackID: string; audi
   return (
     <>
       <StyledMenuTile.ItemButton
+        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
         css={spacingCSS}
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
@@ -115,7 +117,11 @@ const MinimiseInset = () => {
 
   return (
     <>
-      <StyledMenuTile.ItemButton css={spacingCSS} onClick={() => setMinimised(!minimised)}>
+      <StyledMenuTile.ItemButton
+        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+        css={spacingCSS}
+        onClick={() => setMinimised(!minimised)}
+      >
         <ShrinkIcon height={20} width={20} />
         <span>{minimised ? 'Show' : 'Minimise'} your video</span>
       </StyledMenuTile.ItemButton>
@@ -133,12 +139,16 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
   const currentLayer = track.layerDefinitions.find((layer: HMSSimulcastLayerDefinition) => layer.layer === track.layer);
   return (
     <Fragment>
-      <StyledMenuTile.ItemButton css={{ color: '$on_surface_medium', cursor: 'default' }}>
+      <StyledMenuTile.ItemButton
+        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+        css={{ color: '$on_surface_medium', cursor: 'default' }}
+      >
         Select maximum resolution
       </StyledMenuTile.ItemButton>
       {track.layerDefinitions.map((layer: HMSSimulcastLayerDefinition) => {
         return (
           <StyledMenuTile.ItemButton
+            className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
             key={layer.layer}
             onClick={async () => {
               await actions.setPreferredLayer(trackId, layer.layer);
@@ -174,7 +184,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
           </StyledMenuTile.ItemButton>
         );
       })}
-      <StyledMenuTile.ItemButton>
+      <StyledMenuTile.ItemButton className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}>
         <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
           Currently streaming:
           <Text
@@ -251,6 +261,7 @@ export const TileMenuContent = ({
         {canMinimise && <MinimiseInset />}
         {!userName && (
           <StyledMenuTile.ItemButton
+            className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
             onClick={() => {
               openNameChangeModal();
               closeSheetOnClick();
@@ -268,6 +279,7 @@ export const TileMenuContent = ({
     <>
       {toggleVideo ? (
         <StyledMenuTile.ItemButton
+          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
           css={spacingCSS}
           onClick={() => {
             toggleVideo();
@@ -283,6 +295,7 @@ export const TileMenuContent = ({
       {toggleAudio ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
+          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
           onClick={() => {
             toggleAudio();
             closeSheetOnClick();
