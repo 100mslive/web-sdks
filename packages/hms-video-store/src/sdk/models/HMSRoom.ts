@@ -14,6 +14,14 @@ export default class Room implements HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
+  /**
+   * @alpha
+   */
+  isEffectsEnabled?: boolean;
+  /**
+   * @alpha
+   */
+  effectsKey?: string;
 
   constructor(id: string) {
     this.id = id;

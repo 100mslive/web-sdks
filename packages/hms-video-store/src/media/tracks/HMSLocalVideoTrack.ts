@@ -12,7 +12,8 @@ import {
   ScreenCaptureHandle,
 } from '../../interfaces';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
-import { HMSVideoPluginsManager } from '../../plugins/video';
+import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
+import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
@@ -30,6 +31,7 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
 export class HMSLocalVideoTrack extends HMSVideoTrack {
   settings: HMSVideoTrackSettings;
   private pluginsManager: HMSVideoPluginsManager;
+  private mediaStreamPluginsManager: HMSMediaStreamPluginsManager;
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
@@ -75,6 +77,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
+    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager();
     this.setFirstTrackId(this.trackId);
   }
 
@@ -112,11 +115,40 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       await super.setEnabled(value);
       if (value) {
         await this.pluginsManager.waitForRestart();
+        await this.processPlugins();
         this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
       }
       this.videoHandler.updateSinks();
     }
     this.eventBus.localVideoEnabled.publish({ enabled: value, track: this });
+  }
+
+  private async processPlugins() {
+    try {
+      const plugins = this.mediaStreamPluginsManager.getPlugins();
+      if (plugins.length > 0) {
+        const processedStream = this.mediaStreamPluginsManager.applyPlugins(new MediaStream([this.nativeTrack]));
+        const newTrack = processedStream.getVideoTracks()[0];
+        await this.setProcessedTrack(newTrack);
+      } else {
+        await this.setProcessedTrack();
+      }
+    } catch (e) {
+      console.error('error in processing plugin(s)', e);
+    }
+  }
+
+  async addStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+    if (this.pluginsManager.getPlugins().length > 0) {
+      throw Error('Plugins of type HMSMediaStreamPlugin and HMSVideoPlugin cannot be used together');
+    }
+    this.mediaStreamPluginsManager.addPlugins(plugins);
+    await this.processPlugins();
+  }
+
+  async removeStreamPlugins(plugins: HMSMediaStreamPlugin[]) {
+    this.mediaStreamPluginsManager.removePlugins(plugins);
+    await this.processPlugins();
   }
 
   /**
@@ -156,13 +188,18 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * @see HMSVideoPlugin
    */
   getPlugins(): string[] {
-    return this.pluginsManager.getPlugins();
+    return this.mediaStreamPluginsManager.getPlugins().length > 0
+      ? this.mediaStreamPluginsManager.getPlugins()
+      : this.pluginsManager.getPlugins();
   }
 
   /**
    * @see HMSVideoPlugin
    */
   async addPlugin(plugin: HMSVideoPlugin, pluginFrameRate?: number): Promise<void> {
+    if (this.mediaStreamPluginsManager.getPlugins().length > 0) {
+      throw Error('Plugins of type HMSVideoPlugin and HMSMediaStreamPlugin cannot be used together');
+    }
     return this.pluginsManager.addPlugin(plugin, pluginFrameRate);
   }
 
@@ -329,14 +366,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   }
 
   private async replaceSender(newTrack: MediaStreamTrack, enabled: boolean) {
-    const localStream = this.stream as HMSLocalStream;
     if (enabled) {
-      await localStream.replaceSenderTrack(this.nativeTrack, this.processedTrack || newTrack);
+      await this.replaceSenderTrack(this.processedTrack || newTrack);
     } else {
-      await localStream.replaceSenderTrack(this.processedTrack || this.nativeTrack, newTrack);
+      await this.replaceSenderTrack(newTrack);
     }
-    await localStream.replaceStreamTrack(this.nativeTrack, newTrack);
+    const localStream = this.stream as HMSLocalStream;
+    localStream.replaceStreamTrack(this.nativeTrack, newTrack);
   }
+
+  private replaceSenderTrack = async (track: MediaStreamTrack) => {
+    if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
+      HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
+      return;
+    }
+    await this.transceiver.sender.replaceTrack(track);
+  };
 
   private buildNewSettings = (settings: Partial<HMSVideoTrackSettings>) => {
     const { width, height, codec, maxFramerate, maxBitrate, deviceId, advanced, facingMode } = {
@@ -409,20 +454,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
     // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
-      if (this.processedTrack) {
-        // remove, reset back to the native track
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
-      }
       this.processedTrack = undefined;
     } else if (processedTrack !== this.processedTrack) {
-      if (this.processedTrack) {
-        // replace previous processed track with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
-      } else {
-        // there is no prev processed track, replace native with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
-      }
       this.processedTrack = processedTrack;
     }
+    await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
   };
 }

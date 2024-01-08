@@ -43,7 +43,7 @@ export type {
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
-  HMSPollLeaderboardResponse,
+  HMSQuizLeaderboardResponse,
 } from './internal';
 
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';

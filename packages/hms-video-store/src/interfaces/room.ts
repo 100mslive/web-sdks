@@ -33,6 +33,14 @@ export interface HMSRoom {
   description?: string;
   max_size?: number;
   large_room_optimization?: boolean;
+  /**
+   * @alpha
+   */
+  isEffectsEnabled?: boolean;
+  /**
+   * @alpha
+   */
+  effectsKey?: string;
 }
 
 export interface HMSRecording {

@@ -2,6 +2,7 @@ import type * as Stitches from '@stitches/react';
 import { createStitches } from '@stitches/react';
 import merge from 'lodash.merge';
 import { baseConfig, defaultMedia, defaultThemeMap, defaultUtils } from './base.config';
+import { DEFAULT_PORTAL_CONTAINER } from '../Prebuilt/common/constants';
 
 const HmsStitches = createStitches({
   prefix: 'hms-ui',
@@ -28,18 +29,9 @@ export const {
 } = HmsStitches;
 
 export const globalStyles = globalCss({
-  '*': {
+  [`${DEFAULT_PORTAL_CONTAINER} *`]: {
     fontFamily: '$sans',
     boxSizing: 'border-box',
-    borderWidth: 0,
-    borderStyle: 'solid',
-  },
-  body: {
-    margin: 0,
-  },
-  '#root': {
-    height: '100%',
-    overscrollBehaviorY: 'none',
   },
   '::-webkit-scrollbar-track': {
     WebkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',

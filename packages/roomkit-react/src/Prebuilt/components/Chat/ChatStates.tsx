@@ -4,7 +4,7 @@ import { Button } from '../../../Button';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useIsLocalPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 export const ChatPaused = () => {
@@ -55,7 +55,7 @@ export const ChatPaused = () => {
 };
 
 export const ChatBlocked = () => {
-  const isLocalPeerBlacklisted = useIsLocalPeerBlacklisted();
+  const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   if (!isLocalPeerBlacklisted) {
     return null;
   }
