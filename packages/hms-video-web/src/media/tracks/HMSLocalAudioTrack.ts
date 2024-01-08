@@ -91,10 +91,10 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
       HMSLogger.d(this.TAG, 'replaceTrack, Previous track stopped', prevTrack, 'newTrack', newTrack);
 
       const localStream = this.stream as HMSLocalStream;
-      // change nativeTrack so plugin can start its work
-      await localStream.replaceSenderTrack(prevTrack, this.processedTrack || newTrack);
       await localStream.replaceStreamTrack(prevTrack, newTrack);
+      // change nativeTrack so plugin can start its work
       this.nativeTrack = newTrack;
+      await this.replaceSenderTrack();
       isLevelMonitored && this.initAudioLevelMonitor();
     } catch (e) {
       if (this.isPublished) {
@@ -183,23 +183,11 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   async setProcessedTrack(processedTrack?: MediaStreamTrack) {
     // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
-      if (this.processedTrack) {
-        // remove, reset back to the native track
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, this.nativeTrack);
-      }
       this.processedTrack = undefined;
-      return;
-    }
-    if (processedTrack !== this.processedTrack) {
-      if (this.processedTrack) {
-        // replace previous processed track with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.processedTrack, processedTrack);
-      } else {
-        // there is no prev processed track, replace native with new one
-        await (this.stream as HMSLocalStream).replaceSenderTrack(this.nativeTrack, processedTrack);
-      }
+    } else if (processedTrack !== this.processedTrack) {
       this.processedTrack = processedTrack;
     }
+    await this.replaceSenderTrack();
   }
 
   initAudioLevelMonitor() {
@@ -248,6 +236,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   getTrackBeingSent() {
     return this.processedTrack || this.nativeTrack;
   }
+
+  private replaceSenderTrack = async () => {
+    if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
+      HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
+      return;
+    }
+    await this.transceiver.sender.replaceTrack(this.processedTrack || this.nativeTrack);
+  };
 
   private buildNewSettings(settings: Partial<HMSAudioTrackSettings>) {
     const { volume, codec, maxBitrate, deviceId, advanced } = { ...this.settings, ...settings };
