@@ -10,7 +10,6 @@ import {
   mergeTrackArrayFields,
 } from './sdkUtils/storeMergeUtils';
 import { SDKToHMS } from './adapter';
-import { HMSInteractivityCenter } from './HMSInteractivityCenter';
 import { HMSNotifications } from './HMSNotifications';
 import { HMSPlaylist } from './HMSPlaylist';
 import { HMSSessionStore } from './HMSSessionStore';
@@ -26,7 +25,6 @@ import {
   HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSException as SDKHMSException,
-  HMSInteractivityCenter as IHMSInteractivityCenter,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalTrack as SDKHMSLocalTrack,
@@ -125,7 +123,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   audioPlaylist!: IHMSPlaylistActions;
   videoPlaylist!: IHMSPlaylistActions;
   sessionStore: IHMSSessionStoreActions<T['sessionStore']>;
-  interactivityCenter: IHMSInteractivityCenter;
   private beamSpeakerLabelsLogger?: BeamSpeakerLabelsLogger<T>;
 
   constructor(store: IHMSStore<T>, sdk: HMSSdk, notificationManager: HMSNotifications<T>) {
@@ -134,9 +131,13 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.hmsNotifications = notificationManager;
 
     this.sessionStore = new HMSSessionStore<T['sessionStore']>(this.sdk, this.setSessionStoreValueLocally.bind(this));
-    this.interactivityCenter = new HMSInteractivityCenter(this.sdk);
     this.actionBatcher = new ActionBatcher(store);
   }
+
+  get interactivityCenter() {
+    return this.sdk.getInteractivityCenter();
+  }
+
   setPlaylistSettings(settings: sdkTypes.HMSPlaylistSettings): void {
     this.sdk.updatePlaylistSettings(settings);
   }
