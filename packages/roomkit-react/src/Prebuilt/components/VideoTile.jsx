@@ -1,5 +1,5 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
-import { useMeasure, useMedia } from 'react-use';
+import { useMeasure } from 'react-use';
 import {
   selectAudioTrackByPeerID,
   selectHasPeerHandRaised,
@@ -18,7 +18,6 @@ import TileMenu, { isSameTile } from './TileMenu/TileMenu';
 import { AudioLevel } from '../../AudioLevel';
 import { Avatar } from '../../Avatar';
 import { VideoTileStats } from '../../Stats';
-import { config as cssConfig } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { getVideoTileLabel } from './peerTileUtils';
@@ -44,7 +43,6 @@ const Tile = ({
 }) => {
   const trackSelector = trackId ? selectVideoTrackByID(trackId) : selectVideoTrackByPeerID(peerId);
   const track = useHMSStore(trackSelector);
-  const isMobile = useMedia(cssConfig.media.md);
   const peerName = useHMSStore(selectPeerNameByID(peerId));
   const audioTrack = useHMSStore(selectAudioTrackByPeerID(peerId));
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -141,7 +139,7 @@ const Tile = ({
               {!hideMetadataOnTile && <PeerMetadata peerId={peerId} size={attribBoxSize} />}
             </>
           ) : null}
-          {isMouseHovered || (isDragabble && isMobile) ? (
+          {isMouseHovered || (isDragabble && navigator.maxTouchPoints > 0) ? (
             <TileMenu
               peerID={peerId}
               audioTrackID={audioTrack?.id}

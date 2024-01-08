@@ -1,5 +1,5 @@
 {
-  "version": "0.10.27",
+  "version": "0.10.28",
   "license": "MIT",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",

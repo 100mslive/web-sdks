@@ -38,4 +38,6 @@ export interface HMSRoom {
    */
   peerCount?: number;
   isLargeRoom?: boolean;
+  isEffectsEnabled?: boolean;
+  effectsKey?: string;
 }

@@ -20,7 +20,7 @@ export class ActionBatcher<T extends HMSGenericTypes = { sessionStore: Record<st
     this.store = store;
   }
 
-  setState(fn: SetState, action: ActionName) {
+  setState(fn: SetState, action: ActionName, timeout = this.DEFAULT_INTERVAL_MS) {
     this.queuedUpdates[action] = this.queuedUpdates[action] || [];
     this.queuedUpdates[action].push(fn);
     if (this.timers[action]) {
@@ -28,7 +28,7 @@ export class ActionBatcher<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     // set a future timeout if a timer is not there already
     if (window) {
-      this.timers[action] = window.setTimeout(() => this.setStateBatched(action), this.DEFAULT_INTERVAL_MS);
+      this.timers[action] = window.setTimeout(() => this.setStateBatched(action), timeout);
     } else {
       // nodejs, ignore batching for now
       this.setStateBatched(action);
