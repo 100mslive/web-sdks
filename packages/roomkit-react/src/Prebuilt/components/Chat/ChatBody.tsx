@@ -48,7 +48,7 @@ function getRowHeight(index: number) {
 }
 
 const setRowHeight = (index: number, id: string, size: number) => {
-  if (rowHeights[index]?.id === id && rowHeights[index]?.size) {
+  if (rowHeights[index]?.id === id && rowHeights[index]?.size === size) {
     return;
   }
   listInstance?.resetAfterIndex(Math.max(index - 1, 0));
@@ -163,6 +163,20 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
+const getMessageBackgroundColor = (
+  messageType: string,
+  selectedPeerID: string,
+  selectedRole: string,
+  isOverlay: boolean,
+  pinnedBy?: string,
+) => {
+  if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
+  if (messageType && !(selectedPeerID || selectedRole)) {
+    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
+  }
+  return '';
+};
+
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
@@ -190,25 +204,11 @@ const ChatMessage = React.memo(
       showReply = true;
     }
 
-    const getBackgroundColor = (
-      messageType: string,
-      selectedPeerID: string,
-      selectedRole: string,
-      isOverlay: boolean,
-      pinnedBy?: string,
-    ) => {
-      if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
-      if (messageType && !(selectedPeerID || selectedRole)) {
-        return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
-      }
-      return '';
-    };
-
     useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index, message.id]);
+    }, [index, message.id, pinnedBy]);
 
     return (
       <Box
@@ -228,7 +228,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            background: getBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay, pinnedBy),
+            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay, pinnedBy),
             r: '$1',
             p: '$4',
             userSelect: 'none',
