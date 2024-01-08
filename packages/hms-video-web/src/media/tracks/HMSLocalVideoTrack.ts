@@ -453,20 +453,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private removeOrReplaceProcessedTrack = async (processedTrack?: MediaStreamTrack) => {
     // if all plugins are removed reset everything back to native track
     if (!processedTrack) {
-      if (this.processedTrack) {
-        // remove, reset back to the native track
-        await this.replaceSenderTrack(this.nativeTrack);
-      }
       this.processedTrack = undefined;
     } else if (processedTrack !== this.processedTrack) {
-      if (this.processedTrack) {
-        // replace previous processed track with new one
-        await this.replaceSenderTrack(processedTrack);
-      } else {
-        // there is no prev processed track, replace native with new one
-        await this.replaceSenderTrack(processedTrack);
-      }
       this.processedTrack = processedTrack;
     }
+    await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
   };
 }
