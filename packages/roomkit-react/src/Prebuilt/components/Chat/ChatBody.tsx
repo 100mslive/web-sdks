@@ -8,6 +8,7 @@ import {
   HMSRoleName,
   selectHMSMessages,
   selectLocalPeerID,
+  selectLocalPeerName,
   selectLocalPeerRoleName,
   selectPeerNameByID,
   selectSessionStore,
@@ -16,6 +17,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import { SolidPinIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig, styled } from '../../../Theme';
@@ -25,6 +27,7 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const formatTime = (date: Date) => {
@@ -45,7 +48,7 @@ function getRowHeight(index: number) {
 }
 
 const setRowHeight = (index: number, id: string, size: number) => {
-  if (rowHeights[index]?.id === id && rowHeights[index]?.size) {
+  if (rowHeights[index]?.id === id && rowHeights[index]?.size === size) {
     return;
   }
   listInstance?.resetAfterIndex(Math.max(index - 1, 0));
@@ -160,15 +163,32 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
+const getMessageBackgroundColor = (
+  messageType: string,
+  selectedPeerID: string,
+  selectedRole: string,
+  isOverlay: boolean,
+  pinnedBy?: string,
+) => {
+  if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
+  if (messageType && !(selectedPeerID || selectedRole)) {
+    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
+  }
+  return '';
+};
+
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
+    const { getPinnedBy } = usePinnedMessages();
+    const pinnedBy = getPinnedBy(message.id);
     const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const localPeerId = useHMSStore(selectLocalPeerID);
+    const localPeerName = useHMSStore(selectLocalPeerName);
     const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
     const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
@@ -188,7 +208,7 @@ const ChatMessage = React.memo(
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index, message.id]);
+    }, [index, message.id, pinnedBy]);
 
     return (
       <Box
@@ -208,12 +228,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            bg:
-              messageType && !(selectedPeer.id || selectedRole)
-                ? isOverlay
-                  ? 'rgba(0, 0, 0, 0.64)'
-                  : '$surface_default'
-                : undefined,
+            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay, pinnedBy),
             r: '$1',
             p: '$4',
             userSelect: 'none',
@@ -231,6 +246,14 @@ const ChatMessage = React.memo(
             }
           }}
         >
+          {pinnedBy ? (
+            <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
+              <SolidPinIcon height={12} width={12} />
+              <Text variant="xs" css={{ color: 'inherit' }}>
+                Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}{' '}
+              </Text>
+            </Flex>
+          ) : null}
           <Text
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',

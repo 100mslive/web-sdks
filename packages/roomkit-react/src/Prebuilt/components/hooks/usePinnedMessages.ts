@@ -20,7 +20,7 @@ type PinnedMessage = {
 /**
  * set pinned chat message by updating the session store
  */
-export const useSetPinnedMessages = () => {
+export const usePinnedMessages = () => {
   const hmsActions = useHMSActions();
   const vanillaStore = useHMSVanillaStore();
 
@@ -74,5 +74,16 @@ export const useSetPinnedMessages = () => {
     [hmsActions, vanillaStore],
   );
 
-  return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages };
+  const getPinnedBy = (messageID: string) => {
+    const pinnedMessages = vanillaStore.getState(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES)) || [];
+    let pinnedBy = '';
+    pinnedMessages.forEach((pinnedMessage: PinnedMessage) => {
+      if (pinnedMessage.id === messageID) {
+        pinnedBy = pinnedMessage.pinnedBy;
+      }
+    });
+    return pinnedBy;
+  };
+
+  return { setPinnedMessages, removePinnedMessage, unpinBlacklistedMessages, getPinnedBy };
 };
