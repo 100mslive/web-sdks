@@ -259,8 +259,8 @@ export const QuestionForm = ({
         <Tooltip
           disabled={isValid}
           title={
-            options.length === 0
-              ? 'At least one option is required for a question'
+            options.length < 2
+              ? 'At least two options must be added'
               : `Please fill all the fields ${isQuiz ? 'and mark the correct answer(s)' : ''} to continue`
           }
           boxCss={{ maxWidth: '$40' }}
@@ -307,7 +307,7 @@ export const isValidQuestion = ({
     return false;
   }
 
-  const everyOptionHasText = options.length > 0 && options.every(option => option && isValidTextInput(option.text, 1));
+  const everyOptionHasText = options.length > 1 && options.every(option => option && isValidTextInput(option.text, 1));
   const hasCorrectAnswer = options.some(option => option.isCorrectAnswer);
 
   if (!isQuiz) {

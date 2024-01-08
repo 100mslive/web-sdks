@@ -17,9 +17,9 @@ import { usePollViewState } from '../../AppData/useUISettings';
 import { StatusIndicator } from '../common/StatusIndicator';
 import { POLL_VIEWS } from '../../../common/constants';
 
-export const Voting = ({ id, toggleVoting }: { id: number; toggleVoting: () => void }) => {
+export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => void }) => {
   const actions = useHMSActions();
-  const poll = useHMSStore(selectPollByID(id.toString()));
+  const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
@@ -82,7 +82,7 @@ export const Voting = ({ id, toggleVoting }: { id: number; toggleVoting: () => v
           <Button
             variant="danger"
             css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={() => actions.interactivityCenter.stopPoll(id.toString())}
+            onClick={() => actions.interactivityCenter.stopPoll(id)}
           >
             End {poll.type}
           </Button>
