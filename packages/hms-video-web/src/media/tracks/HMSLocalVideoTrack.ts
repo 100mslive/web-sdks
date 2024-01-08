@@ -377,7 +377,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private replaceSenderTrack = async (track: MediaStreamTrack) => {
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
-      HMSLogger.w(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
+      HMSLogger.d(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
       return;
     }
     await this.transceiver.sender.replaceTrack(track);
