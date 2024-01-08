@@ -1,12 +1,11 @@
 import {
-  HMSPoll,
+  HMSInteractivityCenter as IHMSInteractivityCenter,
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
   HMSWhiteboardCreateOptions,
   HMSWhiteboardInteractivityCenter,
 } from '../internal';
-import { IHMSInteractivityCenter } from '../schema';
 import { HMSSdk } from '../sdk';
 
 class WhiteboardInteractivityCenter implements HMSWhiteboardInteractivityCenter {
@@ -54,7 +53,7 @@ export class HMSInteractivityCenter implements IHMSInteractivityCenter {
     return this.sdkInteractivityCenter.addResponsesToPoll(pollID, responses);
   }
 
-  fetchLeaderboard(poll: HMSPoll, offset: number, count: number) {
-    return this.sdkInteractivityCenter.fetchLeaderboard(poll, offset, count);
+  fetchLeaderboard(pollID: string, offset: number, count: number) {
+    return this.sdkInteractivityCenter.fetchLeaderboard(pollID, offset, count);
   }
 }

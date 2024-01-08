@@ -34,7 +34,7 @@ export const Leaderboard = ({ pollID }: { pollID: string }) => {
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (poll) {
-        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(poll, 0, 50);
+        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(poll.id, 0, 50);
         setPollLeaderboard(leaderboardData);
       }
     };

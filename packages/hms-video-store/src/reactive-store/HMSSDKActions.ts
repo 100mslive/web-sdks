@@ -26,6 +26,7 @@ import {
   HMSChangeMultiTrackStateRequest as SDKHMSChangeMultiTrackStateRequest,
   HMSChangeTrackStateRequest as SDKHMSChangeTrackStateRequest,
   HMSException as SDKHMSException,
+  HMSInteractivityCenter as IHMSInteractivityCenter,
   HMSLeaveRoomRequest as SDKHMSLeaveRoomRequest,
   HMSLocalAudioTrack as SDKHMSLocalAudioTrack,
   HMSLocalTrack as SDKHMSLocalTrack,
@@ -62,7 +63,6 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSVideoTrack,
-  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from '../schema';

@@ -4,6 +4,7 @@ import {
   HMSAudioPlugin,
   HMSAudioTrackSettings,
   HMSConfig,
+  HMSInteractivityCenter as IHMSInteractivityCenter,
   HMSLogLevel,
   HMSMidCallPreviewConfig,
   HMSPlaylistSettings,
@@ -27,7 +28,6 @@ import {
   HMSRoleName,
   HMSTrackID,
   HMSTrackSource,
-  IHMSInteractivityCenter,
   IHMSPlaylistActions,
   IHMSSessionStoreActions,
 } from './schema';
