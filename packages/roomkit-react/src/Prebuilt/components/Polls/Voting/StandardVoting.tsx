@@ -1,14 +1,10 @@
-// @ts-check
 import React from 'react';
+import { HMSPoll } from '@100mslive/react-sdk';
 import { PeerParticipationSummary } from './PeerParticipationSummary';
+// @ts-ignore
 import { QuestionCard } from './QuestionCard';
 
-/**
- *
- * @param {{poll: import("@100mslive/react-sdk").HMSPoll}} param0
- * @returns
- */
-export const StandardView = ({ poll }) => {
+export const StandardView = ({ poll }: { poll: HMSPoll }) => {
   if (!poll?.questions) {
     return null;
   }

@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   selectLocalPeerRoleName,
   selectPermissions,
@@ -74,6 +74,14 @@ const AddMenu = () => {
   const { setPollState } = usePollViewState();
   const [interactionType, setInteractionType] = useState(INTERACTION_TYPE.POLL);
 
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [interactionType]);
+
   const handleCreate = id => {
     setPollState({
       [POLL_STATE.pollInView]: id,
@@ -117,7 +125,9 @@ const AddMenu = () => {
       <Flex direction="column">
         <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
+          ref={inputRef}
           type="text"
+          placeholder="Enter a name to continue"
           value={title}
           onChange={event => setTitle(event.target.value)}
           css={{

@@ -43,6 +43,10 @@ export type {
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
+  HMSPollQuestion,
+  HMSPollQuestionType,
+  HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionOption,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
 } from './internal';
