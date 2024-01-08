@@ -154,6 +154,8 @@ export class SDKToHMS {
       joinedAt: sdkRoom.joinedAt,
       peerCount: sdkRoom.peerCount,
       isLargeRoom: sdkRoom.large_room_optimization,
+      isEffectsEnabled: sdkRoom.isEffectsEnabled,
+      effectsKey: sdkRoom.effectsKey,
     };
   }
 
