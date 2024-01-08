@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar, Flex, Text } from '../../../../';
 
-export const VoterList = ({ voters }) => {
+export const VoterList = ({ voters }: { voters: string[] }) => {
   return voters.map((voter, index) => (
     <Flex align="center" key={`${voter}-${index}`} css={{ gap: '$4', py: '$2' }}>
       <Avatar

@@ -5,7 +5,15 @@ import { Box, Flex } from '../../../../Layout';
 import { Dialog } from '../../../../Modal';
 import { Text } from '../../../../Text';
 
-export const DeleteQuestionModal = ({ open, setOpen, removeQuestion }) => {
+export const DeleteQuestionModal = ({
+  open,
+  setOpen,
+  removeQuestion,
+}: {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  removeQuestion: () => void;
+}) => {
   return (
     <Dialog.Root open={open}>
       <Dialog.Overlay />

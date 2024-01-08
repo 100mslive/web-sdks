@@ -41,8 +41,12 @@ export type {
   RID,
   HMSPoll,
   HMSPollCreateParams,
+  HMSPollQuestion,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,
+  HMSPollQuestionType,
+  HMSPollQuestionOptionCreateParams,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
+  HMSPollQuestionOption,
 } from './hmsSDKStore/sdkTypes';

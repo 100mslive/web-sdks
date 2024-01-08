@@ -28,8 +28,12 @@ import {
   HMSPlaylistSettings,
   HMSPoll,
   HMSPollCreateParams,
+  HMSPollQuestion,
   HMSPollQuestionAnswer,
   HMSPollQuestionCreateParams,
+  HMSPollQuestionOption,
+  HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionResponse,
   HMSPollQuestionType,
   HMSPollsUpdate,
   HMSPreferredSimulcastLayer,
@@ -79,7 +83,6 @@ export {
   parsedUserAgent,
   simulcastMapping,
   DeviceType,
-  HMSPollQuestionType,
   HMSPeerListIterator,
 };
 
@@ -130,7 +133,12 @@ export type {
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   HMSPollCreateParams,
+  HMSPollQuestion,
   HMSPollQuestionAnswer,
+  HMSPollQuestionType,
   HMSPollQuestionCreateParams,
+  HMSPollQuestionOptionCreateParams,
+  HMSPollQuestionOption,
+  HMSPollQuestionResponse,
   HMSWhiteboard,
 };
