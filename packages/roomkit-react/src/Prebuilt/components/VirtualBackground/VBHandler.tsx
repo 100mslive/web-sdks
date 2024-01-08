@@ -67,6 +67,11 @@ export class VBPlugin {
       await this.hmsPlugin?.setBackground(HMSVirtualBackgroundTypes.NONE, HMSVirtualBackgroundTypes.NONE);
     }
   };
+
+  reset = () => {
+    this.effectsPlugin = undefined;
+    this.hmsPlugin = undefined;
+  };
 }
 
 export const VBHandler = new VBPlugin();

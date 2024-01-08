@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { usePreviousDistinct } from 'react-use';
 import { HMSRoomState, selectRoomState, useHMSStore } from '@100mslive/react-sdk';
+import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { useRoomLayout } from './provider/roomLayoutProvider';
 import { useRedirectToLeave } from './components/hooks/useRedirectToLeave';
 import {
@@ -60,6 +61,7 @@ export const useAppStateManager = () => {
     ) {
       const goTo = isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING;
       setActiveState(isLeaveScreenEnabled ? PrebuiltStates.LEAVE : goTo);
+      VBHandler.reset();
       redirectToLeave(1000); // to clear toasts after 1 second
     } else if (!prevRoomState && roomState === HMSRoomState.Disconnected) {
       setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
