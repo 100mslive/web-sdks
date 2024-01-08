@@ -48,4 +48,4 @@ export type {
 
 export { HMSReactiveStore } from './reactive-store/HMSReactiveStore';
 export { HMSPluginUnsupportedTypes, HMSRecordingState } from './internal';
-export type { HMSVideoPlugin, HMSPluginSupportResult, HMSFrameworkInfo } from './internal';
+export type { HMSVideoPlugin, HMSMediaStreamPlugin, HMSPluginSupportResult, HMSFrameworkInfo } from './internal';
