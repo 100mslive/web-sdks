@@ -8,7 +8,7 @@ import {
   selectRoleByRoleName,
   selectRoleChangeRequest,
   selectRolesMap,
-} from '../../core';
+} from '../../';
 import { hostRole, localPeer, makeFakeStore, remotePeerOne, ROLES, speakerRole } from '../fakeStore';
 
 let fakeStore: HMSStore;

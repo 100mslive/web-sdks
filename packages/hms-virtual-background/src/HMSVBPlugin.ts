@@ -6,7 +6,7 @@ import {
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
-} from '@100mslive/hms-video';
+} from '@100mslive/hms-video-store';
 import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {

@@ -14,12 +14,7 @@ async function main() {
   }
   require('dotenv').config();
   const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-  const source =
-    pkg.name === '100ms_edtech_template'
-      ? './src/App.js'
-      : pkg.name === '@100mslive/roomkit-web'
-      ? './src/index.js'
-      : './src/index.ts';
+  const source = pkg.name === '@100mslive/roomkit-web' ? './src/index.js' : './src/index.ts';
   const external = [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})];
   const loader = { '.js': 'jsx', '.svg': 'dataurl', '.png': 'dataurl' };
   const define = { 'process.env': JSON.stringify(process.env) };

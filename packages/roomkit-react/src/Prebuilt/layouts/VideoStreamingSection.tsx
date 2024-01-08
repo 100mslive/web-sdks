@@ -34,7 +34,6 @@ import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScree
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
-// const WhiteboardView = React.lazy(() => import("./WhiteboardView"));
 // @ts-ignore: No implicit Any
 const HLSView = React.lazy(() => import('./HLSView'));
 

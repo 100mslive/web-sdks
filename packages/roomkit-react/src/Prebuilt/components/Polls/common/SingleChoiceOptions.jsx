@@ -1,7 +1,7 @@
 // @ts-check
 import React from 'react';
 import { CheckCircleIcon } from '@100mslive/react-icons';
-import { Flex, Label, RadioGroup, Text } from '../../../../';
+import { Flex, Label, RadioGroup, Text } from '../../../..';
 import { OptionInputWithDelete } from './OptionInputWithDelete';
 import { VoteCount } from './VoteCount';
 import { VoteProgress } from './VoteProgress';

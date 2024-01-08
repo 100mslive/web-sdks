@@ -1,15 +1,34 @@
 ### About
 
-This package holds the code for the react wrapper over the core SDK. 
+This package is a react wrapper over the core SDK(`@100mslive/hms-video-store`). 
 An easy way to use the store, actions and notifications are provided via
-React hooks. Some other hooks are also provided for ease of use which wrap
+React hooks. 
+Some other hooks are also provided for ease of use which wrap
 over the primitive ones.
 If someone is using class based react components, they'll be better off
 with using the core sdk directly.
 
-> If you're already using hooks from hms-video-react, this package will be a drop
-> in replacement. hms-video-react is planned to be deprecated so please move your code
-> to using this package instead.
+### Installation
+
+```
+yarn add @100mslive/react-sdk
+```
+
+### Usage
+Add `HMSRoomProvider` from `@100mslive/react-sdk` at the top level of your component tree where you want to use the hooks. Wihout this the hooks will throw an error.
+
+```
+<HMSRoomProvider>
+   <YourComponent></YourComponent>
+</HMSRoomProvider>
+```
+
+By default, when using `HMSRoomProvider` room leave will be called when you are leaving/closing the tab.
+To disable this behaviour, you can pass `leaveOnUnload` as `false`
+
+> NOTE: The above leave might or might not be successfully sent to server as it depends on the browser implementation. This works on chromium based browsers.
+
+
 
 ### Primitive Hooks
 
@@ -35,3 +54,5 @@ These are hooks wrapper over the sdk things.
 - useRemoteAVToggle - to toggle remote mute/unmute + audio volume changer on tile level
 - useAutoplayError - unblock browser autoplay block
 - useAudioLevelStyles - apply css properties on element based on it's audio level
+
+Refer to [docs](https://www.100ms.live/docs/javascript/v2/quickstart/react-quickstart) for a more detailed guide. 

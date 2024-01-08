@@ -21,7 +21,7 @@ import { ToastManager } from '../Toast/ToastManager';
 import { MwebChatOption } from './MwebChatOption';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useChatBlacklist, useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
-import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
+import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const iconStyle = { height: '1.125rem', width: '1.125rem' };
@@ -62,7 +62,7 @@ export const ChatActions = ({
   const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
   const { blacklistItem: blacklistPeer } = useChatBlacklist(SESSION_STORE_KEY.CHAT_PEER_BLACKLIST);
   const localPeerName = useHMSStore(selectLocalPeerName);
-  const { setPinnedMessages, unpinBlacklistedMessages } = useSetPinnedMessages();
+  const { setPinnedMessages, unpinBlacklistedMessages } = usePinnedMessages();
 
   const { blacklistItem: blacklistMessage, blacklistedIDs: blacklistedMessageIDs } = useChatBlacklist(
     SESSION_STORE_KEY.CHAT_MESSAGE_BLACKLIST,
@@ -213,6 +213,7 @@ export const ChatActions = ({
           p: '$2',
           opacity: open ? 1 : 0,
           position: 'absolute',
+          top: 0,
           right: 0,
           zIndex: 1,
           '@md': { opacity: 1 },

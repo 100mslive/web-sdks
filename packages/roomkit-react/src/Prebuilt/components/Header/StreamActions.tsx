@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
-import { HMSRecordingState } from '@100mslive/hms-video';
+import { HMSRecordingState } from '@100mslive/hms-video-store';
 import {
   HMSRoomState,
   selectHLSState,

@@ -5,12 +5,10 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   MusicIcon,
-  PencilDrawIcon,
   ShareScreenIcon,
   VideoPlayerIcon,
 } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
-import { useWhiteboardMetadata } from '../../plugins/whiteboard/useWhiteboardMetadata';
 import { useUISettings } from '../AppData/useUISettings';
 import { usePlaylistMusic } from '../hooks/usePlaylistMusic';
 import { useScreenshareAudio } from '../hooks/useScreenshareAudio';
@@ -57,16 +55,9 @@ export const AdditionalRoomState = () => {
   const { screenSharingPeerName, screenSharingPeerId, screenShareVideoTrackId } = useScreenShare();
 
   const isVideoScreenSharingOn = !!screenShareVideoTrackId;
-  const { whiteboardOwner, amIWhiteboardOwner, toggleWhiteboard } = useWhiteboardMetadata();
   const shouldShowScreenShareState = isAudioOnly && isVideoScreenSharingOn;
   const shouldShowVideoState = isAudioOnly && isVideoPlayListPlaying;
-  if (
-    isPlaylistInactive &&
-    isAudioshareInactive &&
-    !shouldShowScreenShareState &&
-    !shouldShowVideoState &&
-    !whiteboardOwner
-  ) {
+  if (isPlaylistInactive && isAudioshareInactive && !shouldShowScreenShareState && !shouldShowVideoState) {
     return null;
   }
 
@@ -109,13 +100,6 @@ export const AdditionalRoomState = () => {
             <Tooltip title="Playlist Music">
               <Flex align="center" css={{ color: '$on_primary_high', mx: '$2' }}>
                 <AudioPlayerIcon width={24} height={24} />
-              </Flex>
-            </Tooltip>
-          )}
-          {whiteboardOwner && (
-            <Tooltip title="Whiteboard">
-              <Flex align="center" css={{ color: '$on_primary_high', mx: '$2' }}>
-                <PencilDrawIcon width={24} height={24} />
               </Flex>
             </Tooltip>
           )}
@@ -188,27 +172,6 @@ export const AdditionalRoomState = () => {
             <Text variant="sm" css={{ ml: '$2', flex: '1 1 0' }}>
               {`Shared by: ${peerSharingPlaylist.id === localPeerID ? 'You' : peerSharingPlaylist.name}`}
             </Text>
-          </Dropdown.Item>
-        )}
-        {whiteboardOwner && (
-          <Dropdown.Item css={{ color: '$on_primary_high' }}>
-            <PencilDrawIcon width={24} height={24} />
-            <Text variant="sm" css={{ ml: '$2', flex: '1 1 0' }}>
-              Whiteboard Owner - {whiteboardOwner.name}
-              {amIWhiteboardOwner && '(You)'}
-            </Text>
-            {amIWhiteboardOwner && (
-              <Text
-                variant="sm"
-                css={{ color: '$alert_error_default', ml: '$2', cursor: 'pointer' }}
-                onClick={e => {
-                  e.preventDefault();
-                  toggleWhiteboard();
-                }}
-              >
-                Stop
-              </Text>
-            )}
           </Dropdown.Item>
         )}
       </Dropdown.Content>

@@ -44,12 +44,17 @@ object received is frozen, and it is not allowed to mutate it. You'll get an err
 if you try to mutate this data in any way. Immutability of the store is how we ensure
 it to be consistent and reflect the truth at any point of time.
 
+### Installation
+```
+yarn add @100mslive/hms-video-store
+```
+
 ### How To Use
 
 ```js
-const manager = new HMSReactiveStore();
-const hmsActions = manager.getHMSActions();
-const hmsStore = manager.getStore();
+const hms = new HMSReactiveStore();
+const hmsActions = hms.getHMSActions();
+const hmsStore = hms.getStore();
 
 const toggleAudio = () => {
     const isEnabled = hmsStore.getState(selectIsLocalAudioEnabled);
@@ -83,7 +88,7 @@ function join() {
     return <>
         {
             !isConnected &&
-            <Button onClick={hmsActions.join()}>Join</Button>
+            <Button onClick={() => hmsActions.join()}>Join</Button>
         }
     </>
 }
@@ -97,3 +102,5 @@ function join() {
 
 ### Store Graph
 ![Store State](images/store-graph.png)
+
+Refer to [docs](https://www.100ms.live/docs/javascript/v2/quickstart/javascript-quickstart) for more detailed guide

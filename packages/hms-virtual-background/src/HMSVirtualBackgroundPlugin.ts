@@ -5,7 +5,7 @@ import {
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
-} from '@100mslive/hms-video';
+} from '@100mslive/hms-video-store';
 import '@tensorflow/tfjs-backend-webgl';
 import { loadTFLite } from './defineTFLite';
 
