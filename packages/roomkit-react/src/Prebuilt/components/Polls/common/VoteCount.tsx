@@ -1,8 +1,7 @@
-// @ts-check
 import React from 'react';
 import { Flex, Text } from '../../../../';
 
-export const VoteCount = ({ voteCount }) => {
+export const VoteCount = ({ voteCount }: { voteCount: number }) => {
   return (
     <Flex css={{ alignItems: 'center' }}>
       {voteCount ? (

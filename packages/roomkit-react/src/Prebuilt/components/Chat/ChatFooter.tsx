@@ -214,6 +214,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 '&:valid ~ .send-msg': { color: '$on_surface_high' },
                 '& ~ .send-msg': { color: '$on_surface_low' },
                 '&::placeholder': { color: '$on_surface_medium' },
+                border: 'none',
               }}
               placeholder={message_placeholder}
               ref={inputRef}
