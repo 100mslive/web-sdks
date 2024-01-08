@@ -18,6 +18,7 @@ import { StyledMenuTile } from '../../../TileMenu';
 import { ChangeNameModal } from '../MoreSettings/ChangeNameModal';
 import { TileMenuContent } from './TileMenuContent';
 import { useDropdownList } from '../hooks/useDropdownList';
+import { getDragClassName } from './utils';
 
 /**
  * Taking peerID as peer won't necesarilly have tracks
@@ -48,6 +49,7 @@ const TileMenu = ({
   const peer = useHMSStore(selectPeerByID(peerID));
   const [showNameChangeModal, setShowNameChangeModal] = useState(false);
   useDropdownList({ open, name: 'TileMenu' });
+  const dragClassName = getDragClassName();
 
   if (!(removeOthers || toggleAudio || toggleVideo || setVolume || showPinAction) && hideSimulcastLayers) {
     return null;
@@ -75,7 +77,7 @@ const TileMenu = ({
           data-testid="participant_menu_btn"
           css={{ bg: `${theme.colors.background_dim.value}A3`, p: '$2', w: 'unset', h: 'unset' }}
           onClick={e => e.stopPropagation()}
-          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+          className={dragClassName}
         >
           <VerticalMenuIcon width={20} height={20} />
         </StyledMenuTile.Trigger>

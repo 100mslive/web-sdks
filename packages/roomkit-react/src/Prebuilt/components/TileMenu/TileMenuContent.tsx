@@ -38,6 +38,7 @@ import { ToastManager } from '../Toast/ToastManager';
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 // @ts-ignore
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
+import { getDragClassName } from './utils';
 import { APP_DATA, REMOTE_STOP_SCREENSHARE_TYPE, SESSION_STORE_KEY } from '../../common/constants';
 
 export const isSameTile = ({
@@ -64,6 +65,7 @@ const SpotlightActions = ({
   const hmsActions = useHMSActions();
   const spotlightPeerId = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT));
   const isTileSpotlighted = spotlightPeerId === peerId;
+  const dragClassName = getDragClassName();
 
   const setSpotlightPeerId = (peerIdToSpotlight?: string) =>
     hmsActions.sessionStore
@@ -72,7 +74,7 @@ const SpotlightActions = ({
 
   return (
     <StyledMenuTile.ItemButton
-      className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+      className={dragClassName}
       css={spacingCSS}
       onClick={() => {
         if (isTileSpotlighted) {
@@ -91,6 +93,7 @@ const SpotlightActions = ({
 
 const PinActions = ({ audioTrackID, videoTrackID }: { videoTrackID: string; audioTrackID: string }) => {
   const [pinnedTrackId, setPinnedTrackId] = useSetAppDataByKey(APP_DATA.pinnedTrackId);
+  const dragClassName = getDragClassName();
 
   const isTilePinned = isSameTile({
     trackId: pinnedTrackId,
@@ -101,7 +104,7 @@ const PinActions = ({ audioTrackID, videoTrackID }: { videoTrackID: string; audi
   return (
     <>
       <StyledMenuTile.ItemButton
-        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+        className={dragClassName}
         css={spacingCSS}
         onClick={() => (isTilePinned ? setPinnedTrackId() : setPinnedTrackId(videoTrackID || audioTrackID))}
       >
@@ -114,14 +117,11 @@ const PinActions = ({ audioTrackID, videoTrackID }: { videoTrackID: string; audi
 
 const MinimiseInset = () => {
   const [minimised, setMinimised] = useSetAppDataByKey(APP_DATA.minimiseInset);
+  const dragClassName = getDragClassName();
 
   return (
     <>
-      <StyledMenuTile.ItemButton
-        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
-        css={spacingCSS}
-        onClick={() => setMinimised(!minimised)}
-      >
+      <StyledMenuTile.ItemButton className={dragClassName} css={spacingCSS} onClick={() => setMinimised(!minimised)}>
         <ShrinkIcon height={20} width={20} />
         <span>{minimised ? 'Show' : 'Minimise'} your video</span>
       </StyledMenuTile.ItemButton>
@@ -137,18 +137,16 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
     return null;
   }
   const currentLayer = track.layerDefinitions.find((layer: HMSSimulcastLayerDefinition) => layer.layer === track.layer);
+  const dragClassName = getDragClassName();
   return (
     <Fragment>
-      <StyledMenuTile.ItemButton
-        className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
-        css={{ color: '$on_surface_medium', cursor: 'default' }}
-      >
+      <StyledMenuTile.ItemButton className={dragClassName} css={{ color: '$on_surface_medium', cursor: 'default' }}>
         Select maximum resolution
       </StyledMenuTile.ItemButton>
       {track.layerDefinitions.map((layer: HMSSimulcastLayerDefinition) => {
         return (
           <StyledMenuTile.ItemButton
-            className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+            className={dragClassName}
             key={layer.layer}
             onClick={async () => {
               await actions.setPreferredLayer(trackId, layer.layer);
@@ -184,7 +182,7 @@ const SimulcastLayers = ({ trackId }: { trackId: HMSTrackID }) => {
           </StyledMenuTile.ItemButton>
         );
       })}
-      <StyledMenuTile.ItemButton className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}>
+      <StyledMenuTile.ItemButton className={dragClassName}>
         <Text as="span" variant="xs" css={{ color: '$on_surface_medium' }}>
           Currently streaming:
           <Text
@@ -239,6 +237,7 @@ export const TileMenuContent = ({
   openNameChangeModal: () => void;
 }) => {
   const actions = useHMSActions();
+  const dragClassName = getDragClassName();
   const removeOthers: boolean | undefined = useHMSStore(selectPermissions)?.removeOthers;
   const { userName } = useHMSPrebuiltContext();
 
@@ -261,7 +260,7 @@ export const TileMenuContent = ({
         {canMinimise && <MinimiseInset />}
         {!userName && (
           <StyledMenuTile.ItemButton
-            className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+            className={dragClassName}
             onClick={() => {
               openNameChangeModal();
               closeSheetOnClick();
@@ -279,7 +278,7 @@ export const TileMenuContent = ({
     <>
       {toggleVideo ? (
         <StyledMenuTile.ItemButton
-          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+          className={dragClassName}
           css={spacingCSS}
           onClick={() => {
             toggleVideo();
@@ -295,7 +294,7 @@ export const TileMenuContent = ({
       {toggleAudio ? (
         <StyledMenuTile.ItemButton
           css={spacingCSS}
-          className={navigator?.maxTouchPoints > 0 ? '__cancel-drag-event' : ''}
+          className={dragClassName}
           onClick={() => {
             toggleAudio();
             closeSheetOnClick();
