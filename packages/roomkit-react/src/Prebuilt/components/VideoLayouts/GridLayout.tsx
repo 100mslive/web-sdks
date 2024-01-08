@@ -58,8 +58,9 @@ export const GridLayout = ({
       return peers.filter(peer => peer.id !== activeScreensharePeerId);
     }
     if (isInsetEnabled) {
+      const isLocalPeerPinned = localPeerID === pinnedTrack?.peerId;
       // if localPeer role is prominent role, it shows up in the center or local peer is pinned, so allow it in active speaker sorting
-      if ((localPeerRole && prominentRoles.includes(localPeerRole)) || localPeerID === pinnedTrack?.peerId) {
+      if ((localPeerRole && prominentRoles.includes(localPeerRole)) || isLocalPeerPinned) {
         return peers;
       } else {
         return peers.filter(peer => !peer.isLocal);
