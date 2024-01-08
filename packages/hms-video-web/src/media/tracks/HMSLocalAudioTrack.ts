@@ -239,6 +239,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
 
   private replaceSenderTrack = async () => {
     if (!this.transceiver || this.transceiver.direction !== 'sendonly') {
+      HMSLogger.w(this.TAG, `transceiver for ${this.trackId} not available or not connected yet`);
       return;
     }
     await this.transceiver.sender.replaceTrack(this.processedTrack || this.nativeTrack);
