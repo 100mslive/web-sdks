@@ -19,7 +19,7 @@ export const TextArea = styled('textarea', {
     color: '$on_surface_medium',
   },
   variants: {
-    alert_error_default: {
+    error: {
       true: {
         '&:focus': {
           boxShadow: '0 0 0 3px $colors$alert_error_default',
