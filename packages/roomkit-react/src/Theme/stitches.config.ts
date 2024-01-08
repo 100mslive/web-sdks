@@ -32,8 +32,6 @@ export const globalStyles = globalCss({
   [`${DEFAULT_PORTAL_CONTAINER} *`]: {
     fontFamily: '$sans',
     boxSizing: 'border-box',
-    borderWidth: 0,
-    borderStyle: 'solid',
   },
   '::-webkit-scrollbar-track': {
     WebkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',

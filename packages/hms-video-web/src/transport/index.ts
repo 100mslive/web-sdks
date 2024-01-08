@@ -1169,6 +1169,11 @@ export default class HMSTransport implements ITransport {
         userAgent: this.store.getUserAgent(),
         initEndpoint,
       });
+      const room = this.store.getRoom();
+      if (room) {
+        room.effectsKey = this.initConfig.config.vb?.effectsKey;
+        room.isEffectsEnabled = this.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
+      }
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
