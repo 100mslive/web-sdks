@@ -15,9 +15,7 @@ async function main() {
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
   const external = Object.keys(pkg.dependencies || {});
   external.push(...Object.keys(pkg.peerDependencies || {}));
-  if (pkg.name === '@100mslive/hms-noise-suppression') {
-    external.push('fs', 'path', './src/models/Noise.js');
-  }
+
   const commonOptions = {
     entryPoints: [source],
     bundle: true,

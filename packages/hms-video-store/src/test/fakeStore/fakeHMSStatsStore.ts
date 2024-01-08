@@ -1,4 +1,4 @@
-import { HMSPeerStats, HMSStatsStore, HMSTrackStats } from '../../core';
+import { HMSPeerStats, HMSStatsStore, HMSTrackStats } from '../..';
 
 export let localPeerStats: HMSPeerStats;
 export let localVideoTrackStats: HMSTrackStats;

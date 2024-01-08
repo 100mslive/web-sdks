@@ -13,5 +13,5 @@
   "packageDocsPath": "packages/hms-video-store/docs",
   "publicPath": "/api-reference/javascript/v2/",
   "githubPages": false,
-  "pagesPattern": "(?<!README\.md)$",
+  "pagesPattern": "(?<!README.md)$",
 }
