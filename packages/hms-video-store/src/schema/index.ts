@@ -11,4 +11,3 @@ export * from './device-change';
 export * from './playlist';
 export * from './session-store';
 export * from './playlist-selectors';
-export * from './interactivity-center';

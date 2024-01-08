@@ -39,7 +39,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (!quizLeaderboard && quiz) {
-        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz, 0, 50);
+        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 50);
         setQuizLeaderboard(leaderboardData);
       }
     };

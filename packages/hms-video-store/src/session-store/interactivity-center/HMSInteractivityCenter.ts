@@ -10,7 +10,6 @@ import {
   HMSPollCreateParams,
   HMSPollQuestionAnswer,
   HMSPollQuestionOption,
-  HMSPollQuestionResponse,
   HMSPollQuestionResponseCreateParams,
   HMSPollQuestionType,
   HMSPollStates,
@@ -124,6 +123,45 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     await this.transport.signal.setPollResponses({ poll_id: pollID, responses: responsesParams });
   }
 
+  async fetchLeaderboard(pollID: string, offset: number, count: number): Promise<HMSQuizLeaderboardResponse> {
+    const poll = this.store.getPoll(pollID);
+    if (!poll) {
+      throw new Error('Invalid poll ID - Poll not found');
+    }
+
+    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
+
+    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
+      return { entries: [], hasNext: false };
+    }
+    const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
+      poll_id: poll.id,
+      count,
+      offset,
+    });
+
+    const summary = {
+      avgScore: pollLeaderboard.avg_score,
+      avgTime: pollLeaderboard.avg_time,
+      votedUsers: pollLeaderboard.voted_users,
+      totalUsers: pollLeaderboard.total_users,
+      correctAnswers: pollLeaderboard.correct_users,
+    };
+
+    const leaderboardEntries = pollLeaderboard.questions.map(question => {
+      return {
+        position: question.position,
+        totalResponses: question.total_responses,
+        correctResponses: question.correct_responses,
+        duration: question.duration,
+        peer: question.peer,
+        score: question.score,
+      };
+    });
+
+    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
+  }
+
   async getPolls(): Promise<HMSPoll[]> {
     const pollsList = await this.transport.signal.getPollsList({ count: 50 });
     const polls: HMSPoll[] = [];
@@ -141,10 +179,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     }
 
     return polls;
-  }
-
-  getResponses(_pollID: string): Promise<HMSPollQuestionResponse[]> {
-    throw new Error('Method not implemented.');
   }
 
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {
@@ -184,40 +218,6 @@ export class InteractivityCenter implements HMSInteractivityCenter {
     }
 
     return question;
-  }
-
-  async fetchLeaderboard(poll: HMSPoll, offset: number, count: number): Promise<HMSQuizLeaderboardResponse> {
-    const canReadPolls = this.store.getLocalPeer()?.role?.permissions.pollRead || false;
-
-    if (poll.anonymous || poll.state !== HMSPollStates.STOPPED || !canReadPolls) {
-      return { entries: [], hasNext: false };
-    }
-    const pollLeaderboard = await this.transport.signal.fetchPollLeaderboard({
-      poll_id: poll.id,
-      count,
-      offset,
-    });
-
-    const summary = {
-      avgScore: pollLeaderboard.avg_score,
-      avgTime: pollLeaderboard.avg_time,
-      votedUsers: pollLeaderboard.voted_users,
-      totalUsers: pollLeaderboard.total_users,
-      correctAnswers: pollLeaderboard.correct_users,
-    };
-
-    const leaderboardEntries = pollLeaderboard.questions.map(question => {
-      return {
-        position: question.position,
-        totalResponses: question.total_responses,
-        correctResponses: question.correct_responses,
-        duration: question.duration,
-        peer: question.peer,
-        score: question.score,
-      };
-    });
-
-    return { entries: leaderboardEntries, hasNext: !pollLeaderboard.last, summary };
   }
 }
 
