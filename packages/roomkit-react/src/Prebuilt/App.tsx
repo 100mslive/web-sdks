@@ -25,6 +25,7 @@ import { Notifications } from './components/Notifications';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -124,6 +125,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
     // leave room when component unmounts
     useEffect(
       () => () => {
+        VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();
       },
       [],
