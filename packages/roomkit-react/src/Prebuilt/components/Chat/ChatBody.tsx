@@ -27,7 +27,8 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { usePinnedMessages } from '../hooks/usePinnedMessages';
+import { useChatBackground } from '../hooks/useChatBackground';
+import { usePinnedBy } from '../hooks/usePinnedBy';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const formatTime = (date: Date) => {
@@ -163,32 +164,15 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const getMessageBackgroundColor = (
-  messageType: string,
-  selectedPeerID: string,
-  selectedRole: string,
-  isOverlay: boolean,
-  pinnedBy?: string,
-) => {
-  if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
-  if (messageType && !(selectedPeerID || selectedRole)) {
-    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
-  }
-  return '';
-};
-
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-    const { getPinnedBy } = usePinnedMessages();
-    const pinnedBy = getPinnedBy(message.id);
     const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const localPeerId = useHMSStore(selectLocalPeerID);
-    const localPeerName = useHMSStore(selectLocalPeerName);
     const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
     const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
     const messageType = getMessageType({
@@ -204,11 +188,13 @@ const ChatMessage = React.memo(
       showReply = true;
     }
 
+    const background = useChatBackground(message.id, !!messageType, selectedPeer.id, selectedRole, !!isOverlay);
+
     useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index, message.id, pinnedBy]);
+    }, [index, message.id]);
 
     return (
       <Box
@@ -228,7 +214,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay, pinnedBy),
+            background,
             r: '$1',
             p: '$4',
             userSelect: 'none',
@@ -246,14 +232,7 @@ const ChatMessage = React.memo(
             }
           }}
         >
-          {pinnedBy ? (
-            <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
-              <SolidPinIcon height={12} width={12} />
-              <Text variant="xs" css={{ color: 'inherit' }}>
-                Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}{' '}
-              </Text>
-            </Flex>
-          ) : null}
+          <PinnedBy messageId={message.id} index={index} rowRef={rowRef} />
           <Text
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',
@@ -447,3 +426,35 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
   },
 );
+
+const PinnedBy = ({
+  messageId,
+  index,
+  rowRef,
+}: {
+  messageId: string;
+  index: number;
+  rowRef?: React.MutableRefObject<HTMLDivElement | null>;
+}) => {
+  const pinnedBy = usePinnedBy(messageId);
+  const localPeerName = useHMSStore(selectLocalPeerName);
+
+  useLayoutEffect(() => {
+    if (rowRef?.current && pinnedBy) {
+      setRowHeight(index, messageId, rowRef?.current.clientHeight);
+    }
+  }, [index, messageId, pinnedBy, rowRef]);
+
+  if (!pinnedBy) {
+    return null;
+  }
+
+  return (
+    <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
+      <SolidPinIcon height={12} width={12} />
+      <Text variant="xs" css={{ color: 'inherit' }}>
+        Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}
+      </Text>
+    </Flex>
+  );
+};
