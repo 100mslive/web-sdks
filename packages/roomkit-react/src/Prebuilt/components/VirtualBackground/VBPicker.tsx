@@ -38,7 +38,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const track = useHMSStore(trackSelector);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
-  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
+  const isEffectsEnabled = !useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
@@ -57,7 +57,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       return;
     }
     if (!isPluginAdded) {
-      let vbObject = VBHandler.getVBObject();
+      let vbObject = VBHandler?.getVBObject();
       if (!vbObject) {
         VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
         vbObject = VBHandler.getVBObject();

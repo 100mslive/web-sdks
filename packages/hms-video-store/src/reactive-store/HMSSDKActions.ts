@@ -1397,7 +1397,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.sdk.getLocalPeer()?.videoTrack;
+
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addPlugin(plugin, pluginFrameRate);
@@ -1406,7 +1407,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}VideoPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
   }
@@ -1418,7 +1419,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.sdk.getLocalPeer()?.videoTrack;
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins(plugins);
@@ -1427,7 +1428,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}MediaStreamPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
   }
@@ -1439,7 +1440,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.store.getTrackById(trackID);
+      const sdkTrack = this.sdk.getLocalPeer()?.audioTrack;
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
@@ -1448,7 +1449,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         }
         this.syncRoomState(`${action}AudioPlugin`);
       } else {
-        this.logPossibleInconsistency(`track ${trackID} not present, unable to remove plugin`);
+        this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
   }
