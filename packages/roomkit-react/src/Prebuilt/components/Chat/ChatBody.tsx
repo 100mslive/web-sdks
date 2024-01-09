@@ -27,6 +27,7 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
+import { useChatBackground } from '../hooks/useChatBackground';
 import { usePinnedBy } from '../hooks/usePinnedBy';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
@@ -163,20 +164,6 @@ const SenderName = styled(Text, {
   fontWeight: '$semiBold',
 });
 
-const getMessageBackgroundColor = (
-  messageType: string,
-  selectedPeerID: string,
-  selectedRole: string,
-  isOverlay: boolean,
-  // pinnedBy?: string,
-) => {
-  // if (pinnedBy) return 'linear-gradient(277deg, $surface_default 0%, $surface_dim 60.87%)';
-  if (messageType && !(selectedPeerID || selectedRole)) {
-    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
-  }
-  return '';
-};
-
 const ChatMessage = React.memo(
   ({ index, style = {}, message }: { message: HMSMessage; index: number; style: React.CSSProperties }) => {
     const { elements } = useRoomLayoutConferencingScreen();
@@ -200,6 +187,8 @@ const ChatMessage = React.memo(
     } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
       showReply = true;
     }
+
+    const background = useChatBackground(message.id, !!messageType, selectedPeer.id, selectedRole, !!isOverlay);
 
     useLayoutEffect(() => {
       if (rowRef.current) {
@@ -225,7 +214,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay),
+            background,
             r: '$1',
             p: '$4',
             userSelect: 'none',
