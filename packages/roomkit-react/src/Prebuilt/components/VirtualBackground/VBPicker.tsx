@@ -57,7 +57,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
       return;
     }
     if (!isPluginAdded) {
-      let vbObject = VBHandler?.getVBObject();
+      let vbObject = VBHandler.getVBObject();
       if (!vbObject) {
         VBHandler.initialisePlugin(isEffectsEnabled && effectsKey ? effectsKey : '');
         vbObject = VBHandler.getVBObject();
