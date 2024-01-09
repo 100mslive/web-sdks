@@ -134,6 +134,10 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     this.actionBatcher = new ActionBatcher(store);
   }
 
+  getLocalTrack(trackID: string) {
+    return this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+  }
+
   get interactivityCenter() {
     return this.sdk.getInteractivityCenter();
   }
@@ -918,7 +922,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     let sdkTrack = this.sdk.store.getTrackById(trackID);
     // preview tracks are not added to the sdk store, so access from local peer.
     if (!sdkTrack) {
-      sdkTrack = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+      sdkTrack = this.getLocalTrack(trackID);
     }
     if (sdkTrack && sdkTrack.type === 'video') {
       await this.sdk.attachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
@@ -1300,7 +1304,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setEnabledSDKTrack(trackID: string, enabled: boolean) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID);
+    const track = this.getLocalTrack(trackID);
     if (track) {
       await track.setEnabled(enabled);
     } else {
@@ -1309,7 +1313,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalVideoTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSVideoTrackSettings>) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalVideoTrack;
+    const track = this.getLocalTrack(trackID) as SDKHMSLocalVideoTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1318,7 +1322,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setSDKLocalAudioTrackSettings(trackID: string, settings: Partial<sdkTypes.HMSAudioTrackSettings>) {
-    const track = this.sdk.store.getLocalPeerTracks().find(track => track.trackId === trackID) as SDKHMSLocalAudioTrack;
+    const track = this.getLocalTrack(trackID) as SDKHMSLocalAudioTrack;
     if (track) {
       await track.setSettings(settings);
     } else {
@@ -1397,7 +1401,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.getLocalPeer()?.videoTrack;
+      const sdkTrack = this.getLocalTrack(trackID);
 
       if (sdkTrack) {
         if (action === 'add') {
@@ -1419,7 +1423,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalVideoTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.getLocalPeer()?.videoTrack;
+      const sdkTrack = this.getLocalTrack(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalVideoTrack).addStreamPlugins(plugins);
@@ -1440,7 +1444,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
     const trackID = this.store.getState(selectLocalAudioTrackID);
     if (trackID) {
-      const sdkTrack = this.sdk.getLocalPeer()?.audioTrack;
+      const sdkTrack = this.getLocalTrack(trackID);
       if (sdkTrack) {
         if (action === 'add') {
           await (sdkTrack as SDKHMSLocalAudioTrack).addPlugin(plugin);
