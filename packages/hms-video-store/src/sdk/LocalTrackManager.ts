@@ -175,6 +175,7 @@ export class LocalTrackManager {
       delete audioConstraints.advanced;
       constraints.audio = {
         ...audioConstraints,
+        channelCount: config.channelCount,
         autoGainControl: false,
         noiseSuppression: false,
         // @ts-ignore
@@ -537,7 +538,7 @@ export class LocalTrackManager {
   // eslint-disable-next-line complexity
   private async getOrDefaultScreenshareConfig(partialConfig?: Partial<HMSScreenShareConfig>) {
     type RequiredConfig = HMSScreenShareConfig &
-      Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement' | 'displaySurface'>>;
+      Required<Omit<HMSScreenShareConfig, 'cropTarget' | 'cropElement' | 'displaySurface' | 'channelCount'>>;
     const config: RequiredConfig = Object.assign(
       {
         videoOnly: false,
@@ -560,6 +561,9 @@ export class LocalTrackManager {
     if (config.preferCurrentTab) {
       config.selfBrowserSurface = 'include';
       config.displaySurface = undefined; // so the default selected is the current tab
+    }
+    if (config.channelCount !== 2) {
+      config.channelCount = 1;
     }
     // @ts-ignore
     if (config.cropElement && window.CropTarget?.fromElement) {

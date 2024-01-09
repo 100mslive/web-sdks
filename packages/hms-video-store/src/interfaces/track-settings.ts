@@ -109,6 +109,12 @@ export interface HMSScreenShareConfig {
    * the tab which is being shared
    */
   cropTarget?: object;
+  /**
+   * Used for selecting stereo/mono audio for the screenshare audio track when present.
+   * 1 - mono audio - default
+   * 2 - stereo audio
+   */
+  channelCount?: number;
 }
 
 export interface ScreenCaptureHandle {
