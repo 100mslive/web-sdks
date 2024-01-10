@@ -269,7 +269,7 @@ const ChatMessage = React.memo(
                     variant="sub2"
                     css={{ color: isOverlay ? '#FFF' : '$on_surface_high', fontWeight: '$semiBold' }}
                   >
-                    {message.senderName}
+                    {message.sender === localPeerId ? `${message.senderName} (You)` : message.senderName}
                   </SenderName>
                 </Tooltip>
               )}
@@ -449,17 +449,18 @@ const PinnedBy = ({
   const localPeerName = useHMSStore(selectLocalPeerName);
 
   useLayoutEffect(() => {
-    if (rowRef?.current && pinnedBy) {
-      rowRef.current.style.background =
-        'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
+    if (rowRef?.current) {
+      if (pinnedBy) {
+        rowRef.current.style.background =
+          'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
+      } else {
+        rowRef.current.style.background = '';
+      }
       setRowHeight(index, messageId, rowRef?.current.clientHeight);
     }
   }, [index, messageId, pinnedBy, rowRef]);
 
   if (!pinnedBy) {
-    if (rowRef?.current) {
-      rowRef.current.style.background = '';
-    }
     return null;
   }
 

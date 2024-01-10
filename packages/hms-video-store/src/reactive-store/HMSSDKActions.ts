@@ -415,7 +415,8 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       type: messageInput.type || 'chat',
       recipientPeer: messageInput.recipientPeer,
       recipientRoles: messageInput.recipientRoles,
-      senderName: `${this.sdk.getLocalPeer()?.name} (You)`,
+      senderName: this.sdk.getLocalPeer()?.name,
+      sender: this.sdk.getLocalPeer()?.peerId,
       ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
     };
     this.putMessageInStore(hmsMessage);
