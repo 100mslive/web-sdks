@@ -27,7 +27,6 @@ import { EmptyChat } from './EmptyChat';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSetSubscribedChatSelector } from '../AppData/useUISettings';
-import { useChatBackground } from '../hooks/useChatBackground';
 import { usePinnedBy } from '../hooks/usePinnedBy';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
@@ -54,6 +53,18 @@ const setRowHeight = (index: number, id: string, size: number) => {
   }
   listInstance?.resetAfterIndex(Math.max(index - 1, 0));
   Object.assign(rowHeights, { [index]: { size, id } });
+};
+
+const getMessageBackgroundColor = (
+  messageType: string,
+  selectedPeerID: string,
+  selectedRole: string,
+  isOverlay: boolean,
+) => {
+  if (messageType && !(selectedPeerID || selectedRole)) {
+    return isOverlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_default';
+  }
+  return '';
 };
 
 const MessageTypeContainer = ({ left, right }: { left?: string; right?: string }) => {
@@ -188,8 +199,6 @@ const ChatMessage = React.memo(
       showReply = true;
     }
 
-    const background = useChatBackground(message.id, !!messageType, selectedPeer.id, selectedRole, !!isOverlay);
-
     useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
@@ -214,7 +223,7 @@ const ChatMessage = React.memo(
             flexWrap: 'wrap',
             position: 'relative',
             // Theme independent color, token should not be used for transparent chat
-            background,
+            background: getMessageBackgroundColor(messageType, selectedPeer.id, selectedRole, !!isOverlay),
             r: '$1',
             p: '$4',
             userSelect: 'none',
@@ -441,11 +450,16 @@ const PinnedBy = ({
 
   useLayoutEffect(() => {
     if (rowRef?.current && pinnedBy) {
+      rowRef.current.style.background =
+        'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
       setRowHeight(index, messageId, rowRef?.current.clientHeight);
     }
   }, [index, messageId, pinnedBy, rowRef]);
 
   if (!pinnedBy) {
+    if (rowRef?.current) {
+      rowRef.current.style.background = '';
+    }
     return null;
   }
 
