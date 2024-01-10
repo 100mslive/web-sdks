@@ -118,7 +118,7 @@ export const ChatActions = ({
       tooltipText: 'Reply to group',
       icon: <ReplyGroupIcon style={iconStyle} />,
       onClick: onReplyGroup,
-      show: showReply && message.recipientRoles?.length && message.recipientRoles?.length > 0,
+      show: showReply && (message.recipientRoles ? message.recipientRoles.length > 0 : false),
     },
     pin: {
       text: 'Pin message',
