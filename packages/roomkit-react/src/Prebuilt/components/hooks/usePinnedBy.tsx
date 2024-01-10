@@ -8,12 +8,14 @@ export const usePinnedBy = (messageId: string) => {
   const [pinnedBy, setPinnedBy] = useState('');
 
   useEffect(() => {
-    setPinnedBy('');
+    let match = '';
     pinnedMessages?.forEach((pinnedMessage: PinnedMessage) => {
       if (pinnedMessage.id === messageId) {
-        setPinnedBy(pinnedMessage.pinnedBy);
+        match = pinnedMessage.pinnedBy;
       }
     });
+
+    setPinnedBy(match);
   }, [messageId, pinnedMessages]);
 
   return pinnedBy;
