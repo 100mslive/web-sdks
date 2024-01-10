@@ -125,6 +125,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   private async processPlugins() {
     try {
+      if (this.pluginsManager.getPlugins().length > 0) {
+        return;
+      }
       const plugins = this.mediaStreamPluginsManager.getPlugins();
       if (plugins.length > 0) {
         const processedStream = this.mediaStreamPluginsManager.applyPlugins(new MediaStream([this.nativeTrack]));
