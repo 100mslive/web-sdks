@@ -7,6 +7,7 @@ import {
   EyeCloseIcon,
   PeopleRemoveIcon,
   PinIcon,
+  ReplyGroupIcon,
   ReplyIcon,
   VerticalMenuIcon,
 } from '@100mslive/react-icons';
@@ -36,6 +37,7 @@ const tooltipBoxCSS = {
 export const ChatActions = ({
   showPinAction,
   onReply,
+  onReplyGroup,
   showReply,
   message,
   sentByLocalPeer,
@@ -45,6 +47,7 @@ export const ChatActions = ({
 }: {
   showPinAction: boolean;
   onReply: () => void;
+  onReplyGroup: () => void;
   showReply: boolean;
   message: HMSMessage;
   sentByLocalPeer: boolean;
@@ -104,11 +107,18 @@ export const ChatActions = ({
     }
   > = {
     reply: {
-      text: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
-      tooltipText: message.recipientRoles?.length ? 'Reply to group' : 'Reply privately',
+      text: 'Reply privately',
+      tooltipText: 'Reply privately',
       icon: <ReplyIcon style={iconStyle} />,
       onClick: onReply,
       show: showReply,
+    },
+    replyGroup: {
+      text: 'Reply to group',
+      tooltipText: 'Reply to group',
+      icon: <ReplyGroupIcon style={iconStyle} />,
+      onClick: onReplyGroup,
+      show: showReply && message.recipientRoles?.length && message.recipientRoles?.length > 0,
     },
     pin: {
       text: 'Pin message',
@@ -223,6 +233,13 @@ export const ChatActions = ({
           <Tooltip boxCss={tooltipBoxCSS} title={options.reply.tooltipText}>
             <IconButton data-testid="reply_message_btn" onClick={options.reply.onClick}>
               {options.reply.icon}
+            </IconButton>
+          </Tooltip>
+        ) : null}
+        {options.replyGroup.show ? (
+          <Tooltip boxCss={tooltipBoxCSS} title={options.replyGroup.tooltipText}>
+            <IconButton data-testid="reply_group_message_btn" onClick={options.replyGroup.onClick}>
+              {options.replyGroup.icon}
             </IconButton>
           </Tooltip>
         ) : null}
