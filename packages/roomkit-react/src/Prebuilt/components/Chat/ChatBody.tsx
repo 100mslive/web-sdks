@@ -302,12 +302,13 @@ const ChatMessage = React.memo(
               message={message}
               sentByLocalPeer={message.sender === localPeerId}
               onReply={() => {
+                setRoleSelector('');
+                setPeerSelector({ id: message.sender, name: message.senderName });
+              }}
+              onReplyGroup={() => {
                 if (message.recipientRoles?.length) {
                   setRoleSelector(message.recipientRoles[0]);
                   setPeerSelector({});
-                } else {
-                  setRoleSelector('');
-                  setPeerSelector({ id: message.sender, name: message.senderName });
                 }
               }}
               showReply={showReply}
