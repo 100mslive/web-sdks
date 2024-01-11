@@ -181,7 +181,6 @@ const ChatMessage = React.memo(
     const rowRef = useRef<HTMLDivElement | null>(null);
     const isMobile = useMedia(cssConfig.media.md);
     const isPrivateChatEnabled = !!elements?.chat?.private_chat_enabled;
-    const roleWhiteList = elements?.chat?.roles_whitelist || [];
     const isOverlay = elements?.chat?.is_overlay && isMobile;
     const localPeerId = useHMSStore(selectLocalPeerID);
     const [selectedRole, setRoleSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.ROLE);
@@ -192,13 +191,7 @@ const ChatMessage = React.memo(
     });
     const [openSheet, setOpenSheet] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
-    let showReply = false;
-    if (message.recipientRoles && roleWhiteList.includes(message.recipientRoles[0])) {
-      showReply = true;
-    } else if (message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled) {
-      showReply = true;
-    }
-
+    const showReply = message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled;
     useLayoutEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, message.id, rowRef.current.clientHeight);
