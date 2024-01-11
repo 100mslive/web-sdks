@@ -306,8 +306,8 @@ const ChatMessage = React.memo(
                 setPeerSelector({ id: message.sender, name: message.senderName });
               }}
               onReplyGroup={() => {
-                if (message.recipientRoles?.length) {
-                  setRoleSelector(message.recipientRoles[0]);
+                if (message.senderRole) {
+                  setRoleSelector(message.senderRole);
                   setPeerSelector({});
                 }
               }}
