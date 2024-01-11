@@ -8,17 +8,19 @@ export class HMSAudioTrackSettingsBuilder {
   private _deviceId = 'default';
   private _advanced: Array<MediaTrackConstraintSet> = [
     // @ts-ignore
-    { googEchoCancellation: { exact: true } },
+    { echoCancellation: { exact: true } },
     // @ts-ignore
-    { googExperimentalEchoCancellation: { exact: true } },
+    // { googEchoCancellation: { exact: true } },
+    // @ts-ignore
+    // { googExperimentalEchoCancellation: { exact: true } },
     // @ts-ignore
     { autoGainControl: { exact: true } },
     // @ts-ignore
     { noiseSuppression: { exact: true } },
     // @ts-ignore
-    { googHighpassFilter: { exact: true } },
+    // { googHighpassFilter: { exact: true } },
     // @ts-ignore
-    { googAudioMirroring: { exact: true } },
+    // { googAudioMirroring: { exact: true } },
   ];
 
   volume(volume: number) {

@@ -292,6 +292,7 @@ class Store {
         promises.push(track.setOutputDevice(device));
       }
     });
+    console.log(`DEBUG - updateAudioOutputDevice remoteTracks:${promises.length}`, device);
     await Promise.all(promises);
   }
 

@@ -51,5 +51,6 @@ export function enableOpusDtx(desc: RTCSessionDescriptionInit): RTCSessionDescri
     return desc;
   }
 
-  return { type: desc.type, sdp: desc.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
+  return desc;
+  // return { type: desc.type, sdp: desc.sdp!.replace('useinbandfec=1', 'useinbandfec=1;usedtx=1') };
 }
