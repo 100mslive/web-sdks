@@ -166,6 +166,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   addSink(videoElement: HTMLVideoElement) {
     this.addSinkInternal(videoElement, this.processedTrack || this.nativeTrack);
+    videoElement.muted = true;
   }
 
   /**

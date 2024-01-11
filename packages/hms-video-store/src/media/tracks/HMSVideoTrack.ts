@@ -79,6 +79,7 @@ export class HMSVideoTrack extends HMSTrack {
     }
     // videoElement.srcObject = new MediaStream([track]);
     videoElement.srcObject = this.stream.nativeStream;
+    videoElement.muted = false;
     console.log(`DEBUG - HMSVideoTrack.addSinkInternal`, this.stream.nativeStream.getTracks());
     this.sinkCount++;
   }
