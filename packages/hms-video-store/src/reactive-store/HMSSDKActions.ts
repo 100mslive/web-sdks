@@ -407,6 +407,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       HMSLogger.w('sendMessage', 'Failed to send message', messageInput);
       throw Error(`sendMessage Failed - ${JSON.stringify(messageInput)}`);
     }
+    const localPeer = this.sdk.getLocalPeer();
     const hmsMessage: HMSMessage = {
       read: true,
       id: messageInput.id,
@@ -415,8 +416,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       type: messageInput.type || 'chat',
       recipientPeer: messageInput.recipientPeer,
       recipientRoles: messageInput.recipientRoles,
-      senderName: this.sdk.getLocalPeer()?.name,
-      sender: this.sdk.getLocalPeer()?.peerId,
+      senderName: localPeer?.name,
+      sender: localPeer?.peerId,
+      senderRole: localPeer?.role?.name,
       ignored: !!messageInput.type && this.ignoredMessageTypes.includes(messageInput.type),
     };
     this.putMessageInStore(hmsMessage);
