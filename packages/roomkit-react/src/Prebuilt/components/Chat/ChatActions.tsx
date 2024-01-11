@@ -56,10 +56,9 @@ export const ChatActions = ({
   setOpenSheet: (value: boolean) => void;
 }) => {
   const { elements } = useRoomLayoutConferencingScreen();
-  const { can_hide_message, can_block_user } = elements?.chat?.real_time_controls || {
-    can_hide_message: false,
-    can_block_user: false,
-  };
+  const { can_hide_message = false, can_block_user = false } = elements?.chat?.real_time_controls || {};
+  const { roles_whitelist = [] } = elements?.chat || {};
+
   const [open, setOpen] = useState(false);
   const actions = useHMSActions();
   const canRemoveOthers = useHMSStore(selectPermissions)?.removeOthers;
@@ -118,7 +117,7 @@ export const ChatActions = ({
       tooltipText: 'Reply to group',
       icon: <ReplyGroupIcon style={iconStyle} />,
       onClick: onReplyGroup,
-      show: showReply && (message.recipientRoles ? message.recipientRoles.length > 0 : false),
+      show: !!message.senderRole && roles_whitelist.includes(message.senderRole),
     },
     pin: {
       text: 'Pin message',
