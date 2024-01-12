@@ -1,5 +1,5 @@
 import { tsvb } from 'effects-sdk';
-import { HMSMediaStreamPlugin } from '@100mslive/hms-video';
+import { HMSMediaStreamPlugin } from '@100mslive/hms-video-store';
 import { EFFECTS_SDK_ASSETS } from './constants';
 import { HMSVirtualBackgroundTypes } from './interfaces';
 

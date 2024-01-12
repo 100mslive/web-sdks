@@ -4,14 +4,11 @@ import { HMSNotificationTypes, useHMSNotifications, useHMSStore } from '@100msli
 
 export const useUnreadPollQuizPresent = () => {
   const localPeerID = useHMSStore(selectLocalPeerID);
-  const notification = useHMSNotifications();
+  const notification = useHMSNotifications(HMSNotificationTypes.POLL_STARTED);
   const [unreadPollQuiz, setUnreadPollQuiz] = useState(false);
 
   useEffect(() => {
     if (!notification) {
-      return;
-    }
-    if (notification.type !== HMSNotificationTypes.POLL_STARTED) {
       return;
     }
     setUnreadPollQuiz(notification.data.startedBy !== localPeerID);

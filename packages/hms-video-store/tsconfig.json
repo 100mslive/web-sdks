@@ -9,5 +9,5 @@
     "emitDeclarationOnly": true
   },
   "include": ["src/**/*", "types"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "internal-docs", "images"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "internal-docs", "docs", "images"]
 }

@@ -3,7 +3,7 @@ import {
   selectConnectionQualityByPeerID,
   selectIsLocalAudioPluginPresent,
   selectIsLocalVideoPluginPresent,
-} from '../../core';
+} from '../../';
 import { localAudio, localPeer, localVideo, makeFakeStore } from '../fakeStore';
 
 let fakeStore: HMSStore;
