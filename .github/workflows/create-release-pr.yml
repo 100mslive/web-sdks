@@ -41,11 +41,8 @@ jobs:
       - name: Get current version
         id: version
         run: |
-          SDK_VERSION=$(cd packages/hms-video-web && node -p -e "require('./package.json').version")
-          echo $SDK_VERSION
           STORE_VERSION=$(cd packages/hms-video-store && node -p -e "require('./package.json').version")
           echo $STORE_VERSION
-          echo "::set-output name=sdk_version::$(echo $SDK_VERSION)"
           echo "::set-output name=store_version::$(echo $STORE_VERSION)"
 
       - uses: peter-evans/create-pull-request@v4

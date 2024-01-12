@@ -10,6 +10,7 @@ export class HMSMediaStreamPluginsManager {
 
   removePlugins(plugins: HMSMediaStreamPlugin[]) {
     plugins.forEach(plugin => {
+      plugin.stop();
       this.plugins.delete(plugin);
     });
   }
