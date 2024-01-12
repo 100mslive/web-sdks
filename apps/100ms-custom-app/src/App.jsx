@@ -22,6 +22,7 @@ const App = () => {
   const { roomId, role } = getRoomIdRoleFromUrl();
   const { overrideLayout, isHeadless } = useOverridePrebuiltLayout();
   const paramUserName = useSearchParam('name');
+  const paramUserId = useSearchParam('userId');
   const hmsPrebuiltRef = useRef();
 
   useEffect(() => {
@@ -85,6 +86,7 @@ const App = () => {
           screens={overrideLayout ? overrideLayout : undefined}
           options={{
             userName: isHeadless && !paramUserName ? 'Beam' : paramUserName,
+            userId: paramUserId,
             endpoints: {
               tokenByRoomCode:
                 process.env.REACT_APP_TOKEN_BY_ROOM_CODE_ENDPOINT,
