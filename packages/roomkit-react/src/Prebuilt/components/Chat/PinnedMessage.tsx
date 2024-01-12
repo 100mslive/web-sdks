@@ -11,7 +11,7 @@ import { ArrowNavigation } from './ArrowNavigation';
 import { AnnotisedMessage } from './ChatBody';
 import { StickIndicator } from './StickIndicator';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useSetPinnedMessages } from '../hooks/useSetPinnedMessages';
+import { usePinnedMessages } from '../hooks/usePinnedMessages';
 import { SESSION_STORE_KEY } from '../../common/constants';
 
 const PINNED_MESSAGE_LENGTH = 75;
@@ -19,7 +19,7 @@ const PINNED_MESSAGE_LENGTH = 75;
 export const PinnedMessage = () => {
   const pinnedMessages = useHMSStore(selectSessionStore(SESSION_STORE_KEY.PINNED_MESSAGES));
   const [pinnedMessageIndex, setPinnedMessageIndex] = useState(0);
-  const { removePinnedMessage } = useSetPinnedMessages();
+  const { removePinnedMessage } = usePinnedMessages();
   const isMobile = useMedia(cssConfig.media.md);
 
   const { elements } = useRoomLayoutConferencingScreen();

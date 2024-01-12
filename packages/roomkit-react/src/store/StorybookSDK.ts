@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { HMSFrameworkInfo } from '@100mslive/hms-video';
+import { HMSFrameworkInfo } from '@100mslive/hms-video-store';
 import {
   HMSActions,
   HMSAudioTrackSettings,
@@ -87,6 +87,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
         isLocal: true,
         id: String(this.randomNumber()),
         auxiliaryTracks: [],
+        isHandRaised: false,
       };
       store.room.peers.push(this.localPeer.id);
       store.peers[this.localPeer.id] = this.localPeer;
@@ -111,6 +112,7 @@ export class StoryBookSDK implements Partial<HMSActions> {
           isLocal: true,
           id: String(this.randomNumber()),
           auxiliaryTracks: [],
+          isHandRaised: false,
         };
         store.room.peers.push(this.localPeer.id);
         store.peers[this.localPeer.id] = this.localPeer;
