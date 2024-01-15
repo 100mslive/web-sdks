@@ -33,7 +33,7 @@ export const decorators: DecoratorFn[] = [
     return (
       //@ts-ignore
       <HMSRoomProvider store={storyBookStore} actions={storyBookSDK}>
-        <HMSThemeProvider themeType={isDark ? ThemeTypes.dark : ThemeTypes.light}>{Story()}</HMSThemeProvider>
+        <HMSThemeProvider themeType={ThemeTypes.default}>{Story()}</HMSThemeProvider>
       </HMSRoomProvider>
     );
   },
