@@ -28,7 +28,7 @@ const IconSection = styled(IconButton, {
 const OptionsSection = styled(IconButton, {
   w: 'unset',
   h: '$14',
-  p: '$4',
+  p: '$4 $2',
   r: '$1',
   borderTopLeftRadius: 0,
   borderColor: '$border_bright',
