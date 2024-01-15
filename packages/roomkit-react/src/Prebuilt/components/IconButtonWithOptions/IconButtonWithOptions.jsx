@@ -12,7 +12,7 @@ const IconSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopRightRadius: 0,
-  borderColor: '$border_default',
+  borderColor: '$border_bright',
   borderBottomRightRadius: 0,
   position: 'relative',
   '&:not([disabled]):focus-visible': {
@@ -31,7 +31,7 @@ const OptionsSection = styled(IconButton, {
   p: '$4',
   r: '$1',
   borderTopLeftRadius: 0,
-  borderColor: '$border_default',
+  borderColor: '$border_bright',
   borderBottomLeftRadius: 0,
   borderLeftWidth: 0,
   position: 'relative',
