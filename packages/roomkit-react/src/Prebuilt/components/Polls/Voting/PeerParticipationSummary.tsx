@@ -32,10 +32,13 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
         { title: 'Avg. Score', value: summary.avgScore },
       ]
     : [
-        { title: 'Your rank', value: `${peerEntry?.position}/${summary.totalUsers}` },
+        { title: 'Your rank', value: peerEntry?.position ? `${peerEntry.position}/${summary.totalUsers}` : '-' },
         { title: 'Points', value: peerEntry?.score },
         { title: 'Time Taken', value: peerEntry?.duration },
-        { title: 'Correct Answers', value: `${peerEntry?.correctResponses}/${peerEntry?.totalResponses}` },
+        {
+          title: 'Correct Answers',
+          value: peerEntry?.totalResponses ? `${peerEntry?.correctResponses}/${peerEntry.totalResponses}` : '-',
+        },
       ];
 
   return (

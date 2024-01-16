@@ -19,26 +19,32 @@ export const useQuizSummary = (quizID: string) => {
     avgTime: 0,
     correctUsers: 0,
   };
-
-  const defaultCalculations = { maxPossibleScore: 0, totalResponses: 0 };
-
-  const { maxPossibleScore, totalResponses } =
-    quiz?.questions?.reduce((accumulator, question) => {
-      accumulator.maxPossibleScore += question.weight || 0;
-      accumulator.totalResponses += question?.responses?.length || 0;
-      return accumulator;
-    }, defaultCalculations) || defaultCalculations;
+  const [calculations, setCalculations] = useState({ maxPossibleScore: 0, totalResponses: 0 });
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
       if (!quizLeaderboard && quiz && !quiz?.anonymous && quiz.state === 'stopped') {
         const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 50);
+
+        const { maxPossibleScore, totalResponses } =
+          quiz?.questions?.reduce((accumulator, question) => {
+            accumulator.maxPossibleScore += question.weight || 0;
+            accumulator.totalResponses += question?.responses?.length || 0;
+            return accumulator;
+          }, calculations) || calculations;
+
         setQuizLeaderboard(leaderboardData);
+        setCalculations({ maxPossibleScore, totalResponses });
       }
     };
 
     fetchLeaderboardData();
-  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard]);
+  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard, calculations]);
 
-  return { quizLeaderboard, summary, maxPossibleScore, totalResponses };
+  return {
+    quizLeaderboard,
+    summary,
+    maxPossibleScore: calculations.maxPossibleScore,
+    totalResponses: calculations.totalResponses,
+  };
 };
