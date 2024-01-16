@@ -7,9 +7,9 @@ import {
   selectPeerByID,
   selectRoleByRoleName,
 } from '@100mslive/hms-video-store';
-import { IHMSActions } from '@100mslive/hms-video-store/src/core/IHMSActions';
-import { IHMSStoreReadOnly } from '../../packages/hms-video-store/src/core/IHMSStore';
-import { HMSSdk } from '../../packages/hms-video-web/src';
+import { IHMSActions } from '@100mslive/hms-video-store/src/IHMSActions';
+import { IHMSStoreReadOnly } from '@100mslive/hms-video-store/src/IHMSStore';
+import { HMSSdk } from '@100mslive/hms-video-store/src/sdk';
 
 /**
  * helper for dealing with peers creates in cypress.

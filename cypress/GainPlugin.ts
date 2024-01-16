@@ -1,4 +1,4 @@
-import { HMSAudioPluginType, HMSAudioPlugin } from '@100mslive/hms-video';
+import { HMSAudioPlugin, HMSAudioPluginType } from '@100mslive/hms-video-store';
 
 export class GainPlugin implements HMSAudioPlugin {
   private gainNode?: GainNode;

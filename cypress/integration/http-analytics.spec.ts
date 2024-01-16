@@ -1,11 +1,11 @@
-import { HMSAction } from '@100mslive/hms-video/src/error/HMSAction';
-import { HMSUpdateListener } from '../../packages/hms-video-web/src';
-import AnalyticsEventFactory from '../../packages/hms-video-web/src/analytics/AnalyticsEventFactory';
-import { HTTPAnalyticsTransport } from '../../packages/hms-video-web/src/analytics/HTTPAnalyticsTransport';
-import { ErrorFactory } from '../../packages/hms-video-web/src/error/ErrorFactory';
-import { HMSPreviewListener } from '../../packages/hms-video-web/src/interfaces/preview-listener';
-import { HMSSdk } from '../../packages/hms-video-web/src/sdk';
-import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-web/src/utils/constants';
+import { HMSAction } from '@100mslive/hms-video-store/src/error/HMSAction';
+import { HMSUpdateListener } from '@100mslive/hms-video-store/src/internal';
+import AnalyticsEventFactory from '../../packages/hms-video-store/src/analytics/AnalyticsEventFactory';
+import { HTTPAnalyticsTransport } from '../../packages/hms-video-store/src/analytics/HTTPAnalyticsTransport';
+import { ErrorFactory } from '../../packages/hms-video-store/src/error/ErrorFactory';
+import { HMSPreviewListener } from '../../packages/hms-video-store/src/interfaces/preview-listener';
+import { HMSSdk } from '../../packages/hms-video-store/src/sdk';
+import { CLIENT_ANAYLTICS_QA_ENDPOINT } from '../../packages/hms-video-store/src/utils/constants';
 
 let sdk: HMSSdk;
 let token: string;

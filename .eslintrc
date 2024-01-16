@@ -78,7 +78,6 @@
                 "^@?\\w",
                 // Internal packages.
                 // Internal packages.
-                "^@100mslive/hms-video",
                 "^@100mslive/hms-video-store",
                 "^@100mslive/react-sdk",
                 "^@100mslive/react-icons",
