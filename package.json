@@ -35,12 +35,7 @@
     "tslib": "^2.2.0",
     "typedoc": "^0.24.8",
     "typedoc-plugin-markdown": "^3.14.0",
-    "typescript": "~4.7.4",
-    "webpack": "^5.76.0",
-    "webpack-bundle-analyzer": "^4.5.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.7.4",
-    "webpack-manifest-plugin": "^4.1.1"
+    "typescript": "~4.7.4"
   },
   "scripts": {
     "lint": "lerna run lint",
@@ -54,8 +49,6 @@
     "build:only": "lerna run build:only --stream",
     "postinstall": "husky install && lerna bootstrap",
     "cypress:open": "cypress open",
-    "app": "cd apps/100ms-web && yarn start",
-    "app:custom": "cd apps/100ms-custom-app && yarn start",
     "store": "cd packages/hms-video-store && yarn start",
     "reactsdk": "cd packages/react-sdk && yarn start",
     "prebuilt": "cd packages/roomkit-react && yarn start",
@@ -69,8 +62,7 @@
   },
   "workspaces": [
     "packages/*",
-    "apps/*",
-    "playwright/*"
+    "examples/*"
   ],
   "engines": {
     "node": ">=16"

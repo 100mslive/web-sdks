@@ -1,4 +1,4 @@
-import { HMSVideoPluginType } from '@100mslive/hms-video';
+import { HMSVideoPluginType } from '@100mslive/hms-video-store';
 export class brighteningPlugin {
   private brightnessMul: number;
   private name;
