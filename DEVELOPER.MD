@@ -123,13 +123,9 @@
   be putting it in.
 - If you can't think of a way to avoid media query(should be really rare for roomkit-react), make
   variants, and use media query from app.
-- No fixed height, width in pixels, avoid anything in pixels, rem, percet are fine.
+- No fixed height, width in pixels, avoid anything in pixels, rem, percent are fine.
 - There is almost always a better and more responsive solution using
   css properties than going for pixel based dimensions or media queries.
-
-## Coding Guidelines(100ms-web, 100ms-custom-app)
-
-- Everything react related from above
 - Write code which is easy to read, understand and customise not only as a whole
   piece but also when broken down in multiple pieces
 - No quick POCs with hacky code for merging to main

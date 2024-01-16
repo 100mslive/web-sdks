@@ -6,10 +6,6 @@ This monorepo contains all the packages required to integrate 100ms on web
 
 ### Local Setup
 
-To setup locally, install lerna globally
-
-`npm install -g lerna@5`
-
 Clone the repo locally and run yarn install
 
 ```
@@ -24,22 +20,6 @@ yarn install
 yarn test
 ```
 
-### Running playwright tests
-
-Navigate to playwright directory before running below commands.
-
-## Install packages
-
-```
-yarn install
-```
-
-## Run for say qa-in
-
-```
- yarn qa-in
-```
-
 ### Lint
 
 Runs eslint across all packages
@@ -48,22 +28,20 @@ Runs eslint across all packages
 yarn lint
 ```
 
-### Running dev server
-
-Run whatever things you're changing in below in different terminal instances. For other packages you can navigate to
-the folder directly and run `yarn start`.
+### Running Sample Prebuilt
 
 ```
-# for hms-video-store
-> yarn store
+# do this at the root level
+yarn install
+yarn build
 
-# for react-sdk
-> yarn reactsdk
-
-# for roomkit-react
-> yarn prebuilt
-
+cd examples/prebuilt-react-integration
+yarn dev
 ```
+You can get a roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
+
+if you want to make changes in a particular package and want to automatically update the above app, navigate to the package and call yarn start
+or use the scripts from the top level package.json
 
 ### Update a packages version
 
