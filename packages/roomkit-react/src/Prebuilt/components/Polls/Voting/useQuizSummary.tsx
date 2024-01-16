@@ -1,18 +1,15 @@
 import { useEffect, useState } from 'react';
 import {
-  HMSNotificationTypes,
   HMSQuizLeaderboardResponse,
   HMSQuizLeaderboardSummary,
   selectPollByID,
   useHMSActions,
-  useHMSNotifications,
   useHMSStore,
 } from '@100mslive/react-sdk';
 
 export const useQuizSummary = (quizID: string) => {
   const hmsActions = useHMSActions();
   const quiz = useHMSStore(selectPollByID(quizID));
-  const pollEndNotification = useHMSNotifications(HMSNotificationTypes.POLL_STOPPED);
   const [quizLeaderboard, setQuizLeaderboard] = useState<HMSQuizLeaderboardResponse | undefined>();
 
   const summary: HMSQuizLeaderboardSummary = quizLeaderboard?.summary || {
@@ -20,7 +17,7 @@ export const useQuizSummary = (quizID: string) => {
     votedUsers: 0,
     avgScore: 0,
     avgTime: 0,
-    correctAnswers: 0,
+    correctUsers: 0,
   };
 
   const defaultCalculations = { maxPossibleScore: 0, totalResponses: 0 };
@@ -34,16 +31,14 @@ export const useQuizSummary = (quizID: string) => {
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
-      if (!quizLeaderboard && quiz && quiz?.anonymous && quiz.state === 'stopped') {
+      if (!quizLeaderboard && quiz && !quiz?.anonymous && quiz.state === 'stopped') {
         const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 50);
         setQuizLeaderboard(leaderboardData);
       }
     };
 
-    if (pollEndNotification) {
-      fetchLeaderboardData();
-    }
-  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard, pollEndNotification]);
+    fetchLeaderboardData();
+  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard]);
 
   return { quizLeaderboard, summary, maxPossibleScore, totalResponses };
 };

@@ -145,7 +145,7 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       avgTime: pollLeaderboard.avg_time,
       votedUsers: pollLeaderboard.voted_users,
       totalUsers: pollLeaderboard.total_users,
-      correctAnswers: pollLeaderboard.correct_users,
+      correctUsers: pollLeaderboard.correct_users,
     };
 
     const leaderboardEntries = pollLeaderboard.questions.map(question => {

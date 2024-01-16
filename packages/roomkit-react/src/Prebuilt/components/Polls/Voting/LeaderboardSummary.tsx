@@ -56,7 +56,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
 
       {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
 
-      <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
+      <Text variant="sm" css={{ fontWeight: '$semiBold', mt: '$4' }}>
         Leaderboard
       </Text>
       <Text variant="xs" css={{ color: '$on_surface_medium' }}>

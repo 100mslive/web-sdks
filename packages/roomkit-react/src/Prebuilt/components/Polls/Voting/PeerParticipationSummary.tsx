@@ -22,12 +22,17 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
             summary.votedUsers
           }/${summary.totalUsers})`,
         },
-        { title: 'Correct Answers', value: summary.correctAnswers },
+        {
+          title: 'Correct Answers',
+          value: `${summary.totalUsers ? ((100 * summary.correctUsers) / summary.totalUsers).toFixed(2) : 0}% (${
+            summary.correctUsers
+          }/${summary.totalUsers})`,
+        },
         { title: 'Avg. Time Taken', value: summary.avgTime },
         { title: 'Avg. Score', value: summary.avgScore },
       ]
     : [
-        { title: 'Your rank', value: peerEntry?.position },
+        { title: 'Your rank', value: `${peerEntry?.position}/${summary.totalUsers}` },
         { title: 'Points', value: peerEntry?.score },
         { title: 'Time Taken', value: peerEntry?.duration },
         { title: 'Correct Answers', value: `${peerEntry?.correctResponses}/${peerEntry?.totalResponses}` },
