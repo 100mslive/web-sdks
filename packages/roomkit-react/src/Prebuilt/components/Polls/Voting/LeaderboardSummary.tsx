@@ -1,50 +1,26 @@
-import React, { useEffect, useState } from 'react';
-import {
-  HMSQuizLeaderboardResponse,
-  HMSQuizLeaderboardSummary,
-  selectPollByID,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import React, { useState } from 'react';
+import { selectPollByID, useHMSStore } from '@100mslive/react-sdk';
 import { ChevronLeftIcon, ChevronRightIcon, CrossIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Loading } from '../../../../Loading';
 import { Text } from '../../../../Text';
 import { LeaderboardEntry } from './LeaderboardEntry';
-import { StatisticBox } from './StatisticBox';
+import { PeerParticipationSummary } from './PeerParticipationSummary';
 // @ts-ignore
 import { useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore
 import { usePollViewState } from '../../AppData/useUISettings';
+import { useQuizSummary } from './useQuizSummary';
 // @ts-ignore
 import { StatusIndicator } from '../common/StatusIndicator';
 import { POLL_VIEWS } from '../../../common/constants';
 
 export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
-  const hmsActions = useHMSActions();
   const quiz = useHMSStore(selectPollByID(pollID));
-  const [quizLeaderboard, setQuizLeaderboard] = useState<HMSQuizLeaderboardResponse | undefined>();
+  const { quizLeaderboard, maxPossibleScore } = useQuizSummary(pollID);
   const [viewAllEntries, setViewAllEntries] = useState(false);
-  const summary: HMSQuizLeaderboardSummary = quizLeaderboard?.summary || {
-    totalUsers: 0,
-    votedUsers: 0,
-    avgScore: 0,
-    avgTime: 0,
-    correctAnswers: 0,
-  };
-
   const { setPollView } = usePollViewState();
   const toggleSidepane = useSidepaneToggle();
-
-  useEffect(() => {
-    const fetchLeaderboardData = async () => {
-      if (!quizLeaderboard && quiz) {
-        const leaderboardData = await hmsActions.interactivityCenter.fetchLeaderboard(quiz.id, 0, 50);
-        setQuizLeaderboard(leaderboardData);
-      }
-    };
-    fetchLeaderboardData();
-  }, [quiz, hmsActions.interactivityCenter, quizLeaderboard]);
 
   if (!quiz || !quizLeaderboard)
     return (
@@ -52,14 +28,6 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
         <Loading />
       </Flex>
     );
-
-  const defaultCalculations = { maxPossibleScore: 0, totalResponses: 0 };
-  const { maxPossibleScore, totalResponses } =
-    quiz.questions?.reduce((accumulator, question) => {
-      accumulator.maxPossibleScore += question.weight || 0;
-      accumulator.totalResponses += question?.responses?.length || 0;
-      return accumulator;
-    }, defaultCalculations) || defaultCalculations;
 
   const questionCount = quiz.questions?.length || 0;
 
@@ -86,27 +54,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
         </Flex>
       </Flex>
 
-      {!viewAllEntries ? (
-        <Box css={{ py: '$4' }}>
-          <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
-            Participation Summary
-          </Text>
-
-          <Box css={{ my: '$4' }}>
-            <Flex css={{ w: '100%', gap: '$4' }}>
-              <StatisticBox
-                title="Voted"
-                value={`${summary?.totalUsers ? (100 * summary?.votedUsers) / summary?.totalUsers : 0}%`}
-              />
-              <StatisticBox title="Correct Answers" value={`${summary?.correctAnswers}/${totalResponses}`} />
-            </Flex>
-            <Flex css={{ w: '100%', gap: '$4', mt: '$4' }}>
-              {summary?.avgTime > 0 ? <StatisticBox title="Avg. Time" value={summary?.avgTime} /> : null}
-              <StatisticBox title="Avg. Score" value={summary?.avgScore} />
-            </Flex>
-          </Box>
-        </Box>
-      ) : null}
+      {!viewAllEntries ? <PeerParticipationSummary quiz={quiz} /> : null}
 
       <Text variant="sm" css={{ fontWeight: '$semiBold' }}>
         Leaderboard
