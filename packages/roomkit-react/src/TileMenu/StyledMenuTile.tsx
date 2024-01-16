@@ -49,6 +49,7 @@ const styledItem = {
 const StyledItemButton = styled('button', {
   ...styledItem,
   height: '$14',
+  border: 'none',
   '&:hover': {
     backgroundColor: '$surface_brighter',
   },
