@@ -1,14 +1,17 @@
 import React, { useEffect, useMemo } from 'react';
+import { useMedia } from 'react-use';
 import { selectPeers, selectWhiteboard, useHMSStore, useWhiteboard } from '@100mslive/react-sdk';
 import { SecondaryTiles } from '../components/SecondaryTiles';
 import { ProminenceLayout } from '../components/VideoLayouts/ProminenceLayout';
+import { config as cssConfig } from '../../';
 import { Box } from '../../Layout';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../components/AppData/useUISettings';
 import { APP_DATA } from '../common/constants';
 
 const EmbedComponent = () => {
-  const { iframeRef } = useWhiteboard();
+  const isMobile = useMedia(cssConfig.media.md);
+  const { iframeRef } = useWhiteboard(isMobile);
 
   return (
     <Box

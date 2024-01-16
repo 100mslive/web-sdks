@@ -10,7 +10,7 @@ import { useHMSActions, useHMSStore } from '../primitives/HmsRoomProvider';
 
 const WHITEBOARD_ORIGIN = 'https://whiteboard-qa.100ms.live';
 
-export const useWhiteboard = () => {
+export const useWhiteboard = (isMobile = false) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const localPeerUserId = useHMSStore(selectLocalPeer)?.customerUserId;
   const whiteboard = useHMSStore(selectWhiteboard);
@@ -30,11 +30,11 @@ export const useWhiteboard = () => {
     const url = new URL(WHITEBOARD_ORIGIN);
     url.searchParams.set('endpoint', `https://${whiteboard.addr}`);
     url.searchParams.set('token', whiteboard.token);
-    if (isHeadless) {
+    if (isHeadless || isMobile) {
       url.searchParams.set('zoom_to_content', 'true');
     }
     iframeRef.current.src = url.toString();
-  }, [whiteboard?.addr, whiteboard?.token, isHeadless]);
+  }, [whiteboard?.addr, whiteboard?.token, isHeadless, isMobile]);
 
   useEffect(() => {
     if (isConnected) {
