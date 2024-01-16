@@ -2,116 +2,6 @@
 # yarn lockfile v1
 
 
-"@100mslive/hls-player@0.1.28":
-  version "0.1.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hls-player/-/hls-player-0.1.28.tgz#9cf5a2dfedc6929373cfb74f7ff3f41b3520010f"
-  integrity sha512-f0dquinRe3l0SwKJhjwsUAUt86cPGqqmbss/o6MFFS7ngaTqxKPpEMQUrs4I4fs+8WVE0z9YVbJCdOXPOA5Yeg==
-  dependencies:
-    "@100mslive/hls-stats" "0.2.28"
-    eventemitter2 "^6.4.7"
-    hls.js "1.4.12"
-
-"@100mslive/hls-stats@0.2.28":
-  version "0.2.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hls-stats/-/hls-stats-0.2.28.tgz#16609e8194d250b6ed59128e82c93b73287446d0"
-  integrity sha512-3TQZcEDFu+FF229SB7D+kkVHbZDi1VH54IyibC1/IATIKMElxN0X7PIwgNZsVVcBAL/etnYMwBKk/OF8yt8yeQ==
-
-"@100mslive/hms-video-store@0.10.28":
-  version "0.10.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video-store/-/hms-video-store-0.10.28.tgz#7527f072247eb8c65db858d990c2e7d5d9b7b30e"
-  integrity sha512-NVRV5GMIU0zuiT+b57LU+wBweppQb0OSEpELKrdbyYErvhtECHbWxtKKApg1xbXbKt7faAlHrdWnkpQucFi5+A==
-  dependencies:
-    "@100mslive/hms-video" "0.9.28"
-    eventemitter2 "^6.4.7"
-    immer "^9.0.6"
-    reselect "4.0.0"
-    zustand "3.5.7"
-
-"@100mslive/hms-video@0.9.28":
-  version "0.9.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-video/-/hms-video-0.9.28.tgz#0af509058c4cf991e972276d1b4466cf84369c3d"
-  integrity sha512-3YZsOgWuMLxS5+MECK+Ui9zZBdmbOj7JEfYN8KpZ6bHc+Q6wLpXvRyuTOj6qP/nWzDiGqn1UxXtIAY38NP0pcQ==
-  dependencies:
-    eventemitter2 "^6.4.7"
-    sdp-transform "^2.14.1"
-    ua-parser-js "^1.0.1"
-    uuid "^8.3.2"
-    webrtc-adapter "^8.0.0"
-
-"@100mslive/hms-virtual-background@1.11.28":
-  version "1.11.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/hms-virtual-background/-/hms-virtual-background-1.11.28.tgz#1d0e512ef2da7080da24ed0082db528c331af7f1"
-  integrity sha512-wcdBUA/UdubnfT1eH1337+dqN6sMyqLnAVDDgkhSBFaQyjtZICotEumPo/LT0Z0GeLUhH2iO5owQ9F/uoRufzw==
-  dependencies:
-    "@mediapipe/selfie_segmentation" "^0.1.1632777926"
-    "@tensorflow-models/body-segmentation" "^1.0.1"
-    "@tensorflow/tfjs-backend-webgl" "^3.3.0"
-    "@tensorflow/tfjs-converter" "^3.19.0"
-    "@tensorflow/tfjs-core" "^3.19.0"
-    "@webassemblyjs/helper-wasm-bytecode" "1.11.1"
-    "@webassemblyjs/wasm-gen" "1.11.1"
-    effects-sdk "2.6.8"
-    gifuct-js "^2.1.2"
-    wasm-check "^2.0.2"
-
-"@100mslive/react-icons@0.8.28":
-  version "0.8.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-icons/-/react-icons-0.8.28.tgz#9b85627cc1580ae4a10e03df99f917ebb295c7c1"
-  integrity sha512-4W36IiwmMlcE3eHmpYwITfR/wtr9XVjF2wEmsJnCfp/a0ydnr6OPJfipUI3Ndn4X+wcFdReR2GTqmQzgFIFjkw==
-
-"@100mslive/react-sdk@0.8.28":
-  version "0.8.28"
-  resolved "https://registry.yarnpkg.com/@100mslive/react-sdk/-/react-sdk-0.8.28.tgz#9e3d14e19d2678a08a91497fd8da6ea7cf995c1e"
-  integrity sha512-O+Czzi7W/zocf4tKyQ1y3k5dxaGbOBTGaCxzN82FEl8GhX6/ma0Tpx98sfE7DRIqPc6OqiFN3Pg7GWeooObKaQ==
-  dependencies:
-    "@100mslive/hms-video-store" "0.10.28"
-    react-resize-detector "^7.0.0"
-    zustand "^3.6.2"
-
-"@100mslive/roomkit-react@0.1.19":
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/@100mslive/roomkit-react/-/roomkit-react-0.1.19.tgz#fe6d33bf82dab3d27c57e73a9de651f26d20a96f"
-  integrity sha512-dDevv3IjmKCJKrMonbGFb864O6GjbqomZa7RyNNIqV1EkSzd403BJa3SmjRDu3f0lH/pWjkP9Mhl4Sd9KZvKig==
-  dependencies:
-    "@100mslive/hls-player" "0.1.28"
-    "@100mslive/hms-virtual-background" "1.11.28"
-    "@100mslive/react-icons" "0.8.28"
-    "@100mslive/react-sdk" "0.8.28"
-    "@100mslive/types-prebuilt" "0.12.5"
-    "@emoji-mart/data" "^1.0.6"
-    "@emoji-mart/react" "^1.0.1"
-    "@radix-ui/react-accordion" "1.0.0"
-    "@radix-ui/react-checkbox" "1.0.0"
-    "@radix-ui/react-collapsible" "1.0.0"
-    "@radix-ui/react-dialog" "1.0.4"
-    "@radix-ui/react-dropdown-menu" "2.0.5"
-    "@radix-ui/react-label" "1.0.0"
-    "@radix-ui/react-popover" "1.0.6"
-    "@radix-ui/react-progress" "1.0.0"
-    "@radix-ui/react-radio-group" "1.0.0"
-    "@radix-ui/react-select" "1.0.0"
-    "@radix-ui/react-slider" "1.0.0"
-    "@radix-ui/react-switch" "1.0.0"
-    "@radix-ui/react-tabs" "1.0.0"
-    "@radix-ui/react-toast" "1.0.0"
-    "@radix-ui/react-tooltip" "1.0.6"
-    "@stitches/react" "^1.2.8"
-    emoji-mart "^5.2.2"
-    eventemitter2 "^6.4.7"
-    lodash.merge "^4.6.2"
-    pusher-js "^7.0.3"
-    qrcode.react "^3.1.0"
-    react-draggable "^4.4.5"
-    react-intersection-observer "^9.4.3"
-    react-swipeable "^7.0.1"
-    react-use "^17.4.0"
-    react-virtualized-auto-sizer "^1.0.7"
-    react-window "^1.8.7"
-    recordrtc "^5.6.2"
-    screenfull "^5.1.0"
-    uuid "^8.3.2"
-    worker-timers "^7.0.40"
-
 "@100mslive/types-prebuilt@0.12.5":
   version "0.12.5"
   resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.5.tgz#505d19e228f7e2929eb93c489a0f886d628df02f"
@@ -5546,15 +5436,6 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.51.tgz#cfd70924a25a3fd32b218e5e420e6897e1ac4f40"
   integrity sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==
 
-"@types/express-serve-static-core@4.17.28":
-  version "4.17.28"
-  resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.28.tgz#c47def9f34ec81dc6328d0b1b5303d1ec98d86b8"
-  integrity sha512-P1BJAEAW3E2DJUlkgq4tOL3RyMunoWXqbSCygWo5ZIWTjUgN1YnaXWW4VWl/oc8vs/XoYibEGBKP0uZyF4AHig==
-  dependencies:
-    "@types/node" "*"
-    "@types/qs" "*"
-    "@types/range-parser" "*"
-
 "@types/express-serve-static-core@^4.17.33":
   version "4.17.35"
   resolved "https://registry.yarnpkg.com/@types/express-serve-static-core/-/express-serve-static-core-4.17.35.tgz#c95dd4424f0d32e525d23812aa8ab8e4d3906c4f"
@@ -9383,7 +9264,7 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
 
-eventemitter2@^6.4.3, eventemitter2@^6.4.7, eventemitter2@^6.4.9:
+eventemitter2@^6.4.3, eventemitter2@^6.4.9:
   version "6.4.9"
   resolved "https://registry.yarnpkg.com/eventemitter2/-/eventemitter2-6.4.9.tgz#41f2750781b4230ed58827bc119d293471ecb125"
   integrity sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg==
@@ -14383,15 +14264,6 @@ puppeteer-core@^2.1.1:
     rimraf "^2.6.1"
     ws "^6.1.0"
 
-pusher-js@^7.0.3:
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/pusher-js/-/pusher-js-7.6.0.tgz#8e4535856371be0f475a42b3eec1f8b5614672de"
-  integrity sha512-5CJ7YN5ZdC24E0ETraCU5VYFv0IY5ziXhrS0gS5+9Qrro1E4M1lcZhtr9H1H+6jNSLj1LKKAgcLeE1EH9GxMlw==
-  dependencies:
-    "@types/express-serve-static-core" "4.17.28"
-    "@types/node" "^14.14.31"
-    tweetnacl "^1.0.3"
-
 q@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.5.1.tgz#7e32f75b41381291d04611f1bf14109ac00651d7"
@@ -16527,11 +16399,6 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
   integrity sha512-KXXFFdAbFXY4geFIwoyNK+f5Z1b7swfXABfL7HXCmoIWMKU3dmS26672A4EeQtDzLKy7SXmfBu51JolvEKwtGA==
-
-tweetnacl@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-1.0.3.tgz#ac0af71680458d8a6378d0d0d050ab1407d35596"
-  integrity sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
