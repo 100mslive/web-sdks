@@ -68,13 +68,11 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       </Flex>
 
       <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto' }}>
-        <Flex align="center">
-          <Box css={{ flex: 'auto' }}>
-            <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
-              {pollCreatorName || 'Participant'} started a {poll.type}
-            </Text>
-          </Box>
-        </Flex>
+        {poll.state === 'started' ? (
+          <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
+            {pollCreatorName || 'Participant'} started a {poll.type}
+          </Text>
+        ) : null}
 
         {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
 
