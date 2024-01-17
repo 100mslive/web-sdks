@@ -201,7 +201,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     }
   }
 
-  getRawTrackById(trackId: string) {
+  getNativeTrackById(trackId: string) {
     return this.sdk.store.getTrackById(trackId)?.nativeTrack;
   }
 

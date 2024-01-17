@@ -13,6 +13,7 @@ import {
   HMSPreferredSimulcastLayer,
   HMSPreviewConfig,
   HMSScreenShareConfig,
+  HMSTrack,
   HMSVideoPlugin,
   HMSVideoTrackSettings,
   RTMPRecordingConfig,
@@ -508,6 +509,8 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
    **/
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
+
+  getTrackById(trackId: string): HMSTrack | undefined;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
 

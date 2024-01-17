@@ -85,9 +85,8 @@ export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
     const peers = allPeers.filter(peer => !!peer.audioTrack);
     const peerAudioLevels = [];
     for (const peer of peers) {
-      // @ts-ignore
-      const sdkTrack = this.actions.getTrackById(peer.audioTrack);
-      const nativeStream: MediaStream = sdkTrack?.stream?.nativeStream;
+      const sdkTrack = this.actions.getTrackById(peer.audioTrack || '');
+      const nativeStream: MediaStream | undefined = sdkTrack?.stream?.nativeStream;
       if (!peer.joinedAt) {
         continue;
       }
