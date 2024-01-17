@@ -31,8 +31,7 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
         { title: 'Avg. Time Taken', value: summary.avgTime },
         {
           title: 'Avg. Score',
-          value:
-            summary.avgScore === parseInt(summary.avgScore.toString()) ? summary.avgScore : summary.avgScore.toFixed(2),
+          value: Number.isInteger(summary.avgScore) ? summary.avgScore : summary.avgScore.toFixed(2),
         },
       ]
     : [
