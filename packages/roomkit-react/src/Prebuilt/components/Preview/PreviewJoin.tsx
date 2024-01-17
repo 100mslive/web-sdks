@@ -160,20 +160,7 @@ const PreviewJoin = ({
             <Chip content={getParticipantChipContent(peerCount)} hideIfNoContent />
           </Flex>
         </Flex>
-        {toggleVideo ? (
-          <Flex
-            align="center"
-            justify="center"
-            css={{
-              mt: '$14',
-              '@md': { mt: 0 },
-              '@sm': { width: '100%' },
-              flexDirection: 'column',
-            }}
-          >
-            <PreviewTile name={name} error={previewError} />
-          </Flex>
-        ) : null}
+        {toggleVideo ? <PreviewTile name={name} error={previewError} /> : null}
         <Box css={{ w: '100%', maxWidth: `${Math.max(aspectRatio, 1) * 360}px` }}>
           <PreviewControls hideSettings={!toggleVideo && !toggleAudio} vbEnabled={!!virtual_background} />
           <PreviewForm
@@ -227,7 +214,9 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
         height: 'min(360px, 70vh)',
         maxWidth: '640px',
         overflow: 'clip',
+        mt: '$14',
         '@md': {
+          mt: 0,
           width: 'min(220px, 70vw)',
           maxWidth: '100%',
           my: '$4',
