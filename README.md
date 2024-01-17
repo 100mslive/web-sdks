@@ -6,35 +6,21 @@ This monorepo contains all the packages required to integrate 100ms on web
 
 ### Local Setup
 
-Clone the repo locally and run yarn install
+> Node version 18.0.0 or later
+
+if you are using a different version in other projects, use [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to manage node versions.
+
 
 ```
 git clone https://github.com/100mslive/web-sdks.git
 cd web-sdks
 yarn install
-```
-
-### Test
-
-```
-yarn test
-```
-
-### Lint
-
-Runs eslint across all packages
-
-```
-yarn lint
+yarn build
 ```
 
 ### Running Sample Prebuilt
 
 ```
-# do this at the root level
-yarn install
-yarn build
-
 cd examples/prebuilt-react-integration
 yarn dev
 ```
