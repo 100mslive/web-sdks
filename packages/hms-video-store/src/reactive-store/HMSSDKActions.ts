@@ -1291,14 +1291,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const hmsPeer = draftStore.peers[sdkPeer.peerId];
       const draftTracks = draftStore.tracks;
       const trackId = sdkTrack.trackId;
-      // find and remove the exact track from hmsPeer
-      if (this.isSameStoreSDKTrack(trackId, hmsPeer?.audioTrack)) {
+
+      if (trackId === hmsPeer.audioTrack) {
         delete hmsPeer?.audioTrack;
-      } else if (this.isSameStoreSDKTrack(trackId, hmsPeer?.videoTrack)) {
+      } else if (trackId === hmsPeer.videoTrack) {
         delete hmsPeer?.videoTrack;
       } else {
         const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
-        if (auxiliaryIndex > -1 && this.isSameStoreSDKTrack(trackId, hmsPeer?.auxiliaryTracks[auxiliaryIndex])) {
+        if (auxiliaryIndex > -1) {
           hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
         }
       }
@@ -1459,17 +1459,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
         this.logPossibleInconsistency(`track ${trackID} not present, unable to ${action} plugin`);
       }
     }
-  }
-
-  /**
-   * In case of replace track id is changed but not in store. Given the store id, check the real id
-   * sdk is using to refer to the track and match them.
-   */
-  private isSameStoreSDKTrack(sdkTrackID: string, storeTrackID?: string): boolean {
-    if (!storeTrackID) {
-      return false;
-    }
-    return this.sdk.store.getTrackById(storeTrackID)?.trackId === sdkTrackID;
   }
 
   /**
