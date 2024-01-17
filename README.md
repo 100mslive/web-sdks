@@ -27,7 +27,7 @@ yarn dev
 
 `http://locahost:<port>/<room-code>`
 
-Once you run `yarn dev`, the the localhost link with the port will be generated automatically. Just get the roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
+Once you run `yarn dev`, the localhost link with the port will be generated automatically. Just get the roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
 
 
 ### Testing changes locally
