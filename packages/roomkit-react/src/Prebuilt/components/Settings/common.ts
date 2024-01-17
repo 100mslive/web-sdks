@@ -1,8 +1,10 @@
 import { GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
 import { css } from '../../..';
-import DeviceSettings from '../Settings/DeviceSettings';
-import { LayoutSettings } from '../Settings/LayoutSettings';
-import { NotificationSettings } from '../Settings/NotificationSettings';
+// @ts-ignore: No implicit Any
+import DeviceSettings from './DeviceSettings';
+import { LayoutSettings } from './LayoutSettings';
+// @ts-ignore: No implicit Any
+import { NotificationSettings } from './NotificationSettings';
 
 export const settingOverflow = css({
   flex: '1 1 0',
@@ -39,3 +41,9 @@ export const settingsList = [
     content: LayoutSettings,
   },
 ];
+
+export const LayoutMode: Record<string, string> = {
+  SIDEBAR: 'sidebar',
+  GALLERY: 'gallery',
+  SPOTLIGHT: 'spotlight',
+};

@@ -3,7 +3,21 @@ import { Label } from '../../../Label';
 import { Flex } from '../../../Layout';
 import { Switch } from '../../../Switch';
 
-const SwitchWithLabel = ({ label, icon, id, onChange, checked, hide = false }) => {
+const SwitchWithLabel = ({
+  label,
+  icon,
+  id,
+  onChange,
+  checked,
+  hide = false,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  id: string;
+  onChange: (value: boolean) => void;
+  checked: boolean;
+  hide?: boolean;
+}) => {
   return (
     <Flex
       align="center"
