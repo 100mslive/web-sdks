@@ -14,7 +14,7 @@ export const StandardView = ({ poll }: { poll: HMSPoll }) => {
 
   return (
     <>
-      {isQuiz && isStopped ? <PeerParticipationSummary poll={poll} /> : null}
+      {isQuiz && isStopped ? <PeerParticipationSummary quiz={poll} /> : null}
       {poll.questions?.map((question, index) => (
         <QuestionCard
           pollID={poll.id}

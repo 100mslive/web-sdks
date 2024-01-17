@@ -157,7 +157,7 @@ export interface HMSQuizLeaderboardSummary {
   avgTime: number;
   votedUsers: number;
   totalUsers: number;
-  correctAnswers: number;
+  correctUsers: number;
 }
 
 export interface HMSQuizLeaderboardResponse {
