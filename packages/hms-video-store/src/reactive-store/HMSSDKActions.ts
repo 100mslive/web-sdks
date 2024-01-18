@@ -1292,14 +1292,16 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       const draftTracks = draftStore.tracks;
       const trackId = sdkTrack.trackId;
 
-      if (trackId === hmsPeer.audioTrack) {
-        delete hmsPeer?.audioTrack;
-      } else if (trackId === hmsPeer.videoTrack) {
-        delete hmsPeer?.videoTrack;
-      } else {
-        const auxiliaryIndex = hmsPeer?.auxiliaryTracks.indexOf(trackId);
-        if (auxiliaryIndex > -1) {
-          hmsPeer?.auxiliaryTracks.splice(auxiliaryIndex, 1);
+      if (hmsPeer) {
+        if (trackId === hmsPeer.audioTrack) {
+          delete hmsPeer.audioTrack;
+        } else if (trackId === hmsPeer.videoTrack) {
+          delete hmsPeer.videoTrack;
+        } else {
+          const auxiliaryIndex = hmsPeer.auxiliaryTracks.indexOf(trackId);
+          if (auxiliaryIndex > -1) {
+            hmsPeer.auxiliaryTracks.splice(auxiliaryIndex, 1);
+          }
         }
       }
       delete draftTracks[trackId];
