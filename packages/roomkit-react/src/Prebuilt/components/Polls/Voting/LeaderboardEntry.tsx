@@ -58,7 +58,7 @@ export const LeaderboardEntry = ({
           <>
             <CheckCircleIcon height={16} width={16} />
             <Text variant="xs">
-              {correctResponses} / {questionCount}
+              {correctResponses}/{questionCount}
             </Text>
           </>
         ) : null}

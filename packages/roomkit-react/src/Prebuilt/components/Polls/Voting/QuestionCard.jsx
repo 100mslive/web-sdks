@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
@@ -41,7 +41,7 @@ export const QuestionCard = ({
 
   const isLive = pollState === 'started';
   const canRespond = isLive && !localPeerResponse;
-  const startTime = Date.now();
+  const startTime = useRef(Date.now());
   const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
 
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
@@ -68,7 +68,7 @@ export const QuestionCard = ({
         questionIndex: index,
         option: singleOptionAnswer,
         options: Array.from(multipleOptionAnswer),
-        duration: Date.now() - startTime,
+        duration: Date.now() - startTime.current,
       },
     ]);
   }, [isValidVote, startTime, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
