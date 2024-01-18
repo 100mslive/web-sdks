@@ -39,7 +39,7 @@ import { getMetadata } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
-const pollToastCache: Record<string, string> = {};
+const pollToastKey: Record<string, string> = {};
 
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
@@ -173,14 +173,14 @@ export function Notifications() {
             ),
             duration: Infinity,
           });
-          pollToastCache[notification.data.id] = pollToastID;
+          pollToastKey[notification.data.id] = pollToastID;
         }
         break;
       case HMSNotificationTypes.POLL_STOPPED:
         const pollID = notification?.data.id;
-        if (pollID && pollToastCache?.[pollID]) {
-          ToastManager.removeToast(pollToastCache?.[notification.data.id]);
-          delete pollToastCache[notification?.data.id];
+        if (pollID && pollToastKey?.[pollID]) {
+          ToastManager.removeToast(pollToastKey?.[notification.data.id]);
+          delete pollToastKey[notification?.data.id];
         }
         break;
       default:
