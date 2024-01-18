@@ -510,6 +510,13 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setAppData(key: string, value: Record<string | number, any>, merge?: boolean): void;
   setAppData(key: string, value: any): void;
 
+  /**
+   * native stream track subject to change during mute/unmute or contrainst changes or other process. Hence, it might or might not the accurate raw track
+   * @param trackId
+   * pass the trackId for which you want native raw track
+   */
+  getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
+
   getTrackById(trackId: string): HMSTrack | undefined;
 
   getAuthTokenByRoomCode(tokenRequest: TokenRequest, tokenRequestOptions?: TokenRequestOptions): Promise<string>;
