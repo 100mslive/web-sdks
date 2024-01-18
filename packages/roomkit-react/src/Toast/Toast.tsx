@@ -78,6 +78,7 @@ const ToastClose = styled(ToastPrimitives.Close, {});
 const ToastAction = styled(ToastPrimitives.Action, {
   cursor: 'pointer',
   background: 'none',
+  border: 'none',
 });
 const ToastViewport = styled(ToastPrimitives.Viewport, {
   position: 'fixed',

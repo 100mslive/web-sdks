@@ -6,53 +6,33 @@ This monorepo contains all the packages required to integrate 100ms on web
 
 ### Local Setup
 
-Clone the repo locally and run yarn install
+> Node version 18.0.0 or later
+
+if you are using a different version in other projects, use [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to manage node versions.
+
 
 ```
 git clone https://github.com/100mslive/web-sdks.git
 cd web-sdks
 yarn install
-```
-
-### Test
-
-```
-yarn test
-```
-
-### Lint
-
-Runs eslint across all packages
-
-```
-yarn lint
+yarn build
 ```
 
 ### Running Sample Prebuilt
 
 ```
-# do this at the root level
-yarn install
-yarn build
-
 cd examples/prebuilt-react-integration
 yarn dev
 ```
-You can get a roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
 
-if you want to make changes in a particular package and want to automatically update the above app, navigate to the package and call yarn start
-or use the scripts from the top level package.json
+`http://locahost:<port>/<room-code>`
 
-### Update a packages version
-
-Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to
-update all versions.
+Once you run `yarn dev`, the localhost link with the port will be generated automatically. Just get the roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
 
 
-### Publishing Alpha/Experimental versions
+### Testing changes locally
+Run `yarn start` by navigating to the package you are making changes to, the changes should reflect in the above sample app.
 
-To publish an alpha/experimental from your `experimental` branch, run the '[Create Release PR](https://github.com/100mslive/web-sdks/actions/workflows/publish.yml)' action on the `experimental` branch with `prerelease` as input.
-This bumps the version of all the packages and creates a PR against your `experimental` branch.
+For example, if you are making changes in roomkit-react(prebuilt), run `yarn start` in that package. The sample app should auto reload.
 
-Merge this PR into your `experimental` branch and run the `Publish Packages` workflow on your branch with `alpha` as input to publish the packages.
-
+> Note: Make sure `yarn build` is run atleast once before using `yarn start`

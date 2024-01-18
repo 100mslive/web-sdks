@@ -10,9 +10,14 @@
     "prebuilt",
     "roomkit"
   ],
-  "version": "0.2.1-alpha.1",
+  "version": "0.2.1",
   "author": "100ms",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/roomkit-react"
+  },
   "files": [
     "dist",
     "src"
@@ -77,10 +82,10 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hls-player": "0.2.1-alpha.1",
-    "@100mslive/hms-virtual-background": "1.12.1-alpha.1",
-    "@100mslive/react-icons": "0.9.1-alpha.1",
-    "@100mslive/react-sdk": "0.9.1-alpha.1",
+    "@100mslive/hls-player": "0.2.1",
+    "@100mslive/hms-virtual-background": "1.12.1",
+    "@100mslive/react-icons": "0.9.1",
+    "@100mslive/react-sdk": "0.9.1",
     "@100mslive/types-prebuilt": "0.12.5",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
