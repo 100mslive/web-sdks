@@ -19,7 +19,6 @@ export const SingleChoiceOptions = ({
   localPeerResponse,
   singleOptionAnswer,
 }) => {
-  console.log('ollo singleoptionanswer', singleOptionAnswer);
   return (
     <RadioGroup.Root value={localPeerResponse?.option} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
@@ -67,8 +66,10 @@ export const SingleChoiceOptions = ({
 
               <Flex direction="column" css={{ flexGrow: '1' }}>
                 <Flex css={{ w: '100%' }}>
-                  <Text css={{ display: 'flex', flexGrow: '1' }}>
-                    <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
+                  <Text css={{ display: 'flex', flexGrow: '1', color: '$on_surface_high' }}>
+                    <Label style={{ color: 'inherit' }} htmlFor={`${questionIndex}-${option.index}`}>
+                      {option.text}
+                    </Label>
                   </Text>
                   {showVoteCount && <VoteCount voteCount={option.voteCount} />}
                 </Flex>

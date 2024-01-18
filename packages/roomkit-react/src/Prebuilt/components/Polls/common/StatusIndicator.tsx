@@ -15,7 +15,7 @@ export const StatusIndicator = ({ isLive }: { isLive: boolean }) => {
           variant="caption"
           css={{
             fontWeight: '$semiBold',
-            color: '$on_surface_high',
+            color: '$on_primary_high',
           }}
         >
           {isLive ? 'LIVE' : 'ENDED'}

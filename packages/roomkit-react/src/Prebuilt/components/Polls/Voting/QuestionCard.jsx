@@ -41,7 +41,7 @@ export const QuestionCard = ({
 
   const isLive = pollState === 'started';
   const canRespond = isLive && !localPeerResponse;
-
+  const startTime = Date.now();
   const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
 
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
@@ -62,14 +62,16 @@ export const QuestionCard = ({
     if (!isValidVote) {
       return;
     }
+
     await actions.interactivityCenter.addResponsesToPoll(pollID, [
       {
         questionIndex: index,
         option: singleOptionAnswer,
         options: Array.from(multipleOptionAnswer),
+        duration: Date.now() - startTime,
       },
     ]);
-  }, [actions, index, pollID, isValidVote, singleOptionAnswer, multipleOptionAnswer]);
+  }, [isValidVote, startTime, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
 
   return (
     <Box

@@ -9,7 +9,7 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
 
   if (!activeQuestion) {
-    return null;
+    return <></>;
   }
 
   return poll.questions?.map(question =>
@@ -30,6 +30,8 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
         setCurrentIndex={setCurrentIndex}
         rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
       />
-    ) : null,
+    ) : (
+      <></>
+    ),
   );
 };
