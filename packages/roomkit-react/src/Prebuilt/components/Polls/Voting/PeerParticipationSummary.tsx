@@ -29,7 +29,10 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
           }/${summary.totalUsers})`,
         },
         { title: 'Avg. Time Taken', value: summary.avgTime },
-        { title: 'Avg. Score', value: summary.avgScore },
+        {
+          title: 'Avg. Score',
+          value: Number.isInteger(summary.avgScore) ? summary.avgScore : summary.avgScore.toFixed(2),
+        },
       ]
     : [
         { title: 'Your rank', value: peerEntry?.position ? `${peerEntry.position}/${summary.totalUsers}` : '-' },

@@ -67,7 +67,6 @@ const AddMenu = () => {
   const actions = useHMSActions();
   const [title, setTitle] = useState('');
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
-  const [anonymous, setAnonymous] = useState(false);
   const [hideVoteCount, setHideVoteCount] = useState(false);
   const [error, setError] = useState();
   const [titleError, setTitleError] = useState('');
@@ -141,12 +140,12 @@ const AddMenu = () => {
             Hide Vote Count
           </Text>
         </Flex>
-        <Flex align="center" css={{ mt: '$10' }}>
+        {/* <Flex align="center" css={{ mt: '$10' }}>
           <Switch onCheckedChange={value => setAnonymous(value)} css={{ mr: '$6' }} />
           <Text variant="body2" css={{ c: '$on_surface_medium' }}>
             Make Results Anonymous
           </Text>
-        </Flex>
+        </Flex> */}
         {/* <Timer
         timer={timer}
         setTimer={setTimer}
@@ -164,7 +163,7 @@ const AddMenu = () => {
               .createPoll({
                 id,
                 title,
-                anonymous,
+                anonymous: false,
                 rolesThatCanViewResponses: hideVoteCount && localPeerRoleName ? [localPeerRoleName] : undefined,
                 type: interactionType.toLowerCase(),
                 // duration: showTimerDropDown ? timer : undefined,

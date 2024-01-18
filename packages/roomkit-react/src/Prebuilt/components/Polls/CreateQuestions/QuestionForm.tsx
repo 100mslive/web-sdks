@@ -6,7 +6,8 @@ import {
   HMSPollQuestionType,
 } from '@100mslive/react-sdk';
 import { AddCircleIcon, TrashIcon } from '@100mslive/react-icons';
-import { Button, Dropdown, Flex, IconButton, Input, Switch, Text, TextArea, Tooltip } from '../../../..';
+// import { Button, Dropdown, Flex, IconButton, Input, Switch, Text, TextArea, Tooltip } from '../../../..';
+import { Button, Dropdown, Flex, IconButton, Input, Text, TextArea, Tooltip } from '../../../..';
 // @ts-ignore
 import { DialogDropdownTrigger } from '../../../primitives/DropdownTrigger';
 // @ts-ignore
@@ -50,7 +51,7 @@ export const QuestionForm = ({
       { text: '', isCorrectAnswer: false },
     ],
   );
-  const [skippable, setSkippable] = useState(false);
+  // const [skippable, setSkippable] = useState(false);
   const isValid = isValidQuestion({
     text,
     type,
@@ -241,12 +242,12 @@ export const QuestionForm = ({
                   }}
                 />
               </Flex>
-              <Flex justify="between" css={{ mt: '$md', gap: '$6', w: '100%' }}>
+              {/* <Flex justify="between" css={{ mt: '$md', gap: '$6', w: '100%' }}>
                 <Text variant="sm" css={{ color: '$on_surface_medium' }}>
                   Allow to skip
                 </Text>
                 <Switch defaultChecked={skippable} onCheckedChange={checked => setSkippable(checked)} />
-              </Flex>
+              </Flex> */}
             </>
           ) : null}
         </>
@@ -274,7 +275,7 @@ export const QuestionForm = ({
                 text,
                 type,
                 options,
-                skippable,
+                skippable: false,
                 draftID: question.draftID,
                 weight,
               });
