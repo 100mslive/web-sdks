@@ -49,7 +49,7 @@ export function PermissionErrorModal() {
             w: 'min(380px, 90%)',
             p: '$8',
             // overlay over Sheet.tsx
-            zIndex: 1003,
+            zIndex: 23,
           }}
         >
           <Dialog.Title
