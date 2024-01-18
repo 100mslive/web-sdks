@@ -38,6 +38,9 @@ import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppDat
 import { getMetadata } from '../../common/utils';
 // @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
+
+const pollToastKey: Record<string, string> = {};
+
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
@@ -151,7 +154,8 @@ export function Notifications() {
       case HMSNotificationTypes.POLL_STARTED:
         if (notification.data.startedBy !== localPeerID && screenProps.screenType !== 'hls_live_streaming') {
           const pollStartedBy = vanillaStore.getState(selectPeerNameByID(notification.data.startedBy)) || 'Participant';
-          ToastManager.addToast({
+
+          const pollToastID = ToastManager.addToast({
             title: `${pollStartedBy} started a ${notification.data.type}: ${notification.data.title}`,
             action: (
               <Button
@@ -167,7 +171,16 @@ export function Notifications() {
                 {notification.data.type === 'quiz' ? 'Answer' : 'Vote'}
               </Button>
             ),
+            duration: Infinity,
           });
+          pollToastKey[notification.data.id] = pollToastID;
+        }
+        break;
+      case HMSNotificationTypes.POLL_STOPPED:
+        const pollID = notification?.data.id;
+        if (pollID && pollToastKey?.[pollID]) {
+          ToastManager.removeToast(pollToastKey?.[notification.data.id]);
+          delete pollToastKey[notification?.data.id];
         }
         break;
       default:
