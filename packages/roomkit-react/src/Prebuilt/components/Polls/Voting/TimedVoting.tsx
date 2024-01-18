@@ -9,29 +9,31 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
 
   if (!activeQuestion) {
-    return <></>;
+    return null;
   }
 
-  return poll.questions?.map(question =>
-    currentIndex === question.index ? (
-      <QuestionCard
-        pollID={poll.id}
-        isQuiz={poll.type === 'quiz'}
-        startedBy={poll.startedBy}
-        pollState={poll.state}
-        index={question.index}
-        text={question.text}
-        type={question.type}
-        result={question?.result}
-        totalQuestions={poll.questions?.length || 0}
-        options={question.options}
-        responses={question.responses}
-        answer={question.answer}
-        setCurrentIndex={setCurrentIndex}
-        rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
-      />
-    ) : (
-      <></>
-    ),
+  return (
+    <>
+      {poll.questions?.map(question =>
+        currentIndex === question.index ? (
+          <QuestionCard
+            pollID={poll.id}
+            isQuiz={poll.type === 'quiz'}
+            startedBy={poll.startedBy}
+            pollState={poll.state}
+            index={question.index}
+            text={question.text}
+            type={question.type}
+            result={question?.result}
+            totalQuestions={poll.questions?.length || 0}
+            options={question.options}
+            responses={question.responses}
+            answer={question.answer}
+            setCurrentIndex={setCurrentIndex}
+            rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
+          />
+        ) : null,
+      )}
+    </>
   );
 };
