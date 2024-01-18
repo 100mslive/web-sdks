@@ -1,14 +1,8 @@
 // @ts-check
 import React, { useCallback, useMemo, useState } from 'react';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import {
-  CheckCircleIcon,
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CrossCircleIcon,
-} from '@100mslive/react-icons';
-import { Box, Button, Flex, IconButton, Text } from '../../../../';
+import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
+import { Box, Button, Flex, Text } from '../../../../';
 import { checkCorrectAnswer } from '../../../common/utils';
 import { MultipleChoiceOptions } from '../common/MultipleChoiceOptions';
 import { SingleChoiceOptions } from '../common/SingleChoiceOptions';
@@ -27,9 +21,7 @@ export const QuestionCard = ({
   options = [],
   answer,
   setCurrentIndex,
-  skippable = false,
   responses = [],
-  isTimed = false,
   rolesThatCanViewResponses,
 }) => {
   const actions = useHMSActions();
@@ -37,6 +29,7 @@ export const QuestionCard = ({
   const localPeerResponse = responses?.find(
     response => response.peer?.peerid === localPeer?.id || response.peer?.userid === localPeer?.customerUserId,
   );
+
   const isLocalPeerCreator = localPeer?.id === startedBy;
   const localPeerRoleName = useHMSStore(selectLocalPeerRoleName);
   const roleCanViewResponse =
@@ -51,23 +44,9 @@ export const QuestionCard = ({
 
   const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
 
-  const prev = index !== 1;
-  const next = index !== totalQuestions && (skippable || localPeerResponse);
-
-  const moveNext = useCallback(() => {
-    setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
-  }, [setCurrentIndex, totalQuestions]);
-
-  const movePrev = () => {
-    setCurrentIndex(curr => Math.max(1, curr - 1));
-  };
-
-  // const [textAnswer, setTextAnswer] = useState('');
   const [singleOptionAnswer, setSingleOptionAnswer] = useState();
   const [multipleOptionAnswer, setMultipleOptionAnswer] = useState(new Set());
   const [showOptions, setShowOptions] = useState(true);
-
-  // const stringAnswerExpected = [QUESTION_TYPE.LONG_ANSWER, QUESTION_TYPE.SHORT_ANSWER].includes(type);
 
   const respondedToQuiz = isQuiz && localPeerResponse && !localPeerResponse.skipped;
 
@@ -91,16 +70,6 @@ export const QuestionCard = ({
       },
     ]);
   }, [actions, index, pollID, isValidVote, singleOptionAnswer, multipleOptionAnswer]);
-
-  const handleSkip = useCallback(async () => {
-    await actions.interactivityCenter.addResponsesToPoll(pollID, [
-      {
-        questionIndex: index,
-        skipped: true,
-      },
-    ]);
-    moveNext();
-  }, [actions, index, pollID, moveNext]);
 
   return (
     <Box
@@ -135,39 +104,6 @@ export const QuestionCard = ({
           {respondedToQuiz && !isCorrectAnswer ? <CrossCircleIcon height={20} width={20} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
-
-        {isTimed ? (
-          <Flex align="center" css={{ gap: '$4' }}>
-            <IconButton
-              disabled={!prev}
-              onClick={movePrev}
-              css={
-                prev
-                  ? { color: '$on_surface_high', cursor: 'pointer' }
-                  : {
-                      color: '$on_surface_low',
-                      cursor: 'not-allowed',
-                    }
-              }
-            >
-              <ChevronLeftIcon height={16} width={16} />
-            </IconButton>
-            <IconButton
-              disabled={!next}
-              onClick={moveNext}
-              css={
-                next
-                  ? { color: '$on_surface_high', cursor: 'pointer' }
-                  : {
-                      color: '$on_surface_low',
-                      cursor: 'not-allowed',
-                    }
-              }
-            >
-              <ChevronRightIcon height={16} width={16} />
-            </IconButton>
-          </Flex>
-        ) : null}
       </Flex>
 
       <Flex justify="between" css={{ my: '$md' }}>
@@ -188,7 +124,6 @@ export const QuestionCard = ({
             questionIndex={index}
             isQuiz={isQuiz}
             canRespond={canRespond}
-            response={localPeerResponse}
             correctOptionIndex={answer?.option}
             options={options}
             setAnswer={setSingleOptionAnswer}
@@ -196,14 +131,15 @@ export const QuestionCard = ({
             showVoteCount={showVoteCount}
             localPeerResponse={localPeerResponse}
             isStopped={pollState === 'stopped'}
+            singleOptionAnswer={singleOptionAnswer}
           />
         ) : null}
+
         {type === QUESTION_TYPE.MULTIPLE_CHOICE ? (
           <MultipleChoiceOptions
             questionIndex={index}
             isQuiz={isQuiz}
             canRespond={canRespond}
-            response={localPeerResponse}
             correctOptionIndexes={answer?.options}
             options={options}
             selectedOptions={multipleOptionAnswer}
@@ -214,14 +150,16 @@ export const QuestionCard = ({
             isStopped={pollState === 'stopped'}
           />
         ) : null}
+
         {isLive && (
           <QuestionActions
             isValidVote={isValidVote}
-            skippable={skippable}
-            onSkip={handleSkip}
             onVote={handleVote}
             response={localPeerResponse}
             isQuiz={isQuiz}
+            incrementIndex={() => {
+              setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
+            }}
           />
         )}
       </Box>
@@ -229,15 +167,9 @@ export const QuestionCard = ({
   );
 };
 
-const QuestionActions = ({ isValidVote, skippable, response, isQuiz, onVote, onSkip }) => {
+const QuestionActions = ({ isValidVote, response, isQuiz, onVote, incrementIndex }) => {
   return (
     <Flex align="center" justify="end" css={{ gap: '$4', w: '100%' }}>
-      {skippable && !response ? (
-        <Button variant="standard" onClick={onSkip} css={{ p: '$xs $10', fontWeight: '$semiBold' }}>
-          Skip
-        </Button>
-      ) : null}
-
       {response ? (
         <Text css={{ fontWeight: '$semiBold', color: '$on_surface_medium' }}>
           {response.skipped ? 'Skipped' : null}
@@ -245,7 +177,14 @@ const QuestionActions = ({ isValidVote, skippable, response, isQuiz, onVote, onS
           {!isQuiz && !response.skipped ? 'Voted' : null}
         </Text>
       ) : (
-        <Button css={{ p: '$xs $10', fontWeight: '$semiBold' }} disabled={!isValidVote} onClick={onVote}>
+        <Button
+          css={{ p: '$xs $10', fontWeight: '$semiBold' }}
+          disabled={!isValidVote}
+          onClick={() => {
+            onVote();
+            incrementIndex();
+          }}
+        >
           {isQuiz ? 'Answer' : 'Vote'}
         </Button>
       )}

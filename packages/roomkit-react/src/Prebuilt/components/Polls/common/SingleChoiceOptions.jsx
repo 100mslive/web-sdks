@@ -9,7 +9,6 @@ import { VoteProgress } from './VoteProgress';
 export const SingleChoiceOptions = ({
   questionIndex,
   options,
-  response,
   canRespond,
   setAnswer,
   totalResponses,
@@ -18,9 +17,11 @@ export const SingleChoiceOptions = ({
   isStopped,
   isQuiz,
   localPeerResponse,
+  singleOptionAnswer,
 }) => {
+  console.log('ollo singleoptionanswer', singleOptionAnswer);
   return (
-    <RadioGroup.Root value={response?.option} onValueChange={value => setAnswer(value)}>
+    <RadioGroup.Root value={localPeerResponse?.option} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (
@@ -42,6 +43,7 @@ export const SingleChoiceOptions = ({
                       borderWidth: '2px',
                     },
                   }}
+                  checked={singleOptionAnswer === option.index}
                   disabled={!canRespond}
                   value={option.index}
                   id={`${questionIndex}-${option.index}`}
