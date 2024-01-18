@@ -9,23 +9,25 @@ import { SecondaryTiles } from '../SecondaryTiles';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
-import { useSetAppDataByKey } from '../AppData/useUISettings';
-import { APP_DATA } from '../../common/constants';
+import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
+import { LayoutMode } from '../Settings/common';
+import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {
   const peersSharing = useHMSStore(selectPeersScreenSharing);
   const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const [page, setPage] = useState(0);
+  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
   const activeSharePeer = peersSharing[page];
   const isMobile = useMedia(cssConfig.media.md);
   const secondaryPeers = useMemo(() => {
-    if (isMobile) {
+    if (isMobile || layoutMode === LayoutMode.SIDEBAR) {
       return activeSharePeer
         ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)] //keep active sharing peer as first tile
         : peers;
     }
     return peers.filter(p => p.id !== activeSharePeer?.id);
-  }, [activeSharePeer, peers, isMobile]);
+  }, [activeSharePeer, peers, isMobile, layoutMode]);
   useEffect(() => {
     setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
     return () => {

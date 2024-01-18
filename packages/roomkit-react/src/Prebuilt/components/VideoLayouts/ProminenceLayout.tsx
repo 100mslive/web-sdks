@@ -4,16 +4,23 @@ import { Box, Flex } from '../../../Layout';
 import { CSS } from '../../../Theme';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
+// @ts-ignore: No implicit Any
+import { useUISettings } from '../AppData/useUISettings';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
+import { LayoutMode } from '../Settings/common';
+import { UI_SETTINGS } from '../../common/constants';
 
-const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => (
-  <Flex
-    direction="column"
-    css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
-  >
-    {children}
-  </Flex>
-);
+const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => {
+  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
+  return (
+    <Flex
+      direction={layoutMode === LayoutMode.SIDEBAR ? 'row' : 'column'}
+      css={{ h: '100%', flex: '1 1 0', minWidth: 0, gap: '$6', '@md': { gap: edgeToEdge ? 0 : '$6' } }}
+    >
+      {children}
+    </Flex>
+  );
+};
 
 const ProminentSection = ({ children, css = {} }: React.PropsWithChildren<{ css?: CSS }>) => {
   return (
@@ -29,18 +36,28 @@ const SecondarySection = ({
   edgeToEdge,
 }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
+  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
   if (!tiles?.length) {
     return null;
   }
+  const gridStyles =
+    layoutMode === LayoutMode.SIDEBAR
+      ? {
+          gridTemplateColumns: '1fr',
+          gridTemplateRows: `repeat(${tiles.length}, minmax(0, 135px))`,
+        }
+      : {
+          gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
+          gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))`,
+        };
   return (
     <Box
       css={{
         display: 'grid',
-        gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
-        gridTemplateColumns: `repeat(${tiles.length}, minmax(0, 1fr))`,
-        margin: '0 auto',
+        margin: 'auto',
         gap: '$2 $4',
         placeItems: 'center',
+        ...gridStyles,
         '@md': { gap: edgeToEdge ? 0 : '$4' },
       }}
     >
@@ -62,7 +79,9 @@ const SecondarySection = ({
           />
         );
       })}
-      <Box css={{ gridColumn: `1/span ${tiles.length}` }}>{children}</Box>
+      {children && (
+        <Box css={{ gridColumn: layoutMode === LayoutMode.SIDEBAR ? 1 : `1/span ${tiles.length}` }}>{children}</Box>
+      )}
     </Box>
   );
 };

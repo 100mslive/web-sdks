@@ -44,7 +44,7 @@ export const LayoutSettings = () => {
                 <RadioGroup.Item value={LayoutMode[key]} id="layoutMode" css={{ mr: '$4' }}>
                   <RadioGroup.Indicator />
                 </RadioGroup.Item>
-                <Label htmlFor="layoutMode">Sidebar</Label>
+                <Label htmlFor="layoutMode">{LayoutMode[key]}</Label>
               </Flex>
             );
           })}

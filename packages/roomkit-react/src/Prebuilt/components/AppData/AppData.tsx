@@ -15,6 +15,7 @@ import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPrefere
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 // @ts-ignore
 import { useSetAppDataByKey } from './useUISettings';
+import { LayoutMode } from '../Settings/common';
 import {
   APP_DATA,
   CHAT_SELECTOR,
@@ -33,6 +34,7 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
+    [UI_SETTINGS.layoutMode]: LayoutMode.GALLERY,
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,

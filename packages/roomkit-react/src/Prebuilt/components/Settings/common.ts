@@ -43,7 +43,7 @@ export const settingsList = [
 ];
 
 export const LayoutMode: Record<string, string> = {
-  SIDEBAR: 'sidebar',
-  GALLERY: 'gallery',
-  SPOTLIGHT: 'spotlight',
+  SIDEBAR: 'Sidebar',
+  GALLERY: 'Gallery',
+  SPOTLIGHT: 'Spotlight',
 };

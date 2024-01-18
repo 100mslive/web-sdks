@@ -99,6 +99,7 @@ const FullScreenButton = styled('button', {
   color: '$on_surface_high',
   borderRadius: '$round',
   backgroundColor: '$surface_default',
+  border: 'none',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
