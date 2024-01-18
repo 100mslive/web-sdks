@@ -212,6 +212,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
         bg: '$surface_default',
         aspectRatio,
         height: 'min(360px, 70vh)',
+        width: 'auto',
         maxWidth: '640px',
         overflow: 'clip',
         mt: '$14',
