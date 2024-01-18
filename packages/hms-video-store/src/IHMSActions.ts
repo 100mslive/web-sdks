@@ -511,9 +511,11 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   setAppData(key: string, value: any): void;
 
   /**
-   * native stream track subject to change during mute/unmute or contrainst changes or other process. Hence, it might or might not the accurate raw track
    * @param trackId
-   * pass the trackId for which you want native raw track
+   * pass the trackId for which you want mediaStreamTrack
+   *
+   * Note: In case of local peer, the native audio track will change the first time it is unmuted.
+   * In case of video track, the native track changes everytime you mute/unmute.
    */
   getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
 
