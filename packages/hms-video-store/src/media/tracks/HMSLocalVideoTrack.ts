@@ -184,7 +184,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     } else {
       await this.pluginsManager.waitForRestart();
-      this.processPlugins();
+      await this.processPlugins();
     }
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
