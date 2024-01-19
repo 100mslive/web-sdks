@@ -285,6 +285,7 @@ export class AudioSinkManager {
         }
       }
       const outputDevice = this.deviceManager.outputDevice;
+      console.log({ outputDevice, bluetoothDevice, speakerPhone });
       if (
         outputDevice &&
         outputDevice.groupId !== bluetoothDevice?.groupId &&
