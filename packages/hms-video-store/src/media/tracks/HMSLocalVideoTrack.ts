@@ -182,6 +182,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       // if track is muted, we just cache the settings for when it is unmuted
       this.settings = newSettings;
       return;
+    } else {
+      await this.pluginsManager.waitForRestart();
+      this.processPlugins();
     }
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
