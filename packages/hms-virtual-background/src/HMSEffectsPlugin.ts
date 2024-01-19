@@ -34,26 +34,34 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return 'HMSEffects';
   }
 
-  setBlur(blur: number) {
-    this.blurAmount = blur;
+  removeBlur() {
+    this.blurAmount = 0;
+    this.effects.clearBlur();
     this.background = '';
-    this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
-    this.effects.setBlur(blur);
+  }
+
+  removeBackground() {
+    this.background = '';
     this.effects.clearBackground();
   }
 
+  setBlur(blur: number) {
+    this.removeBackground();
+    this.blurAmount = blur;
+    this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
+    this.effects.setBlur(blur);
+  }
+
   removeEffects() {
-    this.effects.clearBackground();
-    this.effects.clearBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.NONE;
-    this.background = '';
+    this.removeBackground();
+    this.removeBlur();
   }
 
   setBackground(url: HMSEffectsBackground) {
     this.background = url;
-    this.blurAmount = 0;
+    this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
-    this.effects.clearBlur();
     this.effects.setBackground(url);
   }
 
