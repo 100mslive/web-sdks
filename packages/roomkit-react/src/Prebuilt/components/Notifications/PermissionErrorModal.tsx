@@ -44,7 +44,14 @@ export function PermissionErrorModal() {
     <Dialog.Root open={!!deviceType}>
       <Dialog.Portal>
         <Dialog.Overlay />
-        <Dialog.Content css={{ w: 'min(380px, 90%)', p: '$8' }}>
+        <Dialog.Content
+          css={{
+            w: 'min(380px, 90%)',
+            p: '$8',
+            // overlay over Sheet.tsx
+            zIndex: 23,
+          }}
+        >
           <Dialog.Title
             css={{
               borderBottom: '1px solid $border_default',
