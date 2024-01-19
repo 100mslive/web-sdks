@@ -13,27 +13,21 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   }
 
   return (
-    <>
-      {poll.questions?.map(question =>
-        currentIndex === question.index ? (
-          <QuestionCard
-            pollID={poll.id}
-            isQuiz={poll.type === 'quiz'}
-            startedBy={poll.startedBy}
-            pollState={poll.state}
-            index={question.index}
-            text={question.text}
-            type={question.type}
-            result={question?.result}
-            totalQuestions={poll.questions?.length || 0}
-            options={question.options}
-            responses={question.responses}
-            answer={question.answer}
-            setCurrentIndex={setCurrentIndex}
-            rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
-          />
-        ) : null,
-      )}
-    </>
+    <QuestionCard
+      pollID={poll.id}
+      isQuiz={poll.type === 'quiz'}
+      startedBy={poll.startedBy}
+      pollState={poll.state}
+      index={activeQuestion.index}
+      text={activeQuestion.text}
+      type={activeQuestion.type}
+      result={activeQuestion?.result}
+      totalQuestions={poll.questions?.length || 0}
+      options={activeQuestion.options}
+      responses={activeQuestion.responses}
+      answer={activeQuestion.answer}
+      setCurrentIndex={setCurrentIndex}
+      rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
+    />
   );
 };

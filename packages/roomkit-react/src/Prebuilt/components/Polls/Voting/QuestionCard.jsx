@@ -71,7 +71,22 @@ export const QuestionCard = ({
         duration: Date.now() - startTime.current,
       },
     ]);
-  }, [isValidVote, startTime, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
+    startTime.current = Date.now();
+
+    if (isQuiz && index !== totalQuestions) {
+      setSingleOptionAnswer(undefined);
+      setMultipleOptionAnswer(new Set());
+    }
+  }, [
+    isValidVote,
+    actions.interactivityCenter,
+    pollID,
+    index,
+    singleOptionAnswer,
+    multipleOptionAnswer,
+    totalQuestions,
+    isQuiz,
+  ]);
 
   return (
     <Box
@@ -123,6 +138,7 @@ export const QuestionCard = ({
       <Box css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'hidden' }}>
         {type === QUESTION_TYPE.SINGLE_CHOICE ? (
           <SingleChoiceOptions
+            key={index}
             questionIndex={index}
             isQuiz={isQuiz}
             canRespond={canRespond}
@@ -133,7 +149,7 @@ export const QuestionCard = ({
             showVoteCount={showVoteCount}
             localPeerResponse={localPeerResponse}
             isStopped={pollState === 'stopped'}
-            singleOptionAnswer={singleOptionAnswer}
+            answer={singleOptionAnswer}
           />
         ) : null}
 
