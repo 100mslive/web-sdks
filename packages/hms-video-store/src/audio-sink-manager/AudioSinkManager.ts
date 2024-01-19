@@ -271,7 +271,7 @@ export class AudioSinkManager {
       let speakerPhone: InputDeviceInfo | null = null;
       let earpiece: InputDeviceInfo | null = null;
 
-      for (const device of this.deviceManager.audioOutput) {
+      for (const device of this.deviceManager.audioInput) {
         if (device.label.toLowerCase().includes('speakerphone')) {
           speakerPhone = device;
         }
