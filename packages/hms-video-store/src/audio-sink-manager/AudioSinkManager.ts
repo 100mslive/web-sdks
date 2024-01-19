@@ -267,14 +267,9 @@ export class AudioSinkManager {
   // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
     if (this.audioSink?.children.length === 0) {
-      const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
-      const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-      if (localAudioTrack && device) {
-        await localAudioTrack.setSettings({ deviceId: device?.deviceId });
-        await localAudioTrack.setSettings({ deviceId: 'default' });
-      }
-      let bluetoothDevice: MediaDeviceInfo | null = null;
-      let speakerPhone: MediaDeviceInfo | null = null;
+      let bluetoothDevice: InputDeviceInfo | null = null;
+      let speakerPhone: InputDeviceInfo | null = null;
+      let earpiece: InputDeviceInfo | null = null;
 
       for (const device of this.deviceManager.audioOutput) {
         if (device.label.toLowerCase().includes('speakerphone')) {
@@ -283,19 +278,14 @@ export class AudioSinkManager {
         if (device.label.toLowerCase().includes('bluetooth')) {
           bluetoothDevice = device;
         }
-      }
-      const outputDevice = this.deviceManager.outputDevice;
-      console.log({ outputDevice, bluetoothDevice, speakerPhone });
-      if (
-        outputDevice &&
-        outputDevice.groupId !== bluetoothDevice?.groupId &&
-        outputDevice.groupId !== speakerPhone?.groupId
-      ) {
-        if (bluetoothDevice?.deviceId) {
-          await this.deviceManager.updateOutputDevice(bluetoothDevice.deviceId);
-        } else if (speakerPhone?.deviceId) {
-          await this.deviceManager.updateOutputDevice(speakerPhone.deviceId);
+        if (device.label.toLowerCase().includes('earpiece')) {
+          earpiece = device;
         }
+      }
+      const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
+      if (localAudioTrack && earpiece) {
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
+        await localAudioTrack.setSettings({ deviceId: bluetoothDevice?.deviceId || speakerPhone?.deviceId });
       }
     }
   };
