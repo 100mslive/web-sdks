@@ -512,10 +512,12 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
 
   /**
    * @param trackId
-   * pass the trackId for which you want mediaStreamTrack
-   *
+   * pass the trackId from store (for instance, peer.audioTrack) for which you want the native MediaStreamTrack instance.
+   * Be cautious when using this and modifying the underlying MediastreamTrack.
    * Note: In case of local peer, the native audio track will change the first time it is unmuted.
    * In case of video track, the native track changes everytime you mute/unmute.
+   * Be cautious when using this. This will not be needed unless you want to do some extra processing on the audio/video tracks.
+   * We recommend using our plugins for the same instead
    */
   getNativeTrackById(trackId: string): MediaStreamTrack | undefined;
 
