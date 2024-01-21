@@ -1,8 +1,106 @@
 import React from 'react';
-import { CheckIcon, SettingsIcon } from '@100mslive/react-icons';
+import { useMedia } from 'react-use';
+import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
+import { Sheet } from '../../../Sheet';
+import { config } from '../../../Theme';
 
 export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
+  const isMobile = useMedia(config.media.md);
+  if (isMobile) {
+    return (
+      <Sheet.Root open={open} onOpenChange={onOpen}>
+        <Sheet.Trigger asChild data-testid="quality_selector">
+          <Flex
+            css={{
+              color: '$on_primary_high',
+              r: '$1',
+              cursor: 'pointer',
+              p: '$2',
+            }}
+          >
+            <SettingsIcon />
+          </Flex>
+        </Sheet.Trigger>
+
+        {layers.length > 0 && (
+          <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => onOpen(false)}>
+            <Sheet.Title
+              css={{
+                display: 'flex',
+                color: '$on_surface_high',
+                w: '100%',
+                justifyContent: 'space-between',
+                mt: '$8',
+                fontSize: '$md',
+                px: '$10',
+                pb: '$8',
+                borderBottom: '1px solid $border_bright',
+                alignItems: 'center',
+              }}
+            >
+              Quality
+              <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpen(false)}>
+                <CrossIcon />
+              </Sheet.Close>
+            </Sheet.Title>
+            {layers.map(layer => {
+              return (
+                <Flex
+                  align="center"
+                  css={{
+                    w: '100%',
+                    bg:
+                      !isAuto && layer.width === selection?.width && layer.height === selection?.height
+                        ? '$surface_default'
+                        : '$surface_bright',
+                    '&:hover': {
+                      bg: '$surface_brighter',
+                    },
+                    cursor: 'pointer',
+                    gap: '$4',
+                    p: '$8',
+                  }}
+                  key={layer.width}
+                  onClick={() => onQualityChange(layer)}
+                >
+                  <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                    {getQualityText(layer)}
+                  </Text>
+                  <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                    {getBitrateText(layer)}
+                  </Text>
+                  {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
+                    <CheckIcon width="16px" height="16px" />
+                  )}
+                </Flex>
+              );
+            })}
+            <Flex
+              align="center"
+              css={{
+                w: '100%',
+                bg: !isAuto ? '$surface_bright' : '$surface_default',
+                '&:hover': {
+                  bg: '$surface_brighter',
+                },
+                cursor: 'pointer',
+                gap: '$4',
+                p: '$8',
+              }}
+              key="auto"
+              onClick={() => onQualityChange({ height: 'auto' })}
+            >
+              <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+                Auto
+              </Text>
+              {isAuto && <CheckIcon width="16px" height="16px" />}
+            </Flex>
+          </Sheet.Content>
+        )}
+      </Sheet.Root>
+    );
+  }
   return (
     <Dropdown.Root open={open} onOpenChange={value => onOpen(value)}>
       <Dropdown.Trigger asChild data-testid="quality_selector">

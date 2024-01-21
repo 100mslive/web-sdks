@@ -62,7 +62,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     return null;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} />
+    <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />
   ) : (
     <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} />
   );

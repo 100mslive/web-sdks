@@ -1,4 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
+import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -16,6 +17,7 @@ import {
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
+import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -55,6 +57,7 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  const isMobile = useMedia(cssConfig.media.md);
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -106,14 +109,25 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
-          <SidePane
-            screenType={screenType}
-            // @ts-ignore
-            tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
-            hideControls={hideControls}
-          />
-        </Box>
+        {screenType === 'hls_live_streaming' && isMobile ? (
+          <Box css={{ height: '50%', maxHeight: '50%', overflowY: 'clip' }}>
+            <SidePane
+              screenType={screenType}
+              // @ts-ignore
+              tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+              hideControls={hideControls}
+            />
+          </Box>
+        ) : (
+          <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
+            <SidePane
+              screenType={screenType}
+              // @ts-ignore
+              tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+              hideControls={hideControls}
+            />
+          </Box>
+        )}
       </Flex>
     </Suspense>
   );

@@ -30,7 +30,7 @@ const SidePane = ({
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
-  const { elements } = useRoomLayoutConferencingScreen();
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const { elements: preview_elements } = useRoomLayoutPreviewScreen();
 
   const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
@@ -68,6 +68,7 @@ const SidePane = ({
   };
   const VB = sidepane === SIDE_PANE_OPTIONS.VB;
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
+  const mwebHLSStream = isMobile && screenType === 'hls_live_streaming';
 
   return (
     <Flex
@@ -96,7 +97,7 @@ const SidePane = ({
         <Box
           css={{
             w: '$100',
-            h: mwebStreamingChat ? '0' : '100%',
+            h: mwebStreamingChat ? '0' : mwebHLSStream ? '50%' : '100%',
             p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,

@@ -11,7 +11,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { CloseIcon, ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
@@ -275,6 +275,209 @@ const HLSView = () => {
     [controlsVisible, isFullScreen, qualityDropDownOpen],
   );
 
+  if (isMobile) {
+    return (
+      <Flex
+        key="hls-viewer"
+        id={`hls-viewer-${themeType}`}
+        ref={hlsViewRef}
+        css={{
+          size: '100%',
+        }}
+      >
+        {hlsUrl && !streamEnded ? (
+          <Flex
+            id="hls-player-container"
+            align="center"
+            justify="center"
+            css={{
+              width: '100%',
+              margin: '0 auto',
+              height: '100%',
+            }}
+          >
+            <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
+            {showLoader && (
+              <Flex
+                align="center"
+                justify="center"
+                css={{
+                  position: 'absolute',
+                }}
+              >
+                <Loading width={72} height={72} />
+              </Flex>
+            )}
+            <HMSVideoPlayer.Root
+              ref={videoRef}
+              onMouseEnter={onHoverHandler}
+              onMouseMove={onHoverHandler}
+              onMouseLeave={onHoverHandler}
+            >
+              <Box
+                css={{
+                  position: 'absolute',
+                  top: '40%',
+                  left: '50%',
+                  transform: 'translateY(-40%) translateX(-50%)',
+                  padding: '$8 14px $8 18px',
+                  display: 'inline-flex',
+                  r: '50%',
+                  gap: '$1',
+                  bg: '$primary_default',
+                  zIndex: 21,
+                }}
+              >
+                <IconButton onClick={async () => await hlsPlayer?.play()} data-testid="play_btn">
+                  <PlayIcon width="60px" height="60px" />
+                </IconButton>
+              </Box>
+              <Flex
+                ref={controlsRef}
+                direction="column"
+                justify="flex-end"
+                align="flex-start"
+                css={{
+                  position: 'absolute',
+                  top: '0',
+                  left: '0',
+                  width: '100%',
+                  flexShrink: 0,
+                  visibility: controlsVisible ? `` : `hidden`,
+                  opacity: controlsVisible ? `1` : '0',
+                }}
+              >
+                <HMSVideoPlayer.Controls.Root
+                  css={{
+                    p: '$4 $8',
+                  }}
+                >
+                  <HMSVideoPlayer.Controls.Left>
+                    <IconButton onClick={() => console.log('TOOD')}>
+                      <CloseIcon />
+                    </IconButton>
+                  </HMSVideoPlayer.Controls.Left>
+
+                  <HMSVideoPlayer.Controls.Right>
+                    {hasCaptions && (
+                      <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                    )}
+                    {availableLayers.length > 0 ? (
+                      <HLSQualitySelector
+                        layers={availableLayers}
+                        onOpen={setQualityDropDownOpen}
+                        open={qualityDropDownOpen}
+                        selection={currentSelectedQuality}
+                        onQualityChange={handleQuality}
+                        isAuto={isUserSelectedAuto}
+                      />
+                    ) : null}
+                  </HMSVideoPlayer.Controls.Right>
+                </HMSVideoPlayer.Controls.Root>
+              </Flex>
+              <Flex
+                ref={controlsRef}
+                direction="column"
+                justify="flex-end"
+                align="flex-start"
+                css={{
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0',
+                  background: `linear-gradient(180deg, ${theme.colors.background_dim.value}00 29.46%, ${theme.colors.background_dim.value}A3 100%);`,
+                  width: '100%',
+                  pt: '$8',
+                  flexShrink: 0,
+                  transition: 'visibility 0s 0.5s, opacity 0.5s linear',
+                  visibility: controlsVisible ? `` : `hidden`,
+                  opacity: controlsVisible ? `1` : '0',
+                }}
+              >
+                <HMSVideoPlayer.Controls.Root
+                  css={{
+                    p: '$4 $8',
+                  }}
+                >
+                  <HMSVideoPlayer.Controls.Left>
+                    <IconButton
+                      variant="standard"
+                      css={{ px: '$2' }}
+                      onClick={async () => {
+                        await hlsPlayer.seekToLivePosition();
+                        setIsVideoLive(true);
+                      }}
+                      key="jump-to-live_btn"
+                      data-testid="jump-to-live_btn"
+                    >
+                      <Tooltip title="Go to Live" side="top">
+                        <Flex justify="center" gap={2} align="center">
+                          <Box
+                            css={{
+                              height: '$4',
+                              width: '$4',
+                              background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
+                              r: '$1',
+                            }}
+                          />
+                          <Text
+                            variant={{
+                              '@sm': 'xs',
+                            }}
+                            css={{
+                              c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
+                            }}
+                          >
+                            {isVideoLive ? 'LIVE' : 'GO LIVE'}
+                          </Text>
+                        </Flex>
+                      </Tooltip>
+                    </IconButton>
+                    <HMSVideoPlayer.Duration hlsPlayer={hlsPlayer} />
+                  </HMSVideoPlayer.Controls.Left>
+
+                  <HMSVideoPlayer.Controls.Right>
+                    {isFullScreenSupported ? (
+                      <FullScreenButton
+                        isFullScreen={isFullScreen}
+                        onToggle={toggle}
+                        icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                      />
+                    ) : null}
+                  </HMSVideoPlayer.Controls.Right>
+                </HMSVideoPlayer.Controls.Root>
+              </Flex>
+              <Box>
+                {hlsPlayer && (
+                  <HMSVideoPlayer.Progress
+                    hlsPlayer={hlsPlayer}
+                    onValueChange={time => {
+                      hlsPlayer.seekTo(time);
+                    }}
+                  />
+                )}
+              </Box>
+            </HMSVideoPlayer.Root>
+          </Flex>
+        ) : (
+          <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+            <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
+              {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <RadioIcon height={56} width={56} />}
+            </Flex>
+            <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
+              {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
+            </Text>
+            <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
+              {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
+            </Text>
+          </Flex>
+        )}
+        {/** player handler --> left -> go live with timer or live, right -> expand icon  */}
+        {/** inbetween -> play pause icon, double tap to go back/forward */}
+        {/** seekbar */}
+        {/** half page will have chat or participant view  */}
+      </Flex>
+    );
+  }
   return (
     <Flex
       key="hls-viewer"
@@ -316,26 +519,6 @@ const HLSView = () => {
             onMouseMove={onHoverHandler}
             onMouseLeave={onHoverHandler}
           >
-            {isMobile && isPaused && (
-              <Box
-                css={{
-                  position: 'absolute',
-                  top: '40%',
-                  left: '50%',
-                  transform: 'translateY(-40%) translateX(-50%)',
-                  padding: '$8 14px $8 18px',
-                  display: 'inline-flex',
-                  r: '50%',
-                  gap: '$1',
-                  bg: '$primary_default',
-                  zIndex: 21,
-                }}
-              >
-                <IconButton onClick={async () => await hlsPlayer?.play()} data-testid="play_btn">
-                  <PlayIcon width="60px" height="60px" />
-                </IconButton>
-              </Box>
-            )}
             <Flex
               ref={controlsRef}
               direction="column"

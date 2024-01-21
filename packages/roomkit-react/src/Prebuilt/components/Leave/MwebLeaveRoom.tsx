@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
@@ -11,19 +10,19 @@ import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
 import { LeaveSessionContent } from './LeaveSessionContent';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
-  screenType,
   endRoom,
 }: {
   leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
-  screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
+  const { screenType } = useRoomLayoutConferencingScreen();
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
