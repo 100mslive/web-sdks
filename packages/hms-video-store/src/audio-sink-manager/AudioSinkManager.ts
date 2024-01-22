@@ -269,11 +269,15 @@ export class AudioSinkManager {
     if (this.audioSink?.children.length === 0) {
       let bluetoothDevice: InputDeviceInfo | null = null;
       let speakerPhone: InputDeviceInfo | null = null;
+      let wired: InputDeviceInfo | null = null;
       let earpiece: InputDeviceInfo | null = null;
 
       for (const device of this.deviceManager.audioInput) {
         if (device.label.toLowerCase().includes('speakerphone')) {
           speakerPhone = device;
+        }
+        if (device.label.toLowerCase().includes('wired')) {
+          wired = device;
         }
         if (device.label.toLowerCase().includes('bluetooth')) {
           bluetoothDevice = device;
@@ -285,7 +289,9 @@ export class AudioSinkManager {
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
-        await localAudioTrack.setSettings({ deviceId: bluetoothDevice?.deviceId || speakerPhone?.deviceId });
+        await localAudioTrack.setSettings({
+          deviceId: bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId,
+        });
       }
     }
   };
