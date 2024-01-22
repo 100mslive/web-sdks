@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
-import { Box, Flex, Slider, Video } from '../../../index';
+import { Box, Button, Flex, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -26,6 +26,7 @@ import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
+const presets = ['lightning', 'speed', 'quality', 'balanced'];
 
 export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -45,6 +46,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
     (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
   );
+  const [preset, setPreset] = useState(VBHandler.getPreset() || 'lightning');
+
   const mediaList = backgroundMedia.length
     ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
@@ -148,6 +151,21 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             max={1}
           />
         ) : null}
+
+        <Flex css={{ gap: '$2', mt: '$4' }}>
+          {presets.map(presetString => (
+            <Button
+              key={presetString}
+              variant={presetString === preset ? 'primary' : 'standard'}
+              onClick={() => {
+                VBHandler.setPreset(presetString);
+                setPreset(presetString);
+              }}
+            >
+              {presetString}
+            </Button>
+          ))}
+        </Flex>
 
         <VBCollection
           title="Backgrounds"

@@ -34,6 +34,16 @@ export class VBPlugin {
     }
   };
 
+  setPreset = (preset: string) => {
+    if (this.effectsPlugin) {
+      this.effectsPlugin.setPreset(preset);
+    }
+  };
+
+  getPreset = () => {
+    return this.effectsPlugin?.getPreset() || '';
+  };
+
   getVBObject = () => {
     return this.effectsPlugin || this.hmsPlugin;
   };

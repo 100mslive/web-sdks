@@ -11,6 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
+  private preset = 'lightning';
 
   constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
@@ -73,12 +74,22 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     return this.background || this.backgroundType;
   }
 
+  setPreset(preset: string) {
+    console.log('preset updated to', preset);
+    this.preset = preset;
+    this.effects.setSegmentationPreset(this.preset);
+  }
+
+  getPreset() {
+    return this.preset;
+  }
+
   apply(stream: MediaStream): MediaStream {
     this.effects.onReady = () => {
       if (this.effects) {
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset('lightning');
+        this.effects.setSegmentationPreset(this.preset);
         // Also ranges from 0 to 1
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
