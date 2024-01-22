@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import {
+  selectIsInPreview,
   selectLocalPeerName,
   selectLocalPeerRoleName,
   selectRoleChangeRequest,
@@ -20,6 +21,7 @@ import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 export const RoleChangeRequestModal = () => {
   const hmsActions = useHMSActions();
   const { updateMetaData } = useMyMetadata();
+  const isPreview = useHMSStore(selectIsInPreview);
   const currentRole = useHMSStore(selectLocalPeerRoleName);
   const roleChangeRequest = useHMSStore(selectRoleChangeRequest);
   const name = useHMSStore(selectLocalPeerName);
@@ -87,6 +89,7 @@ export const RoleChangeRequestModal = () => {
         await hmsActions.lowerLocalPeerHand();
       }}
       actionText="Accept"
+      disableActions={!isPreview}
     />
   );
 };
