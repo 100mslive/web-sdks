@@ -8,7 +8,7 @@ export type HMSEffectsBackground = string | MediaStream | MediaStreamTrack | HTM
 export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private effects: tsvb;
   // Ranges from 0 to 1
-  blurAmount = 0;
+  private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
 
@@ -63,6 +63,13 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.removeBlur();
     this.backgroundType = HMSVirtualBackgroundTypes.IMAGE;
     this.effects.setBackground(url);
+  }
+
+  getBlurAmount() {
+    if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
+      return this.blurAmount;
+    }
+    return 0;
   }
 
   getBackground() {

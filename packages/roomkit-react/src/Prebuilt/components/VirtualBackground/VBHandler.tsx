@@ -19,8 +19,18 @@ export class VBPlugin {
     if (this.effectsPlugin) {
       return this.effectsPlugin?.getBackground();
     } else {
+      const background = this.hmsPlugin?.getBackground();
       // @ts-ignore
-      return this.hmsPlugin?.background?.src || this.hmsPlugin?.background;
+      return background?.src || background;
+    }
+  };
+
+  getBlurAmount = () => {
+    if (this.effectsPlugin) {
+      return this.effectsPlugin.getBlurAmount();
+    } else {
+      // Treating HMS VB intensity as a fixed value
+      return this.hmsPlugin?.getBackground() === HMSVirtualBackgroundTypes.BLUR ? 1 : 0;
     }
   };
 

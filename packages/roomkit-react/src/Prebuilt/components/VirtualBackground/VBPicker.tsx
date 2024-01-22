@@ -36,8 +36,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
-  // @ts-ignore
-  const [blurAmount, setBlurAmount] = useState(VBHandler.getVBObject()?.blurAmount || 0.5);
+  const [blurAmount, setBlurAmount] = useState(VBHandler.getBlurAmount() || 0.5);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
