@@ -264,13 +264,28 @@ export class AudioSinkManager {
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
+  // eslint-disable-next-line complexity
   private autoSelectAudioOutput = async () => {
     if (this.audioSink?.children.length === 0) {
-      const device = this.deviceManager.audioInput?.find(device => device.label.includes('earpiece'));
+      let bluetoothDevice: InputDeviceInfo | null = null;
+      let speakerPhone: InputDeviceInfo | null = null;
+      let earpiece: InputDeviceInfo | null = null;
+
+      for (const device of this.deviceManager.audioInput) {
+        if (device.label.toLowerCase().includes('speakerphone')) {
+          speakerPhone = device;
+        }
+        if (device.label.toLowerCase().includes('bluetooth')) {
+          bluetoothDevice = device;
+        }
+        if (device.label.toLowerCase().includes('earpiece')) {
+          earpiece = device;
+        }
+      }
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
-      if (localAudioTrack && device) {
-        await localAudioTrack.setSettings({ deviceId: device?.deviceId });
-        await localAudioTrack.setSettings({ deviceId: 'default' });
+      if (localAudioTrack && earpiece) {
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
+        await localAudioTrack.setSettings({ deviceId: bluetoothDevice?.deviceId || speakerPhone?.deviceId });
       }
     }
   };
