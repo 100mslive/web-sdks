@@ -66,10 +66,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   }
 
   getBlurAmount() {
-    if (this.backgroundType === HMSVirtualBackgroundTypes.BLUR) {
-      return this.blurAmount;
-    }
-    return 0;
+    return this.blurAmount;
   }
 
   getBackground() {
