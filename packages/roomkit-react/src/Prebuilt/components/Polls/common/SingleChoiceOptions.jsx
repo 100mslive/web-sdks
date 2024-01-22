@@ -9,7 +9,6 @@ import { VoteProgress } from './VoteProgress';
 export const SingleChoiceOptions = ({
   questionIndex,
   options,
-  response,
   canRespond,
   setAnswer,
   totalResponses,
@@ -18,9 +17,10 @@ export const SingleChoiceOptions = ({
   isStopped,
   isQuiz,
   localPeerResponse,
+  answer,
 }) => {
   return (
-    <RadioGroup.Root value={response?.option} onValueChange={value => setAnswer(value)}>
+    <RadioGroup.Root value={answer || null} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (
@@ -65,8 +65,10 @@ export const SingleChoiceOptions = ({
 
               <Flex direction="column" css={{ flexGrow: '1' }}>
                 <Flex css={{ w: '100%' }}>
-                  <Text css={{ display: 'flex', flexGrow: '1' }}>
-                    <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
+                  <Text css={{ display: 'flex', flexGrow: '1', color: '$on_surface_high' }}>
+                    <Label style={{ color: 'inherit' }} htmlFor={`${questionIndex}-${option.index}`}>
+                      {option.text}
+                    </Label>
                   </Text>
                   {showVoteCount && <VoteCount voteCount={option.voteCount} />}
                 </Flex>

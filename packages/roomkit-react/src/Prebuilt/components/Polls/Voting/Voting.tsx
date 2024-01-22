@@ -23,6 +23,8 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
   const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
   const { setPollView } = usePollViewState();
+  // Sets view - linear or vertical, toggles timer indicator
+  const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
 
   if (!poll) {
     return null;
@@ -30,8 +32,6 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
   const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 
-  // Sets view - linear or vertical, toggles timer indicator
-  const isTimed = (poll.duration || 0) > 0;
   const isLive = poll.state === 'started';
 
   return (
@@ -74,7 +74,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           </Text>
         ) : null}
 
-        {isTimed ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
+        {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
 
         {poll.state === 'started' && isLocalPeerCreator && (
           <Button

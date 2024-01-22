@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
-import { Box, Flex, Video } from '../../../index';
+import { Box, Flex, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -36,6 +36,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
+  const [blurAmount, setBlurAmount] = useState(0.5);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
@@ -127,13 +128,26 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => {
-                await VBHandler?.setBlur(0.5);
+                await VBHandler?.setBlur(blurAmount);
                 setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
               },
             },
           ]}
           activeBackground={activeBackground}
         />
+
+        {activeBackground === HMSVirtualBackgroundTypes.BLUR ? (
+          <Slider
+            value={[blurAmount]}
+            onValueChange={async e => {
+              setBlurAmount(e[0]);
+              await VBHandler.setBlur(e[0]);
+            }}
+            step={0.1}
+            min={0.1}
+            max={1}
+          />
+        ) : null}
 
         <VBCollection
           title="Backgrounds"
