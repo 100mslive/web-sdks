@@ -2,12 +2,12 @@ import React from 'react';
 import { TrackWithPeerAndDimensions } from '@100mslive/react-sdk';
 import { Box, Flex } from '../../../Layout';
 import { CSS } from '../../../Theme';
+import { LayoutMode } from '../Settings/LayoutSettings';
 // @ts-ignore: No implicit Any
 import VideoTile from '../VideoTile';
 // @ts-ignore: No implicit Any
 import { useUISettings } from '../AppData/useUISettings';
 import { useVideoTileContext } from '../hooks/useVideoTileLayout';
-import { LayoutMode } from '../Settings/common';
 import { UI_SETTINGS } from '../../common/constants';
 
 const Root = ({ children, edgeToEdge }: React.PropsWithChildren<{ edgeToEdge?: boolean }>) => {

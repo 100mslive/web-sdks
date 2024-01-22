@@ -9,13 +9,13 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { LayoutMode } from '../Settings/LayoutSettings';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from './useSidepane';
 // @ts-ignore
 import { useSetAppDataByKey } from './useUISettings';
-import { LayoutMode } from '../Settings/common';
 import {
   APP_DATA,
   CHAT_SELECTOR,

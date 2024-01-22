@@ -6,11 +6,11 @@ import { Pagination } from '../Pagination';
 // @ts-ignore: No implicit Any
 import ScreenshareTile from '../ScreenshareTile';
 import { SecondaryTiles } from '../SecondaryTiles';
+import { LayoutMode } from '../Settings/LayoutSettings';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
 import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
-import { LayoutMode } from '../Settings/common';
 import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {

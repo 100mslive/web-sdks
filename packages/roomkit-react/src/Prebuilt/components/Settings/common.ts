@@ -41,9 +41,3 @@ export const settingsList = [
     content: LayoutSettings,
   },
 ];
-
-export const LayoutMode: Record<string, string> = {
-  SIDEBAR: 'Sidebar',
-  GALLERY: 'Gallery',
-  SPOTLIGHT: 'Spotlight',
-};

@@ -1,11 +1,26 @@
 import React, { useCallback } from 'react';
 import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { GalleryIcon, PersonRectangleIcon, SidebarIcon } from '@100mslive/react-icons';
 import { Box, Flex, Label, RadioGroup, Slider, Text } from '../../..';
 import SwitchWithLabel from './SwitchWithLabel';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
-import { LayoutMode, settingOverflow } from './common';
+import { settingOverflow } from './common';
 import { UI_SETTINGS } from '../../common/constants';
+
+export const LayoutMode = {
+  SIDEBAR: 'Sidebar',
+  GALLERY: 'Gallery',
+  SPOTLIGHT: 'Spotlight',
+};
+
+export type LayoutModeKeys = keyof typeof LayoutMode;
+
+const LayoutModeIconMapping = {
+  GALLERY: <GalleryIcon />,
+  SIDEBAR: <SidebarIcon />,
+  SPOTLIGHT: <PersonRectangleIcon />,
+};
 
 export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
@@ -31,6 +46,7 @@ export const LayoutSettings = () => {
           Layout Modes
         </Text>
         <RadioGroup.Root
+          css={{ flexDirection: 'column', alignItems: 'start', gap: '$10' }}
           value={layoutMode}
           onValueChange={value =>
             setUISettings({
@@ -40,11 +56,12 @@ export const LayoutSettings = () => {
         >
           {Object.keys(LayoutMode).map(key => {
             return (
-              <Flex align="center" key={key} css={{ mr: '$8' }}>
-                <RadioGroup.Item value={LayoutMode[key]} id="layoutMode" css={{ mr: '$4' }}>
+              <Flex align="center" key={key} css={{ mr: '$8', gap: '$4' }}>
+                <RadioGroup.Item value={LayoutMode[key as LayoutModeKeys]} id="layoutMode" css={{ mr: '$4' }}>
                   <RadioGroup.Indicator />
                 </RadioGroup.Item>
-                <Label htmlFor="layoutMode">{LayoutMode[key]}</Label>
+                {LayoutModeIconMapping[key as LayoutModeKeys]}
+                <Label htmlFor="layoutMode">{LayoutMode[key as LayoutModeKeys]}</Label>
               </Flex>
             );
           })}

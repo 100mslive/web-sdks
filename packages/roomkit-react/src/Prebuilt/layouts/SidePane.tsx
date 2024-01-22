@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
-import { LayoutMode } from '../components/Settings/common';
+import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
