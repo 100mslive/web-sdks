@@ -3,11 +3,13 @@ import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import {
+  HMSNotificationTypes,
   selectAppData,
   selectHLSState,
   selectPeerNameByID,
   selectPollByID,
   useHMSActions,
+  useHMSNotifications,
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
@@ -30,12 +32,14 @@ import { usePollViewToggle } from '../components/AppData/useSidepane';
 import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
 
 let hlsPlayer;
+const toastMap = {};
 
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
+  const notification = useHMSNotifications(HMSNotificationTypes.POLL_STOPPED);
   const hmsActions = useHMSActions();
   const { themeType, theme } = useTheme();
   const [streamEnded, setStreamEnded] = useState(false);
@@ -86,6 +90,15 @@ const HLSView = () => {
   }, [hlsUrl, streamEnded, lastHlsUrl]);
 
   useEffect(() => {
+    if (!notification) return;
+    const toastID = toastMap?.[notification.data.id];
+    if (toastID) {
+      ToastManager.removeToast(toastMap[notification.data.id]);
+      delete toastMap[notification.data.id];
+    }
+  }, [notification]);
+
+  useEffect(() => {
     const videoElem = videoRef.current;
     const setStreamEndedCallback = () => {
       setStreamEnded(true);
@@ -126,7 +139,7 @@ const HLSView = () => {
         const poll = vanillaStore.getState(selectPollByID(pollId));
         const pollStartedBy = vanillaStore.getState(selectPeerNameByID(poll.startedBy)) || 'Participant';
         // launch poll
-        ToastManager.addToast({
+        const toastID = ToastManager.addToast({
           title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
           action: (
             <Button
@@ -142,7 +155,9 @@ const HLSView = () => {
               {poll.type === 'quiz' ? 'Answer' : 'Vote'}
             </Button>
           ),
+          duration: Infinity,
         });
+        toastMap[pollId] = toastID;
         return;
       }
       switch (parsedPayload.type) {
