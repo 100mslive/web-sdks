@@ -145,6 +145,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
     }
   }
 
+  getBackground() {
+    return this.background;
+  }
+
   stop(): void {
     if (this.backgroundType !== HMSVirtualBackgroundTypes.BLUR && this.background !== HMSVirtualBackgroundTypes.NONE) {
       this.segmentation?.reset();

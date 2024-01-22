@@ -65,6 +65,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.setBackground(url);
   }
 
+  getBlurAmount() {
+    return this.blurAmount;
+  }
+
   getBackground() {
     return this.background || this.backgroundType;
   }
