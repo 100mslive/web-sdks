@@ -3,7 +3,7 @@ import { AlertOctagonIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@10
 import { Box } from '../../../';
 import SwitchWithLabel from './SwitchWithLabel';
 import { useSetSubscribedNotifications, useSubscribedNotifications } from '../AppData/useUISettings';
-import { settingOverflow } from './common.js';
+import { settingOverflow } from './common';
 import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
 const NotificationItem = ({ type, label, icon, checked }) => {

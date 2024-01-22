@@ -9,7 +9,7 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { settingContent, settingsList } from './common.js';
+import { settingContent, settingsList } from './common';
 
 const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
