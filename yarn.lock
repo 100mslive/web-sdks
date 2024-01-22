@@ -17289,6 +17289,11 @@ xmlchars@^2.2.0:
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
 
+xstate@^5.5.1:
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/xstate/-/xstate-5.5.1.tgz#279ee1a8c537278e5cae414964938ade045f6f2b"
+  integrity sha512-12Was43pPJKg3JWoelOREtTNYgFz6tRlNrMaRuqOibEe3pn8/uOWiP8ySMfOynyIjHUxd4BU7wV9O54Ma3FM6g==
+
 xtend@~4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
