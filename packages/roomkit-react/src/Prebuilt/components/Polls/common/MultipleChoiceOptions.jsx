@@ -10,7 +10,6 @@ export const MultipleChoiceOptions = ({
   questionIndex,
   options,
   canRespond,
-  response,
   totalResponses,
   selectedOptions,
   setSelectedOptions,
@@ -39,7 +38,7 @@ export const MultipleChoiceOptions = ({
               <Checkbox.Root
                 id={`${questionIndex}-${option.index}`}
                 disabled={!canRespond}
-                checked={response?.options?.includes(option.index)}
+                checked={localPeerResponse?.options?.includes(option.index)}
                 onCheckedChange={checked => handleCheckedChange(checked, option.index)}
                 css={{
                   cursor: canRespond ? 'pointer' : 'not-allowed',

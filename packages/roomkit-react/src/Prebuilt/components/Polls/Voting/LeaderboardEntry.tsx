@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircleIcon, TrophyFilledIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon, ClockIcon, TrophyFilledIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Text } from '../../../../Text';
 
@@ -12,6 +12,7 @@ export const LeaderboardEntry = ({
   correctResponses,
   userName,
   maxPossibleScore,
+  duration,
 }: {
   position: number;
   score: number;
@@ -19,6 +20,7 @@ export const LeaderboardEntry = ({
   correctResponses: number;
   userName: string;
   maxPossibleScore: number;
+  duration: number;
 }) => {
   return (
     <Flex align="center" justify="between" css={{ my: '$4' }}>
@@ -49,13 +51,23 @@ export const LeaderboardEntry = ({
           </Text>
         </Box>
       </Flex>
+
       <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
         {position === 1 ? <TrophyFilledIcon height={16} width={16} /> : null}
-        <CheckCircleIcon height={16} width={16} />
         {questionCount ? (
-          <Text variant="xs">
-            {correctResponses} / {questionCount}
-          </Text>
+          <>
+            <CheckCircleIcon height={16} width={16} />
+            <Text variant="xs">
+              {correctResponses}/{questionCount}
+            </Text>
+          </>
+        ) : null}
+
+        {duration ? (
+          <Flex align="center" css={{ gap: '$2', color: '$on_surface_medium' }}>
+            <ClockIcon height={16} width={16} />
+            <Text variant="xs">{(duration / 1000).toFixed(3)}s</Text>
+          </Flex>
         ) : null}
       </Flex>
     </Flex>

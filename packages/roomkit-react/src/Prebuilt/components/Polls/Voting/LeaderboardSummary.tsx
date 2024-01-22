@@ -86,6 +86,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
                 correctResponses={question.correctResponses}
                 userName={question.peer.username || ''}
                 maxPossibleScore={maxPossibleScore}
+                duration={question.duration}
               />
             ))}
         {quizLeaderboard?.entries?.length > 5 && !viewAllEntries ? (

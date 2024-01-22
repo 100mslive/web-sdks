@@ -143,8 +143,8 @@ const StyledButton = styled('button', {
         '$secondary_bright',
         '$secondary_dim',
         '$secondary_disabled',
-        '$on_surface_high',
-        '$on_surface_low',
+        '$on_secondary_high',
+        '$on_secondary_low',
       ),
       danger: getButtonVariants(
         '$alert_error_default',
