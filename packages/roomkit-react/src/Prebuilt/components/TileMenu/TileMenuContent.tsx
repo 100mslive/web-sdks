@@ -314,7 +314,12 @@ export const TileMenuContent = ({
               Volume ({volume})
             </Box>
           </Flex>
-          <Slider css={{ my: '0.5rem' }} step={5} value={[volume || 100]} onValueChange={e => setVolume?.(e[0])} />
+          <Slider
+            css={{ my: '0.5rem' }}
+            step={5}
+            value={[typeof volume === 'number' ? volume : 100]}
+            onValueChange={e => setVolume?.(e[0])}
+          />
         </StyledMenuTile.VolumeItem>
       ) : null}
 
