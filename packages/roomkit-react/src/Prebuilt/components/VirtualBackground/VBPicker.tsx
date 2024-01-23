@@ -136,7 +136,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           activeBackground={activeBackground}
         />
 
-        {activeBackground === HMSVirtualBackgroundTypes.BLUR ? (
+        {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
           <Slider
             value={[blurAmount]}
             onValueChange={async e => {
