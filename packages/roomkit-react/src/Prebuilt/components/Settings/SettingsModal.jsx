@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
-import { ChevronLeftIcon, CrossIcon } from '@100mslive/react-icons';
+import { ChevronLeftIcon, CrossIcon, GridFourIcon, NotificationsIcon, SettingsIcon } from '@100mslive/react-icons';
 import { HorizontalDivider } from '../../../Divider';
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
@@ -9,7 +9,31 @@ import { Sheet } from '../../../Sheet';
 import { Tabs } from '../../../Tabs';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { settingContent, settingsList } from './common';
+import DeviceSettings from './DeviceSettings';
+import { LayoutSettings } from './LayoutSettings';
+import { NotificationSettings } from './NotificationSettings';
+import { settingContent } from './common';
+
+const settingsList = [
+  {
+    tabName: 'devices',
+    title: 'Device Settings',
+    icon: SettingsIcon,
+    content: DeviceSettings,
+  },
+  {
+    tabName: 'notifications',
+    title: 'Notifications',
+    icon: NotificationsIcon,
+    content: NotificationSettings,
+  },
+  {
+    tabName: 'layout',
+    title: 'Layout',
+    icon: GridFourIcon,
+    content: LayoutSettings,
+  },
+];
 
 const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => {
   const mediaQueryLg = cssConfig.media.md;
@@ -53,8 +77,9 @@ const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => 
       showSetting={showSetting}
       hideSettingByTabName={hideSettingByTabName}
       resetSelection={resetSelection}
-      children={children}
-    />
+    >
+      {children}
+    </MobileSettingModal>
   ) : (
     <DesktopSettingModal
       open={open}
@@ -64,8 +89,9 @@ const SettingsModal = ({ open, onOpenChange, screenType, children = <></> }) => 
       showSetting={showSetting}
       hideSettingByTabName={hideSettingByTabName}
       resetSelection={resetSelection}
-      children={children}
-    />
+    >
+      {children}
+    </DesktopSettingModal>
   );
 };
 
@@ -238,6 +264,7 @@ const DesktopSettingModal = ({
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ content: Content, title, tabName }) => {
+                    console.log({ tabName, Content });
                     return (
                       <Tabs.Content key={tabName} value={tabName} className={settingContent()}>
                         <SettingsContentHeader onBack={resetSelection} isMobile={false}>

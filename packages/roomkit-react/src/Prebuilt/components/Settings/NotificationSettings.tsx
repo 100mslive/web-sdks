@@ -1,12 +1,23 @@
 import React from 'react';
 import { AlertOctagonIcon, HandIcon, PeopleAddIcon, PeopleRemoveIcon } from '@100mslive/react-icons';
-import { Box } from '../../../';
+import { Box } from '../../..';
 import SwitchWithLabel from './SwitchWithLabel';
+// @ts-ignore: No implicit Any
 import { useSetSubscribedNotifications, useSubscribedNotifications } from '../AppData/useUISettings';
 import { settingOverflow } from './common';
 import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
-const NotificationItem = ({ type, label, icon, checked }) => {
+const NotificationItem = ({
+  type,
+  label,
+  icon,
+  checked,
+}: {
+  type: string;
+  label: string;
+  icon: React.ReactNode;
+  checked: boolean;
+}) => {
   const [, setSubscribedNotifications] = useSetSubscribedNotifications(type);
   return (
     <SwitchWithLabel

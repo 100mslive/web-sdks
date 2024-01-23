@@ -14,7 +14,7 @@ export const LayoutMode = {
   SPOTLIGHT: 'Spotlight',
 };
 
-export type LayoutModeKeys = keyof typeof LayoutMode;
+type LayoutModeKeys = keyof typeof LayoutMode;
 
 const LayoutModeIconMapping = {
   GALLERY: <GalleryIcon />,
@@ -46,7 +46,7 @@ export const LayoutSettings = () => {
           Layout Modes
         </Text>
         <RadioGroup.Root
-          css={{ flexDirection: 'column', alignItems: 'start', gap: '$10' }}
+          css={{ flexDirection: 'column', alignItems: 'start', gap: '$10', my: '$2', py: '$8' }}
           value={layoutMode}
           onValueChange={value =>
             setUISettings({
@@ -56,12 +56,14 @@ export const LayoutSettings = () => {
         >
           {Object.keys(LayoutMode).map(key => {
             return (
-              <Flex align="center" key={key} css={{ mr: '$8', gap: '$4' }}>
-                <RadioGroup.Item value={LayoutMode[key as LayoutModeKeys]} id="layoutMode" css={{ mr: '$4' }}>
+              <Flex align="center" key={key} css={{ mr: '$8', gap: '$8' }}>
+                <RadioGroup.Item value={LayoutMode[key as LayoutModeKeys]} id={`layoutMode-${key}`} css={{ mr: '$4' }}>
                   <RadioGroup.Indicator />
                 </RadioGroup.Item>
-                {LayoutModeIconMapping[key as LayoutModeKeys]}
-                <Label htmlFor="layoutMode">{LayoutMode[key as LayoutModeKeys]}</Label>
+                <Label htmlFor={`layoutMode-${key}`} css={{ display: 'flex', gap: '$8', cursor: 'pointer' }}>
+                  {LayoutModeIconMapping[key as LayoutModeKeys]}
+                  {LayoutMode[key as LayoutModeKeys]}
+                </Label>
               </Flex>
             );
           })}
