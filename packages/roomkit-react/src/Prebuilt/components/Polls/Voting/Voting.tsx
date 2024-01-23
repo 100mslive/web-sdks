@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  selectLocalPeerID,
   selectPeerNameByID,
+  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -21,7 +21,8 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const actions = useHMSActions();
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
-  const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
+  const permissions = useHMSStore(selectPermissions);
+  const canEndActivity = !!permissions?.pollWrite;
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
@@ -76,7 +77,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
         {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
 
-        {poll.state === 'started' && isLocalPeerCreator && (
+        {poll.state === 'started' && canEndActivity && (
           <Button
             variant="danger"
             css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
