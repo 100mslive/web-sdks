@@ -26,7 +26,7 @@ import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
 import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
-const presets = ['lightning', 'speed', 'quality', 'balanced'];
+const presets = ['lightning', 'speed', 'balanced', 'quality'];
 
 export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBackgroundMedia[] }) => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
