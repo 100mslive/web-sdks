@@ -136,7 +136,9 @@ export const QuestionCard = ({
         </Box>
       </Flex>
 
-      <Box css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'hidden' }}>
+      <Box
+        css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'auto', mb: '$4' }}
+      >
         {type === QUESTION_TYPE.SINGLE_CHOICE ? (
           <SingleChoiceOptions
             key={index}
@@ -169,19 +171,18 @@ export const QuestionCard = ({
             isStopped={pollState === 'stopped'}
           />
         ) : null}
-
-        {isLive && (
-          <QuestionActions
-            isValidVote={isValidVote}
-            onVote={handleVote}
-            response={localPeerResponse}
-            isQuiz={isQuiz}
-            incrementIndex={() => {
-              setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
-            }}
-          />
-        )}
       </Box>
+      {isLive && (
+        <QuestionActions
+          isValidVote={isValidVote}
+          onVote={handleVote}
+          response={localPeerResponse}
+          isQuiz={isQuiz}
+          incrementIndex={() => {
+            setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
+          }}
+        />
+      )}
     </Box>
   );
 };
