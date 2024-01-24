@@ -1,4 +1,4 @@
-export const getFormattedTime = (milliseconds: number) => {
+export const getFormattedTime = (milliseconds: number | undefined) => {
   if (!milliseconds) return '-';
   const totalSeconds = milliseconds / 1000;
   const minutes = Math.floor(totalSeconds / 60);
