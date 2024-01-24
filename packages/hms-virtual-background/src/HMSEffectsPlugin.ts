@@ -37,7 +37,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   removeBlur() {
     this.blurAmount = 0;
     this.effects.clearBlur();
-    this.background = '';
   }
 
   removeBackground() {

@@ -36,7 +36,7 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
         },
       ]
     : [
-        { title: 'Your rank', value: peerEntry?.position ? `${peerEntry.position}/${summary.totalUsers}` : '-' },
+        { title: 'Your rank', value: peerEntry?.position || '-' },
         { title: 'Points', value: peerEntry?.score },
         // Time in ms
         { title: 'Time Taken', value: `${((peerEntry?.duration || 0) / 1000).toFixed(3)}s` },
