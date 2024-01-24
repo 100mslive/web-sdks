@@ -355,8 +355,8 @@ export class HMSHLSPlayer implements IHMSHLSPlayer, IHMSHLSPlayerEventEmitter {
   private getPlayerConfig(): Partial<HlsConfig> {
     return {
       enableWorker: true,
-      maxBufferLength: 20,
-      backBufferLength: 10,
+      lowLatencyMode: true,
+      backBufferLength: 90,
       abrBandWidthUpFactor: 1,
       playlistLoadPolicy: {
         default: {
