@@ -1,12 +1,16 @@
 export const getFormattedTime = (milliseconds: number | undefined) => {
   if (!milliseconds) return '-';
+
   const totalSeconds = milliseconds / 1000;
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
-  const timeString = `${minutes ? `${minutes}m ` : ''}${
-    Number.isInteger(seconds) || minutes ? seconds.toFixed(0) : seconds.toFixed(1)
-  }s`;
+  let formattedSeconds = '';
+  if (Number.isInteger(seconds) || minutes) {
+    formattedSeconds = seconds.toFixed(0);
+  } else {
+    formattedSeconds = seconds.toFixed(1);
+  }
 
-  return timeString;
+  return `${minutes ? `${minutes}m ` : ''}${formattedSeconds}s`;
 };
