@@ -40,6 +40,7 @@ export const QuestionCard = ({
     roleCanViewResponse && (localPeerResponse || (isLocalPeerCreator && pollState === 'stopped')) && !isQuiz;
 
   const isLive = pollState === 'started';
+  const pollEnded = pollState === 'stopped';
   const canRespond = isLive && !localPeerResponse;
   const startTime = useRef(Date.now());
   const isCorrectAnswer = checkCorrectAnswer(answer, localPeerResponse, type);
@@ -117,8 +118,8 @@ export const QuestionCard = ({
             gap: '$4',
           }}
         >
-          {respondedToQuiz && isCorrectAnswer ? <CheckCircleIcon height={20} width={20} /> : null}
-          {respondedToQuiz && !isCorrectAnswer ? <CrossCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={20} width={20} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
       </Flex>
@@ -135,7 +136,9 @@ export const QuestionCard = ({
         </Box>
       </Flex>
 
-      <Box css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'hidden' }}>
+      <Box
+        css={{ maxHeight: showOptions ? '$80' : '0', transition: 'max-height 0.3s ease', overflowY: 'auto', mb: '$4' }}
+      >
         {type === QUESTION_TYPE.SINGLE_CHOICE ? (
           <SingleChoiceOptions
             key={index}
@@ -168,19 +171,18 @@ export const QuestionCard = ({
             isStopped={pollState === 'stopped'}
           />
         ) : null}
-
-        {isLive && (
-          <QuestionActions
-            isValidVote={isValidVote}
-            onVote={handleVote}
-            response={localPeerResponse}
-            isQuiz={isQuiz}
-            incrementIndex={() => {
-              setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
-            }}
-          />
-        )}
       </Box>
+      {isLive && (
+        <QuestionActions
+          isValidVote={isValidVote}
+          onVote={handleVote}
+          response={localPeerResponse}
+          isQuiz={isQuiz}
+          incrementIndex={() => {
+            setCurrentIndex(curr => Math.min(totalQuestions, curr + 1));
+          }}
+        />
+      )}
     </Box>
   );
 };
