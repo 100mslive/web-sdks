@@ -73,11 +73,6 @@ export const QuestionCard = ({
       },
     ]);
     startTime.current = Date.now();
-
-    if (isQuiz && index !== totalQuestions) {
-      setSingleOptionAnswer(undefined);
-      setMultipleOptionAnswer(new Set());
-    }
   }, [
     isValidVote,
     actions.interactivityCenter,
@@ -118,8 +113,8 @@ export const QuestionCard = ({
             gap: '$4',
           }}
         >
-          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={20} width={20} /> : null}
-          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={16} width={16} /> : null}
+          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={16} width={16} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
       </Flex>
@@ -152,7 +147,6 @@ export const QuestionCard = ({
             showVoteCount={showVoteCount}
             localPeerResponse={localPeerResponse}
             isStopped={pollState === 'stopped'}
-            answer={singleOptionAnswer}
           />
         ) : null}
 

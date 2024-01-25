@@ -24,7 +24,7 @@ export const LeaderboardEntry = ({
   duration: number;
 }) => {
   return (
-    <Flex align="center" justify="between" css={{ my: '$4' }}>
+    <Flex align="center" justify="between" css={{ my: '$8' }}>
       <Flex align="center" css={{ gap: '$6' }}>
         <Flex
           align="center"
