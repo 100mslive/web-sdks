@@ -147,6 +147,17 @@ export const getPeerResponses = (questions, peerid, userid) => {
   );
 };
 
+export const getLastAttemptedIndex = (questions, peerid, userid = '') => {
+  const peerResponses = getPeerResponses(questions, peerid, userid) || [];
+  for (let i = 0; i < peerResponses.length; i++) {
+    if (peerResponses[i] === undefined) {
+      // Backend question index starts at 1
+      return i + 1;
+    }
+  }
+  return 1;
+};
+
 export const getPeerParticipationSummary = (poll, localPeerID, localCustomerUserID) => {
   let correctResponses = 0;
   let score = 0;

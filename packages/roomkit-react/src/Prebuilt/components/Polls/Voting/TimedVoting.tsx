@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { HMSPoll } from '@100mslive/react-sdk';
+import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
+// @ts-ignore
+import { getLastAttemptedIndex } from '../../../common/utils';
 
 export const TimedView = ({ poll }: { poll: HMSPoll }) => {
-  // Backend question index starts at 1
-  const [currentIndex, setCurrentIndex] = useState(1);
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const lastAttemptedIndex = getLastAttemptedIndex(poll.questions, localPeerId, '');
+  const [currentIndex, setCurrentIndex] = useState(lastAttemptedIndex);
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
 
   if (!activeQuestion) {
