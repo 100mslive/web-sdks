@@ -49,6 +49,20 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
       }
     });
+
+    this.eventBus.manualDeviceChange.subscribe(({ type, deviceId, groupId }) => {
+      const inputType = type === 'video' ? 'videoInput' : type;
+      const newSelection = this[inputType].find(
+        device => this.createIdentifier(device) === this.createIdentifier({ deviceId, groupId }),
+      );
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: { [inputType]: newSelection },
+          devices: this.getDevices(),
+          type,
+        }),
+      );
+    });
   }
 
   updateOutputDevice = async (deviceId?: string) => {

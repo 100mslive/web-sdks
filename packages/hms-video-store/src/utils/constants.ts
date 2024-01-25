@@ -36,6 +36,7 @@ export const SUBSCRIBE_STATS_PUSH_INTERVAL = 60;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
+  MANUAL_DEVICE_CHANGE: 'manual-device-change',
   LOCAL_AUDIO_ENABLED: 'local-audio-enabled',
   LOCAL_VIDEO_ENABLED: 'local-video-enabled',
   STATS_UPDATE: 'stats-update', // emitted by HMSWebrtcInternals
