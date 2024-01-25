@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectPeersScreenSharing, useHMSStore } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
+import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 // @ts-ignore: No implicit Any
 import ScreenshareTile from '../ScreenshareTile';
@@ -21,6 +22,9 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   const activeSharePeer = peersSharing[page];
   const isMobile = useMedia(cssConfig.media.md);
   const secondaryPeers = useMemo(() => {
+    if (layoutMode === LayoutMode.SPOTLIGHT) {
+      return [];
+    }
     if (isMobile || layoutMode === LayoutMode.SIDEBAR) {
       return activeSharePeer
         ? [activeSharePeer, ...peers.filter(p => p.id !== activeSharePeer?.id)] //keep active sharing peer as first tile
@@ -47,6 +51,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
         onPageSize={onPageSize}
         edgeToEdge={edgeToEdge}
       />
+      {layoutMode === LayoutMode.SPOTLIGHT && activeSharePeer && <InsetTile peerId={activeSharePeer?.id} />}
     </ProminenceLayout.Root>
   );
 };
