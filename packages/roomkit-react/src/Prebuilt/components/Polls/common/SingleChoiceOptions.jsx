@@ -24,7 +24,7 @@ export const SingleChoiceOptions = ({
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (
-            <Flex align="start" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$5' }}>
+            <Flex align="start" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$4' }}>
               {!isStopped || !isQuiz ? (
                 <RadioGroup.Item
                   css={{
@@ -95,7 +95,7 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handle
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map((option, index) => {
           return (
-            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$5' }}>
+            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$4' }}>
               {isQuiz && (
                 <RadioGroup.Item
                   css={{
