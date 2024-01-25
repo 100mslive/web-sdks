@@ -59,7 +59,7 @@ export const SingleChoiceOptions = ({
 
               {isStopped && correctOptionIndex === option.index && isQuiz ? (
                 <Flex css={{ color: '$on_surface_high' }}>
-                  <CheckCircleIcon />
+                  <CheckCircleIcon height={20} width={20} />
                 </Flex>
               ) : null}
 

@@ -3,7 +3,7 @@ import { Box } from '../../../../Layout';
 import { Text } from '../../../../Text';
 
 export const StatisticBox = ({ title, value = 0 }: { title: string; value: string | number | undefined }) => {
-  if (!value) {
+  if (!value && !(typeof value === 'number')) {
     return <></>;
   }
   return (

@@ -68,7 +68,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         </Box>
       </Flex>
 
-      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto' }}>
+      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto', pb: canViewLeaderboard ? '$20' : '$8' }}>
         {poll.state === 'started' ? (
           <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
             {pollCreatorName || 'Participant'} started a {poll.type}
@@ -88,12 +88,28 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         )}
 
         {canViewLeaderboard ? (
-          <Button
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={() => setPollView(POLL_VIEWS.RESULTS)}
+          <Flex
+            css={{
+              position: 'absolute',
+              bottom: 0,
+              right: 0,
+              w: '100%',
+              borderTop: '1px solid $border_bright',
+              p: '$2',
+              bg: '$surface_dim',
+            }}
           >
-            View Leaderboard
-          </Button>
+            <Button
+              css={{
+                fontWeight: '$semiBold',
+                w: 'max-content',
+                ml: 'auto',
+              }}
+              onClick={() => setPollView(POLL_VIEWS.RESULTS)}
+            >
+              View Leaderboard
+            </Button>
+          </Flex>
         ) : null}
       </Flex>
     </Container>

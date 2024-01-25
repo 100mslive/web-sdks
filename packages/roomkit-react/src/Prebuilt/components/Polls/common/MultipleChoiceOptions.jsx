@@ -52,7 +52,7 @@ export const MultipleChoiceOptions = ({
 
             {isStopped && correctOptionIndexes?.includes(option.index) ? (
               <Flex css={{ color: '$on_surface_high' }}>
-                <CheckCircleIcon />
+                <CheckCircleIcon height={20} width={20} />
               </Flex>
             ) : null}
 
