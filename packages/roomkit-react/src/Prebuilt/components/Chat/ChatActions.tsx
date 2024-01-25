@@ -53,7 +53,7 @@ export const ChatActions = ({
   sentByLocalPeer: boolean;
   isMobile: boolean;
   openSheet: boolean;
-  setOpenSheet: (value: boolean) => void;
+  setOpenSheet: (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => void;
 }) => {
   const { elements } = useRoomLayoutConferencingScreen();
   const { can_hide_message = false, can_block_user = false } = elements?.chat?.real_time_controls || {};
@@ -174,7 +174,7 @@ export const ChatActions = ({
   if (isMobile) {
     return (
       <Sheet.Root open={openSheet} onOpenChange={setOpenSheet}>
-        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => setOpenSheet(false)}>
+        <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={e => setOpenSheet(false, e)}>
           <Sheet.Title
             css={{
               display: 'flex',
@@ -190,7 +190,7 @@ export const ChatActions = ({
             }}
           >
             Message options
-            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => setOpenSheet(false)}>
+            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={e => setOpenSheet(false, e)}>
               <CrossIcon />
             </Sheet.Close>
           </Sheet.Title>
