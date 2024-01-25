@@ -12,46 +12,33 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
   const attemptedAll = poll.questions?.length === lastAttemptedIndex - 1;
 
-  if (!activeQuestion) {
+  if (!activeQuestion || !poll.questions?.length) {
     return null;
   }
 
-  return poll.questions?.map(question => {
-    return attemptedAll || activeQuestion.index === question.index ? (
-      <QuestionCard
-        pollID={poll.id}
-        isQuiz={poll.type === 'quiz'}
-        startedBy={poll.startedBy}
-        pollState={poll.state}
-        index={question.index}
-        text={question.text}
-        type={question.type}
-        result={question?.result}
-        totalQuestions={poll.questions?.length || 0}
-        options={question.options}
-        responses={question.responses}
-        answer={question.answer}
-        setCurrentIndex={setCurrentIndex}
-        rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
-      />
-    ) : null;
-  });
+  return (
+    <>
+      {poll.questions.map(question => {
+        return attemptedAll || activeQuestion.index === question.index ? (
+          <QuestionCard
+            key={question.index}
+            pollID={poll.id}
+            isQuiz={poll.type === 'quiz'}
+            startedBy={poll.startedBy}
+            pollState={poll.state}
+            index={question.index}
+            text={question.text}
+            type={question.type}
+            result={question?.result}
+            totalQuestions={poll.questions?.length || 0}
+            options={question.options}
+            responses={question.responses}
+            answer={question.answer}
+            setCurrentIndex={setCurrentIndex}
+            rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
+          />
+        ) : null;
+      })}
+    </>
+  );
 };
-// ) : (
-//   <QuestionCard
-//     pollID={poll.id}
-//     isQuiz={poll.type === 'quiz'}
-//     startedBy={poll.startedBy}
-//     pollState={poll.state}
-//     index={activeQuestion.index}
-//     text={activeQuestion.text}
-//     type={activeQuestion.type}
-//     result={activeQuestion?.result}
-//     totalQuestions={poll.questions?.length || 0}
-//     options={activeQuestion.options}
-//     responses={activeQuestion.responses}
-//     answer={activeQuestion.answer}
-//     setCurrentIndex={setCurrentIndex}
-//     rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
-//   />
-// );
