@@ -150,7 +150,7 @@ export const getPeerResponses = (questions, peerid, userid) => {
 export const getLastAttemptedIndex = (questions, peerid, userid = '') => {
   const peerResponses = getPeerResponses(questions, peerid, userid) || [];
   for (let i = 0; i < peerResponses.length; i++) {
-    if (peerResponses[i] === undefined) {
+    if (peerResponses[i] === undefined || peerResponses[i].length === 0) {
       // Backend question index starts at 1
       return i + 1;
     }
