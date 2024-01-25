@@ -53,7 +53,7 @@ const SecondarySection = ({
       css={{
         display: 'grid',
         margin: 'auto',
-        gap: '$2 $4',
+        gap: hasSidebar ? '$8' : '$2 $4',
         placeItems: 'center',
         ...gridStyles,
         '@md': { gap: edgeToEdge ? 0 : '$4' },

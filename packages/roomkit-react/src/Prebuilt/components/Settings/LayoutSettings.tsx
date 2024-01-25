@@ -14,9 +14,9 @@ export const LayoutMode = {
   SPOTLIGHT: 'Spotlight',
 };
 
-type LayoutModeKeys = keyof typeof LayoutMode;
+export type LayoutModeKeys = keyof typeof LayoutMode;
 
-const LayoutModeIconMapping = {
+export const LayoutModeIconMapping = {
   GALLERY: <GalleryIcon />,
   SIDEBAR: <SidebarIcon />,
   SPOTLIGHT: <PersonRectangleIcon />,

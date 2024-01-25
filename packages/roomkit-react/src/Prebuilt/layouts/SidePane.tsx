@@ -62,7 +62,6 @@ const SidePane = ({
   if (!ViewComponent && (!trackId || layoutMode !== LayoutMode.GALLERY)) {
     return null;
   }
-
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
     roundedVideoTile: tileProps?.rounded_video_tile,

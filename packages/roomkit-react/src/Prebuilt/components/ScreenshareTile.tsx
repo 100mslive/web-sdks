@@ -9,12 +9,17 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
+// @ts-ignore: No implicit Any
 import TileMenu from './TileMenu/TileMenu';
+import { Box } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
+import { LayoutModeSelector } from './LayoutModeSelector';
+// @ts-ignore: No implicit Any
 import { getVideoTileLabel } from './peerTileUtils';
 import { ScreenshareDisplay } from './ScreenshareDisplay';
+// @ts-ignore: No implicit Any
 import { useUISettings } from './AppData/useUISettings';
 import { UI_SETTINGS } from '../common/constants';
 
@@ -27,7 +32,7 @@ const labelStyles = {
   flexShrink: 0,
 };
 
-const Tile = ({ peerId, width = '100%', height = '100%' }) => {
+const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; width?: string; height?: string }) => {
   const isLocal = useHMSStore(selectLocalPeerID) === peerId;
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
   const peer = useHMSStore(selectPeerByID(peerId));
@@ -44,7 +49,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
 
-  if (isLocal && !['browser', 'window', 'application'].includes(track?.displaySurface)) {
+  if (isLocal && track?.displaySurface && !['browser', 'window', 'application'].includes(track?.displaySurface)) {
     return <ScreenshareDisplay />;
   }
 
@@ -77,10 +82,21 @@ const Tile = ({ peerId, width = '100%', height = '100%' }) => {
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
+        <Box
+          css={{
+            position: 'absolute',
+            top: '$2',
+            right: isFullScreenSupported && isMouseHovered ? '$12' : '$2',
+            zIndex: 5,
+          }}
+        >
+          <LayoutModeSelector />
+        </Box>
+
         {track ? (
           <Video
             screenShare={true}
-            mirror={peer.isLocal && track?.source === 'regular'}
+            mirror={peer.isLocal}
             attach={!isAudioOnly}
             trackId={track.id}
             css={{ minHeight: 0 }}
