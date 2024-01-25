@@ -17,9 +17,9 @@ export const LayoutMode = {
 export type LayoutModeKeys = keyof typeof LayoutMode;
 
 export const LayoutModeIconMapping = {
-  GALLERY: <GalleryIcon />,
-  SIDEBAR: <SidebarIcon />,
-  SPOTLIGHT: <PersonRectangleIcon />,
+  [LayoutMode.GALLERY]: <GalleryIcon />,
+  [LayoutMode.SIDEBAR]: <SidebarIcon />,
+  [LayoutMode.SPOTLIGHT]: <PersonRectangleIcon />,
 };
 
 export const LayoutSettings = () => {
@@ -39,6 +39,7 @@ export const LayoutSettings = () => {
     [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings],
   );
 
+  console.log({ layoutMode });
   return (
     <Box className={settingOverflow()}>
       <Box>
@@ -61,7 +62,7 @@ export const LayoutSettings = () => {
                   <RadioGroup.Indicator />
                 </RadioGroup.Item>
                 <Label htmlFor={`layoutMode-${key}`} css={{ display: 'flex', gap: '$8', cursor: 'pointer' }}>
-                  {LayoutModeIconMapping[key as LayoutModeKeys]}
+                  {LayoutModeIconMapping[LayoutMode[key as LayoutModeKeys]]}
                   {LayoutMode[key as LayoutModeKeys]}
                 </Label>
               </Flex>

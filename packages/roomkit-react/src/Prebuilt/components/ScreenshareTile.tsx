@@ -13,6 +13,7 @@ import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
 import TileMenu from './TileMenu/TileMenu';
 import { Box } from '../../Layout';
 import { VideoTileStats } from '../../Stats';
+import { useTheme } from '../../Theme';
 import { Video } from '../../Video';
 import { StyledVideoTile } from '../../VideoTile';
 import { LayoutModeSelector } from './LayoutModeSelector';
@@ -35,6 +36,7 @@ const labelStyles = {
 const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; width?: string; height?: string }) => {
   const isLocal = useHMSStore(selectLocalPeerID) === peerId;
   const track = useHMSStore(selectScreenShareByPeerID(peerId));
+  const { theme } = useTheme();
   const peer = useHMSStore(selectPeerByID(peerId));
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
@@ -64,13 +66,21 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   });
 
   return (
-    <StyledVideoTile.Root css={{ width, height, p: 0, minHeight: 0 }} data-testid="screenshare_tile">
+    <StyledVideoTile.Root
+      css={{
+        width,
+        height,
+        p: 0,
+        minHeight: 0,
+      }}
+      data-testid="screenshare_tile"
+    >
       <StyledVideoTile.Container
         transparentBg
         ref={fullscreenRef}
         css={{ flexDirection: 'column', gap: '$2' }}
-        onMouseEnter={() => setIsMouseHovered(true)}
-        onMouseLeave={() => {
+        onMouseOver={() => setIsMouseHovered(true)}
+        onMouseOut={() => {
           setIsMouseHovered(false);
         }}
       >
@@ -78,7 +88,10 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
           <VideoTileStats audioTrackID={audioTrack?.id} videoTrackID={track?.id} peerID={peerId} isLocal={isLocal} />
         ) : null}
         {isFullScreenSupported && isMouseHovered ? (
-          <StyledVideoTile.FullScreenButton onClick={() => setFullscreen(!fullscreen)}>
+          <StyledVideoTile.FullScreenButton
+            css={{ bg: `${theme.colors.background_dim.value}A3` }}
+            onClick={() => setFullscreen(!fullscreen)}
+          >
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
@@ -86,8 +99,11 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
           css={{
             position: 'absolute',
             top: '$2',
-            right: isFullScreenSupported && isMouseHovered ? '$12' : '$2',
+            r: '$1',
+            h: '$14',
+            right: isFullScreenSupported && isMouseHovered ? '$17' : '$2',
             zIndex: 5,
+            bg: `${theme.colors.background_dim.value}A3`,
           }}
         >
           <LayoutModeSelector />
