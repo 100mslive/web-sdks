@@ -33,7 +33,7 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
         { title: 'Avg. Time Taken', value: getFormattedTime(summary.avgTime) },
         {
           title: 'Avg. Score',
-          value: Number.isInteger(summary.avgScore) ? summary.avgScore : summary.avgScore.toFixed(2) || 0,
+          value: Number.isInteger(summary.avgScore) ? summary.avgScore : summary.avgScore.toFixed(2),
         },
       ]
     : [
