@@ -6,7 +6,7 @@ import { config as cssConfig } from '../../Theme';
 import { Pagination } from './Pagination';
 import { usePagesWithTiles } from './hooks/useTileLayout';
 
-export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {
+export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, hasSidebar }: LayoutProps) => {
   const isMobile = useMedia(cssConfig.media.md);
   const maxTileCount = isMobile ? 2 : 4;
   const pagesWithTiles = usePagesWithTiles({ peers, maxTileCount });
@@ -20,7 +20,7 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge }: 
   }, [pageSize, onPageSize]);
 
   return (
-    <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]} edgeToEdge={edgeToEdge}>
+    <ProminenceLayout.SecondarySection tiles={pagesWithTiles[page]} edgeToEdge={edgeToEdge} hasSidebar={hasSidebar}>
       {!edgeToEdge && (
         <Pagination
           page={page}

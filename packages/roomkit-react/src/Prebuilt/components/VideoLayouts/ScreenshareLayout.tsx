@@ -40,7 +40,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
 
   return (
-    <ProminenceLayout.Root edgeToEdge={edgeToEdge}>
+    <ProminenceLayout.Root edgeToEdge={edgeToEdge} hasSidebar={layoutMode === LayoutMode.SIDEBAR}>
       <ProminenceLayout.ProminentSection>
         <ScreenshareTile peerId={peersSharing[page]?.id} />
         {!edgeToEdge && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
@@ -50,6 +50,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
         onPageChange={onPageChange}
         onPageSize={onPageSize}
         edgeToEdge={edgeToEdge}
+        hasSidebar={layoutMode === LayoutMode.SIDEBAR}
       />
       {layoutMode === LayoutMode.SPOTLIGHT && activeSharePeer && <InsetTile peerId={activeSharePeer?.id} />}
     </ProminenceLayout.Root>
