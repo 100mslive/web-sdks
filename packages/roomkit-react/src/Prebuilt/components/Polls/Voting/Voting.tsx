@@ -68,7 +68,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         </Box>
       </Flex>
 
-      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto', pb: canViewLeaderboard ? '$20' : '$8' }}>
+      <Flex direction="column" css={{ p: '$8 $10', flex: '1 1 0', overflowY: 'auto' }}>
         {poll.state === 'started' ? (
           <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
             {pollCreatorName || 'Participant'} started a {poll.type}
@@ -76,40 +76,23 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         ) : null}
 
         {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
-
+      </Flex>
+      <Flex
+        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}
+      >
         {poll.state === 'started' && canEndActivity && (
           <Button
             variant="danger"
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
+            css={{ fontWeight: '$semiBold', w: 'max-content' }}
             onClick={() => actions.interactivityCenter.stopPoll(id)}
           >
             End {poll.type}
           </Button>
         )}
-
         {canViewLeaderboard ? (
-          <Flex
-            css={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              w: '100%',
-              borderTop: '1px solid $border_bright',
-              p: '$2',
-              bg: '$surface_dim',
-            }}
-          >
-            <Button
-              css={{
-                fontWeight: '$semiBold',
-                w: 'max-content',
-                ml: 'auto',
-              }}
-              onClick={() => setPollView(POLL_VIEWS.RESULTS)}
-            >
-              View Leaderboard
-            </Button>
-          </Flex>
+          <Button css={{ fontWeight: '$semiBold', w: 'max-content' }} onClick={() => setPollView(POLL_VIEWS.RESULTS)}>
+            View Leaderboard
+          </Button>
         ) : null}
       </Flex>
     </Container>

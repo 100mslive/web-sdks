@@ -17,10 +17,9 @@ export const SingleChoiceOptions = ({
   isStopped,
   isQuiz,
   localPeerResponse,
-  answer,
 }) => {
   return (
-    <RadioGroup.Root value={answer || null} onValueChange={value => setAnswer(value)}>
+    <RadioGroup.Root value={localPeerResponse?.option} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (

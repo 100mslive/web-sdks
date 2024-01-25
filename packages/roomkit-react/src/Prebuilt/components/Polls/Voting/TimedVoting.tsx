@@ -1,33 +1,44 @@
 import React, { useState } from 'react';
-import { HMSPoll } from '@100mslive/react-sdk';
+import { HMSPoll, selectLocalPeerID, useHMSStore } from '@100mslive/react-sdk';
 // @ts-ignore
 import { QuestionCard } from './QuestionCard';
+// @ts-ignore
+import { getLastAttemptedIndex } from '../../../common/utils';
 
 export const TimedView = ({ poll }: { poll: HMSPoll }) => {
-  // Backend question index starts at 1
-  const [currentIndex, setCurrentIndex] = useState(1);
+  const localPeerId = useHMSStore(selectLocalPeerID);
+  const lastAttemptedIndex = getLastAttemptedIndex(poll.questions, localPeerId, '');
+  const [currentIndex, setCurrentIndex] = useState(lastAttemptedIndex);
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
+  const attemptedAll = poll.questions?.length === lastAttemptedIndex - 1;
 
-  if (!activeQuestion) {
+  if (!activeQuestion || !poll.questions?.length) {
     return null;
   }
 
   return (
-    <QuestionCard
-      pollID={poll.id}
-      isQuiz={poll.type === 'quiz'}
-      startedBy={poll.startedBy}
-      pollState={poll.state}
-      index={activeQuestion.index}
-      text={activeQuestion.text}
-      type={activeQuestion.type}
-      result={activeQuestion?.result}
-      totalQuestions={poll.questions?.length || 0}
-      options={activeQuestion.options}
-      responses={activeQuestion.responses}
-      answer={activeQuestion.answer}
-      setCurrentIndex={setCurrentIndex}
-      rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
-    />
+    <>
+      {poll.questions.map(question => {
+        return attemptedAll || activeQuestion.index === question.index ? (
+          <QuestionCard
+            key={question.index}
+            pollID={poll.id}
+            isQuiz={poll.type === 'quiz'}
+            startedBy={poll.startedBy}
+            pollState={poll.state}
+            index={question.index}
+            text={question.text}
+            type={question.type}
+            result={question?.result}
+            totalQuestions={poll.questions?.length || 0}
+            options={question.options}
+            responses={question.responses}
+            answer={question.answer}
+            setCurrentIndex={setCurrentIndex}
+            rolesThatCanViewResponses={poll.rolesThatCanViewResponses}
+          />
+        ) : null;
+      })}
+    </>
   );
 };
