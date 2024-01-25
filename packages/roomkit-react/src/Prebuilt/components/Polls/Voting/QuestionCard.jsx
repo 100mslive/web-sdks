@@ -113,8 +113,8 @@ export const QuestionCard = ({
             gap: '$4',
           }}
         >
-          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={20} width={20} /> : null}
-          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={20} width={20} /> : null}
+          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={16} width={16} /> : null}
+          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={16} width={16} /> : null}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
       </Flex>
