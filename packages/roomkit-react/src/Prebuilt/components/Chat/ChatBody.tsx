@@ -189,7 +189,7 @@ const ChatMessage = React.memo(
       roles: message.recipientRoles,
       receiver: message.recipientPeer,
     });
-    const [openSheet, setOpenSheet] = useState(false);
+    const [openSheet, setOpenSheetBare] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
     const showReply = message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled;
     useLayoutEffect(() => {
@@ -197,6 +197,11 @@ const ChatMessage = React.memo(
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
     }, [index, message.id]);
+
+    const setOpenSheet = (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => {
+      e?.stopPropagation();
+      setOpenSheetBare(value);
+    };
 
     return (
       <Box
@@ -228,9 +233,9 @@ const ChatMessage = React.memo(
             },
           }}
           data-testid="chat_msg"
-          onClick={() => {
+          onClick={e => {
             if (isMobile) {
-              setOpenSheet(true);
+              setOpenSheet(true, e);
             }
           }}
         >
@@ -321,8 +326,7 @@ const ChatMessage = React.memo(
               color: isOverlay ? '#FFF' : '$on_surface_high',
             }}
             onClick={e => {
-              e.stopPropagation();
-              setOpenSheet(true);
+              setOpenSheet(true, e);
             }}
           >
             <AnnotisedMessage message={message.message} />
