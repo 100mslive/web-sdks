@@ -73,11 +73,6 @@ export const QuestionCard = ({
       },
     ]);
     startTime.current = Date.now();
-
-    if (isQuiz && index !== totalQuestions) {
-      setSingleOptionAnswer(undefined);
-      setMultipleOptionAnswer(new Set());
-    }
   }, [
     isValidVote,
     actions.interactivityCenter,
@@ -152,7 +147,6 @@ export const QuestionCard = ({
             showVoteCount={showVoteCount}
             localPeerResponse={localPeerResponse}
             isStopped={pollState === 'stopped'}
-            answer={singleOptionAnswer}
           />
         ) : null}
 
