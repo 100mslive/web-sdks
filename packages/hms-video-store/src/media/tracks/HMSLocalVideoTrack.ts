@@ -451,10 +451,13 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           deviceId: settings.deviceId,
           groupId,
         });
-        this.eventBus.manualDeviceChange.publish({
+        this.eventBus.deviceChange.publish({
+          isManual: true,
           type: 'video',
-          deviceId: settings.deviceId,
-          groupId: groupId!,
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }

@@ -1,9 +1,10 @@
 import { HMSException } from '../error/HMSException';
 
 export interface HMSDeviceChangeEvent {
+  isManual?: boolean;
   error?: HMSException;
-  devices: DeviceMap;
-  selection?: MediaDeviceInfo;
+  devices?: DeviceMap;
+  selection?: Partial<MediaDeviceInfo>;
   type: 'audioOutput' | 'audioInput' | 'video';
 }
 

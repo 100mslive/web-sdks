@@ -279,10 +279,13 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
           deviceId: settings.deviceId,
           groupId,
         });
-        this.eventBus.manualDeviceChange.publish({
+        this.eventBus.deviceChange.publish({
+          isManual: true,
           type: 'audioInput',
-          deviceId: settings.deviceId,
-          groupId: groupId!,
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }
