@@ -53,6 +53,7 @@ export type HMSPrebuiltOptions = {
   userId?: string;
   endpoints?: object;
   effectsSDKKey?: string;
+  inCustomiser?: boolean;
 };
 
 export type HMSPrebuiltProps = {
@@ -88,7 +89,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints } = {},
+      options: { userName = '', userId = '', endpoints, inCustomiser } = {},
       screens,
       onLeave,
       onJoin,
@@ -170,6 +171,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
           value={{
             roomCode,
             containerSelector,
+            inCustomiser,
             onLeave,
             onJoin,
             userName,

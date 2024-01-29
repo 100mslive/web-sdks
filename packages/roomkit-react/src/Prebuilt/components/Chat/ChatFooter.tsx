@@ -6,6 +6,7 @@ import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100m
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
+import { useHMSPrebuiltContext } from '../../AppContext';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
@@ -87,6 +88,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+  const { inCustomiser } = useHMSPrebuiltContext();
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
@@ -95,6 +97,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       inputRef.current?.focus();
     }
   }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -219,7 +222,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={!isMobile}
+              autoFocus={!isMobile || !inCustomiser}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey) {
