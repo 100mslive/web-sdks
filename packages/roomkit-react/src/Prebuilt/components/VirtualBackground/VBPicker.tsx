@@ -150,6 +150,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                   Low
                 </Text>
                 <Slider
+                  showTooltip={false}
                   value={[blurAmount]}
                   onValueChange={async e => {
                     setBlurAmount(e[0]);
@@ -176,6 +177,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                   Low
                 </Text>
                 <Slider
+                  showTooltip={false}
                   value={[qualityMap[preset] as number]}
                   onValueChange={async e => {
                     const presetName = qualityMap[e[0]];
