@@ -89,7 +89,7 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       logo,
       typography,
       themes,
-      options: { userName = '', userId = '', endpoints, inCustomiser } = {},
+      options: { userName = '', userId = '', endpoints, inCustomiser = false } = {},
       screens,
       onLeave,
       onJoin,
