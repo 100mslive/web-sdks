@@ -10,7 +10,7 @@ export const PreviousRoleInMetadata = () => {
   useEffect(() => {
     let previousRole = vanillaStore.getState(selectLocalPeerRoleName);
     const unsubscribe = vanillaStore.subscribe(currentRole => {
-      if (previousRole !== currentRole) {
+      if (previousRole !== currentRole && currentRole) {
         updateMetaData({ prevRole: previousRole });
         previousRole = currentRole;
       }
