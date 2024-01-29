@@ -23,7 +23,7 @@ import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia } from './constants';
+import { defaultMedia, qualityMap } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -52,6 +52,8 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
   const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
+
+  const [preset, setPreset] = useState(VBHandler.getPreset() || 'balanced');
 
   useEffect(() => {
     if (!track?.id) {
@@ -136,18 +138,63 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           activeBackground={activeBackground}
         />
 
-        {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
-          <Slider
-            value={[blurAmount]}
-            onValueChange={async e => {
-              setBlurAmount(e[0]);
-              await VBHandler.setBlur(e[0]);
-            }}
-            step={0.1}
-            min={0.1}
-            max={1}
-          />
-        ) : null}
+        {/* Sliders */}
+        <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+          {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+            <Box>
+              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+                Blur intensity
+              </Text>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  Low
+                </Text>
+                <Slider
+                  showTooltip={false}
+                  value={[blurAmount]}
+                  onValueChange={async e => {
+                    setBlurAmount(e[0]);
+                    await VBHandler.setBlur(e[0]);
+                  }}
+                  step={0.1}
+                  min={0.1}
+                  max={1}
+                />
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  High
+                </Text>
+              </Flex>
+            </Box>
+          ) : null}
+
+          {isEffectsEnabled && effectsKey && activeBackground !== HMSVirtualBackgroundTypes.NONE ? (
+            <Box>
+              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+                Quality
+              </Text>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  Low
+                </Text>
+                <Slider
+                  showTooltip={false}
+                  value={[qualityMap[preset] as number]}
+                  onValueChange={async e => {
+                    const presetName = qualityMap[e[0]] as string;
+                    setPreset(presetName);
+                    VBHandler.setPreset(presetName);
+                  }}
+                  step={1}
+                  min={0}
+                  max={3}
+                />
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  High
+                </Text>
+              </Flex>
+            </Box>
+          ) : null}
+        </Flex>
 
         <VBCollection
           title="Backgrounds"
