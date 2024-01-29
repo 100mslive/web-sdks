@@ -180,9 +180,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
                   showTooltip={false}
                   value={[qualityMap[preset] as number]}
                   onValueChange={async e => {
-                    const presetName = qualityMap[e[0]];
+                    const presetName = qualityMap[e[0]] as string;
                     setPreset(presetName);
-                    VBHandler.setPreset(presetName as string);
+                    VBHandler.setPreset(presetName);
                   }}
                   step={1}
                   min={0}
