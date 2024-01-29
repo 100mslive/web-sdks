@@ -4,6 +4,7 @@ import { Box } from '../../../../Layout';
 import { Text } from '../../../../Text';
 import { StatisticBox } from './StatisticBox';
 import { useQuizSummary } from './useQuizSummary';
+import { getFormattedTime } from '../common/utils';
 
 export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -29,17 +30,17 @@ export const PeerParticipationSummary = ({ quiz }: { quiz: HMSPoll }) => {
           }/${summary.totalUsers})`,
         },
         // Time in ms
-        { title: 'Avg. Time Taken', value: `${(summary.avgTime / 1000).toFixed(3)}s` },
+        { title: 'Avg. Time Taken', value: getFormattedTime(summary.avgTime) },
         {
           title: 'Avg. Score',
           value: Number.isInteger(summary.avgScore) ? summary.avgScore : summary.avgScore.toFixed(2),
         },
       ]
     : [
-        { title: 'Your rank', value: peerEntry?.position ? `${peerEntry.position}/${summary.totalUsers}` : '-' },
-        { title: 'Points', value: peerEntry?.score },
+        { title: 'Your rank', value: peerEntry?.position || '-' },
+        { title: 'Points', value: peerEntry?.score || 0 },
         // Time in ms
-        { title: 'Time Taken', value: `${((peerEntry?.duration || 0) / 1000).toFixed(3)}s` },
+        { title: 'Time Taken', value: getFormattedTime(peerEntry?.duration) },
         {
           title: 'Correct Answers',
           value: peerEntry?.totalResponses ? `${peerEntry?.correctResponses}/${peerEntry.totalResponses}` : '-',

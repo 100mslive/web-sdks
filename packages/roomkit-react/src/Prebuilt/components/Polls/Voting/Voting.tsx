@@ -1,7 +1,7 @@
 import React from 'react';
 import {
-  selectLocalPeerID,
   selectPeerNameByID,
+  selectPermissions,
   selectPollByID,
   useHMSActions,
   useHMSStore,
@@ -21,7 +21,8 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
   const actions = useHMSActions();
   const poll = useHMSStore(selectPollByID(id));
   const pollCreatorName = useHMSStore(selectPeerNameByID(poll?.createdBy));
-  const isLocalPeerCreator = useHMSStore(selectLocalPeerID) === poll?.createdBy;
+  const permissions = useHMSStore(selectPermissions);
+  const canEndActivity = !!permissions?.pollWrite;
   const { setPollView } = usePollViewState();
   // Sets view - linear or vertical, toggles timer indicator
   const showSingleView = poll?.type === 'quiz' && poll.state === 'started';
@@ -67,7 +68,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         </Box>
       </Flex>
 
-      <Flex direction="column" css={{ p: '$8 $10', overflowY: 'auto' }}>
+      <Flex direction="column" css={{ p: '$8 $10', flex: '1 1 0', overflowY: 'auto' }}>
         {poll.state === 'started' ? (
           <Text css={{ color: '$on_surface_medium', fontWeight: '$semiBold' }}>
             {pollCreatorName || 'Participant'} started a {poll.type}
@@ -75,22 +76,21 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
         ) : null}
 
         {showSingleView ? <TimedView poll={poll} /> : <StandardView poll={poll} />}
-
-        {poll.state === 'started' && isLocalPeerCreator && (
+      </Flex>
+      <Flex
+        css={{ w: '100%', justifyContent: 'end', alignItems: 'center', p: '$8', borderTop: '1px solid $border_bright' }}
+      >
+        {poll.state === 'started' && canEndActivity && (
           <Button
             variant="danger"
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
+            css={{ fontWeight: '$semiBold', w: 'max-content' }}
             onClick={() => actions.interactivityCenter.stopPoll(id)}
           >
             End {poll.type}
           </Button>
         )}
-
         {canViewLeaderboard ? (
-          <Button
-            css={{ fontWeight: '$semiBold', w: 'max-content', ml: 'auto', mt: '$8' }}
-            onClick={() => setPollView(POLL_VIEWS.RESULTS)}
-          >
+          <Button css={{ fontWeight: '$semiBold', w: 'max-content' }} onClick={() => setPollView(POLL_VIEWS.RESULTS)}>
             View Leaderboard
           </Button>
         ) : null}

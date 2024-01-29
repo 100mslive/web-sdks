@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircleIcon, ClockIcon, TrophyFilledIcon } from '@100mslive/react-icons';
 import { Box, Flex } from '../../../../Layout';
 import { Text } from '../../../../Text';
+import { getFormattedTime } from '../common/utils';
 
 const positionColorMap: Record<number, string> = { 1: '#D69516', 2: '#3E3E3E', 3: '#583B0F' };
 
@@ -23,7 +24,7 @@ export const LeaderboardEntry = ({
   duration: number;
 }) => {
   return (
-    <Flex align="center" justify="between" css={{ my: '$4' }}>
+    <Flex align="center" justify="between" css={{ my: '$8' }}>
       <Flex align="center" css={{ gap: '$6' }}>
         <Flex
           align="center"
@@ -66,7 +67,7 @@ export const LeaderboardEntry = ({
         {duration ? (
           <Flex align="center" css={{ gap: '$2', color: '$on_surface_medium' }}>
             <ClockIcon height={16} width={16} />
-            <Text variant="xs">{(duration / 1000).toFixed(3)}s</Text>
+            <Text variant="xs">{getFormattedTime(duration)}</Text>
           </Flex>
         ) : null}
       </Flex>
