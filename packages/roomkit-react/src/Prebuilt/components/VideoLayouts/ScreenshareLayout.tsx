@@ -11,14 +11,14 @@ import { LayoutMode } from '../Settings/LayoutSettings';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
 // @ts-ignore: No implicit Any
-import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
+import { useSetAppDataByKey, useSetUiSettings } from '../AppData/useUISettings';
 import { APP_DATA, UI_SETTINGS } from '../../common/constants';
 
 export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge }: LayoutProps) => {
   const peersSharing = useHMSStore(selectPeersScreenSharing);
   const [, setActiveScreenSharePeer] = useSetAppDataByKey(APP_DATA.activeScreensharePeerId);
   const [page, setPage] = useState(0);
-  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
+  const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
   const activeSharePeer = peersSharing[page];
   const isMobile = useMedia(cssConfig.media.md);
   const secondaryPeers = useMemo(() => {
@@ -32,6 +32,12 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
     }
     return peers.filter(p => p.id !== activeSharePeer?.id);
   }, [activeSharePeer, peers, isMobile, layoutMode]);
+
+  useEffect(() => {
+    if (layoutMode !== LayoutMode.SIDEBAR) {
+      setLayoutMode(LayoutMode.SIDEBAR);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
     return () => {
