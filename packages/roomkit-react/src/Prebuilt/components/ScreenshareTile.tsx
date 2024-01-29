@@ -41,7 +41,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
   const [isMouseHovered, setIsMouseHovered] = useState(false);
   const showStatsOnTiles = useUISettings(UI_SETTINGS.showStatsOnTiles);
-  const fullscreenRef = useRef(null);
+  const fullscreenRef = useRef<HTMLDivElement | null>(null);
   // fullscreen is for desired state
   const [fullscreen, setFullscreen] = useState(false);
   // isFullscreen is for true state
@@ -79,8 +79,8 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
         transparentBg
         ref={fullscreenRef}
         css={{ flexDirection: 'column', gap: '$2' }}
-        onMouseOver={() => setIsMouseHovered(true)}
-        onMouseOut={() => {
+        onMouseEnter={() => setIsMouseHovered(true)}
+        onMouseLeave={() => {
           setIsMouseHovered(false);
         }}
       >
@@ -95,19 +95,21 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
-        <Box
-          css={{
-            position: 'absolute',
-            top: '$2',
-            r: '$1',
-            h: '$14',
-            right: isFullScreenSupported && isMouseHovered ? '$17' : '$2',
-            zIndex: 5,
-            bg: `${theme.colors.background_dim.value}A3`,
-          }}
-        >
-          <LayoutModeSelector />
-        </Box>
+        {isMouseHovered && (
+          <Box
+            css={{
+              position: 'absolute',
+              top: '$2',
+              r: '$1',
+              h: '$14',
+              right: isFullScreenSupported ? '$17' : '$2',
+              zIndex: 5,
+              bg: `${theme.colors.background_dim.value}A3`,
+            }}
+          >
+            <LayoutModeSelector />
+          </Box>
+        )}
 
         {track ? (
           <Video
