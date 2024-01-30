@@ -417,12 +417,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      console.log('dimensions changed', settings);
       if (this.source === 'video') {
         const track = await this.replaceTrackWith(settings);
+        console.log('applying Constraints', settings.toConstraints());
+        await track.applyConstraints(settings.toConstraints());
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
-        await this.nativeTrack.applyConstraints(settings.toConstraints());
         await this.processPlugins();
         this.videoHandler.updateSinks();
       } else {
