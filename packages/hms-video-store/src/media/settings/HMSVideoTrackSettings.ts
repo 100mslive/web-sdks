@@ -116,7 +116,9 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     if (isScreenShare) {
       dimensionConstraintKey = 'max';
     }
+
     const aspectRatio = this.improviseConstraintsAspect();
+    console.log({ h: aspectRatio.height, w: aspectRatio.width });
     return {
       width: { [dimensionConstraintKey]: aspectRatio.width },
       height: { [dimensionConstraintKey]: aspectRatio.height },
@@ -139,6 +141,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
 
   // reverse the height and width if mobile as mobile web browsers override the height and width basis orientation
   private improviseConstraintsAspect(): Partial<IHMSVideoTrackSettings> {
+    console.log({ width: this.width, height: this.height });
     if (isMobile() && this.height && this.width && this.height > this.width) {
       return {
         width: this.height,
