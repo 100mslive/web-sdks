@@ -50,8 +50,8 @@ export class DeviceManager implements HMSDeviceManager {
       }
     });
 
-    this.eventBus.deviceChange.subscribe(({ type, isManual, selection }) => {
-      if (isManual) {
+    this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {
+      if (isUserSelection) {
         const inputType = type === 'video' ? 'videoInput' : type;
         const newSelection = this[inputType].find(
           device => this.createIdentifier(device) === this.createIdentifier(selection),
@@ -61,7 +61,7 @@ export class DeviceManager implements HMSDeviceManager {
             selection: { [inputType]: newSelection },
             devices: this.getDevices(),
             type,
-            isManual,
+            isUserSelection,
           }),
         );
       }

@@ -452,7 +452,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
           groupId,
         });
         this.eventBus.deviceChange.publish({
-          isManual: true,
+          isUserSelection: true,
           type: 'video',
           selection: {
             deviceId: settings.deviceId,

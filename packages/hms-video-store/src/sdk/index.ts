@@ -468,7 +468,7 @@ export class HMSSdk implements HMSInterface {
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
-    if (event.isManual) {
+    if (event.isUserSelection) {
       return;
     }
     HMSLogger.d(this.TAG, 'Device Change event', event);

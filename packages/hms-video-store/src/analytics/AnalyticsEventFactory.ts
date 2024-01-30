@@ -136,13 +136,13 @@ export default class AnalyticsEventFactory {
   }
 
   static deviceChange({
-    isManual,
+    isUserSelection,
     selection,
     type,
     devices,
     error,
   }: {
-    isManual?: boolean;
+    isUserSelection?: boolean;
     selection: Partial<SelectedDevices>;
     type?: 'change' | 'list' | 'audioInput' | 'audioOutput' | 'video';
     devices: DeviceMap;
@@ -150,7 +150,7 @@ export default class AnalyticsEventFactory {
   }) {
     const name = this.eventNameFor(error ? 'publish' : `device.${type}`, error === undefined);
     const level = error ? AnalyticsEventLevel.ERROR : AnalyticsEventLevel.INFO;
-    const properties = this.getPropertiesWithError({ selection, devices, isManual }, error);
+    const properties = this.getPropertiesWithError({ selection, devices, isUserSelection }, error);
     return new AnalyticsEvent({
       name,
       level,

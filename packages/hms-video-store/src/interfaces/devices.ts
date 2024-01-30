@@ -1,7 +1,7 @@
 import { HMSException } from '../error/HMSException';
 
 export interface HMSDeviceChangeEvent {
-  isManual?: boolean;
+  isUserSelection?: boolean;
   error?: HMSException;
   devices?: DeviceMap;
   selection?: Partial<MediaDeviceInfo>;

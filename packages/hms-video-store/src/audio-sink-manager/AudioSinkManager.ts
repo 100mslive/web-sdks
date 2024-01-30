@@ -191,7 +191,7 @@ export class AudioSinkManager {
 
   private handleAudioDeviceChange = (event: HMSDeviceChangeEvent) => {
     // if there is no selection that means this is an init request. No need to do anything
-    if (event.isManual || event.error || !event.selection || event.type === 'video') {
+    if (event.isUserSelection || event.error || !event.selection || event.type === 'video') {
       return;
     }
     this.unpauseAudioTracks();
