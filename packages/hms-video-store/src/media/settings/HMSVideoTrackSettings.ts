@@ -99,7 +99,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     deviceId?: string | undefined,
     advanced?: Array<MediaTrackConstraintSet>,
     maxBitrate?: number,
-    facingMode?: HMSFacingMode,
+    facingMode = HMSFacingMode.USER,
   ) {
     this.width = width;
     this.height = height;
