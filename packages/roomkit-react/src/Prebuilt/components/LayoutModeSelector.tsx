@@ -15,12 +15,21 @@ export const LayoutModeSelector = () => {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Flex align="center" css={{ gap: '$4', color: '$on_surface_low', r: '$1', p: '$2 $4', height: '100%' }}>
+        <Flex
+          align="center"
+          css={{
+            gap: '$4',
+            color: open ? '$on_surface_low' : '$on_surface_medium',
+            r: '$1',
+            p: '$2 $4',
+            height: '100%',
+          }}
+        >
           <Flex
             align="center"
             justify="center"
             css={{
-              color: '$on_surface_medium',
+              color: 'inherit',
               '& > svg': {
                 w: '$9',
                 h: '$9',
@@ -29,7 +38,7 @@ export const LayoutModeSelector = () => {
           >
             {LayoutModeIconMapping[layoutMode as LayoutModeKeys]}
           </Flex>
-          <Text variant="caption" css={{ color: '$on_surface_low', lineHeight: '$sm' }}>
+          <Text variant="caption" css={{ color: 'inherit', lineHeight: '$sm' }}>
             {layoutMode}
           </Text>
           {open ? <ChevronUpIcon width={16} height={16} /> : <ChevronDownIcon width={16} height={16} />}
