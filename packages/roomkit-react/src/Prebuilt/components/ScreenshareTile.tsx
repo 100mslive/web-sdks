@@ -9,7 +9,6 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { ExpandIcon, ShrinkIcon } from '@100mslive/react-icons';
-// @ts-ignore: No implicit Any
 import TileMenu from './TileMenu/TileMenu';
 import { Box } from '../../Layout';
 import { VideoTileStats } from '../../Stats';

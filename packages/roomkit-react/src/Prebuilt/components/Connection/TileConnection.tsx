@@ -14,7 +14,7 @@ const TileConnection = ({
   name: string;
   peerId: string;
   hideLabel: boolean;
-  width?: number;
+  width?: string | number;
   spotlighted?: boolean;
   pinned?: boolean;
 }) => {
@@ -37,7 +37,7 @@ const TileConnection = ({
               css={{
                 c: '$on_surface_high',
                 verticalAlign: 'baseline',
-                ...(width ? textEllipsis(width - 60) : {}),
+                ...(width ? textEllipsis((width as number) - 60) : {}),
               }}
               variant="xs"
             >

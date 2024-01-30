@@ -116,7 +116,7 @@ export const InsetTile = ({ peerId }: { peerId?: string }) => {
         ) : (
           <VideoTile
             peerId={peer?.id}
-            trackid={peer?.videoTrack}
+            trackId={peer?.videoTrack}
             rootCSS={{
               size: '100%',
               padding: 0,

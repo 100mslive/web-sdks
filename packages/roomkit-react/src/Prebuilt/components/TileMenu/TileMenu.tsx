@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import {
+  HMSVideoTrack,
   selectLocalPeerID,
   selectPeerByID,
   selectPermissions,
@@ -30,20 +31,27 @@ const TileMenu = ({
   isScreenshare = false,
   canMinimise,
   enableSpotlightingPeer = true,
+}: {
+  audioTrackID: string;
+  videoTrackID: string;
+  peerID: string;
+  isScreenshare?: boolean;
+  canMinimise?: boolean;
+  enableSpotlightingPeer?: boolean;
 }) => {
   const [open, setOpen] = useState(false);
   const { theme } = useTheme();
 
   const localPeerID = useHMSStore(selectLocalPeerID);
   const isLocal = localPeerID === peerID;
-  const { removeOthers } = useHMSStore(selectPermissions);
+  const { removeOthers } = useHMSStore(selectPermissions) || {};
   const { setVolume, toggleAudio, toggleVideo } = useRemoteAVToggle(audioTrackID, videoTrackID);
   const showSpotlight = enableSpotlightingPeer;
 
   const isPrimaryVideoTrack = useHMSStore(selectVideoTrackByPeerID(peerID))?.id === videoTrackID;
-  const showPinAction = audioTrackID || (videoTrackID && isPrimaryVideoTrack);
+  const showPinAction = !!(audioTrackID || (videoTrackID && isPrimaryVideoTrack));
 
-  const track = useHMSStore(selectTrackByID(videoTrackID));
+  const track = useHMSStore(selectTrackByID(videoTrackID)) as HMSVideoTrack;
   const hideSimulcastLayers = !track?.layerDefinitions?.length || track.degraded || !track.enabled;
   const isMobile = useMedia(cssConfig.media.md);
   const peer = useHMSStore(selectPeerByID(peerID));
@@ -99,7 +107,7 @@ const TileMenu = ({
               >
                 <Box>
                   <Text css={{ color: '$on_surface_high', fontWeight: '$semiBold' }}>
-                    {peer.name}
+                    {peer?.name}
                     {isLocal ? ` (You)` : null}
                   </Text>
                   {peer?.roleName ? (
