@@ -417,15 +417,16 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      if (this.source === 'video') {
-        const track = await this.replaceTrackWith(settings);
-        await this.replaceSender(track, this.enabled);
-        this.nativeTrack = track;
-        await this.processPlugins();
-        this.videoHandler.updateSinks();
-      } else {
-        await this.nativeTrack.applyConstraints(settings.toConstraints());
-      }
+      console.log('dimensions changed', settings);
+      // if (this.source === 'video') {
+      //   const track = await this.replaceTrackWith(settings);
+      //   await this.replaceSender(track, this.enabled);
+      //   this.nativeTrack = track;
+      //   await this.processPlugins();
+      //   this.videoHandler.updateSinks();
+      // } else {
+      await this.nativeTrack.applyConstraints(settings.toConstraints());
+      // }
     }
   };
 
