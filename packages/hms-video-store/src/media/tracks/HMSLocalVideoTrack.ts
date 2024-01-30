@@ -445,10 +445,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         await this.processPlugins();
         this.videoHandler.updateSinks();
       }
-      if (!internal) {
+      const groupId = this.nativeTrack.getSettings().groupId;
+      if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
+          groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'video',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }

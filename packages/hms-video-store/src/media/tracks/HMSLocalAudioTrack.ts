@@ -273,10 +273,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (hasPropertyChanged('deviceId')) {
       this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       await this.replaceTrackWith(settings);
-      if (!internal) {
+      const groupId = this.nativeTrack.getSettings().groupId;
+      if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('audioInput', {
           deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
+          groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'audioInput',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }
