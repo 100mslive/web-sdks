@@ -1,12 +1,5 @@
-// @ts-check
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import {
-  selectLocalPeerRoleName,
-  selectPermissions,
-  selectPolls,
-  useHMSActions,
-  useHMSStore,
-} from '@100mslive/react-sdk';
+import { selectLocalPeerRoleName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { QuestionIcon, StatsIcon } from '@100mslive/react-icons';
 import { Button, Flex, Input, Switch, Text } from '../../../../';
 import { Container, ContentHeader, ErrorText } from '../../Streaming/Common';
@@ -181,11 +174,26 @@ const AddMenu = () => {
 };
 
 const PrevMenu = () => {
-  // filter polls that have been started or stopped sorted by when they were created and their live state
-  const polls = useHMSStore(selectPolls)
-    ?.filter(poll => poll.state === 'started' || poll.state === 'stopped')
-    .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-    .sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
+  const hmsActions = useHMSActions();
+  const [polls, setPolls] = useState([]);
+
+  useEffect(() => {
+    const listPolls = async () => {
+      const polls = await hmsActions.interactivityCenter.getPolls();
+      const sortedPolls = await polls
+        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
+      return sortedPolls;
+    };
+
+    const updatePolls = async () => {
+      const sortedPolls = await listPolls();
+      setPolls(sortedPolls);
+    };
+
+    updatePolls();
+  }, [hmsActions.interactivityCenter]);
+
   return polls?.length ? (
     <Flex
       css={{
@@ -199,8 +207,8 @@ const PrevMenu = () => {
           Previous Polls and Quizzes
         </Text>
         <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
-          {polls.map(poll => (
-            <InteractionCard key={poll.id} id={poll.id} title={poll.title} isLive={poll.state === 'started'} />
+          {polls?.map(poll => (
+            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
           ))}
         </Flex>
       </Flex>
@@ -208,15 +216,8 @@ const PrevMenu = () => {
   ) : null;
 };
 
-const InteractionCard = ({ id, title, isLive }) => {
+const InteractionCard = ({ id, title, status }) => {
   const { setPollState } = usePollViewState();
-
-  const goToVote = id => {
-    setPollState({
-      [POLL_STATE.pollInView]: id,
-      [POLL_STATE.view]: POLL_VIEWS.VOTE,
-    });
-  };
 
   return (
     <Flex direction="column" css={{ backgroundColor: '$surface_bright', borderRadius: '$1', p: '$8' }}>
@@ -224,10 +225,18 @@ const InteractionCard = ({ id, title, isLive }) => {
         <Text variant="sub1" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
           {title}
         </Text>
-        <StatusIndicator isLive={isLive} />
+        <StatusIndicator status={status} />
       </Flex>
       <Flex css={{ w: '100%', gap: '$4' }} justify="end">
-        <Button variant="primary" onClick={() => goToVote(id)}>
+        <Button
+          variant="primary"
+          onClick={() =>
+            setPollState({
+              [POLL_STATE.pollInView]: id,
+              [POLL_STATE.view]: status === 'created' ? POLL_VIEWS.CREATE_QUESTIONS : POLL_VIEWS.VOTE,
+            })
+          }
+        >
           View
         </Button>
       </Flex>

@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { selectPollByID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';
@@ -12,12 +12,16 @@ import { usePollViewState } from '../../AppData/useUISettings';
 import { POLL_VIEWS } from '../../../common/constants';
 
 export function CreateQuestions() {
-  const [questions, setQuestions] = useState([{ draftID: uuid() }]);
   const actions = useHMSActions();
   const { isHLSRunning } = useRecordingStreaming();
   const togglePollView = usePollViewToggle();
   const { pollInView: id, setPollView } = usePollViewState();
   const interaction = useHMSStore(selectPollByID(id));
+  const [questions, setQuestions] = useState(
+    interaction.questions?.length ? interaction.questions : [{ draftID: uuid() }],
+  );
+
+  console.log('draft poll', interaction);
 
   const isValidPoll = useMemo(
     () => questions.length > 0 && questions.every(question => isValidQuestion(question)),
@@ -25,16 +29,6 @@ export function CreateQuestions() {
   );
 
   const launchPoll = async () => {
-    const validQuestions = questions
-      .filter(question => isValidQuestion(question))
-      .map(question => ({
-        text: question.text,
-        type: question.type,
-        options: question.options,
-        skippable: question.skippable,
-        weight: question.weight,
-      }));
-    await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
     await actions.interactivityCenter.startPoll(id);
     await sendTimedMetadata(id);
     setPollView(POLL_VIEWS.VOTE);
@@ -56,6 +50,22 @@ export function CreateQuestions() {
     }
   };
 
+  useEffect(() => {
+    const updateQuestions = async () => {
+      const validQuestions = questions
+        .filter(question => isValidQuestion(question))
+        .map(question => ({
+          text: question.text,
+          type: question.type,
+          options: question.options,
+          skippable: question.skippable,
+          weight: question.weight,
+        }));
+      await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
+    };
+    updateQuestions();
+  }, [actions.interactivityCenter, id, questions]);
+
   const headingTitle = interaction?.type
     ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
     : 'Polls and Quizzes';
@@ -64,7 +74,7 @@ export function CreateQuestions() {
     <Container rounded>
       <ContentHeader
         content={headingTitle}
-        onClose={togglePollView}
+        onClose={() => togglePollView()}
         onBack={() => setPollView(POLL_VIEWS.CREATE_POLL_QUIZ)}
       />
       <Flex direction="column" css={{ p: '$10', overflowY: 'auto' }}>
@@ -130,13 +140,7 @@ const QuestionCard = ({ question, onSave, index, length, removeQuestion, isQuiz,
   return (
     <Flex direction="column" css={{ p: '$md', bg: '$surface_default', r: '$1', mb: '$sm' }}>
       {question.saved ? (
-        <SavedQuestion
-          question={question}
-          index={index}
-          length={length}
-          convertToDraft={convertToDraft}
-          removeQuestion={removeQuestion}
-        />
+        <SavedQuestion question={question} index={index} length={length} convertToDraft={convertToDraft} />
       ) : (
         <QuestionForm
           question={question}
