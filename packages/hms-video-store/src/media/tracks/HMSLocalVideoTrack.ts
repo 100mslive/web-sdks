@@ -420,7 +420,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       if (this.source === 'video') {
-        console.trace('settings');
+        console.log('settings', settings.toConstraints());
         // await this.switchCamera(true);
         // await this.switchCamera();
         await this.nativeTrack.applyConstraints(settings.toConstraints());
