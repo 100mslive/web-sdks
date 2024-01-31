@@ -462,7 +462,6 @@ export class LocalTrackManager {
       | undefined;
 
     if (trackSettings?.video) {
-      console.log('setSettings');
       await videoTrack?.setSettings(trackSettings.video);
     }
 
