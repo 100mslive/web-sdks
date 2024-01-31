@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
@@ -24,7 +25,7 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
   return function hasChanged(
     prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced' | 'facingMode',
   ) {
-    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+    return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
 
@@ -417,6 +418,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     // if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
     //   // await stream.setMaxBitrateAndFramerate(this);
     // }
+    console.log(hasPropertyChanged('width'), hasPropertyChanged('height'), hasPropertyChanged('advanced'));
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       console.log('settings', settings.toConstraints());
