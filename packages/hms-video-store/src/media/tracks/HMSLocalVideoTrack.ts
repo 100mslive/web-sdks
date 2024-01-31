@@ -306,7 +306,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    * will change the facingMode to environment if current facing mode is user or vice versa.
    * will be useful when on mobile web to toggle between front and back camera's
    */
-  async switchCamera() {
+  async switchCamera(internal = false) {
     const currentFacingMode = this.getMediaTrackSettings().facingMode;
     if (!currentFacingMode || this.source !== 'regular') {
       HMSLogger.d(this.TAG, 'facingMode not supported');
@@ -317,13 +317,15 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
     await this.replaceSender(track, this.enabled);
     this.nativeTrack = track;
-    await this.processPlugins();
-    this.videoHandler.updateSinks();
-    this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
-    DeviceStorageManager.updateSelection('videoInput', {
-      deviceId: this.settings.deviceId,
-      groupId: this.nativeTrack.getSettings().groupId,
-    });
+    if (!internal) {
+      await this.processPlugins();
+      this.videoHandler.updateSinks();
+      this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
+      DeviceStorageManager.updateSelection('videoInput', {
+        deviceId: this.settings.deviceId,
+        groupId: this.nativeTrack.getSettings().groupId,
+      });
+    }
   }
 
   /**
@@ -418,13 +420,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       if (this.source === 'video') {
-        const track = await this.replaceTrackWith(settings);
-        console.log('applying Constraints', settings.toConstraints());
-        await track.applyConstraints(settings.toConstraints());
-        await this.replaceSender(track, this.enabled);
-        this.nativeTrack = track;
-        await this.processPlugins();
-        this.videoHandler.updateSinks();
+        await this.switchCamera(true);
+        await this.switchCamera();
       } else {
         await this.nativeTrack.applyConstraints(settings.toConstraints());
       }
