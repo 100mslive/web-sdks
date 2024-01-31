@@ -412,11 +412,11 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   // eslint-disable-next-line complexity
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
     console.log({ newsettings: settings });
-    const stream = this.stream as HMSLocalStream;
+    // const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-      await stream.setMaxBitrateAndFramerate(this);
-    }
+    // if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
+    //   // await stream.setMaxBitrateAndFramerate(this);
+    // }
 
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       console.log('settings', settings.toConstraints());
