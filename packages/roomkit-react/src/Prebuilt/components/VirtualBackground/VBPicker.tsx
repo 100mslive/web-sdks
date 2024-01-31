@@ -136,18 +136,35 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           activeBackground={activeBackground}
         />
 
-        {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
-          <Slider
-            value={[blurAmount]}
-            onValueChange={async e => {
-              setBlurAmount(e[0]);
-              await VBHandler.setBlur(e[0]);
-            }}
-            step={0.1}
-            min={0.1}
-            max={1}
-          />
-        ) : null}
+        {/* Slider */}
+        <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+          {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+            <Box>
+              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+                Blur intensity
+              </Text>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  Low
+                </Text>
+                <Slider
+                  showTooltip={false}
+                  value={[blurAmount]}
+                  onValueChange={async e => {
+                    setBlurAmount(e[0]);
+                    await VBHandler.setBlur(e[0]);
+                  }}
+                  step={0.1}
+                  min={0.1}
+                  max={1}
+                />
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  High
+                </Text>
+              </Flex>
+            </Box>
+          ) : null}
+        </Flex>
 
         <VBCollection
           title="Backgrounds"
