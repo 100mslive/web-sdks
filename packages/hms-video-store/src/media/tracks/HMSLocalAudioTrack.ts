@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
@@ -15,7 +16,7 @@ import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
-    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+    return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
 
