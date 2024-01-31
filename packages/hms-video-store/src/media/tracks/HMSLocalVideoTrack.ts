@@ -412,20 +412,18 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
 
   // eslint-disable-next-line complexity
   private handleSettingsChange = async (settings: HMSVideoTrackSettings) => {
-    console.log({ newsettings: settings });
-    // const stream = this.stream as HMSLocalStream;
+    const stream = this.stream as HMSLocalStream;
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
-    // if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
-    //   // await stream.setMaxBitrateAndFramerate(this);
-    // }
-    console.log(hasPropertyChanged('width'), hasPropertyChanged('height'), hasPropertyChanged('advanced'));
-
+    if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
+      await stream.setMaxBitrateAndFramerate(this);
+    }
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
-      console.log('settings', settings.toConstraints());
       if (this.source === 'video') {
-        // await this.switchCamera(true);
-        // await this.switchCamera();
-        await this.nativeTrack.applyConstraints(settings.toConstraints());
+        const track = await this.replaceTrackWith(settings);
+        await this.replaceSender(track, this.enabled);
+        this.nativeTrack = track;
+        await this.processPlugins();
+        this.videoHandler.updateSinks();
       } else {
         await this.nativeTrack.applyConstraints(settings.toConstraints());
       }

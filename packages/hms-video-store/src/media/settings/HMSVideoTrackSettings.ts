@@ -1,6 +1,6 @@
 import { IAnalyticsPropertiesProvider } from '../../analytics/IAnalyticsPropertiesProvider';
 import { HMSFacingMode, HMSVideoCodec, HMSVideoTrackSettings as IHMSVideoTrackSettings } from '../../interfaces';
-// import { isMobile } from '../../utils/support';
+import { isMobile } from '../../utils/support';
 
 export class HMSVideoTrackSettingsBuilder {
   private _width?: number = 320;
@@ -139,21 +139,13 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
   }
 
   // reverse the height and width if mobile as mobile web browsers override the height and width basis orientation
-  // eslint-disable-next-line complexity
   private improviseConstraintsAspect(): Partial<IHMSVideoTrackSettings> {
-    // if (isMobile() && isIOS()) {
-    //   const isLandscape = window.innerWidth > window.innerHeight;
-    //   return {
-    //     width: isLandscape ? this.width : this.height,
-    //     height: isLandscape ? this.height : this.width,
-    //   };
-    // }
-    // if (isMobile() && this.height && this.width && this.height > this.width) {
-    //   return {
-    //     width: this.height,
-    //     height: this.width,
-    //   };
-    // }
+    if (isMobile() && this.height && this.width && this.height > this.width) {
+      return {
+        width: this.height,
+        height: this.width,
+      };
+    }
     return {
       width: this.width,
       height: this.height,
