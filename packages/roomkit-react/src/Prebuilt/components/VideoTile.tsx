@@ -7,7 +7,6 @@ import {
   selectLocalPeerID,
   selectPeerMetadata,
   selectPeerNameByID,
-  selectSessionStore,
   selectVideoTrackByID,
   selectVideoTrackByPeerID,
   useHMSStore,
@@ -27,7 +26,7 @@ import { getVideoTileLabel } from './peerTileUtils';
 import { useSetAppDataByKey, useUISettings } from './AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize } from '../common/utils';
-import { APP_DATA, SESSION_STORE_KEY, UI_SETTINGS } from '../common/constants';
+import { APP_DATA, UI_SETTINGS } from '../common/constants';
 
 const PeerMetadata = ({ peerId, size }: { peerId: string; size?: 'medium' | 'small' }) => {
   const metaData = useHMSStore(selectPeerMetadata(peerId));
@@ -100,7 +99,6 @@ const Tile = ({
     videoTrackID: track?.id,
     audioTrackID: audioTrack?.id,
   });
-  const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
   const label = getVideoTileLabel({
     peerName,
     track,
@@ -193,7 +191,6 @@ const Tile = ({
             peerId={peerId}
             width={width}
             pinned={pinned}
-            spotlighted={spotlighted}
           />
         </StyledVideoTile.Container>
       ) : null}
