@@ -10,7 +10,7 @@ export type { DeviceMap };
  */
 export interface HMSDeviceChangeEvent {
   error?: HMSException;
-  devices: DeviceMap;
-  selection?: MediaDeviceInfo;
+  devices?: DeviceMap;
+  selection?: Partial<MediaDeviceInfo>;
   type: 'audioOutput' | 'audioInput' | 'video';
 }

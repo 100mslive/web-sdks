@@ -11,7 +11,11 @@ with using the core sdk directly.
 ### Installation
 
 ```
-yarn add @100mslive/react-sdk
+// npm
+npm install @100mslive/react-sdk@latest --save
+
+// yarn
+yarn add @100mslive/react-sdk@latest
 ```
 
 ### Usage

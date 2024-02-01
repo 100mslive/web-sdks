@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
@@ -15,7 +16,7 @@ import { HMSLocalStream } from '../streams';
 
 function generateHasPropertyChanged(newSettings: Partial<HMSAudioTrackSettings>, oldSettings: HMSAudioTrackSettings) {
   return function hasChanged(prop: 'codec' | 'volume' | 'maxBitrate' | 'deviceId' | 'advanced') {
-    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+    return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
 
@@ -273,10 +274,19 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (hasPropertyChanged('deviceId')) {
       this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
       await this.replaceTrackWith(settings);
-      if (!internal) {
+      const groupId = this.nativeTrack.getSettings().groupId;
+      if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('audioInput', {
           deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
+          groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'audioInput',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }
