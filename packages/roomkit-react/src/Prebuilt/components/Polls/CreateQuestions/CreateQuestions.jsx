@@ -63,7 +63,7 @@ export function CreateQuestions() {
     <Container rounded>
       <ContentHeader
         content={headingTitle}
-        onClose={() => togglePollView()}
+        onClose={togglePollView}
         onBack={() => setPollView(POLL_VIEWS.CREATE_POLL_QUIZ)}
       />
       <Flex direction="column" css={{ p: '$10', overflowY: 'auto' }}>
@@ -77,15 +77,8 @@ export function CreateQuestions() {
               onSave={async questionParams => {
                 const updatedQuestions = [...questions.slice(0, index), questionParams, ...questions.slice(index + 1)];
                 setQuestions(updatedQuestions);
-                const validQuestions = updatedQuestions
-                  .filter(question => isValidQuestion(question))
-                  .map(question => ({
-                    text: question.text,
-                    type: question.type,
-                    options: question.options,
-                    skippable: question.skippable,
-                    weight: question.weight,
-                  }));
+                const validQuestions = updatedQuestions.filter(question => isValidQuestion(question));
+
                 await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
               }}
               isQuiz={isQuiz}

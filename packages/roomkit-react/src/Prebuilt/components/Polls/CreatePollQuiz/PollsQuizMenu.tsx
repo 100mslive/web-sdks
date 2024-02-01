@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { selectLocalPeerRoleName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSPoll, selectLocalPeerRoleName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { QuestionIcon, StatsIcon } from '@100mslive/react-icons';
-import { Button, Flex, Input, Switch, Text } from '../../../../';
+import { Button, Flex, Input, Switch, Text } from '../../../..';
+// @ts-ignore
 import { Container, ContentHeader, ErrorText } from '../../Streaming/Common';
+// @ts-ignore
 import { usePollViewToggle } from '../../AppData/useSidepane';
+// @ts-ignore
 import { usePollViewState } from '../../AppData/useUISettings';
+// @ts-ignore
 import { isValidTextInput } from '../../../common/utils';
 import { StatusIndicator } from '../common/StatusIndicator';
 import { INTERACTION_TYPE, POLL_STATE, POLL_VIEWS } from '../../../common/constants';
@@ -24,7 +28,17 @@ export const PollsQuizMenu = () => {
   );
 };
 
-function InteractionSelectionCard({ title, icon, active, onClick }) {
+function InteractionSelectionCard({
+  title,
+  icon,
+  active,
+  onClick,
+}: {
+  title: string;
+  icon: React.JSX.Element;
+  active: boolean;
+  onClick: () => void;
+}) {
   const activeBorderStyle = active ? '$space$px solid $primary_default' : '$space$px solid $border_bright';
   return (
     <Flex
@@ -66,7 +80,7 @@ const AddMenu = () => {
   const { setPollState } = usePollViewState();
   const [interactionType, setInteractionType] = useState(INTERACTION_TYPE.POLL);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -74,7 +88,7 @@ const AddMenu = () => {
     }
   }, [interactionType]);
 
-  const handleCreate = id => {
+  const handleCreate = (id: string) => {
     setPollState({
       [POLL_STATE.pollInView]: id,
       [POLL_STATE.view]: POLL_VIEWS.CREATE_QUESTIONS,
@@ -92,8 +106,6 @@ const AddMenu = () => {
       return false;
     }
   }, [title]);
-  // const [timer, setTimer] = useState(10);
-  // const [showTimerDropDown, setShowTimerDropDown] = useState(false);
 
   return (
     <>
@@ -158,8 +170,8 @@ const AddMenu = () => {
                 title,
                 anonymous: false,
                 rolesThatCanViewResponses: hideVoteCount && localPeerRoleName ? [localPeerRoleName] : undefined,
+                // @ts-ignore
                 type: interactionType.toLowerCase(),
-                // duration: showTimerDropDown ? timer : undefined,
               })
               .then(() => handleCreate(id))
               .catch(err => setError(err.message));
@@ -175,7 +187,7 @@ const AddMenu = () => {
 
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
-  const [polls, setPolls] = useState([]);
+  const [polls, setPolls] = useState<HMSPoll[]>([]);
 
   useEffect(() => {
     const listPolls = async () => {
@@ -208,7 +220,7 @@ const PrevMenu = () => {
         </Text>
         <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
           {polls?.map(poll => (
-            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
+            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state || ''} />
           ))}
         </Flex>
       </Flex>
@@ -216,7 +228,7 @@ const PrevMenu = () => {
   ) : null;
 };
 
-const InteractionCard = ({ id, title, status }) => {
+const InteractionCard = ({ id, title, status }: { id: string; title: string; status: string }) => {
   const { setPollState } = usePollViewState();
 
   return (
