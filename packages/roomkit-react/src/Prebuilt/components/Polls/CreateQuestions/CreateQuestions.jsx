@@ -11,6 +11,13 @@ import { usePollViewToggle } from '../../AppData/useSidepane';
 import { usePollViewState } from '../../AppData/useUISettings';
 import { POLL_VIEWS } from '../../../common/constants';
 
+const getEditableFormat = questions => {
+  const editableQuestions = questions.map(question => {
+    return { ...question, saved: true, draftID: uuid() };
+  });
+  return editableQuestions;
+};
+
 export function CreateQuestions() {
   const actions = useHMSActions();
   const { isHLSRunning } = useRecordingStreaming();
@@ -18,10 +25,8 @@ export function CreateQuestions() {
   const { pollInView: id, setPollView } = usePollViewState();
   const interaction = useHMSStore(selectPollByID(id));
   const [questions, setQuestions] = useState(
-    interaction.questions?.length ? interaction.questions : [{ draftID: uuid() }],
+    interaction.questions?.length ? getEditableFormat(interaction.questions) : [{ draftID: uuid() }],
   );
-
-  console.log('draft poll', interaction);
 
   const isValidPoll = useMemo(
     () => questions.length > 0 && questions.every(question => isValidQuestion(question)),
@@ -86,7 +91,7 @@ export function CreateQuestions() {
               isQuiz={isQuiz}
               removeQuestion={questionID =>
                 setQuestions(prev => {
-                  return prev.filter(questionFromSet => questionID !== questionFromSet.draftID);
+                  return prev.filter(questionFromSet => questionID !== questionFromSet?.draftID);
                 })
               }
               convertToDraft={questionID =>
@@ -118,7 +123,7 @@ export function CreateQuestions() {
           </Text>
         </Flex>
         <Flex css={{ w: '100%' }} justify="end">
-          <Button disabled={!isValidPoll} onClick={launchPoll}>
+          <Button disabled={!isValidPoll} onClick={async () => launchPoll()}>
             Launch {interaction.type}
           </Button>
         </Flex>

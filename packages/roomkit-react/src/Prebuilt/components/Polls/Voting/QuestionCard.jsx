@@ -73,16 +73,7 @@ export const QuestionCard = ({
       },
     ]);
     startTime.current = Date.now();
-  }, [
-    isValidVote,
-    actions.interactivityCenter,
-    pollID,
-    index,
-    singleOptionAnswer,
-    multipleOptionAnswer,
-    totalQuestions,
-    isQuiz,
-  ]);
+  }, [isValidVote, actions.interactivityCenter, pollID, index, singleOptionAnswer, multipleOptionAnswer]);
 
   return (
     <Box
