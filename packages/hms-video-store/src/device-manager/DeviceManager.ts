@@ -68,11 +68,19 @@ export class DeviceManager implements HMSDeviceManager {
     });
   }
 
-  updateOutputDevice = async (deviceId?: string) => {
+  updateOutputDevice = async (deviceId?: string, isUserSelection?: boolean) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
       await this.store.updateAudioOutputDevice(newDevice);
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          isUserSelection,
+          selection: { audioOutput: newDevice },
+          devices: this.getDevices(),
+          type: 'audioOutput',
+        }),
+      );
       DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
