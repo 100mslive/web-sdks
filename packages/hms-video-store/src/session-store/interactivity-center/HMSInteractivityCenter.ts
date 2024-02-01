@@ -186,7 +186,8 @@ export class InteractivityCenter implements HMSInteractivityCenter {
       this.store.setPoll(poll);
     }
 
-    return polls || [];
+    this.listener?.onPollsUpdate(HMSPollsUpdate.POLLS_LIST, polls);
+    return polls;
   }
 
   private createQuestionSetParams(questionParams: HMSPollQuestionCreateParams, index: number): PollQuestionParams {

@@ -1,5 +1,5 @@
 // @ts-check
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { selectPollByID, useHMSActions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 import { AddCircleIcon } from '@100mslive/react-icons';
@@ -50,22 +50,6 @@ export function CreateQuestions() {
     }
   };
 
-  useEffect(() => {
-    const updateQuestions = async () => {
-      const validQuestions = questions
-        .filter(question => isValidQuestion(question))
-        .map(question => ({
-          text: question.text,
-          type: question.type,
-          options: question.options,
-          skippable: question.skippable,
-          weight: question.weight,
-        }));
-      await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
-    };
-    updateQuestions();
-  }, [actions.interactivityCenter, id, questions]);
-
   const headingTitle = interaction?.type
     ? interaction?.type?.[0]?.toUpperCase() + interaction?.type?.slice(1)
     : 'Polls and Quizzes';
@@ -85,12 +69,19 @@ export function CreateQuestions() {
               question={question}
               index={index}
               length={questions.length}
-              onSave={questionParams => {
-                setQuestions(questions => [
-                  ...questions.slice(0, index),
-                  questionParams,
-                  ...questions.slice(index + 1),
-                ]);
+              onSave={async questionParams => {
+                const updatedQuestions = [...questions.slice(0, index), questionParams, ...questions.slice(index + 1)];
+                setQuestions(updatedQuestions);
+                const validQuestions = updatedQuestions
+                  .filter(question => isValidQuestion(question))
+                  .map(question => ({
+                    text: question.text,
+                    type: question.type,
+                    options: question.options,
+                    skippable: question.skippable,
+                    weight: question.weight,
+                  }));
+                await actions.interactivityCenter.addQuestionsToPoll(id, validQuestions);
               }}
               isQuiz={isQuiz}
               removeQuestion={questionID =>
