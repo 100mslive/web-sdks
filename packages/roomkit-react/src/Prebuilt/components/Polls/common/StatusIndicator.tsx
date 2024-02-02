@@ -9,13 +9,13 @@ const statusMap: Record<HMSPollState, PollStage> = {
   stopped: PollStage.ENDED,
 };
 
-export const StatusIndicator = ({ status }: { status?: HMSPollState | undefined }) => {
+export const StatusIndicator = ({ status }: { status?: HMSPollState }) => {
   if (!status) return null;
   return (
     <Flex align="center">
       <Flex
         css={{
-          backgroundColor: status === 'started' ? '$alert_error_default' : '$secondary_default',
+          backgroundColor: statusMap[status] === PollStage.LIVE ? '$alert_error_default' : '$secondary_default',
           p: '$2 $4',
           borderRadius: '$0',
         }}
@@ -27,7 +27,7 @@ export const StatusIndicator = ({ status }: { status?: HMSPollState | undefined 
             color: '$on_primary_high',
           }}
         >
-          {status ? statusMap[status] : ''}
+          {statusMap[status]}
         </Text>
       </Flex>
     </Flex>
