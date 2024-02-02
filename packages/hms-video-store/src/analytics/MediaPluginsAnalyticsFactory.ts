@@ -41,6 +41,16 @@ export default class MediaPluginsAnalyticsFactory {
     return new AnalyticsEvent({ name, level, properties });
   }
 
+  static added(pluginName: string, added_at: number) {
+    const name = 'mediaPlugin.added';
+    const level = AnalyticsEventLevel.INFO;
+    const properties = {
+      plugin_name: pluginName,
+      added_at: added_at,
+    };
+    return new AnalyticsEvent({ name, level, properties });
+  }
+
   static stats({
     pluginName,
     duration,

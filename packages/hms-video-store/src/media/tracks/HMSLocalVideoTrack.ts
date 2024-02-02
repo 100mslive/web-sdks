@@ -78,7 +78,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
-    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager();
+    this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
     this.setFirstTrackId(this.trackId);
   }
 
