@@ -110,7 +110,16 @@ export const VideoStreamingSection = ({
       >
         {ViewComponent}
         {isCaptionEnabled && (
-          <Box css={{ position: 'fixed', top: '90%', left: '50%', background: 'gray', color: 'white' }}>
+          <Box
+            css={{
+              position: 'fixed',
+              top: '85%',
+              left: '32%',
+              background: 'gray',
+              maxWidth: '40%',
+              textOverflow: 'clip',
+            }}
+          >
             <CaptionsViewer />
           </Box>
         )}

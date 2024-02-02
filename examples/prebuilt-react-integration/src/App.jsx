@@ -8,7 +8,6 @@ export default function App() {
     <HMSPrebuilt
       roomCode={roomCode}
       options={{
-        userName: 'Amar',
         endpoints: {
           tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
           roomLayout: 'https://api-nonprod.100ms.live/v2/layouts/ui',
