@@ -63,10 +63,10 @@ export default class MediaPluginsAnalyticsFactory {
     pluginName: string;
     duration: number;
     loadTime: number;
-    avgPreProcessingTime: number;
-    avgProcessingTime: number;
-    inputFrameRate: number;
-    pluginFrameRate: number;
+    avgPreProcessingTime?: number;
+    avgProcessingTime?: number;
+    inputFrameRate?: number;
+    pluginFrameRate?: number;
   }) {
     const name = 'mediaPlugin.stats';
     const level = AnalyticsEventLevel.INFO;

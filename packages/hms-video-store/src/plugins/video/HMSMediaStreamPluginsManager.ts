@@ -1,16 +1,16 @@
 import { HMSMediaStreamPlugin } from './HMSMediaStreamPlugin';
-import { MediaStreamPluginsAnalytics } from './MediaStreamPluginsAnalytics';
+import { VideoPluginsAnalytics } from './VideoPluginsAnalytics';
 import { EventBus } from '../../events/EventBus';
 import { HMSException } from '../../internal';
 import HMSLogger from '../../utils/logger';
 
 export class HMSMediaStreamPluginsManager {
-  private analytics: MediaStreamPluginsAnalytics;
+  private analytics: VideoPluginsAnalytics;
   private plugins: Set<HMSMediaStreamPlugin>;
 
   constructor(eventBus: EventBus) {
     this.plugins = new Set<HMSMediaStreamPlugin>();
-    this.analytics = new MediaStreamPluginsAnalytics(eventBus);
+    this.analytics = new VideoPluginsAnalytics(eventBus);
   }
 
   addPlugins(plugins: HMSMediaStreamPlugin[]): void {
