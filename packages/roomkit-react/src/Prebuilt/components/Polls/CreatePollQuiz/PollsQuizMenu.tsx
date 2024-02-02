@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { HMSPoll, selectLocalPeerRoleName, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  HMSPoll,
+  HMSPollState,
+  selectLocalPeerRoleName,
+  selectPermissions,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { QuestionIcon, StatsIcon } from '@100mslive/react-icons';
 import { Button, Flex, Input, Switch, Text } from '../../../..';
 // @ts-ignore
@@ -220,7 +227,7 @@ const PrevMenu = () => {
         </Text>
         <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
           {polls?.map(poll => (
-            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state || ''} />
+            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
           ))}
         </Flex>
       </Flex>
@@ -228,7 +235,7 @@ const PrevMenu = () => {
   ) : null;
 };
 
-const InteractionCard = ({ id, title, status }: { id: string; title: string; status: string }) => {
+const InteractionCard = ({ id, title, status }: { id: string; title: string; status?: HMSPollState }) => {
   const { setPollState } = usePollViewState();
 
   return (

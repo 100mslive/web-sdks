@@ -1,15 +1,15 @@
 import React from 'react';
-import { HMSPollStates } from '@100mslive/react-sdk';
+import { HMSPollState } from '@100mslive/react-sdk';
 import { Flex, Text } from '../../../../';
 import { PollStage } from './constants';
 
-const statusMap: Record<HMSPollStates, PollStage> = {
+const statusMap: Record<HMSPollState, PollStage> = {
   created: PollStage.DRAFT,
   started: PollStage.LIVE,
   stopped: PollStage.ENDED,
 };
 
-export const StatusIndicator = ({ status }: { status?: HMSPollStates }) => {
+export const StatusIndicator = ({ status }: { status?: HMSPollState | undefined }) => {
   if (!status) return null;
   return (
     <Flex align="center">
@@ -27,7 +27,7 @@ export const StatusIndicator = ({ status }: { status?: HMSPollStates }) => {
             color: '$on_primary_high',
           }}
         >
-          {statusMap[status]}
+          {status ? statusMap[status] : ''}
         </Text>
       </Flex>
     </Flex>
