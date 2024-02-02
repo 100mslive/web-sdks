@@ -12,14 +12,14 @@ export const TimedView = ({ poll }: { poll: HMSPoll }) => {
   const activeQuestion = poll.questions?.find(question => question.index === currentIndex);
   const attemptedAll = poll.questions?.length === lastAttemptedIndex - 1;
 
-  if (!activeQuestion || !poll.questions?.length) {
+  if ((!activeQuestion && !attemptedAll) || !poll.questions?.length) {
     return null;
   }
 
   return (
     <>
       {poll.questions.map(question => {
-        return attemptedAll || activeQuestion.index === question.index ? (
+        return attemptedAll || activeQuestion?.index === question.index ? (
           <QuestionCard
             key={question.index}
             pollID={poll.id}
