@@ -9,6 +9,7 @@ import {
   selectLocalPeerRoleName,
   selectPeerScreenSharing,
   selectWhiteboard,
+  useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
