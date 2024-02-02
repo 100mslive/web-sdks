@@ -47,6 +47,7 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   backgroundType: 'backgroundType',
+  caption: 'caption',
 };
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',

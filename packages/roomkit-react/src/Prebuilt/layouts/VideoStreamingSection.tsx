@@ -9,7 +9,6 @@ import {
   selectLocalPeerRoleName,
   selectPeerScreenSharing,
   selectWhiteboard,
-  useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
@@ -24,7 +23,9 @@ import SidePane from './SidePane';
 // @ts-ignore: No implicit Any
 import { WaitingView } from './WaitingView';
 import { WhiteboardView } from './WhiteboardView';
+import { CaptionsViewer } from '../plugins/CaptionsViewer';
 import {
+  useIsCaptionEnabled,
   usePDFConfig,
   useUrlToEmbed,
   useWaitingViewerRole,
@@ -50,6 +51,7 @@ export const VideoStreamingSection = ({
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const peerSharing = useHMSStore(selectPeerScreenSharing);
   const isWhiteboardOpen = useHMSStore(selectWhiteboard)?.open;
+  const isCaptionEnabled = useIsCaptionEnabled();
 
   const hmsActions = useHMSActions();
   const waitingViewerRole = useWaitingViewerRole();
@@ -106,6 +108,11 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
+        {isCaptionEnabled && (
+          <Box css={{ position: 'fixed', top: '90%', left: '50%', background: 'gray', color: 'white' }}>
+            <CaptionsViewer />
+          </Box>
+        )}
         <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
           <SidePane
             screenType={screenType}

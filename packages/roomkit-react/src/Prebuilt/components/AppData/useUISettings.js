@@ -93,6 +93,16 @@ export const useSubscribedNotifications = notificationKey => {
   return notificationPreference;
 };
 
+export const useIsCaptionEnabled = () => {
+  const isCaptionEnabled = useHMSStore(selectAppDataByPath(APP_DATA.caption));
+  return isCaptionEnabled;
+};
+
+export const useSetIsCaptionEnabled = () => {
+  const [value, setValue] = useSetAppDataByKey(APP_DATA.caption);
+  return [value, setValue];
+};
+
 export const useIsNotificationDisabled = () => {
   const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.disableNotifications));
   return notificationPreference;
