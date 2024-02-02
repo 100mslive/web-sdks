@@ -28,10 +28,7 @@ export function CreateQuestions() {
     interaction.questions?.length ? getEditableFormat(interaction.questions) : [{ draftID: uuid() }],
   );
 
-  const isValidPoll = useMemo(
-    () => questions.length > 0 && questions.every(question => isValidQuestion(question)),
-    [questions],
-  );
+  const isValidPoll = useMemo(() => questions.length > 0 && questions.every(isValidQuestion), [questions]);
 
   const launchPoll = async () => {
     await actions.interactivityCenter.startPoll(id);
@@ -117,7 +114,7 @@ export function CreateQuestions() {
         </Flex>
         <Flex css={{ w: '100%' }} justify="end">
           <Button disabled={!isValidPoll} onClick={async () => launchPoll()}>
-            Launch {interaction.type}
+            Launch {interaction?.type}
           </Button>
         </Flex>
       </Flex>

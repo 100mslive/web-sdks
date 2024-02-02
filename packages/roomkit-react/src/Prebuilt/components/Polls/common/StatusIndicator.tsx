@@ -1,13 +1,15 @@
 import React from 'react';
+import { HMSPollStates } from '@100mslive/react-sdk';
 import { Flex, Text } from '../../../../';
+import { PollStage } from './constants';
 
-const statusMap: Record<string, string> = {
-  created: 'DRAFT',
-  started: 'LIVE',
-  stopped: 'ENDED',
+const statusMap: Record<HMSPollStates, PollStage> = {
+  created: PollStage.DRAFT,
+  started: PollStage.LIVE,
+  stopped: PollStage.ENDED,
 };
 
-export const StatusIndicator = ({ status }: { status?: string }) => {
+export const StatusIndicator = ({ status }: { status?: HMSPollStates }) => {
   if (!status) return null;
   return (
     <Flex align="center">
