@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { selectIsLocalScreenShared, selectIsLocalVideoEnabled, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { GalleryIcon, PersonRectangleIcon, SidebarIcon } from '@100mslive/react-icons';
-import { Box, Flex, Label, RadioGroup, Slider, Text } from '../../..';
+import { Box, Flex, Slider, Text } from '../../..';
 import SwitchWithLabel from './SwitchWithLabel';
 // @ts-ignore: No implicit Any
 import { useSetUiSettings } from '../AppData/useUISettings';
@@ -26,7 +26,7 @@ export const LayoutSettings = () => {
   const hmsActions = useHMSActions();
   const isLocalVideoEnabled = useHMSStore(selectIsLocalVideoEnabled);
   const isLocalScreenShared = useHMSStore(selectIsLocalScreenShared);
-  const [{ isAudioOnly, maxTileCount, mirrorLocalVideo, layoutMode }, setUISettings] = useSetUiSettings();
+  const [{ isAudioOnly, maxTileCount, mirrorLocalVideo }, setUISettings] = useSetUiSettings();
   const toggleIsAudioOnly = useCallback(
     async (isAudioOnlyModeOn?: boolean) => {
       if (isAudioOnlyModeOn) {
@@ -39,14 +39,13 @@ export const LayoutSettings = () => {
     [hmsActions, isLocalVideoEnabled, isLocalScreenShared, setUISettings],
   );
 
-  console.log({ layoutMode });
   return (
     <Box className={settingOverflow()}>
       <Box>
         <Text variant="md" css={{ fontWeight: '$semiBold' }}>
           Layout Modes
         </Text>
-        <RadioGroup.Root
+        {/* <RadioGroup.Root
           css={{ flexDirection: 'column', alignItems: 'start', gap: '$10', my: '$2', py: '$8' }}
           value={layoutMode}
           onValueChange={value =>
@@ -68,7 +67,7 @@ export const LayoutSettings = () => {
               </Flex>
             );
           })}
-        </RadioGroup.Root>
+        </RadioGroup.Root> */}
       </Box>
       <Flex align="center" css={{ w: '100%', my: '$2', py: '$8', '@md': { display: 'none' } }}>
         <Text variant="md" css={{ fontWeight: '$semiBold' }}>
