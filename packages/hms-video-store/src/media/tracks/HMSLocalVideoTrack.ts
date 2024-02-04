@@ -1,3 +1,4 @@
+import isEqual from 'lodash.isequal';
 import { HMSVideoTrack } from './HMSVideoTrack';
 import { VideoElementManager } from './VideoElementManager';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
@@ -24,7 +25,7 @@ function generateHasPropertyChanged(newSettings: Partial<HMSVideoTrackSettings>,
   return function hasChanged(
     prop: 'codec' | 'width' | 'height' | 'maxFramerate' | 'maxBitrate' | 'deviceId' | 'advanced' | 'facingMode',
   ) {
-    return prop in newSettings && newSettings[prop] !== oldSettings[prop];
+    return !isEqual(newSettings[prop], oldSettings[prop]);
   };
 }
 
@@ -184,7 +185,6 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       return;
     } else {
       await this.pluginsManager.waitForRestart();
-      await this.processPlugins();
     }
     await this.handleSettingsChange(newSettings);
     this.settings = newSettings;
@@ -318,6 +318,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     const track = await this.replaceTrackWith(this.buildNewSettings({ facingMode: facingMode, deviceId: undefined }));
     await this.replaceSender(track, this.enabled);
     this.nativeTrack = track;
+    await this.processPlugins();
     this.videoHandler.updateSinks();
     this.settings = this.buildNewSettings({ deviceId: this.nativeTrack.getSettings().deviceId, facingMode });
     DeviceStorageManager.updateSelection('videoInput', {
@@ -414,12 +415,12 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     if (hasPropertyChanged('maxBitrate') && settings.maxBitrate) {
       await stream.setMaxBitrateAndFramerate(this);
     }
-
     if (hasPropertyChanged('width') || hasPropertyChanged('height') || hasPropertyChanged('advanced')) {
       if (this.source === 'video') {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        await this.processPlugins();
         this.videoHandler.updateSinks();
       } else {
         await this.nativeTrack.applyConstraints(settings.toConstraints());
@@ -441,12 +442,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
         const track = await this.replaceTrackWith(settings);
         await this.replaceSender(track, this.enabled);
         this.nativeTrack = track;
+        await this.processPlugins();
         this.videoHandler.updateSinks();
       }
-      if (!internal) {
+      const groupId = this.nativeTrack.getSettings().groupId;
+      if (!internal && settings.deviceId) {
         DeviceStorageManager.updateSelection('videoInput', {
           deviceId: settings.deviceId,
-          groupId: this.nativeTrack.getSettings().groupId,
+          groupId,
+        });
+        this.eventBus.deviceChange.publish({
+          isUserSelection: true,
+          type: 'video',
+          selection: {
+            deviceId: settings.deviceId,
+            groupId: groupId,
+          },
         });
       }
     }

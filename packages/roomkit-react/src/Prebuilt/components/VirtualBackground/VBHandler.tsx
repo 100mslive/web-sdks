@@ -19,8 +19,18 @@ export class VBPlugin {
     if (this.effectsPlugin) {
       return this.effectsPlugin?.getBackground();
     } else {
+      const background = this.hmsPlugin?.getBackground();
       // @ts-ignore
-      return this.hmsPlugin?.background?.src || this.hmsPlugin?.background;
+      return background?.src || background;
+    }
+  };
+
+  getBlurAmount = () => {
+    if (this.effectsPlugin) {
+      return this.effectsPlugin.getBlurAmount();
+    } else {
+      // Treating HMS VB intensity as a fixed value
+      return this.hmsPlugin?.getBackground() === HMSVirtualBackgroundTypes.BLUR ? 1 : 0;
     }
   };
 
@@ -58,6 +68,16 @@ export class VBPlugin {
         }
       }
     }
+  };
+
+  setPreset = (preset: string) => {
+    if (this.effectsPlugin) {
+      this.effectsPlugin.setPreset(preset);
+    }
+  };
+
+  getPreset = () => {
+    return this.effectsPlugin?.getPreset() || '';
   };
 
   removeEffects = async () => {

@@ -19,9 +19,9 @@ interface HMSDeviceManager extends DeviceMap {
 }
 
 export class DeviceManager implements HMSDeviceManager {
-  audioInput: MediaDeviceInfo[] = [];
+  audioInput: InputDeviceInfo[] = [];
   audioOutput: MediaDeviceInfo[] = [];
-  videoInput: MediaDeviceInfo[] = [];
+  videoInput: InputDeviceInfo[] = [];
   outputDevice?: MediaDeviceInfo;
   // true if user has allowed the permission
   // false if user has denied the permission or prompt was never shown or ignored
@@ -49,13 +49,38 @@ export class DeviceManager implements HMSDeviceManager {
         this.eventBus.deviceChange.publish({ devices: this.getDevices() } as HMSDeviceChangeEvent);
       }
     });
+
+    this.eventBus.deviceChange.subscribe(({ type, isUserSelection, selection }) => {
+      if (isUserSelection) {
+        const inputType = type === 'video' ? 'videoInput' : type;
+        const newSelection = this[inputType].find(
+          device => this.createIdentifier(device) === this.createIdentifier(selection),
+        );
+        this.eventBus.analytics.publish(
+          AnalyticsEventFactory.deviceChange({
+            selection: { [inputType]: newSelection },
+            devices: this.getDevices(),
+            type,
+            isUserSelection,
+          }),
+        );
+      }
+    });
   }
 
-  updateOutputDevice = async (deviceId?: string) => {
+  updateOutputDevice = async (deviceId?: string, isUserSelection?: boolean) => {
     const newDevice = this.audioOutput.find(device => device.deviceId === deviceId);
     if (newDevice) {
       this.outputDevice = newDevice;
       await this.store.updateAudioOutputDevice(newDevice);
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          isUserSelection,
+          selection: { audioOutput: newDevice },
+          devices: this.getDevices(),
+          type: 'audioOutput',
+        }),
+      );
       DeviceStorageManager.updateSelection('audioOutput', { deviceId: newDevice.deviceId, groupId: newDevice.groupId });
     }
     return newDevice;
@@ -140,12 +165,12 @@ export class DeviceManager implements HMSDeviceManager {
       devices.forEach(device => {
         if (device.kind === 'audioinput' && device.label) {
           this.hasMicrophonePermission = true;
-          this.audioInput.push(device as MediaDeviceInfo);
+          this.audioInput.push(device as InputDeviceInfo);
         } else if (device.kind === 'audiooutput') {
           this.audioOutput.push(device);
         } else if (device.kind === 'videoinput' && device.label) {
           this.hasWebcamPermission = true;
-          this.videoInput.push(device as MediaDeviceInfo);
+          this.videoInput.push(device as InputDeviceInfo);
         }
       });
       this.videoInputChanged = this.computeChange(prevVideoInput, this.videoInput);
@@ -362,7 +387,7 @@ export class DeviceManager implements HMSDeviceManager {
         }),
       );
       this.eventBus.deviceChange.publish({
-        error: error as Error,
+        error: error as HMSException,
         type: 'video',
         selection: newSelection,
         devices: this.getDevices(),

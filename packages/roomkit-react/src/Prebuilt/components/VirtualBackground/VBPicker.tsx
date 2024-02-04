@@ -14,7 +14,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CloseIcon, CrossCircleIcon } from '@100mslive/react-icons';
-import { Box, Flex, Video } from '../../../index';
+import { Box, Flex, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -36,6 +36,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const mirrorLocalVideo = useUISettings(UI_SETTINGS.mirrorLocalVideo);
   const trackSelector = selectVideoTrackByID(localPeer?.videoTrack);
   const track = useHMSStore(trackSelector);
+  const [blurAmount, setBlurAmount] = useState(VBHandler.getBlurAmount() || 0.5);
   const roomState = useHMSStore(selectRoomState);
   const isLargeRoom = useHMSStore(selectIsLargeRoom);
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
@@ -127,13 +128,43 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               icon: <BlurPersonHighIcon style={iconDims} />,
               value: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => {
-                await VBHandler?.setBlur(0.5);
+                await VBHandler?.setBlur(blurAmount);
                 setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
               },
             },
           ]}
           activeBackground={activeBackground}
         />
+
+        {/* Slider */}
+        <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
+          {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+            <Box>
+              <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
+                Blur intensity
+              </Text>
+              <Flex css={{ w: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '$4' }}>
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  Low
+                </Text>
+                <Slider
+                  showTooltip={false}
+                  value={[blurAmount]}
+                  onValueChange={async e => {
+                    setBlurAmount(e[0]);
+                    await VBHandler.setBlur(e[0]);
+                  }}
+                  step={0.1}
+                  min={0.1}
+                  max={1}
+                />
+                <Text variant="caption" css={{ fontWeight: '$medium', color: '$on_surface_medium' }}>
+                  High
+                </Text>
+              </Flex>
+            </Box>
+          ) : null}
+        </Flex>
 
         <VBCollection
           title="Backgrounds"

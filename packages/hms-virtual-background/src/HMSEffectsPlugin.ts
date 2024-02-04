@@ -11,6 +11,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   private blurAmount = 0;
   private background: HMSEffectsBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType = HMSVirtualBackgroundTypes.NONE;
+  private preset = 'balanced';
 
   constructor(effectsSDKKey: string) {
     this.effects = new tsvb(effectsSDKKey);
@@ -37,7 +38,6 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
   removeBlur() {
     this.blurAmount = 0;
     this.effects.clearBlur();
-    this.background = '';
   }
 
   removeBackground() {
@@ -50,6 +50,15 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.blurAmount = blur;
     this.backgroundType = HMSVirtualBackgroundTypes.BLUR;
     this.effects.setBlur(blur);
+  }
+
+  setPreset(preset: string) {
+    this.preset = preset;
+    this.effects.setSegmentationPreset(this.preset);
+  }
+
+  getPreset() {
+    return this.preset;
   }
 
   removeEffects() {
@@ -65,6 +74,10 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.setBackground(url);
   }
 
+  getBlurAmount() {
+    return this.blurAmount;
+  }
+
   getBackground() {
     return this.background || this.backgroundType;
   }
@@ -74,8 +87,7 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
       if (this.effects) {
         this.effects.run();
         this.effects.setBackgroundFitMode('fill');
-        this.effects.setSegmentationPreset('lightning');
-        // Also ranges from 0 to 1
+        this.effects.setSegmentationPreset(this.preset);
         if (this.blurAmount) {
           this.setBlur(this.blurAmount);
         } else if (this.background) {

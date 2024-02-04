@@ -468,23 +468,29 @@ export class HMSSdk implements HMSInterface {
   }
 
   private handleDeviceChange = (event: HMSDeviceChangeEvent) => {
+    if (event.isUserSelection) {
+      return;
+    }
     HMSLogger.d(this.TAG, 'Device Change event', event);
     this.deviceChangeListener?.onDeviceChange?.(event);
-    if (event.error && event.type) {
-      const track = event.type.includes('audio') ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;
-      this.errorListener?.onError(event.error);
-      if (
-        [
-          ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
-          ErrorCodes.TracksErrors.DEVICE_IN_USE,
-          ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,
-        ].includes(event.error.code) &&
-        track
-      ) {
-        track.setEnabled(false);
-        this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, this.localPeer!);
+    const disableTrackOnError = () => {
+      if (event.error && event.type) {
+        const track = event.type.includes('audio') ? this.localPeer?.audioTrack : this.localPeer?.videoTrack;
+        this.errorListener?.onError(event.error);
+        if (
+          [
+            ErrorCodes.TracksErrors.CANT_ACCESS_CAPTURE_DEVICE,
+            ErrorCodes.TracksErrors.DEVICE_IN_USE,
+            ErrorCodes.TracksErrors.DEVICE_NOT_AVAILABLE,
+          ].includes(event.error.code) &&
+          track
+        ) {
+          track.setEnabled(false);
+          this.listener?.onTrackUpdate(HMSTrackUpdate.TRACK_MUTED, track, this.localPeer!);
+        }
       }
-    }
+    };
+    disableTrackOnError();
   };
 
   private handleAudioPluginError = (error: HMSException) => {

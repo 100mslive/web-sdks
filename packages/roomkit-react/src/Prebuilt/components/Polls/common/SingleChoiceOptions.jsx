@@ -9,7 +9,6 @@ import { VoteProgress } from './VoteProgress';
 export const SingleChoiceOptions = ({
   questionIndex,
   options,
-  response,
   canRespond,
   setAnswer,
   totalResponses,
@@ -20,11 +19,11 @@ export const SingleChoiceOptions = ({
   localPeerResponse,
 }) => {
   return (
-    <RadioGroup.Root value={response?.option} onValueChange={value => setAnswer(value)}>
+    <RadioGroup.Root value={localPeerResponse?.option} onValueChange={value => setAnswer(value)}>
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map(option => {
           return (
-            <Flex align="start" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$5' }}>
+            <Flex align="start" key={`${questionIndex}-${option.index}`} css={{ w: '100%', gap: '$4' }}>
               {!isStopped || !isQuiz ? (
                 <RadioGroup.Item
                   css={{
@@ -59,14 +58,16 @@ export const SingleChoiceOptions = ({
 
               {isStopped && correctOptionIndex === option.index && isQuiz ? (
                 <Flex css={{ color: '$on_surface_high' }}>
-                  <CheckCircleIcon />
+                  <CheckCircleIcon height={20} width={20} />
                 </Flex>
               ) : null}
 
               <Flex direction="column" css={{ flexGrow: '1' }}>
                 <Flex css={{ w: '100%' }}>
-                  <Text css={{ display: 'flex', flexGrow: '1' }}>
-                    <Label htmlFor={`${questionIndex}-${option.index}`}>{option.text}</Label>
+                  <Text css={{ display: 'flex', flexGrow: '1', color: '$on_surface_high' }}>
+                    <Label style={{ color: 'inherit' }} htmlFor={`${questionIndex}-${option.index}`}>
+                      {option.text}
+                    </Label>
                   </Text>
                   {showVoteCount && <VoteCount voteCount={option.voteCount} />}
                 </Flex>
@@ -93,7 +94,7 @@ export const SingleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, handle
       <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
         {options.map((option, index) => {
           return (
-            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$5' }}>
+            <Flex align="center" key={`option-${index}`} css={{ w: '100%', gap: '$4' }}>
               {isQuiz && (
                 <RadioGroup.Item
                   css={{
