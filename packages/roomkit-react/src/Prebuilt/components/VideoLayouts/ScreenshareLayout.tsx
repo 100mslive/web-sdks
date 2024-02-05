@@ -56,7 +56,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
         onPageChange={onPageChange}
         onPageSize={onPageSize}
         edgeToEdge={edgeToEdge}
-        hasSidebar={layoutMode === LayoutMode.SIDEBAR}
+        hasSidebar={layoutMode === LayoutMode.SIDEBAR && !isMobile}
       />
       {layoutMode === LayoutMode.SPOTLIGHT && activeSharePeer && <InsetTile peerId={activeSharePeer?.id} />}
     </ProminenceLayout.Root>
