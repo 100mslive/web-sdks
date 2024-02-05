@@ -6,7 +6,7 @@ import {
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
 import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, DragHandleIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
+import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -88,7 +88,7 @@ export const DesktopOptions = ({
         <Tooltip title="More options">
           <Dropdown.Trigger asChild data-testid="more_settings_btn">
             <IconButton>
-              <DragHandleIcon />
+              <HamburgerMenuIcon />
             </IconButton>
           </Dropdown.Trigger>
         </Tooltip>
