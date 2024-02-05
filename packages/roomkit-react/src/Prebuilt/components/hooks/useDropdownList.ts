@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
+// @ts-ignore: No implicit Any
 import { useSetAppDataByKey } from '../AppData/useUISettings';
 import { APP_DATA } from '../../common/constants';
 
-export const useDropdownList = ({ name, open }) => {
+export const useDropdownList = ({ name, open }: { name: string; open: boolean }) => {
   const [dropdownList = [], setDropdownList] = useSetAppDataByKey(APP_DATA.dropdownList);
 
   useEffect(() => {

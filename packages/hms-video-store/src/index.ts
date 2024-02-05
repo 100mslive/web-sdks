@@ -40,6 +40,8 @@ export type {
   TokenRequestOptions,
   RID,
   HMSPoll,
+  HMSPollStates,
+  HMSPollState,
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionAnswer,

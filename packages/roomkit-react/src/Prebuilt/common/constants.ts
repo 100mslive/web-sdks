@@ -53,6 +53,7 @@ export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
   maxTileCount: 'maxTileCount',
   uiViewMode: 'uiViewMode',
+  layoutMode: 'layoutMode',
   showStatsOnTiles: 'showStatsOnTiles',
   enableAmbientMusic: 'enableAmbientMusic',
   mirrorLocalVideo: 'mirrorLocalVideo',

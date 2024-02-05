@@ -33,8 +33,6 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
 
   const canViewLeaderboard = poll.type === 'quiz' && poll.state === 'stopped' && !poll.anonymous;
 
-  const isLive = poll.state === 'started';
-
   return (
     <Container rounded>
       <Flex
@@ -56,7 +54,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
           <ChevronLeftIcon />
         </Flex>
         <Text variant="h6">{poll.title}</Text>
-        <StatusIndicator isLive={isLive} />
+        <StatusIndicator status={poll.state} />
         <Box
           css={{
             marginLeft: 'auto',

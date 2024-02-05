@@ -2,7 +2,7 @@ import React from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import { useRecordingStreaming } from '@100mslive/react-sdk';
-import { RadioIcon } from '@100mslive/react-icons';
+import { GoLiveIcon } from '@100mslive/react-icons';
 import { Button, config as cssConfig, Flex, Input, styled } from '../../..';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
@@ -72,7 +72,7 @@ const PreviewForm = ({
 
       <Button type="submit" icon disabled={!name || !enableJoin} onClick={onJoin}>
         {/* Conditions to show go live: The first broadcaster joins a streaming kit that is not live */}
-        {showGoLive ? <RadioIcon height={18} width={18} /> : null}
+        {showGoLive ? <GoLiveIcon height={18} width={18} /> : null}
         {showGoLive ? joinForm.go_live_btn_label : joinForm.join_btn_label}
       </Button>
     </Form>

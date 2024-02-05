@@ -33,7 +33,7 @@ export const ConnectionIndicator = ({
 }) => {
   const downlinkQuality = useHMSStore(selectConnectionQualityByPeerID(peerId))?.downlinkQuality;
   const { theme } = useTheme();
-  const defaultColor = theme.colors.surface_brighter;
+  const defaultColor = theme.colors.on_surface_low;
   if (downlinkQuality === -1 || downlinkQuality === undefined) {
     return null;
   }

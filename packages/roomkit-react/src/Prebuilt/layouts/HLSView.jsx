@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, ExpandIcon, GoLiveIcon, PlayIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
@@ -449,7 +449,7 @@ const HLSView = () => {
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-            {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <RadioIcon height={56} width={56} />}
+            {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
           </Flex>
           <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
             {streamEnded ? 'Stream has ended' : 'Stream yet to start'}

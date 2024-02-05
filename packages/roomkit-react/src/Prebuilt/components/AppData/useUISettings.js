@@ -175,7 +175,7 @@ const useSetAppData = ({ key1, key2 }) => {
 
 export const useShowPolls = () => {
   const permissions = useHMSStore(selectPermissions);
-  const polls = useHMSStore(selectPolls)?.filter(poll => poll.state === 'started' || poll.state === 'stopped');
+  const polls = useHMSStore(selectPolls);
 
   const showPolls = useMemo(() => {
     return permissions?.pollWrite || (permissions?.pollRead && polls?.length > 0);
