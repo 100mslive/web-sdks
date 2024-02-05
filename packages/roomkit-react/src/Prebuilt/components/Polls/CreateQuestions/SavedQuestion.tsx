@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { HMSPollQuestion } from '@100mslive/react-sdk';
-import { CheckCircleIcon, TrashIcon } from '@100mslive/react-icons';
+import { CheckCircleIcon } from '@100mslive/react-icons';
 import { Button, Flex, Text } from '../../../../';
-// @ts-ignore
-import IconButton from '../../../IconButton';
-import { DeleteQuestionModal } from './DeleteQuestionModal';
 import { QUESTION_TYPE_TITLE } from '../../../common/constants';
 
 export const SavedQuestion = ({
@@ -12,15 +9,12 @@ export const SavedQuestion = ({
   index,
   length,
   convertToDraft,
-  removeQuestion,
 }: {
   question: HMSPollQuestion & { draftID: number };
   index: number;
   length: number;
   convertToDraft: (draftID: number) => void;
-  removeQuestion: (draftID: number) => void;
 }) => {
-  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   return (
     <>
       <Text variant="overline" css={{ c: '$on_surface_low', textTransform: 'uppercase' }}>
@@ -48,19 +42,11 @@ export const SavedQuestion = ({
           Not required to answer
         </Text>
       ) : null}
-      <Flex justify="end" css={{ w: '100%', alignItems: 'center', gap: '$4' }}>
-        <IconButton onClick={() => setOpenDeleteModal(true)} css={{ background: 'none' }}>
-          <TrashIcon />
-        </IconButton>
+      <Flex justify="end" css={{ w: '100%', alignItems: 'center' }}>
         <Button variant="standard" css={{ fontWeight: '$semiBold' }} onClick={() => convertToDraft(question.draftID)}>
           Edit
         </Button>
       </Flex>
-      <DeleteQuestionModal
-        removeQuestion={() => removeQuestion(question.draftID)}
-        open={openDeleteModal}
-        setOpen={setOpenDeleteModal}
-      />
     </>
   );
 };
