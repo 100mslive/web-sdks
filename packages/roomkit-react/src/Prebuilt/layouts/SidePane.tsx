@@ -118,6 +118,7 @@ const SidePane = ({
             },
             '@md': {
               p: '$6 $8',
+              h: 'auto',
               pb: mwebStreamingChat ? '$20' : '$12',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
