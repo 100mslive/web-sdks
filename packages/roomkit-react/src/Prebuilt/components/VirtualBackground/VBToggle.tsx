@@ -7,6 +7,7 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { DEFAULT_VB_STATE } from './constants';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -17,8 +18,14 @@ export const VBToggle = () => {
 
   useEffect(() => {
     // If default is present, open the VB sidepane
-    console.log(backgroundMedia);
-  }, [backgroundMedia]);
+    const defaultMediaPresent = !!backgroundMedia?.some(media => media.default);
+    const openedSidepane = !!sessionStorage.getItem(DEFAULT_VB_STATE);
+
+    if (defaultMediaPresent && !openedSidepane) {
+      toggleVB();
+      sessionStorage.setItem(DEFAULT_VB_STATE, 'opened');
+    }
+  }, [backgroundMedia, toggleVB]);
 
   if (!isVideoOn || isSafari) {
     return null;

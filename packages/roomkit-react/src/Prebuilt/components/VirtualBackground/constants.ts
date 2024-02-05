@@ -12,3 +12,6 @@ export const defaultMedia = [
   'https://assets.100ms.live/webapp/vb-mini/vb-11.jpg',
   'https://assets.100ms.live/webapp/vb-mini/vb-12.jpg',
 ];
+
+export const DEFAULT_VB_STATE = 'defaultVB';
+// states - undefined, opened, set

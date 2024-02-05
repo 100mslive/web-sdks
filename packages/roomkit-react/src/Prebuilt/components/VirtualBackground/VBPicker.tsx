@@ -23,7 +23,7 @@ import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
 import { useUISettings } from '../AppData/useUISettings';
 import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { defaultMedia } from './constants';
+import { DEFAULT_VB_STATE, defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -81,8 +81,17 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   }, [isVideoOn, toggleVB]);
 
   useEffect(() => {
-    // If default is present, set it and set a sessionStorage key
-  }, []);
+    const defaultApplied = 'set' === sessionStorage.getItem(DEFAULT_VB_STATE);
+    if (!defaultApplied) {
+      backgroundMedia.forEach(media => {
+        if (media.default && media?.url) {
+          VBHandler?.setBackground(media.url);
+          setActiveBackground(media.url);
+          sessionStorage.setItem(DEFAULT_VB_STATE, 'set');
+        }
+      });
+    }
+  }, [backgroundMedia]);
 
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
