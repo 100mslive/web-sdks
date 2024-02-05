@@ -13,6 +13,14 @@ export const ChangeNameContent = ({
   isMobile,
   onExit,
   onBackClick,
+}: {
+  changeName: () => Promise<void>;
+  setCurrentName: (name: string) => void;
+  currentName?: string;
+  localPeerName?: string;
+  isMobile: boolean;
+  onExit: () => void;
+  onBackClick: () => void;
 }) => {
   return (
     <form
@@ -56,7 +64,7 @@ export const ChangeNameContent = ({
           required
           data-testid="change_name_field"
           onKeyDown={async e => {
-            if (e.key === 'Enter' && currentName.trim().length > 0 && currentName !== localPeerName) {
+            if (e.key === 'Enter' && currentName && currentName.trim().length > 0 && currentName !== localPeerName) {
               e.preventDefault();
               if (isMobile) {
                 return;
@@ -94,7 +102,7 @@ export const ChangeNameContent = ({
           variant="primary"
           css={{ width: '100%' }}
           type="submit"
-          disabled={!currentName.trim() || currentName.trim() === localPeerName}
+          disabled={!currentName?.trim() || currentName?.trim() === localPeerName}
           data-testid="popup_change_btn"
         >
           Change

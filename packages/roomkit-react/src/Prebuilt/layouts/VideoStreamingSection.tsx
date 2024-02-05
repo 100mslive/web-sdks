@@ -106,7 +106,7 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
+        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip', '&:empty': { display: 'none' } }}>
           <SidePane
             screenType={screenType}
             // @ts-ignore

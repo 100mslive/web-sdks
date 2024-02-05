@@ -3,11 +3,15 @@ import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
 import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { SecondaryTiles } from '../SecondaryTiles';
+import { LayoutMode } from '../Settings/LayoutSettings';
 import { Grid } from './Grid';
 import { LayoutProps } from './interface';
 import { ProminenceLayout } from './ProminenceLayout';
+// @ts-ignore: No implicit Any
+import { useUISettings } from '../AppData/useUISettings';
 import { useRoleProminencePeers } from '../hooks/useRoleProminencePeers';
 import { usePagesWithTiles, useTileLayout } from '../hooks/useTileLayout';
+import { UI_SETTINGS } from '../../common/constants';
 
 export function RoleProminence({
   isInsetEnabled = false,
@@ -19,6 +23,7 @@ export function RoleProminence({
 }: LayoutProps) {
   const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
+  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
   const maxTileCount = 4;
   const pageList = usePagesWithTiles({
     peers: prominentPeers,
@@ -38,7 +43,7 @@ export function RoleProminence({
   }, [pageSize, onPageSize]);
 
   return (
-    <ProminenceLayout.Root>
+    <ProminenceLayout.Root hasSidebar={layoutMode === LayoutMode.SIDEBAR}>
       <ProminenceLayout.ProminentSection>
         <Grid ref={ref} tiles={pagesWithTiles[page]} />
       </ProminenceLayout.ProminentSection>
@@ -52,7 +57,12 @@ export function RoleProminence({
           numPages={pagesWithTiles.length}
         />
       )}
-      <SecondaryTiles peers={secondaryPeers} isInsetEnabled={isInsetEnabled} edgeToEdge={edgeToEdge} />
+      <SecondaryTiles
+        peers={layoutMode === LayoutMode.SPOTLIGHT ? [] : secondaryPeers}
+        isInsetEnabled={isInsetEnabled}
+        edgeToEdge={edgeToEdge}
+        hasSidebar={layoutMode === LayoutMode.SIDEBAR}
+      />
       {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );
