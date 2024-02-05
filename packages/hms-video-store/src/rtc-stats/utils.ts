@@ -67,6 +67,7 @@ export const getLocalTrackStats = async (
         peerID: track.peerId,
         enabled: track.enabled,
         codec,
+        trackIdentifier: track.trackId,
       };
     });
   } catch (err: any) {
@@ -124,6 +125,7 @@ export const getTrackStats = async (
       enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
+      trackIdentifier: track.trackId,
     })
   );
 };

@@ -291,7 +291,7 @@ export default class HMSTransport {
               HMSConnectionRole.Publish,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.PUBLISH,
-                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+                `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
           }
@@ -303,7 +303,7 @@ export default class HMSTransport {
           HMSConnectionRole.Publish,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.PUBLISH,
-            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote.candidate}`,
+            `local candidate - ${this.publishConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.publishConnection?.selectedCandidatePair?.remote?.candidate}`,
           ),
         );
       }
@@ -353,7 +353,7 @@ export default class HMSTransport {
           HMSConnectionRole.Subscribe,
           ErrorFactory.WebrtcErrors.ICEFailure(
             HMSAction.SUBSCRIBE,
-            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+            `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
           ),
         );
       }
@@ -365,7 +365,7 @@ export default class HMSTransport {
               HMSConnectionRole.Subscribe,
               ErrorFactory.WebrtcErrors.ICEDisconnected(
                 HMSAction.SUBSCRIBE,
-                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote.candidate}`,
+                `local candidate - ${this.subscribeConnection?.selectedCandidatePair?.local?.candidate}; remote candidate - ${this.subscribeConnection?.selectedCandidatePair?.remote?.candidate}`,
               ),
             );
           }

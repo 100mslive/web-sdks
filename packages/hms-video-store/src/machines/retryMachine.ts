@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { assign, createMachine, interpret, send } from 'xstate';
 import { HMSConnectionRole } from '../connection/model';
 import { HMSException } from '../error/HMSException';

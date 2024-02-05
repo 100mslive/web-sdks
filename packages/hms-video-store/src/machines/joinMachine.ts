@@ -1,4 +1,4 @@
-import { assign, createMachine } from 'xstate';
+import { assign, createMachine, fromPromise } from 'xstate';
 import { ErrorCodes } from '../error/ErrorCodes';
 import { HMSException } from '../internal';
 import HMSTransport from '../transport';
@@ -27,10 +27,14 @@ function shouldRetryError(error: any) {
 
 type JoinEvents = { type: 'init'; payload: joinParams } | { type: 'retry' };
 export const joinMachine = (transport: HMSTransport) =>
-  createMachine<{ retryCount: number } & joinParams, JoinEvents>({
+  createMachine({
     id: 'joinMachine',
     initial: 'idle',
     predictableActionArguments: true,
+    types: {} as {
+      context: { retryCount: number } & joinParams;
+      events: JoinEvents;
+    },
     context: {
       authToken: '',
       peerId: '',
@@ -44,7 +48,7 @@ export const joinMachine = (transport: HMSTransport) =>
         on: {
           init: {
             target: 'init',
-            actions: assign((_, event) => {
+            actions: assign(({ event }) => {
               return event.payload;
             }),
           },
@@ -52,27 +56,28 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       init: {
         entry: assign({
-          retryCount: context => context.retryCount + 1,
+          retryCount: ({ context }) => context.retryCount + 1,
         }),
         invoke: {
           id: 'initService',
-          src: context => {
+          src: fromPromise(({ input }) => {
             console.log({ joinCall: 'joinCalled' });
-            return transport.join(context);
-          },
+            return transport.join(input);
+          }),
+          input: ({ context }) => context,
           onDone: {
             target: 'ws',
           },
           onError: [
             {
               target: 'init',
-              cond: (context, event) => {
-                return shouldRetryError(event.data) && context.retryCount < 5;
+              guard: ({ context, event }) => {
+                return shouldRetryError(event.error) && context.retryCount < 5;
               },
             },
             {
-              cond: (context, event) => {
-                return !shouldRetryError(event.data) || context.retryCount >= 5;
+              guard: ({ context, event }) => {
+                return !shouldRetryError(event.error) || context.retryCount >= 5;
               },
               target: 'failed',
             },
@@ -81,22 +86,23 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       ws: {
         invoke: {
-          src: context => {
-            return transport.openSignal(context.authToken, context.peerId);
-          },
+          src: fromPromise(({ input }) => {
+            return transport.openSignal(input.authToken, input.peerId);
+          }),
+          input: ({ context }) => ({ authToken: context.authToken, peerId: context.peerId }),
           onDone: {
             target: 'iceConnection',
           },
           onError: [
             {
               target: 'ws',
-              cond: (context, event) => {
-                return shouldRetryError(event.data) && context.retryCount < 5;
+              guard: ({ context, event }) => {
+                return shouldRetryError(event.error) && context.retryCount < 5;
               },
             },
             {
-              cond: (context, event) => {
-                return !shouldRetryError(event.data) || context.retryCount >= 5;
+              guard: ({ context, event }) => {
+                return !shouldRetryError(event.error) || context.retryCount >= 5;
               },
               target: 'failed',
             },
@@ -105,22 +111,23 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       iceConnection: {
         invoke: {
-          src: context => {
-            return transport.createConnectionsAndNegotiateJoin(context.customData, context.autoSubscribeVideo);
-          },
+          src: fromPromise(({ input }) => {
+            return transport.createConnectionsAndNegotiateJoin(input.customData, input.autoSubscribeVideo);
+          }),
+          input: ({ context }) => ({ customData: context.customData, autoSubscribeVideo: context.autoSubscribeVideo }),
           onDone: {
             target: 'success',
           },
           onError: [
             {
               target: 'iceConnection',
-              cond: (context, event) => {
-                return shouldRetryError(event.data) && context.retryCount < 5;
+              guard: ({ context, event }) => {
+                return shouldRetryError(event.error) && context.retryCount < 5;
               },
             },
             {
-              cond: (context, event) => {
-                return !shouldRetryError(event.data) || context.retryCount >= 5;
+              guard: ({ context, event }) => {
+                return !shouldRetryError(event.error) || context.retryCount >= 5;
               },
               target: 'failed',
             },

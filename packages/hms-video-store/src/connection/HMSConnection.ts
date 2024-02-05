@@ -8,10 +8,10 @@ import HMSLogger from '../utils/logger';
 import { enableOpusDtx, fixMsid } from '../utils/session-description';
 
 const TAG = '[HMSConnection]';
-interface RTCIceCandidatePair {
-  local: RTCIceCandidate;
-  remote: RTCIceCandidate;
-}
+// interface RTCIceCandidatePair {
+//   local: RTCIceCandidate;
+//   remote: RTCIceCandidate;
+// }
 
 export default abstract class HMSConnection {
   readonly role: HMSConnectionRole;
@@ -30,7 +30,7 @@ export default abstract class HMSConnection {
    */
   readonly candidates = new Array<RTCIceCandidateInit>();
 
-  selectedCandidatePair?: RTCIceCandidatePair;
+  selectedCandidatePair?: RTCIceCandidatePair | null;
 
   protected constructor(role: HMSConnectionRole, signal: JsonRpcSignal) {
     this.role = role;
@@ -126,9 +126,7 @@ export default abstract class HMSConnection {
           const iceTransport = transmitter.transport.iceTransport;
 
           const logSelectedCandidate = () => {
-            // @ts-expect-error
             if (typeof iceTransport.getSelectedCandidatePair === 'function') {
-              // @ts-expect-error
               this.selectedCandidatePair = iceTransport.getSelectedCandidatePair();
               HMSLogger.d(
                 TAG,
@@ -139,9 +137,7 @@ export default abstract class HMSConnection {
             }
           };
 
-          // @ts-expect-error
           if (typeof iceTransport.onselectedcandidatepairchange === 'function') {
-            // @ts-expect-error
             iceTransport.onselectedcandidatepairchange = logSelectedCandidate;
           }
           logSelectedCandidate();

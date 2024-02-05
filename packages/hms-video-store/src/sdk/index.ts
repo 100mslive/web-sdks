@@ -1,4 +1,4 @@
-import { interpret } from 'xstate';
+import { createActor, toPromise } from 'xstate';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
 import { HMSPeerListIterator } from './HMSPeerListIterator';
@@ -552,7 +552,7 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.time(`join-room-${roomId}`);
 
     try {
-      const actor = interpret(joinMachine(this.transport));
+      const actor = createActor(joinMachine(this.transport));
       actor.start();
       actor.send({
         type: 'init',
@@ -564,12 +564,13 @@ export class HMSSdk implements HMSInterface {
           autoSubscribeVideo: config.autoVideoSubscribe,
         },
       });
-      await new Promise<void>(resolve => {
-        actor.onDone(event => {
-          console.log({ event });
-          resolve();
-        });
-      });
+      await toPromise(actor);
+      // await new Promise<void>(resolve => {
+      //   actor.onDone(event => {
+      //     console.log({ event });
+      //     resolve();
+      //   });
+      // });
 
       // await this.transport.join({
       //   authToken: config.authToken,
