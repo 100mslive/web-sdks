@@ -21,12 +21,18 @@ export const SecondaryTiles = ({ peers, onPageChange, onPageSize, edgeToEdge, ha
     peers:
       spotlightPeerId || pinnedPeer
         ? [...peers].sort((p1, p2) => {
-            const peerIdList = [activeScreensharePeerId, pinnedPeer, spotlightPeerId];
-            // put active screenshare peer, pinned peer, spotlight peer at first
-            if (peerIdList.includes(p1)) {
+            if (activeScreensharePeerId === p1.id) {
               return -1;
             }
-            if (peerIdList.includes(p2)) {
+            if (activeScreensharePeerId === p2.id) {
+              return 1;
+            }
+            const peerIdList = [pinnedPeer, spotlightPeerId];
+            // put active screenshare peer, pinned peer, spotlight peer at first
+            if (peerIdList.includes(p1.id)) {
+              return -1;
+            }
+            if (peerIdList.includes(p2.id)) {
               return 1;
             }
             return 0;
