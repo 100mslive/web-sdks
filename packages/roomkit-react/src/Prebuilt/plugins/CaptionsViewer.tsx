@@ -9,8 +9,54 @@ interface CaptionData {
   peer_id: string;
   final: boolean;
   transcript: string;
+  transcriptQueue: SimpleQueue;
 }
 
+interface Transcript {
+  transcript: string;
+  final: boolean;
+}
+class SimpleQueue {
+  private storage: Transcript[] = [];
+  constructor(private capacity: number = 3) {}
+  enqueue(value: string, final: boolean): void {
+    if (!value) {
+      return;
+    }
+    if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
+      this.dequeue();
+    }
+    if (this.size() <= 0 || this.storage[this.size() - 1]?.final) {
+      this.storage.push({
+        transcript: value,
+        final: final,
+      });
+      return;
+    }
+    this.storage[this.size() - 1].transcript = value;
+    this.storage[this.size() - 1].final = final;
+  }
+  dequeue(): Transcript | undefined {
+    if (this.size() <= 0) {
+      return undefined;
+    }
+    return this.storage.shift();
+  }
+  peek(): Transcript | undefined {
+    if (this.size() <= 0) {
+      return undefined;
+    }
+    return this.storage[0];
+  }
+  getTranscription(): string {
+    let script = '';
+    this.storage.forEach((value: Transcript) => (script += value.transcript + ' '));
+    return script;
+  }
+  size(): number {
+    return this.storage.length;
+  }
+}
 class Queue {
   private storage: { [key: string]: CaptionData[] } = {};
   constructor(private capacity: number = 3) {}
@@ -19,11 +65,15 @@ class Queue {
     if (this.size() === this.capacity) {
       this.dequeue();
     }
+    if (!value.transcriptQueue) {
+      value.transcriptQueue = new SimpleQueue();
+    }
+    value.transcriptQueue.enqueue(value.transcript, value.final);
     if (!this.storage[key]) {
       this.storage[key] = [value];
       return;
     }
-    this.storage[key].push(value);
+    // this.storage[key].push(value);
   }
   dequeue(): CaptionData[] {
     const key: string = Object.keys(this.storage).shift() || '';
@@ -43,7 +93,7 @@ class Queue {
     const data = keys.map((key: string) => {
       const data = this.storage[key];
       let word = '';
-      data.forEach((value: CaptionData) => (word = value.transcript));
+      data.forEach((value: CaptionData) => (word = value.transcriptQueue.getTranscription()));
       return { [key]: word };
     });
     return data;
@@ -66,7 +116,7 @@ class CaptionMaintainerQueue {
     });
   }
 }
-const Transcript = ({ peer_id, data }: { peer_id: string; data: string }) => {
+const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) => {
   const peerName = useHMSStore(selectPeerNameByID(peer_id));
   if (!data) return null;
   return <Text>{`${peerName}: ${data}`}</Text>;
@@ -99,7 +149,7 @@ export const CaptionsViewer = () => {
     <Flex direction="column" gap={1}>
       {currentData.map((data: { [key: string]: string }, index: number) => {
         const key = Object.keys(data)[0];
-        return <Transcript key={index} peer_id={key} data={data[key]} />;
+        return <TranscriptView key={index} peer_id={key} data={data[key]} />;
       })}
     </Flex>
   );
