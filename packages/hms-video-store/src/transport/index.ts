@@ -34,7 +34,6 @@ import { ISignalEventsObserver } from '../signal/ISignalEventsObserver';
 import JsonRpcSignal from '../signal/jsonrpc';
 import {
   ICE_DISCONNECTION_TIMEOUT,
-  MAX_TRANSPORT_RETRIES,
   PROTOCOL_SPEC,
   PROTOCOL_VERSION,
   PUBLISH_STATS_PUSH_INTERVAL,
@@ -402,41 +401,47 @@ export default class HMSTransport {
     return initConfig;
   }
 
-  async join(
-    authToken: string,
-    peerId: string,
-    customData: { name: string; metaData: string },
-    initEndpoint: string,
+  async join({
+    authToken,
+    peerId,
+    customData,
+    initEndpoint,
     autoSubscribeVideo = false,
-  ): Promise<void> {
+  }: {
+    authToken: string;
+    peerId: string;
+    customData: { name: string; metaData: string };
+    initEndpoint: string;
+    autoSubscribeVideo?: boolean;
+  }): Promise<void> {
     HMSLogger.d(TAG, 'join: started ⏰');
-    try {
-      if (!this.signal.isConnected || !this.initConfig) {
-        await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
-      }
-
-      this.validateNotDisconnected('connect');
-
-      if (this.initConfig) {
-        await this.waitForLocalRoleAvailability();
-        await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo);
-        await this.initRtcStatsMonitor();
-
-        HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
-      }
-    } catch (error) {
-      HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
-      this.state = TransportState.Failed;
-      const ex = error as HMSException;
-      // set isTerminal to true if not already when error code is 500(internal biz server error)
-      ex.isTerminal = ex.isTerminal || ex.code === 500;
-      await this.observer.onStateChange(this.state, ex);
-      throw ex;
+    // try {
+    if (!this.signal.isConnected || !this.initConfig) {
+      await this.connect(authToken, initEndpoint, peerId, customData, autoSubscribeVideo);
     }
 
-    HMSLogger.d(TAG, '✅ join: successful');
-    this.state = TransportState.Joined;
-    this.observer.onStateChange(this.state);
+    this.validateNotDisconnected('connect');
+
+    // if (this.initConfig) {
+    //   await this.waitForLocalRoleAvailability();
+    //   await this.createConnectionsAndNegotiateJoin(customData, autoSubscribeVideo);
+    //   await this.initRtcStatsMonitor();
+
+    //   HMSLogger.d(TAG, '✅ join: Negotiated over PUBLISH connection');
+    // }
+    // } catch (error) {
+    //   HMSLogger.e(TAG, `join: failed ❌ [token=${authToken}]`, error);
+    //   this.state = TransportState.Failed;
+    //   const ex = error as HMSException;
+    //   // set isTerminal to true if not already when error code is 500(internal biz server error)
+    //   ex.isTerminal = ex.isTerminal || ex.code === 500;
+    //   await this.observer.onStateChange(this.state, ex);
+    //   throw ex;
+    // }
+
+    // HMSLogger.d(TAG, '✅ join: successful');
+    // this.state = TransportState.Joined;
+    // this.observer.onStateChange(this.state);
   }
 
   async connect(
@@ -455,11 +460,12 @@ export default class HMSTransport {
       endpoint,
       autoSubscribeVideo,
     );
-    try {
-      const response = await this.internalConnect(token, endpoint, peerId);
-      return response;
-    } catch (error) {
-      const shouldRetry =
+    // try {
+    return await this.internalConnect(token, endpoint, peerId);
+    // return response;
+    // } catch (error) {
+    // throw error;
+    /* const shouldRetry =
         error instanceof HMSException &&
         ([
           ErrorCodes.WebSocketConnectionErrors.WEBSOCKET_CONNECTION_LOST,
@@ -486,8 +492,8 @@ export default class HMSTransport {
         });
       } else {
         throw error;
-      }
-    }
+      } */
+    // }
   }
 
   async leave(notifyServer: boolean): Promise<void> {
@@ -650,7 +656,7 @@ export default class HMSTransport {
     HMSLogger.d(TAG, `✅ unpublishTrack: trackId=${track.trackId}`, this.callbacks);
   }
 
-  private waitForLocalRoleAvailability() {
+  waitForLocalRoleAvailability() {
     if (this.store.hasRoleDetailsArrived()) {
       return;
     } else {
@@ -660,10 +666,7 @@ export default class HMSTransport {
     }
   }
 
-  private async createConnectionsAndNegotiateJoin(
-    customData: { name: string; metaData: string },
-    autoSubscribeVideo = false,
-  ) {
+  async createConnectionsAndNegotiateJoin(customData: { name: string; metaData: string }, autoSubscribeVideo = false) {
     const isWebRTC = this.doesLocalPeerNeedWebRTC();
     if (isWebRTC) {
       this.createPeerConnections();
@@ -912,7 +915,7 @@ export default class HMSTransport {
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
       // if leave was called while init was going on, don't open websocket
       this.validateNotDisconnected('post init');
-      await this.openSignal(token, peerId);
+      // await this.openSignal(token, peerId);
       this.observer.onConnected();
       this.store.setSimulcastEnabled(this.isFlagEnabled(InitFlags.FLAG_SERVER_SIMULCAST));
       HMSLogger.d(TAG, 'Adding Analytics Transport: JsonRpcSignal');
@@ -945,7 +948,7 @@ export default class HMSTransport {
     }
   }
 
-  private async openSignal(token: string, peerId: string) {
+  public async openSignal(token: string, peerId: string) {
     if (!this.initConfig) {
       throw ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
@@ -967,7 +970,7 @@ export default class HMSTransport {
     HMSLogger.d(TAG, '✅ internal connect: connected to ws endpoint');
   }
 
-  private async initRtcStatsMonitor() {
+  async initRtcStatsMonitor() {
     this.webrtcInternals?.setPeerConnections({
       publish: this.publishConnection?.nativeConnection,
       subscribe: this.subscribeConnection?.nativeConnection,

@@ -5,7 +5,7 @@ export default function App() {
   const roomCode = getRoomCodeFromUrl();
 
   return (
-      <HMSPrebuilt roomCode={roomCode}/>
+      <HMSPrebuilt roomCode={roomCode} screens={{ preview: null }}/>
   )
 }
 

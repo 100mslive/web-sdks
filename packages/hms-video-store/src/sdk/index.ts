@@ -1,3 +1,4 @@
+import { interpret } from 'xstate';
 import HMSRoom from './models/HMSRoom';
 import { HMSLocalPeer } from './models/peer';
 import { HMSPeerListIterator } from './HMSPeerListIterator';
@@ -47,6 +48,7 @@ import { RTMPRecordingConfig } from '../interfaces/rtmp-recording-config';
 import InitialSettings from '../interfaces/settings';
 import { HMSAudioListener, HMSPeerUpdate, HMSTrackUpdate, HMSUpdateListener } from '../interfaces/update-listener';
 import { PlaylistManager } from '../internal';
+import { joinMachine } from '../machines/joinMachine';
 import { HMSLocalStream } from '../media/streams/HMSLocalStream';
 import {
   HMSLocalAudioTrack,
@@ -550,13 +552,32 @@ export class HMSSdk implements HMSInterface {
     HMSLogger.time(`join-room-${roomId}`);
 
     try {
-      await this.transport.join(
-        config.authToken,
-        this.localPeer!.peerId,
-        { name: config.userName, metaData: config.metaData! },
-        config.initEndpoint!,
-        config.autoVideoSubscribe,
-      );
+      const actor = interpret(joinMachine(this.transport));
+      actor.start();
+      actor.send({
+        type: 'init',
+        payload: {
+          authToken: config.authToken,
+          peerId: this.localPeer!.peerId,
+          customData: { name: config.userName, metaData: config.metaData! },
+          initEndpoint: config.initEndpoint!,
+          autoSubscribeVideo: config.autoVideoSubscribe,
+        },
+      });
+      await new Promise<void>(resolve => {
+        actor.onDone(event => {
+          console.log({ event });
+          resolve();
+        });
+      });
+
+      // await this.transport.join({
+      //   authToken: config.authToken,
+      //   peerId: this.localPeer!.peerId,
+      //   customData: { name: config.userName, metaData: config.metaData! },
+      //   initEndpoint: config.initEndpoint!,
+      //   autoSubscribeVideo: config.autoVideoSubscribe,
+      // });
       HMSLogger.d(this.TAG, `✅ Joined room ${roomId}`);
       this.analyticsTimer.start(TimedEvent.PEER_LIST);
       await this.notifyJoin();
