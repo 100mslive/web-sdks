@@ -264,7 +264,6 @@ const DesktopSettingModal = ({
                 {settingsList
                   .filter(({ tabName }) => showSetting[tabName])
                   .map(({ content: Content, title, tabName }) => {
-                    console.log({ tabName, Content });
                     return (
                       <Tabs.Content key={tabName} value={tabName} className={settingContent()}>
                         <SettingsContentHeader onBack={resetSelection} isMobile={false}>

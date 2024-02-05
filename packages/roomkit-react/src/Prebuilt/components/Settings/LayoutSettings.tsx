@@ -42,10 +42,10 @@ export const LayoutSettings = () => {
   return (
     <Box className={settingOverflow()}>
       <Box>
-        <Text variant="md" css={{ fontWeight: '$semiBold' }}>
+        {/* <Text variant="md" css={{ fontWeight: '$semiBold' }}>
           Layout Modes
         </Text>
-        {/* <RadioGroup.Root
+         <RadioGroup.Root
           css={{ flexDirection: 'column', alignItems: 'start', gap: '$10', my: '$2', py: '$8' }}
           value={layoutMode}
           onValueChange={value =>

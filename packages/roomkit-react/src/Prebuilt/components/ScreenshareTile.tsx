@@ -50,7 +50,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
   const isFullScreenSupported = screenfull.isEnabled;
   const audioTrack = useHMSStore(selectScreenShareAudioByPeerID(peer?.id));
 
-  if (isLocal && track?.displaySurface && !['browser', 'window', 'application'].includes(track?.displaySurface)) {
+  if (isLocal && track?.displaySurface && !['browser', 'window', 'application'].includes(track.displaySurface)) {
     return <ScreenshareDisplay />;
   }
 
