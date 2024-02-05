@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
+import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
 // @ts-ignore: No implicit Any
@@ -12,12 +13,14 @@ import { Box, Flex } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../components/AppData/useSidepane';
+// @ts-ignore: No implicit Any
+import { useUISettings } from '../components/AppData/useUISettings';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { translateAcross } from '../../utils';
-import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
+import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
 
 const SidePane = ({
   tileProps,
@@ -32,6 +35,7 @@ const SidePane = ({
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   const { elements: preview_elements } = useRoomLayoutPreviewScreen();
+  const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
 
   const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
     ? preview_elements?.virtual_background?.background_media
@@ -55,10 +59,9 @@ const SidePane = ({
     };
   }, [resetSidePane]);
 
-  if (!ViewComponent && !trackId) {
+  if (!ViewComponent && (!trackId || layoutMode !== LayoutMode.GALLERY)) {
     return null;
   }
-
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
     roundedVideoTile: tileProps?.rounded_video_tile,
@@ -82,7 +85,7 @@ const SidePane = ({
         '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
-      {trackId && (
+      {trackId && layoutMode === LayoutMode.GALLERY && (
         <VideoTile
           peerId={activeScreensharePeerId}
           trackId={trackId}
@@ -118,6 +121,7 @@ const SidePane = ({
             },
             '@md': {
               p: '$6 $8',
+              h: 'auto',
               pb: mwebStreamingChat ? '$20' : '$12',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',

@@ -41,28 +41,28 @@ For example, if you are making changes in roomkit-react(prebuilt), run `yarn sta
 The packages folder contains all the SDK's of 100ms. Here is a brief overview of them.
 
 `hms-video-store` 
-This is the source of `@100mslive/hms-video-store`. 
+is the source of `@100mslive/hms-video-store`. 
 This package contains the core SDK and the reactive store parts. 
 For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/hms-video-store/README.md).
 
 `react-icons`
-This is the source of `@100mslive/react-icons`.
+is the source of `@100mslive/react-icons`.
 This contains all the icons used in the 100ms prebuilt.
 For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/react-icons/README.md).
 
 `react-sdk`
-This is the source of `@100mslive/react-sdk`.
+is the source of `@100mslive/react-sdk`.
 This contains the base React Hooks and some commonly used functionalities as React Hooks.
 For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/react-sdk/README.md).
 
 
 `roomkit-react`
-This is the source of `@100mslive/roomkit-react`.
+is the source of `@100mslive/roomkit-react`.
 This contains the React components used in the prebuilt and the Prebuilt component itself.
 For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/roomkit-react/README.md).
 
 `roomkit-web`
-This is the source of `@100mslive/roomkit-web`.
+is the source of `@100mslive/roomkit-web`.
 This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,
 this can be used as a web component.
 For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/roomkit-web/README.md).
