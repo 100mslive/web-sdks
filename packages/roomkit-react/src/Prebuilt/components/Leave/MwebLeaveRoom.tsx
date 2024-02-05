@@ -1,10 +1,13 @@
 import React, { Fragment, useState } from 'react';
+import { useMedia } from 'react-use';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
-import { ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { CloseIcon, ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { IconButton } from '../../../IconButton';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
+import { config as cssConfig } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton } from './LeaveAtoms';
@@ -42,20 +45,7 @@ export const MwebLeaveRoom = ({
       {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
-            <LeaveIconButton
-              key="LeaveRoom"
-              data-testid="leave_room_btn"
-              css={{
-                borderTopRightRadius: '$1',
-                borderBottomRightRadius: '$1',
-              }}
-            >
-              <Tooltip title="Leave Room">
-                <Box>
-                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-                </Box>
-              </Tooltip>
-            </LeaveIconButton>
+            <LeaveIcon onClick={() => setOpen(!open)} />
           </Sheet.Trigger>
           <Sheet.Content>
             <LeaveCard
@@ -87,13 +77,7 @@ export const MwebLeaveRoom = ({
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => setShowLeaveRoomAlert(true)}>
-          <Tooltip title="Leave Room">
-            <Box>
-              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-            </Box>
-          </Tooltip>
-        </LeaveIconButton>
+        <LeaveIcon onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
@@ -111,5 +95,37 @@ export const MwebLeaveRoom = ({
         </Sheet.Content>
       </Sheet.Root>
     </Fragment>
+  );
+};
+
+const LeaveIcon = ({ onClick }: { onClick: () => void }) => {
+  const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.ls);
+  const { screenType } = useRoomLayoutConferencingScreen();
+
+  return (isMobile || isLandscape) && screenType === 'hls_live_streaming' ? (
+    <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => onClick()}>
+      <Tooltip title="Leave Room">
+        <Box>
+          <CloseIcon />
+        </Box>
+      </Tooltip>
+    </IconButton>
+  ) : (
+    <LeaveIconButton
+      key="LeaveRoom"
+      data-testid="leave_room_btn"
+      css={{
+        borderTopRightRadius: '$1',
+        borderBottomRightRadius: '$1',
+      }}
+      onClick={() => onClick()}
+    >
+      <Tooltip title="Leave Room">
+        <Box>
+          <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+        </Box>
+      </Tooltip>
+    </LeaveIconButton>
   );
 };

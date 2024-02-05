@@ -76,7 +76,7 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: '100%',
+        h: mwebHLSStream ? '50%' : '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
@@ -97,7 +97,7 @@ const SidePane = ({
         <Box
           css={{
             w: '$100',
-            h: mwebStreamingChat ? '0' : mwebHLSStream ? '50%' : '100%',
+            h: mwebStreamingChat ? '0' : '100%',
             p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,
@@ -119,6 +119,7 @@ const SidePane = ({
             },
             '@md': {
               p: '$6 $8',
+              h: mwebHLSStream ? '50%' : '100%',
               pb: mwebStreamingChat ? '$20' : '$12',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',

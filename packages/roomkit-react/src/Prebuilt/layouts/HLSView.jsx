@@ -11,13 +11,14 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { CloseIcon, ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, ExpandIcon, PlayIcon, RadioIcon, ShrinkIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
 import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
 import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
+import { LeaveRoom } from '../components/Leave/LeaveRoom';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
 import { IconButton } from '../../IconButton';
@@ -27,7 +28,7 @@ import { Text } from '../../Text';
 import { config, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { usePollViewToggle } from '../components/AppData/useSidepane';
-import { APP_DATA, EMOJI_REACTION_TYPE } from '../common/constants';
+import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
 
 let hlsPlayer;
 
@@ -60,6 +61,8 @@ const HLSView = () => {
   const vanillaStore = useHMSVanillaStore();
 
   const isMobile = useMedia(config.media.md);
+  const isLandscape = useMedia(config.media.ls);
+  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
@@ -275,14 +278,21 @@ const HLSView = () => {
     [controlsVisible, isFullScreen, qualityDropDownOpen],
   );
 
-  if (isMobile) {
+  if (isMobile || isLandscape) {
     return (
       <Flex
         key="hls-viewer"
         id={`hls-viewer-${themeType}`}
         ref={hlsViewRef}
         css={{
-          size: '100%',
+          w: '100%',
+          h:
+            (sidepane === SIDE_PANE_OPTIONS.POLLS ||
+              sidepane === SIDE_PANE_OPTIONS.CHAT ||
+              sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) &&
+            isMobile
+              ? '50%'
+              : '100%',
         }}
       >
         {hlsUrl && !streamEnded ? (
@@ -353,9 +363,7 @@ const HLSView = () => {
                   }}
                 >
                   <HMSVideoPlayer.Controls.Left>
-                    <IconButton onClick={() => console.log('TOOD')}>
-                      <CloseIcon />
-                    </IconButton>
+                    <LeaveRoom />
                   </HMSVideoPlayer.Controls.Left>
 
                   <HMSVideoPlayer.Controls.Right>

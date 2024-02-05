@@ -23,6 +23,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.ls);
   const rolesMap: Record<string, HMSRole> = useHMSStore(selectRolesMap);
   const streamingPermissionRoles = Object.keys(rolesMap).filter(roleName => {
     const roleObj = rolesMap[roleName];
@@ -60,6 +61,9 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
 
   if (!permissions || !isConnected) {
     return null;
+  }
+  if ((isMobile || isLandscape) && screenType === 'hls_live_streaming') {
+    return <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />;
   }
   return isMobile ? (
     <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />
