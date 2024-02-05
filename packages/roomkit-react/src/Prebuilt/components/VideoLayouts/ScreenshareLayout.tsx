@@ -21,6 +21,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   const [layoutMode, setLayoutMode] = useSetUiSettings(UI_SETTINGS.layoutMode);
   const activeSharePeer = peersSharing[page];
   const isMobile = useMedia(cssConfig.media.md);
+  const hasSidebar = !isMobile && layoutMode === LayoutMode.SIDEBAR;
   const secondaryPeers = useMemo(() => {
     if (layoutMode === LayoutMode.SPOTLIGHT) {
       return [];
@@ -46,7 +47,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
 
   return (
-    <ProminenceLayout.Root edgeToEdge={edgeToEdge} hasSidebar={layoutMode === LayoutMode.SIDEBAR}>
+    <ProminenceLayout.Root edgeToEdge={edgeToEdge} hasSidebar={hasSidebar}>
       <ProminenceLayout.ProminentSection>
         <ScreenshareTile peerId={peersSharing[page]?.id} />
         {!edgeToEdge && <Pagination page={page} onPageChange={setPage} numPages={peersSharing.length} />}
@@ -56,7 +57,7 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
         onPageChange={onPageChange}
         onPageSize={onPageSize}
         edgeToEdge={edgeToEdge}
-        hasSidebar={layoutMode === LayoutMode.SIDEBAR && !isMobile}
+        hasSidebar={hasSidebar}
       />
       {layoutMode === LayoutMode.SPOTLIGHT && activeSharePeer && <InsetTile peerId={activeSharePeer?.id} />}
     </ProminenceLayout.Root>
