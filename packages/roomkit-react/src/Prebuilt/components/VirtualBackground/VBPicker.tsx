@@ -80,6 +80,10 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     }
   }, [isVideoOn, toggleVB]);
 
+  useEffect(() => {
+    // If default is present, set it and set a sessionStorage key
+  }, []);
+
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
       <Flex align="center" justify="between" css={{ w: '100%', background: '$surface_dim', pb: '$4' }}>
