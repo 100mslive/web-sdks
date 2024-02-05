@@ -14,4 +14,4 @@ export const defaultMedia = [
 ];
 
 export const DEFAULT_VB_STATE = 'defaultVB';
-// states - undefined, opened, set
+// states - '', opened, set

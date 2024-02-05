@@ -17,7 +17,6 @@ export const VBToggle = () => {
   const backgroundMedia = elements?.virtual_background?.background_media;
 
   useEffect(() => {
-    // If default is present, open the VB sidepane
     const defaultMediaPresent = !!backgroundMedia?.some(media => media.default);
     const openedSidepane = !!sessionStorage.getItem(DEFAULT_VB_STATE);
 
