@@ -6,8 +6,9 @@ import IconButton from '../../IconButton';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
-import { DEFAULT_VB_STATE } from './constants';
+// @ts-ignore
+import { useSetAppDataByKey } from '../AppData/useUISettings';
+import { APP_DATA, DEFAULT_VB_STATES, isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
@@ -15,16 +16,16 @@ export const VBToggle = () => {
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
   const { elements } = useRoomLayoutConferencingScreen();
   const backgroundMedia = elements?.virtual_background?.background_media;
+  const [defaultVBState, setDefaultVBState] = useSetAppDataByKey(APP_DATA.defaultVB);
 
   useEffect(() => {
     const defaultMediaPresent = !!backgroundMedia?.some(media => media.default);
-    const openedSidepane = !!sessionStorage.getItem(DEFAULT_VB_STATE);
 
-    if (defaultMediaPresent && !openedSidepane) {
+    if (defaultMediaPresent && defaultVBState === DEFAULT_VB_STATES.UNSET) {
       toggleVB();
-      sessionStorage.setItem(DEFAULT_VB_STATE, 'opened');
+      setDefaultVBState(DEFAULT_VB_STATES.OPENED);
     }
-  }, [backgroundMedia, toggleVB]);
+  }, [backgroundMedia, defaultVBState, setDefaultVBState, toggleVB]);
 
   if (!isVideoOn || isSafari) {
     return null;

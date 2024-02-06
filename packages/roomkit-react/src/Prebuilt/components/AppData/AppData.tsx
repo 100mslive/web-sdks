@@ -18,6 +18,7 @@ import { useSetAppDataByKey } from './useUISettings';
 import {
   APP_DATA,
   CHAT_SELECTOR,
+  DEFAULT_VB_STATES,
   DEFAULT_WAITING_VIEWER_ROLE,
   POLL_STATE,
   SIDE_PANE_OPTIONS,
@@ -59,6 +60,7 @@ const initialAppData = {
   [APP_DATA.disableNotifications]: false,
   [APP_DATA.background]: 'none',
   [APP_DATA.backgroundType]: 'none',
+  [APP_DATA.defaultVB]: DEFAULT_VB_STATES.UNSET,
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',

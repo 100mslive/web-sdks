@@ -25,7 +25,6 @@ import { Notifications } from './components/Notifications';
 import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { DEFAULT_VB_STATE } from './components/VirtualBackground/constants';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
@@ -123,9 +122,8 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
       (ref as MutableRefObject<HMSPrebuiltRefType>).current = { ...reactiveStore.current };
     }, [ref]);
 
+    // leave room when component unmounts
     useEffect(() => {
-      sessionStorage.setItem(DEFAULT_VB_STATE, '');
-      // leave room when component unmounts
       return () => {
         VBHandler.reset();
         reactiveStore?.current?.hmsActions.leave();

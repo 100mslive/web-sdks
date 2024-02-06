@@ -21,9 +21,9 @@ import { VBHandler } from './VBHandler';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
 // @ts-ignore
-import { useUISettings } from '../AppData/useUISettings';
-import { SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
-import { DEFAULT_VB_STATE, defaultMedia } from './constants';
+import { useSetAppDataByKey, useUISettings } from '../AppData/useUISettings';
+import { APP_DATA, DEFAULT_VB_STATES, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
+import { defaultMedia } from './constants';
 
 const iconDims = { height: '40px', width: '40px' };
 
@@ -42,6 +42,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
+  const [defaultVBState, setDefaultVBState] = useSetAppDataByKey(APP_DATA.defaultVB);
   const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
     (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || HMSVirtualBackgroundTypes.NONE,
   );
@@ -81,17 +82,16 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   }, [isVideoOn, toggleVB]);
 
   useEffect(() => {
-    const defaultApplied = 'set' === sessionStorage.getItem(DEFAULT_VB_STATE);
-    if (!defaultApplied) {
+    if (defaultVBState === DEFAULT_VB_STATES.OPENED) {
       backgroundMedia.forEach(media => {
         if (media.default && media?.url) {
           VBHandler?.setBackground(media.url);
           setActiveBackground(media.url);
-          sessionStorage.setItem(DEFAULT_VB_STATE, 'set');
+          setDefaultVBState(DEFAULT_VB_STATES.SET);
         }
       });
     }
-  }, [backgroundMedia]);
+  }, [backgroundMedia, defaultVBState, setDefaultVBState]);
 
   return (
     <Flex css={{ pr: '$6', size: '100%' }} direction="column">
