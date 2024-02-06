@@ -426,11 +426,15 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0) {
-      return <EmptyChat />;
-    }
-
-    return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
+    return (
+      <Box css={{ overflowY: 'auto' }}>
+        {filteredMessages.length === 0 ? (
+          <EmptyChat />
+        ) : (
+          <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />
+        )}
+      </Box>
+    );
   },
 );
 
