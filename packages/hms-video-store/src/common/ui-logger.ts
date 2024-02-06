@@ -1,4 +1,4 @@
-import { HMSLogLevel } from '../core/hmsSDKStore/sdkTypes';
+import { HMSLogLevel } from '../internal';
 
 const HMS_STORE_TAG = 'HMS-Store:';
 
@@ -33,7 +33,7 @@ export class HMSLogger {
     this.log(HMSLogLevel.TIMEEND, '[HMSPerformanceTiming]', mark, mark);
   }
 
-  static cleanUp() {
+  static cleanup() {
     performance.clearMarks();
     performance.clearMeasures();
   }

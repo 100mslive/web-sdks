@@ -24,7 +24,7 @@ const getFiles = (path, arrayOfFiles = []) => {
  * @param {string | undefined} content
  * @returns {string | undefined}
  */
-const replaceTitleWithMetadata = content => {
+/* const replaceTitleWithMetadata = content => {
   const lines = content?.split('\n');
   const firstLine = lines?.at(0);
   if (!lines || !firstLine) {
@@ -41,7 +41,7 @@ const replaceTitleWithMetadata = content => {
   lines.splice(0, 1, meta);
   return lines.join('\n');
 };
-
+ */
 /**
  * Remove .md extension from all links used in a file
  * @param {string | undefined} content
@@ -57,7 +57,7 @@ const removeFileExtensionFromLinks = content => {
  * @returns {string | undefined}
  */
 const replaceContentLinks = content => {
-  return content?.replace('/modules', '/home/content');
+  return content?.replace(/\/modules/g, '/home/content');
 };
 
 const main = () => {

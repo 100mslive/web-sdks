@@ -4,13 +4,13 @@ import {
   HMSNotificationSeverity,
   HMSNotificationTypes,
   HMSPeer,
-  HMSReactiveStore,
   HMSStore,
   HMSTrack,
-} from '../../core';
-import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../core/hmsSDKStore/common/mapping';
-import { HMSNotifications } from '../../core/hmsSDKStore/HMSNotifications';
-import * as sdkTypes from '../../core/hmsSDKStore/sdkTypes';
+} from '../../';
+import * as sdkTypes from '../../internal';
+import { PEER_NOTIFICATION_TYPES, TRACK_NOTIFICATION_TYPES } from '../../reactive-store/common/mapping';
+import { HMSNotifications } from '../../reactive-store/HMSNotifications';
+import { HMSReactiveStore } from '../../reactive-store/HMSReactiveStore';
 import { makeFakeStore } from '../fakeStore';
 import { makeFakePeer, makeFakeTrack } from '../fixtures';
 

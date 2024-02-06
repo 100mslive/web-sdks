@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { SVGProps } from 'react';
-
 const SvgColoredTimeIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg width="24px" height="24px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <path d="m38.211 14.289-2.5-2.5L38.5 9l2.5 2.5-2.789 2.789ZM27 4h-6v6h6V4Z" fill="#F5BC00" />
@@ -29,5 +28,4 @@ const SvgColoredTimeIcon = (props: SVGProps<SVGSVGElement>) => (
     </defs>
   </svg>
 );
-
 export default SvgColoredTimeIcon;

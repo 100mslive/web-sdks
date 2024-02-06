@@ -1,150 +1,71 @@
 ## Web sdks
 
-
-This monorepo will contain all packages related to core sdk and store.
-
+This monorepo contains all the packages required to integrate 100ms on web
 
 ## Before doing any code change please take time to go through the [guidelines](./DEVELOPER.MD) line by line.
 
 ### Local Setup
 
-To setup locally, install lerna globally
+> Node version 18.0.0 or later
 
-`npm install -g lerna`
+if you are using a different version in other projects, use [nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating) to manage node versions.
 
-Clone the repo locally and run yarn install
 
 ```
 git clone https://github.com/100mslive/web-sdks.git
 cd web-sdks
 yarn install
+yarn build
 ```
 
-### Test
+### Running Sample Prebuilt
 
 ```
-yarn test 
-```
-### Running playwright tests
-
-Navigate to playwright directory before running below commands.
-
-## Install packages
-
-```
-yarn install
+cd examples/prebuilt-react-integration
+yarn dev
 ```
 
-## Run for say qa-in
+`http://locahost:<port>/<room-code>`
 
-```
- yarn qa-in
-```
+Once you run `yarn dev`, the localhost link with the port will be generated automatically. Just get the roomCode from [100ms dashboard](https://dashboard.100ms.live) and append at the end
 
-### Lint
 
-```
-yarn lint
-```
+### Testing changes locally
+Run `yarn start` by navigating to the package you are making changes to, the changes should reflect in the above sample app.
 
-### Running dev server
+For example, if you are making changes in roomkit-react(prebuilt), run `yarn start` in that package. The sample app should auto reload.
 
-Run whatever things you're changing in below in different terminal instances. For other packages you can navigate to
-the folder directly and run `yarn start`.
+> Note: Make sure `yarn build` is run atleast once before using `yarn start`
 
-```
-# for webapp
-> yarn app
+### Understanding the packages:
+The packages folder contains all the SDK's of 100ms. Here is a brief overview of them.
 
-# for hms-video-web
-> yarn sdk
+`hms-video-store` 
+is the source of `@100mslive/hms-video-store`. 
+This package contains the core SDK and the reactive store parts. 
+For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/hms-video-store/README.md).
 
-# for hms-video-store
-> yarn store
+`react-icons`
+is the source of `@100mslive/react-icons`.
+This contains all the icons used in the 100ms prebuilt.
+For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/react-icons/README.md).
 
-# for react-sdk
-> yarn reactsdk
+`react-sdk`
+is the source of `@100mslive/react-sdk`.
+This contains the base React Hooks and some commonly used functionalities as React Hooks.
+For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/react-sdk/README.md).
 
-# for react-ui
-> yarn reactui
-```
 
-> Note: run yarn start in sdk first and then in store
+`roomkit-react`
+is the source of `@100mslive/roomkit-react`.
+This contains the React components used in the prebuilt and the Prebuilt component itself.
+For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/roomkit-react/README.md).
 
-### Custom App in Dev
+`roomkit-web`
+is the source of `@100mslive/roomkit-web`.
+This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,
+this can be used as a web component.
+For more details refer [here](https://github.com/100mslive/web-sdks/blob/main/packages/roomkit-web/README.md).
 
-This is useful when you want to see changes from `100ms-web` app being reflected in custom app in dev. Run `yarn dev` in `100ms-web` & `yarn start` in `custom-app`
 
-### Update a packages version
 
-Run [this](https://github.com/100mslive/web-sdks/actions/workflows/create-release-pr.yml) to
-update all versions.
-
-#### Updating single ones
-
-Go to the path of the package ex: cd packages/hms-video-web and run the following command
-`npm version prerelease --preid=alpha --git-tag-version=false`
-
-To update the same in dependent packages run
-`lerna add @100mslive/hms-video --scope=@100mslive/hms-video-store --exact`
-
-### Publishing Alpha/Experimental versions
-
-To publish an alpha/experimental from your `experimental` branch, run the '[Create Release PR](https://github.com/100mslive/web-sdks/actions/workflows/publish.yml)' action on the `experimental` branch.
-This bumps the version of all the packages and creates a PR against your `experimental` branch.
-
-Merge this PR into your `experimental` branch and run the 'Publish Packages' on your branch to publish the packages.
-
-### Syncing with webapp
-
-check the existing remotes with `git remote -v`;
-if there is only one remote, add webapp as a new remote.
-`git remote add -f webapp https://github.com/100mslive/100ms-web.git`
-
-## push to webapp
-
-`git subtree push --prefix=apps/100ms-web webapp sync-webapp`
-
-## pull from webapp
-
-`git subtree pull --prefix=apps/100ms-web webapp main`
-
-## Adding a new repo into the monorepo
-
-**To add an existing repo**
-
-`git clone <repourl>`
-
-- if commit history is not need directly copy the files.
-  `cd repo`
-  `rm -rf .git`
-  `git rm -r --cached`
-  `cp -r repo path-to-web-sdks/packages`
-- if commit history is needed
-  `lerna import path-to-repo --flatten --preserve-commit` (to be run at root level)
-
-**To Create a new repo**
-
-Follow the documentation [here](https://github.com/lerna/lerna/tree/main/commands/create#readme)
-
-> Note: Don't forget to update mapping in `scripts/constants.js`. Also update`lernaCommands` in `versioning.js` depending on the new repo's dependencies and dependents
-
-## Setup Cypress
-
-- Create a .env file to the root folder and add the following variables.
-
-```
-CYPRESS_TOKEN_ENDPOINT=https://qa-in2.100ms.live/hmsapi/ravi.qa-app.100ms.live/api/token
-CYPRESS_ROOM_ID=60f26ab342a997a1ff49c5c2
-CYPRESS_ROLE=student
-CYPRESS_API_ENV=qa
-CYPRESS_INIT_ENDPOINT=https://qa-init.100ms.live/init
-```
-
-- Run `yarn cypress:open` at the root level to open the cypress app.
-
-## Tips and Tricks
-
-- `window.toggleUiTheme()` in console to switch between dark and light themes
-- Set directJoin to true in PreviewScreen.jsx to not have to click on join after
-  page reload.

@@ -1,4 +1,4 @@
-import { HMSAudioTrack, HMSPeer, HMSTrackType, HMSVideoTrack } from '../core';
+import { HMSAudioTrack, HMSPeer, HMSTrackType, HMSVideoTrack } from '../';
 
 let counter = 100;
 type HMSObjectType<T> = T extends 'audio' ? HMSAudioTrack : T extends 'video' ? HMSVideoTrack : HMSVideoTrack;
@@ -18,5 +18,7 @@ export const makeFakePeer = (): HMSPeer => {
     isLocal: false,
     name: 'test',
     videoTrack: '',
+    groups: [],
+    isHandRaised: false,
   };
 };

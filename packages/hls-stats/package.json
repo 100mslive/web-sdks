@@ -1,10 +1,15 @@
 {
   "name": "@100mslive/hls-stats",
-  "version": "0.1.0",
+  "version": "0.3.3",
   "description": "A simple library that provides stats for your hls stream",
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/hls-stats"
+  },
   "files": [
     "src",
     "dist"
@@ -31,9 +36,9 @@
   "author": "Ragzzy-R",
   "license": "ISC",
   "devDependencies": {
-    "hls.js": "^1.2.5"
+    "hls.js": "1.4.12"
   },
   "peerDependencies": {
-    "hls.js": "^1.2.5"
+    "hls.js": "1.4.12"
   }
 }

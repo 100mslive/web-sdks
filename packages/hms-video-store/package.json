@@ -1,6 +1,11 @@
 {
-  "version": "0.9.0",
+  "version": "0.11.3",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/100mslive/web-sdks.git",
+    "directory": "packages/hms-video-store"
+  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -18,6 +23,7 @@
       "default": "./dist/index.js"
     }
   },
+  "sideEffects": false,
   "scripts": {
     "prestart": "rm -rf dist && yarn types:build",
     "start": "concurrently \"yarn dev\" \"yarn types\"",
@@ -39,31 +45,32 @@
   },
   "name": "@100mslive/hms-video-store",
   "author": "100ms",
-  "sideEffects": false,
   "dependencies": {
-    "@100mslive/hms-video": "0.8.0",
-    "eventemitter2": "^6.4.7",
+    "eventemitter2": "^6.4.9",
     "immer": "^9.0.6",
+    "lodash.isequal": "^4.5.0",
     "reselect": "4.0.0",
+    "sdp-transform": "^2.14.1",
+    "ua-parser-js": "^1.0.1",
+    "uuid": "^8.3.2",
+    "webrtc-adapter": "^8.0.0",
     "zustand": "3.5.7"
   },
   "devDependencies": {
-    "ts-node": "^10.4.0",
+    "@types/dom-screen-wake-lock": "^1.0.1",
+    "@types/lodash.isequal": "^4.5.8",
+    "@types/sdp-transform": "^2.4.4",
+    "@types/ua-parser-js": "^0.7.36",
+    "@types/uuid": "^8.3.0",
+    "jest-canvas-mock": "^2.3.1",
+    "jsdom-worker": "^0.3.0",
     "tslib": "^2.2.0"
   },
-  "description": "This is an addon to the core sdk provided by 100ms. It abstracts away the intricacies of data management and provides a flux based reactive data store where data flows in only one direction.",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/100mslive/hms-video-store.git"
-  },
+  "description": "@100mslive Core SDK which abstracts the complexities of webRTC while providing a reactive store for data management with a unidirectional data flow",
   "keywords": [
     "video",
     "webrtc",
     "conferencing",
     "100ms"
-  ],
-  "bugs": {
-    "url": "https://github.com/100mslive/hms-video-store/issues"
-  },
-  "homepage": "https://github.com/100mslive/hms-video-store#readme"
+  ]
 }

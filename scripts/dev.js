@@ -6,9 +6,7 @@ async function main() {
   const source = pkg.name === '@100mslive/react-icons' ? './src/index.tsx' : './src/index.ts';
   const external = Object.keys(pkg.dependencies || {});
   external.push(...Object.keys(pkg.peerDependencies || {}));
-  if (pkg.name === '@100mslive/hms-noise-suppression') {
-    external.push('fs', 'path', './src/models/Noise.js');
-  }
+
   const commonOptions = {
     entryPoints: [source],
     minify: false,
@@ -17,36 +15,43 @@ async function main() {
     target: 'esnext',
     tsconfig: 'tsconfig.json',
     external,
+    loader: {
+      '.png': 'binary',
+      '.svg': 'text',
+    },
+    plugins: [
+      {
+        name: 'on-rebuild-plugin',
+        setup(build) {
+          build.onEnd(result => {
+            if (result.errors.length > 0) {
+              console.log(`× ${pkg.name}: An error prevented the ${build.initialOptions.format} rebuild.`);
+              return;
+            }
+            console.log(`✔ ${pkg.name}: Rebuilt.`);
+          });
+        },
+      },
+    ],
   };
-  esbuild.build({
+
+  const cjsContext = await esbuild.context({
     outfile: 'dist/index.cjs.js',
     format: 'cjs',
-    watch: {
-      onRebuild(error) {
-        if (error) {
-          console.log(`× ${pkg.name}: An error in prevented the cjs rebuild.`);
-          return;
-        }
-        console.log(`✔ ${pkg.name}: Rebuilt.`);
-      },
-    },
     ...commonOptions,
   });
 
-  esbuild.build({
+  const esmContext = await esbuild.context({
     outfile: 'dist/index.js',
     format: 'esm',
     ...commonOptions,
-    watch: {
-      onRebuild(error) {
-        if (error) {
-          console.log(`× ${pkg.name}: An error in prevented the esm rebuild.`);
-          return;
-        }
-        console.log(`✔ ${pkg.name}: Rebuilt.`);
-      },
-    },
   });
+
+  await cjsContext.rebuild();
+  await cjsContext.watch();
+
+  await esmContext.rebuild();
+  await esmContext.watch();
 }
 
 main();

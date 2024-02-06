@@ -6,12 +6,12 @@ import {
   HMSPluginUnsupportedTypes,
   HMSVideoPlugin,
   HMSVideoPluginType,
-} from '@100mslive/hms-video';
+} from '@100mslive/hms-video-store';
 import { HMSBackgroundInput, HMSVirtualBackground, HMSVirtualBackgroundTypes } from './interfaces';
 
 export class HMSVBPlugin implements HMSVideoPlugin {
   private TAG = '[HMSVBPlugin]';
-  private background: HMSVirtualBackground;
+  private background: HMSVirtualBackground = HMSVirtualBackgroundTypes.NONE;
   private backgroundType: HMSVirtualBackgroundTypes = HMSVirtualBackgroundTypes.NONE;
   private segmentation!: SelfieSegmentation;
   private outputCanvas?: HTMLCanvasElement;
@@ -143,6 +143,10 @@ export class HMSVBPlugin implements HMSVideoPlugin {
           `backgroundType did not match with any of the supported background types - ${HMSVirtualBackgroundTypes}`,
         );
     }
+  }
+
+  getBackground() {
+    return this.background;
   }
 
   stop(): void {

@@ -8,16 +8,9 @@ import {
   HMSTrackID,
   HMSTrackSource,
   HMSTrackType,
-} from '../../core';
-import { HMSSimulcastLayer } from '../../core/hmsSDKStore/sdkTypes';
-import {
-  HMSAudioTrack,
-  HMSPlaylist,
-  HMSPlaylistType,
-  HMSRole,
-  HMSScreenVideoTrack,
-  HMSVideoTrack,
-} from '../../core/schema';
+} from '../../';
+import { HMSSimulcastLayer } from '../../internal';
+import { HMSAudioTrack, HMSPlaylist, HMSPlaylistType, HMSRole, HMSScreenVideoTrack, HMSVideoTrack } from '../../schema';
 
 function makeTrack(
   id: HMSTrackID,
@@ -92,6 +85,7 @@ export const makeFakeStore = (): HMSStore => {
     appData: {
       isAudioOnly: true,
     },
+    templateAppData: {},
     peers: {
       '1': {
         id: '1',
@@ -102,6 +96,8 @@ export const makeFakeStore = (): HMSStore => {
         audioTrack: '102',
         auxiliaryTracks: [],
         metadata: '{}',
+        groups: [],
+        isHandRaised: false,
       },
       '2': {
         id: '2',
@@ -112,6 +108,8 @@ export const makeFakeStore = (): HMSStore => {
         audioTrack: '104',
         auxiliaryTracks: ['105', '106', '107'],
         metadata: '{"hello":"world"}',
+        groups: [],
+        isHandRaised: false,
       },
       '3': {
         id: '3',
@@ -121,6 +119,8 @@ export const makeFakeStore = (): HMSStore => {
         videoTrack: '105',
         audioTrack: '106',
         auxiliaryTracks: [],
+        groups: [],
+        isHandRaised: false,
       },
     },
     tracks: {
@@ -287,6 +287,10 @@ export const makeFakeStore = (): HMSStore => {
       audioTrack: '102',
     },
     errors: [],
+    sessionStore: {},
+    polls: {},
+    whiteboards: {},
+    hideLocalPeer: false,
   };
 
   localPeer = fakeStore.peers['1'];

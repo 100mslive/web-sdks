@@ -40,7 +40,17 @@ export interface usePreviewInput {
    */
   captureNetworkQualityInPreview?: boolean;
   asRole?: string;
+  /**
+   * if this flag is enabled, the SDK takes care of unsubscribing to the video when it goes out of view.
+   * Additionally if simulcast is enabled, it takes care of auto managing simulcast layers based on the
+   * dimensions of the video element to conserve bandwidth.
+   */
   autoManageVideo?: boolean;
+  /**
+   * if this flag is enabled, wake lock will be acquired automatically(if supported) when joining the room, so the device
+   * will be kept awake.
+   */
+  autoManageWakeLock?: boolean;
 }
 
 export interface usePreviewResult {
@@ -79,6 +89,7 @@ export const usePreviewJoin = ({
   captureNetworkQualityInPreview,
   asRole,
   autoManageVideo,
+  autoManageWakeLock,
 }: usePreviewInput): usePreviewResult => {
   const actions = useHMSActions();
   const roomState = useHMSStore(selectRoomState);
@@ -96,25 +107,35 @@ export const usePreviewJoin = ({
       asRole,
       captureNetworkQualityInPreview,
       autoManageVideo,
+      autoManageWakeLock,
     };
-  }, [name, token, metadata, initEndpoint, initialSettings, captureNetworkQualityInPreview, asRole, autoManageVideo]);
+  }, [
+    name,
+    token,
+    metadata,
+    initEndpoint,
+    initialSettings,
+    captureNetworkQualityInPreview,
+    asRole,
+    autoManageVideo,
+    autoManageWakeLock,
+  ]);
 
   const preview = useCallback(async () => {
     if (!token) {
       return;
     }
-    if (roomState !== HMSRoomState.Disconnected) {
-      return;
-    }
-    if (isConnected) {
-      await actions.leave();
-    }
     try {
+      if (isConnected || roomState !== HMSRoomState.Disconnected) {
+        await actions.leave().catch(() => {
+          // Do nothing as this might lead to leave called before join
+        });
+      }
       await actions.preview(config);
     } catch (err) {
       handleError(err as Error, 'preview');
     }
-  }, [actions, handleError, token, roomState, config, isConnected]);
+  }, [token, isConnected, roomState, actions, config, handleError]);
 
   const join = useCallback(async () => {
     if (!token) {

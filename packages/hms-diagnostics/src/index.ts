@@ -1,6 +1,6 @@
 import cloneDeep from 'lodash.clonedeep';
 import setInObject from 'lodash.set';
-import type { InitConfig } from '@100mslive/hms-video';
+import type { InitConfig } from '@100mslive/hms-video-store';
 import {
   BuildGetMediaError,
   decodeJWT,
@@ -9,7 +9,7 @@ import {
   HMSSdk,
   validateMediaDevicesExistence,
   validateRTCPeerConnection,
-} from '@100mslive/hms-video';
+} from '@100mslive/hms-video-store';
 import { initialState } from './initial-state';
 import {
   ConnectivityKeys,
@@ -269,5 +269,6 @@ export class HMSDiagnostics implements HMSDiagnosticsInterface {
   }
 }
 
-export { TrackAudioLevelMonitor } from '@100mslive/hms-video';
+export { TrackAudioLevelMonitor } from '@100mslive/hms-video-store';
 export { HMSDiagnosticsCheck } from './interfaces';
+export type { HMSDiagnosticsOutputValue } from './interfaces';

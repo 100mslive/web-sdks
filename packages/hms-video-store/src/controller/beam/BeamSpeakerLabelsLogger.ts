@@ -1,21 +1,21 @@
+import { HMSGenericTypes, HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../';
 import { HMSLogger } from '../../common/ui-logger';
-import { HMSPeer, IHMSStore, selectIsConnectedToRoom, selectPeers } from '../../core';
-import { IHMSActions } from '../../core/IHMSActions';
+import { IHMSActions } from '../../IHMSActions';
 
 /**
  * Log data of audio level and speaker speaking periodically to beam for transcript
  * diarization.
  */
-export class BeamSpeakerLabelsLogger {
+export class BeamSpeakerLabelsLogger<T extends HMSGenericTypes> {
   private audioContext?: AudioContext;
   private readonly intervalMs: number;
   private shouldMonitor: boolean;
   private hasStarted: boolean;
   private unsubs: any[];
   private readonly analysers: Record<string, AnalyserNode>;
-  private readonly store: IHMSStore;
-  private actions: IHMSActions;
-  constructor(store: IHMSStore, actions: IHMSActions) {
+  private readonly store: IHMSStore<T>;
+  private actions: IHMSActions<T>;
+  constructor(store: IHMSStore<T>, actions: IHMSActions<T>) {
     this.intervalMs = 100;
     this.shouldMonitor = false;
     this.hasStarted = false;
@@ -85,9 +85,8 @@ export class BeamSpeakerLabelsLogger {
     const peers = allPeers.filter(peer => !!peer.audioTrack);
     const peerAudioLevels = [];
     for (const peer of peers) {
-      // @ts-ignore
-      const sdkTrack = this.actions.hmsSDKTracks[peer.audioTrack];
-      const nativeStream: MediaStream = sdkTrack?.stream?.nativeStream;
+      const sdkTrack = this.actions.getTrackById(peer.audioTrack || '');
+      const nativeStream: MediaStream | undefined = sdkTrack?.stream?.nativeStream;
       if (!peer.joinedAt) {
         continue;
       }
@@ -103,7 +102,7 @@ export class BeamSpeakerLabelsLogger {
         event: 'app-audio-level',
         data: peerAudioLevels,
       };
-      // HMSLogger.d('logging audio levels', peerAudioLevels);
+      HMSLogger.d('logging audio levels', peerAudioLevels);
       window.__triggerBeamEvent__(JSON.stringify(payload));
     }
   }
