@@ -22,7 +22,11 @@ import { PeerNotification } from '../HMSNotifications';
  */
 export class PeerManager {
   private readonly TAG = '[PeerManager]';
-  constructor(private store: Store, private trackManager: TrackManager, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    private trackManager: TrackManager,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

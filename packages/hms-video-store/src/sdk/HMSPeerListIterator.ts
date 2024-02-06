@@ -11,7 +11,11 @@ export class HMSPeerListIterator {
   private iterator: string | null = null;
   private total = 0;
   private defaultPaginationLimit = 10;
-  constructor(private transport: HMSTransport, private store: Store, private options?: HMSPeerListIteratorOptions) {}
+  constructor(
+    private transport: HMSTransport,
+    private store: Store,
+    private options?: HMSPeerListIteratorOptions,
+  ) {}
 
   private validateConnection() {
     if (!this.transport || !this.store) {

@@ -31,7 +31,10 @@ import {
 export class RoomUpdateManager {
   private readonly TAG = '[RoomUpdateManager]';
 
-  constructor(private store: Store, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   // eslint-disable-next-line complexity
   handleNotification(method: HMSNotificationMethod, notification: any) {

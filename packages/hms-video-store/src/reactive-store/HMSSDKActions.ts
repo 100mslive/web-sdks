@@ -885,18 +885,21 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   private onPollsUpdate(actionType: sdkTypes.HMSPollsUpdate, polls: sdkTypes.HMSPoll[]) {
     const actionName = POLL_NOTIFICATION_TYPES[actionType];
     this.setState(draftStore => {
-      const pollsObject = polls.reduce((acc, poll) => {
-        acc[poll.id] = {
-          ...poll,
-          questions: poll.questions?.map(question => ({
-            ...question,
-            answer: question.answer ? { ...question.answer } : undefined,
-            options: question.options?.map(option => ({ ...option })),
-            responses: question.responses?.map(response => ({ ...response })),
-          })),
-        };
-        return acc;
-      }, {} as { [key: string]: sdkTypes.HMSPoll });
+      const pollsObject = polls.reduce(
+        (acc, poll) => {
+          acc[poll.id] = {
+            ...poll,
+            questions: poll.questions?.map(question => ({
+              ...question,
+              answer: question.answer ? { ...question.answer } : undefined,
+              options: question.options?.map(option => ({ ...option })),
+              responses: question.responses?.map(response => ({ ...response })),
+            })),
+          };
+          return acc;
+        },
+        {} as { [key: string]: sdkTypes.HMSPoll },
+      );
       mergeNewPollsInDraft(draftStore.polls, pollsObject);
     }, actionName);
 

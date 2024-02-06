@@ -3,7 +3,10 @@ import { Store } from '../../sdk/store';
 import { ConnectionQualityList } from '../HMSNotifications';
 
 export class ConnectionQualityManager {
-  constructor(private store: Store, public listener?: HMSConnectionQualityListener) {}
+  constructor(
+    private store: Store,
+    public listener?: HMSConnectionQualityListener,
+  ) {}
 
   handleQualityUpdate(qualityList: ConnectionQualityList) {
     const peers = qualityList.peers;

@@ -34,7 +34,10 @@ export class DeviceManager implements HMSDeviceManager {
   private videoInputChanged = false;
   private audioInputChanged = false;
 
-  constructor(private store: Store, private eventBus: EventBus) {
+  constructor(
+    private store: Store,
+    private eventBus: EventBus,
+  ) {
     const isLocalTrackEnabled = ({ enabled, track }: { enabled: boolean; track: HMSLocalTrack }) =>
       enabled && track.source === 'regular';
     this.eventBus.localVideoEnabled.waitFor(isLocalTrackEnabled).then(async () => {

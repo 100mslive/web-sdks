@@ -8,7 +8,11 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { PollStartNotification, PollStatsNotification, PollStopNotification } from '../HMSNotifications';
 
 export class PollsManager {
-  constructor(private store: Store, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    private transport: HMSTransport,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

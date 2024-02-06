@@ -10,7 +10,10 @@ export interface IAudioOutputManager {
 }
 
 export class AudioOutputManager implements IAudioOutputManager {
-  constructor(private deviceManager: DeviceManager, private audioSinkManager: AudioSinkManager) {}
+  constructor(
+    private deviceManager: DeviceManager,
+    private audioSinkManager: AudioSinkManager,
+  ) {}
 
   getVolume() {
     return this.audioSinkManager.getVolume();

@@ -191,8 +191,8 @@ const TrackStats = ({ trackID, layer, local }) => {
   const selector = layer
     ? selectHMSStats.localVideoTrackStatsByLayer(layer)(trackID)
     : local
-    ? selectHMSStats.localAudioTrackStatsByID(trackID)
-    : selectHMSStats.trackStatsByID(trackID);
+      ? selectHMSStats.localAudioTrackStatsByID(trackID)
+      : selectHMSStats.trackStatsByID(trackID);
   const stats = useHMSStatsStore(selector);
   if (!stats) {
     return null;

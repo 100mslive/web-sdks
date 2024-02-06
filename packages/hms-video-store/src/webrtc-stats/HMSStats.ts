@@ -17,7 +17,10 @@ export class HMSStats implements IHMSStatsStoreReadOnly {
   readonly getSubscribePeerConnection: () => Promise<RTCPeerConnection | undefined>;
   private readonly store: IHMSStatsStore;
 
-  constructor(private hmsStore: IHMSStore, private sdk?: HMSSdk) {
+  constructor(
+    private hmsStore: IHMSStore,
+    private sdk?: HMSSdk,
+  ) {
     this.store = HMSReactiveStore.createNewHMSStore<HMSStatsStore>(
       storeNameWithTabTitle('HMSStatsStore'),
       createDefaultStatsStore,

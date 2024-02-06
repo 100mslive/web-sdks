@@ -13,7 +13,12 @@ import { TrackState, TrackStateNotification } from '../HMSNotifications';
 export class OnDemandTrackManager extends TrackManager {
   TAG = '[OnDemandTrackManager]';
 
-  constructor(store: Store, eventBus: EventBus, private transport: HMSTransport, listener?: HMSUpdateListener) {
+  constructor(
+    store: Store,
+    eventBus: EventBus,
+    private transport: HMSTransport,
+    listener?: HMSUpdateListener,
+  ) {
     super(store, eventBus, listener);
   }
 

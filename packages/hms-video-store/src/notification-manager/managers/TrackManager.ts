@@ -27,7 +27,11 @@ export class TrackManager {
   public TAG = '[TrackManager]';
   private tracksToProcess: Map<string, HMSRemoteTrack> = new Map();
 
-  constructor(public store: Store, public eventBus: EventBus, public listener?: HMSUpdateListener) {}
+  constructor(
+    public store: Store,
+    public eventBus: EventBus,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   /**
    * Add event from biz on track-add

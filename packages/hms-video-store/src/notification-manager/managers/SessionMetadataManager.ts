@@ -5,7 +5,10 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { MetadataChangeNotification } from '../HMSNotifications';
 
 export class SessionMetadataManager {
-  constructor(private store: Store, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   handleNotification(method: string, notification: any) {
     if (method !== HMSNotificationMethod.METADATA_CHANGE) {

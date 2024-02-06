@@ -4,7 +4,11 @@ import { Store } from '../../sdk/store';
 import { SpeakerList } from '../HMSNotifications';
 
 export class ActiveSpeakerManager {
-  constructor(private store: Store, public listener?: HMSUpdateListener, public audioListener?: HMSAudioListener) {}
+  constructor(
+    private store: Store,
+    public listener?: HMSUpdateListener,
+    public audioListener?: HMSAudioListener,
+  ) {}
 
   handleActiveSpeakers(speakerList: SpeakerList) {
     const speakers = speakerList['speaker-list'];

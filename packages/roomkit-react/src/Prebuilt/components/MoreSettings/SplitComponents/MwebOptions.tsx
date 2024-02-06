@@ -282,8 +282,8 @@ export const MwebOptions = ({
                   {isBrowserRecordingOn
                     ? 'Recording On'
                     : isRecordingLoading
-                    ? 'Starting Recording'
-                    : 'Start Recording'}
+                      ? 'Starting Recording'
+                      : 'Start Recording'}
                 </ActionTile.Title>
               </ActionTile.Root>
             ) : null}

@@ -5,7 +5,11 @@ import { HMSNotificationMethod } from '../HMSNotificationMethod';
 import { WhiteboardInfo } from '../HMSNotifications';
 
 export class WhiteboardManager {
-  constructor(private store: Store, private transport: HMSTransport, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    private transport: HMSTransport,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

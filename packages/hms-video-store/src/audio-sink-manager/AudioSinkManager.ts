@@ -41,7 +41,11 @@ export class AudioSinkManager {
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
 
-  constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
+  constructor(
+    private store: Store,
+    private deviceManager: DeviceManager,
+    private eventBus: EventBus,
+  ) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);

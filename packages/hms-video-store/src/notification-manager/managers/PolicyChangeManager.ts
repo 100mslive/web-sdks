@@ -10,7 +10,10 @@ import { PolicyParams } from '../HMSNotifications';
  * - Emit 'policy-change' to finish preview before calling listener.onPreview
  */
 export class PolicyChangeManager {
-  constructor(private store: Store, private eventBus: EventBus) {}
+  constructor(
+    private store: Store,
+    private eventBus: EventBus,
+  ) {}
 
   handlePolicyChange(params: PolicyParams) {
     const localPeer = this.store.getLocalPeer();

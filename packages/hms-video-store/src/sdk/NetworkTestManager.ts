@@ -9,7 +9,10 @@ export class NetworkTestManager {
   private readonly TAG = '[NetworkTestManager]';
   private controller = new AbortController();
   private score?: number;
-  constructor(private eventBus: EventBus, private listener?: HMSUpdateListener) {}
+  constructor(
+    private eventBus: EventBus,
+    private listener?: HMSUpdateListener,
+  ) {}
 
   start = async (networkHealth: NetworkHealth) => {
     if (!networkHealth) {

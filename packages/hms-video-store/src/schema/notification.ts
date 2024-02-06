@@ -173,8 +173,8 @@ export type HMSNotificationTypeParam = HMSNotificationTypes | HMSNotificationTyp
 export type HMSNotificationInCallback<T extends HMSNotificationTypeParam> = T extends HMSNotificationTypes[]
   ? MappedNotifications<T>[number]
   : T extends HMSNotificationTypes
-  ? HMSNotificationMapping<T>
-  : HMSNotification;
+    ? HMSNotificationMapping<T>
+    : HMSNotification;
 
 export type HMSNotificationCallback<T extends HMSNotificationTypeParam> = (
   notification: HMSNotificationInCallback<T>,

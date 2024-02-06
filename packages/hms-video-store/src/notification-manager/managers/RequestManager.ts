@@ -12,7 +12,10 @@ import {
  * Handles request from remote peers to change something on the local side. For eg. role change, track mute/unmute.
  */
 export class RequestManager {
-  constructor(private store: Store, public listener?: HMSUpdateListener) {}
+  constructor(
+    private store: Store,
+    public listener?: HMSUpdateListener,
+  ) {}
 
   handleNotification(method: string, notification: any) {
     switch (method) {

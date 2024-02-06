@@ -23,7 +23,11 @@ import { convertDateNumToDate } from '../../utils/date';
 
 export class InteractivityCenter implements HMSInteractivityCenter {
   whiteboard: WhiteboardInteractivityCenter;
-  constructor(private transport: HMSTransport, private store: Store, private listener?: InteractivityListener) {
+  constructor(
+    private transport: HMSTransport,
+    private store: Store,
+    private listener?: InteractivityListener,
+  ) {
     this.whiteboard = new WhiteboardInteractivityCenter(transport, store, listener);
   }
 

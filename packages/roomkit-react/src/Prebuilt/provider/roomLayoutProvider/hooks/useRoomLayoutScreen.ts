@@ -16,10 +16,10 @@ export type useRoomLayoutScreenProps = {
 type useRoomLayoutScreenReturnType<T extends useRoomLayoutScreenProps> = T['screen'] extends 'conferencing'
   ? ConferencingScreen
   : T['screen'] extends 'leave'
-  ? LeaveScreen
-  : T['screen'] extends 'preview'
-  ? PreviewScreen
-  : undefined;
+    ? LeaveScreen
+    : T['screen'] extends 'preview'
+      ? PreviewScreen
+      : undefined;
 
 function useRoomLayoutScreen<T extends useRoomLayoutScreenProps>({
   screen,
