@@ -18,7 +18,7 @@ interface Transcript {
 }
 class SimpleQueue {
   private storage: Transcript[] = [];
-  constructor(private capacity: number = 3) {}
+  constructor(private capacity: number = 5) {}
   enqueue(value: string, final: boolean): void {
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue();
