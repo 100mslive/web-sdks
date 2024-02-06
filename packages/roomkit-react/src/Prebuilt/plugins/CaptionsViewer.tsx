@@ -20,13 +20,17 @@ class SimpleQueue {
   private storage: Transcript[] = [];
   constructor(private capacity: number = 3) {}
   enqueue(value: string, final: boolean): void {
-    if (!value) {
-      return;
-    }
     if (this.size() === this.capacity && this.storage[this.size() - 1].final) {
       this.dequeue();
     }
-    if (this.size() <= 0 || this.storage[this.size() - 1]?.final) {
+    if (this.size() === 0) {
+      this.storage.push({
+        transcript: value,
+        final: final,
+      });
+      return;
+    }
+    if (this.size() > 0 && this.storage[this.size() - 1]?.final === true) {
       this.storage.push({
         transcript: value,
         final: final,
@@ -58,31 +62,35 @@ class SimpleQueue {
   }
 }
 class Queue {
-  private storage: { [key: string]: CaptionData[] } = {};
+  private storage: { [key: string]: CaptionData } = {};
   constructor(private capacity: number = 3) {}
 
-  enqueue(key: string, value: CaptionData): void {
+  enqueue(key: string, value: Transcript): void {
     if (this.size() === this.capacity) {
       this.dequeue();
     }
-    if (!value.transcriptQueue) {
-      value.transcriptQueue = new SimpleQueue();
-    }
-    value.transcriptQueue.enqueue(value.transcript, value.final);
     if (!this.storage[key]) {
-      this.storage[key] = [value];
+      this.storage[key] = {
+        peer_id: key,
+        transcript: value.transcript,
+        final: value.final,
+        transcriptQueue: new SimpleQueue(),
+        start: 0,
+        end: 0,
+      };
+      this.storage[key].transcriptQueue.enqueue(value.transcript, value.final);
       return;
     }
-    // this.storage[key].push(value);
+    this.storage[key].transcriptQueue.enqueue(value.transcript, value.final);
   }
-  dequeue(): CaptionData[] {
+  dequeue(): CaptionData {
     const key: string = Object.keys(this.storage).shift() || '';
     const captionData = this.storage[key];
     delete this.storage[key];
-    return captionData || [];
+    return captionData;
   }
 
-  peek(): CaptionData[] | undefined {
+  peek(): CaptionData | undefined {
     if (this.size() <= 0) return undefined;
     const key: string = Object.keys(this.storage).shift() || '';
     return this.storage[key];
@@ -92,8 +100,7 @@ class Queue {
     const keys = Object.keys(this.storage);
     const data = keys.map((key: string) => {
       const data = this.storage[key];
-      let word = '';
-      data.forEach((value: CaptionData) => (word = value.transcriptQueue.getTranscription()));
+      const word = data.transcriptQueue.getTranscription();
       return { [key]: word };
     });
     return data;
@@ -105,11 +112,6 @@ class Queue {
 
 class CaptionMaintainerQueue {
   captionData: Queue = new Queue();
-  constructor(data: CaptionData[] = []) {
-    data.forEach((value: CaptionData) => {
-      this.captionData.enqueue(value.peer_id, value);
-    });
-  }
   push(data: CaptionData[] = []) {
     data.forEach((value: CaptionData) => {
       this.captionData.enqueue(value.peer_id, value);
@@ -118,23 +120,23 @@ class CaptionMaintainerQueue {
 }
 const TranscriptView = ({ peer_id, data }: { peer_id: string; data: string }) => {
   const peerName = useHMSStore(selectPeerNameByID(peer_id));
+  data = data.trim();
   if (!data) return null;
   return <Text>{`${peerName}: ${data}`}</Text>;
 };
 export const CaptionsViewer = () => {
-  const captionQueue = new CaptionMaintainerQueue();
-  const [currentData, setCurrentData] = useState<{ [key: string]: string }[]>([
-    // {
-    //   data1: 'Hellow there I am doing great here!!, Hellow there I am doing great here!!',
-    // },
-    // {
-    //   data2: 'Hello there I am not doing great here!!, Hellow there I am doing great here!!',
-    // },
-  ]);
+  const [captionQueue, setCaptionQueue] = useState<CaptionMaintainerQueue | null>(null);
+  const [currentData, setCurrentData] = useState<{ [key: string]: string }[]>([]);
 
   useEffect(() => {
+    setCaptionQueue(new CaptionMaintainerQueue());
+  }, []);
+  useEffect(() => {
     const timeInterval = setInterval(() => {
-      const data = captionQueue.captionData.findPeerData();
+      if (!captionQueue) {
+        return;
+      }
+      const data = captionQueue.captionData?.findPeerData();
       setCurrentData(data);
     }, 1000);
     return () => clearInterval(timeInterval);
@@ -142,7 +144,7 @@ export const CaptionsViewer = () => {
 
   useCustomEvent({
     type: 'transcript',
-    onEvent: (data: any) => captionQueue.push(data.results),
+    onEvent: (data: any) => captionQueue && captionQueue.push(data.results),
   });
 
   return (
