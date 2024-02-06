@@ -33,11 +33,13 @@ export const EmptyChat = () => {
       justify="center"
     >
       <Box>
-        <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+        {window && window.screen.height > 600 ? (
+          <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+        ) : null}
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
         </Text>
-        {canSendMessages ? (
+        {canSendMessages && window.screen.height > 400 ? (
           <Text
             variant="sm"
             css={{ mt: '$4', maxWidth: '80%', textAlign: 'center', mx: 'auto', c: '$on_surface_medium' }}
