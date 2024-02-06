@@ -1,8 +1,9 @@
 import React from 'react';
-import { Button, Dialog, Text } from '../../../';
+import { Button, Dialog, Text } from '../../..';
+// @ts-ignore
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 
-export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }) {
+export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }: { open: boolean; unblockAutoPlay: () => void }) {
   return (
     <Dialog.Root
       open={open}

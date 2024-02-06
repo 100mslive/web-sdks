@@ -1,13 +1,14 @@
 import React from 'react';
 import { useMedia } from 'react-use';
 import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
-import { Box, Dropdown, Flex, Text, Tooltip } from '../../../';
+import { Box, Dropdown, Flex, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { config } from '../../../Theme';
 
 export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
   const isMobile = useMedia(config.media.md);
-  if (isMobile) {
+  const isLandscape = useMedia(config.media.ls);
+  if (isMobile || isLandscape) {
     return (
       <Sheet.Root open={open} onOpenChange={onOpen}>
         <Sheet.Trigger asChild data-testid="quality_selector">

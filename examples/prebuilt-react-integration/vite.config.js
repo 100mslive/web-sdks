@@ -7,4 +7,7 @@ export default defineConfig({
   define: {
     'process.env': {},
   },
+  optimizeDeps: {
+    exclude: ['lodash'],
+  },
 });

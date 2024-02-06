@@ -1,11 +1,13 @@
 import React from 'react';
 import { ClosedCaptionIcon, OpenCaptionIcon } from '@100mslive/react-icons';
 import { IconButton, Tooltip } from '../../../';
+import { useHMSPlayerContext } from './PlayerContext';
 
-export function HLSCaptionSelector({ isEnabled, onClick }: { isEnabled: boolean; onClick: () => void }) {
+export function HLSCaptionSelector({ isEnabled }: { isEnabled: boolean }) {
+  const hlsPlayerContext = useHMSPlayerContext();
   return (
     <Tooltip title="Subtitles/closed captions" side="top">
-      <IconButton css={{ p: '$2' }} onClick={() => onClick()}>
+      <IconButton css={{ p: '$2' }} onClick={() => hlsPlayerContext?.toggleCaption()}>
         {isEnabled ? <ClosedCaptionIcon width="20" height="20px" /> : <OpenCaptionIcon width="20" height="20px" />}
       </IconButton>
     </Tooltip>

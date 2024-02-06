@@ -1,5 +1,8 @@
+// @ts-ignore
 import { LeftControls, RightControls, VideoControls } from './Controls';
+// @ts-ignore
 import { HMSVideo } from './HMSVideo';
+// @ts-ignore
 import { PlayButton } from './PlayButton';
 import { VideoProgress } from './VideoProgress';
 import { VideoTime } from './VideoTime';
