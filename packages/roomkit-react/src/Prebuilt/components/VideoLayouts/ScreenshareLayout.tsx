@@ -35,10 +35,19 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
   }, [activeSharePeer, peers, isMobile, layoutMode]);
 
   useEffect(() => {
-    if (layoutMode !== LayoutMode.SIDEBAR) {
-      setLayoutMode(LayoutMode.SIDEBAR);
+    if (isMobile) {
+      setLayoutMode(LayoutMode.GALLERY);
+      return;
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (layoutMode === LayoutMode.SIDEBAR) {
+      return;
+    }
+    setLayoutMode(LayoutMode.SIDEBAR);
+    return () => {
+      // reset to gallery once screenshare is stopped
+      setLayoutMode(LayoutMode.GALLERY);
+    };
+  }, [isMobile]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     setActiveScreenSharePeer(isMobile ? '' : activeSharePeer?.id);
     return () => {
