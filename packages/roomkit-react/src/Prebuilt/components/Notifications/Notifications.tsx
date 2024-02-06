@@ -4,9 +4,11 @@ import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
   HMSRoomState,
+  selectIsLocalScreenShared,
   selectLocalPeerID,
   selectPeerNameByID,
   selectRoomState,
+  useAwayNotifications,
   useCustomEvent,
   useHMSNotifications,
   useHMSStore,
@@ -14,7 +16,7 @@ import {
 } from '@100mslive/react-sdk';
 import { GroupIcon } from '@100mslive/react-icons';
 import { Box, Button } from '../../..';
-import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
+import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastBatcher } from '../Toast/ToastBatcher';
 // @ts-ignore: No implicit Any
@@ -50,6 +52,9 @@ export function Notifications() {
   const screenProps = useRoomLayoutConferencingScreen();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
+  const { showNotification } = useAwayNotifications();
+  const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
+  const logoURL = useRoomLayout()?.logo?.url;
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -180,6 +185,14 @@ export function Notifications() {
         if (pollID && pollToastKey?.[pollID]) {
           ToastManager.removeToast(pollToastKey?.[notification.data.id]);
           delete pollToastKey[notification?.data.id];
+        }
+        break;
+      case HMSNotificationTypes.NEW_MESSAGE:
+        if (amIScreenSharing) {
+          showNotification(`New message from ${notification.data.senderName}`, {
+            body: notification.data.message,
+            icon: logoURL,
+          });
         }
         break;
       default:
