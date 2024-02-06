@@ -34,6 +34,7 @@ export const EmptyChat = () => {
     >
       <Box>
         <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />
+
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
         </Text>
