@@ -194,7 +194,10 @@ export const SidePaneTabs = React.memo<{
               <Tabs.Content value={SIDE_PANE_OPTIONS.PARTICIPANTS} css={{ p: 0 }}>
                 <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
               </Tabs.Content>
-              <Tabs.Content value={SIDE_PANE_OPTIONS.CHAT} css={{ p: 0, overflowY: 'auto' }}>
+              <Tabs.Content
+                value={SIDE_PANE_OPTIONS.CHAT}
+                css={{ p: 0, overflowY: 'auto', '@md': { overflowY: 'unset' } }}
+              >
                 <Chat />
               </Tabs.Content>
             </Tabs.Root>
