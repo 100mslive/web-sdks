@@ -111,13 +111,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
         )}
 
         {track ? (
-          <Video
-            screenShare={true}
-            mirror={peer.isLocal}
-            attach={!isAudioOnly}
-            trackId={track.id}
-            css={{ minHeight: 0 }}
-          />
+          <Video screenShare={true} mirror={false} attach={!isAudioOnly} trackId={track.id} css={{ minHeight: 0 }} />
         ) : null}
         <StyledVideoTile.Info css={labelStyles}>{label}</StyledVideoTile.Info>
         {isMouseHovered && !peer.isLocal ? (
