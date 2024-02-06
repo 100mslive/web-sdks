@@ -2,10 +2,13 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 import { useMedia } from 'react-use';
 import data from '@emoji-mart/data';
 import Picker from '@emoji-mart/react';
-import { HMSException, selectLocalPeer, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import { HMSException, selectLocalPeer, useAVToggle, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
+import { MoreSettings } from '../MoreSettings/MoreSettings';
+// @ts-ignore: No implicit Any
+import { RaiseHand } from '../RaiseHand';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
@@ -77,7 +80,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const { elements } = useRoomLayoutConferencingScreen();
+  const isLandscape = useMedia(cssConfig.media.ls);
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
   const isOverlayChat = elements?.chat?.is_overlay;
@@ -87,6 +91,9 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const defaultSelection = useDefaultChatSelection();
   const selection = selectedPeer.name || selectedRole || defaultSelection;
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
+  const isMwebHLSStream = screenType === 'hls_live_streaming' && (isMobile || isLandscape);
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
@@ -198,7 +205,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               position: 'relative',
               py: '$6',
               pl: '$8',
-              flexGrow: 1,
+              flexGrow: `${isMwebHLSStream ? 1 : 0}`,
               r: '$1',
               '@md': {
                 minHeight: 'unset',
@@ -257,6 +264,17 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               <SendIcon />
             </BaseIconButton>
           </Flex>
+          {isMwebHLSStream && (
+            <Flex
+              css={{
+                alignItems: 'center',
+              }}
+              gap="1"
+            >
+              {noAVPermissions ? <RaiseHand /> : null}
+              <MoreSettings elements={elements} screenType={screenType} />
+            </Flex>
+          )}
         </Flex>
       )}
     </Box>

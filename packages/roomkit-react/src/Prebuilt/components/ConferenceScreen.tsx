@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import {
   HMSRoomState,
@@ -9,6 +10,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Footer } from './Footer/Footer';
+import { LeaveRoom } from './Leave/LeaveRoom';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 // @ts-ignore: No implicit Any
 import { ActivatedPIP } from './PIP/PIPComponent';
@@ -16,6 +18,7 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
+import { config } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
@@ -52,6 +55,9 @@ export const ConferenceScreen = () => {
     }
   };
   const autoRoomJoined = useRef(isPreviewScreenEnabled);
+  const isMobile = useMedia(config.media.md);
+  const isLandscape = useMedia(config.media.ls);
+  const isMwebHLSStream = screenProps.screenType === 'hls_live_streaming' && (isMobile || isLandscape);
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
@@ -112,7 +118,7 @@ export const ConferenceScreen = () => {
         </Box>
       ) : null}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-        {!screenProps.hideSections.includes('header') && (
+        {!screenProps.hideSections.includes('header') && !isMwebHLSStream && (
           <Box
             ref={headerRef}
             css={{
@@ -127,6 +133,11 @@ export const ConferenceScreen = () => {
           >
             <Header />
           </Box>
+        )}
+        {isMwebHLSStream && (
+          <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
+            <LeaveRoom screenType={screenProps.screenType} />
+          </Flex>
         )}
         <Box
           css={{
@@ -154,7 +165,7 @@ export const ConferenceScreen = () => {
             />
           ) : null}
         </Box>
-        {!screenProps.hideSections.includes('footer') && screenProps.elements && (
+        {!screenProps.hideSections.includes('footer') && screenProps.elements && !isMwebHLSStream && (
           <Box
             ref={footerRef}
             css={{

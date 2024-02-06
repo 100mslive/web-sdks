@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import { HMSHLSLayer } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import { selectHLSState, selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
@@ -6,10 +7,11 @@ import { ExpandIcon, PauseIcon, PlayIcon, ShrinkIcon } from '@100mslive/react-ic
 import { IconButton } from '../../../IconButton';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
+import { config } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
+import { ChatToggle } from '../Footer/ChatToggle';
 // @ts-ignore: No implicit any
 import { Logo } from '../Header/HeaderComponents';
-import { LeaveRoom } from '../Leave/LeaveRoom';
 import { FullScreenButton } from './FullscreenButton';
 import { HLSCaptionSelector } from './HLSCaptionSelector';
 // @ts-ignore
@@ -55,9 +57,9 @@ export const MwebHLSView = React.forwardRef<
     const controlsRef: React.RefObject<HTMLDivElement> = useRef<HTMLDivElement>(null);
     const controlsTimerRef = useRef();
 
-    const { screenType } = useRoomLayoutConferencingScreen();
-
     const isFullScreenSupported = screenfull.isEnabled;
+
+    const isLandscape = useMedia(config.media.ls);
 
     const handleQuality = useCallback(
       (quality: HMSHLSLayer) => {
@@ -106,7 +108,7 @@ export const MwebHLSView = React.forwardRef<
               r: '$round',
               gap: '$1',
               bg: 'rgba(0, 0, 0, 0.6)',
-              zIndex: 21,
+              zIndex: 1,
               visibility: controlsVisible ? `` : `hidden`,
               opacity: controlsVisible ? `1` : '0',
             }}
@@ -141,11 +143,8 @@ export const MwebHLSView = React.forwardRef<
                 p: '$4 $8',
               }}
             >
-              <HMSVideoPlayer.Controls.Left>
-                <LeaveRoom screenType={screenType} />
-              </HMSVideoPlayer.Controls.Left>
-
               <HMSVideoPlayer.Controls.Right>
+                {isLandscape && <ChatToggle />}
                 {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
                 {availableLayers.length > 0 ? (
                   <HLSQualitySelector
@@ -229,20 +228,20 @@ export const MwebHLSView = React.forwardRef<
               </HMSVideoPlayer.Controls.Right>
             </HMSVideoPlayer.Controls.Root>
           </Flex>
+          <Flex
+            direction="column"
+            justify="end"
+            align="start"
+            css={{
+              position: 'absolute',
+              bottom: '0',
+              w: '100%',
+            }}
+          >
+            <HMSVideoPlayer.Progress />
+            {/* <HLSViewTitle /> */}
+          </Flex>
         </HMSVideoPlayer.Root>
-        <Flex
-          direction="column"
-          justify="end"
-          align="start"
-          css={{
-            position: 'absolute',
-            bottom: '0',
-            w: '100%',
-          }}
-        >
-          <HMSVideoPlayer.Progress />
-          <HLSViewTitle />
-        </Flex>
       </>
     );
   },
@@ -253,7 +252,7 @@ export const MwebHLSView = React.forwardRef<
 	seekbar
 	half page will have chat or participant view
 */
-const HLSViewTitle = () => {
+export const HLSViewTitle = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const hlsState = useHMSStore(selectHLSState);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
