@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParam } from 'react-use';
+import { useHMSActions } from '@100mslive/react-sdk';
 import { Flex } from '../../..';
 import { useHMSPrebuiltContext } from '../../AppContext';
 import { useRoomLayout } from '../../provider/roomLayoutProvider';
@@ -11,7 +12,7 @@ import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/ho
 // @ts-ignore: No implicit Any
 import { useAuthToken } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
-import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
+import { APP_DATA, DEFAULT_VB_STATES, QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 export const PreviewScreen = () => {
   const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
@@ -20,8 +21,13 @@ export const PreviewScreen = () => {
   const { userName } = useHMSPrebuiltContext();
   const initialName = userName || (skipPreview ? 'Beam' : '');
   const authToken = useAuthToken();
+  const hmsActions = useHMSActions();
   const roomLayout = useRoomLayout();
   const { preview_header: previewHeader = {} } = roomLayout?.screens?.preview?.default?.elements || {};
+
+  useEffect(() => {
+    hmsActions.setAppData(APP_DATA.defaultVB, DEFAULT_VB_STATES.UNSET);
+  }, [hmsActions]);
 
   return (
     <Flex direction="column" css={{ size: '100%' }}>
