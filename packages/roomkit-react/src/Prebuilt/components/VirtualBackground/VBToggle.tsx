@@ -2,7 +2,6 @@ import React from 'react';
 import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
-// @ts-ignore
 import IconButton from '../../IconButton';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
