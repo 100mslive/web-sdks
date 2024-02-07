@@ -2,16 +2,18 @@ import React from 'react';
 import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
+// @ts-ignore
 import IconButton from '../../IconButton';
+// @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const VBToggle = () => {
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const isVBOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.VB);
   const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
 
-  if (!isVideoOn || isSafari) {
+  if (!isVideoOn) {
     return null;
   }
 
