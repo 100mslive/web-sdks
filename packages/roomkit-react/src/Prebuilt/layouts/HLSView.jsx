@@ -252,7 +252,7 @@ const HLSView = () => {
               sidepane === SIDE_PANE_OPTIONS.CHAT ||
               sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) &&
             isMobile
-              ? '50%'
+              ? '32%'
               : '100%',
         }}
       >
@@ -265,7 +265,7 @@ const HLSView = () => {
               css={{
                 width: '100%',
                 margin: '0 auto',
-                height: isFullScreen || isChatOpen || isParticipantOpen || isPollOpen || isLandscape ? '100%' : '50%',
+                height: isFullScreen || isChatOpen || isParticipantOpen || isPollOpen || isLandscape ? '100%' : '32%',
               }}
             >
               <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />

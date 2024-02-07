@@ -27,6 +27,7 @@ const SidePane = ({
   hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useMedia(cssConfig.media.lg);
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
@@ -76,11 +77,11 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: mwebHLSStream ? '50%' : '100%',
+        h: mwebHLSStream ? '68%' : '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
-        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
+        '@md': { position: mwebStreamingChat || isLandscape ? 'absolute' : '', zIndex: 12 },
       }}
     >
       {trackId && (
@@ -97,14 +98,15 @@ const SidePane = ({
         <Box
           css={{
             w: '$100',
-            h: mwebStreamingChat ? '0' : '100%',
+            h: mwebStreamingChat || isLandscape ? '0' : '100%',
             p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,
-            maxHeight: mwebStreamingChat ? '300px' : 'unset',
-            background: mwebStreamingChat
-              ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
-              : '$surface_dim',
+            maxHeight: mwebStreamingChat || isLandscape ? '300px' : 'unset',
+            background:
+              mwebStreamingChat || isLandscape
+                ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
+                : '$surface_dim',
             r: '$1',
             position: 'relative',
             '@lg': {
@@ -119,8 +121,8 @@ const SidePane = ({
             },
             '@md': {
               p: '$6 $8',
-              h: mwebHLSStream ? '50%' : '100%',
-              pb: mwebStreamingChat ? '$20' : '$12',
+              h: mwebHLSStream || isLandscape ? '68%' : '100%',
+              pb: mwebStreamingChat || isLandscape ? '$20' : '$12',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
