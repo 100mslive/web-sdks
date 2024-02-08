@@ -18,6 +18,7 @@ import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStream
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
+import { isMobile } from '../../utils/user-agent';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
 
@@ -61,6 +62,10 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
    */
   isPublished = false;
 
+  inBackground = false;
+
+  mutedInBackground = false;
+
   constructor(
     stream: HMSLocalStream,
     track: MediaStreamTrack,
@@ -80,6 +85,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
     this.setFirstTrackId(this.trackId);
+    // add event listener here
+    window.addEventListener('visibilitychange', this.visibilityListener);
   }
 
   /** @internal */
@@ -223,6 +230,22 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     return this.pluginsManager.validatePlugin(plugin);
   }
 
+  async visibilityListener() {
+    console.log('Track', document.visibilityState, isMobile());
+    // To account for video being on
+    if (document.visibilityState === 'hidden' && isMobile()) {
+      console.log('Muting track');
+      this.inBackground = true;
+      this.setEnabled(false);
+      this.mutedInBackground = true;
+    } else if (document.visibilityState === 'visible' && this.mutedInBackground) {
+      console.log('Unmuting track');
+      this.setEnabled(true);
+      this.mutedInBackground = false;
+      this.inBackground = false;
+    }
+  }
+
   /**
    * @internal
    */
@@ -232,6 +255,8 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    // remove event listener here
+    window.removeEventListener('visibilitychange', this.visibilityListener);
   }
 
   /**
@@ -478,3 +503,19 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
   };
 }
+
+/**
+ *
+ * Add a listener for visibility changes
+ *
+ * ONLY FOR MWEB
+ *
+ * If video is enabled but not visible:
+ *  - set a flag
+ *  - toggle off video
+ *
+ * If visible and flag is set
+ *  - unset flag
+ *  - enable video
+ *
+ */

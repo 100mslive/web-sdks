@@ -77,3 +77,10 @@ const convertObjectToString = (object: UserAgent, delimiter = ',') =>
     .filter(key => isPresent(object[key as keyof UserAgent]))
     .map(key => `${key}:${object[key as keyof UserAgent]}`)
     .join(delimiter);
+
+export const isMobile = () => {
+  if (window && window.screen.width < 768) {
+    return true;
+  }
+  return false;
+};
