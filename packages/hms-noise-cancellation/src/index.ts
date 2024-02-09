@@ -1,1 +1,1 @@
-export * from './KrispPlugin';
+export * from './HMSKrispPlugin';
