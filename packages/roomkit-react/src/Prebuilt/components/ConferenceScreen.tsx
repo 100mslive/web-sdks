@@ -6,11 +6,13 @@ import {
   selectAppData,
   selectIsConnectedToRoom,
   selectRoomState,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Footer } from './Footer/Footer';
 import { LeaveRoom } from './Leave/LeaveRoom';
+import { MoreSettings } from './MoreSettings/MoreSettings';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 // @ts-ignore: No implicit Any
 import { ActivatedPIP } from './PIP/PIPComponent';
@@ -25,6 +27,8 @@ import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
+// @ts-ignore: No implicit Any
+import { RaiseHand } from './RaiseHand';
 import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
@@ -49,6 +53,10 @@ export const ConferenceScreen = () => {
   const isMobileDevice = isAndroid || isIOS || isIPadOS;
   const dropdownListRef = useRef<string[]>();
   const [isHLSStarted] = useSetAppDataByKey(APP_DATA.hlsStarted);
+
+  const { toggleAudio, toggleVideo } = useAVToggle();
+  const noAVPermissions = !(toggleAudio || toggleVideo);
+  const showChat = !!screenProps.elements?.chat;
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice) {
       setHideControls(value => !value);
@@ -183,6 +191,20 @@ export const ConferenceScreen = () => {
           >
             <Footer elements={screenProps.elements} screenType={screenProps.screenType} />
           </Box>
+        )}
+        {isMwebHLSStream && !showChat && (
+          <Flex
+            css={{
+              alignItems: 'center',
+              pr: '$4',
+              pb: '$4',
+            }}
+            justify="end"
+            gap="1"
+          >
+            {noAVPermissions ? <RaiseHand /> : null}
+            <MoreSettings elements={screenProps.elements} screenType={screenProps.screenType} />
+          </Flex>
         )}
         <RoleChangeRequestModal />
         <HLSFailureModal />

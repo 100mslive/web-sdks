@@ -26,6 +26,7 @@ export const MwebHLSView = React.forwardRef<
   HTMLDivElement,
   {
     isFullScreen: boolean;
+    isLoading: boolean;
     isPaused: boolean;
     hasCaptions: boolean;
     isCaptionEnabled: boolean;
@@ -39,6 +40,7 @@ export const MwebHLSView = React.forwardRef<
   (
     {
       isFullScreen,
+      isLoading,
       isPaused,
       hasCaptions,
       isCaptionEnabled,
@@ -97,32 +99,34 @@ export const MwebHLSView = React.forwardRef<
           onTouchStart={onHoverHandler}
           onTouchLeave={onHoverHandler}
         >
-          <Box
-            css={{
-              position: 'absolute',
-              top: '40%',
-              left: '50%',
-              transform: 'translateY(-40%) translateX(-50%)',
-              padding: '$4 14px $4 14px',
-              display: 'inline-flex',
-              r: '$round',
-              gap: '$1',
-              bg: 'rgba(0, 0, 0, 0.6)',
-              zIndex: 1,
-              visibility: controlsVisible ? `` : `hidden`,
-              opacity: controlsVisible ? `1` : '0',
-            }}
-          >
-            {isPaused ? (
-              <IconButton onClick={async () => await hlsPlayerContext?.play()} data-testid="play_btn">
-                <PlayIcon width="48px" height="48px" />
-              </IconButton>
-            ) : (
-              <IconButton onClick={async () => hlsPlayerContext?.pause()} data-testid="pause_btn">
-                <PauseIcon width="48px" height="48px" />
-              </IconButton>
-            )}
-          </Box>
+          {!isLoading && (
+            <Box
+              css={{
+                position: 'absolute',
+                top: '40%',
+                left: '50%',
+                transform: 'translateY(-40%) translateX(-50%)',
+                padding: '$4 14px $4 14px',
+                display: 'inline-flex',
+                r: '$round',
+                gap: '$1',
+                bg: 'rgba(0, 0, 0, 0.6)',
+                zIndex: 1,
+                visibility: controlsVisible ? `` : `hidden`,
+                opacity: controlsVisible ? `1` : '0',
+              }}
+            >
+              {isPaused ? (
+                <IconButton onClick={async () => await hlsPlayerContext?.play()} data-testid="play_btn">
+                  <PlayIcon width="48px" height="48px" />
+                </IconButton>
+              ) : (
+                <IconButton onClick={async () => hlsPlayerContext?.pause()} data-testid="pause_btn">
+                  <PauseIcon width="48px" height="48px" />
+                </IconButton>
+              )}
+            </Box>
+          )}
           <Flex
             ref={controlsRef}
             direction="column"
@@ -227,19 +231,7 @@ export const MwebHLSView = React.forwardRef<
                 ) : null}
               </HMSVideoPlayer.Controls.Right>
             </HMSVideoPlayer.Controls.Root>
-          </Flex>
-          <Flex
-            direction="column"
-            justify="end"
-            align="start"
-            css={{
-              position: 'absolute',
-              bottom: '0',
-              w: '100%',
-            }}
-          >
             <HMSVideoPlayer.Progress />
-            {/* <HLSViewTitle /> */}
           </Flex>
         </HMSVideoPlayer.Root>
       </>
@@ -271,6 +263,10 @@ export const HLSViewTitle = () => {
   useEffect(() => {
     if (hlsState?.running) {
       startTimer();
+      const timeStamp = hlsState?.variants[0]?.[screenType === 'hls_live_streaming' ? 'startedAt' : 'initialisedAt'];
+      if (hlsState?.running && timeStamp) {
+        setLiveTime(Date.now() - timeStamp.getTime());
+      }
     }
     if (!hlsState?.running && intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -283,22 +279,38 @@ export const HLSViewTitle = () => {
   }, [hlsState.running, startTimer]);
 
   return (
-    <Flex gap="2" align="center" css={{ position: 'relative', height: '100%' }}>
+    <Flex
+      gap="4"
+      align="center"
+      css={{
+        position: 'relative',
+        h: 'fit-content',
+        w: '100%',
+        borderColor: '$border_bright',
+        border: '0 0 $2 0',
+        p: '$8',
+      }}
+    >
       <Logo />
       <Flex direction="column">
         <Text variant="sub2">Tech Talk</Text>
-        <Flex>
-          <Text variant="caption">{getWatchCount(peerCount)}</Text>
+        <Flex gap="1">
+          <Text variant="caption" css={{ color: '$on_surface_medium' }}>
+            {getWatchCount(peerCount) + ' watching'}{' '}
+          </Text>
           <Text
             variant="caption"
             css={{
               w: '$3',
               h: '$8',
+              color: '$on_surface_medium',
             }}
           >
             .
           </Text>
-          <Text variant="caption">{getTime(liveTime)}</Text>
+          <Text variant="caption" css={{ color: '$on_surface_medium' }}>
+            {'Started ' + getTime(liveTime) + ' ago'}
+          </Text>
         </Flex>
       </Flex>
     </Flex>

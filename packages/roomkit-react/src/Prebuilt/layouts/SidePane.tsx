@@ -82,7 +82,7 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: isMobileHLSStream ? '68%' : '100%',
+        h: isMobileHLSStream ? '64%' : '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
@@ -127,9 +127,9 @@ const SidePane = ({
             },
             '@md': {
               p: '$6 $8',
-              h: isMobileHLSStream ? '68%' : '100%',
+              h: isMobileHLSStream ? '64%' : '100%',
               pb: '$12',
-              minHeight: isMobileHLSStream ? '68%' : '',
+              minHeight: isMobileHLSStream ? '64%' : '',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,

@@ -14,7 +14,7 @@ import { ColoredHandIcon, RadioIcon } from '@100mslive/react-icons';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { DesktopHLSView } from '../components/HMSVideo/DesktopHLSView';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
-import { MwebHLSView } from '../components/HMSVideo/MwebHLSView';
+import { HLSViewTitle, MwebHLSView } from '../components/HMSVideo/MwebHLSView';
 import { HMSPlayerContext, useSetHMSPlayerContext } from '../components/HMSVideo/PlayerContext';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
@@ -33,6 +33,7 @@ const HLSView = () => {
   const hlsViewRef = useRef(null);
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
+  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const hmsActions = useHMSActions();
   const { themeType } = useTheme();
   const [streamEnded, setStreamEnded] = useState(false);
@@ -52,11 +53,11 @@ const HLSView = () => {
   const [hlsPlayerContext, setHLSPlayerContext] = useSetHMSPlayerContext();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const showChat = !!elements?.chat;
 
   const isMobile = useMedia(config.media.md);
   const isLandscape = useMedia(config.media.ls);
 
-  const { screenType } = useRoomLayoutConferencingScreen();
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
   });
@@ -65,10 +66,10 @@ const HLSView = () => {
   const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
 
   useEffect(() => {
-    if (sidepane === '' && isMwebHLSStream) {
+    if (sidepane === '' && isMwebHLSStream && showChat) {
       toggleChat();
     }
-  }, [sidepane, isMwebHLSStream, toggleChat]);
+  }, [sidepane, isMwebHLSStream, toggleChat, showChat]);
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
     /**
@@ -244,47 +245,51 @@ const HLSView = () => {
         justify="center"
         css={{
           w: sidepane !== '' && isLandscape ? '55%' : '100%',
-          h: sidepane !== '' && isMobile ? '32%' : '100%',
+          h: sidepane !== '' && isMobile ? '36%' : '100%',
         }}
       >
         {hlsUrl && !streamEnded ? (
-          <HMSPlayerContext.Provider value={{ hlsPlayer }}>
-            <Flex
-              id="hls-player-container"
-              align="center"
-              justify="center"
-              css={{
-                width: '100%',
-                margin: '0 auto',
-                height: isFullScreen || sidepane !== '' || isLandscape ? '100%' : '32%',
-              }}
-            >
-              <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
-              {showLoader && (
-                <Flex
-                  align="center"
-                  justify="center"
-                  css={{
-                    position: 'absolute',
-                  }}
-                >
-                  <Loading width={72} height={72} />
-                </Flex>
-              )}
-              <MwebHLSView
-                ref={videoRef}
-                isFullScreen={isFullScreen}
-                isPaused={isPaused}
-                hasCaptions={hasCaptions}
-                isCaptionEnabled={isCaptionEnabled}
-                isVideoLive={isVideoLive}
-                availableLayers={availableLayers}
-                currentSelectedQuality={currentSelectedQuality}
-                setIsVideoLive={setIsVideoLive}
-                toggle={toggle}
-              />
-            </Flex>
-          </HMSPlayerContext.Provider>
+          <>
+            <HMSPlayerContext.Provider value={{ hlsPlayer }}>
+              <Flex
+                id="hls-player-container"
+                align="center"
+                justify="center"
+                css={{
+                  width: '100%',
+                  margin: '0 auto',
+                  height: isFullScreen || sidepane !== '' || isLandscape ? '100%' : '36%',
+                }}
+              >
+                <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
+                {showLoader && (
+                  <Flex
+                    align="center"
+                    justify="center"
+                    css={{
+                      position: 'absolute',
+                    }}
+                  >
+                    <Loading width={72} height={72} />
+                  </Flex>
+                )}
+                <MwebHLSView
+                  ref={videoRef}
+                  isFullScreen={isFullScreen}
+                  isLoading={showLoader}
+                  isPaused={isPaused}
+                  hasCaptions={hasCaptions}
+                  isCaptionEnabled={isCaptionEnabled}
+                  isVideoLive={isVideoLive}
+                  availableLayers={availableLayers}
+                  currentSelectedQuality={currentSelectedQuality}
+                  setIsVideoLive={setIsVideoLive}
+                  toggle={toggle}
+                />
+              </Flex>
+            </HMSPlayerContext.Provider>
+            {!isLandscape && <HLSViewTitle />}
+          </>
         ) : (
           <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
             <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
