@@ -196,7 +196,7 @@ export const SidePaneTabs = React.memo<{
               </Tabs.Content>
               <Tabs.Content
                 value={SIDE_PANE_OPTIONS.CHAT}
-                css={{ p: 0, overflowY: 'auto', '@md': { overflowY: 'unset' } }}
+                css={{ p: 0, overflowY: 'auto', '@md': { overflowY: 'unset' }, overflowX: 'hidden' }}
               >
                 <Chat />
               </Tabs.Content>
