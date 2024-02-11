@@ -23,7 +23,7 @@ export const EmptyChat = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setShowImage(window.innerHeight >= 450);
+      setShowImage(window.innerHeight >= 500);
     };
     window.addEventListener('resize', handleResize);
     handleResize();
@@ -47,7 +47,15 @@ export const EmptyChat = () => {
       justify="center"
     >
       <Box>
-        {showImage && <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />}
+        {showImage && (
+          <img
+            src={emptyChat}
+            alt="Empty Chat"
+            height={132}
+            width={185}
+            style={{ margin: '0 auto', marginTop: '0.5rem' }}
+          />
+        )}
 
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
