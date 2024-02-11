@@ -19,7 +19,9 @@ export const MoreSettings = ({
   screenType: keyof ConferencingScreen;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  return isMobile ? (
+  const isLandscape = useMedia(cssConfig.media.lg);
+  const isLandscapeHLSStream = screenType === 'hls_live_streaming' || isLandscape;
+  return isMobile || isLandscapeHLSStream ? (
     <MwebOptions elements={elements} screenType={screenType} />
   ) : (
     <DesktopOptions elements={elements} screenType={screenType} />

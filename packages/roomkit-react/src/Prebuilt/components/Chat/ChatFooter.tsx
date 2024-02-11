@@ -20,7 +20,7 @@ import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppDa
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection } from '../../common/hooks';
+import { useDefaultChatSelection, useLandscapeHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -94,6 +94,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const isMwebHLSStream = screenType === 'hls_live_streaming' && (isMobile || isLandscape);
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
@@ -241,7 +242,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               onCut={e => e.stopPropagation()}
               onCopy={e => e.stopPropagation()}
             />
-            {!isMobile ? (
+            {!isMobile && !isLandscapeHLSStream ? (
               <EmojiPicker
                 onSelect={emoji => {
                   if (inputRef.current) {

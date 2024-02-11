@@ -22,7 +22,7 @@ import { Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { config, useTheme } from '../../Theme';
-import { useIsSidepaneTypeOpen, usePollViewToggle, useSidepaneToggle } from '../components/AppData/useSidepane';
+import { usePollViewToggle, useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -50,13 +50,11 @@ const HLSView = () => {
   const togglePollView = usePollViewToggle();
   const vanillaStore = useHMSVanillaStore();
   const [hlsPlayerContext, setHLSPlayerContext] = useSetHMSPlayerContext();
-  const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
-  const isParticipantOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.PARTICIPANTS);
-  const isPollOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.POLLS);
+  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
 
   const isMobile = useMedia(config.media.md);
   const isLandscape = useMedia(config.media.ls);
-  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
 
   const { screenType } = useRoomLayoutConferencingScreen();
   const isFullScreen = useFullscreen(hlsViewRef, show, {
@@ -65,13 +63,12 @@ const HLSView = () => {
   const [showLoader, setShowLoader] = useState(false);
 
   const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
-  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
 
   useEffect(() => {
-    if (!isChatOpen && isMwebHLSStream) {
+    if (sidepane === '' && isMwebHLSStream) {
       toggleChat();
     }
-  }, [isChatOpen, isMwebHLSStream, toggleChat]);
+  }, [sidepane, isMwebHLSStream, toggleChat]);
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
     /**
@@ -246,14 +243,8 @@ const HLSView = () => {
         direction="column"
         justify="center"
         css={{
-          w: '100%',
-          h:
-            (sidepane === SIDE_PANE_OPTIONS.POLLS ||
-              sidepane === SIDE_PANE_OPTIONS.CHAT ||
-              sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS) &&
-            isMobile
-              ? '32%'
-              : '100%',
+          w: sidepane !== '' && isLandscape ? '55%' : '100%',
+          h: sidepane !== '' && isMobile ? '32%' : '100%',
         }}
       >
         {hlsUrl && !streamEnded ? (
@@ -265,7 +256,7 @@ const HLSView = () => {
               css={{
                 width: '100%',
                 margin: '0 auto',
-                height: isFullScreen || isChatOpen || isParticipantOpen || isPollOpen || isLandscape ? '100%' : '32%',
+                height: isFullScreen || sidepane !== '' || isLandscape ? '100%' : '32%',
               }}
             >
               <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />

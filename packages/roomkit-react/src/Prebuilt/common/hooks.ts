@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   selectAvailableRoleNames,
@@ -10,6 +11,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
+import { config } from '../../Theme';
 import { useRoomLayout } from '../provider/roomLayoutProvider';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { CHAT_SELECTOR } from './constants';
@@ -99,4 +101,16 @@ export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }
     participantList = participantList.filter(peer => peer.name.toLowerCase().includes(search));
   }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
+};
+
+export const useLandscapeHLSStream = () => {
+  const isLandscape = useMedia(config.media.ls);
+  const { screenType } = useRoomLayoutConferencingScreen();
+  return isLandscape && screenType === 'hls_live_streaming';
+};
+
+export const useMobileHLSStream = () => {
+  const isMobile = useMedia(config.media.md);
+  const { screenType } = useRoomLayoutConferencingScreen();
+  return isMobile && screenType === 'hls_live_streaming';
 };

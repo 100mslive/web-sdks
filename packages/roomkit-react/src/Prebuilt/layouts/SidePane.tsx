@@ -16,6 +16,7 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS } from '../common/constants';
 
@@ -31,8 +32,11 @@ const SidePane = ({
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
-  const { elements, screenType } = useRoomLayoutConferencingScreen();
+  const { elements } = useRoomLayoutConferencingScreen();
   const { elements: preview_elements } = useRoomLayoutPreviewScreen();
+
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobileHLSStream = useMobileHLSStream();
 
   const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
     ? preview_elements?.virtual_background?.background_media
@@ -44,7 +48,9 @@ const SidePane = ({
     ViewComponent = <Polls />;
   }
   if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = <SidePaneTabs hideControls={hideControls} active={sidepane} />;
+    ViewComponent = (
+      <SidePaneTabs hideControls={hideControls} active={sidepane} hideTab={isMobileHLSStream || isLandscapeHLSStream} />
+    );
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
     ViewComponent = <VBPicker backgroundMedia={backgroundMedia} />;
@@ -69,7 +75,6 @@ const SidePane = ({
   };
   const VB = sidepane === SIDE_PANE_OPTIONS.VB;
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
-  const mwebHLSStream = isMobile && screenType === 'hls_live_streaming';
 
   return (
     <Flex
@@ -77,7 +82,7 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: mwebHLSStream ? '68%' : '100%',
+        h: isMobileHLSStream ? '68%' : '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
@@ -114,15 +119,17 @@ const SidePane = ({
               h: '100%',
               ml: 0,
               right: 0,
-              position: 'fixed',
+              position: isLandscapeHLSStream ? '' : 'fixed',
+              minHeight: isLandscapeHLSStream ? '100%' : '',
               bottom: 0,
               borderRadius: 0,
               zIndex: 10,
             },
             '@md': {
               p: '$6 $8',
-              h: mwebHLSStream || isLandscape ? '68%' : '100%',
-              pb: mwebStreamingChat || isLandscape ? '$20' : '$12',
+              h: isMobileHLSStream ? '68%' : '100%',
+              pb: '$12',
+              minHeight: isMobileHLSStream ? '68%' : '',
               borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
               animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
