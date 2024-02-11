@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
@@ -19,6 +19,20 @@ export const EmptyChat = () => {
       (elements.chat.roles_whitelist && elements.chat.roles_whitelist.length)) &&
     !isLocalPeerBlacklisted;
 
+  const [showImage, setShowImage] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setShowImage(window.innerHeight >= 450);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   if (isMobile && elements?.chat?.is_overlay) return <></>;
 
   return (
@@ -33,7 +47,7 @@ export const EmptyChat = () => {
       justify="center"
     >
       <Box>
-        <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '8px auto 4px auto' }} />
+        {showImage && <img src={emptyChat} alt="Empty Chat" height={132} width={185} style={{ margin: '0 auto' }} />}
 
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>
           {canSendMessages ? 'Start a conversation' : 'No messages yet'}
