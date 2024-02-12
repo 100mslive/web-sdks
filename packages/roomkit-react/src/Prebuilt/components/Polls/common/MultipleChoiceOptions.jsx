@@ -10,7 +10,6 @@ export const MultipleChoiceOptions = ({
   questionIndex,
   options,
   canRespond,
-  response,
   totalResponses,
   selectedOptions,
   setSelectedOptions,
@@ -39,7 +38,7 @@ export const MultipleChoiceOptions = ({
               <Checkbox.Root
                 id={`${questionIndex}-${option.index}`}
                 disabled={!canRespond}
-                checked={response?.options?.includes(option.index)}
+                checked={localPeerResponse?.options?.includes(option.index)}
                 onCheckedChange={checked => handleCheckedChange(checked, option.index)}
                 css={{
                   cursor: canRespond ? 'pointer' : 'not-allowed',
@@ -53,7 +52,7 @@ export const MultipleChoiceOptions = ({
 
             {isStopped && correctOptionIndexes?.includes(option.index) ? (
               <Flex css={{ color: '$on_surface_high' }}>
-                <CheckCircleIcon />
+                <CheckCircleIcon height={20} width={20} />
               </Flex>
             ) : null}
 
@@ -84,7 +83,7 @@ export const MultipleChoiceOptionInputs = ({ isQuiz, options, selectAnswer, hand
     <Flex direction="column" css={{ gap: '$md', w: '100%', mb: '$md' }}>
       {options.map((option, index) => {
         return (
-          <Flex align="center" key={index} css={{ w: '100%', gap: '$5' }}>
+          <Flex align="center" key={index} css={{ w: '100%', gap: '$4' }}>
             {isQuiz && (
               <Checkbox.Root
                 onCheckedChange={checked => selectAnswer(checked, index)}

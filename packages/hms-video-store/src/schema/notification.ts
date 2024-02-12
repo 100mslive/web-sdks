@@ -125,6 +125,7 @@ export enum HMSNotificationTypes {
   POLL_STARTED = 'POLL_STARTED',
   POLL_STOPPED = 'POLL_STOPPED',
   POLL_VOTES_UPDATED = 'POLL_VOTES_UPDATED',
+  POLLS_LIST = 'POLLS_LIST',
   // POLL_LEADERBOARD_SHARED = 'POLL_LEADERBOARD_SHARED',
   HAND_RAISE_CHANGED = 'HAND_RAISE_CHANGED',
 }
@@ -157,6 +158,7 @@ export type HMSNotificationMapping<T extends HMSNotificationTypes, C = any> = {
   [HMSNotificationTypes.POLL_STARTED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_STOPPED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_VOTES_UPDATED]: HMSPollNotification;
+  [HMSNotificationTypes.POLLS_LIST]: HMSPollNotification;
   // [HMSNotificationTypes.POLL_LEADERBOARD_SHARED]: HMSPollNotification;
   [HMSNotificationTypes.POLL_CREATED]: HMSPollNotification;
   [HMSNotificationTypes.HAND_RAISE_CHANGED]: HMSPeerNotification;

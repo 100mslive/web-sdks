@@ -47,9 +47,9 @@ export const isSameTile = ({
   audioTrackID,
 }: {
   trackId: HMSTrackID;
-  videoTrackID: string;
-  audioTrackID: string;
-}) => trackId && ((videoTrackID && videoTrackID === trackId) || (audioTrackID && audioTrackID === trackId));
+  videoTrackID?: string;
+  audioTrackID?: string;
+}) => !!trackId && ((!!videoTrackID && videoTrackID === trackId) || (!!audioTrackID && audioTrackID === trackId));
 
 const spacingCSS = { '@md': { my: '$8', fontWeight: '$semiBold', fontSize: 'sm' } };
 
@@ -232,9 +232,9 @@ export const TileMenuContent = ({
   showSpotlight: boolean;
   showPinAction: boolean;
   peerID: string;
-  canMinimise: boolean;
-  closeSheetOnClick: () => void;
-  openNameChangeModal: () => void;
+  canMinimise?: boolean;
+  closeSheetOnClick?: () => void;
+  openNameChangeModal?: () => void;
 }) => {
   const actions = useHMSActions();
   const dragClassName = getDragClassName();
@@ -252,8 +252,8 @@ export const TileMenuContent = ({
 
   const isMobile = useMedia(cssConfig.media.md);
 
-  return isLocal ? (
-    (showPinAction || canMinimise || !userName || showSpotlight) && (
+  if (isLocal) {
+    return showPinAction || canMinimise || !userName || showSpotlight ? (
       <>
         {showPinAction && <PinActions audioTrackID={audioTrackID} videoTrackID={videoTrackID} />}
         {showSpotlight && <SpotlightActions peerId={peerID} onSpotLightClick={() => closeSheetOnClick()} />}
@@ -273,8 +273,10 @@ export const TileMenuContent = ({
           </StyledMenuTile.ItemButton>
         )}
       </>
-    )
-  ) : (
+    ) : null;
+  }
+
+  return (
     <>
       {toggleVideo ? (
         <StyledMenuTile.ItemButton
@@ -314,7 +316,12 @@ export const TileMenuContent = ({
               Volume ({volume})
             </Box>
           </Flex>
-          <Slider css={{ my: '0.5rem' }} step={5} value={[volume || 100]} onValueChange={e => setVolume?.(e[0])} />
+          <Slider
+            css={{ my: '0.5rem' }}
+            step={5}
+            value={[typeof volume === 'number' ? volume : 100]}
+            onValueChange={e => setVolume?.(e[0])}
+          />
         </StyledMenuTile.VolumeItem>
       ) : null}
 

@@ -545,7 +545,6 @@ export interface IHMSActions<T extends HMSGenericTypes = { sessionStore: Record<
   lowerLocalPeerHand(): Promise<void>;
   raiseRemotePeerHand(peerId: string): Promise<void>;
   lowerRemotePeerHand(peerId: string): Promise<void>;
-
   getPeerListIterator(options?: HMSPeerListIteratorOptions): HMSPeerListIterator;
   /**
    * Method to override the default settings for playlist tracks

@@ -36,7 +36,6 @@ import { usePollViewToggle } from '../AppData/useSidepane';
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { getMetadata } from '../../common/utils';
-// @ts-ignore: No implicit Any
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};

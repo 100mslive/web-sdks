@@ -1,12 +1,21 @@
 import React from 'react';
+import { HMSPollState } from '@100mslive/react-sdk';
 import { Flex, Text } from '../../../../';
+import { PollStage } from './constants';
 
-export const StatusIndicator = ({ isLive }: { isLive: boolean }) => {
+const statusMap: Record<HMSPollState, PollStage> = {
+  created: PollStage.DRAFT,
+  started: PollStage.LIVE,
+  stopped: PollStage.ENDED,
+};
+
+export const StatusIndicator = ({ status }: { status?: HMSPollState }) => {
+  if (!status) return null;
   return (
     <Flex align="center">
       <Flex
         css={{
-          backgroundColor: isLive ? '$alert_error_default' : '$secondary_default',
+          backgroundColor: statusMap[status] === PollStage.LIVE ? '$alert_error_default' : '$secondary_default',
           p: '$2 $4',
           borderRadius: '$0',
         }}
@@ -15,10 +24,10 @@ export const StatusIndicator = ({ isLive }: { isLive: boolean }) => {
           variant="caption"
           css={{
             fontWeight: '$semiBold',
-            color: '$on_surface_high',
+            color: '$on_primary_high',
           }}
         >
-          {isLive ? 'LIVE' : 'ENDED'}
+          {statusMap[status]}
         </Text>
       </Flex>
     </Flex>

@@ -116,6 +116,7 @@ export class HMSVideoTrackSettings implements IHMSVideoTrackSettings, IAnalytics
     if (isScreenShare) {
       dimensionConstraintKey = 'max';
     }
+
     const aspectRatio = this.improviseConstraintsAspect();
     return {
       width: { [dimensionConstraintKey]: aspectRatio.width },

@@ -1,28 +1,35 @@
 import React from 'react';
-import { PinIcon, SpotlightIcon } from '@100mslive/react-icons';
+import { selectScreenShareByPeerID, selectSessionStore, useHMSStore } from '@100mslive/react-sdk';
+import { PinIcon, ShareScreenIcon, SpotlightIcon } from '@100mslive/react-icons';
 import { Flex, styled, Text, textEllipsis } from '../../..';
 import { ConnectionIndicator } from './ConnectionIndicator';
+import { SESSION_STORE_KEY } from '../../common/constants';
 
 const TileConnection = ({
   name,
   peerId,
   hideLabel,
   width,
-  spotlighted,
   pinned,
 }: {
   name: string;
   peerId: string;
   hideLabel: boolean;
-  width?: number;
-  spotlighted?: boolean;
+  width?: string | number;
   pinned?: boolean;
 }) => {
+  const spotlighted = useHMSStore(selectSessionStore(SESSION_STORE_KEY.SPOTLIGHT)) === peerId;
+  const isPeerScreenSharing = !!useHMSStore(selectScreenShareByPeerID(peerId));
   return (
     <Wrapper>
       {!hideLabel ? (
         <>
           <Flex align="center">
+            {isPeerScreenSharing && (
+              <IconWrapper>
+                <ShareScreenIcon width="15" height="15" />
+              </IconWrapper>
+            )}
             {pinned && (
               <IconWrapper>
                 <PinIcon width="15" height="15" />
@@ -37,7 +44,7 @@ const TileConnection = ({
               css={{
                 c: '$on_surface_high',
                 verticalAlign: 'baseline',
-                ...(width ? textEllipsis(width - 60) : {}),
+                ...(width ? textEllipsis((width as number) - 60) : {}),
               }}
               variant="xs"
             >
@@ -51,7 +58,7 @@ const TileConnection = ({
   );
 };
 
-const IconWrapper = styled('div', { c: '$on_surface_high', ml: '$3', mt: '$1' });
+const IconWrapper = styled('div', { c: '$on_surface_high', ml: '$3', mt: '$1', display: 'flex' });
 
 const Wrapper = styled('div', {
   display: 'flex',

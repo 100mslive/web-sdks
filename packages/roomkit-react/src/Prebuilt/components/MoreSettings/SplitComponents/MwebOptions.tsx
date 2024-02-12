@@ -13,8 +13,8 @@ import {
 import {
   BrbIcon,
   CrossIcon,
-  DragHandleIcon,
   EmojiIcon,
+  HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
   PeopleIcon,
@@ -119,7 +119,7 @@ export const MwebOptions = ({
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
             <IconButton>
-              <DragHandleIcon />
+              <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
         </Tooltip>
