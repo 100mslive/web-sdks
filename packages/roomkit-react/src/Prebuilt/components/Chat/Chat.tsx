@@ -38,6 +38,7 @@ export const Chat = () => {
   return (
     <Flex
       direction="column"
+      justify="end"
       css={{
         size: '100%',
         gap: '$4',
