@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  HMSPoll,
   HMSPollState,
   selectLocalPeerRoleName,
   selectPermissions,
+  selectPolls,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -133,7 +133,7 @@ const AddMenu = () => {
           active={interactionType === INTERACTION_TYPE.QUIZ}
         />
       </Flex>
-      <Flex direction="column">
+      <Flex direction="column" css={{ borderBottom: '$space$px solid $border_bright', mb: '$10', pb: '$10' }}>
         <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
           ref={inputRef}
@@ -194,33 +194,18 @@ const AddMenu = () => {
 
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
-  const [polls, setPolls] = useState<HMSPoll[]>([]);
+  const polls = useHMSStore(selectPolls);
 
   useEffect(() => {
-    const listPolls = async () => {
-      const polls = await hmsActions.interactivityCenter.getPolls();
-      const sortedPolls = await polls
-        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
-      return sortedPolls;
-    };
-
     const updatePolls = async () => {
-      const sortedPolls = await listPolls();
-      setPolls(sortedPolls);
+      await hmsActions.interactivityCenter.getPolls();
     };
 
     updatePolls();
   }, [hmsActions.interactivityCenter]);
 
   return polls?.length ? (
-    <Flex
-      css={{
-        borderTop: '$space$px solid $border_bright',
-        mt: '$10',
-        pt: '$10',
-      }}
-    >
+    <Flex>
       <Flex direction="column" css={{ w: '100%' }}>
         <Text variant="h6" css={{ c: '$on_surface_high' }}>
           Previous Polls and Quizzes
