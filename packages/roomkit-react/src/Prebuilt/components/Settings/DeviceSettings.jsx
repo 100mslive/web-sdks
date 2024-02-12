@@ -15,7 +15,7 @@ import { config as cssConfig } from '../../../Theme';
 import { DialogDropdownTrigger } from '../../primitives/DropdownTrigger';
 import { useUISettings } from '../AppData/useUISettings';
 import { useDropdownSelection } from '../hooks/useDropdownSelection';
-import { settingOverflow } from './common.js';
+import { settingOverflow } from './common';
 import { UI_SETTINGS } from '../../common/constants';
 
 /**

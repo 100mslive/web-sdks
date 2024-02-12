@@ -9,6 +9,7 @@ import {
   useHMSStore,
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
+import { LayoutMode } from '../Settings/LayoutSettings';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -34,6 +35,7 @@ const initialAppData = {
     [UI_SETTINGS.enableAmbientMusic]: false,
     [UI_SETTINGS.uiViewMode]: UI_MODE_GRID,
     [UI_SETTINGS.mirrorLocalVideo]: true,
+    [UI_SETTINGS.layoutMode]: LayoutMode.GALLERY,
   },
   [APP_DATA.subscribedNotifications]: {
     PEER_JOINED: false,

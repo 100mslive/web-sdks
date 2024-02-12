@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import screenfull from 'screenfull';
 import { ToastManager } from '../Toast/ToastManager';
+import { DEFAULT_PORTAL_CONTAINER } from '../../common/constants';
 
 export const useFullscreen = () => {
   const [isFullScreenEnabled, setIsFullScreenEnabled] = useState(screenfull.isFullscreen);
@@ -14,7 +15,7 @@ export const useFullscreen = () => {
       if (isFullScreenEnabled) {
         await screenfull.exit();
       } else {
-        await screenfull.request();
+        await screenfull.request(document.querySelector(DEFAULT_PORTAL_CONTAINER));
       }
     } catch (err) {
       ToastManager.addToast({ title: err.message });
