@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
+import { selectIsEffectsEnabled, selectIsLocalVideoEnabled, useHMSStore } from '@100mslive/react-sdk';
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
@@ -17,6 +17,7 @@ export const VBToggle = () => {
   const { elements } = useRoomLayoutConferencingScreen();
   const backgroundMedia = elements?.virtual_background?.background_media;
   const [defaultVBState, setDefaultVBState] = useSetAppDataByKey(APP_DATA.defaultVB);
+  const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
 
   useEffect(() => {
     const defaultMediaPresent = !!backgroundMedia?.some(media => media.default);
@@ -27,7 +28,7 @@ export const VBToggle = () => {
     }
   }, [backgroundMedia, defaultVBState, setDefaultVBState, toggleVB]);
 
-  if (!isVideoOn || isSafari) {
+  if (!isVideoOn || (!isEffectsEnabled && isSafari)) {
     return null;
   }
 
