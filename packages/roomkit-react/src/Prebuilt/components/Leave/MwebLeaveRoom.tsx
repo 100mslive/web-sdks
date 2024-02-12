@@ -3,7 +3,7 @@ import { useMedia } from 'react-use';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
-import { CloseIcon, ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { ExitIcon, InteractionClosedIcon, StopIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
@@ -107,7 +107,7 @@ const LeaveIcon = ({ onClick }: { onClick: () => void }) => {
     <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => onClick()}>
       <Tooltip title="Leave Room">
         <Box>
-          <CloseIcon />
+          <InteractionClosedIcon />
         </Box>
       </Tooltip>
     </IconButton>

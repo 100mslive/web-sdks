@@ -1,4 +1,5 @@
 import {
+  HMSPoll,
   HMSPollCreateParams,
   HMSPollQuestionCreateParams,
   HMSPollQuestionResponseCreateParams,
@@ -19,7 +20,7 @@ export interface HMSInteractivityCenter {
   stopPoll(pollID: string): Promise<void>;
   addResponsesToPoll(pollID: string, responses: HMSPollQuestionResponseCreateParams[]): Promise<void>;
   fetchLeaderboard(pollID: string, offset: number, count: number): Promise<HMSQuizLeaderboardResponse>;
-
+  getPolls(): Promise<HMSPoll[]>;
   /** @alpha */
   whiteboard: HMSWhiteboardInteractivityCenter;
 }

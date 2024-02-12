@@ -92,7 +92,7 @@ export function ShareScreenOptions() {
             >
               <IconButton
                 as="div"
-                onClick={() => toggleScreenShare()}
+                onClick={toggleScreenShare}
                 css={{
                   p: '$6',
                   display: 'flex',

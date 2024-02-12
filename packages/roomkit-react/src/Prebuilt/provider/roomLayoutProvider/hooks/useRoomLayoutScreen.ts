@@ -29,13 +29,15 @@ function useRoomLayoutScreen<T extends useRoomLayoutScreenProps>({
   return screenProps;
 }
 
+type PreviewKeys = Omit<PreviewScreen, 'skip_preview_screen'>;
+
 export function useRoomLayoutPreviewScreen() {
   const screenProps = useRoomLayoutScreen({ screen: 'preview' });
-  const isPreviewScreenEnabled = !!screenProps;
+  const isPreviewScreenEnabled = !!screenProps && !screenProps?.skip_preview_screen;
   let elements: DefaultPreviewScreen_Elements | undefined;
-  let screenType: keyof PreviewScreen | undefined;
+  let screenType: keyof PreviewKeys | undefined;
   if (isPreviewScreenEnabled) {
-    screenType = Object.keys(screenProps)[0] as keyof PreviewScreen;
+    screenType = Object.keys(screenProps).filter(key => key !== 'skip_preview_screen')[0] as keyof PreviewKeys;
     elements = screenProps[screenType]?.elements;
   }
   return {

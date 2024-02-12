@@ -26,13 +26,16 @@ export class VideoPluginsAnalytics {
     this.pluginFrameRate = {};
   }
 
-  added(name: string, inputFrameRate: number, pluginFrameRate?: number) {
+  added(name: string, inputFrameRate?: number, pluginFrameRate?: number) {
     this.pluginAdded[name] = true;
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
     this.processingAvgs[name] = new RunningAverage();
-    this.pluginInputFrameRate[name] = inputFrameRate;
-    this.pluginFrameRate[name] = pluginFrameRate || inputFrameRate;
+    if (inputFrameRate) {
+      this.pluginInputFrameRate[name] = inputFrameRate;
+      this.pluginFrameRate[name] = pluginFrameRate || inputFrameRate;
+    }
+    this.eventBus.analytics.publish(MediaPluginsAnalyticsFactory.added(name, this.addedTimestamps[name]));
   }
 
   removed(name: string) {

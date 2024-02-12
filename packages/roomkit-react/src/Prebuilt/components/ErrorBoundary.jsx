@@ -4,7 +4,6 @@ import { Button } from '../../Button';
 import { Box, Flex } from '../../Layout';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
-import { ErrorWithSupportLink } from './AuthToken';
 
 export class ErrorBoundary extends Component {
   constructor(props) {
@@ -49,7 +48,10 @@ export class ErrorBoundary extends Component {
                 <Text>Something went wrong</Text>
                 <Text>Message: ${this.state.error}</Text>
                 <br />
-                {ErrorWithSupportLink(`Please reload to see if it works.`)}
+                Please reload to see if it works. If you think this is a mistake on our side, please reach out to us on
+                <a href="https://discord.com/invite/kGdmszyzq2" target="_blank" rel="noreferrer">
+                  Discord
+                </a>
               </div>
               <Flex>
                 <Tooltip title="Reload page">

@@ -44,7 +44,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
           <Text variant="lg" css={{ fontWeight: '$semiBold' }}>
             {quiz.title}
           </Text>
-          <StatusIndicator isLive={false} />
+          <StatusIndicator status={quiz.state} />
         </Flex>
         <Flex
           css={{ color: '$on_surface_medium', '&:hover': { color: '$on_surface_high', cursor: 'pointer' } }}
@@ -86,6 +86,7 @@ export const LeaderboardSummary = ({ pollID }: { pollID: string }) => {
                 correctResponses={question.correctResponses}
                 userName={question.peer.username || ''}
                 maxPossibleScore={maxPossibleScore}
+                duration={question.duration}
               />
             ))}
         {quizLeaderboard?.entries?.length > 5 && !viewAllEntries ? (

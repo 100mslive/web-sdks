@@ -78,7 +78,7 @@ export const VideoPlayer = React.memo(({ peerId }) => {
       <VideoPlaylistControls>
         {screenfull.enabled && (
           <IconButton
-            onClick={() => toggle()}
+            onClick={toggle}
             css={{
               color: '$on_primary_high',
               height: 'max-content',

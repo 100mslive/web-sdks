@@ -47,7 +47,6 @@ export const VideoProgress = () => {
     const progress = Math.floor(getPercentage(userClickedX, progressBarWidth));
     const videoEl = hlsPlayerContext?.getVideoElement();
     const currentTime = (progress * (videoEl?.duration || 0)) / 100;
-    console.log('current time ', currentTime);
     if (onValueChange) {
       onValueChange(currentTime);
     }

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { CloseIcon } from '@100mslive/react-icons';
+import { CrossIcon } from '@100mslive/react-icons';
 import { Flex } from '../../Layout';
 import { Text } from '../../Text';
 import IconButton from '../IconButton';
@@ -19,7 +19,7 @@ export function HlsStatsOverlay({ hlsStatsState, onClose }) {
       direction="column"
     >
       <IconButton css={{ position: 'absolute', top: '$2', right: '$2' }} onClick={onClose}>
-        <CloseIcon />
+        <CrossIcon />
       </IconButton>
       <HlsStatsRow label="URL">
         <Flex align="center">

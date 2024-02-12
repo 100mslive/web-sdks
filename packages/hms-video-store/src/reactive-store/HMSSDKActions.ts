@@ -173,7 +173,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async setPreferredLayer(trackId: string, layer: sdkTypes.HMSPreferredSimulcastLayer) {
-    const track = this.sdk.store.getTrackById(trackId);
+    const track = this.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSRemoteVideoTrack) {
         //@ts-ignore
@@ -199,6 +199,14 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
     } else {
       this.logPossibleInconsistency(`track ${trackId} not present, unable to set preffer layer`);
     }
+  }
+
+  getNativeTrackById(trackId: string) {
+    return this.sdk.store.getTrackById(trackId)?.nativeTrack;
+  }
+
+  getTrackById(trackId: string) {
+    return this.sdk.store.getTrackById(trackId);
   }
 
   getAuthTokenByRoomCode(
@@ -458,7 +466,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   async detachVideo(trackID: string, videoElement: HTMLVideoElement) {
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack?.type === 'video') {
       await this.sdk.detachVideo(sdkTrack as SDKHMSVideoTrack, videoElement);
     } else {
@@ -499,7 +507,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has video track';
       return result;
     }
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalVideoTrack).validatePlugin(plugin);
     } else {
@@ -524,7 +532,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       result.errMsg = 'call this function only after local peer has audio track';
       return result;
     }
-    const sdkTrack = this.sdk.store.getTrackById(trackID);
+    const sdkTrack = this.getTrackById(trackID);
     if (sdkTrack) {
       result = (sdkTrack as SDKHMSLocalAudioTrack).validatePlugin(plugin);
     } else {
@@ -711,7 +719,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   async setRemoteTrackEnabled(trackID: HMSTrackID | HMSTrackID[], enabled: boolean) {
     if (typeof trackID === 'string') {
-      const track = this.sdk.store.getTrackById(trackID);
+      const track = this.getTrackById(trackID);
       if (track && isRemoteTrack(track)) {
         await this.sdk.changeTrackState(track as SDKHMSRemoteTrack, enabled);
       } else {
@@ -922,7 +930,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async attachVideoInternal(trackID: string, videoElement: HTMLVideoElement) {
-    let sdkTrack = this.sdk.store.getTrackById(trackID);
+    let sdkTrack = this.getTrackById(trackID);
     // preview tracks are not added to the sdk store, so access from local peer.
     if (!sdkTrack) {
       sdkTrack = this.getLocalTrack(trackID);
@@ -1363,7 +1371,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
   }
 
   private async setTrackVolume(value: number, trackId: HMSTrackID) {
-    const track = this.sdk.store.getTrackById(trackId);
+    const track = this.getTrackById(trackId);
     if (track) {
       if (track instanceof SDKHMSAudioTrack) {
         await track.setVolume(value);
@@ -1492,7 +1500,7 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
 
   private getStoreLocalTrackIDfromSDKTrack(sdkTrack: SDKHMSLocalTrack) {
     const trackIDs = this.store.getState(selectLocalTrackIDs);
-    return trackIDs.find(trackID => this.sdk.store.getTrackById(trackID)?.trackId === sdkTrack.trackId);
+    return trackIDs.find(trackID => this.getTrackById(trackID)?.trackId === sdkTrack.trackId);
   }
 
   private setProgress = ({ type, progress }: sdkTypes.HMSPlaylistProgressEvent) => {

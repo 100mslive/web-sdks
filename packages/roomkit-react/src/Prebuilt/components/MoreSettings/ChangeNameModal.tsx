@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
 import { selectLocalPeerName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { config as cssConfig, Dialog } from '../../../';
+import { config as cssConfig, Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
+// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
+// @ts-ignore: No implicit Any
 import { ChangeNameContent } from './ChangeNameContent';
+// @ts-ignore: No implicit Any
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 
-export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
+export const ChangeNameModal = ({
+  onOpenChange,
+  openParentSheet = undefined,
+}: {
+  onOpenChange: (value: boolean) => void;
+  openParentSheet?: () => void;
+}) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(UserPreferencesKeys.PREVIEW);
   const hmsActions = useHMSActions();
   const localPeerName = useHMSStore(selectLocalPeerName);
@@ -15,7 +24,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
   const isMobile = useMedia(cssConfig.media.md);
 
   const changeName = async () => {
-    const name = currentName.trim();
+    const name = currentName?.trim() || '';
     if (!name || name === localPeerName) {
       return;
     }
@@ -27,7 +36,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
       });
     } catch (error) {
       console.error('failed to update name', error);
-      ToastManager.addToast({ title: error.message });
+      ToastManager.addToast({ title: (error as Error).message });
     } finally {
       onOpenChange(false);
     }
@@ -42,7 +51,7 @@ export const ChangeNameModal = ({ onOpenChange, openParentSheet = null }) => {
     onExit: () => onOpenChange(false),
     onBackClick: () => {
       onOpenChange(false);
-      openParentSheet();
+      openParentSheet?.();
     },
   };
 

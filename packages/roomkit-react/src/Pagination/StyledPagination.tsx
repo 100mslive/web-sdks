@@ -14,6 +14,7 @@ const Root = styled('div', {
 
 const Chevron = styled('button', {
   color: '$on_surface_high',
+  border: 'none',
   '&:focus': {
     outline: 'none',
   },

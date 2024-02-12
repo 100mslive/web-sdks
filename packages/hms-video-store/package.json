@@ -1,5 +1,5 @@
 {
-  "version": "0.11.1",
+  "version": "0.11.5",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -48,6 +48,7 @@
   "dependencies": {
     "eventemitter2": "^6.4.9",
     "immer": "^9.0.6",
+    "lodash.isequal": "^4.5.0",
     "reselect": "4.0.0",
     "sdp-transform": "^2.14.1",
     "ua-parser-js": "^1.0.1",
@@ -57,6 +58,7 @@
   },
   "devDependencies": {
     "@types/dom-screen-wake-lock": "^1.0.1",
+    "@types/lodash.isequal": "^4.5.8",
     "@types/sdp-transform": "^2.4.4",
     "@types/ua-parser-js": "^0.7.36",
     "@types/uuid": "^8.3.0",

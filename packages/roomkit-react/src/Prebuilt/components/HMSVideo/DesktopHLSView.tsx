@@ -103,9 +103,7 @@ export const DesktopHLSView = React.forwardRef<
             opacity: controlsVisible ? `1` : '0',
           }}
         >
-          <Box>
-            <HMSVideoPlayer.Progress />
-          </Box>
+          <HMSVideoPlayer.Progress />
           <HMSVideoPlayer.Controls.Root
             css={{
               p: '$4 $8',

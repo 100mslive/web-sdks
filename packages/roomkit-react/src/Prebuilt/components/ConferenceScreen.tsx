@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { v4 as uuid } from 'uuid';
 import {
   HMSRoomState,
   selectAppData,
@@ -93,7 +94,7 @@ export const ConferenceScreen = () => {
     ) {
       hmsActions
         .join({
-          userName: userName || '',
+          userName: userName || uuid(),
           authToken: authTokenInAppData,
           initEndpoint: endpoints?.init,
           settings: {
