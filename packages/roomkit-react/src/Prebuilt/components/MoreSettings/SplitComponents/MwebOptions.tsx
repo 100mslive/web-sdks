@@ -22,6 +22,7 @@ import {
   QuizIcon,
   RecordIcon,
   SettingsIcon,
+  VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
@@ -54,8 +55,6 @@ import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
-
-// const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -92,10 +91,10 @@ export const MwebOptions = ({
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
-  const { toggleAudio, toggleVideo } = useAVToggle();
+  const { toggleAudio, toggleVideo, isLocalVideoEnabled } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
-  // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -182,11 +181,17 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {/* {isVideoOn ? (
-              <Suspense fallback="">
-                <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
-              </Suspense>
-            ) : null} */}
+            {isLocalVideoEnabled && !!elements?.virtual_background ? (
+              <ActionTile.Root
+                onClick={() => {
+                  toggleVB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <VirtualBackgroundIcon />
+                <ActionTile.Title>Virtual Background</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
 
             {elements?.emoji_reactions && (
               <ActionTile.Root
