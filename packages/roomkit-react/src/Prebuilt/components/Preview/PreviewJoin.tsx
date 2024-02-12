@@ -268,7 +268,7 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
     >
       <Flex css={{ gap: '$4' }}>
         <AudioVideoToggle />
-        {!isMobile && vbEnabled ? <VBToggle /> : null}
+        {vbEnabled ? <VBToggle /> : null}
       </Flex>
       {!hideSettings ? <PreviewSettings /> : null}
     </Flex>
