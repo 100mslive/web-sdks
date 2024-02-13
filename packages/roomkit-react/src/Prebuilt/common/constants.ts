@@ -46,7 +46,6 @@ export const APP_DATA = {
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
   background: 'background',
-  backgroundType: 'backgroundType',
 };
 
 export const UI_SETTINGS = {

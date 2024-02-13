@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -62,7 +61,6 @@ const initialAppData = {
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
   [APP_DATA.background]: 'none',
-  [APP_DATA.backgroundType]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
@@ -116,7 +114,6 @@ export const AppData = React.memo(() => {
     });
     if (defaultMediaURL) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      hmsActions.setAppData(APP_DATA.backgroundType, HMSVirtualBackgroundTypes.IMAGE);
       toggleVB();
     }
   }, [hmsActions, elements?.virtual_background?.background_media, toggleVB]);
