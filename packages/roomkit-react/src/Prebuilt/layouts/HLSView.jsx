@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
+import screenfull from 'screenfull';
 import {
   HMSNotificationTypes,
   selectAppData,
@@ -12,18 +13,24 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, GoLiveIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, ExpandIcon, GoLiveIcon, PauseIcon, PlayIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
-import { DesktopHLSView } from '../components/HMSVideo/DesktopHLSView';
+import { HMSVideoPlayer } from '../components/HMSVideo';
+import { FullScreenButton } from '../components/HMSVideo/FullscreenButton';
 import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBlockedPrompt';
-import { HLSViewTitle, MwebHLSView } from '../components/HMSVideo/MwebHLSView';
+import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
+import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
+import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
 import { HMSPlayerContext, useSetHMSPlayerContext } from '../components/HMSVideo/PlayerContext';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
-import { Flex } from '../../Layout';
+import { IconButton } from '../../IconButton';
+import { Box, Flex } from '../../Layout';
 import { Loading } from '../../Loading';
 import { Text } from '../../Text';
-import { config, useTheme } from '../../Theme';
+import { config, theme, useTheme } from '../../Theme';
+import { Tooltip } from '../../Tooltip';
 import { usePollViewToggle, useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
@@ -54,10 +61,16 @@ const HLSView = () => {
   const lastHlsUrl = usePrevious(hlsUrl);
   const togglePollView = usePollViewToggle();
   const vanillaStore = useHMSVanillaStore();
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
+  const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
+  const controlsRef = useRef(null);
+  const controlsTimerRef = useRef();
   const [hlsPlayerContext, setHLSPlayerContext] = useSetHMSPlayerContext();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const showChat = !!elements?.chat;
+  const isFullScreenSupported = screenfull.isEnabled;
 
   const isMobile = useMedia(config.media.md);
   const isLandscape = useMedia(config.media.ls);
@@ -117,6 +130,15 @@ const HLSView = () => {
     };
   }, [hlsUrl]);
 
+  const handleQuality = useCallback(
+    quality => {
+      if (hlsPlayerContext) {
+        setIsUserSelectedAuto(quality.height?.toString().toLowerCase() === 'auto');
+        hlsPlayerContext?.setLayer(quality);
+      }
+    },
+    [availableLayers], //eslint-disable-line
+  );
   /**
    * initialize HMSHLSPlayer and add event listeners.
    */
@@ -250,128 +272,248 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  if (isMobile || isLandscape) {
-    return (
-      <Flex
-        key="hls-viewer"
-        id={`hls-viewer-${themeType}`}
-        ref={hlsViewRef}
-        direction="column"
-        justify="center"
-        css={{
-          w: sidepane !== '' && isLandscape ? '55%' : '100%',
-          h: sidepane !== '' && isMobile ? '36%' : '100%',
-        }}
-      >
-        {hlsUrl && !streamEnded ? (
-          <>
-            <HMSPlayerContext.Provider value={{ hlsPlayer }}>
-              <Flex
-                id="hls-player-container"
-                align="center"
-                justify="center"
-                css={{
-                  width: '100%',
-                  margin: '0 auto',
-                  height: isFullScreen || sidepane !== '' || isLandscape ? '100%' : '36%',
-                }}
-              >
-                <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
-                {showLoader && (
-                  <Flex
-                    align="center"
-                    justify="center"
-                    css={{
-                      position: 'absolute',
-                    }}
-                  >
-                    <Loading width={72} height={72} />
-                  </Flex>
-                )}
-                <MwebHLSView
-                  ref={videoRef}
-                  isFullScreen={isFullScreen}
-                  isLoading={showLoader}
-                  isPaused={isPaused}
-                  hasCaptions={hasCaptions}
-                  isCaptionEnabled={isCaptionEnabled}
-                  isVideoLive={isVideoLive}
-                  availableLayers={availableLayers}
-                  currentSelectedQuality={currentSelectedQuality}
-                  setIsVideoLive={setIsVideoLive}
-                  toggle={toggle}
-                />
-              </Flex>
-            </HMSPlayerContext.Provider>
-            {!isLandscape && <HLSViewTitle />}
-          </>
-        ) : (
-          <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
-            <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-              {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
-            </Flex>
-            <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
-              {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
-            </Text>
-            <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
-              {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
-            </Text>
-          </Flex>
-        )}
-      </Flex>
-    );
-  }
+  const onHoverHandler = useCallback(
+    event => {
+      if (event.type === 'mouseenter' || event.type === 'touchenter' || qualityDropDownOpen) {
+        setControlsVisible(true);
+        return;
+      }
+      if (event.type === 'mouseleave' || event.type === 'touchleave') {
+        setControlsVisible(false);
+      } else if (isFullScreen && !controlsVisible && event.type === 'mousemove') {
+        setControlsVisible(true);
+        if (controlsTimerRef.current) {
+          clearTimeout(controlsTimerRef.current);
+        }
+      }
+    },
+    [controlsVisible, isFullScreen, qualityDropDownOpen],
+  );
+
   return (
     <Flex
       key="hls-viewer"
       id={`hls-viewer-${themeType}`}
       ref={hlsViewRef}
+      direction={isMobile || isLandscape ? 'column' : 'row'}
       css={{
-        size: '100%',
+        w: sidepane !== '' && isLandscape ? '55%' : '100%',
+        h: sidepane !== '' && isMobile ? '36%' : '100%',
       }}
     >
-      {hlsStatsState?.url && enablHlsStats ? (
+      {hlsStatsState?.url && enablHlsStats && !(isMobile || isLandscape) ? (
         <HlsStatsOverlay hlsStatsState={hlsStatsState} onClose={sfnOverlayClose} />
       ) : null}
       {hlsUrl && !streamEnded ? (
-        <HMSPlayerContext.Provider value={{ hlsPlayer }}>
-          <Flex
-            id="hls-player-container"
-            align="center"
-            justify="center"
-            css={{
-              size: '100%',
-              width:
-                videoRef.current && videoRef.current.clientWidth <= 720 ? `${videoRef.current.clientWidth}px` : '100%',
-              margin: '0 auto',
-            }}
-          >
-            <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
-            {showLoader && (
-              <Flex
-                align="center"
-                justify="center"
-                css={{
-                  position: 'absolute',
-                }}
+        <>
+          <HMSPlayerContext.Provider value={{ hlsPlayer }}>
+            <Flex
+              id="hls-player-container"
+              align="center"
+              justify="center"
+              css={{
+                size: '100%',
+                width:
+                  videoRef.current && videoRef.current.clientWidth <= 720 && !(isMobile || isLandscape)
+                    ? `${videoRef.current.clientWidth}px`
+                    : '100%',
+                margin: '0 auto',
+              }}
+            >
+              <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
+              {showLoader && (
+                <Flex
+                  align="center"
+                  justify="center"
+                  css={{
+                    position: 'absolute',
+                  }}
+                >
+                  <Loading width={72} height={72} />
+                </Flex>
+              )}
+              <HMSVideoPlayer.Root
+                ref={videoRef}
+                onMouseEnter={onHoverHandler}
+                onMouseMove={onHoverHandler}
+                onMouseLeave={onHoverHandler}
+                onTouchStart={onHoverHandler}
+                onTouchLeave={onHoverHandler}
               >
-                <Loading width={72} height={72} />
-              </Flex>
-            )}
-            <DesktopHLSView
-              ref={videoRef}
-              isFullScreen={isFullScreen}
-              isPaused={isPaused}
-              hasCaptions={hasCaptions}
-              isCaptionEnabled={isCaptionEnabled}
-              isVideoLive={isVideoLive}
-              availableLayers={availableLayers}
-              currentSelectedQuality={currentSelectedQuality}
-              setIsVideoLive={setIsVideoLive}
-              toggle={toggle}
-            />
-          </Flex>
-        </HMSPlayerContext.Provider>
+                <>
+                  {isMobile || isLandscape ? (
+                    <>
+                      {!showLoader && (
+                        <Box
+                          css={{
+                            position: 'absolute',
+                            top: '40%',
+                            left: '50%',
+                            transform: 'translateY(-40%) translateX(-50%)',
+                            padding: '$4 14px $4 14px',
+                            display: 'inline-flex',
+                            r: '$round',
+                            gap: '$1',
+                            bg: 'rgba(0, 0, 0, 0.6)',
+                            zIndex: 1,
+                            visibility: controlsVisible ? `` : `hidden`,
+                            opacity: controlsVisible ? `1` : '0',
+                          }}
+                        >
+                          {isPaused ? (
+                            <IconButton onClick={async () => await hlsPlayerContext?.play()} data-testid="play_btn">
+                              <PlayIcon width="48px" height="48px" />
+                            </IconButton>
+                          ) : (
+                            <IconButton onClick={async () => hlsPlayerContext?.pause()} data-testid="pause_btn">
+                              <PauseIcon width="48px" height="48px" />
+                            </IconButton>
+                          )}
+                        </Box>
+                      )}
+                      <Flex
+                        ref={controlsRef}
+                        direction="column"
+                        justify="start"
+                        align="start"
+                        css={{
+                          position: 'absolute',
+                          top: '0',
+                          left: '0',
+                          width: '100%',
+                          flexShrink: 0,
+                          visibility: controlsVisible ? `` : `hidden`,
+                          opacity: controlsVisible ? `1` : '0',
+                        }}
+                      >
+                        <HMSVideoPlayer.Controls.Root
+                          css={{
+                            p: '$4 $8',
+                          }}
+                        >
+                          <HMSVideoPlayer.Controls.Right>
+                            {isLandscape && <ChatToggle />}
+                            {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
+                            {availableLayers.length > 0 ? (
+                              <HLSQualitySelector
+                                layers={availableLayers}
+                                onOpen={setQualityDropDownOpen}
+                                open={qualityDropDownOpen}
+                                selection={currentSelectedQuality}
+                                onQualityChange={handleQuality}
+                                isAuto={isUserSelectedAuto}
+                              />
+                            ) : null}
+                          </HMSVideoPlayer.Controls.Right>
+                        </HMSVideoPlayer.Controls.Root>
+                      </Flex>
+                    </>
+                  ) : null}
+                  <Flex
+                    ref={controlsRef}
+                    direction="column"
+                    justify="end"
+                    align="start"
+                    css={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '0',
+                      background:
+                        isMobile || isLandscape
+                          ? ''
+                          : `linear-gradient(180deg, ${theme.colors.background_dim.value}00 29.46%, ${theme.colors.background_dim.value}A3 100%);`,
+                      width: '100%',
+                      pt: '$8',
+                      flexShrink: 0,
+                      transition: 'visibility 0s 0.5s, opacity 0.5s linear',
+                      visibility: controlsVisible ? `` : `hidden`,
+                      opacity: controlsVisible ? `1` : '0',
+                    }}
+                  >
+                    {!(isMobile || isLandscape) && <HMSVideoPlayer.Progress />}
+                    <HMSVideoPlayer.Controls.Root
+                      css={{
+                        p: '$4 $8',
+                      }}
+                    >
+                      <HMSVideoPlayer.Controls.Left>
+                        {!(isMobile || isLandscape) && (
+                          <>
+                            <HMSVideoPlayer.PlayButton
+                              onClick={async () => {
+                                isPaused ? await hlsPlayerContext?.play() : hlsPlayerContext?.pause();
+                              }}
+                              isPaused={isPaused}
+                            />
+                            <HMSVideoPlayer.Duration />
+                            <HMSVideoPlayer.Volume />
+                          </>
+                        )}
+                        <IconButton
+                          css={{ px: '$2' }}
+                          onClick={async () => {
+                            await hlsPlayerContext?.seekToLivePosition();
+                            setIsVideoLive(true);
+                          }}
+                          key="jump-to-live_btn"
+                          data-testid="jump-to-live_btn"
+                        >
+                          <Tooltip title="Go to Live" side="top">
+                            <Flex justify="center" gap={2} align="center">
+                              <Box
+                                css={{
+                                  height: '$4',
+                                  width: '$4',
+                                  background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
+                                  r: '$1',
+                                }}
+                              />
+                              <Text
+                                variant={{
+                                  '@sm': 'xs',
+                                }}
+                                css={{
+                                  c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
+                                }}
+                              >
+                                {isVideoLive ? 'LIVE' : 'GO LIVE'}
+                              </Text>
+                            </Flex>
+                          </Tooltip>
+                        </IconButton>
+                        {isMobile || isLandscape ? <HMSVideoPlayer.Duration /> : null}
+                      </HMSVideoPlayer.Controls.Left>
+
+                      <HMSVideoPlayer.Controls.Right>
+                        {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
+                        {availableLayers.length > 0 && !(isMobile || isLandscape) ? (
+                          <HLSQualitySelector
+                            layers={availableLayers}
+                            onOpen={setQualityDropDownOpen}
+                            open={qualityDropDownOpen}
+                            selection={currentSelectedQuality}
+                            onQualityChange={handleQuality}
+                            isAuto={isUserSelectedAuto}
+                          />
+                        ) : null}
+                        {isFullScreenSupported ? (
+                          <FullScreenButton
+                            isFullScreen={isFullScreen}
+                            onToggle={toggle}
+                            icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                          />
+                        ) : null}
+                      </HMSVideoPlayer.Controls.Right>
+                    </HMSVideoPlayer.Controls.Root>
+                    {isMobile || isLandscape ? <HMSVideoPlayer.Progress /> : null}
+                  </Flex>
+                </>
+              </HMSVideoPlayer.Root>
+            </Flex>
+          </HMSPlayerContext.Provider>
+
+          {isMobile && !isFullScreen && <HLSViewTitle />}
+        </>
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>

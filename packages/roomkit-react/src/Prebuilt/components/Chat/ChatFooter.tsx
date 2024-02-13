@@ -100,9 +100,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      inputRef.current?.focus();
+      if (!isMwebHLSStream) {
+        inputRef.current?.focus();
+      }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -227,7 +229,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={!isMobile}
+              autoFocus={false}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey) {
