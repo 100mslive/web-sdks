@@ -133,7 +133,7 @@ const AddMenu = () => {
           active={interactionType === INTERACTION_TYPE.QUIZ}
         />
       </Flex>
-      <Flex direction="column" css={{ borderBottom: '$space$px solid $border_bright', mb: '$10', pb: '$10' }}>
+      <Flex direction="column" css={{ mb: '$10' }}>
         <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
           ref={inputRef}
@@ -195,6 +195,7 @@ const AddMenu = () => {
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
   const polls = useHMSStore(selectPolls);
+  const permissions = useHMSStore(selectPermissions);
 
   useEffect(() => {
     const updatePolls = async () => {
@@ -205,16 +206,20 @@ const PrevMenu = () => {
   }, [hmsActions.interactivityCenter]);
 
   return polls?.length ? (
-    <Flex>
-      <Flex direction="column" css={{ w: '100%' }}>
-        <Text variant="h6" css={{ c: '$on_surface_high' }}>
-          Previous Polls and Quizzes
-        </Text>
-        <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
-          {polls?.map(poll => (
-            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
-          ))}
-        </Flex>
+    <Flex
+      direction="column"
+      css={{
+        width: '100%',
+        ...(permissions?.pollWrite ? { borderTop: '$space$px solid $border_bright', paddingTop: '$10' } : {}),
+      }}
+    >
+      <Text variant="h6" css={{ c: '$on_surface_high' }}>
+        Previous Polls and Quizzes
+      </Text>
+      <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
+        {polls?.map(poll => (
+          <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
+        ))}
       </Flex>
     </Flex>
   ) : null;
