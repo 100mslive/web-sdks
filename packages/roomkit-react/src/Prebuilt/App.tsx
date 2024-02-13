@@ -213,7 +213,6 @@ export const HMSPrebuilt = React.forwardRef<HMSPrebuiltRefType, HMSPrebuiltProps
                         },
                       }}
                     >
-                      <AppData />
                       <Init />
                       <DialogContainerProvider dialogContainerSelector={containerSelector}>
                         <Box
@@ -290,6 +289,7 @@ function AppRoutes({
   return (
     <AppStateContext.Provider value={{ rejoin }}>
       <>
+        {activeState !== PrebuiltStates.LEAVE && <AppData />}
         <ToastContainer />
         <Notifications />
         <MwebLandscapePrompt />
