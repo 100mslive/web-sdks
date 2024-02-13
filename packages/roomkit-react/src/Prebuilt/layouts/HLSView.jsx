@@ -22,7 +22,7 @@ import { HLSAutoplayBlockedPrompt } from '../components/HMSVideo/HLSAutoplayBloc
 import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
-import { HMSPlayerContext, useSetHMSPlayerContext } from '../components/HMSVideo/PlayerContext';
+import { HMSPlayerContext } from '../components/HMSVideo/PlayerContext';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
 import { IconButton } from '../../IconButton';
@@ -66,7 +66,6 @@ const HLSView = () => {
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const controlsRef = useRef(null);
   const controlsTimerRef = useRef();
-  const [hlsPlayerContext, setHLSPlayerContext] = useSetHMSPlayerContext();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const showChat = !!elements?.chat;
@@ -132,9 +131,9 @@ const HLSView = () => {
 
   const handleQuality = useCallback(
     quality => {
-      if (hlsPlayerContext) {
+      if (hlsPlayer) {
         setIsUserSelectedAuto(quality.height?.toString().toLowerCase() === 'auto');
-        hlsPlayerContext?.setLayer(quality);
+        hlsPlayer?.setLayer(quality);
       }
     },
     [availableLayers], //eslint-disable-line
@@ -146,7 +145,7 @@ const HLSView = () => {
     let videoEl = videoRef.current;
     const manifestLoadedHandler = ({ layers }) => {
       setAvailableLayers(layers);
-      setHasCaptions(hlsPlayerContext?.hasCaptions());
+      setHasCaptions(hlsPlayer?.hasCaptions());
     };
     const layerUpdatedHandler = ({ layer }) => {
       setCurrentSelectedQuality(layer);
@@ -218,7 +217,6 @@ const HLSView = () => {
     const handleAutoplayBlock = data => setIsHlsAutoplayBlocked(!!data);
     if (videoEl && hlsUrl) {
       hlsPlayer = new HMSHLSPlayer(hlsUrl, videoEl);
-      setHLSPlayerContext(hlsPlayer);
       hlsPlayer.on(HMSHLSPlayerEvents.SEEK_POS_BEHIND_LIVE_EDGE, handleNoLongerLive);
       hlsPlayer.on(HMSHLSPlayerEvents.TIMED_METADATA_LOADED, metadataLoadedHandler);
       hlsPlayer.on(HMSHLSPlayerEvents.ERROR, handleError);
@@ -239,7 +237,6 @@ const HLSView = () => {
         hlsPlayer.off(HMSHLSPlayerEvents.MANIFEST_LOADED, manifestLoadedHandler);
         hlsPlayer.off(HMSHLSPlayerEvents.LAYER_UPDATED, layerUpdatedHandler);
         hlsPlayer.reset();
-        setHLSPlayerContext(undefined);
       };
     }
   }, [hlsUrl]);
@@ -250,18 +247,18 @@ const HLSView = () => {
   useEffect(() => {
     const onHLSStats = state => setHlsStatsState(state);
     if (enablHlsStats) {
-      hlsPlayerContext?.on(HMSHLSPlayerEvents.STATS, onHLSStats);
+      hlsPlayer?.on(HMSHLSPlayerEvents.STATS, onHLSStats);
     } else {
-      hlsPlayerContext?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     }
     return () => {
-      hlsPlayerContext?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
+      hlsPlayer?.off(HMSHLSPlayerEvents.STATS, onHLSStats);
     };
   }, [enablHlsStats]);
 
   const unblockAutoPlay = async () => {
     try {
-      await hlsPlayerContext.play();
+      await hlsPlayer.play();
       setIsHlsAutoplayBlocked(false);
     } catch (error) {
       console.error('Tried to unblock Autoplay failed with', error.message);
@@ -301,12 +298,12 @@ const HLSView = () => {
         h: sidepane !== '' && isMobile ? '36%' : '100%',
       }}
     >
-      {hlsStatsState?.url && enablHlsStats && !(isMobile || isLandscape) ? (
-        <HlsStatsOverlay hlsStatsState={hlsStatsState} onClose={sfnOverlayClose} />
-      ) : null}
       {hlsUrl && !streamEnded ? (
         <>
           <HMSPlayerContext.Provider value={{ hlsPlayer }}>
+            {hlsStatsState?.url && enablHlsStats && !(isMobile || isLandscape) ? (
+              <HlsStatsOverlay hlsStatsState={hlsStatsState} onClose={sfnOverlayClose} />
+            ) : null}
             <Flex
               id="hls-player-container"
               align="center"
@@ -361,11 +358,21 @@ const HLSView = () => {
                           }}
                         >
                           {isPaused ? (
-                            <IconButton onClick={async () => await hlsPlayerContext?.play()} data-testid="play_btn">
+                            <IconButton
+                              onClick={async () => {
+                                await hlsPlayer?.play();
+                              }}
+                              data-testid="play_btn"
+                            >
                               <PlayIcon width="48px" height="48px" />
                             </IconButton>
                           ) : (
-                            <IconButton onClick={async () => hlsPlayerContext?.pause()} data-testid="pause_btn">
+                            <IconButton
+                              onClick={async () => {
+                                await hlsPlayer?.pause();
+                              }}
+                              data-testid="pause_btn"
+                            >
                               <PauseIcon width="48px" height="48px" />
                             </IconButton>
                           )}
@@ -441,7 +448,7 @@ const HLSView = () => {
                           <>
                             <HMSVideoPlayer.PlayButton
                               onClick={async () => {
-                                isPaused ? await hlsPlayerContext?.play() : hlsPlayerContext?.pause();
+                                isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
                               }}
                               isPaused={isPaused}
                             />
@@ -452,7 +459,7 @@ const HLSView = () => {
                         <IconButton
                           css={{ px: '$2' }}
                           onClick={async () => {
-                            await hlsPlayerContext?.seekToLivePosition();
+                            await hlsPlayer?.seekToLivePosition();
                             setIsVideoLive(true);
                           }}
                           key="jump-to-live_btn"
@@ -485,7 +492,9 @@ const HLSView = () => {
                       </HMSVideoPlayer.Controls.Left>
 
                       <HMSVideoPlayer.Controls.Right>
-                        {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
+                        {hasCaptions && !(isMobile || isLandscape) && (
+                          <HLSCaptionSelector isEnabled={isCaptionEnabled} />
+                        )}
                         {availableLayers.length > 0 && !(isMobile || isLandscape) ? (
                           <HLSQualitySelector
                             layers={availableLayers}
