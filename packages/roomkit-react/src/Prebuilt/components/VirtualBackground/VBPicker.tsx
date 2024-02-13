@@ -47,10 +47,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const isEffectsEnabled = useHMSStore(selectIsEffectsEnabled);
   const effectsKey = useHMSStore(selectEffectsKey);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
-  const defaultBackground = useHMSStore(selectAppData(APP_DATA.background));
-  const [activeBackground, setActiveBackground] = useState<string | HMSVirtualBackgroundTypes>(
-    (VBHandler?.getBackground() as string | HMSVirtualBackgroundTypes) || defaultBackground,
-  );
+  const background = useHMSStore(selectAppData(APP_DATA.background));
   const mediaList = backgroundMedia.length
     ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
@@ -78,7 +75,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         }
       }
       const handleDefaultBackground = async () => {
-        switch (activeBackground) {
+        switch (background) {
           case HMSVirtualBackgroundTypes.NONE: {
             break;
           }
@@ -87,12 +84,12 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             break;
           }
           default:
-            await VBHandler.setBackground(activeBackground);
+            await VBHandler.setBackground(background);
         }
       };
       handleDefaultBackground();
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, activeBackground, blurAmount]);
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
 
   useEffect(() => {
     if (!isVideoOn) {
@@ -140,7 +137,7 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               value: HMSVirtualBackgroundTypes.NONE,
               onClick: async () => {
                 await VBHandler.removeEffects();
-                setActiveBackground(HMSVirtualBackgroundTypes.NONE);
+                hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.NONE);
               },
             },
             {
@@ -149,16 +146,16 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
               value: HMSVirtualBackgroundTypes.BLUR,
               onClick: async () => {
                 await VBHandler?.setBlur(blurAmount);
-                setActiveBackground(HMSVirtualBackgroundTypes.BLUR);
+                hmsActions.setAppData(APP_DATA.background, HMSVirtualBackgroundTypes.BLUR);
               },
             },
           ]}
-          activeBackground={activeBackground}
+          activeBackground={background}
         />
 
         {/* Slider */}
         <Flex direction="column" css={{ w: '100%', gap: '$8', mt: '$8' }}>
-          {activeBackground === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
+          {background === HMSVirtualBackgroundTypes.BLUR && isEffectsEnabled && effectsKey ? (
             <Box>
               <Text variant="sm" css={{ color: '$on_surface_high', fontWeight: '$semiBold', mb: '$4' }}>
                 Blur intensity
@@ -193,10 +190,10 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
             value: mediaURL,
             onClick: async () => {
               await VBHandler?.setBackground(mediaURL);
-              setActiveBackground(mediaURL);
+              hmsActions.setAppData(APP_DATA.background, mediaURL);
             },
           }))}
-          activeBackground={activeBackground}
+          activeBackground={background}
         />
       </Box>
     </Flex>
