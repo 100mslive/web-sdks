@@ -14,7 +14,7 @@ import { useAuthToken } from '../AppData/useUISettings';
 import { QUERY_PARAM_PREVIEW_AS_ROLE } from '../../common/constants';
 
 export const PreviewScreen = () => {
-  const { isPreviewScreenEnabled, elements } = useRoomLayoutPreviewScreen();
+  const { isPreviewScreenEnabled } = useRoomLayoutPreviewScreen();
   const skipPreview = !isPreviewScreenEnabled;
   const previewAsRole = useSearchParam(QUERY_PARAM_PREVIEW_AS_ROLE);
   const { userName } = useHMSPrebuiltContext();
@@ -31,12 +31,7 @@ export const PreviewScreen = () => {
         align="center"
       >
         {authToken && Object.keys(previewHeader).length > 0 ? (
-          <PreviewJoin
-            initialName={initialName}
-            skipPreview={skipPreview}
-            asRole={previewAsRole ?? undefined}
-            virtualBackgroundMedia={elements?.virtual_background?.background_media}
-          />
+          <PreviewJoin initialName={initialName} skipPreview={skipPreview} asRole={previewAsRole ?? undefined} />
         ) : (
           <FullPageProgress />
         )}

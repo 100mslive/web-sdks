@@ -1,7 +1,5 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useMeasure, useMedia } from 'react-use';
-import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
-import { VirtualBackgroundMedia } from '@100mslive/types-prebuilt/elements/virtual_background';
 import {
   HMSRoomState,
   selectIsLocalVideoEnabled,
@@ -9,7 +7,6 @@ import {
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
-  useHMSActions,
   useHMSStore,
   useParticipants,
   usePreviewJoin,
@@ -40,14 +37,12 @@ import { VBToggle } from '../VirtualBackground/VBToggle';
 import PreviewForm from './PreviewForm';
 import { useRoomLayoutPreviewScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
-import { useSidepaneToggle } from '../AppData/useSidepane';
-// @ts-ignore: No implicit Any
 import { useAuthToken, useUISettings } from '../AppData/useUISettings';
 // @ts-ignore: No implicit Any
 import { defaultPreviewPreference, UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore: No implicit Any
 import { calculateAvatarAndAttribBoxSize, getFormattedCount } from '../../common/utils';
-import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../../common/constants';
+import { UI_SETTINGS } from '../../common/constants';
 
 const getParticipantChipContent = (peerCount = 0) => {
   if (peerCount === 0) {
@@ -74,18 +69,15 @@ const PreviewJoin = ({
   skipPreview,
   initialName,
   asRole,
-  virtualBackgroundMedia,
 }: {
   skipPreview?: boolean;
   initialName?: string;
   asRole?: string;
-  virtualBackgroundMedia?: VirtualBackgroundMedia[];
 }) => {
   const [previewPreference, setPreviewPreference] = useUserPreferences(
     UserPreferencesKeys.PREVIEW,
     defaultPreviewPreference,
   );
-  const hmsActions = useHMSActions();
   const { isStreamingOn } = useRecordingStreaming();
   const authToken = useAuthToken();
   const [name, setName] = useState(initialName || previewPreference.name);
@@ -111,7 +103,6 @@ const PreviewJoin = ({
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
-  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
@@ -137,20 +128,6 @@ const PreviewJoin = ({
       setName(initialName);
     }
   }, [initialName]);
-
-  useEffect(() => {
-    let defaultMediaURL;
-    virtualBackgroundMedia?.forEach(media => {
-      if (media.default && media.url) {
-        defaultMediaURL = media.url;
-      }
-    });
-    if (defaultMediaURL) {
-      toggleVB();
-      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      hmsActions.setAppData(APP_DATA.backgroundType, HMSVirtualBackgroundTypes.IMAGE);
-    }
-  }, [virtualBackgroundMedia, hmsActions, toggleVB]);
 
   return roomState === HMSRoomState.Preview ? (
     <Flex justify="center" css={{ size: '100%', position: 'relative' }}>

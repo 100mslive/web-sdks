@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { HMSVirtualBackgroundTypes } from '@100mslive/hms-virtual-background';
 import {
   HMSRoomState,
   selectFullAppData,
@@ -10,6 +11,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { LayoutMode } from '../Settings/LayoutSettings';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -71,6 +73,8 @@ export const AppData = React.memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const appData = useHMSStore(selectFullAppData);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -102,6 +106,20 @@ export const AppData = React.memo(() => {
     }
     hmsActions.setAppData(APP_DATA.subscribedNotifications, preferences.subscribedNotifications, true);
   }, [preferences.subscribedNotifications, hmsActions]);
+
+  useEffect(() => {
+    let defaultMediaURL;
+    elements?.virtual_background?.background_media?.forEach(media => {
+      if (media.default && media.url) {
+        defaultMediaURL = media.url;
+      }
+    });
+    if (defaultMediaURL) {
+      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
+      hmsActions.setAppData(APP_DATA.backgroundType, HMSVirtualBackgroundTypes.IMAGE);
+      toggleVB();
+    }
+  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB]);
 
   return <ResetStreamingStart />;
 });

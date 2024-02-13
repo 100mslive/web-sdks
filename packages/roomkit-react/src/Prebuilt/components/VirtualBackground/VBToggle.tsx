@@ -5,7 +5,6 @@ import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
 // @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
-// @ts-ignore
 import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const VBToggle = () => {
