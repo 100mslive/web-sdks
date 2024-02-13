@@ -54,7 +54,7 @@ export const LeaderboardEntry = ({
       </Flex>
 
       <Flex align="center" css={{ gap: '$4', color: '$on_surface_medium' }}>
-        {position === 1 ? <TrophyFilledIcon height={16} width={16} /> : null}
+        {position === 1 && score ? <TrophyFilledIcon height={16} width={16} /> : null}
         {questionCount ? (
           <>
             <CheckCircleIcon height={16} width={16} />
