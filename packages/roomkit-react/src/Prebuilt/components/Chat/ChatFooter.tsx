@@ -99,11 +99,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      if (!isMwebHLSStream) {
+      if (!(isMwebHLSStream || isLandscapeHLSStream)) {
         inputRef.current?.focus();
       }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream, isLandscapeHLSStream]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
