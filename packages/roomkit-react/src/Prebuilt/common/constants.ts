@@ -47,7 +47,6 @@ export const APP_DATA = {
   pollState: 'pollState',
   background: 'background',
   backgroundType: 'backgroundType',
-  defaultVB: 'defaultVB',
 };
 
 export const UI_SETTINGS = {
@@ -86,12 +85,6 @@ export const SUBSCRIBED_NOTIFICATIONS = {
   METADATA_UPDATED: 'METADATA_UPDATED',
   NEW_MESSAGE: 'NEW_MESSAGE',
   ERROR: 'ERROR',
-};
-
-export const DEFAULT_VB_STATES = {
-  UNSET: 'UNSET',
-  OPENED: 'OPENED',
-  SET: 'SET',
 };
 
 export const CREATE_ROOM_DOC_URL = 'https://github.com/100mslive/100ms-web/wiki/Creating-and-joining-a-room';
