@@ -7,7 +7,8 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { AudioLevelIcon } from '@100mslive/react-icons';
-import { IconButton } from '../../../IconButton';
+import { Tooltip } from '../../../Tooltip';
+import IconButton from '../../IconButton';
 
 export const NoiseCancellationToggle = () => {
   const pluginRef = useRef(new HMSKrispPlugin());
@@ -23,15 +24,17 @@ export const NoiseCancellationToggle = () => {
   }, [localPeerAudioTrackID, actions, isPluginAdded]);
 
   return (
-    <IconButton
-      active={active}
-      onClick={() => {
-        pluginRef.current.toggle();
-        setActive(!pluginRef.current.isEnabled());
-      }}
-      data-testid="noise_cancellation_btn"
-    >
-      <AudioLevelIcon />
-    </IconButton>
+    <Tooltip title="Noise Cancellation">
+      <IconButton
+        active={active}
+        onClick={() => {
+          pluginRef.current.toggle();
+          setActive(!pluginRef.current.isEnabled());
+        }}
+        data-testid="noise_cancellation_btn"
+      >
+        <AudioLevelIcon />
+      </IconButton>
+    </Tooltip>
   );
 };

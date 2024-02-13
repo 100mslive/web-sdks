@@ -15,10 +15,10 @@
       "dist"
     ],
     "peerDependencies": {
-        "@100mslive/hms-video-store": "0.11.3"
+        "@100mslive/hms-video-store": "0.11.5"
     },
     "devDependencies": {
-        "@100mslive/hms-video-store": "0.11.3"
+        "@100mslive/hms-video-store": "0.11.5"
     },
     "scripts": {
       "start": "concurrently \"yarn dev\" \"yarn types\"",
