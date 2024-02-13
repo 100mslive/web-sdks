@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  HMSPoll,
   HMSPollState,
   selectLocalPeerRoleName,
   selectPermissions,
+  selectPolls,
   useHMSActions,
   useHMSStore,
 } from '@100mslive/react-sdk';
@@ -133,7 +133,7 @@ const AddMenu = () => {
           active={interactionType === INTERACTION_TYPE.QUIZ}
         />
       </Flex>
-      <Flex direction="column">
+      <Flex direction="column" css={{ mb: '$10' }}>
         <Text variant="body2" css={{ mb: '$4' }}>{`Name this ${interactionType.toLowerCase()}`}</Text>
         <Input
           ref={inputRef}
@@ -194,20 +194,12 @@ const AddMenu = () => {
 
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
-  const [polls, setPolls] = useState<HMSPoll[]>([]);
+  const polls = useHMSStore(selectPolls);
+  const permissions = useHMSStore(selectPermissions);
 
   useEffect(() => {
-    const listPolls = async () => {
-      const polls = await hmsActions.interactivityCenter.getPolls();
-      const sortedPolls = await polls
-        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
-      return sortedPolls;
-    };
-
     const updatePolls = async () => {
-      const sortedPolls = await listPolls();
-      setPolls(sortedPolls);
+      await hmsActions.interactivityCenter.getPolls();
     };
 
     updatePolls();
@@ -215,21 +207,19 @@ const PrevMenu = () => {
 
   return polls?.length ? (
     <Flex
+      direction="column"
       css={{
-        borderTop: '$space$px solid $border_bright',
-        mt: '$10',
-        pt: '$10',
+        width: '100%',
+        ...(permissions?.pollWrite ? { borderTop: '$space$px solid $border_bright', paddingTop: '$10' } : {}),
       }}
     >
-      <Flex direction="column" css={{ w: '100%' }}>
-        <Text variant="h6" css={{ c: '$on_surface_high' }}>
-          Previous Polls and Quizzes
-        </Text>
-        <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
-          {polls?.map(poll => (
-            <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
-          ))}
-        </Flex>
+      <Text variant="h6" css={{ c: '$on_surface_high' }}>
+        Previous Polls and Quizzes
+      </Text>
+      <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
+        {polls?.map(poll => (
+          <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
+        ))}
       </Flex>
     </Flex>
   ) : null;
