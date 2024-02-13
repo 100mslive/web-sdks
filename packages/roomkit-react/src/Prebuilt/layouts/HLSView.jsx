@@ -308,7 +308,8 @@ const HLSView = () => {
           align="center"
           justify="center"
           css={{
-            width: '100%',
+            width:
+              videoRef.current && videoRef.current.clientWidth <= 720 ? `${videoRef.current.clientWidth}px` : '100%',
             margin: '0 auto',
             height: '100%',
           }}
@@ -351,6 +352,7 @@ const HLSView = () => {
                 </IconButton>
               </Box>
             )}
+
             <Flex
               ref={controlsRef}
               direction="column"
@@ -370,78 +372,90 @@ const HLSView = () => {
               }}
             >
               {!isMobile && (
-                <HMSVideoPlayer.Controls.Root
-                  css={{
-                    p: '$4 $8',
-                  }}
-                >
-                  <HMSVideoPlayer.Controls.Left>
-                    <HMSVideoPlayer.PlayButton
-                      onClick={async () => {
-                        isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
-                      }}
-                      isPaused={isPaused}
-                    />
-                    <HMSVideoPlayer.Duration hlsPlayer={hlsPlayer} />
-                    <HMSVideoPlayer.Volume hlsPlayer={hlsPlayer} />
-                    <IconButton
-                      variant="standard"
-                      css={{ px: '$2' }}
-                      onClick={async () => {
-                        await hlsPlayer.seekToLivePosition();
-                        setIsVideoLive(true);
-                      }}
-                      key="jump-to-live_btn"
-                      data-testid="jump-to-live_btn"
-                    >
-                      <Tooltip title="Go to Live" side="top">
-                        <Flex justify="center" gap={2} align="center">
-                          <Box
-                            css={{
-                              height: '$4',
-                              width: '$4',
-                              background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
-                              r: '$1',
-                            }}
-                          />
-                          <Text
-                            variant={{
-                              '@sm': 'xs',
-                            }}
-                            css={{
-                              c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
-                            }}
-                          >
-                            {isVideoLive ? 'LIVE' : 'GO LIVE'}
-                          </Text>
-                        </Flex>
-                      </Tooltip>
-                    </IconButton>
-                  </HMSVideoPlayer.Controls.Left>
-
-                  <HMSVideoPlayer.Controls.Right>
-                    {hasCaptions && (
-                      <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                <Flex direction="column">
+                  <Box>
+                    {hlsPlayer && (
+                      <HMSVideoPlayer.Progress
+                        hlsPlayer={hlsPlayer}
+                        onValueChange={time => {
+                          hlsPlayer.seekTo(time);
+                        }}
+                      />
                     )}
-                    {availableLayers.length > 0 ? (
-                      <HLSQualitySelector
-                        layers={availableLayers}
-                        onOpen={setQualityDropDownOpen}
-                        open={qualityDropDownOpen}
-                        selection={currentSelectedQuality}
-                        onQualityChange={handleQuality}
-                        isAuto={isUserSelectedAuto}
+                  </Box>
+                  <HMSVideoPlayer.Controls.Root
+                    css={{
+                      p: '$4 $8',
+                    }}
+                  >
+                    <HMSVideoPlayer.Controls.Left>
+                      <HMSVideoPlayer.PlayButton
+                        onClick={async () => {
+                          isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
+                        }}
+                        isPaused={isPaused}
                       />
-                    ) : null}
-                    {isFullScreenSupported ? (
-                      <FullScreenButton
-                        isFullScreen={isFullScreen}
-                        onToggle={toggle}
-                        icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                      />
-                    ) : null}
-                  </HMSVideoPlayer.Controls.Right>
-                </HMSVideoPlayer.Controls.Root>
+                      <HMSVideoPlayer.Duration hlsPlayer={hlsPlayer} />
+                      <HMSVideoPlayer.Volume hlsPlayer={hlsPlayer} />
+                      <IconButton
+                        variant="standard"
+                        css={{ px: '$2' }}
+                        onClick={async () => {
+                          await hlsPlayer.seekToLivePosition();
+                          setIsVideoLive(true);
+                        }}
+                        key="jump-to-live_btn"
+                        data-testid="jump-to-live_btn"
+                      >
+                        <Tooltip title="Go to Live" side="top">
+                          <Flex justify="center" gap={2} align="center">
+                            <Box
+                              css={{
+                                height: '$4',
+                                width: '$4',
+                                background: isVideoLive ? '$alert_error_default' : '$on_primary_medium',
+                                r: '$1',
+                              }}
+                            />
+                            <Text
+                              variant={{
+                                '@sm': 'xs',
+                              }}
+                              css={{
+                                c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
+                              }}
+                            >
+                              {isVideoLive ? 'LIVE' : 'GO LIVE'}
+                            </Text>
+                          </Flex>
+                        </Tooltip>
+                      </IconButton>
+                    </HMSVideoPlayer.Controls.Left>
+
+                    <HMSVideoPlayer.Controls.Right>
+                      {hasCaptions && (
+                        <HLSCaptionSelector onClick={() => hlsPlayer?.toggleCaption()} isEnabled={isCaptionEnabled} />
+                      )}
+                      {availableLayers.length > 0 ? (
+                        <HLSQualitySelector
+                          layers={availableLayers}
+                          onOpen={setQualityDropDownOpen}
+                          open={qualityDropDownOpen}
+                          selection={currentSelectedQuality}
+                          onQualityChange={handleQuality}
+                          isAuto={isUserSelectedAuto}
+                        />
+                      ) : null}
+                      {isFullScreenSupported ? (
+                        <FullScreenButton
+                          isFullScreen={isFullScreen}
+                          onToggle={toggle}
+                          icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
+                        />
+                      ) : null}
+                    </HMSVideoPlayer.Controls.Right>
+                  </HMSVideoPlayer.Controls.Root>
+                </Flex>
               )}
             </Flex>
           </HMSVideoPlayer.Root>

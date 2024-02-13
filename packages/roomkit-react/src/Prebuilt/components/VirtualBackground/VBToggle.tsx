@@ -3,6 +3,7 @@ import { selectIsEffectsEnabled, selectIsLocalVideoEnabled, useHMSStore } from '
 import { VirtualBackgroundIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../../Tooltip';
 import IconButton from '../../IconButton';
+// @ts-ignore
 import { useIsSidepaneTypeOpen, useSidepaneToggle } from '../AppData/useSidepane';
 import { isSafari, SIDE_PANE_OPTIONS } from '../../common/constants';
 
