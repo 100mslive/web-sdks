@@ -20,7 +20,7 @@ import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppDa
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
 // @ts-ignore
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
-import { useDefaultChatSelection, useLandscapeHLSStream } from '../../common/hooks';
+import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
 
 const TextArea = styled('textarea', {
@@ -80,7 +80,6 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [draftMessage, setDraftMessage] = useChatDraftMessage();
   const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.ls);
   const { elements, screenType } = useRoomLayoutConferencingScreen();
   const message_placeholder = elements?.chat?.message_placeholder || 'Send a message';
   const localPeer = useHMSStore(selectLocalPeer);
@@ -93,18 +92,18 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   const isLocalPeerBlacklisted = useIsPeerBlacklisted({ local: true });
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
-  const isMwebHLSStream = screenType === 'hls_live_streaming' && (isMobile || isLandscape);
+  const isMwebHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      if (!isMwebHLSStream) {
+      if (!isMwebHLSStream || !isLandscapeHLSStream) {
         inputRef.current?.focus();
       }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream, isLandscapeHLSStream]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -208,7 +207,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               position: 'relative',
               py: '$6',
               pl: '$8',
-              flexGrow: `${isMwebHLSStream ? 1 : 0}`,
+              flexGrow: `${isMwebHLSStream || isLandscapeHLSStream ? 1 : 0}`,
               r: '$1',
               '@md': {
                 minHeight: 'unset',
@@ -267,7 +266,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               <SendIcon />
             </BaseIconButton>
           </Flex>
-          {isMwebHLSStream && (
+          {(isMwebHLSStream || isLandscapeHLSStream) && (
             <Flex
               css={{
                 alignItems: 'center',

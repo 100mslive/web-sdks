@@ -67,16 +67,16 @@ export const HLSViewTitle = () => {
           <Text variant="caption" css={{ color: '$on_surface_medium' }}>
             {getWatchCount(peerCount) + ' watching'}{' '}
           </Text>
-          <Text
-            variant="caption"
+          <Flex
+            direction="column"
             css={{
               w: '$3',
-              h: '$8',
-              color: '$on_surface_medium',
+              h: '$3',
+              backgroundColor: '$on_surface_medium',
+              borderRadius: '50%',
+              alignSelf: 'center',
             }}
-          >
-            .
-          </Text>
+          />
           <Text variant="caption" css={{ color: '$on_surface_medium' }}>
             {'Started ' + getTime(liveTime) + ' ago'}
           </Text>

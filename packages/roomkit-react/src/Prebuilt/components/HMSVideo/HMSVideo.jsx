@@ -1,7 +1,10 @@
 import React, { forwardRef } from 'react';
+import { useMedia } from 'react-use';
 import { Flex } from '../../../';
+import { config } from '../../../Theme';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+  const isLandscape = useMedia(config.media.ls);
   return (
     <Flex
       data-testid="hms-video"
@@ -34,6 +37,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           margin: '0 auto',
           minHeight: '0',
           objectFit: 'cover',
+          width: isLandscape ? '100%' : '',
         }}
         ref={videoRef}
         playsInline

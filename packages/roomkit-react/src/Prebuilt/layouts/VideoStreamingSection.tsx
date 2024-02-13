@@ -1,5 +1,4 @@
 import React, { Suspense, useEffect } from 'react';
-import { useMedia } from 'react-use';
 import {
   ConferencingScreen,
   DefaultConferencingScreen_Elements,
@@ -17,7 +16,6 @@ import {
 import FullPageProgress from '../components/FullPageProgress';
 import { GridLayout } from '../components/VideoLayouts/GridLayout';
 import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { EmbedView } from './EmbedView';
 // @ts-ignore: No implicit Any
@@ -33,6 +31,7 @@ import {
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
+import { useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -57,7 +56,7 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
-  const isMobile = useMedia(cssConfig.media.md);
+  const isMobileHLSStream = useMobileHLSStream();
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -109,25 +108,20 @@ export const VideoStreamingSection = ({
         }}
       >
         {ViewComponent}
-        {screenType === 'hls_live_streaming' && isMobile ? (
-          <Box css={{ height: '50%', maxHeight: '50%', overflowY: 'clip' }}>
-            <SidePane
-              screenType={screenType}
-              // @ts-ignore
-              tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
-              hideControls={hideControls}
-            />
-          </Box>
-        ) : (
-          <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip' }}>
-            <SidePane
-              screenType={screenType}
-              // @ts-ignore
-              tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
-              hideControls={hideControls}
-            />
-          </Box>
-        )}
+        <Box
+          css={{
+            height: isMobileHLSStream ? '50%' : '100%',
+            maxHeight: isMobileHLSStream ? '50' : '100%',
+            overflowY: 'clip',
+          }}
+        >
+          <SidePane
+            screenType={screenType}
+            // @ts-ignore
+            tileProps={(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid}
+            hideControls={hideControls}
+          />
+        </Box>
       </Flex>
     </Suspense>
   );

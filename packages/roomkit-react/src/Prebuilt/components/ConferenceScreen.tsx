@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
 import { v4 as uuid } from 'uuid';
 import {
@@ -21,7 +20,6 @@ import { ActivatedPIP } from './PIP/PIPComponent';
 import { PictureInPicture } from './PIP/PIPManager';
 import { RoleChangeRequestModal } from './RoleChangeRequest/RoleChangeRequestModal';
 import { Box, Flex } from '../../Layout';
-import { config } from '../../Theme';
 import { useHMSPrebuiltContext } from '../AppContext';
 import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 // @ts-ignore: No implicit Any
@@ -36,6 +34,7 @@ import {
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useAuthToken, useSetAppDataByKey } from './AppData/useUISettings';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { APP_DATA, isAndroid, isIOS, isIPadOS } from '../common/constants';
 
@@ -57,6 +56,7 @@ export const ConferenceScreen = () => {
 
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
+  // using it in hls stream to show action button when chat is disabled
   const showChat = !!screenProps.elements?.chat;
   const toggleControls = () => {
     if (dropdownListRef.current?.length === 0 && isMobileDevice) {
@@ -64,9 +64,9 @@ export const ConferenceScreen = () => {
     }
   };
   const autoRoomJoined = useRef(isPreviewScreenEnabled);
-  const isMobile = useMedia(config.media.md);
-  const isLandscape = useMedia(config.media.ls);
-  const isMwebHLSStream = screenProps.screenType === 'hls_live_streaming' && (isMobile || isLandscape);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
