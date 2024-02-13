@@ -18,10 +18,14 @@ export const NoiseCancellationToggle = () => {
   const actions = useHMSActions();
 
   useEffect(() => {
-    if (localPeerAudioTrackID && !isPluginAdded) {
+    if (localPeerAudioTrackID && !isPluginAdded && pluginRef.current.isSupported()) {
       actions.addPluginToAudioTrack(pluginRef.current);
     }
   }, [localPeerAudioTrackID, actions, isPluginAdded]);
+
+  if (!pluginRef.current.isSupported()) {
+    return null;
+  }
 
   return (
     <Tooltip title="Noise Cancellation">
