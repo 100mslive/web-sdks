@@ -10,6 +10,7 @@ import {
   useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { LayoutMode } from '../Settings/LayoutSettings';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 //@ts-ignore
 import { UserPreferencesKeys, useUserPreferences } from '../hooks/useUserPreferences';
 // @ts-ignore
@@ -60,7 +61,6 @@ const initialAppData = {
   [APP_DATA.activeScreensharePeerId]: '',
   [APP_DATA.disableNotifications]: false,
   [APP_DATA.background]: 'none',
-  [APP_DATA.backgroundType]: 'none',
   [APP_DATA.pollState]: {
     [POLL_STATE.pollInView]: '',
     [POLL_STATE.view]: '',
@@ -71,6 +71,8 @@ export const AppData = React.memo(() => {
   const hmsActions = useHMSActions();
   const [preferences = {}] = useUserPreferences(UserPreferencesKeys.UI_SETTINGS);
   const appData = useHMSStore(selectFullAppData);
+  const { elements } = useRoomLayoutConferencingScreen();
+  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -102,6 +104,19 @@ export const AppData = React.memo(() => {
     }
     hmsActions.setAppData(APP_DATA.subscribedNotifications, preferences.subscribedNotifications, true);
   }, [preferences.subscribedNotifications, hmsActions]);
+
+  useEffect(() => {
+    let defaultMediaURL;
+    elements?.virtual_background?.background_media?.forEach(media => {
+      if (media.default && media.url) {
+        defaultMediaURL = media.url;
+      }
+    });
+    if (defaultMediaURL) {
+      hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
+      toggleVB();
+    }
+  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB]);
 
   return <ResetStreamingStart />;
 });
