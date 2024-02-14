@@ -103,7 +103,6 @@ const PreviewJoin = ({
     asRole,
   });
   const roomState = useHMSStore(selectRoomState);
-
   const savePreferenceAndJoin = useCallback(() => {
     setPreviewPreference({
       name,
