@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
+import { RoomDetailsPane } from '../components/RoomDetails/RoomDetailsPane';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
@@ -51,6 +52,9 @@ const SidePane = ({
   }
   if (sidepane === SIDE_PANE_OPTIONS.VB) {
     ViewComponent = <VBPicker backgroundMedia={backgroundMedia} />;
+  }
+  if (sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS) {
+    ViewComponent = <RoomDetailsPane />;
   }
 
   useEffect(() => {

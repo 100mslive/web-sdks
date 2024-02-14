@@ -64,6 +64,7 @@ export const SIDE_PANE_OPTIONS = {
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
   VB: 'VB',
+  ROOM_DETAILS: 'ROOM_DETAILS',
 };
 
 export const POLL_STATE = {
