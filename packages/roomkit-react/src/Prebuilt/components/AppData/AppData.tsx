@@ -5,6 +5,7 @@ import {
   selectHLSState,
   selectRoomState,
   selectRTMPState,
+  useAVToggle,
   useHMSActions,
   useHMSStore,
   useRecordingStreaming,
@@ -73,6 +74,7 @@ export const AppData = React.memo(() => {
   const appData = useHMSStore(selectFullAppData);
   const { elements } = useRoomLayoutConferencingScreen();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const { isLocalVideoEnabled } = useAVToggle();
 
   useEffect(() => {
     hmsActions.initAppData({
@@ -114,9 +116,11 @@ export const AppData = React.memo(() => {
     });
     if (defaultMediaURL) {
       hmsActions.setAppData(APP_DATA.background, defaultMediaURL);
-      toggleVB();
+      if (isLocalVideoEnabled) {
+        toggleVB();
+      }
     }
-  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB]);
+  }, [hmsActions, elements?.virtual_background?.background_media, toggleVB, isLocalVideoEnabled]);
 
   return <ResetStreamingStart />;
 });
