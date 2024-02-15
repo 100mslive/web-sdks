@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import {
   selectAppData,
   selectEffectsKey,
@@ -19,7 +20,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, Flex, Slider, Video } from '../../../index';
+import { Box, config as cssConfig, Flex, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -48,13 +49,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   const effectsKey = useHMSStore(selectEffectsKey);
   const isPluginAdded = useHMSStore(selectIsLocalVideoPluginPresent(VBHandler?.getName() || ''));
   const background = useHMSStore(selectAppData(APP_DATA.background));
+  const isMobile = useMedia(cssConfig.media.md);
   const mediaList = backgroundMedia.length
     ? backgroundMedia.map((media: VirtualBackgroundMedia) => media.url || '')
     : defaultMedia;
 
   const inPreview = roomState === HMSRoomState.Preview;
   // Hidden in preview as the effect will be visible in the preview tile
-  const showVideoTile = isVideoOn && isLargeRoom && !inPreview;
+  const showVideoTile = isVideoOn && ((isLargeRoom && !inPreview) || isMobile);
 
   useEffect(() => {
     if (!track?.id) {
@@ -73,6 +75,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           }
           hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
+      }
+      if (isMobile) {
+        VBHandler.setPreset('quality');
       }
       const handleDefaultBackground = async () => {
         switch (background) {
