@@ -62,6 +62,16 @@ For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 
 For full documentation, visit [100ms.live/docs/prebuilt/v2/prebuilt/quickstart](https://www.100ms.live/docs/prebuilt/v2/prebuilt/quickstart)
 
+
+## Other SDKs
+| Client | Repository | Documentation |
+|--|--|--|
+| Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/quickstart)
+| iOS | [100ms-ios-sdk](https://github.com/100mslive/100ms-ios-sdk) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/quickstart)
+| Prebuilt iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt)
+| Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/quickstart)
+| React Native | [100ms-react-native](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit)| [Link](https://www.100ms.live/docs/react-native/v2/quickstart/quickstart)
+
 ## Community & Support
 
 -   [GitHub Issues](https://github.com/100mslive/web-sdks/issues). Submit any bugs or errors you encounter using the Web SDKs.
