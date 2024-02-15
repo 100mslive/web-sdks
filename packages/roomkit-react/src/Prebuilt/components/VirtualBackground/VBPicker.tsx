@@ -76,9 +76,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           hmsActions.addPluginToVideoTrack(vbObject as HMSVBPlugin, Math.floor(role.publishParams.video.frameRate / 2));
         }
       }
-      if (isMobile) {
-        VBHandler.setPreset('quality');
-      }
       const handleDefaultBackground = async () => {
         switch (background) {
           case HMSVirtualBackgroundTypes.NONE: {
@@ -93,8 +90,11 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         }
       };
       handleDefaultBackground();
+      if (isMobile) {
+        setTimeout(() => VBHandler.setPreset('quality'), 0);
+      }
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount, isMobile]);
 
   useEffect(() => {
     if (!isVideoOn) {
