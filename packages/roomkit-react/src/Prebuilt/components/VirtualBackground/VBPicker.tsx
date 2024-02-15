@@ -90,11 +90,14 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
         }
       };
       handleDefaultBackground();
-      if (isMobile) {
-        // setTimeout(() => VBHandler.setPreset('quality'), 0);
-      }
     }
-  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount, isMobile]);
+  }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
+
+  useEffect(() => {
+    if (isMobile && VBHandler.getPreset() !== 'quality') {
+      VBHandler.setPreset('quality');
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (!isVideoOn) {
