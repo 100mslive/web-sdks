@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useMedia } from 'react-use';
-import { Box, Flex } from '../../../Layout';
+import { ChevronRightIcon } from '@100mslive/react-icons';
+import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
 import { RoomDetailsSheet } from '../RoomDetails/RoomDetailsSheet';
@@ -12,7 +13,7 @@ import { SIDE_PANE_OPTIONS } from '../../common/constants';
 export const RoomDetailsHeader = () => {
   const { title, description } = useRoomLayoutHeader();
   const isMobile = useMedia(cssConfig.media.md);
-  const clipLength = isMobile ? 8 : 100;
+  const clipLength = isMobile ? 8 : 10;
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const [openDetailsSheet, setOpenDetailsSheet] = useState(false);
 
@@ -21,30 +22,31 @@ export const RoomDetailsHeader = () => {
   }
 
   return (
-    <Box css={{ ml: '$9' }}>
+    <Flex direction={isMobile ? 'row' : 'column'} css={{ ml: '$8', alignItems: isMobile ? 'center' : 'start' }}>
       <Text variant="sm" css={{ c: '$on_surface_high', fontWeight: '$semiBold' }}>
         {title}
       </Text>
-      <Flex align="end" css={{ color: '$on_surface_high' }}>
-        <Text variant="xs" css={{ c: '$on_surface_medium' }}>
-          {description.slice(0, clipLength)}
-        </Text>
-        {description.length > clipLength ? (
-          <span
-            style={{ fontWeight: '600', fontSize: '12px', cursor: 'pointer', lineHeight: '1rem' }}
-            onClick={() => {
-              if (isMobile) {
-                setOpenDetailsSheet(true);
-                return;
-              }
-              toggleDetailsPane();
-            }}
-          >
-            &nbsp;...more
-          </span>
-        ) : null}
-      </Flex>
+      {!isMobile && (
+        <Flex align="end" css={{ color: '$on_surface_high' }}>
+          <Text variant="xs" css={{ c: '$on_surface_medium' }}>
+            {description.slice(0, clipLength)}
+          </Text>
+          {description.length > clipLength ? (
+            <span
+              style={{ fontWeight: '600', fontSize: '12px', cursor: 'pointer', lineHeight: '1rem' }}
+              onClick={toggleDetailsPane}
+            >
+              &nbsp;...more
+            </span>
+          ) : null}
+        </Flex>
+      )}
+      {isMobile && description ? (
+        <Flex css={{ color: '$on_surface_medium', opacity: openDetailsSheet ? 0 : 1 }}>
+          <ChevronRightIcon height={16} width={16} onClick={() => setOpenDetailsSheet(true)} />
+        </Flex>
+      ) : null}
       {openDetailsSheet && <RoomDetailsSheet open={openDetailsSheet} onOpenChange={setOpenDetailsSheet} />}
-    </Box>
+    </Flex>
   );
 };

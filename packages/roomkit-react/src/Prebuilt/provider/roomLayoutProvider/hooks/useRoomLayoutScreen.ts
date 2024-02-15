@@ -109,8 +109,8 @@ export function useRoomLayoutHeader() {
   }, [hlsState?.variants, isRecordingOn, peerCount, sessionStartedAt]);
 
   return {
-    title: elements.header?.title || '',
-    description: elements.header?.description || '',
+    title: elements.header?.title || 'Title',
+    description: elements.header?.description || 'Description',
     details,
   };
 }

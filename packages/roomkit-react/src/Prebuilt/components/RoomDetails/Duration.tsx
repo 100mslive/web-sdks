@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Flex } from '../../../Layout';
-import { Loading } from '../../../Loading';
 import { Text } from '../../../Text';
 import { getFormattedTime } from '../Polls/common/utils';
 
 export const Duration = ({ timeStamp }: { timeStamp: Date }) => {
-  const [elapsedTime, setElapsedTime] = useState('');
+  const [elapsedTime, setElapsedTime] = useState(getFormattedTime(Date.now() - timeStamp.getTime(), false));
 
   useEffect(() => {
     const timerAdded = setInterval(() => {
@@ -19,13 +18,9 @@ export const Duration = ({ timeStamp }: { timeStamp: Date }) => {
 
   return (
     <Flex css={{ color: '$on_surface_medium' }}>
-      {elapsedTime ? (
-        <Text variant="xs" css={{ color: 'inherit' }}>
-          Started {elapsedTime} ago
-        </Text>
-      ) : (
-        <Loading size={16} />
-      )}
+      <Text variant="xs" css={{ color: 'inherit' }}>
+        Started {elapsedTime} ago
+      </Text>
     </Flex>
   );
 };
