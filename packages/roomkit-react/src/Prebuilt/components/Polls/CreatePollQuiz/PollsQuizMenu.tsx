@@ -195,9 +195,13 @@ const AddMenu = () => {
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
   const polls = useHMSStore(selectPolls);
-  const sortedPolls = polls
-    ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
-    ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0));
+  const sortedPolls = useMemo(
+    () =>
+      polls
+        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0)),
+    [polls],
+  );
   const permissions = useHMSStore(selectPermissions);
 
   useEffect(() => {
