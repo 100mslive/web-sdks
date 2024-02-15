@@ -12,7 +12,7 @@ export const SpeakerTag = () => {
       <Flex
         align="center"
         justify="center"
-        css={{ flex: '1 1 0', color: '$on_primary_high', '@md': { display: 'none' } }}
+        css={{ flex: '1 1 0', color: '$on_surface_high', '@md': { display: 'none' } }}
       >
         <VerticalDivider css={{ ml: '$8' }} />
         <VolumeOneIcon />
