@@ -97,8 +97,10 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
     const setQuality = async () => {
       if (isMobile && VBHandler.getPreset() !== 'quality') {
         await VBHandler.setPreset('quality');
+        console.log('setting to quality ollo');
       }
     };
+    console.log('firing setq ollo');
     setQuality();
   }, [isMobile]);
 
