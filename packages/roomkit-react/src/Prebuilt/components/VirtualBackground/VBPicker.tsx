@@ -94,9 +94,12 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
 
   useEffect(() => {
-    if (isMobile && VBHandler.getPreset() !== 'quality') {
-      VBHandler.setPreset('quality');
-    }
+    const setQuality = async () => {
+      if (isMobile && VBHandler.getPreset() !== 'quality') {
+        await VBHandler.setPreset('quality');
+      }
+    };
+    setQuality();
   }, [isMobile]);
 
   useEffect(() => {
