@@ -81,14 +81,14 @@ export function useRoomLayoutLeaveScreen() {
 }
 
 export function useRoomLayoutHeader() {
-  // const { elements } = useRoomLayoutConferencingScreen();
+  const { elements } = useRoomLayoutConferencingScreen();
   // return elements.header;
   const { isRecordingOn } = useRecordingStreaming();
   const peerCount = useHMSStore(selectPeerCount);
   const sessionStartedAt = useHMSStore(selectRoomStartTime);
   const hlsState = useHMSStore(selectHLSState);
 
-  // People watching, duration, recording status
+  // People watching, start timestamp, recording status
   const details = useMemo(() => {
     const details = [];
     let timeStamp;
@@ -109,8 +109,8 @@ export function useRoomLayoutHeader() {
   }, [hlsState?.variants, isRecordingOn, peerCount, sessionStartedAt]);
 
   return {
-    title: 'Title',
-    description: 'Description lorem ipsum dolor sit amet this has to be over a hundred characters at this point',
+    title: elements.header?.title || '',
+    description: elements.header?.description || '',
     details,
   };
 }
