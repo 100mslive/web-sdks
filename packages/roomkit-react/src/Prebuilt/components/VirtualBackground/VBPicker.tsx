@@ -20,7 +20,7 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { BlurPersonHighIcon, CrossCircleIcon, CrossIcon } from '@100mslive/react-icons';
-import { Box, config as cssConfig, Flex, Slider, Video } from '../../../index';
+import { Box, Button, config as cssConfig, Flex, Slider, Video } from '../../../index';
 import { Text } from '../../../Text';
 import { VBCollection } from './VBCollection';
 import { VBHandler } from './VBHandler';
@@ -94,17 +94,6 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
   }, [hmsActions, role, isPluginAdded, isEffectsEnabled, effectsKey, track?.id, background, blurAmount]);
 
   useEffect(() => {
-    const setQuality = async () => {
-      if (isMobile && VBHandler.getPreset() !== 'quality') {
-        await VBHandler.setPreset('quality');
-        console.log('setting to quality ollo');
-      }
-    };
-    console.log('firing setq ollo');
-    setQuality();
-  }, [isMobile]);
-
-  useEffect(() => {
     if (!isVideoOn) {
       toggleVB();
     }
@@ -132,6 +121,9 @@ export const VBPicker = ({ backgroundMedia = [] }: { backgroundMedia: VirtualBac
           css={{ width: '100%', height: '16rem' }}
         />
       ) : null}
+      <Button css={{ mt: '$4' }} onClick={() => VBHandler.setPreset('quality')}>
+        Quality
+      </Button>
       <Box
         css={{
           mt: '$4',
