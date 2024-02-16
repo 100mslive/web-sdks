@@ -20,7 +20,7 @@ type UserAgent = {
   framework_sdk_version?: HMSFrameworkInfo['sdkVersion'];
 };
 
-export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo): string {
+export async function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo) {
   const sdk = 'web';
   const env = domainCategory !== DomainCategory.LOCAL && sdkEnv === ENV.PROD ? 'prod' : 'debug';
 
@@ -39,9 +39,9 @@ export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrame
     });
   }
 
-  const parsedOs = parsedUserAgent.getOS();
-  const parsedDevice = parsedUserAgent.getDevice();
-  const parsedBrowser = parsedUserAgent.getBrowser();
+  const parsedOs = await parsedUserAgent.getOS().withClientHints();
+  const parsedDevice = await parsedUserAgent.getDevice().withClientHints();
+  const parsedBrowser = await parsedUserAgent.getBrowser().withClientHints();
 
   const os = replaceSpaces(`web_${parsedOs.name}`);
   const os_version = parsedOs.version || '';

@@ -361,7 +361,7 @@ export class HMSSdk implements HMSInterface {
     }
 
     this.analyticsTimer.start(TimedEvent.PREVIEW);
-    this.setUpPreview(config, listener);
+    await this.setUpPreview(config, listener);
 
     // Request permissions and populate devices before waiting for policy
     if (config.alwaysRequestPermissions) {
@@ -517,7 +517,7 @@ export class HMSSdk implements HMSInterface {
     this.removeDevicesFromConfig(config);
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
-    this.store.createAndSetUserAgent(this.frameworkInfo);
+    await this.store.createAndSetUserAgent(this.frameworkInfo);
     HMSAudioContextHandler.resumeContext();
     // acquire screen lock to stay awake while in call
     const storeConfig = this.store.getConfig();
@@ -1239,7 +1239,7 @@ export class HMSSdk implements HMSInterface {
    * @param {HMSConfig} config
    * @param {HMSPreviewListener} listener
    */
-  private setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
+  private async setUpPreview(config: HMSPreviewConfig, listener: HMSPreviewListener) {
     this.listener = listener as unknown as HMSUpdateListener;
     this.sdkState.isPreviewCalled = true;
     this.sdkState.isPreviewInProgress = true;
@@ -1247,7 +1247,7 @@ export class HMSSdk implements HMSInterface {
     this.commonSetup(config, roomId, listener);
     this.store.setConfig(config);
     /** set after config since we need config to get env for user agent */
-    this.store.createAndSetUserAgent(this.frameworkInfo);
+    await this.store.createAndSetUserAgent(this.frameworkInfo);
     this.createAndAddLocalPeerToStore(config, role, userId, config.asRole);
   }
 

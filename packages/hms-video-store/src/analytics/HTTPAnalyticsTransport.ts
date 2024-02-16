@@ -66,13 +66,16 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       },
     };
     const url = this.env === ENV.PROD ? CLIENT_ANAYLTICS_PROD_ENDPOINT : CLIENT_ANAYLTICS_QA_ENDPOINT;
+    const headers = new Headers({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${event.metadata.token}`,
+    });
+    if (event.metadata.userAgent) {
+      headers.set('user_agent', event.metadata.userAgent);
+    }
     fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${event.metadata.token}`,
-        user_agent_v2: event.metadata.userAgent,
-      },
+      headers,
       body: JSON.stringify(requestBody),
     })
       .then(response => {
