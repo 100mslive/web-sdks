@@ -1,7 +1,6 @@
-# 100ms Prebuilt - React Example
-
 ![Banner](https://github.com/adityathakurxd/web-sdks/assets/53579386/713492fd-425a-48b6-b351-43011902288b)
 
+# 100ms Prebuilt - React Example
 
 ### How to run locally?
 
