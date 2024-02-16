@@ -44,13 +44,14 @@ We’re building infrastructure to power **live interactions**. Live interaction
 
 
 ###  100ms Prebuilt Cross Platform Support
-| Client | Repository | Documentation |
-|--|--|--|
-| Web | [web-sdks](https://github.com/100mslive/web-sdks/tree/main/packages/roomkit-react) | [Link](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)
-| Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/prebuilt-android)
-| iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt)
-| Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/prebuilt)
-| React Native | [100ms-react-native](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit)| [Link](https://www.100ms.live/docs/react-native/v2/quickstart/prebuilt)
+| Client | Repository | Docs | Example |
+|--|--|--|--|
+| Web | [web-sdks](https://github.com/100mslive/web-sdks/tree/main/packages/roomkit-react) | [Link](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart) | [prebuilt-react-integration](https://github.com/100mslive/web-sdks/tree/main/examples/prebuilt-react-integration)
+| Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/prebuilt-android) | [AndroidPrebuiltDemo](https://github.com/100mslive/AndroidPrebuiltDemo)
+| iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt) | [100ms-roomkit-example](https://github.com/100mslive/100ms-roomkit-example)
+| Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/prebuilt) | [hms_room_kit/example](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit/example)
+| React Native | [100ms-react-native](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit)| [Link](https://www.100ms.live/docs/react-native/v2/quickstart/prebuilt) | [react-native-room-kit/example](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit/example)
+
 
 <hr>
 <br>
