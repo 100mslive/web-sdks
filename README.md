@@ -32,7 +32,7 @@ We’re building infrastructure to power **live interactions**. Live interaction
 > Navigate to `react-sdk` for the base React Hooks and some commonly used functionalities by clicking [here](./packages/react-sdk).
 
 2.  ## 100ms Prebuilt 
-	- 100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
+	- 100ms Prebuilt is a high-level abstraction with no-code customization that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
 	- **Related packages include:** `roomkit-react` and `roomkit-web`.
 	- Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
 
