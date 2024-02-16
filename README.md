@@ -11,8 +11,9 @@ This repository also contains the Prebuilt component, other React components use
 
 100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code. It abstracts out nuances regarding audio/video integration which enables your end-users to get reliable live video without the hassles of integration. 
 
-Get started with 100ms Prebuilt [here](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)!
-Find the different platforms we support [here](./#100ms-prebuilt-cross-platform-support).
+Find the Prebuilt component [here](./packages/react-sdk/README.md).<br>
+Learn about 100ms Prebuilt Cross Platform Support [here](./#100ms-prebuilt-cross-platform-support).<br>
+Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
 
 ## Contributing
 We welcome external contributors or anyone excited to help improve 100ms SDKs. If you'd like to get involved, check out our [contribution guide](./DEVELOPER.MD), and get started exploring the codebase.
