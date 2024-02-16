@@ -192,11 +192,21 @@ const ChatMessage = React.memo(
     const [openSheet, setOpenSheetBare] = useState(false);
     const showPinAction = !!elements?.chat?.allow_pinning_messages;
     const showReply = message.sender !== selectedPeer.id && message.sender !== localPeerId && isPrivateChatEnabled;
+
+    const pinnedBy = usePinnedBy(message.id);
+    const localPeerName = useHMSStore(selectLocalPeerName);
+
     useLayoutEffect(() => {
       if (rowRef.current) {
+        if (pinnedBy) {
+          rowRef.current.style.background =
+            'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
+        } else {
+          rowRef.current.style.background = '';
+        }
         setRowHeight(index, message.id, rowRef.current.clientHeight);
       }
-    }, [index, message.id]);
+    }, [index, message.id, pinnedBy]);
 
     const setOpenSheet = (value: boolean, e?: React.MouseEvent<HTMLElement, MouseEvent>) => {
       e?.stopPropagation();
@@ -239,7 +249,14 @@ const ChatMessage = React.memo(
             }
           }}
         >
-          <PinnedBy messageId={message.id} index={index} rowRef={rowRef} />
+          {pinnedBy && (
+            <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
+              <SolidPinIcon height={12} width={12} />
+              <Text variant="xs" css={{ color: 'inherit' }}>
+                Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}
+              </Text>
+            </Flex>
+          )}
           <Text
             css={{
               color: isOverlay ? '#FFF' : '$on_surface_high',
@@ -433,41 +450,3 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
     );
   },
 );
-
-const PinnedBy = ({
-  messageId,
-  index,
-  rowRef,
-}: {
-  messageId: string;
-  index: number;
-  rowRef?: React.MutableRefObject<HTMLDivElement | null>;
-}) => {
-  const pinnedBy = usePinnedBy(messageId);
-  const localPeerName = useHMSStore(selectLocalPeerName);
-
-  useLayoutEffect(() => {
-    if (rowRef?.current) {
-      if (pinnedBy) {
-        rowRef.current.style.background =
-          'linear-gradient(277deg, var(--hms-ui-colors-surface_default) 0%, var(--hms-ui-colors-surface_dim) 60.87%)';
-      } else {
-        rowRef.current.style.background = '';
-      }
-      setRowHeight(index, messageId, rowRef?.current.clientHeight);
-    }
-  }, [index, messageId, pinnedBy, rowRef]);
-
-  if (!pinnedBy) {
-    return null;
-  }
-
-  return (
-    <Flex align="center" css={{ gap: '$2', mb: '$2', color: '$on_surface_low' }}>
-      <SolidPinIcon height={12} width={12} />
-      <Text variant="xs" css={{ color: 'inherit' }}>
-        Pinned by {localPeerName === pinnedBy ? 'you' : pinnedBy}
-      </Text>
-    </Flex>
-  );
-};
