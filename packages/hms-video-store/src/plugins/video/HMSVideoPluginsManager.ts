@@ -6,7 +6,7 @@ import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
-import { workerSleep } from '../../utils/timer-utils';
+import { reusableWorker } from '../../utils/timer-utils';
 import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;
@@ -57,6 +57,7 @@ export class HMSVideoPluginsManager {
   private pluginNumFramesToSkip: Record<string, number>;
   private pluginNumFramesSkipped: Record<string, number>;
   private canvases: Array<CanvasElement>; //array of canvases to store intermediate result
+  private reusableWorker = reusableWorker();
 
   constructor(track: HMSLocalVideoTrack, eventBus: EventBus) {
     this.hmsTrack = track;
@@ -216,7 +217,7 @@ export class HMSVideoPluginsManager {
       return;
     }
     while (this.pluginsLoopState === 'paused') {
-      await workerSleep(100);
+      await this.reusableWorker.sleep(100);
     }
   }
 
@@ -288,7 +289,7 @@ export class HMSVideoPluginsManager {
           this.resetCanvases();
         }
         this.pluginsLoopState = 'paused';
-        await workerSleep(sleepTimeMs);
+        await this.reusableWorker.sleep(sleepTimeMs);
         continue;
       }
       let processingTime = 0;
@@ -306,7 +307,7 @@ export class HMSVideoPluginsManager {
       }
       this.pluginsLoopState = 'running';
       // take into account processing time to decide time to wait for the next loop
-      await workerSleep(sleepTimeMs - processingTime);
+      await this.reusableWorker.sleep(sleepTimeMs - processingTime);
     }
   }
 

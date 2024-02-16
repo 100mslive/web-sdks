@@ -1,4 +1,4 @@
-export const worker = `(function metronomeWorkerSetup() {
+export const worker = `(function workerSetup() {
   function ticker() {
     self.postMessage('tick');
   }
@@ -45,6 +45,27 @@ export function workerSleep(ms: number): Promise<void> {
       }
     };
   });
+}
+
+export function reusableWorker() {
+  if (typeof Worker === 'undefined') {
+    return {
+      sleep: (ms: number) => sleep(ms),
+    };
+  }
+  const WorkerThread = new Worker(URL.createObjectURL(new Blob([worker], { type: 'application/javascript' })));
+  return {
+    sleep: (ms: number) => {
+      WorkerThread.postMessage(['start', ms]);
+      return new Promise<void>(resolve => {
+        WorkerThread.onmessage = event => {
+          if (event.data === 'tick') {
+            resolve();
+          }
+        };
+      });
+    },
+  };
 }
 
 /**
