@@ -9,7 +9,10 @@ This repository also contains the Prebuilt component, other React components use
 
 ![Banner](https://github.com/adityathakurxd/web-sdks/assets/53579386/cd9a4d3f-0ebf-4f20-ae9a-1ae4ad0308c5)
 
-100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code. It abstracts out nuances regarding audio/video integration which enables your end-users to get reliable live video without the hassles of integration. Get started with 100ms Prebuilt [here](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)!
+100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code. It abstracts out nuances regarding audio/video integration which enables your end-users to get reliable live video without the hassles of integration. 
+
+Get started with 100ms Prebuilt [here](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)!
+Find the different platforms we support [here](./#100ms-prebuilt-cross-platform-support).
 
 ## Contributing
 We welcome external contributors or anyone excited to help improve 100ms SDKs. If you'd like to get involved, check out our [contribution guide](./DEVELOPER.MD), and get started exploring the codebase.
@@ -65,6 +68,7 @@ For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 ## 100ms Prebuilt Cross Platform Support
 | Client | Repository | Documentation |
 |--|--|--|
+| Web | [web-sdks](https://github.com/100mslive/web-sdks/tree/main/packages/roomkit-react) | [Link](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)
 | Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/prebuilt-android)
 | iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt)
 | Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/prebuilt)
