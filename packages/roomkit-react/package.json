@@ -10,7 +10,7 @@
     "prebuilt",
     "roomkit"
   ],
-  "version": "0.2.3",
+  "version": "0.2.6",
   "author": "100ms",
   "license": "MIT",
   "repository": {
@@ -82,10 +82,10 @@
     "react": ">=17.0.2 <19.0.0"
   },
   "dependencies": {
-    "@100mslive/hls-player": "0.2.3",
-    "@100mslive/hms-virtual-background": "1.12.3",
-    "@100mslive/react-icons": "0.9.3",
-    "@100mslive/react-sdk": "0.9.3",
+    "@100mslive/hls-player": "0.2.6",
+    "@100mslive/hms-virtual-background": "1.12.6",
+    "@100mslive/react-icons": "0.9.6",
+    "@100mslive/react-sdk": "0.9.6",
     "@100mslive/types-prebuilt": "0.12.6",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",

@@ -8,5 +8,3 @@ export default function App() {
       <HMSPrebuilt roomCode={roomCode} screens={{ preview: null }}/>
   )
 }
-
-

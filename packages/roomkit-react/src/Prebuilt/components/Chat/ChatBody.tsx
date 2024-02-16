@@ -136,7 +136,7 @@ const Link = styled('a', {
   },
 });
 
-export const AnnotisedMessage = ({ message }: { message: string }) => {
+export const AnnotisedMessage = ({ message, length }: { message: string; length?: number }) => {
   if (!message) {
     return <Fragment />;
   }
@@ -149,10 +149,10 @@ export const AnnotisedMessage = ({ message }: { message: string }) => {
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link href={part} key={part} target="_blank" rel="noopener noreferrer">
-              {part}
+              {part.slice(0, length)}
             </Link>
           ) : (
-            part
+            part.slice(0, length)
           ),
         )}
     </Fragment>
@@ -426,11 +426,11 @@ export const ChatBody = React.forwardRef<VariableSizeList, { scrollToBottom: (co
       return unsubscribe;
     }, [vanillaStore, listRef, scrollToBottom]);
 
-    if (filteredMessages.length === 0) {
-      return <EmptyChat />;
-    }
-
-    return <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />;
+    return filteredMessages.length === 0 ? (
+      <EmptyChat />
+    ) : (
+      <VirtualizedChatMessages messages={filteredMessages} ref={listRef} scrollToBottom={scrollToBottom} />
+    );
   },
 );
 

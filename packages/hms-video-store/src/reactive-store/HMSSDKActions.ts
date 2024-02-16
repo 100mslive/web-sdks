@@ -902,7 +902,6 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       );
       mergeNewPollsInDraft(draftStore.polls, pollsObject);
     }, actionName);
-
     polls.forEach(poll => this.hmsNotifications.sendPollUpdate(actionType, poll.id));
   }
 

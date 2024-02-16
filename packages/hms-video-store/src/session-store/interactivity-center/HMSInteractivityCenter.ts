@@ -184,8 +184,13 @@ export class InteractivityCenter implements HMSInteractivityCenter {
         count: 50,
       });
       const poll = createHMSPollFromPollParams(pollParams);
-      poll.questions = questions.questions.map(({ question, options, answer }) => ({ ...question, options, answer }));
-
+      const existingPoll = this.store.getPoll(pollParams.poll_id);
+      poll.questions = questions.questions.map(({ question, options, answer }, index) => ({
+        ...question,
+        options,
+        answer,
+        responses: existingPoll?.questions?.[index]?.responses,
+      }));
       polls.push(poll);
       this.store.setPoll(poll);
     }
