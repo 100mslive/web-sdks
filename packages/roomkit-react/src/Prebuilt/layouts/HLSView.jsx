@@ -372,16 +372,6 @@ const HLSView = () => {
             >
               {!isMobile && (
                 <Flex direction="column">
-                  <Box>
-                    {hlsPlayer && (
-                      <HMSVideoPlayer.Progress
-                        hlsPlayer={hlsPlayer}
-                        onValueChange={time => {
-                          hlsPlayer.seekTo(time);
-                        }}
-                      />
-                    )}
-                  </Box>
                   <HMSVideoPlayer.Controls.Root
                     css={{
                       p: '$4 $8',
