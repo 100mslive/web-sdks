@@ -22,7 +22,6 @@ import {
   QuizIcon,
   RecordIcon,
   SettingsIcon,
-  VirtualBackgroundIcon,
 } from '@100mslive/react-icons';
 import { Box, Loading, Tooltip } from '../../../..';
 import { Sheet } from '../../../../Sheet';
@@ -91,10 +90,10 @@ export const MwebOptions = ({
   const peerCount = useHMSStore(selectPeerCount);
   const emojiCardRef = useRef(null);
   const { isBRBOn, toggleBRB, isHandRaised, toggleHandRaise } = useMyMetadata();
-  const { toggleAudio, toggleVideo, isLocalVideoEnabled } = useAVToggle();
+  const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
-  const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  // const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -181,7 +180,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {isLocalVideoEnabled && !!elements?.virtual_background ? (
+            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
               <ActionTile.Root
                 onClick={() => {
                   toggleVB();
@@ -191,7 +190,7 @@ export const MwebOptions = ({
                 <VirtualBackgroundIcon />
                 <ActionTile.Title>Virtual Background</ActionTile.Title>
               </ActionTile.Root>
-            ) : null}
+            ) : null} */}
 
             {elements?.emoji_reactions && (
               <ActionTile.Root

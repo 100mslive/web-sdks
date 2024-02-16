@@ -308,8 +308,7 @@ const HLSView = () => {
           align="center"
           justify="center"
           css={{
-            width:
-              videoRef.current && videoRef.current.clientWidth <= 720 ? `${videoRef.current.clientWidth}px` : '100%',
+            width: '100%',
             margin: '0 auto',
             height: '100%',
           }}

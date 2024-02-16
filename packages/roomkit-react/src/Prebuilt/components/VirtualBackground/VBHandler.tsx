@@ -70,9 +70,9 @@ export class VBPlugin {
     }
   };
 
-  setPreset = (preset: string) => {
+  setPreset = async (preset: string) => {
     if (this.effectsPlugin) {
-      this.effectsPlugin.setPreset(preset);
+      await this.effectsPlugin.setPreset(preset);
     }
   };
 
