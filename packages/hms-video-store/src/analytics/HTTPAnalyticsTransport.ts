@@ -71,7 +71,7 @@ class ClientAnalyticsTransport implements IAnalyticsTransportProvider {
       Authorization: `Bearer ${event.metadata.token}`,
     });
     if (event.metadata.userAgent) {
-      headers.set('user_agent', event.metadata.userAgent);
+      headers.set('user_agent_v2', event.metadata.userAgent);
     }
     fetch(url, {
       method: 'POST',
