@@ -53,7 +53,7 @@ For example, if you are making changes in roomkit-react(prebuilt), run `yarn sta
 The packages folder contains all the SDK's of 100ms. Here is a brief overview of them.
 | Directory | Package | Description | Link |
 |--|--|--|--|
-| `hms-video-store`  | `@100mslive/hms-video-store` | This package contains the core SDK and the reactive store parts.  | [README](./blob/main/packages/hms-video-store/README.md) |
+| `hms-video-store`  | `@100mslive/hms-video-store` | This package contains the core SDK and the reactive store parts.  | [README](./packages/hms-video-store/README.md) |
 | `react-icons`  | `@100mslive/react-icons` | This contains all the icons used in the 100ms prebuilt.  | [README](./blob/main/packages/react-icons/README.md) |
 | `react-sdk` | `@100mslive/react-sdk` | This contains the base React Hooks and some commonly used functionalities as React Hooks. | [README](./blob/main/packages/react-sdk/README.md) |
 | `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the prebuilt and the Prebuilt component itself.  | [README](./blob/main/packages/roomkit-react/README.md) |
