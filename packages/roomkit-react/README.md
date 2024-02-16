@@ -62,7 +62,7 @@ The `Prebuilt` folder contains the full prebuilt implementation.
 |[AppStateContext](src/Prebuilt/AppStateContext.tsx)  | Contains the logic to switch between different screens, for example, Preview to Meeting, Meeting to Leave. These transitions are based on the roomState that is available from the reactive store (`useHMSStore(selectHMSRoomState)`). |
 | [PreviewScreen](src/Prebuilt/components/Preview/PreviewScreen.tsx) | Contains the Preview implementation. Contains the Video tile, video, audio toggles and Virtual background and settings along with the name input.|
 | [ConferenceScreen](src/Prebuilt/components/ConferenceScreen.tsx) | This contains the screen once you finish Preview and enter the meeting. This contains the header and footer and the main content.|
-| [VideoStreamingSection](src/Prebuilt/layouts/VideoStreamingSection.tsx) |This is the component that contains the main video rendering components and a sidebar(Chat, Polls, and Others are shown here)  |
+| [VideoStreamingSection](src/Prebuilt/layouts/VideoStreamingSection.tsx) |This is the component that contains the main video rendering components and a sidebar (Interactive features like Chat and Polls are displayed here)  |
 | [LeaveScreen](src/Prebuilt/components/LeaveScreen.tsx) |This is the screen that is shown when you leave the meeting  |
 
 
