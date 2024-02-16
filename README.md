@@ -1,24 +1,55 @@
 
 # Web SDKs
 
-This monorepo contains all the packages required to integrate 100ms on the web.
+This monorepo contains all the packages required to integrate 100ms on the web. 
 
-This repository also contains the Prebuilt component, other React components used in the Prebuilt and the web component port of the `HMSPrebuilt`.
+## What is included?
+The packages folder contains all the SDK's of 100ms. Here is a brief overview of them:
+| Directory | Package | Description | Link |
+|--|--|--|--|
+| `hms-video-store`  | `@100mslive/hms-video-store` | This package contains the core SDK and the reactive store parts.  | [README](./packages/hms-video-store) |
+| `react-icons`  | `@100mslive/react-icons` | This contains all the icons used in the 100ms prebuilt.  | [README](./packages/react-icons) |
+| `react-sdk` | `@100mslive/react-sdk` | This contains the base React Hooks and some commonly used functionalities as React Hooks. | [README](./packages/react-sdk) |
+| `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the prebuilt and the Prebuilt component itself.  | [README](./packages/roomkit-react) |
+| `roomkit-web` | `@100mslive/roomkit-web` | This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,this can be used as a web component. | [README](./packages/roomkit-web)|
 
-## 100ms Prebuilt
+For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 
-![Banner](https://github.com/adityathakurxd/web-sdks/assets/53579386/cd9a4d3f-0ebf-4f20-ae9a-1ae4ad0308c5)
+<br>
 
-100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code. It abstracts out nuances regarding audio/video integration which enables your end-users to get reliable live video without the hassles of integration. 
+## How to integrate?
+The 100ms SDK gives you everything you need to build scalable, high-quality live video and audio experiences. 
 
-Find the Prebuilt component [here](./packages/roomkit-react).<br>
-Learn about 100ms Prebuilt Cross Platform Support [here](./#100ms-prebuilt-cross-platform-support).<br>
-Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
+We’re building infrastructure to power **live interactions**. Live interaction refers to anything happening in real-time or near real-time. Examples include video and audio calls (such as Google Meet or Zoom), live streaming (like Twitch or YouTube Live), real-time chat messages (often included as part of the previous two), and collaborative tools like whiteboards and document editors. Additionally, there are offshoots of these live interactions, such as post-call recordings or transcriptions, which can be accessed later.
 
-## Contributing
-We welcome external contributors or anyone excited to help improve 100ms SDKs. If you'd like to get involved, check out our [contribution guide](./DEVELOPER.MD), and get started exploring the codebase.
+**There are two ways you can add 100ms to your apps:**
 
-Please join us [on Discord](https://discord.com/invite/kGdmszyzq2) to discuss any new ideas and/or PRs.
+1. ## Custom UI
+	-	100ms SDKs are powerful and highly extensible to build and support all custom experiences and UI.
+	-	**Related packages include:** `@100mslive/react-sdk`, `@100mslive/hms-video-store` and `@100mslive/react-icons`.
+	-	Get started with integrating the SDK using the [How to Guide](https://www.100ms.live/docs/javascript/v2/how-to-guides/install-the-sdk/integration). <br>
+
+2.  ## 100ms Prebuilt 
+	- 100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
+	- **Related packages include:** `roomkit-react` and `roomkit-web`.
+	- Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
+
+
+<hr>
+
+####  100ms Prebuilt Cross Platform Support
+| Client | Repository | Documentation |
+|--|--|--|
+| Web | [web-sdks](https://github.com/100mslive/web-sdks/tree/main/packages/roomkit-react) | [Link](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)
+| Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/prebuilt-android)
+| iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt)
+| Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/prebuilt)
+| React Native | [100ms-react-native](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit)| [Link](https://www.100ms.live/docs/react-native/v2/quickstart/prebuilt)
+
+<hr>
+<br>
+
+## Setup
 
 ### Local Setup
 
@@ -53,27 +84,15 @@ For example, if you are making changes in roomkit-react(prebuilt), run `yarn sta
 
 > Note: Make sure `yarn build` is run atleast once before using `yarn start`
 
-## Understanding the Packages
-The packages folder contains all the SDK's of 100ms. Here is a brief overview of them.
-| Directory | Package | Description | Link |
-|--|--|--|--|
-| `hms-video-store`  | `@100mslive/hms-video-store` | This package contains the core SDK and the reactive store parts.  | [README](./packages/hms-video-store/README.md) |
-| `react-icons`  | `@100mslive/react-icons` | This contains all the icons used in the 100ms prebuilt.  | [README](./packages/react-icons/README.md) |
-| `react-sdk` | `@100mslive/react-sdk` | This contains the base React Hooks and some commonly used functionalities as React Hooks. | [README](./packages/react-sdk/README.md) |
-| `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the prebuilt and the Prebuilt component itself.  | [README](./packages/roomkit-react/README.md) |
-| `roomkit-web` | `@100mslive/roomkit-web` | This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,this can be used as a web component. | [README](./packages/roomkit-web/README.md)|
 
-For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
+<br>
 
+## Contributing
+We welcome external contributors or anyone excited to help improve 100ms SDKs. If you'd like to get involved, check out our [contribution guide](./DEVELOPER.MD), and get started exploring the codebase.
 
-## 100ms Prebuilt Cross Platform Support
-| Client | Repository | Documentation |
-|--|--|--|
-| Web | [web-sdks](https://github.com/100mslive/web-sdks/tree/main/packages/roomkit-react) | [Link](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart)
-| Android | [100ms-android](https://github.com/100mslive/100ms-android/tree/release-v2/room-kit) | [Link](https://www.100ms.live/docs/android/v2/quickstart/prebuilt-android)
-| iOS | [100ms-roomkit-ios](https://github.com/100mslive/100ms-roomkit-ios) | [Link](https://www.100ms.live/docs/ios/v2/quickstart/prebuilt)
-| Flutter | [100ms-flutter](https://github.com/100mslive/100ms-flutter/tree/main/packages/hms_room_kit)| [Link](https://www.100ms.live/docs/flutter/v2/quickstart/prebuilt)
-| React Native | [100ms-react-native](https://github.com/100mslive/100ms-react-native/tree/main/packages/react-native-room-kit)| [Link](https://www.100ms.live/docs/react-native/v2/quickstart/prebuilt)
+Please join us [on Discord](https://discord.com/invite/kGdmszyzq2) to discuss any new ideas and/or PRs.
+
+<br>
 
 ## Community & Support
 
