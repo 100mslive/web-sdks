@@ -10,7 +10,7 @@ The packages folder contains all the SDK's of 100ms. Here is a brief overview of
 | `hms-video-store`  | `@100mslive/hms-video-store` | This package contains the core SDK and the reactive store parts.  | [README](./packages/hms-video-store) |
 | `react-icons`  | `@100mslive/react-icons` | This contains all the icons used in the 100ms prebuilt.  | [README](./packages/react-icons) |
 | `react-sdk` | `@100mslive/react-sdk` | This contains the base React Hooks and some commonly used functionalities as React Hooks. | [README](./packages/react-sdk) |
-| `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the prebuilt and the Prebuilt component itself.  | [README](./packages/roomkit-react) |
+| `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the Prebuilt and the Prebuilt component itself.  | [README](./packages/roomkit-react) |
 | `roomkit-web` | `@100mslive/roomkit-web` | This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,this can be used as a web component. | [README](./packages/roomkit-web)|
 
 For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
@@ -29,11 +29,14 @@ We’re building infrastructure to power **live interactions**. Live interaction
 	-	**Related packages include:** `@100mslive/react-sdk`, `@100mslive/hms-video-store` and `@100mslive/react-icons`.
 	-	Get started with integrating the SDK using the [How to Guide](https://www.100ms.live/docs/javascript/v2/how-to-guides/install-the-sdk/integration). <br>
 
+> Navigate to `react-sdk` for the base React Hooks and some commonly used functionalities by clicking [here](./packages/react-sdk).
+
 2.  ## 100ms Prebuilt 
 	- 100ms Prebuilt is a high-level abstraction that enables you to embed video conferencing and/or live streaming UI—with a few lines of code.
 	- **Related packages include:** `roomkit-react` and `roomkit-web`.
 	- Get started with 100ms Prebuilt using the [Prebuilt Quickstart for Web](https://www.100ms.live/docs/javascript/v2/quickstart/prebuilt-quickstart). <br>
 
+> Navigate to `roomkit-react` for the React components used in Prebuilt and the Prebuilt component itself by clicking [here](./packages/roomkit-react).
 
 <hr>
 
