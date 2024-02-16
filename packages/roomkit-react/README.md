@@ -90,5 +90,5 @@ Read this [doc](../../DEVELOPER.MD) for the coding guidelines.
 ## Community & Support
 
 -   [GitHub Issues](https://github.com/100mslive/web-sdks/issues) - Submit any bugs or errors you encounter using the Web SDKs.
--   [Discord](https://discord.supabase.com/) - Hang out with the community members, share your projects or ask questions to get help from the 100ms team.
+-   [Discord](https://discord.com/invite/kGdmszyzq2) - Hang out with the community members, share your projects or ask questions to get help from the 100ms team.
 -   [Contact](https://www.100ms.live/contact) - Reach out to 100ms team to get pricing information, understand how we can help you go live, or to learn more about the platform.
