@@ -59,7 +59,7 @@ The packages folder contains all the SDK's of 100ms. Here is a brief overview of
 | `roomkit-react`  | `@100mslive/roomkit-react`| This contains the React components used in the prebuilt and the Prebuilt component itself.  | [README](./blob/main/packages/roomkit-react/README.md) |
 | `roomkit-web` | `@100mslive/roomkit-web` | This is a web component port of the `HMSPrebuilt` component from the `roomkit-react`. If you are not using React,this can be used as a web component. | [README](./blob/main/packages/roomkit-web/README.md)|
 
-For full documentation, visit [100ms.live/docs/prebuilt/v2/prebuilt/quickstart](https://www.100ms.live/docs/prebuilt/v2/prebuilt/quickstart)
+For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 
 
 ## 100ms Prebuilt Cross Platform Support
