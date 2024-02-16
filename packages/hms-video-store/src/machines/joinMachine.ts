@@ -25,12 +25,11 @@ function shouldRetryError(error: any) {
   );
 }
 
-type JoinEvents = { type: 'init'; payload: joinParams } | { type: 'retry' };
+type JoinEvents = { type: 'init'; payload: joinParams } | { type: 'retry' } | any;
 export const joinMachine = (transport: HMSTransport) =>
   createMachine({
     id: 'joinMachine',
     initial: 'idle',
-    predictableActionArguments: true,
     types: {} as {
       context: { retryCount: number } & joinParams;
       events: JoinEvents;
@@ -139,8 +138,7 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       failed: {
         type: 'final',
-        // @ts-ignore
-        data: (_, event) => event.data,
+        output: ({ event }) => event.data,
       },
     },
   });
