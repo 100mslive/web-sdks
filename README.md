@@ -20,8 +20,6 @@ For full documentation, visit [100ms.live/docs](https://www.100ms.live/docs)
 ## How to integrate?
 The 100ms SDK gives you everything you need to build scalable, high-quality live video and audio experiences. 
 
-We’re building infrastructure to power **live interactions**. Live interaction refers to anything happening in real-time or near real-time. Examples include video and audio calls (such as Google Meet or Zoom), live streaming (like Twitch or YouTube Live), real-time chat messages (often included as part of the previous two), and collaborative tools like whiteboards, etc. Additionally, there are offshoots of these live interactions, such as post-call recordings or transcriptions, which can be accessed later.
-
 **There are two ways you can add 100ms to your apps:**
 
 1. ## Custom UI
