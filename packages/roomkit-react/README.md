@@ -51,8 +51,8 @@ Prebuilt customisations are available on [100ms dashboard](https://dashboard.100
 ### Understanding the Structure
 
 The `src` folder contains all the components, `Button`, `Accordion` etc.
-The `Prebuilt` folder contains the full prebuilt implementation.
-`App.tsx` is the entry point for the prebuilt which contains the `HMSPrebuilt` component.
+The `Prebuilt` folder contains the full Prebuilt implementation.
+`App.tsx` is the entry point for the Prebuilt which contains the `HMSPrebuilt` component.
 
 ### Major Components in Prebuilt
 
