@@ -1,5 +1,5 @@
 
-![Banner](https://github.com/100mslive/web-sdks/assets/53579386/2bc03d08-b0c1-471e-8469-2196532c024a)
+![Banner](https://github.com/100mslive/web-sdks/blob/06c65259912db6ccd8617f2ecb6fef51429251ec/prebuilt-banner.png)
 # Room Kit React Library
 
 
