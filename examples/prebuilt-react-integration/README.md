@@ -1,4 +1,4 @@
-![Banner](https://github.com/adityathakurxd/web-sdks/assets/53579386/713492fd-425a-48b6-b351-43011902288b)
+![Banner](https://github.com/100mslive/web-sdks/blob/06c65259912db6ccd8617f2ecb6fef51429251ec/prebuilt-banner.png)
 
 # 100ms Prebuilt - React Example
 
