@@ -38,7 +38,7 @@ The 100ms SDK gives you everything you need to build scalable, high-quality live
 
 <hr>
 
-![Banner](https://github.com/adityathakurxd/web-sdks/assets/53579386/ddde5f35-2302-4f91-adb0-f08848e12fba)
+![Banner](prebuilt-banner.png)
 
 
 ###  100ms Prebuilt Cross Platform Support
