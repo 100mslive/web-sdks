@@ -55,8 +55,6 @@ import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
 import { SIDE_PANE_OPTIONS } from '../../../common/constants';
 
-// const VirtualBackground = React.lazy(() => import('../../../plugins/VirtualBackground/VirtualBackground'));
-
 const MODALS = {
   CHANGE_NAME: 'changeName',
   SELF_ROLE_CHANGE: 'selfRoleChange',
@@ -95,7 +93,7 @@ export const MwebOptions = ({
   const { toggleAudio, toggleVideo } = useAVToggle();
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
-  // const isVideoOn = useHMSStore(selectIsLocalVideoEnabled);
+  // const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -182,10 +180,16 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null}
 
-            {/* {isVideoOn ? (
-              <Suspense fallback="">
-                <VirtualBackground asActionTile onVBClick={() => setOpenOptionsSheet(false)} />
-              </Suspense>
+            {/* {isLocalVideoEnabled && !!elements?.virtual_background ? (
+              <ActionTile.Root
+                onClick={() => {
+                  toggleVB();
+                  setOpenOptionsSheet(false);
+                }}
+              >
+                <VirtualBackgroundIcon />
+                <ActionTile.Title>Virtual Background</ActionTile.Title>
+              </ActionTile.Root>
             ) : null} */}
 
             {elements?.emoji_reactions && (
