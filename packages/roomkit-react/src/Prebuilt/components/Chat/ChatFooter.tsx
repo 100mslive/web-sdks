@@ -7,7 +7,6 @@ import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100msli
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
-// @ts-ignore: No implicit Any
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore
 import { ToastManager } from '../Toast/ToastManager';
@@ -99,11 +98,11 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      if (!(isMwebHLSStream || isLandscapeHLSStream)) {
+      if (!(isMobile || isLandscapeHLSStream)) {
         inputRef.current?.focus();
       }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMwebHLSStream, isLandscapeHLSStream]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -207,7 +206,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               position: 'relative',
               py: '$6',
               pl: '$8',
-              flexGrow: `${isMwebHLSStream || isLandscapeHLSStream ? 1 : 0}`,
+              flexGrow: '1',
               r: '$1',
               '@md': {
                 minHeight: 'unset',
@@ -228,7 +227,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={false}
+              autoFocus={!isMobile}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey) {

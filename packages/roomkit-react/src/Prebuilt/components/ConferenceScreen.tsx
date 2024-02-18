@@ -127,7 +127,7 @@ export const ConferenceScreen = () => {
         </Box>
       ) : null}
       <Flex css={{ size: '100%', overflow: 'hidden' }} direction="column">
-        {!screenProps.hideSections.includes('header') && !isMwebHLSStream && (
+        {!(screenProps.hideSections.includes('header') || isMwebHLSStream) && (
           <Box
             ref={headerRef}
             css={{

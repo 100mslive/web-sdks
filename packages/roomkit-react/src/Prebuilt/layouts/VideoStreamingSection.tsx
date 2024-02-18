@@ -111,7 +111,8 @@ export const VideoStreamingSection = ({
         <Box
           css={{
             height: isMobileHLSStream ? '50%' : '100%',
-            maxHeight: isMobileHLSStream ? '50' : '100%',
+            maxHeight: '100%',
+            '&:empty': { display: 'none' },
             overflowY: 'clip',
           }}
         >

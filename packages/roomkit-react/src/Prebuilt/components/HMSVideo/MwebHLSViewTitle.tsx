@@ -4,8 +4,10 @@ import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit any
 import { Logo } from '../Header/HeaderComponents';
-import { getTime, getWatchCount } from './HMSVIdeoUtils';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+// @ts-ignore: No implicit Any
+import { getFormattedCount } from '../../common/utils';
+import { getTime } from './utils';
 
 /*
 	player handler --> left -> go live with timer or live, right -> expand icon 
@@ -58,14 +60,17 @@ export const HLSViewTitle = () => {
         borderColor: '$border_bright',
         border: '0 0 $2 0',
         p: '$8',
+        backgroundColor: '$surface_dim',
       }}
     >
       <Logo />
       <Flex direction="column">
-        <Text variant="sub2">Tech Talk</Text>
+        <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
+          Tech Talk
+        </Text>
         <Flex gap="1">
           <Text variant="caption" css={{ color: '$on_surface_medium' }}>
-            {getWatchCount(peerCount) + ' watching'}{' '}
+            {getFormattedCount(peerCount) + ' watching'}
           </Text>
           <Flex
             direction="column"

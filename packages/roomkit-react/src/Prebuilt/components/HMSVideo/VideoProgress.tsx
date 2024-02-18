@@ -1,58 +1,55 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Box, Flex } from '../../..';
-import { getPercentage } from './HMSVIdeoUtils';
 import { useHMSPlayerContext } from './PlayerContext';
+import { getPercentage } from './utils';
 
 export const VideoProgress = () => {
-  const hlsPlayerContext = useHMSPlayerContext();
+  const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState(0);
   const [bufferProgress, setBufferProgress] = useState(0);
   const progressRootRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoEl = hlsPlayer?.getVideoElement();
 
   const onValueChange = (time: number) => {
-    hlsPlayerContext?.seekTo(time);
+    hlsPlayer?.seekTo(time);
   };
   useEffect(() => {
-    if (!hlsPlayerContext) {
-      return;
-    }
-    videoRef.current = hlsPlayerContext.getVideoElement();
     const timeupdateHandler = () => {
-      if (!videoRef.current) {
+      if (!videoEl) {
         return;
       }
-      const videoProgress = Math.floor(getPercentage(videoRef.current.currentTime, videoRef.current.duration));
+      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, videoEl.duration));
       let bufferProgress = 0;
-      if (videoRef.current.buffered.length > 0) {
-        bufferProgress = Math.floor(getPercentage(videoRef.current.buffered?.end(0), videoRef.current.duration));
+      if (videoEl.buffered.length > 0) {
+        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), videoEl.duration));
       }
 
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
       setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
     };
-    if (videoRef.current) {
-      videoRef.current.addEventListener('timeupdate', timeupdateHandler);
+    if (videoEl) {
+      videoEl.addEventListener('timeupdate', timeupdateHandler);
     }
     return function cleanup() {
-      if (videoRef.current) {
-        videoRef.current.removeEventListener('timeupdate', timeupdateHandler);
-      }
+      videoEl?.removeEventListener('timeupdate', timeupdateHandler);
     };
-  }, [hlsPlayerContext]);
+  }, [videoEl]);
 
   const onProgressChangeHandler = (e: React.MouseEvent<HTMLElement>) => {
     const userClickedX = e.clientX - (progressRootRef.current?.offsetLeft || 0);
     const progressBarWidth = progressRootRef.current?.offsetWidth || 0;
     const progress = Math.floor(getPercentage(userClickedX, progressBarWidth));
-    const videoEl = hlsPlayerContext?.getVideoElement();
+    const videoEl = hlsPlayer?.getVideoElement();
     const currentTime = (progress * (videoEl?.duration || 0)) / 100;
     if (onValueChange) {
       onValueChange(currentTime);
     }
   };
 
-  return videoRef.current ? (
+  if (!videoEl) {
+    return null;
+  }
+  return (
     <Flex
       ref={progressRootRef}
       css={{ cursor: 'pointer', h: '$4', alignSelf: 'stretch' }}
@@ -83,5 +80,5 @@ export const VideoProgress = () => {
         }}
       />
     </Flex>
-  ) : null;
+  );
 };

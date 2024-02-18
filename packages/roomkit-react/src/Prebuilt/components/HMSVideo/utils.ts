@@ -3,10 +3,10 @@ export function getPercentage(a: number, b: number) {
 }
 
 /**
+ * Take a time in seconds and return its equivalent time in hh:mm:ss format
+ * @param {number} timeInSeconds if given as floating point value, it is floored.
  *
- * @param {number} timeInSeconds - if given as floating point value, it is floored.
- * @returns  a string representing timeInSeconds in HH:MM:SS format.
- * (e.g) getDurationFromSeconds(3910) returns "1:05:10"
+ * @returns a string representing timeInSeconds in HH:MM:SS format.
  */
 export function getDurationFromSeconds(timeInSeconds: number) {
   let time = Math.floor(timeInSeconds);
@@ -24,14 +24,6 @@ export function getDurationFromSeconds(timeInSeconds: number) {
     videoTimeStr = `${prefixedHours}:${prefixedMinutes}:${prefixedSeconds}`;
   }
   return videoTimeStr;
-}
-
-export function getWatchCount(viewer: number) {
-  if (viewer < 1000) {
-    return viewer;
-  }
-  const output = (viewer / 1000).toFixed(2);
-  return output + 'K';
 }
 
 export function getTime(timeInMilles: number) {

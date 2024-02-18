@@ -4,8 +4,8 @@ import { Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 
 export const VolumeControl = () => {
-  const hlsPlayerContext = useHMSPlayerContext();
-  const [volume, setVolume] = useState(hlsPlayerContext?.volume || 100);
+  const { hlsPlayer } = useHMSPlayerContext();
+  const [volume, setVolume] = useState(hlsPlayer?.volume || 100);
   const [showSlider, setShowSlider] = useState(false);
 
   return (
@@ -26,10 +26,10 @@ export const VolumeControl = () => {
         onClick={() => {
           if (volume > 0) {
             setVolume(0);
-            hlsPlayerContext?.setVolume(0);
+            hlsPlayer?.setVolume(0);
           } else {
             setVolume(100);
-            hlsPlayerContext?.setVolume(100);
+            hlsPlayer?.setVolume(100);
           }
         }}
       />
@@ -49,7 +49,7 @@ export const VolumeControl = () => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          hlsPlayerContext?.setVolume(volume[0]);
+          hlsPlayer?.setVolume(volume[0]);
           setVolume(volume[0]);
         }}
         thumbStyles={{ w: '$6', h: '$6' }}

@@ -347,7 +347,7 @@ const HLSView = () => {
                             top: '40%',
                             left: '50%',
                             transform: 'translateY(-40%) translateX(-50%)',
-                            padding: '$4 14px $4 14px',
+                            padding: '$4 $4 $4 $4',
                             display: 'inline-flex',
                             r: '$round',
                             gap: '$1',
@@ -476,11 +476,10 @@ const HLSView = () => {
                                 }}
                               />
                               <Text
-                                variant={{
-                                  '@sm': 'xs',
-                                }}
+                                variant="$body1"
                                 css={{
                                   c: isVideoLive ? '$on_surface_high' : '$on_surface_medium',
+                                  fontWeight: '$semiBold',
                                 }}
                               >
                                 {isVideoLive ? 'LIVE' : 'GO LIVE'}
