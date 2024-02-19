@@ -896,17 +896,22 @@ export default class HMSTransport {
     HMSLogger.d(TAG, 'connect: started ⏰');
     const connectRequestedAt = new Date();
     try {
+      const userAgent = this.store.getUserAgent();
+      if (!userAgent) {
+        throw ErrorFactory.GenericErrors.PeerMetadataMissing(HMSAction.INIT, 'User Agent not available');
+      }
       this.analyticsTimer.start(TimedEvent.INIT);
       this.initConfig = await InitService.fetchInitConfig({
         token,
         peerId,
-        userAgent: this.store.getUserAgent(),
+        userAgent,
         initEndpoint,
       });
       const room = this.store.getRoom();
       if (room) {
         room.effectsKey = this.initConfig.config.vb?.effectsKey;
         room.isEffectsEnabled = this.isFlagEnabled(InitFlags.FLAG_EFFECTS_SDK_ENABLED);
+        room.isHippaEnabled = this.isFlagEnabled(InitFlags.FLAG_HIPPA_ENABLED);
       }
       this.analyticsTimer.end(TimedEvent.INIT);
       HTTPAnalyticsTransport.setWebsocketEndpoint(this.initConfig.endpoint);
@@ -949,12 +954,16 @@ export default class HMSTransport {
     if (!this.initConfig) {
       throw ErrorFactory.APIErrors.InitConfigNotAvailable(HMSAction.INIT, 'Init Config not found');
     }
+    const userAgent = this.store.getUserAgent();
+    if (!userAgent) {
+      throw ErrorFactory.GenericErrors.PeerMetadataMissing(HMSAction.INIT, 'User Agent not available');
+    }
 
     HMSLogger.d(TAG, '⏳ internal connect: connecting to ws endpoint', this.initConfig.endpoint);
     const url = new URL(this.initConfig.endpoint);
     url.searchParams.set('peer', peerId);
     url.searchParams.set('token', token);
-    url.searchParams.set('user_agent_v2', this.store.getUserAgent());
+    url.searchParams.set('user_agent_v2', userAgent);
     url.searchParams.set('protocol_version', PROTOCOL_VERSION);
     url.searchParams.set('protocol_spec', PROTOCOL_SPEC);
 
