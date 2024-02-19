@@ -1,12 +1,27 @@
 import React from 'react';
 import { useMedia } from 'react-use';
+import { HMSHLSLayer } from '@100mslive/hls-player';
 import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { config } from '../../../Theme';
 import { useIsLandscape } from '../../common/hooks';
 
-export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
+export function HLSQualitySelector({
+  open,
+  onOpen,
+  layers,
+  onQualityChange,
+  selection,
+  isAuto,
+}: {
+  open: boolean;
+  onOpen: (value: boolean) => void;
+  layers: HMSHLSLayer[];
+  onQualityChange: (quality: { [key: string]: string | number } | HMSHLSLayer) => void;
+  selection: HMSHLSLayer;
+  isAuto: boolean;
+}) {
   const isMobile = useMedia(config.media.md);
   const isLandscape = useIsLandscape();
   if (isMobile || isLandscape) {
@@ -149,7 +164,7 @@ export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, sele
                     />
                   </>
                 )}
-                {selection && Math.min(selection.width, selection.height)}p
+                {selection && Math.min(selection.width || 0, selection.height || 0)}p
               </Text>
             </Flex>
           </Tooltip>
@@ -223,5 +238,5 @@ export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, sele
   );
 }
 
-const getQualityText = layer => `${Math.min(layer.height, layer.width)}p `;
-const getBitrateText = layer => `(${(Number(layer.bitrate / 1000) / 1000).toFixed(2)} Mbps)`;
+const getQualityText = (layer: HMSHLSLayer) => `${Math.min(layer.height || 0, layer.width || 0)}p `;
+const getBitrateText = (layer: HMSHLSLayer) => `(${(Number(layer.bitrate / 1000) / 1000).toFixed(2)} Mbps)`;
