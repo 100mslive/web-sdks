@@ -52,9 +52,9 @@ export class HMSEffectsPlugin implements HMSMediaStreamPlugin {
     this.effects.setBlur(blur);
   }
 
-  setPreset(preset: string) {
+  async setPreset(preset: string) {
     this.preset = preset;
-    this.effects.setSegmentationPreset(this.preset);
+    await this.effects.setSegmentationPreset(this.preset);
   }
 
   getPreset() {

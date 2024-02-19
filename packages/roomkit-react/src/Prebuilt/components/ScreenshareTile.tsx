@@ -95,7 +95,7 @@ const Tile = ({ peerId, width = '100%', height = '100%' }: { peerId: string; wid
             {isFullscreen ? <ShrinkIcon /> : <ExpandIcon />}
           </StyledVideoTile.FullScreenButton>
         ) : null}
-        {!isMobile && isMouseHovered && (
+        {!isMobile && isMouseHovered && !isFullscreen && (
           <Box
             css={{
               position: 'absolute',
