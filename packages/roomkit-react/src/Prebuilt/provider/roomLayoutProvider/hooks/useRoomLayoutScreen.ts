@@ -91,16 +91,11 @@ export function useRoomLayoutHeader() {
   // People watching, start timestamp, recording status
   const details = useMemo(() => {
     const details = [];
-    let timeStamp;
-    if (hlsState?.variants?.[0] && hlsState?.variants[0]?.['startedAt']) {
+    if (hlsState?.variants[0]?.['startedAt']) {
       details.push(`${getFormattedCount(peerCount)} watching`);
-      const streamStartedAt = hlsState?.variants[0]['startedAt'];
-      timeStamp = streamStartedAt;
+      details.push(hlsState.variants[0]['startedAt']);
     } else if (sessionStartedAt) {
-      timeStamp = sessionStartedAt;
-    }
-    if (timeStamp) {
-      details.push(timeStamp);
+      details.push(sessionStartedAt);
     }
     if (isRecordingOn) {
       details.push('Recording');

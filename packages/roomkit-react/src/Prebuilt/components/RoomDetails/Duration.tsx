@@ -3,18 +3,18 @@ import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { getFormattedTime } from '../Polls/common/utils';
 
-export const Duration = ({ timeStamp }: { timeStamp: Date }) => {
-  const [elapsedTime, setElapsedTime] = useState(getFormattedTime(Date.now() - timeStamp.getTime(), false));
+export const Duration = ({ timestamp }: { timestamp: Date }) => {
+  const [elapsedTime, setElapsedTime] = useState(getFormattedTime(Date.now() - timestamp.getTime(), false));
 
   useEffect(() => {
     const timerAdded = setInterval(() => {
-      setElapsedTime(getFormattedTime(Date.now() - timeStamp.getTime(), false));
+      setElapsedTime(getFormattedTime(Date.now() - timestamp.getTime(), false));
     }, 1000);
 
     return () => {
       clearInterval(timerAdded);
     };
-  }, [timeStamp]);
+  }, [timestamp]);
 
   return (
     <Flex css={{ color: '$on_surface_medium' }}>
