@@ -451,7 +451,7 @@ export default class HMSTransport {
     customData: { name: string; metaData: string },
     autoSubscribeVideo = false,
   ): Promise<InitConfig | void> {
-    this.setTransportStateForConnect();
+    // this.setTransportStateForConnect();
     this.joinParameters = new JoinParameters(
       token,
       peerId,
@@ -1111,7 +1111,7 @@ export default class HMSTransport {
     }
   }
 
-  private setTransportStateForConnect() {
+  /*  private setTransportStateForConnect() {
     if (this.state === TransportState.Failed) {
       this.state = TransportState.Disconnected;
     }
@@ -1127,7 +1127,7 @@ export default class HMSTransport {
       this.state = TransportState.Connecting;
       this.observer.onStateChange(this.state);
     }
-  }
+  } */
 
   private sendErrorAnalyticsEvent(error: HMSException, category: TransportFailureCategory) {
     const additionalProps = this.getAdditionalAnalyticsProperties();

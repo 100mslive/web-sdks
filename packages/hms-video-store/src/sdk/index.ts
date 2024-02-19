@@ -585,6 +585,7 @@ export class HMSSdk implements HMSInterface {
       this.sdkState.isJoinInProgress = false;
       await this.publish(config.settings, previewRole);
     } catch (error) {
+      console.error({ error });
       this.analyticsTimer.end(TimedEvent.JOIN);
       this.sdkState.isJoinInProgress = false;
       this.listener?.onError(error as HMSException);

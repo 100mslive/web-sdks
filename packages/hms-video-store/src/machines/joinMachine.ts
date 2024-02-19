@@ -31,8 +31,9 @@ export const joinMachine = (transport: HMSTransport) =>
     id: 'joinMachine',
     initial: 'idle',
     types: {} as {
-      context: { retryCount: number } & joinParams;
+      context: { retryCount: number; error: HMSException | null } & joinParams;
       events: JoinEvents;
+      output: { data: HMSException };
     },
     context: {
       authToken: '',
@@ -41,6 +42,7 @@ export const joinMachine = (transport: HMSTransport) =>
       initEndpoint: '',
       autoSubscribeVideo: false,
       retryCount: 0,
+      error: null,
     },
     states: {
       idle: {
@@ -70,11 +72,18 @@ export const joinMachine = (transport: HMSTransport) =>
           onError: [
             {
               target: 'init',
+              reenter: true,
               guard: ({ context, event }) => {
+                console.log({
+                  retry: shouldRetryError(event.error),
+                  count: context.retryCount,
+                  error: event.error,
+                });
                 return shouldRetryError(event.error) && context.retryCount < 5;
               },
             },
             {
+              actions: assign({ error: ({ event }) => event.error as HMSException }),
               guard: ({ context, event }) => {
                 return !shouldRetryError(event.error) || context.retryCount >= 5;
               },
@@ -138,7 +147,10 @@ export const joinMachine = (transport: HMSTransport) =>
       },
       failed: {
         type: 'final',
-        output: ({ event }) => event.data,
+        output: ({ context }) => {
+          console.log('output final state', { error: context.error });
+          return context.error;
+        },
       },
     },
   });
