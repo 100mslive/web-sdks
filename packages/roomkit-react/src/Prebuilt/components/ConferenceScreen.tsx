@@ -26,7 +26,6 @@ import { VideoStreamingSection } from '../layouts/VideoStreamingSection';
 import FullPageProgress from './FullPageProgress';
 import { Header } from './Header';
 import { PreviousRoleInMetadata } from './PreviousRoleInMetadata';
-// @ts-ignore: No implicit Any
 import { RaiseHand } from './RaiseHand';
 import {
   useRoomLayoutConferencingScreen,

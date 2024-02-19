@@ -4,10 +4,11 @@ import { CheckIcon, CrossIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Box, Dropdown, Flex, Text, Tooltip } from '../../..';
 import { Sheet } from '../../../Sheet';
 import { config } from '../../../Theme';
+import { useIsLandscape } from '../../common/hooks';
 
 export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, selection, isAuto }) {
   const isMobile = useMedia(config.media.md);
-  const isLandscape = useMedia(config.media.ls);
+  const isLandscape = useIsLandscape();
   if (isMobile || isLandscape) {
     return (
       <Sheet.Root open={open} onOpenChange={onOpen}>
@@ -25,7 +26,7 @@ export function HLSQualitySelector({ open, onOpen, layers, onQualityChange, sele
         </Sheet.Trigger>
 
         {layers.length > 0 && (
-          <Sheet.Content css={{ bg: '$surface_default', pb: '$14' }} onClick={() => onOpen(false)}>
+          <Sheet.Content css={{ bg: '$surface_default', pb: '$1' }} onClick={() => onOpen(false)}>
             <Sheet.Title
               css={{
                 display: 'flex',

@@ -57,8 +57,10 @@ export const HLSViewTitle = () => {
         position: 'relative',
         h: 'fit-content',
         w: '100%',
-        borderColor: '$border_bright',
-        border: '0 0 $2 0',
+        border: '1px solid $border_bright',
+        borderTop: '0',
+        borderRight: '0',
+        borderLeft: '0',
         p: '$8',
         backgroundColor: '$surface_dim',
       }}

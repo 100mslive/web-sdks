@@ -10,6 +10,7 @@ import { DesktopOptions } from './SplitComponents/DesktopOptions';
 // @ts-ignore: No implicit Any
 import { MwebOptions } from './SplitComponents/MwebOptions';
 import { config as cssConfig } from '../../..';
+import { useLandscapeHLSStream } from '../../common/hooks';
 
 export const MoreSettings = ({
   elements,
@@ -19,8 +20,7 @@ export const MoreSettings = ({
   screenType: keyof ConferencingScreen;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.lg);
-  const isLandscapeHLSStream = screenType === 'hls_live_streaming' || isLandscape;
+  const isLandscapeHLSStream = useLandscapeHLSStream();
   return isMobile || isLandscapeHLSStream ? (
     <MwebOptions elements={elements} screenType={screenType} />
   ) : (

@@ -1,5 +1,4 @@
 import React, { Fragment, useState } from 'react';
-import { useMedia } from 'react-use';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
@@ -7,7 +6,6 @@ import { CrossIcon, ExitIcon, StopIcon } from '@100mslive/react-icons';
 import { IconButton } from '../../../IconButton';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
-import { config as cssConfig } from '../../../Theme';
 import { Tooltip } from '../../../Tooltip';
 import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton } from './LeaveAtoms';
@@ -16,6 +14,7 @@ import { LeaveSessionContent } from './LeaveSessionContent';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
@@ -45,7 +44,7 @@ export const MwebLeaveRoom = ({
       {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
-            <LeaveIcon onClick={() => setOpen(!open)} />
+            <LeaveButton onClick={() => setOpen(!open)} />
           </Sheet.Trigger>
           <Sheet.Content>
             <LeaveCard
@@ -77,7 +76,7 @@ export const MwebLeaveRoom = ({
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIcon onClick={() => setShowLeaveRoomAlert(true)} />
+        <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
@@ -98,12 +97,11 @@ export const MwebLeaveRoom = ({
   );
 };
 
-const LeaveIcon = ({ onClick }: { onClick: () => void }) => {
-  const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.ls);
-  const { screenType } = useRoomLayoutConferencingScreen();
+const LeaveButton = ({ onClick }: { onClick: () => void }) => {
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
-  return (isMobile || isLandscape) && screenType === 'hls_live_streaming' ? (
+  return isMobileHLSStream || isLandscapeHLSStream ? (
     <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => onClick()}>
       <Tooltip title="Leave Room">
         <Box>

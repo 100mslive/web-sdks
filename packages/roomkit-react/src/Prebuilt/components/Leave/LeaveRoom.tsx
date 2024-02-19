@@ -18,12 +18,12 @@ import { config as cssConfig } from '../../../Theme';
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.ls);
   const rolesMap: Record<string, HMSRole> = useHMSStore(selectRolesMap);
   const streamingPermissionRoles = Object.keys(rolesMap).filter(roleName => {
     const roleObj = rolesMap[roleName];
@@ -34,6 +34,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   );
   const hlsState = useHMSStore(selectHLSState);
   const hmsActions = useHMSActions();
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   const stopStream = async () => {
     try {
@@ -62,7 +64,7 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
   if (!permissions || !isConnected) {
     return null;
   }
-  if ((isMobile || isLandscape) && screenType === 'hls_live_streaming') {
+  if (isMobileHLSStream || isLandscapeHLSStream) {
     return <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />;
   }
   return isMobile ? (

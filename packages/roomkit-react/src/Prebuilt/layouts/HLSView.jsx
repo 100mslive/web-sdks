@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, ExpandIcon, GoLiveIcon, PauseIcon, PlayIcon, ShrinkIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, GoLiveIcon, PauseIcon, PlayIcon } from '@100mslive/react-icons';
 import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -33,6 +33,7 @@ import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { usePollViewToggle, useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useIsLandscape } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
 
 let hlsPlayer;
@@ -72,7 +73,7 @@ const HLSView = () => {
   const isFullScreenSupported = screenfull.isEnabled;
 
   const isMobile = useMedia(config.media.md);
-  const isLandscape = useMedia(config.media.ls);
+  const isLandscape = useIsLandscape();
 
   const isFullScreen = useFullscreen(hlsViewRef, show, {
     onClose: () => toggle(false),
@@ -347,7 +348,7 @@ const HLSView = () => {
                             top: '40%',
                             left: '50%',
                             transform: 'translateY(-40%) translateX(-50%)',
-                            padding: '$4 $4 $4 $4',
+                            padding: '$4',
                             display: 'inline-flex',
                             r: '$round',
                             gap: '$1',
@@ -505,11 +506,7 @@ const HLSView = () => {
                           />
                         ) : null}
                         {isFullScreenSupported ? (
-                          <FullScreenButton
-                            isFullScreen={isFullScreen}
-                            onToggle={toggle}
-                            icon={isFullScreen ? <ShrinkIcon /> : <ExpandIcon />}
-                          />
+                          <FullScreenButton isFullScreen={isFullScreen} onToggle={toggle} />
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>

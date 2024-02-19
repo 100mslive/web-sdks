@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
+  parsedUserAgent,
   selectAvailableRoleNames,
   selectIsConnectedToRoom,
   selectPeerCount,
@@ -103,8 +104,14 @@ export const useParticipants = (params?: { metadata?: { isHandRaised?: boolean }
   return { participants: participantList, isConnected, peerCount, rolesWithParticipants };
 };
 
-export const useLandscapeHLSStream = () => {
+export const useIsLandscape = () => {
+  const isMobile = parsedUserAgent.getDevice().type === 'mobile';
   const isLandscape = useMedia(config.media.ls);
+  return isMobile && isLandscape;
+};
+
+export const useLandscapeHLSStream = () => {
+  const isLandscape = useIsLandscape();
   const { screenType } = useRoomLayoutConferencingScreen();
   return isLandscape && screenType === 'hls_live_streaming';
 };

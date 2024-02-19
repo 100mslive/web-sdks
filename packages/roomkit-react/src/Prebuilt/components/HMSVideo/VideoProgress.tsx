@@ -52,7 +52,7 @@ export const VideoProgress = () => {
   return (
     <Flex
       ref={progressRootRef}
-      css={{ cursor: 'pointer', h: '$4', alignSelf: 'stretch' }}
+      css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}
       onClick={onProgressChangeHandler}
     >
       <Box

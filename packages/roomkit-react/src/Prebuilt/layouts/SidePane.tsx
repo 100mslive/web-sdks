@@ -19,7 +19,7 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
+import { useIsLandscape, useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
 
@@ -31,7 +31,7 @@ const SidePane = ({
   hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useMedia(cssConfig.media.lg);
+  const isLandscape = useIsLandscape();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;

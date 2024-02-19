@@ -106,6 +106,7 @@ export const VideoStreamingSection = ({
           position: 'relative',
           gap: '$4',
         }}
+        direction={isMobileHLSStream ? 'column' : 'row'}
       >
         {ViewComponent}
         <Box

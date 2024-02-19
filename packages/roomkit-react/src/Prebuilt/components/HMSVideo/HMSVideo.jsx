@@ -1,10 +1,9 @@
 import React, { forwardRef } from 'react';
-import { useMedia } from 'react-use';
 import { Flex } from '../../../';
-import { config } from '../../../Theme';
+import { useIsLandscape } from '../../common/hooks';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
-  const isLandscape = useMedia(config.media.ls);
+  const isLandscape = useIsLandscape();
   return (
     <Flex
       data-testid="hms-video"
