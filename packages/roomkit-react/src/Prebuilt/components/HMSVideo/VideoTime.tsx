@@ -9,7 +9,14 @@ export const VideoTime = () => {
   const [videoTime, setVideoTime] = useState('');
 
   useEffect(() => {
-    const timeupdateHandler = (currentTime: number) => setVideoTime(getDurationFromSeconds(currentTime));
+    const timeupdateHandler = (currentTime: number) => {
+      const videoEl = hlsPlayer?.getVideoElement();
+      if (videoEl) {
+        setVideoTime(getDurationFromSeconds(videoEl.duration - currentTime));
+      } else {
+        setVideoTime(getDurationFromSeconds(currentTime));
+      }
+    };
     if (hlsPlayer) {
       hlsPlayer.on(HMSHLSPlayerEvents.CURRENT_TIME, timeupdateHandler);
     }
@@ -29,7 +36,7 @@ export const VideoTime = () => {
         fontWeight: '$regular',
       }}
     >
-      {videoTime}
+      -{videoTime}
     </Text>
   ) : null;
 };

@@ -453,7 +453,7 @@ const HLSView = () => {
                               }}
                               isPaused={isPaused}
                             />
-                            <HMSVideoPlayer.Duration />
+                            {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                             <HMSVideoPlayer.Volume />
                           </>
                         )}
@@ -488,7 +488,7 @@ const HLSView = () => {
                             </Flex>
                           </Tooltip>
                         </IconButton>
-                        {isMobile || isLandscape ? <HMSVideoPlayer.Duration /> : null}
+                        {(isMobile || isLandscape) && !isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                       </HMSVideoPlayer.Controls.Left>
 
                       <HMSVideoPlayer.Controls.Right>

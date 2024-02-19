@@ -22,6 +22,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         },
         '& video::-webkit-media-text-track-display': {
           padding: '0 $4',
+          boxShadow: '0px 1px 3px 0px #000000A3',
         },
         '& video::-webkit-media-text-track-container': {
           fontSize: '$space$10 !important',
