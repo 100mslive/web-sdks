@@ -103,10 +103,8 @@ export const PinnedMessage = () => {
             title={pinnedMessages[pinnedMessageIndex]?.text}
           >
             <AnnotisedMessage
-              message={`${currentPinnedMessage.slice(
-                0,
-                hideOverflow ? PINNED_MESSAGE_LENGTH : currentPinnedMessage.length,
-              )}`}
+              message={currentPinnedMessage}
+              length={hideOverflow ? PINNED_MESSAGE_LENGTH : currentPinnedMessage.length}
             />
             {canOverflow ? (
               <span style={{ cursor: 'pointer' }} onClick={() => setHideOverflow(prev => !prev)}>

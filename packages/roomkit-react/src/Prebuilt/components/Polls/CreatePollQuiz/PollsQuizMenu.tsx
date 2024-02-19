@@ -195,6 +195,13 @@ const AddMenu = () => {
 const PrevMenu = () => {
   const hmsActions = useHMSActions();
   const polls = useHMSStore(selectPolls);
+  const sortedPolls = useMemo(
+    () =>
+      polls
+        ?.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0))
+        ?.sort((a, b) => (b.state === 'started' ? 1 : 0) - (a.state === 'started' ? 1 : 0)),
+    [polls],
+  );
   const permissions = useHMSStore(selectPermissions);
 
   useEffect(() => {
@@ -217,7 +224,7 @@ const PrevMenu = () => {
         Previous Polls and Quizzes
       </Text>
       <Flex direction="column" css={{ gap: '$10', mt: '$8' }}>
-        {polls?.map(poll => (
+        {sortedPolls?.map(poll => (
           <InteractionCard key={poll.id} id={poll.id} title={poll.title} status={poll.state} />
         ))}
       </Flex>
