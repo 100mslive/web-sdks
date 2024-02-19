@@ -20,7 +20,6 @@ import { ScreenshareToggle } from '../ScreenShareToggle';
 import { VBToggle } from '../VirtualBackground/VBToggle';
 // @ts-ignore: No implicit Any
 import { ChatToggle } from './ChatToggle';
-import { NoiseCancellationToggle } from './NoiseCancellationToggle';
 import { ParticipantCount } from './ParticipantList';
 import { PollsToggle } from './PollsToggle';
 import { WhiteboardToggle } from './WhiteboardToggle';
@@ -80,7 +79,6 @@ export const Footer = ({
       >
         {isMobile ? <LeaveRoom screenType={screenType} /> : null}
         <AudioVideoToggle />
-        <NoiseCancellationToggle />
         {!isMobile && elements.virtual_background ? <VBToggle /> : null}
       </AppFooter.Left>
       <AppFooter.Center
