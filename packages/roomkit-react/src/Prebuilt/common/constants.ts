@@ -46,8 +46,8 @@ export const APP_DATA = {
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
   background: 'background',
-  backgroundType: 'backgroundType',
 };
+
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
   maxTileCount: 'maxTileCount',
@@ -92,11 +92,12 @@ export const HLS_TIMED_METADATA_DOC_URL =
 
 export const REMOTE_STOP_SCREENSHARE_TYPE = 'REMOTE_STOP_SCREENSHARE';
 
-export const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
-export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'firefox';
-export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'safari';
+// mweb could have browser name as "Mobile Chrome" or "Mobile Firefox"
+export const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('chrome');
+export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('firefox');
+export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('safari');
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'ios';
-export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'mac os';
+export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'macos';
 export const isAndroid = parsedUserAgent.getOS()?.name?.toLowerCase() === 'android';
 export const isIPadOS = false;
 // typeof navigator !== "undefined" &&
