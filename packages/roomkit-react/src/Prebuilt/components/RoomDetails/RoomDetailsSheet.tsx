@@ -7,16 +7,15 @@ import { Text } from '../../../Text';
 import { Logo } from '../Header/HeaderComponents';
 import { RoomDetailsRow } from './RoomDetailsRow';
 import { useRoomLayoutHeader } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-export const RoomDetailsSheet = ({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+import { useIsSheetTypeOpen, useSheetToggle } from '../AppData/useSheet';
+import { SHEET_OPTIONS } from '../../common/constants';
+
+export const RoomDetailsSheet = () => {
   const { title, description, details } = useRoomLayoutHeader();
+  const toggleSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
+  const showRoomDetailsSheet = useIsSheetTypeOpen(SHEET_OPTIONS.ROOM_DETAILS);
   return (
-    <Sheet.Root open={open} onOpenChange={onOpenChange}>
+    <Sheet.Root open={showRoomDetailsSheet} onOpenChange={toggleSheet}>
       <Sheet.Content css={{ py: '$8', pb: '$12' }}>
         <Flex
           justify="between"

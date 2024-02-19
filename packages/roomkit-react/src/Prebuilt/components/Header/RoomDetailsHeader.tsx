@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useMedia } from 'react-use';
 import { ChevronRightIcon } from '@100mslive/react-icons';
 import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 import { config as cssConfig } from '../../../Theme';
-import { RoomDetailsSheet } from '../RoomDetails/RoomDetailsSheet';
 import { useRoomLayoutHeader } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSheetToggle } from '../AppData/useSheet';
 // @ts-ignore
 import { useSidepaneToggle } from '../AppData/useSidepane';
-import { SIDE_PANE_OPTIONS } from '../../common/constants';
+import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 export const RoomDetailsHeader = () => {
   const { title, description } = useRoomLayoutHeader();
   const isMobile = useMedia(cssConfig.media.md);
-  const clipLength = isMobile ? 8 : 10;
+  const clipLength = 80;
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
-  const [openDetailsSheet, setOpenDetailsSheet] = useState(false);
+  const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
 
-  if (!title && !description) {
+  if ((!title && !description) || (isMobile && !title)) {
     return null;
   }
 
@@ -42,11 +42,10 @@ export const RoomDetailsHeader = () => {
         </Flex>
       )}
       {isMobile && description ? (
-        <Flex css={{ color: '$on_surface_medium', opacity: openDetailsSheet ? 0 : 1 }}>
-          <ChevronRightIcon height={16} width={16} onClick={() => setOpenDetailsSheet(true)} />
+        <Flex css={{ color: '$on_surface_medium' }}>
+          <ChevronRightIcon height={16} width={16} onClick={toggleDetailsSheet} />
         </Flex>
       ) : null}
-      {openDetailsSheet && <RoomDetailsSheet open={openDetailsSheet} onOpenChange={setOpenDetailsSheet} />}
     </Flex>
   );
 };

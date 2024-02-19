@@ -46,6 +46,7 @@ export const APP_DATA = {
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
   background: 'background',
+  sheet: 'sheet',
 };
 
 export const UI_SETTINGS = {
@@ -64,6 +65,10 @@ export const SIDE_PANE_OPTIONS = {
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
   VB: 'VB',
+  ROOM_DETAILS: 'ROOM_DETAILS',
+};
+
+export const SHEET_OPTIONS = {
   ROOM_DETAILS: 'ROOM_DETAILS',
 };
 

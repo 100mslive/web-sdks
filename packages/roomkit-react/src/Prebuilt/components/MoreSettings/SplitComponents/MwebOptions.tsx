@@ -17,6 +17,7 @@ import {
   HamburgerMenuIcon,
   HandIcon,
   HandRaiseSlashedIcon,
+  InfoIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -42,6 +43,8 @@ import { ActionTile } from '../ActionTile';
 import { ChangeNameModal } from '../ChangeNameModal';
 // @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
+import { useRoomLayoutHeader } from '../../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useSheetToggle } from '../../AppData/useSheet';
 // @ts-ignore: No implicit any
 import { usePollViewToggle, useSidepaneToggle } from '../../AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -54,7 +57,7 @@ import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
-import { SIDE_PANE_OPTIONS } from '../../../common/constants';
+import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../../common/constants';
 
 const MODALS = {
   CHANGE_NAME: 'changeName',
@@ -95,6 +98,8 @@ export const MwebOptions = ({
   const noAVPermissions = !(toggleAudio || toggleVideo);
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const toggleVB = useSidepaneToggle(SIDE_PANE_OPTIONS.VB);
+  const { title, description } = useRoomLayoutHeader();
+  const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -290,6 +295,18 @@ export const MwebOptions = ({
                     ? 'Starting Recording'
                     : 'Start Recording'}
                 </ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
+
+            {title || description ? (
+              <ActionTile.Root
+                onClick={() => {
+                  setOpenOptionsSheet(false);
+                  toggleDetailsSheet();
+                }}
+              >
+                <InfoIcon />
+                <ActionTile.Title>About Session</ActionTile.Title>
               </ActionTile.Root>
             ) : null}
           </Box>

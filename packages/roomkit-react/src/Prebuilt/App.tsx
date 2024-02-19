@@ -26,6 +26,7 @@ import { PreviewScreen } from './components/Preview/PreviewScreen';
 // @ts-ignore: No implicit Any
 import { ToastContainer } from './components/Toast/ToastContainer';
 import { VBHandler } from './components/VirtualBackground/VBHandler';
+import { Sheet } from './layouts/Sheet';
 import { RoomLayoutContext, RoomLayoutProvider, useRoomLayout } from './provider/roomLayoutProvider';
 import { DialogContainerProvider } from '../context/DialogContext';
 import { Box } from '../Layout';
@@ -293,6 +294,7 @@ function AppRoutes({
         <ToastContainer />
         <Notifications />
         <MwebLandscapePrompt />
+        <Sheet />
         <BackSwipe />
         {!isNotificationsDisabled && <FlyingEmoji />}
         <RemoteStopScreenshare />

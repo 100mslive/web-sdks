@@ -104,8 +104,8 @@ export function useRoomLayoutHeader() {
   }, [hlsState?.variants, isRecordingOn, peerCount, sessionStartedAt]);
 
   return {
-    title: elements.header?.title || 'Title',
-    description: elements.header?.description || 'Description',
+    title: elements.header?.title || '',
+    description: elements.header?.description || '',
     details,
   };
 }
