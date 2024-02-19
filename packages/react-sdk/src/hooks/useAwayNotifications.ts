@@ -13,6 +13,10 @@ export const useAwayNotifications = () => {
     if (
       !Notification ||
       Notification?.permission === 'denied' ||
+      /**
+       * document.visibilityState is still 'visible' when the tab is active but window is not open
+       * document.hasFocus() is false when the window is not active
+       */
       (document.visibilityState === 'visible' && document.hasFocus())
     ) {
       return;
