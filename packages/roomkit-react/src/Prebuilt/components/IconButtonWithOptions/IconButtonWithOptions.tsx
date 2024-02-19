@@ -130,7 +130,7 @@ export const IconButtonWithOptions = ({
           </Dropdown.Trigger>
           <Dropdown.Content
             sideOffset={5}
-            alignOffset={-41}
+            alignOffset={-44}
             align="start"
             side="top"
             css={{

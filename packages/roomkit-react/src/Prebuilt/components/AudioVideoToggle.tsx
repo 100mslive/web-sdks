@@ -76,7 +76,7 @@ const OptionLabel = ({ children, icon }: { children: string; icon: React.ReactNo
         h: '$16',
         p: '$4',
         color: '$on_surface_low',
-        bg: '$transparent',
+        bg: 'transparent',
         fontSize: '$xs',
         gap: '$4',
         alignItems: 'center',
@@ -122,7 +122,6 @@ const NoiseCancellation = () => {
         checked={active}
         disabled={inProgress}
         onCheckedChange={async value => {
-          console.log(value);
           setInProgress(true);
           if (value && !isPluginAdded) {
             await actions.addPluginToAudioTrack(plugin);
