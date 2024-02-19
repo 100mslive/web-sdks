@@ -10,13 +10,17 @@ export const useAwayNotifications = () => {
   }, []);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
-    if (!Notification || Notification?.permission === 'denied' || document.visibilityState === 'visible') {
+    if (
+      !Notification ||
+      Notification?.permission === 'denied' ||
+      (document.visibilityState === 'visible' && document.hasFocus())
+    ) {
       return;
     }
     const notification = new Notification(title, options);
 
     const closeNotification = () => {
-      if (document.visibilityState === 'visible') {
+      if (document.visibilityState === 'visible' && document.hasFocus()) {
         notification?.close();
         document.removeEventListener('visibilitychange', closeNotification);
       }
