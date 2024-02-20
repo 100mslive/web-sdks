@@ -97,7 +97,7 @@ const plugin = new HMSKrispPlugin();
 const NoiseCancellation = () => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(isPluginAdded);
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
 
@@ -226,7 +226,7 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           key="toggleAudio"
         >
           <Dropdown.Group>
-            <OptionLabel icon={<MicOnIcon />}>{shouldShowAudioOutput ? 'Audio' : 'Audio Input'}</OptionLabel>
+            <OptionLabel icon={<MicOnIcon />}>{!shouldShowAudioOutput ? 'Audio' : 'Microphone'}</OptionLabel>
             <Options
               options={audioInput}
               selectedDeviceId={selectedDeviceIDs.audioInput}

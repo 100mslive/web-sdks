@@ -9,7 +9,7 @@ export const useAudioOutputTest = ({ deviceId }: { deviceId: string }) => {
         // @ts-ignore
         if (typeof audioRef.current.setSinkId !== 'undefined') {
           // @ts-ignore
-          audioRef.current.setSinkId(id);
+          audioRef.current.setSinkId(deviceId);
         }
       } catch (error) {
         console.log(error);
