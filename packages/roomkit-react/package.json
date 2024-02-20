@@ -84,9 +84,10 @@
   "dependencies": {
     "@100mslive/hls-player": "0.2.6",
     "@100mslive/hms-virtual-background": "1.12.6",
+    "@100mslive/hms-noise-cancellation": "0.0.0-alpha.1",
     "@100mslive/react-icons": "0.9.6",
     "@100mslive/react-sdk": "0.9.6",
-    "@100mslive/types-prebuilt": "0.12.6",
+    "@100mslive/types-prebuilt": "0.12.7",
     "@emoji-mart/data": "^1.0.6",
     "@emoji-mart/react": "^1.0.1",
     "@radix-ui/react-accordion": "1.0.0",

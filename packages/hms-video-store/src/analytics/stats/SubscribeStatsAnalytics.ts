@@ -40,15 +40,17 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
 
   protected sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.subscribeStats(this.toAnalytics()));
+    super.sendEvent();
   }
 
   protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
     const remoteTracksStats = hmsStats.getAllRemoteTracksStats();
+    let shouldCreateSample = false;
     Object.keys(remoteTracksStats).forEach(trackID => {
       const trackStats = remoteTracksStats[trackID];
       const track = this.store.getTrackById(trackID);
       if (this.trackAnalytics.has(trackID)) {
-        this.trackAnalytics.get(trackID)?.push({ ...trackStats });
+        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats });
       } else {
         if (track) {
           const trackAnalytics = new RunningRemoteTrackAnalytics({
@@ -57,18 +59,28 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
             ssrc: trackStats.ssrc.toString(),
             kind: trackStats.kind,
           });
-          trackAnalytics.push({ ...trackStats });
+          trackAnalytics.pushTempStat({ ...trackStats });
           this.trackAnalytics.set(trackID, trackAnalytics);
         }
       }
+      const trackAnalytics = this.trackAnalytics.get(trackID);
+      if (trackAnalytics?.shouldCreateSample()) {
+        shouldCreateSample = true;
+      }
     });
+
+    if (shouldCreateSample) {
+      this.trackAnalytics.forEach(trackAnalytic => {
+        trackAnalytic.createSample();
+      });
+    }
   }
 }
 
 class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
   samples: (RemoteAudioSample | RemoteVideoSample)[] = [];
 
-  protected createSample = (): RemoteAudioSample | RemoteVideoSample => {
+  protected collateSample = (): RemoteAudioSample | RemoteVideoSample => {
     const latestStat = this.getLatestStat();
     const firstStat = this.getFirstStat();
 
@@ -102,7 +114,7 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     }
   };
 
-  protected shouldCreateSample = () => {
+  shouldCreateSample = () => {
     const length = this.tempStats.length;
     const newStat = this.tempStats[length - 1];
     const prevStat = this.tempStats[length - 2];

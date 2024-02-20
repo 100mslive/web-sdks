@@ -18,8 +18,6 @@ import { GroupIcon } from '@100mslive/react-icons';
 import { Box, Button } from '../../..';
 import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
-import { ToastBatcher } from '../Toast/ToastBatcher';
-// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
 import { ChatNotifications } from './ChatNotifications';
@@ -36,8 +34,6 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-// @ts-ignore: No implicit Any
-import { getMetadata } from '../../common/utils';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
@@ -45,7 +41,7 @@ const pollToastKey: Record<string, string> = {};
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
-  const subscribedNotifications = useSubscribedNotifications() || {};
+  const subscribedNotifications = useSubscribedNotifications();
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();
@@ -70,19 +66,6 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
-      case HMSNotificationTypes.METADATA_UPDATED:
-        if (roomState !== HMSRoomState.Connected) {
-          return;
-        }
-        // Don't show toast message when metadata is updated and raiseHand is false.
-        // Don't show toast message in case of local peer.
-        const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal) return;
-
-        console.debug('Metadata updated', notification.data);
-        if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
-        break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(notification.data.id + ' changed their name to ' + notification.data.name);
         break;
