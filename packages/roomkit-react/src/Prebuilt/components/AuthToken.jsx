@@ -70,7 +70,7 @@ const AuthToken = React.memo(({ authTokenByRoomCodeEndpoint, defaultAuthToken })
             alignItems: 'center',
           }}
         >
-          <img src={errorImage} height={80} width={80} />
+          <img src={errorImage} height={80} width={80} alt="Token Error" />
           <Text variant="h4" css={{ textAlign: 'center', mb: '$4', mt: '$10' }}>
             {error.title}
           </Text>

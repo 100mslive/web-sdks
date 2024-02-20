@@ -213,7 +213,7 @@ const HLSView = () => {
         hlsPlayer = null;
       };
     }
-  }, [hlsUrl]);
+  }, [hlsUrl, togglePollView, vanillaStore]);
 
   /**
    * initialize and subscribe to hlsState

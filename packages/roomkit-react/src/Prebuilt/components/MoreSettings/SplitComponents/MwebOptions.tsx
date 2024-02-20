@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectPeerCount,
@@ -287,11 +288,10 @@ export const MwebOptions = ({
               >
                 {isRecordingLoading ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {isBrowserRecordingOn
-                    ? 'Recording On'
-                    : isRecordingLoading
-                    ? 'Starting Recording'
-                    : 'Start Recording'}
+                  {match({ isBrowserRecordingOn, isRecordingLoading })
+                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
+                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')}
                 </ActionTile.Title>
               </ActionTile.Root>
             ) : null}

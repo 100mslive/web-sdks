@@ -1,5 +1,6 @@
 // @ts-check
 import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { match } from 'ts-pattern';
 import { selectLocalPeer, selectLocalPeerRoleName, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { CheckCircleIcon, ChevronDownIcon, CrossCircleIcon } from '@100mslive/react-icons';
 import { Box, Button, Flex, Text } from '../../../../';
@@ -92,12 +93,12 @@ export const QuestionCard = ({
         <Text
           variant="caption"
           css={{
-            color:
-              respondedToQuiz && !isLive
-                ? isCorrectAnswer
-                  ? '$alert_success'
-                  : '$alert_error_default'
-                : '$on_surface_low',
+            color: match({ respondedToQuiz, isLive, isCorrectAnswer })
+              .when(
+                ({ respondedToQuiz, isLive }) => respondedToQuiz && !isLive,
+                ({ isCorrectAnswer }) => (isCorrectAnswer ? '$alert_success' : '$alert_error_default'),
+              )
+              .otherwise(() => '$on_surface_low'),
             fontWeight: '$semiBold',
             display: 'flex',
             alignItems: 'center',
