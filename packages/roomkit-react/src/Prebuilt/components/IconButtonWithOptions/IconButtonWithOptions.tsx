@@ -37,7 +37,15 @@ const IconSection = styled(IconButton, {
     borderTopRightRadius: '$1',
     borderBottomRightRadius: '$1',
   },
-  variants,
+  variants: {
+    ...variants,
+    hideOptions: {
+      true: {
+        borderTopRightRadius: '$1',
+        borderBottomRightRadius: '$1',
+      },
+    },
+  },
 });
 
 const OptionsSection = styled(IconButton, {
@@ -103,7 +111,7 @@ export const IconButtonWithOptions = ({
   const commonProps = { disabled, active };
   return (
     <Flex>
-      <IconSection {...commonProps} onClick={onClick}>
+      <IconSection {...commonProps} onClick={onClick} hideOptions={hideOptions}>
         <Tooltip disabled={!tooltipMessage} title={tooltipMessage}>
           <Icon {...commonProps}>{icon}</Icon>
         </Tooltip>
