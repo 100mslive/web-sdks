@@ -39,7 +39,7 @@ const pollToastKey: Record<string, string> = {};
 export function Notifications() {
   const localPeerID = useHMSStore(selectLocalPeerID);
   const notification = useHMSNotifications();
-  const subscribedNotifications = useSubscribedNotifications();
+  const subscribedNotifications = useSubscribedNotifications() || {};
   const roomState = useHMSStore(selectRoomState);
   const updateRoomLayoutForRole = useUpdateRoomLayout();
   const isNotificationDisabled = useIsNotificationDisabled();

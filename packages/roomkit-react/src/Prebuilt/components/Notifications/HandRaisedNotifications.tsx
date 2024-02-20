@@ -13,13 +13,14 @@ import { ToastBatcher } from '../Toast/ToastBatcher';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useSubscribedNotifications } from '../AppData/useUISettings';
+import { SUBSCRIBED_NOTIFICATIONS } from '../../common/constants';
 
 export const HandRaisedNotifications = () => {
   const notification = useHMSNotifications(HMSNotificationTypes.HAND_RAISE_CHANGED);
   const roomState = useHMSStore(selectRoomState);
   const vanillaStore = useHMSVanillaStore();
   const { on_stage_exp } = useRoomLayoutConferencingScreen().elements || {};
-  const subscribedNotifications = useSubscribedNotifications();
+  const subscribedNotifications = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED) || {};
 
   useEffect(() => {
     if (!notification?.data) {
