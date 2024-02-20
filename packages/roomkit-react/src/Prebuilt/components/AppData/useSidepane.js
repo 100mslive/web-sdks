@@ -56,7 +56,7 @@ export const usePollViewToggle = () => {
         .with(
           {
             isOpen: true,
-            view: P.with(view => !!view),
+            view: P.when(view => !!view),
           },
           () => null,
         )
