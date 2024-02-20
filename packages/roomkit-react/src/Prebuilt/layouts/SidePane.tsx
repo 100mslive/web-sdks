@@ -7,9 +7,7 @@ import { RoomDetailsPane } from '../components/RoomDetails/RoomDetailsPane';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
-// @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
-// @ts-ignore: No implicit Any
 import { VBPicker } from '../components/VirtualBackground/VBPicker';
 import { Box, Flex } from '../../Layout';
 import { config as cssConfig, CSS } from '../../Theme';
