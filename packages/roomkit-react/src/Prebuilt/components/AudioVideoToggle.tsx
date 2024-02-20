@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { HMSKrispPlugin } from '@100mslive/hms-noise-cancellation';
 import {
   DeviceType,
@@ -81,7 +81,7 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
       css={{
         h: '$16',
         p: '$4 $8',
-        color: '$on_surface_low',
+        color: '$on_surface_medium',
         bg: 'transparent',
         fontSize: '$xs',
         gap: '$4',
@@ -101,9 +101,23 @@ const NoiseCancellation = () => {
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
 
+  useEffect(() => {
+    (async () => {
+      setInProgress(true);
+      if (active && !isPluginAdded) {
+        await actions.addPluginToAudioTrack(plugin);
+      }
+      if (!active && isPluginAdded) {
+        await actions.removePluginFromAudioTrack(plugin);
+      }
+      setInProgress(false);
+    })();
+  }, [actions, active, isPluginAdded]);
+
   if (!plugin.isSupported() || !localPeerAudioTrackID) {
     return null;
   }
+
   return (
     <Dropdown.Item
       css={{
@@ -114,6 +128,7 @@ const NoiseCancellation = () => {
       }}
       onClick={e => {
         e.preventDefault();
+        setActive(value => !value);
       }}
     >
       <Label
@@ -127,15 +142,8 @@ const NoiseCancellation = () => {
         id="noise_cancellation"
         checked={active}
         disabled={inProgress}
-        onCheckedChange={async value => {
-          setInProgress(true);
-          if (value && !isPluginAdded) {
-            await actions.addPluginToAudioTrack(plugin);
-          }
-          if (!value && isPluginAdded) {
-            await actions.removePluginFromAudioTrack(plugin);
-          }
-          setInProgress(false);
+        onClick={e => e.stopPropagation()}
+        onCheckedChange={value => {
           setActive(value);
         }}
       />
