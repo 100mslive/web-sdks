@@ -19,11 +19,14 @@ import {
   CheckIcon,
   MicOffIcon,
   MicOnIcon,
+  SettingsIcon,
   SpeakerIcon,
   VideoOffIcon,
   VideoOnIcon,
 } from '@100mslive/react-icons';
 import { IconButtonWithOptions } from './IconButtonWithOptions/IconButtonWithOptions';
+// @ts-ignore: No implicit Any
+import SettingsModal from './Settings/SettingsModal';
 // @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
@@ -33,6 +36,7 @@ import { Switch } from '../../Switch';
 import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
+import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useAudioOutputTest } from './hooks/useAudioOutputTest';
 import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
@@ -103,7 +107,7 @@ const NoiseCancellation = () => {
   return (
     <Dropdown.Item
       css={{
-        p: '$4',
+        p: '$4 $8',
         h: '$15',
         fontSize: '$xs',
         justifyContent: 'space-between',
@@ -167,6 +171,27 @@ const AudioOutputLabel = ({ deviceId }: { deviceId: string }) => {
   );
 };
 
+const AudioSettings = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <>
+      <Dropdown.Item
+        css={{
+          backgroundColor: '$surface_dim',
+          p: '$4 $8',
+          h: '$15',
+          alignItems: 'center',
+          gap: '$2',
+          fontSize: '$xs',
+          '& svg': { size: '$8' },
+        }}
+        onClick={onClick}
+      >
+        <SettingsIcon /> Audio Settings
+      </Dropdown.Item>
+    </>
+  );
+};
+
 export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
@@ -178,6 +203,8 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
   const hasAudioDevices = Number(audioInput?.length) > 0;
   const hasVideoDevices = Number(videoInput?.length) > 0;
   const shouldShowAudioOutput = 'setSinkId' in HTMLMediaElement.prototype && Number(audioOutput?.length) > 0;
+  const { screenType } = useRoomLayoutConferencingScreen();
+  const [showSettings, setShowSettings] = useState(false);
 
   if (!toggleAudio && !toggleVideo) {
     return null;
@@ -221,6 +248,8 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           )}
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <NoiseCancellation />
+          <Dropdown.ItemSeparator css={{ mx: 0 }} />
+          <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
       ) : null}
 
@@ -267,6 +296,9 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           </IconButton>
         </Tooltip>
       ) : null}
+      {showSettings && (
+        <SettingsModal open={showSettings} onOpenChange={() => setShowSettings(false)} screenType={screenType} />
+      )}
     </Fragment>
   );
 };
