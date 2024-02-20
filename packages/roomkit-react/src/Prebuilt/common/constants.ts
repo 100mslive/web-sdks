@@ -137,3 +137,5 @@ export enum QUESTION_TYPE {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '.prebuilt-container';
+
+export const TEST_AUDIO_URL = 'https://100ms.live/test-audio.wav';
