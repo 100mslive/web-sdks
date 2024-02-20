@@ -105,8 +105,17 @@ export const QuestionCard = ({
             gap: '$4',
           }}
         >
-          {respondedToQuiz && isCorrectAnswer && pollEnded ? <CheckCircleIcon height={16} width={16} /> : null}
-          {respondedToQuiz && !isCorrectAnswer && pollEnded ? <CrossCircleIcon height={16} width={16} /> : null}
+          {match({ respondedToQuiz, pollEnded, isCorrectAnswer })
+            .when(
+              ({ respondedToQuiz, pollEnded }) => respondedToQuiz && pollEnded,
+              ({ isCorrectAnswer }) => ({
+                isCorrectAnswer,
+              }),
+            )
+            .with({ isCorrectAnswer }, ({ isCorrectAnswer }) =>
+              isCorrectAnswer ? <CheckCircleIcon height={16} width={16} /> : <CrossCircleIcon height={16} width={16} />,
+            )
+            .otherwise(() => null)}
           QUESTION {index} OF {totalQuestions}: {type.toUpperCase()}
         </Text>
       </Flex>
