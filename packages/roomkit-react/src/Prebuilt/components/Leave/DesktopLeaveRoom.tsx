@@ -1,8 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import { ConferencingScreen } from '@100mslive/types-prebuilt';
-// @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
-// @ts-ignore: No implicit Any
 import { ExitIcon, StopIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Dropdown } from '../../../Dropdown';
 import { Box, Flex } from '../../../Layout';
