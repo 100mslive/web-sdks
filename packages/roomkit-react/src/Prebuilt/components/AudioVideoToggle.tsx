@@ -30,7 +30,6 @@ import SettingsModal from './Settings/SettingsModal';
 // @ts-ignore: No implicit Any
 import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
-import { Label } from '../../Label';
 import { Box, Flex } from '../../Layout';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
@@ -131,13 +130,10 @@ const NoiseCancellation = () => {
         setActive(value => !value);
       }}
     >
-      <Label
-        htmlFor="noise_cancellation"
-        css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}
-      >
+      <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
         <AudioLevelIcon />
         Reduce Noise
-      </Label>
+      </Text>
       <Switch
         id="noise_cancellation"
         checked={active}
