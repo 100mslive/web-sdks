@@ -20,7 +20,7 @@ export const HandRaisedNotifications = () => {
   const roomState = useHMSStore(selectRoomState);
   const vanillaStore = useHMSVanillaStore();
   const { on_stage_exp } = useRoomLayoutConferencingScreen().elements || {};
-  const subscribedNotifications = useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED) || {};
+  const isSubscribing = !!useSubscribedNotifications(SUBSCRIBED_NOTIFICATIONS.METADATA_UPDATED);
 
   useEffect(() => {
     if (!notification?.data) {
@@ -28,12 +28,7 @@ export const HandRaisedNotifications = () => {
     }
 
     // Don't show toast message in case of local peer.
-    if (
-      roomState !== HMSRoomState.Connected ||
-      notification.data.isLocal ||
-      !on_stage_exp ||
-      !subscribedNotifications.METADATA_UPDATED
-    ) {
+    if (roomState !== HMSRoomState.Connected || notification.data.isLocal || !on_stage_exp || !isSubscribing) {
       return;
     }
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
@@ -41,7 +36,7 @@ export const HandRaisedNotifications = () => {
       ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
     }
-  }, [notification, on_stage_exp, roomState, subscribedNotifications.METADATA_UPDATED, vanillaStore]);
+  }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore]);
 
   return null;
 };
