@@ -41,6 +41,8 @@ export interface HMSRoom {
    * @alpha
    */
   effectsKey?: string;
+  isHippaEnabled?: boolean;
+  isNoiseCancellationEnabled?: boolean;
 }
 
 export interface HMSRecording {
