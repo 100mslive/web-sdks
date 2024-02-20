@@ -22,6 +22,7 @@ export default class Room implements HMSRoom {
    * @alpha
    */
   effectsKey?: string;
+  isHippaEnabled?: boolean;
 
   constructor(id: string) {
     this.id = id;

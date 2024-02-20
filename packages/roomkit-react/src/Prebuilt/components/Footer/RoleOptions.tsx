@@ -80,6 +80,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   return (
     <Dropdown.Root open={openOptions} onOpenChange={setOpenOptions}>
       <Dropdown.Trigger
+        data-testid="role_group_options"
         onClick={e => e.stopPropagation()}
         className="role_actions"
         asChild

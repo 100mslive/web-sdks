@@ -38,10 +38,9 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
       user_name?: string;
       user_data?: string;
     };
-    userAgent: string;
+    userAgent?: string;
   } = {
     peer: {},
-    userAgent: createUserAgent(),
   };
   timestamp: number;
   event_id: string;
@@ -55,6 +54,7 @@ export default class AnalyticsEvent implements ISignalParamsProvider<SignalEvent
     this.timestamp = timestamp || new Date().getTime(); // Timestamp of generating the event
     this.event_id = uuid();
     this.device_id = getAnalyticsDeviceId();
+    createUserAgent().then(userAgent => (this.metadata.userAgent = userAgent));
   }
 
   toSignalParams() {
