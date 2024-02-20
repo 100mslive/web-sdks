@@ -201,10 +201,10 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             align="center"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
-              minHeight: '$16',
+              minHeight: isLandscapeHLSStream ? '$14' : '$16',
               maxHeight: '$24',
               position: 'relative',
-              py: '$6',
+              py: isLandscapeHLSStream ? '0' : '$6',
               pl: '$8',
               flexGrow: '1',
               r: '$1',
@@ -227,7 +227,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               placeholder={message_placeholder}
               ref={inputRef}
               required
-              autoFocus={!isMobile}
+              autoFocus={!(isMobile || isLandscapeHLSStream)}
               onKeyPress={async event => {
                 if (event.key === 'Enter') {
                   if (!event.shiftKey) {

@@ -282,6 +282,7 @@ export interface HLSNotification {
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
+  playlist_type?: string;
   metadata?: string;
   started_at?: number;
   initialised_at?: number;

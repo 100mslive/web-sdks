@@ -97,6 +97,7 @@ export interface HMSHLS {
 
 export interface HLSVariant {
   url: string;
+  playlist_type?: string;
   meetingURL?: string;
   metadata?: string;
   startedAt?: Date;

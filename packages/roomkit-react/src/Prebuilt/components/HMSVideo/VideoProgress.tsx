@@ -1,19 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Box, Flex } from '../../..';
+import React, { useEffect, useState } from 'react';
+import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getPercentage } from './utils';
 
 export const VideoProgress = () => {
   const { hlsPlayer } = useHMSPlayerContext();
-  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoProgress, setVideoProgress] = useState<number>(0);
   const [bufferProgress, setBufferProgress] = useState(0);
-  const progressRootRef = useRef<HTMLDivElement>(null);
   const videoEl = hlsPlayer?.getVideoElement();
 
   const onValueChange = (time: number) => {
     hlsPlayer?.seekTo(time);
   };
   useEffect(() => {
+    if (!videoEl) {
+      return;
+    }
     const timeupdateHandler = () => {
       if (!videoEl) {
         return;
@@ -27,20 +29,27 @@ export const VideoProgress = () => {
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
       setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
     };
-    if (videoEl) {
-      videoEl.addEventListener('timeupdate', timeupdateHandler);
-    }
+    videoEl.addEventListener('timeupdate', timeupdateHandler);
     return function cleanup() {
       videoEl?.removeEventListener('timeupdate', timeupdateHandler);
     };
   }, [videoEl]);
 
-  const onProgressChangeHandler = (e: React.MouseEvent<HTMLElement>) => {
-    const userClickedX = e.clientX - (progressRootRef.current?.offsetLeft || 0);
-    const progressBarWidth = progressRootRef.current?.offsetWidth || 0;
-    const progress = Math.floor(getPercentage(userClickedX, progressBarWidth));
+  // const onProgressChangeHandler = (e: React.MouseEvent<HTMLElement>) => {
+  //   const userClickedX = e.clientX - (progressRootRef.current?.offsetLeft || 0);
+  //   const progressBarWidth = progressRootRef.current?.offsetWidth || 0;
+  //   const progress = Math.floor(getPercentage(userClickedX, progressBarWidth));
+  //   const videoEl = hlsPlayer?.getVideoElement();
+  //   const currentTime = (progress * (videoEl?.duration || 0)) / 100;
+  //   if (onValueChange) {
+  //     onValueChange(currentTime);
+  //   }
+  // };
+
+  const onProgress = (progress: number[]) => {
+    const progress1 = Math.floor(getPercentage(progress[0], 100));
     const videoEl = hlsPlayer?.getVideoElement();
-    const currentTime = (progress * (videoEl?.duration || 0)) / 100;
+    const currentTime = (progress1 * (videoEl?.duration || 0)) / 100;
     if (onValueChange) {
       onValueChange(currentTime);
     }
@@ -50,33 +59,31 @@ export const VideoProgress = () => {
     return null;
   }
   return (
-    <Flex
-      ref={progressRootRef}
-      css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}
-      onClick={onProgressChangeHandler}
-    >
-      <Box
-        id="video-actual"
+    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}>
+      <Slider
+        id="video-actual-rest"
         css={{
-          display: 'inline',
-          width: `${videoProgress}%`,
-          background: '$primary_default',
+          cursor: 'pointer',
+          h: '$2',
+          transition: `all .2s ease .5s`,
         }}
+        min={0}
+        max={100}
+        step={1}
+        value={[videoProgress]}
+        showTooltip={false}
+        onValueChange={onProgress}
+        thumbStyles={{ w: '$6', h: '$6' }}
       />
       <Box
         id="video-buffer"
         css={{
+          h: '$2',
           width: `${bufferProgress - videoProgress}%`,
           background: '$on_surface_high',
+          position: 'absolute',
+          left: `${videoProgress}%`,
           opacity: '25%',
-        }}
-      />
-      <Box
-        id="video-rest"
-        css={{
-          width: `${100 - bufferProgress}%`,
-          background: '$on_surface_high',
-          opacity: '10%',
         }}
       />
     </Flex>

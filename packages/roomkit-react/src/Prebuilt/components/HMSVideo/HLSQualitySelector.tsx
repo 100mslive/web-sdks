@@ -67,16 +67,14 @@ export function HLSQualitySelector({
                   align="center"
                   css={{
                     w: '100%',
-                    bg:
-                      !isAuto && layer.width === selection?.width && layer.height === selection?.height
-                        ? '$surface_default'
-                        : '$surface_bright',
+                    bg: '$surface_default',
                     '&:hover': {
                       bg: '$surface_brighter',
                     },
                     cursor: 'pointer',
                     gap: '$4',
-                    p: '$8',
+                    py: '$8',
+                    px: '$10',
                   }}
                   key={layer.width}
                   onClick={() => onQualityChange(layer)}
@@ -97,13 +95,14 @@ export function HLSQualitySelector({
               align="center"
               css={{
                 w: '100%',
-                bg: !isAuto ? '$surface_bright' : '$surface_default',
+                bg: '$surface_default',
                 '&:hover': {
                   bg: '$surface_brighter',
                 },
                 cursor: 'pointer',
                 gap: '$4',
-                p: '$8',
+                py: '$8',
+                px: '$10',
               }}
               key="auto"
               onClick={() => onQualityChange({ height: 'auto' })}

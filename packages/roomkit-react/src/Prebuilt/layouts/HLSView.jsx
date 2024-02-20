@@ -270,13 +270,42 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
+  useEffect(() => {
+    if (controlsVisible && isFullScreen && !qualityDropDownOpen) {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+      controlsTimerRef.current = setTimeout(() => {
+        setControlsVisible(false);
+      }, 5000);
+    }
+    if (!isFullScreen && controlsTimerRef.current) {
+      clearTimeout(controlsTimerRef.current);
+    }
+    return () => {
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+    };
+  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
+
   const onHoverHandler = useCallback(
     event => {
-      if (event.type === 'mouseenter' || event.type === 'touchenter' || qualityDropDownOpen) {
+      event.stopPropagation();
+      // logic for invisible when tapping
+      if (event.type === 'mouseenter' && controlsVisible && (isMobile || isLandscape)) {
+        setControlsVisible(false);
+        return;
+      }
+      // normal scemnario
+      if (event.type === 'mouseenter' || qualityDropDownOpen) {
         setControlsVisible(true);
         return;
       }
-      if (event.type === 'mouseleave' || event.type === 'touchleave') {
+      if (isMobile || isLandscape) {
+        return;
+      }
+      if (event.type === 'mouseleave') {
         setControlsVisible(false);
       } else if (isFullScreen && !controlsVisible && event.type === 'mousemove') {
         setControlsVisible(true);
@@ -285,7 +314,7 @@ const HLSView = () => {
         }
       }
     },
-    [controlsVisible, isFullScreen, qualityDropDownOpen],
+    [controlsVisible, isFullScreen, isLandscape, isMobile, qualityDropDownOpen],
   );
 
   return (
@@ -311,10 +340,6 @@ const HLSView = () => {
               justify="center"
               css={{
                 size: '100%',
-                width:
-                  videoRef.current && videoRef.current.clientWidth <= 720 && !(isMobile || isLandscape)
-                    ? `${videoRef.current.clientWidth}px`
-                    : '100%',
                 margin: '0 auto',
               }}
             >
@@ -335,8 +360,6 @@ const HLSView = () => {
                 onMouseEnter={onHoverHandler}
                 onMouseMove={onHoverHandler}
                 onMouseLeave={onHoverHandler}
-                onTouchStart={onHoverHandler}
-                onTouchLeave={onHoverHandler}
               >
                 <>
                   {isMobile || isLandscape ? (
@@ -438,7 +461,9 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!(isMobile || isLandscape) && <HMSVideoPlayer.Progress />}
+                    {!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' && (
+                      <HMSVideoPlayer.Progress />
+                    )}
                     <HMSVideoPlayer.Controls.Root
                       css={{
                         p: '$4 $8',
@@ -466,7 +491,7 @@ const HLSView = () => {
                           key="jump-to-live_btn"
                           data-testid="jump-to-live_btn"
                         >
-                          <Tooltip title="Go to Live" side="top">
+                          <Tooltip title={isVideoLive ? 'Live' : 'Go to Live'} side="top">
                             <Flex justify="center" gap={2} align="center">
                               <Box
                                 css={{
@@ -510,7 +535,9 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {isMobile || isLandscape ? <HMSVideoPlayer.Progress /> : null}
+                    {(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' ? (
+                      <HMSVideoPlayer.Progress />
+                    ) : null}
                   </Flex>
                 </>
               </HMSVideoPlayer.Root>
