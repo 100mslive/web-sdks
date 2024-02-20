@@ -90,7 +90,7 @@ export const usePinnedTrack = () => {
 
 export const useSubscribedNotifications = notificationKey => {
   const notificationPreference = useHMSStore(selectAppDataByPath(APP_DATA.subscribedNotifications, notificationKey));
-  return notificationPreference;
+  return notificationPreference || {};
 };
 
 export const useIsNotificationDisabled = () => {
