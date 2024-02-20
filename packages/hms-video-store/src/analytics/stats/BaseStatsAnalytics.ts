@@ -21,6 +21,7 @@ import { sleep } from '../../utils/timer-utils';
 export abstract class BaseStatsAnalytics {
   private shouldSendEvent = false;
   protected sequenceNum = 1;
+  protected abstract trackAnalytics: Map<string, RunningTrackAnalytics>;
 
   constructor(
     protected store: Store,
@@ -56,7 +57,11 @@ export abstract class BaseStatsAnalytics {
     }
   }
 
-  protected abstract sendEvent(): void;
+  protected sendEvent(): void {
+    this.trackAnalytics.forEach(trackAnalytic => {
+      trackAnalytic.clearSamples();
+    });
+  }
 
   protected abstract toAnalytics(): PublishAnalyticPayload | SubscribeAnalyticPayload;
 
@@ -73,8 +78,8 @@ export abstract class RunningTrackAnalytics {
   ssrc: string;
   kind: string;
   rid?: string;
-  samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
 
+  protected samples: (LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample)[] = [];
   protected tempStats: TempPublishStats[] = [];
 
   constructor({
@@ -99,22 +104,28 @@ export abstract class RunningTrackAnalytics {
     this.sampleWindowSize = sampleWindowSize;
   }
 
-  push(stat: TempPublishStats) {
+  pushTempStat(stat: TempPublishStats) {
     this.tempStats.push(stat);
-
-    if (this.shouldCreateSample()) {
-      this.samples.push(this.createSample());
-      this.tempStats.length = 0;
-    }
   }
+
+  createSample() {
+    this.samples.push(this.collateSample());
+    this.tempStats.length = 0;
+  }
+
+  clearSamples() {
+    this.samples.length = 0;
+  }
+
+  abstract shouldCreateSample: () => boolean;
+
+  protected abstract collateSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
 
   protected abstract toAnalytics: () =>
     | LocalAudioTrackAnalytics
     | LocalVideoTrackAnalytics
     | RemoteAudioTrackAnalytics
     | RemoteVideoTrackAnalytics;
-
-  protected abstract createSample: () => LocalBaseSample | LocalVideoSample | RemoteAudioSample | RemoteVideoSample;
 
   protected getLatestStat() {
     return this.tempStats[this.tempStats.length - 1];
@@ -123,8 +134,6 @@ export abstract class RunningTrackAnalytics {
   protected getFirstStat() {
     return this.tempStats[0];
   }
-
-  protected abstract shouldCreateSample: () => boolean;
 
   protected calculateSum(key: keyof TempPublishStats) {
     const checkStat = this.getLatestStat()[key];
