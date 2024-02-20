@@ -139,7 +139,7 @@ export const IconButtonWithOptions = ({
               maxHeight: 'unset',
               p: 0,
               border: 'none',
-              bg: '$surface_default',
+              bg: '$surface_dim',
             }}
           >
             {children}

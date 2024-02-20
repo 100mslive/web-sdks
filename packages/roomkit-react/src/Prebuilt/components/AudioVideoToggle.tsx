@@ -28,11 +28,13 @@ import { IconButtonWithOptions } from './IconButtonWithOptions/IconButtonWithOpt
 import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
 import { Label } from '../../Label';
-import { Flex } from '../../Layout';
+import { Box, Flex } from '../../Layout';
 import { Switch } from '../../Switch';
+import { Text } from '../../Text';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
-import { isMacOS } from '../common/constants';
+import { useAudioOutputTest } from './hooks/useAudioOutputTest';
+import { isMacOS, TEST_AUDIO_URL } from '../common/constants';
 
 // const optionsCSS = { fontWeight: '$semiBold', color: '$on_surface_high', w: '100%' };
 
@@ -52,7 +54,7 @@ export const Options = ({
           key={option.label}
           css={{
             backgroundColor: selectedDeviceId === option.deviceId ? '$surface_bright' : '$surface_dim',
-            p: '$4',
+            p: '$4 $8',
             h: '$15',
             fontSize: '$xs',
             justifyContent: 'space-between',
@@ -69,12 +71,12 @@ export const Options = ({
   );
 };
 
-const OptionLabel = ({ children, icon }: { children: string; icon: React.ReactNode }) => {
+const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: React.ReactNode }) => {
   return (
     <Dropdown.Label
       css={{
         h: '$16',
-        p: '$4',
+        p: '$4 $8',
         color: '$on_surface_low',
         bg: 'transparent',
         fontSize: '$xs',
@@ -137,6 +139,34 @@ const NoiseCancellation = () => {
   );
 };
 
+const AudioOutputLabel = ({ deviceId }: { deviceId: string }) => {
+  const { playing, setPlaying, audioRef } = useAudioOutputTest({ deviceId });
+  return (
+    <OptionLabel icon={<SpeakerIcon />}>
+      <Box css={{ flex: '1 1 0' }}>Speakers</Box>
+      <Text
+        variant="xs"
+        css={{ color: '$primary_bright', '&:hover': { cursor: 'pointer' } }}
+        onClick={async () => {
+          if (playing) {
+            return;
+          }
+          await audioRef.current?.play();
+        }}
+      >
+        <audio
+          ref={audioRef}
+          src={TEST_AUDIO_URL}
+          onEnded={() => setPlaying(false)}
+          onPlay={() => setPlaying(true)}
+          style={{ display: 'none' }}
+        />
+        {playing ? 'Playing Sound...' : 'Play Test Sound'}
+      </Text>
+    </OptionLabel>
+  );
+};
+
 export const AudioVideoToggle = ({ hideOptions = false }) => {
   const { allDevices, selectedDeviceIDs, updateDevice } = useDevices();
   const { videoInput, audioInput, audioOutput } = allDevices;
@@ -176,16 +206,20 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
               onClick={deviceId => updateDevice({ deviceId, deviceType: DeviceType.audioInput })}
             />
           </Dropdown.Group>
+          <Dropdown.ItemSeparator css={{ mx: 0 }} />
           {shouldShowAudioOutput && (
-            <Dropdown.Group>
-              <OptionLabel icon={<SpeakerIcon />}>Speakers</OptionLabel>
-              <Options
-                options={audioOutput}
-                selectedDeviceId={selectedDeviceIDs.audioOutput}
-                onClick={deviceId => updateDevice({ deviceId, deviceType: DeviceType.audioOutput })}
-              />
-            </Dropdown.Group>
+            <>
+              <AudioOutputLabel deviceId={selectedDeviceIDs.audioOutput || ''} />
+              <Dropdown.Group>
+                <Options
+                  options={audioOutput}
+                  selectedDeviceId={selectedDeviceIDs.audioOutput}
+                  onClick={deviceId => updateDevice({ deviceId, deviceType: DeviceType.audioOutput })}
+                />
+              </Dropdown.Group>
+            </>
           )}
+          <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <NoiseCancellation />
         </IconButtonWithOptions>
       ) : null}
