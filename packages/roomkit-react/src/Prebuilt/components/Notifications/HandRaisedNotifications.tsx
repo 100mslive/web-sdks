@@ -35,8 +35,11 @@ export const HandRaisedNotifications = () => {
       return;
     }
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
+    // Don't show toast message when metadata is updated and raiseHand is false.
+    // Don't show toast message in case of local peer.
     if (hasPeerHandRaised) {
       ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
+      console.debug('Metadata updated', notification.data);
     }
   }, [notification, on_stage_exp, roomState, subscribedNotifications.METADATA_UPDATED, vanillaStore]);
 
