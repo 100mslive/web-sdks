@@ -19,7 +19,7 @@ export const HandRaisedNotifications = () => {
   const roomState = useHMSStore(selectRoomState);
   const vanillaStore = useHMSVanillaStore();
   const { on_stage_exp } = useRoomLayoutConferencingScreen().elements || {};
-  const subscribedNotifications = useSubscribedNotifications();
+  const subscribedNotifications = useSubscribedNotifications() || {};
 
   useEffect(() => {
     if (!notification?.data) {
