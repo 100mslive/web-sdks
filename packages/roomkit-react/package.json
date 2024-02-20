@@ -83,8 +83,8 @@
   },
   "dependencies": {
     "@100mslive/hls-player": "0.2.6",
-    "@100mslive/hms-virtual-background": "1.12.6",
     "@100mslive/hms-noise-cancellation": "0.0.0-alpha.1",
+    "@100mslive/hms-virtual-background": "1.12.6",
     "@100mslive/react-icons": "0.9.6",
     "@100mslive/react-sdk": "0.9.6",
     "@100mslive/types-prebuilt": "0.12.7",
@@ -118,6 +118,7 @@
     "react-window": "^1.8.7",
     "recordrtc": "^5.6.2",
     "screenfull": "^5.1.0",
+    "ts-pattern": "4.3.0",
     "uuid": "^8.3.2",
     "worker-timers": "^7.0.40"
   }
