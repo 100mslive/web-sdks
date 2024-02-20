@@ -6,6 +6,7 @@ import {
   selectIsLocalAudioPluginPresent,
   selectLocalAudioTrackID,
   selectLocalVideoTrackID,
+  selectRoom,
   selectRoomState,
   selectVideoTrackByID,
   useAVToggle,
@@ -99,6 +100,7 @@ const NoiseCancellation = () => {
   const [active, setActive] = useState(isPluginAdded);
   const [inProgress, setInProgress] = useState(false);
   const actions = useHMSActions();
+  const room = useHMSStore(selectRoom);
 
   useEffect(() => {
     (async () => {
@@ -113,37 +115,40 @@ const NoiseCancellation = () => {
     })();
   }, [actions, active, isPluginAdded]);
 
-  if (!plugin.isSupported() || !localPeerAudioTrackID) {
+  if (!plugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
     return null;
   }
 
   return (
-    <Dropdown.Item
-      css={{
-        p: '$4 $8',
-        h: '$15',
-        fontSize: '$xs',
-        justifyContent: 'space-between',
-      }}
-      onClick={e => {
-        e.preventDefault();
-        setActive(value => !value);
-      }}
-    >
-      <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
-        <AudioLevelIcon />
-        Reduce Noise
-      </Text>
-      <Switch
-        id="noise_cancellation"
-        checked={active}
-        disabled={inProgress}
-        onClick={e => e.stopPropagation()}
-        onCheckedChange={value => {
-          setActive(value);
+    <>
+      <Dropdown.Item
+        css={{
+          p: '$4 $8',
+          h: '$15',
+          fontSize: '$xs',
+          justifyContent: 'space-between',
         }}
-      />
-    </Dropdown.Item>
+        onClick={e => {
+          e.preventDefault();
+          setActive(value => !value);
+        }}
+      >
+        <Text css={{ display: 'flex', alignItems: 'center', gap: '$2', fontSize: '$xs', '& svg': { size: '$8' } }}>
+          <AudioLevelIcon />
+          Reduce Noise
+        </Text>
+        <Switch
+          id="noise_cancellation"
+          checked={active}
+          disabled={inProgress}
+          onClick={e => e.stopPropagation()}
+          onCheckedChange={value => {
+            setActive(value);
+          }}
+        />
+      </Dropdown.Item>
+      <Dropdown.ItemSeparator css={{ mx: 0 }} />
+    </>
   );
 };
 
@@ -252,7 +257,6 @@ export const AudioVideoToggle = ({ hideOptions = false }) => {
           )}
           <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <NoiseCancellation />
-          <Dropdown.ItemSeparator css={{ mx: 0 }} />
           <AudioSettings onClick={() => setShowSettings(true)} />
         </IconButtonWithOptions>
       ) : null}
