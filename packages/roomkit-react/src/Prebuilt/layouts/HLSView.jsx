@@ -289,20 +289,33 @@ const HLSView = () => {
     };
   }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
 
-  const onHoverHandler = useCallback(
+  const onTouchHandler = useCallback(
     event => {
-      event.stopPropagation();
+      event.preventDefault();
       // logic for invisible when tapping
-      if (event.type === 'mouseenter' && controlsVisible && (isMobile || isLandscape)) {
+      if (event.type === 'ontouchstart' && controlsVisible) {
         setControlsVisible(false);
         return;
       }
       // normal scemnario
-      if (event.type === 'mouseenter' || qualityDropDownOpen) {
+      if (event.type === 'ontouchstart' || qualityDropDownOpen) {
         setControlsVisible(true);
         return;
       }
-      if (isMobile || isLandscape) {
+      if (isFullScreen && !controlsVisible && event.type === 'touchmove') {
+        setControlsVisible(true);
+        if (controlsTimerRef.current) {
+          clearTimeout(controlsTimerRef.current);
+        }
+      }
+    },
+    [controlsVisible, isFullScreen, qualityDropDownOpen],
+  );
+  const onHoverHandler = useCallback(
+    event => {
+      // normal scemnario
+      if (event.type === 'mouseenter' || qualityDropDownOpen) {
+        setControlsVisible(true);
         return;
       }
       if (event.type === 'mouseleave') {
@@ -314,7 +327,7 @@ const HLSView = () => {
         }
       }
     },
-    [controlsVisible, isFullScreen, isLandscape, isMobile, qualityDropDownOpen],
+    [controlsVisible, isFullScreen, qualityDropDownOpen],
   );
 
   return (
@@ -360,6 +373,8 @@ const HLSView = () => {
                 onMouseEnter={onHoverHandler}
                 onMouseMove={onHoverHandler}
                 onMouseLeave={onHoverHandler}
+                onTouchStart={onTouchHandler}
+                onTouchMove={onTouchHandler}
               >
                 <>
                   {isMobile || isLandscape ? (
