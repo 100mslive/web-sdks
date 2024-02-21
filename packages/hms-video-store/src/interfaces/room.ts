@@ -41,7 +41,7 @@ export interface HMSRoom {
    * @alpha
    */
   effectsKey?: string;
-  isHippaEnabled?: boolean;
+  isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
 }
 
