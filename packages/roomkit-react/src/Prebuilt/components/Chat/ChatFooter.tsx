@@ -92,9 +92,13 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      inputRef.current?.focus();
+      // @ts-ignore
+      if (!elements?.chat?.disable_autofocus) {
+        inputRef.current?.focus();
+      }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector]);
+    // @ts-ignore
+  }, [defaultSelection, elements?.chat?.disable_autofocus, selectedPeer, selectedRole, setRoleSelector]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
