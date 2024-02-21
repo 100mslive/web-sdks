@@ -5,6 +5,7 @@ import { config as cssConfig, Flex } from '../../..';
 // @ts-ignore: No implicit any
 import { Logo, SpeakerTag } from './HeaderComponents';
 // @ts-ignore: No implicit any
+import { RoomDetailsHeader } from './RoomDetailsHeader';
 import { LiveStatus, RecordingPauseStatus, RecordingStatus, StreamActions } from './StreamActions';
 // @ts-ignore: No implicit any
 import { AudioActions, CamaraFlipActions } from './common';
@@ -20,6 +21,7 @@ export const Header = () => {
     <Flex justify="between" align="center" css={{ position: 'relative', height: '100%' }}>
       <Flex align="center" gap="2" css={{ position: 'absolute', left: '$10' }}>
         <Logo />
+        <RoomDetailsHeader />
         <SpeakerTag />
         {isMobile && (
           <Flex align="center" css={{ gap: '$4' }}>

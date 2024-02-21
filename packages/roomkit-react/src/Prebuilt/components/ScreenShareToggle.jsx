@@ -1,5 +1,5 @@
 import React, { Fragment } from 'react';
-import { selectIsAllowedToPublish, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
+import { selectIsAllowedToPublish, useAwayNotifications, useHMSStore, useScreenShare } from '@100mslive/react-sdk';
 import { ShareScreenIcon } from '@100mslive/react-icons';
 import { ShareScreenOptions } from './pdfAnnotator/shareScreenOptions';
 import { Box, Flex } from '../../Layout';
@@ -14,6 +14,7 @@ export const ScreenshareToggle = ({ css = {} }) => {
   const isAudioOnly = useUISettings(UI_SETTINGS.isAudioOnly);
 
   const { amIScreenSharing, screenShareVideoTrackId: video, toggleScreenShare } = useScreenShare();
+  const { requestPermission } = useAwayNotifications();
   const isVideoScreenshare = amIScreenSharing && !!video;
   if (!isAllowedToPublish.screen || !isScreenshareSupported()) {
     return null;
@@ -28,8 +29,9 @@ export const ScreenshareToggle = ({ css = {} }) => {
           active={!isVideoScreenshare}
           css={css}
           disabled={isAudioOnly}
-          onClick={() => {
-            toggleScreenShare();
+          onClick={async () => {
+            await toggleScreenShare();
+            await requestPermission();
           }}
         >
           <Tooltip title={`${!isVideoScreenshare ? 'Start' : 'Stop'} screen sharing`}>

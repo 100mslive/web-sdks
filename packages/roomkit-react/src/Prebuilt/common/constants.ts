@@ -46,8 +46,9 @@ export const APP_DATA = {
   disableNotifications: 'disableNotifications',
   pollState: 'pollState',
   background: 'background',
-  backgroundType: 'backgroundType',
+  sheet: 'sheet',
 };
+
 export const UI_SETTINGS = {
   isAudioOnly: 'isAudioOnly',
   maxTileCount: 'maxTileCount',
@@ -64,6 +65,11 @@ export const SIDE_PANE_OPTIONS = {
   STREAMING: 'STREAMING',
   POLLS: 'POLLS',
   VB: 'VB',
+  ROOM_DETAILS: 'ROOM_DETAILS',
+};
+
+export const SHEET_OPTIONS = {
+  ROOM_DETAILS: 'ROOM_DETAILS',
 };
 
 export const POLL_STATE = {
@@ -92,11 +98,12 @@ export const HLS_TIMED_METADATA_DOC_URL =
 
 export const REMOTE_STOP_SCREENSHARE_TYPE = 'REMOTE_STOP_SCREENSHARE';
 
-export const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'chrome';
-export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'firefox';
-export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase() === 'safari';
+// mweb could have browser name as "Mobile Chrome" or "Mobile Firefox"
+export const isChrome = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('chrome');
+export const isFirefox = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('firefox');
+export const isSafari = parsedUserAgent.getBrowser()?.name?.toLowerCase().includes('safari');
 export const isIOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'ios';
-export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'mac os';
+export const isMacOS = parsedUserAgent.getOS()?.name?.toLowerCase() === 'macos';
 export const isAndroid = parsedUserAgent.getOS()?.name?.toLowerCase() === 'android';
 export const isIPadOS = false;
 // typeof navigator !== "undefined" &&
@@ -136,3 +143,5 @@ export enum QUESTION_TYPE {
 export const ROLE_CHANGE_DECLINED = 'role_change_declined';
 
 export const DEFAULT_PORTAL_CONTAINER = '.prebuilt-container';
+
+export const TEST_AUDIO_URL = 'https://100ms.live/test-audio.wav';

@@ -136,7 +136,7 @@ const Link = styled('a', {
   },
 });
 
-export const AnnotisedMessage = ({ message }: { message: string }) => {
+export const AnnotisedMessage = ({ message, length }: { message: string; length?: number }) => {
   if (!message) {
     return <Fragment />;
   }
@@ -149,10 +149,10 @@ export const AnnotisedMessage = ({ message }: { message: string }) => {
         .map(part =>
           URL_REGEX.test(part) ? (
             <Link href={part} key={part} target="_blank" rel="noopener noreferrer">
-              {part}
+              {part.slice(0, length)}
             </Link>
           ) : (
-            part
+            part.slice(0, length)
           ),
         )}
     </Fragment>

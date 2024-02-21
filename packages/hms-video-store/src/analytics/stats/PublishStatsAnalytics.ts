@@ -41,21 +41,28 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
 
   protected sendEvent() {
     this.eventBus.analytics.publish(AnalyticsEventFactory.publishStats(this.toAnalytics()));
+    super.sendEvent();
   }
 
   protected handleStatsUpdate(hmsStats: HMSWebrtcStats) {
+    let shouldCreateSample = false;
+
     const localTracksStats = hmsStats.getLocalTrackStats();
     Object.keys(localTracksStats).forEach(trackIDBeingSent => {
       const trackStats = localTracksStats[trackIDBeingSent];
       const track = this.store.getLocalPeerTracks().find(track => track.getTrackIDBeingSent() === trackIDBeingSent);
       Object.keys(trackStats).forEach(statId => {
         const layerStats = trackStats[statId];
-        const identifier = track && this.getTrackIdentifier(track?.trackId, layerStats);
+        if (!track) {
+          return;
+        }
+        const identifier = this.getTrackIdentifier(track.trackId, layerStats);
+        const newTempStats = {
+          ...layerStats,
+          availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
+        };
         if (identifier && this.trackAnalytics.has(identifier)) {
-          this.trackAnalytics.get(identifier)?.push({
-            ...layerStats,
-            availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
-          });
+          this.trackAnalytics.get(identifier)?.pushTempStat(newTempStats);
         } else {
           if (track) {
             const trackAnalytics = new RunningLocalTrackAnalytics({
@@ -65,15 +72,23 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
               ssrc: layerStats.ssrc.toString(),
               kind: layerStats.kind,
             });
-            trackAnalytics.push({
-              ...layerStats,
-              availableOutgoingBitrate: hmsStats.getLocalPeerStats()?.publish?.availableOutgoingBitrate,
-            });
-            this.trackAnalytics.set(this.getTrackIdentifier(track?.trackId, layerStats), trackAnalytics);
+            trackAnalytics.pushTempStat(newTempStats);
+            this.trackAnalytics.set(this.getTrackIdentifier(track.trackId, layerStats), trackAnalytics);
           }
+        }
+
+        const trackAnalytics = this.trackAnalytics.get(identifier);
+        if (trackAnalytics?.shouldCreateSample()) {
+          shouldCreateSample = true;
         }
       });
     });
+
+    if (shouldCreateSample) {
+      this.trackAnalytics.forEach(trackAnalytic => {
+        trackAnalytic.createSample();
+      });
+    }
   }
 
   private getTrackIdentifier(trackId: string, stats: HMSTrackStats) {
@@ -84,7 +99,7 @@ export class PublishStatsAnalytics extends BaseStatsAnalytics {
 class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
   samples: (LocalBaseSample | LocalVideoSample)[] = [];
 
-  protected createSample = (): LocalBaseSample | LocalVideoSample => {
+  protected collateSample = (): LocalBaseSample | LocalVideoSample => {
     const latestStat = this.getLatestStat();
 
     const qualityLimitationDurations = latestStat.qualityLimitationDurations;
@@ -124,7 +139,7 @@ class RunningLocalTrackAnalytics extends RunningTrackAnalytics {
     });
   };
 
-  protected shouldCreateSample = () => {
+  shouldCreateSample = () => {
     const length = this.tempStats.length;
     const newStat = this.tempStats[length - 1];
     const prevStat = this.tempStats[length - 2];

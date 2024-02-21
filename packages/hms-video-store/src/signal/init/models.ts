@@ -58,4 +58,6 @@ export enum InitFlags {
   FLAG_DISABLE_VIDEO_TRACK_AUTO_UNSUBSCRIBE = 'disableVideoTrackAutoUnsubscribe',
   FLAG_WHITEBOARD_ENABLED = 'whiteboardEnabled',
   FLAG_EFFECTS_SDK_ENABLED = 'effectsSDKEnabled',
+  FLAG_HIPPA_ENABLED = 'hippa',
+  FLAG_NOISE_CANCELLATION = 'noiseCancellation',
 }
