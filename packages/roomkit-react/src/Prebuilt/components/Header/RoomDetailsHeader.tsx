@@ -13,7 +13,7 @@ import { SHEET_OPTIONS, SIDE_PANE_OPTIONS } from '../../common/constants';
 export const RoomDetailsHeader = () => {
   const { title, description } = useRoomLayoutHeader();
   const isMobile = useMedia(cssConfig.media.md);
-  const clipLength = 80;
+  const clipLength = 30;
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
 
