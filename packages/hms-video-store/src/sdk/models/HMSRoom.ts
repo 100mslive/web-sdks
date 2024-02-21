@@ -22,7 +22,7 @@ export default class Room implements HMSRoom {
    * @alpha
    */
   effectsKey?: string;
-  isHippaEnabled?: boolean;
+  isHipaaEnabled?: boolean;
   isNoiseCancellationEnabled?: boolean;
 
   constructor(id: string) {
