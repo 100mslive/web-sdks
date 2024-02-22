@@ -96,7 +96,15 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     };
 
     if (latestStat.kind === 'video') {
-      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(baseSample);
+      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(
+        Object.assign(baseSample, {
+          avg_frames_received_per_sec: this.calculateDifferenceAverage('framesReceived'),
+          avg_frames_dropped_per_sec: this.calculateDifferenceAverage('framesDropped'),
+          avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
+          frame_width: this.calculateAverage('frameWidth'),
+          frame_height: this.calculateAverage('frameHeight'),
+        }),
+      );
     } else {
       const audio_concealed_samples =
         (latestStat.concealedSamples || 0) -

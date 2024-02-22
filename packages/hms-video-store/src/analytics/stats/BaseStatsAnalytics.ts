@@ -158,6 +158,11 @@ export abstract class RunningTrackAnalytics {
     return latestValue - firstValue;
   }
 
+  protected calculateDifferenceAverage(key: keyof TempPublishStats, round = true) {
+    const avg = this.calculateDifferenceForSample(key) / this.tempStats.length;
+    return round ? Math.round(avg) : avg;
+  }
+
   protected calculateInstancesOfHigh(key: keyof TempPublishStats, threshold: number) {
     const checkStat = this.getLatestStat()[key];
     if (typeof checkStat !== 'number') {
