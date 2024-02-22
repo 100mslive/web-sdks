@@ -12,12 +12,12 @@ import {
   HMSVideoTrackSettings as IHMSVideoTrackSettings,
   ScreenCaptureHandle,
 } from '../../interfaces';
-import { isBrowser } from '../../internal';
 import { HMSPluginSupportResult, HMSVideoPlugin } from '../../plugins';
 import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/video';
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
+import { isBrowser, isMobile } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -82,7 +82,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
     this.setFirstTrackId(this.trackId);
-    if (isBrowser) {
+    if (isBrowser && isMobile()) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
@@ -237,7 +237,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
-    if (isBrowser) {
+    if (isBrowser && isMobile()) {
       document.removeEventListener('visibilitychange', this.handleVisibilityChange);
     }
   }
