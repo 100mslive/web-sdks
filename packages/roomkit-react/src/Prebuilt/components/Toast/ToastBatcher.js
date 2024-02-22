@@ -45,6 +45,9 @@ export const ToastBatcher = {
         this.showToastInternal({ notification, duration, type });
       }
       this.toastCache[notification.id] = true;
+      if (Object.keys(this.toastCache).length > 100) {
+        this.toastCache = {};
+      }
     } catch (err) {
       console.debug('Notifications', err);
     }
