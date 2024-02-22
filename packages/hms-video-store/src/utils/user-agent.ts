@@ -45,7 +45,10 @@ export async function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HM
    */
   const parsedOs = await parsedUserAgent.getOS().withClientHints();
   const parsedDevice = await parsedUserAgent.getDevice().withClientHints();
-  const parsedBrowser = await parsedUserAgent.getBrowser().withClientHints();
+  // const parsedBrowser = await parsedUserAgent.getBrowser().withClientHints();
+  const parsedBrowser = parsedUserAgent.getBrowser();
+
+  // console.log('log ', parsedBrowser, parsedBrowser1);
 
   const os = replaceSpaces(`web_${parsedOs.name}`);
   const os_version = parsedOs.version || '';
