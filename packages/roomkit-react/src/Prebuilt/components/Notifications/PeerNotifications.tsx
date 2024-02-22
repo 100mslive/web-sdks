@@ -20,7 +20,8 @@ export const PeerNotifications = () => {
   const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
 
   useEffect(() => {
-    if (!notification?.data) {
+    // @ts-ignore
+    if (!notification?.data || !notification.data?.id) {
       return;
     }
 
