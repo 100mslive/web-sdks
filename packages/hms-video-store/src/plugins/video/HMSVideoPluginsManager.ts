@@ -6,7 +6,7 @@ import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
 import { HMSLocalVideoTrack } from '../../media/tracks';
 import HMSLogger from '../../utils/logger';
-import { reusableWorker } from '../../utils/timer-utils';
+import { reusableWorker, workerSleep } from '../../utils/timer-utils';
 import { HMSPluginUnsupportedTypes } from '../audio';
 
 const DEFAULT_FRAME_RATE = 24;
@@ -217,8 +217,9 @@ export class HMSVideoPluginsManager {
       return;
     }
     while (this.pluginsLoopState === 'paused') {
-      await this.reusableWorker.sleep(100);
+      await workerSleep(100);
     }
+    console.log('wait done');
   }
 
   /**
