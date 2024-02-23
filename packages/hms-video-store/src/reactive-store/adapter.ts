@@ -157,6 +157,8 @@ export class SDKToHMS {
       isLargeRoom: sdkRoom.large_room_optimization,
       isEffectsEnabled: sdkRoom.isEffectsEnabled,
       effectsKey: sdkRoom.effectsKey,
+      isHipaaEnabled: sdkRoom.isHipaaEnabled,
+      isNoiseCancellationEnabled: sdkRoom.isNoiseCancellationEnabled,
     };
   }
 

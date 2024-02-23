@@ -4,9 +4,11 @@ import {
   HMSNotificationTypes,
   HMSRoleChangeRequest,
   HMSRoomState,
+  selectIsLocalScreenShared,
   selectLocalPeerID,
   selectPeerNameByID,
   selectRoomState,
+  useAwayNotifications,
   useCustomEvent,
   useHMSNotifications,
   useHMSStore,
@@ -14,9 +16,7 @@ import {
 } from '@100mslive/react-sdk';
 import { GroupIcon } from '@100mslive/react-icons';
 import { Box, Button } from '../../..';
-import { useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
-// @ts-ignore: No implicit Any
-import { ToastBatcher } from '../Toast/ToastBatcher';
+import { useRoomLayout, useUpdateRoomLayout } from '../../provider/roomLayoutProvider';
 // @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { AutoplayBlockedModal } from './AutoplayBlockedModal';
@@ -34,8 +34,6 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { usePollViewToggle } from '../AppData/useSidepane';
 // @ts-ignore: No implicit Any
 import { useIsNotificationDisabled, useSubscribedNotifications } from '../AppData/useUISettings';
-// @ts-ignore: No implicit Any
-import { getMetadata } from '../../common/utils';
 import { ROLE_CHANGE_DECLINED } from '../../common/constants';
 
 const pollToastKey: Record<string, string> = {};
@@ -50,6 +48,9 @@ export function Notifications() {
   const screenProps = useRoomLayoutConferencingScreen();
   const vanillaStore = useHMSVanillaStore();
   const togglePollView = usePollViewToggle();
+  const { showNotification } = useAwayNotifications();
+  const amIScreenSharing = useHMSStore(selectIsLocalScreenShared);
+  const logoURL = useRoomLayout()?.logo?.url;
 
   const handleRoleChangeDenied = useCallback((request: HMSRoleChangeRequest & { peerName: string }) => {
     ToastManager.addToast({
@@ -65,19 +66,6 @@ export function Notifications() {
       return;
     }
     switch (notification.type) {
-      case HMSNotificationTypes.METADATA_UPDATED:
-        if (roomState !== HMSRoomState.Connected) {
-          return;
-        }
-        // Don't show toast message when metadata is updated and raiseHand is false.
-        // Don't show toast message in case of local peer.
-        const metadata = getMetadata(notification.data?.metadata);
-        if (!metadata?.isHandRaised || notification.data.isLocal) return;
-
-        console.debug('Metadata updated', notification.data);
-        if (!subscribedNotifications.METADATA_UPDATED) return;
-        ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
-        break;
       case HMSNotificationTypes.NAME_UPDATED:
         console.log(notification.data.id + ' changed their name to ' + notification.data.name);
         break;
@@ -180,6 +168,14 @@ export function Notifications() {
         if (pollID && pollToastKey?.[pollID]) {
           ToastManager.removeToast(pollToastKey?.[notification.data.id]);
           delete pollToastKey[notification?.data.id];
+        }
+        break;
+      case HMSNotificationTypes.NEW_MESSAGE:
+        if (amIScreenSharing) {
+          showNotification(`New message from ${notification.data.senderName}`, {
+            body: notification.data.message,
+            icon: logoURL,
+          });
         }
         break;
       default:

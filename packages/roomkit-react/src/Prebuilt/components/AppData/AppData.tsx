@@ -54,6 +54,7 @@ const initialAppData = {
   },
   [APP_DATA.chatDraft]: '',
   [APP_DATA.sidePane]: '',
+  [APP_DATA.sheet]: '',
   [APP_DATA.hlsStarted]: false,
   [APP_DATA.rtmpStarted]: false,
   [APP_DATA.recordingStarted]: false,

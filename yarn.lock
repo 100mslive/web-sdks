@@ -2,10 +2,15 @@
 # yarn lockfile v1
 
 
-"@100mslive/types-prebuilt@0.12.6":
-  version "0.12.6"
-  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.6.tgz#d0dd91b9cf7d425d80e7595ed0519bfdf2f3b14d"
-  integrity sha512-DqwWMlGRrDCqyvr32pfijPlh1LfNCBZtEHnPHf7pAXEhR+Eh+jC19vSVCu9WpWkzlhLgxic3cAP88fkyuUTL1g==
+"@100mslive/hms-noise-cancellation@0.0.0-alpha.1":
+  version "0.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@100mslive/hms-noise-cancellation/-/hms-noise-cancellation-0.0.0-alpha.1.tgz#894adbbbc8da757228d98719d3fc17abe129b11f"
+  integrity sha512-GZpycuSW0uA73vbOJy7AKs6xc8U+ifzm9xIOEwtAA28VubeyaEP9LbaP7NWrUkqAmkGl9fRMuxQWoG3gKYek2Q==
+
+"@100mslive/types-prebuilt@0.12.7":
+  version "0.12.7"
+  resolved "https://registry.yarnpkg.com/@100mslive/types-prebuilt/-/types-prebuilt-0.12.7.tgz#66e26701964a8c7a0ab7df4787ac64ad8f8870f4"
+  integrity sha512-GsDJCZA74+wuBorERQbVA0isRUQduBZzkyzRfMhFA29ZDaVTManrnwamf9TrZvrFJRFTVhZ6lv05oUaauqJRjA==
 
 "@aashutoshrathi/word-wrap@^1.2.3":
   version "1.2.6"
@@ -10800,9 +10805,9 @@ invariant@^2.2.4:
     loose-envify "^1.0.0"
 
 ip@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/ip/-/ip-2.0.0.tgz#4cf4ab182fee2314c75ede1276f8c80b479936da"
-  integrity sha512-WKa+XuLG1A1R0UWhl2+1XQSi+fZWMsYKffMZTTYsiZaUD8k2yDAj5atimTUD2TZkyCkNEeYE5NhFZmupOGtjYQ==
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-2.0.1.tgz#e8f3595d33a3ea66490204234b77636965307105"
+  integrity sha512-lJUL9imLTNi1ZfXT+DU6rBBdbiKGBuay9B6xGSPVjUeQwaH1RIGqef8RZkUtHioLmSNpPR5M4HVKJGm1j8FWVQ==
 
 ipaddr.js@1.9.1:
   version "1.9.1"
