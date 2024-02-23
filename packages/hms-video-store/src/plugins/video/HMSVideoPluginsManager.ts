@@ -219,7 +219,6 @@ export class HMSVideoPluginsManager {
     while (this.pluginsLoopState === 'paused') {
       await workerSleep(100);
     }
-    console.log('wait done');
   }
 
   /**
