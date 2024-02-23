@@ -50,6 +50,12 @@ export interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCo
   fecPacketsDiscarded?: number;
   fecPacketsReceived?: number;
   totalSamplesDuration?: number;
+  pauseCount?: number;
+  totalPausesDuration?: number;
+  freezeCount?: number;
+  totalFreezesDuration?: number;
+  jitterBufferDelay?: number;
+  jitterBufferEmittedCount?: number;
 }
 
 export type PeerConnectionType = 'publish' | 'subscribe';

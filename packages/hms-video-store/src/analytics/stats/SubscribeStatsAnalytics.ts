@@ -49,8 +49,12 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     Object.keys(remoteTracksStats).forEach(trackID => {
       const trackStats = remoteTracksStats[trackID];
       const track = this.store.getTrackById(trackID);
+      const calculatedJitterBufferDelay =
+        trackStats.jitterBufferDelay &&
+        trackStats.jitterBufferEmittedCount &&
+        trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount;
       if (this.trackAnalytics.has(trackID)) {
-        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats });
+        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats, calculatedJitterBufferDelay });
       } else {
         if (track) {
           const trackAnalytics = new RunningRemoteTrackAnalytics({
@@ -59,7 +63,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
             ssrc: trackStats.ssrc.toString(),
             kind: trackStats.kind,
           });
-          trackAnalytics.pushTempStat({ ...trackStats });
+          trackAnalytics.pushTempStat({ ...trackStats, calculatedJitterBufferDelay });
           this.trackAnalytics.set(trackID, trackAnalytics);
         }
       }
@@ -103,6 +107,11 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
           avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
           frame_width: this.calculateAverage('frameWidth'),
           frame_height: this.calculateAverage('frameHeight'),
+          pause_count: this.calculateDifferenceForSample('pauseCount'),
+          pause_duration_seconds: this.calculateDifferenceForSample('totalPausesDuration'),
+          freeze_count: this.calculateDifferenceForSample('freezeCount'),
+          freeze_duration_seconds: this.calculateDifferenceForSample('totalFreezesDuration'),
+          avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
         }),
       );
     } else {
