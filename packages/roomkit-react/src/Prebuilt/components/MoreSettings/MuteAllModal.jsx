@@ -22,7 +22,7 @@ const trackTypeOptions = [
 export const MuteAllModal = ({ onOpenChange, isMobile = false }) => {
   const roles = useFilteredRoles();
   const hmsActions = useHMSActions();
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState();
   const [trackType, setTrackType] = useState();
   const [selectedRole, setRole] = useState();
   const [selectedSource, setSource] = useState();

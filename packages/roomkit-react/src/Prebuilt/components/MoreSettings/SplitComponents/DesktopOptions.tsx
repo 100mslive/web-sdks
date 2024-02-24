@@ -5,8 +5,16 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
-import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
-import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
+import { selectAppData, selectLocalPeerID, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
+import {
+  BrbIcon,
+  CheckIcon,
+  HamburgerMenuIcon,
+  InfoIcon,
+  MicOffIcon,
+  PipIcon,
+  SettingsIcon,
+} from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
 // @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
@@ -55,6 +63,7 @@ export const DesktopOptions = ({
   screenType: keyof ConferencingScreen;
 }) => {
   const localPeerId = useHMSStore(selectLocalPeerID);
+  const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const [openModals, setOpenModals] = useState(new Set());
@@ -105,6 +114,15 @@ export const DesktopOptions = ({
             },
           }}
         >
+          {(permissions?.mute || permissions?.unmute) && screenType !== 'hls_live_streaming' ? (
+            <Dropdown.Item onClick={() => updateState(MODALS.MUTE_ALL, true)} data-testid="mute_all_btn">
+              <MicOffIcon />
+              <Text variant="sm" css={{ ml: '$4', color: '$on_surface_high' }}>
+                Mute All
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+
           {isBRBEnabled && screenType !== 'hls_live_streaming' ? (
             <Dropdown.Item onClick={toggleBRB} data-testid="brb_btn">
               <BrbIcon />

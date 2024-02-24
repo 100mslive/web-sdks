@@ -1,4 +1,5 @@
 import React from 'react';
+import { selectPermissions, useHMSStore } from '@100mslive/react-sdk';
 import { Button } from '../../../Button';
 import { Label } from '../../../Label';
 import { Flex } from '../../../Layout';
@@ -8,6 +9,7 @@ import { DialogRow, DialogSelect } from '../../primitives/DialogContent';
 
 export const MuteAllContent = props => {
   const roles = props.roles || [];
+  const permissions = useHMSStore(selectPermissions);
   return (
     <>
       <DialogSelect
@@ -37,18 +39,22 @@ export const MuteAllContent = props => {
       <DialogRow>
         <Text variant="md">Track status</Text>
         <RadioGroup.Root value={props.enabled} onValueChange={props.setEnabled}>
-          <Flex align="center" css={{ mr: '$8' }}>
-            <RadioGroup.Item value={false} id="trackDisableRadio" css={{ mr: '$4' }}>
-              <RadioGroup.Indicator />
-            </RadioGroup.Item>
-            <Label htmlFor="trackDisableRadio">Mute</Label>
-          </Flex>
-          <Flex align="center" css={{ cursor: 'pointer' }}>
-            <RadioGroup.Item value={true} id="trackEnableRadio" css={{ mr: '$4' }}>
-              <RadioGroup.Indicator />
-            </RadioGroup.Item>
-            <Label htmlFor="trackEnableRadio">Request Unmute</Label>
-          </Flex>
+          {permissions?.mute && (
+            <Flex align="center" css={{ mr: '$8' }}>
+              <RadioGroup.Item value={false} id="trackDisableRadio" css={{ mr: '$4' }}>
+                <RadioGroup.Indicator />
+              </RadioGroup.Item>
+              <Label htmlFor="trackDisableRadio">Mute</Label>
+            </Flex>
+          )}
+          {permissions?.unmute && (
+            <Flex align="center" css={{ cursor: 'pointer' }}>
+              <RadioGroup.Item value={true} id="trackEnableRadio" css={{ mr: '$4' }}>
+                <RadioGroup.Indicator />
+              </RadioGroup.Item>
+              <Label htmlFor="trackEnableRadio">Request Unmute</Label>
+            </Flex>
+          )}
         </RadioGroup.Root>
       </DialogRow>
       <DialogRow justify="end">
