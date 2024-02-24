@@ -18,6 +18,7 @@ import {
   HandIcon,
   HandRaiseSlashedIcon,
   InfoIcon,
+  MicOffIcon,
   PeopleIcon,
   QuizActiveIcon,
   QuizIcon,
@@ -233,6 +234,17 @@ export const MwebOptions = ({
                 <ActionTile.Title>Be Right Back</ActionTile.Title>
               </ActionTile.Root>
             )}
+
+            {permissions?.mute || permissions?.unmute ? (
+              <ActionTile.Root
+                onClick={() => {
+                  updateState(MODALS.MUTE_ALL, true);
+                }}
+              >
+                <MicOffIcon />
+                <ActionTile.Title>Mute All</ActionTile.Title>
+              </ActionTile.Root>
+            ) : null}
 
             <ActionTile.Root
               onClick={() => {
