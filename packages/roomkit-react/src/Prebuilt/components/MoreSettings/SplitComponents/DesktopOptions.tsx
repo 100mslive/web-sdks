@@ -178,7 +178,7 @@ export const DesktopOptions = ({
             .otherwise(() => (
               <Dropdown.Item
                 onClick={() => updateState(MODALS.STATS_FOR_NERDS, true)}
-                data-testid="stats_for_nreds_btn"
+                data-testid="stats_for_nerds_btn"
               >
                 <InfoIcon />
                 <Text variant="sm" css={{ ml: '$4' }}>
