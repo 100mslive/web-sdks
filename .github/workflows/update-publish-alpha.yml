@@ -1,26 +1,22 @@
 name: Update publish-alpha
-
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - main
 
 jobs:
-  create-pr:
-    name: Create PR from main to publish-alpha
+  pull-request:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Create PR
-        uses: peter-evans/create-pull-request@v3
+      - uses: actions/checkout@v1
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        if: github.event.pull_request.merged == true
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Merge main into publish-alpha"
-          title: "Merge main into publish-alpha"
-          body: |
-            This PR merges changes from the main branch into the publish-alpha branch.
-          branch: publish-alpha
-          base: main
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: 'main'
+          destination_branch: 'publish-alpha'
+          pr_title: 'Update publish-alpha'
+          pr_body: ':robot: Automated PR from main to publish-alpha'
+          pr_label: 'auto-pr'
