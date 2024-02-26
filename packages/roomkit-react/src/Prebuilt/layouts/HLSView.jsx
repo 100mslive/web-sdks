@@ -271,7 +271,7 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (controlsVisible && isFullScreen && !qualityDropDownOpen) {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
@@ -288,30 +288,16 @@ const HLSView = () => {
         clearTimeout(controlsTimerRef.current);
       }
     };
-  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
+  }, [controlsVisible, isFullScreen, qualityDropDownOpen]); */
 
-  const onTouchHandler = useCallback(
-    event => {
-      event.preventDefault();
-      // logic for invisible when tapping
-      if (event.type === 'touchstart' && controlsVisible) {
-        setControlsVisible(false);
-        return;
-      }
-      // normal scemnario
-      if ((event.type === 'touchstart' || qualityDropDownOpen) && !controlsVisible) {
-        setControlsVisible(true);
-        return;
-      }
-      if (isFullScreen && !controlsVisible && event.type === 'touchmove') {
-        setControlsVisible(true);
-        if (controlsTimerRef.current) {
-          clearTimeout(controlsTimerRef.current);
-        }
-      }
-    },
-    [controlsVisible, isFullScreen, qualityDropDownOpen],
-  );
+  const onTouchHandler = useCallback(() => {
+    // logic for invisible when tapping
+
+    setControlsVisible(value => !value);
+    if (controlsTimerRef.current) {
+      clearTimeout(controlsTimerRef.current);
+    }
+  }, []);
   const onHoverHandler = useCallback(
     event => {
       event.preventDefault();
@@ -378,8 +364,8 @@ const HLSView = () => {
                 onMouseEnter={onHoverHandler}
                 onMouseMove={onHoverHandler}
                 onMouseLeave={onHoverHandler}
-                onTouchStart={onTouchHandler}
-                onTouchMove={onTouchHandler}
+                onClick={onTouchHandler}
+                // onDoubleClick={onTouchHandler}
               >
                 <>
                   {isMobile || isLandscape ? (

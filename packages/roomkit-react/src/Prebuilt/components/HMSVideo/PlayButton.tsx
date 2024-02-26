@@ -15,7 +15,6 @@ export const PlayButton = ({
   const { hlsPlayer } = useHMSPlayerContext();
   const onClick = async (event: MouseEvent) => {
     event?.stopPropagation();
-    event?.preventDefault();
     isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
   };
   return (
