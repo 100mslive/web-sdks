@@ -1,0 +1,22 @@
+name: Update publish-alpha
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        if: github.event.pull_request.merged == true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: 'main'
+          destination_branch: 'publish-alpha'
+          pr_title: 'Update publish-alpha'
+          pr_body: ':robot: Automated PR from main to publish-alpha'
+          pr_label: 'auto-pr'

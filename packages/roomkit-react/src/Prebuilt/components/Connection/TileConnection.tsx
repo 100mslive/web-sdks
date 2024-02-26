@@ -24,33 +24,35 @@ const TileConnection = ({
     <Wrapper>
       {!hideLabel ? (
         <>
-          <Flex align="center">
-            {isPeerScreenSharing && (
-              <IconWrapper>
-                <ShareScreenIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            {pinned && (
-              <IconWrapper>
-                <PinIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            {spotlighted && (
-              <IconWrapper>
-                <SpotlightIcon width="15" height="15" />
-              </IconWrapper>
-            )}
-            <Text
-              css={{
-                c: '$on_surface_high',
-                verticalAlign: 'baseline',
-                ...(width ? textEllipsis((width as number) - 60) : {}),
-              }}
-              variant="xs"
-            >
-              {name}
-            </Text>
-          </Flex>
+          {name ? (
+            <Flex align="center">
+              {isPeerScreenSharing && (
+                <IconWrapper>
+                  <ShareScreenIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              {pinned && (
+                <IconWrapper>
+                  <PinIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              {spotlighted && (
+                <IconWrapper>
+                  <SpotlightIcon width="15" height="15" />
+                </IconWrapper>
+              )}
+              <Text
+                css={{
+                  c: '$on_surface_high',
+                  verticalAlign: 'baseline',
+                  ...(width ? textEllipsis((width as number) - 60) : {}),
+                }}
+                variant="xs"
+              >
+                {name}
+              </Text>
+            </Flex>
+          ) : null}
           <ConnectionIndicator isTile peerId={peerId} hideBg />
         </>
       ) : null}
@@ -70,6 +72,7 @@ const Wrapper = styled('div', {
   backgroundColor: '$background_dim',
   borderRadius: '$1',
   maxWidth: '85%',
+  zIndex: 1,
   '& p,span': {
     p: '$2 $3',
   },
