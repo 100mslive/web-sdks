@@ -37,6 +37,7 @@ interface MissingOutboundStats extends RTCOutboundRtpStreamStats, MissingCommonS
 
 export interface MissingInboundStats extends RTCInboundRtpStreamStats, MissingCommonStats {
   bytesReceived?: number;
+  framesReceived?: number;
   framesDropped?: number;
   jitter?: number;
   packetsLost?: number;
