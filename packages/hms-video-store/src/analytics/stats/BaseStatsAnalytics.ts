@@ -68,7 +68,11 @@ export abstract class BaseStatsAnalytics {
   protected abstract handleStatsUpdate(hmsStats: HMSWebrtcStats): void;
 }
 
-type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number; calculatedJitterBufferDelay?: number };
+type TempPublishStats = HMSTrackStats & {
+  availableOutgoingBitrate?: number;
+  calculatedJitterBufferDelay?: number;
+  avSync?: number;
+};
 
 export abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;

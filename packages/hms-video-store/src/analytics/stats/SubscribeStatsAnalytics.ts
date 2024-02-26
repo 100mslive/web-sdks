@@ -12,8 +12,9 @@ import {
   RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
 } from './interfaces';
+import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { JAVA_INTEGER_MAX_VALUE, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
@@ -53,8 +54,10 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
         trackStats.jitterBufferDelay &&
         trackStats.jitterBufferEmittedCount &&
         trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount;
+
+      const avSync = this.calculateAvSyncForStat(trackStats, hmsStats);
       if (this.trackAnalytics.has(trackID)) {
-        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats, calculatedJitterBufferDelay });
+        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
       } else {
         if (track) {
           const trackAnalytics = new RunningRemoteTrackAnalytics({
@@ -63,7 +66,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
             ssrc: trackStats.ssrc.toString(),
             kind: trackStats.kind,
           });
-          trackAnalytics.pushTempStat({ ...trackStats, calculatedJitterBufferDelay });
+          trackAnalytics.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
           this.trackAnalytics.set(trackID, trackAnalytics);
         }
       }
@@ -78,6 +81,25 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
         trackAnalytic.createSample();
       });
     }
+  }
+
+  // eslint-disable-next-line complexity
+  private calculateAvSyncForStat(trackStats: HMSTrackStats, hmsStats: HMSWebrtcStats) {
+    if (!trackStats.peerID || !(trackStats.kind === 'video')) {
+      return;
+    }
+    const peer = this.store.getPeerById(trackStats.peerID);
+    const audioTrack = peer?.audioTrack;
+    const videoTrack = peer?.videoTrack;
+    const areBothTracksEnabled = audioTrack && videoTrack && audioTrack.enabled && videoTrack.enabled;
+    if (!areBothTracksEnabled) {
+      return JAVA_INTEGER_MAX_VALUE;
+    }
+    const audioStats = hmsStats.getRemoteTrackStats(audioTrack.trackId);
+    if (!audioStats) {
+      return JAVA_INTEGER_MAX_VALUE;
+    }
+    return audioStats.timestamp - trackStats.timestamp;
   }
 }
 
@@ -102,6 +124,7 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     if (latestStat.kind === 'video') {
       return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(
         Object.assign(baseSample, {
+          avg_av_sync_ms: this.calculateAvgAvSyncForSample(),
           avg_frames_received_per_sec: this.calculateDifferenceAverage('framesReceived'),
           avg_frames_dropped_per_sec: this.calculateDifferenceAverage('framesDropped'),
           avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
@@ -152,4 +175,15 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       samples: this.samples,
     };
   };
+
+  private calculateAvgAvSyncForSample() {
+    const avSyncValues = this.tempStats.map(stat => stat.avSync);
+    const validAvSyncValues: number[] = avSyncValues.filter(
+      (value): value is number => value !== undefined && value !== JAVA_INTEGER_MAX_VALUE,
+    );
+    if (validAvSyncValues.length === 0) {
+      return JAVA_INTEGER_MAX_VALUE;
+    }
+    return validAvSyncValues.reduce((a, b) => a + b, 0) / validAvSyncValues.length;
+  }
 }

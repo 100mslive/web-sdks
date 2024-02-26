@@ -59,6 +59,7 @@ export const getLocalTrackStats = async (
       trackStats[stat] = {
         ...out,
         bitrate: computeBitrate('bytesSent', out, prevTrackStats?.[stat]),
+        trackIdentifier: inStats?.trackIdentifier,
         packetsLost: inStats?.packetsLost,
         jitter: inStats?.jitter,
         roundTripTime: inStats?.roundTripTime,
@@ -116,15 +117,16 @@ export const getTrackStats = async (
   }
 
   return (
-    trackStats &&
-    Object.assign(trackStats, {
+    trackStats && {
+      ...trackStats,
+      trackIdentifier: track.trackId,
       bitrate,
       packetsLostRate,
-      peerId: track.peerId,
+      peerID: track.peerId,
       enabled: track.enabled,
       peerName,
       codec: trackStats.codec,
-    })
+    }
   );
 };
 
