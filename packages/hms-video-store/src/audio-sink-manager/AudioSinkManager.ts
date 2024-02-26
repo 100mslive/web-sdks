@@ -40,12 +40,14 @@ export class AudioSinkManager {
   private volume = 100;
   private state = { ...INITIAL_STATE };
   private listener?: HMSUpdateListener;
+  private timer: ReturnType<typeof setInterval> | null = null;
 
   constructor(private store: Store, private deviceManager: DeviceManager, private eventBus: EventBus) {
     this.eventBus.audioTrackAdded.subscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.subscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.subscribe(this.handleTrackUpdate);
     this.eventBus.deviceChange.subscribe(this.handleAudioDeviceChange);
+    this.startPollingForDevices();
   }
 
   setListener(listener?: HMSUpdateListener) {
@@ -93,6 +95,10 @@ export class AudioSinkManager {
   cleanup() {
     this.audioSink?.remove();
     this.audioSink = undefined;
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
     this.eventBus.audioTrackAdded.unsubscribe(this.handleTrackAdd);
     this.eventBus.audioTrackRemoved.unsubscribe(this.handleTrackRemove);
     this.eventBus.audioTrackUpdate.unsubscribe(this.handleTrackUpdate);
@@ -261,6 +267,19 @@ export class AudioSinkManager {
     }
   };
 
+  private startPollingForDevices = () => {
+    // device change supported, no polling needed
+    if ('ondevicechange' in navigator.mediaDevices) {
+      return;
+    }
+    this.timer = setInterval(() => {
+      (async () => {
+        await this.deviceManager.init(true);
+        await this.autoSelectAudioOutput();
+      })();
+    }, 5000);
+  };
+
   /**
    * Mweb is not able to play via call channel by default, this is to switch from media channel to call channel
    */
@@ -288,9 +307,14 @@ export class AudioSinkManager {
       }
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
+        const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+        // already selected appropriate device
+        if (localAudioTrack.settings.deviceId === externalDeviceID) {
+          return;
+        }
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
         await localAudioTrack.setSettings({
-          deviceId: bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId,
+          deviceId: externalDeviceID,
         });
       }
     }
