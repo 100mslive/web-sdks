@@ -23,6 +23,7 @@ import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
 import { HMSPlayerContext } from '../components/HMSVideo/PlayerContext';
+import { LeaveRoom } from '../components/Leave/LeaveRoom';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
 import { IconButton } from '../../IconButton';
@@ -293,12 +294,12 @@ const HLSView = () => {
     event => {
       event.preventDefault();
       // logic for invisible when tapping
-      if (event.type === 'ontouchstart' && controlsVisible) {
+      if (event.type === 'touchstart' && controlsVisible) {
         setControlsVisible(false);
         return;
       }
       // normal scemnario
-      if (event.type === 'ontouchstart' || qualityDropDownOpen) {
+      if ((event.type === 'touchstart' || qualityDropDownOpen) && !controlsVisible) {
         setControlsVisible(true);
         return;
       }
@@ -313,6 +314,10 @@ const HLSView = () => {
   );
   const onHoverHandler = useCallback(
     event => {
+      event.preventDefault();
+      if (isMobile || isLandscape) {
+        return;
+      }
       // normal scemnario
       if (event.type === 'mouseenter' || qualityDropDownOpen) {
         setControlsVisible(true);
@@ -394,7 +399,9 @@ const HLSView = () => {
                             opacity: controlsVisible ? `1` : '0',
                           }}
                         >
-                          <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} height={32} width={32} />
+                          <Box>
+                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} height={32} width={32} />
+                          </Box>
                           <Box
                             css={{
                               bg: 'rgba(0, 0, 0, 0.6)',
@@ -427,6 +434,9 @@ const HLSView = () => {
                             p: '$4 $8',
                           }}
                         >
+                          <HMSVideoPlayer.Controls.Left>
+                            <LeaveRoom screenType={screenType} />
+                          </HMSVideoPlayer.Controls.Left>
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
                             {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}

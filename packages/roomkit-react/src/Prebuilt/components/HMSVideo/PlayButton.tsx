@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { PauseIcon, PlayIcon } from '@100mslive/react-icons';
 import { IconButton, Tooltip } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
@@ -13,7 +13,9 @@ export const PlayButton = ({
   height: number;
 }) => {
   const { hlsPlayer } = useHMSPlayerContext();
-  const onClick = async () => {
+  const onClick = async (event: MouseEvent) => {
+    event?.stopPropagation();
+    event?.preventDefault();
     isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
   };
   return (
