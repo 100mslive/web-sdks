@@ -3,7 +3,7 @@ import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getPercentage } from './utils';
 
-export const VideoProgress = () => {
+export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
   const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [bufferProgress, setBufferProgress] = useState(0);
@@ -74,7 +74,7 @@ export const VideoProgress = () => {
         value={[videoProgress]}
         showTooltip={false}
         onValueChange={onProgress}
-        thumbStyles={{ w: '$6', h: '$6' }}
+        thumbStyles={{ w: '$6', h: '$6', display: isDvr ? '' : 'none' }}
       />
       <Box
         id="video-buffer"

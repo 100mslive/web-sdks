@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, GoLiveIcon, PauseIcon, PlayIcon } from '@100mslive/react-icons';
+import { ColoredHandIcon, GoLiveIcon } from '@100mslive/react-icons';
 import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -380,42 +380,31 @@ const HLSView = () => {
                   {isMobile || isLandscape ? (
                     <>
                       {!showLoader && (
-                        <Box
+                        <Flex
+                          align="center"
+                          justify="center"
                           css={{
-                            position: 'absolute',
-                            top: '40%',
-                            left: '50%',
-                            transform: 'translateY(-40%) translateX(-50%)',
-                            padding: '$4',
+                            bg: '#00000066',
+                            // transform: 'translateY(-40%) translateX(-50%)',
                             display: 'inline-flex',
-                            r: '$round',
-                            gap: '$1',
-                            bg: 'rgba(0, 0, 0, 0.6)',
+                            gap: '$2',
                             zIndex: 1,
+                            size: '100%',
                             visibility: controlsVisible ? `` : `hidden`,
                             opacity: controlsVisible ? `1` : '0',
                           }}
                         >
-                          {isPaused ? (
-                            <IconButton
-                              onClick={async () => {
-                                await hlsPlayer?.play();
-                              }}
-                              data-testid="play_btn"
-                            >
-                              <PlayIcon width="48px" height="48px" />
-                            </IconButton>
-                          ) : (
-                            <IconButton
-                              onClick={async () => {
-                                await hlsPlayer?.pause();
-                              }}
-                              data-testid="pause_btn"
-                            >
-                              <PauseIcon width="48px" height="48px" />
-                            </IconButton>
-                          )}
-                        </Box>
+                          <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} height={32} width={32} />
+                          <Box
+                            css={{
+                              bg: 'rgba(0, 0, 0, 0.6)',
+                              r: '$round',
+                            }}
+                          >
+                            <HMSVideoPlayer.PlayButton isPaused={isPaused} width={48} height={48} />
+                          </Box>
+                          <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Forward} height={32} width={32} />
+                        </Flex>
                       )}
                       <Flex
                         ref={controlsRef}
@@ -428,6 +417,7 @@ const HLSView = () => {
                           left: '0',
                           width: '100%',
                           flexShrink: 0,
+                          zIndex: 1,
                           visibility: controlsVisible ? `` : `hidden`,
                           opacity: controlsVisible ? `1` : '0',
                         }}
@@ -464,6 +454,7 @@ const HLSView = () => {
                       position: 'absolute',
                       bottom: '0',
                       left: '0',
+                      zIndex: 1,
                       background:
                         isMobile || isLandscape
                           ? ''
@@ -476,8 +467,8 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' && (
-                      <HMSVideoPlayer.Progress />
+                    {!(isMobile || isLandscape) && (
+                      <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === 'dvr'} />
                     )}
                     <HMSVideoPlayer.Controls.Root
                       css={{
@@ -487,12 +478,9 @@ const HLSView = () => {
                       <HMSVideoPlayer.Controls.Left>
                         {!(isMobile || isLandscape) && (
                           <>
-                            <HMSVideoPlayer.PlayButton
-                              onClick={async () => {
-                                isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
-                              }}
-                              isPaused={isPaused}
-                            />
+                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} />
+                            <HMSVideoPlayer.PlayButton isPaused={isPaused} />
+                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Forward} />
                             {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                             <HMSVideoPlayer.Volume />
                           </>
@@ -550,8 +538,8 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' ? (
-                      <HMSVideoPlayer.Progress />
+                    {isMobile || isLandscape ? (
+                      <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === 'dvr'} />
                     ) : null}
                   </Flex>
                 </>
