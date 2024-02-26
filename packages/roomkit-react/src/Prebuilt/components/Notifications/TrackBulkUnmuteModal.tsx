@@ -40,10 +40,12 @@ export const TrackBulkUnmuteModal = () => {
 
   const { requestedBy: peer, tracks, enabled } = muteNotification;
 
+  const types = new Set(tracks.map(track => track.type));
+
   return (
     <RequestDialog
       title="Unmute request"
-      body={`${peer?.name} is requesting you to unmute your tracks.`}
+      body={`${peer?.name} is requesting you to unmute your ${Array.from(types).join(',')}`}
       onOpenChange={(value: boolean) => !value && setMuteNotification(null)}
       onAction={() => {
         tracks.forEach(track => {

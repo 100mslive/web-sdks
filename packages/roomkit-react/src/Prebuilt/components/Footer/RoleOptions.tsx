@@ -38,6 +38,9 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
   let allPeersHaveAudioOn = true;
 
   peerList.forEach(peer => {
+    if (peer.isLocal) {
+      return;
+    }
     const isAudioOn = !!peer.audioTrack && store.tracks[peer.audioTrack]?.enabled;
     const isVideoOn = !!peer.videoTrack && store.tracks[peer.videoTrack]?.enabled;
     allPeersHaveAudioOn = allPeersHaveAudioOn && isAudioOn;
