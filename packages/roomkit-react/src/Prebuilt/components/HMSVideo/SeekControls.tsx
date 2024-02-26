@@ -22,7 +22,10 @@ export const SeekControls = ({
     return (
       <Tooltip title="backward" side="top">
         <IconButton
-          onClick={() => hlsPlayer?.seekTo(hlsPlayer?.getVideoElement()?.currentTime - 10)}
+          onClick={e => {
+            e.stopPropagation();
+            hlsPlayer?.seekTo(hlsPlayer?.getVideoElement()?.currentTime - 10);
+          }}
           data-testid="backward_arrow_btn"
         >
           <BackwardArrowIcon width={width} height={height} />
@@ -33,7 +36,10 @@ export const SeekControls = ({
   return (
     <Tooltip title="forward" side="top">
       <IconButton
-        onClick={() => hlsPlayer?.seekTo(hlsPlayer?.getVideoElement()?.currentTime + 10)}
+        onClick={e => {
+          e.stopPropagation();
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement()?.currentTime + 10);
+        }}
         data-testid="forward_arrow_btn"
       >
         <ForwardArrowIcon width={width} height={height} />
