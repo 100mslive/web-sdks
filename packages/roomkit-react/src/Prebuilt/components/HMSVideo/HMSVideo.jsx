@@ -1,9 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Flex } from '../../../';
-import { useIsLandscape } from '../../common/hooks';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
-  const isLandscape = useIsLandscape();
   return (
     <Flex
       data-testid="hms-video"
@@ -36,8 +34,8 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           flex: '1 1 0',
           margin: '0 auto',
           minHeight: '0',
-          objectFit: 'cover',
-          width: isLandscape ? '100%' : '',
+          objectFit: 'contain',
+          width: 'inherit',
         }}
         ref={videoRef}
         playsInline
