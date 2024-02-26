@@ -1,5 +1,5 @@
 import React from 'react';
-import { HandIcon } from '@100mslive/react-icons';
+import { HandIcon, HandRaiseSlashedIcon } from '@100mslive/react-icons';
 import { Tooltip } from '../../Tooltip';
 // @ts-ignore: No implicit Any
 import IconButton from '../IconButton';
@@ -11,7 +11,7 @@ export const RaiseHand = () => {
   return (
     <Tooltip title={isHandRaised ? 'Lower hand' : 'Raise hand'}>
       <IconButton data-testid="hand_raise_btn" active={!isHandRaised} onClick={async () => await toggleHandRaise()}>
-        <HandIcon />
+        {isHandRaised ? <HandRaiseSlashedIcon /> : <HandIcon />}
       </IconButton>
     </Tooltip>
   );

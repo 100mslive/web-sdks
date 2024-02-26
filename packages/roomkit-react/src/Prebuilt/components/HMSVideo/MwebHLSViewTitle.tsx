@@ -29,7 +29,7 @@ export const HLSViewTitle = () => {
         setLiveTime(Date.now() - timeStamp.getTime());
       }
     }, 60000);
-  }, [hlsState?.running, hlsState?.variants]);
+  }, [hlsState?.running, hlsState?.variants, screenType]);
 
   useEffect(() => {
     if (hlsState?.running) {
@@ -47,7 +47,7 @@ export const HLSViewTitle = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [hlsState.running, startTimer]);
+  }, [hlsState?.running, hlsState?.variants, screenType, startTimer]);
 
   return (
     <Flex
@@ -57,10 +57,7 @@ export const HLSViewTitle = () => {
         position: 'relative',
         h: 'fit-content',
         w: '100%',
-        border: '1px solid $border_bright',
-        borderTop: '0',
-        borderRight: '0',
-        borderLeft: '0',
+        borderBottom: '1px solid $border_bright',
         p: '$8',
         backgroundColor: '$surface_dim',
       }}

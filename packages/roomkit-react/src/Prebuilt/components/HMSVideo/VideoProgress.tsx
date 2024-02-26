@@ -65,6 +65,7 @@ export const VideoProgress = () => {
         css={{
           cursor: 'pointer',
           h: '$2',
+          zIndex: 1,
           transition: `all .2s ease .5s`,
         }}
         min={0}
