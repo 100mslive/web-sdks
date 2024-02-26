@@ -67,8 +67,8 @@ jobs:
           PUBLISH_FLAG: alpha
 
         # Delay to wait for the publish to finish
-      - name: Delay for 10 minutes
-        run: sleep 600
+      - name: Delay for 2 minutes
+        run: sleep 120
 
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v3
