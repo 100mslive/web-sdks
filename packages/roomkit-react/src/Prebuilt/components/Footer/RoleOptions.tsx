@@ -110,13 +110,13 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const hmsActions = useHMSActions();
   const { elements } = useRoomLayoutConferencingScreen();
   const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
-  const canMuteRole = permissions?.mute || permissions?.unmute;
+  const canMuteOrUnmute = permissions?.mute || permissions?.unmute;
   const canRemoveRoleFromStage = permissions?.changeRole && roleName === on_stage_role;
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
     permissions?.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
-  if (!(canMuteRole || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0) {
+  if (!(canMuteOrUnmute || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0) {
     return null;
   }
 
@@ -180,7 +180,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
           </Dropdown.Item>
         )}
 
-        {canMuteRole && <MuteUnmuteOption peerList={peerList} roleName={roleName} />}
+        {canMuteOrUnmute && <MuteUnmuteOption peerList={peerList} roleName={roleName} />}
 
         {canRemoveRoleFromRoom && (
           <Dropdown.Item
