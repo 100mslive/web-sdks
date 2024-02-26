@@ -8,7 +8,6 @@ import {
 import { selectAppData, selectLocalPeerID, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { BrbIcon, CheckIcon, HamburgerMenuIcon, InfoIcon, PipIcon, SettingsIcon } from '@100mslive/react-icons';
 import { Checkbox, Dropdown, Flex, Text, Tooltip } from '../../../..';
-// @ts-ignore: No implicit any
 import IconButton from '../../../IconButton';
 // @ts-ignore: No implicit any
 import { PIP } from '../../PIP';
@@ -26,7 +25,6 @@ import { StatsForNerds } from '../../StatsForNerds';
 import { BulkRoleChangeModal } from '../BulkRoleChangeModal';
 // @ts-ignore: No implicit any
 import { FullScreenItem } from '../FullScreenItem';
-// @ts-ignore: No implicit any
 import { MuteAllModal } from '../MuteAllModal';
 // @ts-ignore: No implicit any
 import { useDropdownList } from '../../hooks/useDropdownList';
