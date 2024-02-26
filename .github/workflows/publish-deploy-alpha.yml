@@ -1,0 +1,66 @@
+name: Publish and deploy alpha versions
+
+on:
+  push:
+    branches:
+      - publish-alpha
+
+jobs:
+  bump_versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Update versions
+        env:
+          BUMP: ${{ github.event.inputs.versionBump }}
+        run: |
+          yarn global add lerna@5
+          lerna -v
+          echo $(lerna version $BUMP --no-git-tag-version --exact --yes --no-private)
+          lerna add @100mslive/hms-video-store --peer --scope=@100mslive/hms-virtual-background --exact
+          lerna add @100mslive/roomkit-react --scope=prebuilt-react-integration --exact
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "build: update versions for release"
+          git push origin HEAD:publish-alpha
+
+  publish_packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install packages
+        run: yarn install
+
+      - name: Test
+        run: yarn test
+
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+        # from-package will publish whatever version is present in each package's package.json
+        # it will not publish if the version is already published in npm
+      - name: Publish
+        run: yarn lerna:publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PUBLISH_FLAG: alpha
