@@ -20,15 +20,11 @@ import { getMetadata } from '../../common/utils';
 const dropdownItemCSS = { backgroundColor: '$surface_default', gap: '$4', p: '$8' };
 const optionTextCSS = { fontWeight: '$semiBold', color: '$on_surface_high', textTransform: 'none' };
 
-export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList: HMSPeer[] }) => {
-  const [openOptions, setOpenOptions] = useState(false);
-  const permissions = useHMSStore(selectPermissions);
-  const hmsActions = useHMSActions();
-  const { elements } = useRoomLayoutConferencingScreen();
-  const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
-
+const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleName: string }) => {
   const vanillaStore = useHMSVanillaStore();
   const store = vanillaStore.getState();
+  const hmsActions = useHMSActions();
+  const permissions = useHMSStore(selectPermissions);
 
   let allPeersHaveVideoOn = true;
   let allPeersHaveAudioOn = true;
@@ -40,7 +36,62 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
     allPeersHaveVideoOn = allPeersHaveVideoOn && isVideoOn;
   });
 
-  const canMuteRole = permissions?.mute && roleName === on_stage_role;
+  const setTrackEnabled = async (type: 'audio' | 'video', enabled = false) => {
+    try {
+      await hmsActions.setRemoteTracksEnabled({ roles: [roleName], source: 'regular', type, enabled });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  return (
+    <>
+      {allPeersHaveAudioOn && permissions?.mute ? (
+        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
+          <MicOffIcon />
+          <Text variant="sm" css={optionTextCSS}>
+            Mute Audio
+          </Text>
+        </Dropdown.Item>
+      ) : null}
+
+      {allPeersHaveVideoOn && permissions?.mute ? (
+        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
+          <VideoOffIcon />
+          <Text variant="sm" css={optionTextCSS}>
+            Mute Video
+          </Text>
+        </Dropdown.Item>
+      ) : null}
+
+      {!allPeersHaveAudioOn && permissions?.unmute ? (
+        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
+          <MicOnIcon />
+          <Text variant="sm" css={optionTextCSS}>
+            Unmute Audio
+          </Text>
+        </Dropdown.Item>
+      ) : null}
+
+      {!allPeersHaveVideoOn && permissions?.unmute ? (
+        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
+          <VideoOnIcon />
+          <Text variant="sm" css={optionTextCSS}>
+            Unmute Video
+          </Text>
+        </Dropdown.Item>
+      ) : null}
+    </>
+  );
+};
+
+export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList: HMSPeer[] }) => {
+  const [openOptions, setOpenOptions] = useState(false);
+  const permissions = useHMSStore(selectPermissions);
+  const hmsActions = useHMSActions();
+  const { elements } = useRoomLayoutConferencingScreen();
+  const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
+  const canMuteRole = permissions?.mute || permissions?.unmute;
   const canRemoveRoleFromStage = permissions?.changeRole && roleName === on_stage_role;
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
@@ -57,14 +108,6 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
         hmsActions.changeRoleOfPeer(peer.id, prevRole, true);
       }
     });
-  };
-
-  const setTrackEnabled = async (type: 'audio' | 'video', enabled = false) => {
-    try {
-      await hmsActions.setRemoteTracksEnabled({ roles: [roleName], source: 'regular', type, enabled });
-    } catch (e) {
-      console.error(e);
-    }
   };
 
   const removePeersFromRoom = async () => {
@@ -118,26 +161,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
           </Dropdown.Item>
         )}
 
-        {canMuteRole && (
-          <>
-            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', !allPeersHaveAudioOn)}>
-              {allPeersHaveAudioOn ? <MicOffIcon /> : <MicOnIcon />}
-              <Text variant="sm" css={optionTextCSS}>
-                {allPeersHaveAudioOn ? 'Mute' : 'Unmute'} Audio
-              </Text>
-            </Dropdown.Item>
-
-            <Dropdown.Item
-              css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright' }}
-              onClick={() => setTrackEnabled('video', !allPeersHaveVideoOn)}
-            >
-              {allPeersHaveVideoOn ? <VideoOffIcon /> : <VideoOnIcon />}
-              <Text variant="sm" css={optionTextCSS}>
-                {allPeersHaveVideoOn ? 'Mute' : 'Unmute'} Video
-              </Text>
-            </Dropdown.Item>
-          </>
-        )}
+        {canMuteRole && <MuteUnmuteOption peerList={peerList} roleName={roleName} />}
 
         {canRemoveRoleFromRoom && (
           <Dropdown.Item
