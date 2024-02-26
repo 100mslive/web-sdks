@@ -307,14 +307,14 @@ export class AudioSinkManager {
       }
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
-        const otherDevices = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+        const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
         // already selected appropriate device
-        if (localAudioTrack.settings.deviceId === otherDevices) {
+        if (localAudioTrack.settings.deviceId === externalDeviceID) {
           return;
         }
         await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
         await localAudioTrack.setSettings({
-          deviceId: otherDevices,
+          deviceId: externalDeviceID,
         });
       }
     }
