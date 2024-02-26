@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
-import { HMSPeer, selectPermissions, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
+import {
+  HMSPeer,
+  selectPermissions,
+  selectRoleByRoleName,
+  useHMSActions,
+  useHMSStore,
+  useHMSVanillaStore,
+} from '@100mslive/react-sdk';
 import {
   MicOffIcon,
   MicOnIcon,
@@ -25,6 +32,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
   const store = vanillaStore.getState();
   const hmsActions = useHMSActions();
   const permissions = useHMSStore(selectPermissions);
+  const role = useHMSStore(selectRoleByRoleName(roleName));
 
   let allPeersHaveVideoOn = true;
   let allPeersHaveAudioOn = true;
@@ -46,41 +54,49 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
 
   return (
     <>
-      {allPeersHaveAudioOn && permissions?.mute ? (
-        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
-          <MicOffIcon />
-          <Text variant="sm" css={optionTextCSS}>
-            Mute Audio
-          </Text>
-        </Dropdown.Item>
-      ) : null}
+      {role.publishParams.allowed?.includes('audio') && (
+        <>
+          {allPeersHaveAudioOn && permissions?.mute ? (
+            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
+              <MicOffIcon />
+              <Text variant="sm" css={optionTextCSS}>
+                Mute Audio
+              </Text>
+            </Dropdown.Item>
+          ) : null}
 
-      {allPeersHaveVideoOn && permissions?.mute ? (
-        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
-          <VideoOffIcon />
-          <Text variant="sm" css={optionTextCSS}>
-            Mute Video
-          </Text>
-        </Dropdown.Item>
-      ) : null}
+          {!allPeersHaveAudioOn && permissions?.unmute ? (
+            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', true)}>
+              <MicOnIcon />
+              <Text variant="sm" css={optionTextCSS}>
+                Unmute Audio
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+        </>
+      )}
 
-      {!allPeersHaveAudioOn && permissions?.unmute ? (
-        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', true)}>
-          <MicOnIcon />
-          <Text variant="sm" css={optionTextCSS}>
-            Unmute Audio
-          </Text>
-        </Dropdown.Item>
-      ) : null}
+      {role.publishParams.allowed?.includes('audio') && (
+        <>
+          {allPeersHaveVideoOn && permissions?.mute ? (
+            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
+              <VideoOffIcon />
+              <Text variant="sm" css={optionTextCSS}>
+                Mute Video
+              </Text>
+            </Dropdown.Item>
+          ) : null}
 
-      {!allPeersHaveVideoOn && permissions?.unmute ? (
-        <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', true)}>
-          <VideoOnIcon />
-          <Text variant="sm" css={optionTextCSS}>
-            Unmute Video
-          </Text>
-        </Dropdown.Item>
-      ) : null}
+          {!allPeersHaveVideoOn && permissions?.unmute ? (
+            <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', true)}>
+              <VideoOnIcon />
+              <Text variant="sm" css={optionTextCSS}>
+                Unmute Video
+              </Text>
+            </Dropdown.Item>
+          ) : null}
+        </>
+      )}
     </>
   );
 };
