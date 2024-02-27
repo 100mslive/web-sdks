@@ -35,17 +35,6 @@ export const VideoProgress = () => {
     };
   }, [videoEl]);
 
-  // const onProgressChangeHandler = (e: React.MouseEvent<HTMLElement>) => {
-  //   const userClickedX = e.clientX - (progressRootRef.current?.offsetLeft || 0);
-  //   const progressBarWidth = progressRootRef.current?.offsetWidth || 0;
-  //   const progress = Math.floor(getPercentage(userClickedX, progressBarWidth));
-  //   const videoEl = hlsPlayer?.getVideoElement();
-  //   const currentTime = (progress * (videoEl?.duration || 0)) / 100;
-  //   if (onValueChange) {
-  //     onValueChange(currentTime);
-  //   }
-  // };
-
   const onProgress = (progress: number[]) => {
     const progress1 = Math.floor(getPercentage(progress[0], 100));
     const videoEl = hlsPlayer?.getVideoElement();

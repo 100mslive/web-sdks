@@ -240,7 +240,7 @@ const HLSView = () => {
         hlsPlayer.reset();
       };
     }
-  }, [hlsUrl]);
+  }, [hlsUrl, togglePollView, vanillaStore]);
 
   /**
    * initialize and subscribe to hlsState
