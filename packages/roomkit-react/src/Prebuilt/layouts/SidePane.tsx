@@ -171,7 +171,7 @@ const SidePane = ({
                     maxHeight: 300,
                     background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
                     '@md': {
-                      pb: '$20',
+                      pb: isMobileHLSStream || isLandscapeHLSStream ? '$12' : '$20',
                     },
                   }
                 : {}),
