@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Publish Packages action
-        uses: 100mslive/web-sdks@main
+        uses: 100mslive/web-sdks@publish-alpha
         with:
           publishFlag: 'alpha'
 
