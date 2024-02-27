@@ -14,7 +14,7 @@ import {
 } from './interfaces';
 import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { JAVA_INTEGER_MAX_VALUE, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { MAX_SAFE_INTEGER, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
@@ -93,11 +93,11 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     const videoTrack = peer?.videoTrack;
     const areBothTracksEnabled = audioTrack && videoTrack && audioTrack.enabled && videoTrack.enabled;
     if (!areBothTracksEnabled) {
-      return JAVA_INTEGER_MAX_VALUE;
+      return MAX_SAFE_INTEGER;
     }
     const audioStats = hmsStats.getRemoteTrackStats(audioTrack.trackId);
     if (!audioStats) {
-      return JAVA_INTEGER_MAX_VALUE;
+      return MAX_SAFE_INTEGER;
     }
     return audioStats.timestamp - trackStats.timestamp;
   }
@@ -179,10 +179,10 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
   private calculateAvgAvSyncForSample() {
     const avSyncValues = this.tempStats.map(stat => stat.avSync);
     const validAvSyncValues: number[] = avSyncValues.filter(
-      (value): value is number => value !== undefined && value !== JAVA_INTEGER_MAX_VALUE,
+      (value): value is number => value !== undefined && value !== MAX_SAFE_INTEGER,
     );
     if (validAvSyncValues.length === 0) {
-      return JAVA_INTEGER_MAX_VALUE;
+      return MAX_SAFE_INTEGER;
     }
     return validAvSyncValues.reduce((a, b) => a + b, 0) / validAvSyncValues.length;
   }

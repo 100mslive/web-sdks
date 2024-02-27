@@ -34,7 +34,7 @@ export const PUBLISH_STATS_PUSH_INTERVAL = 300;
 export const SUBSCRIBE_STATS_SAMPLE_WINDOW = 10;
 export const SUBSCRIBE_STATS_PUSH_INTERVAL = 60;
 
-export const JAVA_INTEGER_MAX_VALUE = 2147483647;
+export const MAX_SAFE_INTEGER = Math.pow(2, 31) - 1;
 
 export const HMSEvents = {
   DEVICE_CHANGE: 'device-change',
