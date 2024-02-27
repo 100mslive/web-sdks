@@ -279,9 +279,15 @@ export interface HLSNotification {
   hls_recording?: HLSRecording;
 }
 
+export enum HLSPlaylistType {
+  DVR = 'dvr',
+  NO_DVR = 'no-dvr',
+}
+
 export interface HLSVariantInfo {
   url: string;
   meeting_url?: string;
+  playlist_type?: HLSPlaylistType;
   metadata?: string;
   started_at?: number;
   initialised_at?: number;

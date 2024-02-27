@@ -1,9 +1,9 @@
 import React, { Fragment, useState } from 'react';
-import { ConferencingScreen } from '@100mslive/types-prebuilt';
 // @ts-ignore: No implicit Any
 import { selectIsConnectedToRoom, selectPermissions, useHMSStore, useRecordingStreaming } from '@100mslive/react-sdk';
 // @ts-ignore: No implicit Any
-import { ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { CrossIcon, ExitIcon, StopIcon } from '@100mslive/react-icons';
+import { IconButton } from '../../../IconButton';
 import { Box } from '../../../Layout';
 import { Sheet } from '../../../Sheet';
 import { Tooltip } from '../../../Tooltip';
@@ -11,19 +11,20 @@ import { EndSessionContent } from './EndSessionContent';
 import { LeaveIconButton } from './LeaveAtoms';
 import { LeaveCard } from './LeaveCard';
 import { LeaveSessionContent } from './LeaveSessionContent';
+import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useDropdownList } from '../hooks/useDropdownList';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const MwebLeaveRoom = ({
   leaveRoom,
-  screenType,
   endRoom,
 }: {
   leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
-  screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
 }) => {
   const [open, setOpen] = useState(false);
+  const { screenType } = useRoomLayoutConferencingScreen();
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
   const [showEndStreamAlert, setShowEndStreamAlert] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
@@ -43,20 +44,7 @@ export const MwebLeaveRoom = ({
       {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
-            <LeaveIconButton
-              key="LeaveRoom"
-              data-testid="leave_room_btn"
-              css={{
-                borderTopRightRadius: '$1',
-                borderBottomRightRadius: '$1',
-              }}
-            >
-              <Tooltip title="Leave Room">
-                <Box>
-                  <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-                </Box>
-              </Tooltip>
-            </LeaveIconButton>
+            <LeaveButton onClick={() => setOpen(!open)} />
           </Sheet.Trigger>
           <Sheet.Content>
             <LeaveCard
@@ -88,13 +76,7 @@ export const MwebLeaveRoom = ({
           </Sheet.Content>
         </Sheet.Root>
       ) : (
-        <LeaveIconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => setShowLeaveRoomAlert(true)}>
-          <Tooltip title="Leave Room">
-            <Box>
-              <ExitIcon style={{ transform: 'rotate(180deg)' }} />
-            </Box>
-          </Tooltip>
-        </LeaveIconButton>
+        <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
         <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
@@ -112,5 +94,36 @@ export const MwebLeaveRoom = ({
         </Sheet.Content>
       </Sheet.Root>
     </Fragment>
+  );
+};
+
+const LeaveButton = ({ onClick }: { onClick: () => void }) => {
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+
+  return isMobileHLSStream || isLandscapeHLSStream ? (
+    <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => onClick()}>
+      <Tooltip title="Leave Room">
+        <Box>
+          <CrossIcon />
+        </Box>
+      </Tooltip>
+    </IconButton>
+  ) : (
+    <LeaveIconButton
+      key="LeaveRoom"
+      data-testid="leave_room_btn"
+      css={{
+        borderTopRightRadius: '$1',
+        borderBottomRightRadius: '$1',
+      }}
+      onClick={() => onClick()}
+    >
+      <Tooltip title="Leave Room">
+        <Box>
+          <ExitIcon style={{ transform: 'rotate(180deg)' }} />
+        </Box>
+      </Tooltip>
+    </LeaveIconButton>
   );
 };
