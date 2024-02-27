@@ -57,11 +57,12 @@ export const Options = ({
         <Dropdown.Item
           key={option.label}
           css={{
-            backgroundColor: selectedDeviceId === option.deviceId ? '$surface_bright' : '$surface_dim',
+            backgroundColor: '$surface_dim',
             p: '$4 $8',
             h: '$15',
             fontSize: '$xs',
             justifyContent: 'space-between',
+            color: selectedDeviceId === option.deviceId ? '$primary_bright' : '',
           }}
           onClick={() => {
             onClick(option.deviceId);

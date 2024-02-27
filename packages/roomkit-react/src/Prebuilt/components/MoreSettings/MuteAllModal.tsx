@@ -1,31 +1,32 @@
 import React, { useCallback, useState } from 'react';
-import { useHMSActions } from '@100mslive/react-sdk';
+import {
+  HMSRoleName,
+  HMSTrackSource,
+  HMSTrackType,
+  selectAvailableRoleNames,
+  useHMSActions,
+  useHMSStore,
+} from '@100mslive/react-sdk';
 import { MicOffIcon } from '@100mslive/react-icons';
-import { Dialog } from '../../../';
+import { Dialog } from '../../..';
 import { Sheet } from '../../../Sheet';
+// @ts-ignore: No implicit any
 import { DialogContent } from '../../primitives/DialogContent';
 import { MuteAllContent } from './MuteAllContent';
-import { useFilteredRoles } from '../../common/hooks';
 
-const trackSourceOptions = [
-  { label: 'All Track Sources', value: '' },
-  { label: 'regular', value: 'regular' },
-  { label: 'screen', value: 'screen' },
-  { label: 'audioplaylist', value: 'audioplaylist' },
-  { label: 'videoplaylist', value: 'videoplaylist' },
-];
-const trackTypeOptions = [
-  { label: 'All Track Types', value: '' },
-  { label: 'audio', value: 'audio' },
-  { label: 'video', value: 'video' },
-];
-export const MuteAllModal = ({ onOpenChange, isMobile = false }) => {
-  const roles = useFilteredRoles();
+export const MuteAllModal = ({
+  onOpenChange,
+  isMobile = false,
+}: {
+  onOpenChange: (value: boolean) => void;
+  isMobile?: boolean;
+}) => {
+  const roles = useHMSStore(selectAvailableRoleNames);
   const hmsActions = useHMSActions();
   const [enabled, setEnabled] = useState(false);
-  const [trackType, setTrackType] = useState();
-  const [selectedRole, setRole] = useState();
-  const [selectedSource, setSource] = useState();
+  const [trackType, setTrackType] = useState<HMSTrackType>();
+  const [selectedRole, setRole] = useState<HMSRoleName>();
+  const [selectedSource, setSource] = useState<HMSTrackSource>();
 
   const muteAll = useCallback(async () => {
     await hmsActions.setRemoteTracksEnabled({
@@ -48,8 +49,6 @@ export const MuteAllModal = ({ onOpenChange, isMobile = false }) => {
     setRole,
     selectedSource,
     setSource,
-    trackSourceOptions,
-    trackTypeOptions,
     isMobile,
   };
 

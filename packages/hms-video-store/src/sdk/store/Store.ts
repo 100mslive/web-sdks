@@ -47,7 +47,7 @@ class Store {
   private roleDetailsArrived = false;
   private env: ENV = ENV.PROD;
   private simulcastEnabled = false;
-  private userAgent?: string;
+  private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
 
@@ -188,8 +188,8 @@ class Store {
     return this.userAgent;
   }
 
-  async createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
-    this.userAgent = await createUserAgent(this.env, frameworkInfo);
+  createAndSetUserAgent(frameworkInfo?: HMSFrameworkInfo) {
+    this.userAgent = createUserAgent(this.env, frameworkInfo);
   }
 
   setRoom(room: HMSRoom) {

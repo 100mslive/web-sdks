@@ -34,7 +34,7 @@ export const EmptyChat = () => {
     >
       <Box>
         <Box css={{ m: '0 auto', mt: '$4', '@media (max-height: 575px)': { display: 'none' } }}>
-          <img src={emptyChat} alt="Empty Chat" height={132} width={185} />
+          <img src={emptyChat} style={{ display: 'inline' }} alt="Empty Chat" height={132} width={185} />
         </Box>
 
         <Text variant="h5" css={{ mt: '$8', c: '$on_surface_high' }}>

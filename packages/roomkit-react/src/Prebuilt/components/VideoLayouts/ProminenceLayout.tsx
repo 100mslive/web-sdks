@@ -42,7 +42,8 @@ const SecondarySection = ({
   const gridStyles = hasSidebar
     ? {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: `repeat(${tiles.length}, minmax(0, 135px))`,
+        gridTemplateRows: `repeat(${tiles.length}, minmax(0, 1fr))`,
+        maxHeight: '100%',
       }
     : {
         gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',

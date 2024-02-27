@@ -1,0 +1,66 @@
+name: Publish and deploy alpha versions
+
+on:
+  push:
+    branches:
+      - publish-alpha
+
+jobs:
+  bump_versions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git user
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Install packages
+        run: yarn install --frozen-lockfile
+
+      - name: Update versions
+        run: |
+          yarn global add lerna@5
+          lerna -v
+          echo $(lerna version prerelease --no-git-tag-version --exact --yes --no-private)
+          lerna add @100mslive/hms-video-store --peer --scope=@100mslive/hms-virtual-background --exact
+          lerna add @100mslive/roomkit-react --scope=prebuilt-react-integration --exact
+
+      - name: Commit and push changes
+        run: |
+          git add .
+          git commit -m "build: update versions for release"
+          git push origin HEAD:publish-alpha
+
+
+  run_publish_packages:
+    runs-on: ubuntu-latest
+    needs: bump_versions
+    steps:
+      - name: Trigger Publish Packages workflow
+        uses: aurelien-baudet/workflow-dispatch@v2.1.1
+        with:
+          workflow: publish.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          inputs: '{ "publishFlag": "alpha" }'
+
+          
+        # Delay to wait for the publish to finish
+      - name: Delay for 2 minutes
+        run: sleep 120
+
+  notify_100ms_links:
+   runs-on: ubuntu-latest
+   needs: run_publish_packages
+   steps:
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.PAT }}
+          repository: 100mslive/100ms-links
+          event-type: alpha-publish
+          client-payload: '{"bump": "alpha"}'
+          

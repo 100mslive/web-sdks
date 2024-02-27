@@ -93,7 +93,7 @@ const SidePane = ({
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
-        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
+        '@md': { position: mwebStreamingChat || isLandscape ? 'absolute' : '', zIndex: 12 },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (

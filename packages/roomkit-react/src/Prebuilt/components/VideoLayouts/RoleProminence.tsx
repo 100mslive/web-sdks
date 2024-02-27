@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useMedia } from 'react-use';
 import { selectLocalPeer, useHMSStore } from '@100mslive/react-sdk';
+import { config as cssConfig } from '../../../Theme';
 import { InsetTile } from '../InsetTile';
 import { Pagination } from '../Pagination';
 import { SecondaryTiles } from '../SecondaryTiles';
@@ -24,7 +26,9 @@ export function RoleProminence({
   const { prominentPeers, secondaryPeers } = useRoleProminencePeers(prominentRoles, peers, isInsetEnabled);
   const localPeer = useHMSStore(selectLocalPeer);
   const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
-  const maxTileCount = 4;
+  const isMobile = useMedia(cssConfig.media.md);
+  let maxTileCount = useUISettings(UI_SETTINGS.maxTileCount);
+  maxTileCount = isMobile ? 4 : maxTileCount;
   const pageList = usePagesWithTiles({
     peers: prominentPeers,
     maxTileCount,
@@ -63,7 +67,7 @@ export function RoleProminence({
         edgeToEdge={edgeToEdge}
         hasSidebar={layoutMode === LayoutMode.SIDEBAR}
       />
-      {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
+      {isInsetEnabled && localPeer && prominentPeers.length > 0 && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );
 }
