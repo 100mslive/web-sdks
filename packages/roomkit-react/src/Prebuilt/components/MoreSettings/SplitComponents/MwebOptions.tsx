@@ -120,7 +120,7 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton>
+            <IconButton css={{ '@md': { bg: screenType === 'hls_live_streaming' ? '$surface_default' : '' } }}>
               <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
