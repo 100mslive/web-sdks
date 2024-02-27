@@ -202,7 +202,6 @@ const SidePane = ({
           </Wrapper>
         ))
         .otherwise(() => {
-          console.log('otheriwse');
           return null;
         })}
     </Flex>
