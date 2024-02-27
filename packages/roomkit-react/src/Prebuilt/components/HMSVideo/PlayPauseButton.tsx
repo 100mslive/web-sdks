@@ -3,7 +3,7 @@ import { PauseIcon, PlayIcon } from '@100mslive/react-icons';
 import { IconButton, Tooltip } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 
-export const PlayButton = ({
+export const PlayPauseButton = ({
   isPaused,
   width = 20,
   height = 20,

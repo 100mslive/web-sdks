@@ -418,7 +418,7 @@ const HLSView = () => {
                               r: '$round',
                             }}
                           >
-                            <HMSVideoPlayer.PlayButton isPaused={isPaused} width={48} height={48} />
+                            <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
                           </Box>
                           <HMSVideoPlayer.Seeker
                             title="forward"
@@ -514,7 +514,7 @@ const HLSView = () => {
                             >
                               <BackwardArrowIcon width={20} height={20} />
                             </HMSVideoPlayer.Seeker>
-                            <HMSVideoPlayer.PlayButton isPaused={isPaused} />
+                            <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
                             <HMSVideoPlayer.Seeker
                               onClick={e => {
                                 onDoubleClickHandler(e, videoRef.current?.currentTime + 10);
