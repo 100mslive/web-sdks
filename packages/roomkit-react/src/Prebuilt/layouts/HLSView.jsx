@@ -13,7 +13,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, GoLiveIcon } from '@100mslive/react-icons';
+import { BackwardArrowIcon, ColoredHandIcon, ForwardArrowIcon, GoLiveIcon } from '@100mslive/react-icons';
 import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -58,6 +58,7 @@ const HLSView = () => {
   const [hasCaptions, setHasCaptions] = useState(false);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
+  const [isSeekEnabled, setIsSeekEnabled] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
   const lastHlsUrl = usePrevious(hlsUrl);
@@ -70,6 +71,7 @@ const HLSView = () => {
   const controlsTimerRef = useRef();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const [clickCounter, setClickCounter] = useState(0);
   const showChat = !!elements?.chat;
   const isFullScreenSupported = screenfull.isEnabled;
 
@@ -290,12 +292,30 @@ const HLSView = () => {
     };
   }, [controlsVisible, isFullScreen, qualityDropDownOpen]); */
 
-  const onTouchHandler = useCallback(() => {
-    // logic for invisible when tapping
-
-    setControlsVisible(value => !value);
-    if (controlsTimerRef.current) {
-      clearTimeout(controlsTimerRef.current);
+  const onDoubleClickHandler = useCallback(
+    (event, seek = -1) => {
+      if (!(isMobile || isLandscape)) {
+        return;
+      }
+      setIsSeekEnabled(isSeekEnabled);
+      hlsPlayer?.seekTo(seek !== -1 ? seek : videoRef.current?.currentTime - 10);
+      setIsSeekEnabled(!isSeekEnabled);
+    },
+    [isLandscape, isMobile, isSeekEnabled],
+  );
+  const onClickHandler = useCallback(event => {
+    setClickCounter(clickCounter + 1);
+    const timer = setTimeout(() => {
+      setControlsVisible(value => !value);
+      if (controlsTimerRef.current) {
+        clearTimeout(controlsTimerRef.current);
+      }
+      setClickCounter(clickCounter - 1 > 0 ? clickCounter - 1 : 0);
+    }, 500);
+    if (clickCounter > 1) {
+      setClickCounter(0);
+      onDoubleClickHandler(event);
+      clearTimeout(timer);
     }
   }, []);
   const onHoverHandler = useCallback(
@@ -318,7 +338,7 @@ const HLSView = () => {
         }
       }
     },
-    [controlsVisible, isFullScreen, qualityDropDownOpen],
+    [controlsVisible, isFullScreen, isLandscape, isMobile, qualityDropDownOpen],
   );
 
   return (
@@ -364,8 +384,10 @@ const HLSView = () => {
                 onMouseEnter={onHoverHandler}
                 onMouseMove={onHoverHandler}
                 onMouseLeave={onHoverHandler}
-                onClick={onTouchHandler}
-                // onDoubleClick={onTouchHandler}
+                onClick={onClickHandler}
+                onDoubleClick={e => {
+                  onDoubleClickHandler(e, videoRef.current?.currentTime - 10);
+                }}
               >
                 <>
                   {isMobile || isLandscape ? (
@@ -385,8 +407,20 @@ const HLSView = () => {
                             opacity: controlsVisible ? `1` : '0',
                           }}
                         >
-                          <Box>
-                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} height={32} width={32} />
+                          <Box
+                            onDoubleClick={e => {
+                              onDoubleClickHandler(e, videoRef.current?.currentTime - 10);
+                            }}
+                            css={{
+                              h: '70%',
+                              w: '100%',
+                              visibility: isSeekEnabled ? `` : `hidden`,
+                              opacity: isSeekEnabled ? `1` : '0',
+                            }}
+                          >
+                            <HMSVideoPlayer.Seeker title="backward">
+                              <BackwardArrowIcon width={32} height={32} />
+                            </HMSVideoPlayer.Seeker>
                           </Box>
                           <Box
                             css={{
@@ -396,7 +430,18 @@ const HLSView = () => {
                           >
                             <HMSVideoPlayer.PlayButton isPaused={isPaused} width={48} height={48} />
                           </Box>
-                          <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Forward} height={32} width={32} />
+                          <Box
+                            css={{
+                              h: '70%',
+                              w: '100%',
+                              visibility: isSeekEnabled ? `` : `hidden`,
+                              opacity: isSeekEnabled ? `1` : '0',
+                            }}
+                          >
+                            <HMSVideoPlayer.Seeker title="forward">
+                              <ForwardArrowIcon width={32} height={32} />
+                            </HMSVideoPlayer.Seeker>
+                          </Box>
                         </Flex>
                       )}
                       <Flex
@@ -474,9 +519,23 @@ const HLSView = () => {
                       <HMSVideoPlayer.Controls.Left>
                         {!(isMobile || isLandscape) && (
                           <>
-                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Backward} />
+                            <HMSVideoPlayer.Seeker
+                              onClick={e => {
+                                onDoubleClickHandler(e, videoRef.current?.currentTime - 10);
+                              }}
+                              title="backward"
+                            >
+                              <BackwardArrowIcon width={20} height={20} />
+                            </HMSVideoPlayer.Seeker>
                             <HMSVideoPlayer.PlayButton isPaused={isPaused} />
-                            <HMSVideoPlayer.Seeker variants={HMSVideoPlayer.SeekPath.Forward} />
+                            <HMSVideoPlayer.Seeker
+                              onClick={e => {
+                                onDoubleClickHandler(e, videoRef.current?.currentTime + 10);
+                              }}
+                              title="forward"
+                            >
+                              <ForwardArrowIcon width={20} height={20} />
+                            </HMSVideoPlayer.Seeker>
                             {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                             <HMSVideoPlayer.Volume />
                           </>
@@ -547,6 +606,9 @@ const HLSView = () => {
         </>
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+          <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
+            <LeaveRoom screenType={screenType} />
+          </Flex>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
             {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
           </Flex>

@@ -3,7 +3,7 @@ import { LeftControls, RightControls, VideoControls } from './Controls';
 // @ts-ignore
 import { HMSVideo } from './HMSVideo';
 import { PlayButton } from './PlayButton';
-import { SeekControls, SeekPath } from './SeekControls';
+import { SeekControls } from './SeekControls';
 import { VideoProgress } from './VideoProgress';
 import { VideoTime } from './VideoTime';
 import { VolumeControl } from './VolumeControl';
@@ -20,5 +20,4 @@ export const HMSVideoPlayer = {
     Right: RightControls,
   },
   Seeker: SeekControls,
-  SeekPath: SeekPath,
 };
