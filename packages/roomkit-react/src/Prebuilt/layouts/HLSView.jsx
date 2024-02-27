@@ -83,7 +83,6 @@ const HLSView = () => {
 
   const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
 
-  console.log('HLSPlaylistType ', HLSPlaylistType);
   useEffect(() => {
     if (sidepane === '' && isMwebHLSStream && showChat) {
       toggleChat();
