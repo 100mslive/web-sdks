@@ -152,6 +152,9 @@ const SidePane = ({
         gap: '$4',
         position: 'relative',
         '&:empty': { display: 'none' },
+        '@ls': {
+          w: isMobileHLSStream || isLandscapeHLSStream ? '340px' : '$100',
+        },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (
@@ -198,7 +201,10 @@ const SidePane = ({
             <RoomDetailsPane />
           </Wrapper>
         ))
-        .otherwise(() => null)}
+        .otherwise(() => {
+          console.log('otheriwse');
+          return null;
+        })}
     </Flex>
   );
 };
