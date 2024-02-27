@@ -68,7 +68,11 @@ export abstract class BaseStatsAnalytics {
   protected abstract handleStatsUpdate(hmsStats: HMSWebrtcStats): void;
 }
 
-type TempPublishStats = HMSTrackStats & { availableOutgoingBitrate?: number };
+type TempPublishStats = HMSTrackStats & {
+  availableOutgoingBitrate?: number;
+  calculatedJitterBufferDelay?: number;
+  avSync?: number;
+};
 
 export abstract class RunningTrackAnalytics {
   readonly sampleWindowSize: number;
@@ -156,6 +160,11 @@ export abstract class RunningTrackAnalytics {
     const latestValue = Number(this.getLatestStat()[key]) || 0;
 
     return latestValue - firstValue;
+  }
+
+  protected calculateDifferenceAverage(key: keyof TempPublishStats, round = true) {
+    const avg = this.calculateDifferenceForSample(key) / this.tempStats.length;
+    return round ? Math.round(avg) : avg;
   }
 
   protected calculateInstancesOfHigh(key: keyof TempPublishStats, threshold: number) {

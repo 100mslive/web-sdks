@@ -6,12 +6,14 @@ import { Box, Flex } from '../../Layout';
 import { Dialog } from '../../Modal';
 import { Text } from '../../Text';
 import { config as cssConfig } from '../../Theme';
+import { useLandscapeHLSStream } from '../common/hooks';
 // @ts-ignore
 import { isMobileUserAgent } from '../common/utils';
 
 export const MwebLandscapePrompt = () => {
   const [showMwebLandscapePrompt, setShowMwebLandscapePrompt] = useState(false);
   const isLandscape = useMedia(cssConfig.media.ls);
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useEffect(() => {
     if (!isMobileUserAgent) {
@@ -36,6 +38,9 @@ export const MwebLandscapePrompt = () => {
     };
   }, [isLandscape]);
 
+  if (isLandscapeHLSStream) {
+    return null;
+  }
   return (
     <Dialog.Root open={showMwebLandscapePrompt} onOpenChange={setShowMwebLandscapePrompt}>
       <Dialog.Portal>

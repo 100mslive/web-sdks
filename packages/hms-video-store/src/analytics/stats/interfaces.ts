@@ -87,4 +87,11 @@ export interface RemoteVideoSample extends RemoteBaseSample {
   avg_frames_decoded_per_sec?: number;
   total_pli_count?: number;
   total_nack_count?: number;
+  frame_width?: number;
+  frame_height?: number;
+  pause_count?: number;
+  pause_duration_seconds?: number;
+  freeze_count?: number;
+  freeze_duration_seconds?: number;
+  avg_jitter_buffer_delay?: number;
 }

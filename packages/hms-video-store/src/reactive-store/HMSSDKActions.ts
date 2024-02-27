@@ -1006,7 +1006,9 @@ export class HMSSDKActions<T extends HMSGenericTypes = { sessionStore: Record<st
       mergeNewPeersInDraft(draftPeers, newHmsPeers);
       mergeNewTracksInDraft(draftTracks, newHmsTracks);
       Object.assign(draftStore.settings, newMediaSettings);
-      Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      if (draftStore.room.isConnected) {
+        Object.assign(draftStore.connectionQualities, newNetworkQuality);
+      }
 
       /**
        * if preview is already present merge,

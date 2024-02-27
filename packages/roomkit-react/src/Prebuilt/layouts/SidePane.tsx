@@ -19,6 +19,7 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import { useIsLandscape, useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
 
@@ -56,6 +57,16 @@ const Wrapper = ({ children, css = {} }: { children: React.ReactNode; css?: CSS 
           animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
           ...(css['@md'] || {}),
         },
+        variants: {
+          landscapeStream: {
+            position: 'unset',
+            minHeight: '100%',
+          },
+          mobileStream: {
+            height: '64%',
+            minHeight: '64%',
+          },
+        },
       }}
     >
       {children}
@@ -71,12 +82,16 @@ const SidePane = ({
   hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
+  const isLandscape = useIsLandscape();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
   const { elements } = useRoomLayoutConferencingScreen();
   const { elements: preview_elements } = useRoomLayoutPreviewScreen();
   const layoutMode = useUISettings(UI_SETTINGS.layoutMode);
+
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobileHLSStream = useMobileHLSStream();
 
   const backgroundMedia = preview_elements?.virtual_background?.background_media?.length
     ? preview_elements?.virtual_background?.background_media
@@ -98,6 +113,10 @@ const SidePane = ({
     objectFit: tileProps?.video_object_fit,
   };
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
+  const commonProps = {
+    landscapeStream: isLandscapeHLSStream,
+    mobileStream: isMobileHLSStream,
+  };
 
   return (
     <Flex
@@ -105,12 +124,12 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: '100%',
+        h: isMobileHLSStream ? '64%' : '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
-        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
         '&:empty': { display: 'none' },
+        '@md': { position: mwebStreamingChat || isLandscape ? 'absolute' : '', zIndex: 12 },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (
@@ -133,12 +152,13 @@ const SidePane = ({
                 borderTopRightRadius: '$2',
               },
             }}
+            {...commonProps}
           >
             <Polls />
           </Wrapper>
         ))
         .with(SIDE_PANE_OPTIONS.VB, () => (
-          <Wrapper css={{ p: '$10 $6 $10 $10' }}>
+          <Wrapper css={{ p: '$10 $6 $10 $10' }} {...commonProps}>
             <VBPicker backgroundMedia={backgroundMedia} />
           </Wrapper>
         ))
@@ -156,12 +176,17 @@ const SidePane = ({
                   }
                 : {}),
             }}
+            {...commonProps}
           >
-            <SidePaneTabs hideControls={hideControls} active={sidepane} />
+            <SidePaneTabs
+              hideControls={hideControls}
+              active={sidepane}
+              hideTab={isMobileHLSStream || isLandscapeHLSStream}
+            />
           </Wrapper>
         ))
         .with(SIDE_PANE_OPTIONS.ROOM_DETAILS, () => (
-          <Wrapper>
+          <Wrapper {...commonProps}>
             <RoomDetailsPane />
           </Wrapper>
         ))
