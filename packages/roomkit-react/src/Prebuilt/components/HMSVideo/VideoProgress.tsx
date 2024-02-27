@@ -48,7 +48,7 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
     return null;
   }
   return (
-    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}>
+    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch', pointerEvents: isDvr ? '' : 'none' }}>
       <Slider
         id="video-actual-rest"
         css={{
@@ -56,6 +56,7 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
           h: '$2',
           zIndex: 1,
           transition: `all .2s ease .5s`,
+          pointerEvents: isDvr ? '' : 'none',
         }}
         min={0}
         max={100}

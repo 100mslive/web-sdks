@@ -85,7 +85,6 @@ const HLSView = () => {
 
   const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
 
-  console.log('HLSPlaylistType ', HLSPlaylistType);
   useEffect(() => {
     if (sidepane === '' && isMwebHLSStream && showChat) {
       toggleChat();
@@ -295,7 +294,6 @@ const HLSView = () => {
 
   const onDoubleClickHandler = useCallback(
     (event, seek = -1) => {
-      console.log('here2 ', event);
       if (!(isMobile || isLandscape)) {
         return;
       }
@@ -308,7 +306,6 @@ const HLSView = () => {
     [isLandscape, isMobile],
   );
   const onClickHandler = useCallback(() => {
-    console.log('here1');
     setControlsVisible(value => !value);
     if (controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
@@ -495,7 +492,7 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!(isMobile || isLandscape) && (
+                    {!isMobile && (
                       <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
                     )}
                     <HMSVideoPlayer.Controls.Root
@@ -580,7 +577,7 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {isMobile || isLandscape ? (
+                    {isMobile ? (
                       <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
                     ) : null}
                   </Flex>

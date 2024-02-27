@@ -93,7 +93,7 @@ const SidePane = ({
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
-        '@md': { position: mwebStreamingChat || isLandscape ? 'absolute' : '', zIndex: 12 },
+        '@md': { position: mwebStreamingChat ? 'absolute' : '', zIndex: 12 },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (
@@ -114,7 +114,7 @@ const SidePane = ({
             p: VB ? '$10 $6 $10 $10' : '$10',
             flex: '1 1 0',
             minHeight: 0,
-            maxHeight: mwebStreamingChat || isLandscape ? '300px' : 'unset',
+            maxHeight: mwebStreamingChat || isLandscape ? '340px' : 'unset',
             background:
               mwebStreamingChat || isLandscape
                 ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
