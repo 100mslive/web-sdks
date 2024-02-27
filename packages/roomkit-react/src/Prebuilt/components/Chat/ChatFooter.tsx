@@ -205,7 +205,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               maxHeight: '$24',
               position: 'relative',
               pl: '$8',
-              flexGrow: '1',
+              flexGrow: 1,
               r: '$1',
               '@md': {
                 minHeight: 'unset',
