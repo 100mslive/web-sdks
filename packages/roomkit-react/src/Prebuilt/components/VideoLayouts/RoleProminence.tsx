@@ -67,7 +67,7 @@ export function RoleProminence({
         edgeToEdge={edgeToEdge}
         hasSidebar={layoutMode === LayoutMode.SIDEBAR}
       />
-      {isInsetEnabled && localPeer && !prominentPeers.includes(localPeer) && <InsetTile />}
+      {isInsetEnabled && localPeer && prominentPeers.length > 0 && !prominentPeers.includes(localPeer) && <InsetTile />}
     </ProminenceLayout.Root>
   );
 }
