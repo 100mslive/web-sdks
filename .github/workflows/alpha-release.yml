@@ -41,7 +41,7 @@ jobs:
     needs: bump_versions
     steps:
       - name: Trigger Publish Packages workflow
-        uses: actions/workflow-dispatch@v2
+        uses: aurelien-baudet/workflow-dispatch@v2.1.1
         with:
           workflow: publish.yml
           token: ${{ secrets.GITHUB_TOKEN }}
