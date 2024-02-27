@@ -62,4 +62,5 @@ jobs:
           token: ${{ secrets.PAT }}
           repository: 100mslive/100ms-links
           event-type: alpha-publish
+          client-payload: '{"bump": "alpha"}'
           
