@@ -17,7 +17,7 @@ export const useRoleProminencePeers = (prominentRoles: string[], peers: HMSPeer[
           }
           return acc;
         }
-        if (peer.isLocal && isInsetEnabled) {
+        if (peer.isLocal && isInsetEnabled && !prominentRoles?.includes(peer.roleName || '')) {
           return acc;
         }
         if (prominentRoles?.includes(peer.roleName || '')) {
@@ -25,6 +25,7 @@ export const useRoleProminencePeers = (prominentRoles: string[], peers: HMSPeer[
         } else {
           acc[1].push(peer);
         }
+
         return acc;
       },
       [[], []],
