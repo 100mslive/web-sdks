@@ -98,11 +98,12 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
     if (!selectedPeer.id && !selectedRole && !['Everyone', ''].includes(defaultSelection)) {
       setRoleSelector(defaultSelection);
     } else {
-      if (!(isMobile || isLandscapeHLSStream)) {
+      // @ts-ignore
+      if (!(isMobile || isLandscapeHLSStream) || !elements?.chat?.disable_autofocus) {
         inputRef.current?.focus();
       }
     }
-  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream]);
+  }, [defaultSelection, selectedPeer, selectedRole, setRoleSelector, isMobile, isLandscapeHLSStream, elements?.chat]);
   const sendMessage = useCallback(async () => {
     const message = inputRef?.current?.value;
     if (!message || !message.trim().length) {
@@ -201,10 +202,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             align="center"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
-              minHeight: isLandscapeHLSStream ? '$14' : '$16',
               maxHeight: '$24',
               position: 'relative',
-              py: isLandscapeHLSStream ? '0' : '$6',
               pl: '$8',
               flexGrow: '1',
               r: '$1',
@@ -213,6 +212,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 h: '$14',
                 boxSizing: 'border-box',
               },
+              ...(isLandscapeHLSStream ? { minHeight: '$14', py: 0 } : {}),
             }}
           >
             {children}

@@ -9,14 +9,14 @@ import { useIsLandscape } from '../../common/hooks';
 
 export function HLSQualitySelector({
   open,
-  onOpen,
+  onOpenChange,
   layers,
   onQualityChange,
   selection,
   isAuto,
 }: {
   open: boolean;
-  onOpen: (value: boolean) => void;
+  onOpenChange: (value: boolean) => void;
   layers: HMSHLSLayer[];
   onQualityChange: (quality: { [key: string]: string | number } | HMSHLSLayer) => void;
   selection: HMSHLSLayer;
@@ -26,7 +26,7 @@ export function HLSQualitySelector({
   const isLandscape = useIsLandscape();
   if (isMobile || isLandscape) {
     return (
-      <Sheet.Root open={open} onOpenChange={onOpen}>
+      <Sheet.Root open={open} onOpenChange={onOpenChange}>
         <Sheet.Trigger asChild data-testid="quality_selector">
           <Flex
             css={{
@@ -41,7 +41,7 @@ export function HLSQualitySelector({
         </Sheet.Trigger>
 
         {layers.length > 0 && (
-          <Sheet.Content css={{ bg: '$surface_default', pb: '$1' }} onClick={() => onOpen(false)}>
+          <Sheet.Content css={{ bg: '$surface_default', pb: '$1' }} onClick={() => onOpenChange(false)}>
             <Sheet.Title
               css={{
                 display: 'flex',
@@ -57,7 +57,7 @@ export function HLSQualitySelector({
               }}
             >
               Quality
-              <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpen(false)}>
+              <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpenChange(false)}>
                 <CrossIcon />
               </Sheet.Close>
             </Sheet.Title>
@@ -118,7 +118,7 @@ export function HLSQualitySelector({
     );
   }
   return (
-    <Dropdown.Root open={open} onOpenChange={value => onOpen(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => onOpenChange(value)}>
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{
