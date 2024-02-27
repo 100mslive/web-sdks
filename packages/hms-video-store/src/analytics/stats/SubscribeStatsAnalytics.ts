@@ -12,8 +12,9 @@ import {
   RemoteVideoTrackAnalytics,
   SubscribeAnalyticPayload,
 } from './interfaces';
+import { HMSTrackStats } from '../../interfaces';
 import { HMSWebrtcStats } from '../../rtc-stats';
-import { SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
+import { MAX_SAFE_INTEGER, SUBSCRIBE_STATS_SAMPLE_WINDOW } from '../../utils/constants';
 import AnalyticsEventFactory from '../AnalyticsEventFactory';
 
 export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
@@ -49,8 +50,14 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
     Object.keys(remoteTracksStats).forEach(trackID => {
       const trackStats = remoteTracksStats[trackID];
       const track = this.store.getTrackById(trackID);
+      const calculatedJitterBufferDelay =
+        trackStats.jitterBufferDelay &&
+        trackStats.jitterBufferEmittedCount &&
+        trackStats.jitterBufferDelay / trackStats.jitterBufferEmittedCount;
+
+      const avSync = this.calculateAvSyncForStat(trackStats, hmsStats);
       if (this.trackAnalytics.has(trackID)) {
-        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats });
+        this.trackAnalytics.get(trackID)?.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
       } else {
         if (track) {
           const trackAnalytics = new RunningRemoteTrackAnalytics({
@@ -59,7 +66,7 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
             ssrc: trackStats.ssrc.toString(),
             kind: trackStats.kind,
           });
-          trackAnalytics.pushTempStat({ ...trackStats });
+          trackAnalytics.pushTempStat({ ...trackStats, calculatedJitterBufferDelay, avSync });
           this.trackAnalytics.set(trackID, trackAnalytics);
         }
       }
@@ -74,6 +81,25 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
         trackAnalytic.createSample();
       });
     }
+  }
+
+  // eslint-disable-next-line complexity
+  private calculateAvSyncForStat(trackStats: HMSTrackStats, hmsStats: HMSWebrtcStats) {
+    if (!trackStats.peerID || !(trackStats.kind === 'video')) {
+      return;
+    }
+    const peer = this.store.getPeerById(trackStats.peerID);
+    const audioTrack = peer?.audioTrack;
+    const videoTrack = peer?.videoTrack;
+    const areBothTracksEnabled = audioTrack && videoTrack && audioTrack.enabled && videoTrack.enabled;
+    if (!areBothTracksEnabled) {
+      return MAX_SAFE_INTEGER;
+    }
+    const audioStats = hmsStats.getRemoteTrackStats(audioTrack.trackId);
+    if (!audioStats) {
+      return MAX_SAFE_INTEGER;
+    }
+    return audioStats.timestamp - trackStats.timestamp;
   }
 }
 
@@ -96,7 +122,21 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
     };
 
     if (latestStat.kind === 'video') {
-      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(baseSample);
+      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(
+        Object.assign(baseSample, {
+          avg_av_sync_ms: this.calculateAvgAvSyncForSample(),
+          avg_frames_received_per_sec: this.calculateDifferenceAverage('framesReceived'),
+          avg_frames_dropped_per_sec: this.calculateDifferenceAverage('framesDropped'),
+          avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
+          frame_width: this.calculateAverage('frameWidth'),
+          frame_height: this.calculateAverage('frameHeight'),
+          pause_count: this.calculateDifferenceForSample('pauseCount'),
+          pause_duration_seconds: this.calculateDifferenceForSample('totalPausesDuration'),
+          freeze_count: this.calculateDifferenceForSample('freezeCount'),
+          freeze_duration_seconds: this.calculateDifferenceForSample('totalFreezesDuration'),
+          avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
+        }),
+      );
     } else {
       const audio_concealed_samples =
         (latestStat.concealedSamples || 0) -
@@ -135,4 +175,15 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       samples: this.samples,
     };
   };
+
+  private calculateAvgAvSyncForSample() {
+    const avSyncValues = this.tempStats.map(stat => stat.avSync);
+    const validAvSyncValues: number[] = avSyncValues.filter(
+      (value): value is number => value !== undefined && value !== MAX_SAFE_INTEGER,
+    );
+    if (validAvSyncValues.length === 0) {
+      return MAX_SAFE_INTEGER;
+    }
+    return validAvSyncValues.reduce((a, b) => a + b, 0) / validAvSyncValues.length;
+  }
 }
