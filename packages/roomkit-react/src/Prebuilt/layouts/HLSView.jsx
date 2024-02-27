@@ -3,6 +3,7 @@ import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
 import {
+  HLSPlaylistType,
   HMSNotificationTypes,
   selectAppData,
   selectHLSState,
@@ -82,6 +83,7 @@ const HLSView = () => {
 
   const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
 
+  console.log('HLSPlaylistType ', HLSPlaylistType);
   useEffect(() => {
     if (sidepane === '' && isMwebHLSStream && showChat) {
       toggleChat();
@@ -443,7 +445,7 @@ const HLSView = () => {
                             {availableLayers.length > 0 ? (
                               <HLSQualitySelector
                                 layers={availableLayers}
-                                onOpen={setQualityDropDownOpen}
+                                onOpenChange={setQualityDropDownOpen}
                                 open={qualityDropDownOpen}
                                 selection={currentSelectedQuality}
                                 onQualityChange={handleQuality}
@@ -476,7 +478,7 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' && (
+                    {!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
                       <HMSVideoPlayer.Progress />
                     )}
                     <HMSVideoPlayer.Controls.Root
@@ -538,7 +540,7 @@ const HLSView = () => {
                         {availableLayers.length > 0 && !(isMobile || isLandscape) ? (
                           <HLSQualitySelector
                             layers={availableLayers}
-                            onOpen={setQualityDropDownOpen}
+                            onOpenChange={setQualityDropDownOpen}
                             open={qualityDropDownOpen}
                             selection={currentSelectedQuality}
                             onQualityChange={handleQuality}
@@ -550,7 +552,7 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === 'dvr' ? (
+                    {(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
                       <HMSVideoPlayer.Progress />
                     ) : null}
                   </Flex>

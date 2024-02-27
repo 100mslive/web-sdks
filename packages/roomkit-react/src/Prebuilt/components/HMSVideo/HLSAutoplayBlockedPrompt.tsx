@@ -3,13 +3,19 @@ import { Button, Dialog, Text } from '../../..';
 // @ts-ignore
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
 
-export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }: { open: boolean; unblockAutoPlay: () => void }) {
+export function HLSAutoplayBlockedPrompt({
+  open,
+  unblockAutoPlay,
+}: {
+  open: boolean;
+  unblockAutoPlay: () => Promise<void>;
+}) {
   return (
     <Dialog.Root
       open={open}
-      onOpenChange={value => {
+      onOpenChange={async value => {
         if (!value) {
-          unblockAutoPlay();
+          await unblockAutoPlay();
         }
       }}
     >
@@ -23,8 +29,8 @@ export function HLSAutoplayBlockedPrompt({ open, unblockAutoPlay }: { open: bool
         <DialogRow justify="end">
           <Button
             variant="primary"
-            onClick={() => {
-              unblockAutoPlay();
+            onClick={async () => {
+              await unblockAutoPlay();
             }}
           >
             Play stream
