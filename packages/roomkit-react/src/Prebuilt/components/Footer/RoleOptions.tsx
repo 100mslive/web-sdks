@@ -116,11 +116,13 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const canMuteOrUnmute = permissions?.mute || permissions?.unmute;
   const canRemoveRoleFromStage = permissions?.changeRole && roleName === on_stage_role;
+  const role = useHMSStore(selectRoleByRoleName(roleName));
+
   // on stage and off stage roles
   const canRemoveRoleFromRoom =
     permissions?.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
-  if (!(canMuteOrUnmute || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0) {
+  if (!(canMuteOrUnmute || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0 || !role) {
     return null;
   }
 
