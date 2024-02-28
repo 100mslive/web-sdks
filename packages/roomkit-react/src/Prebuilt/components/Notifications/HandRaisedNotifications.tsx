@@ -3,6 +3,7 @@ import {
   HMSNotificationTypes,
   HMSRoomState,
   selectHasPeerHandRaised,
+  selectPeerByID,
   selectRoomState,
   useHMSNotifications,
   useHMSStore,
@@ -32,8 +33,10 @@ export const HandRaisedNotifications = () => {
       return;
     }
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
+    const peer = vanillaStore.getState(selectPeerByID(notification.data.id));
     if (hasPeerHandRaised) {
-      ToastBatcher.showToast({ notification, type: on_stage_exp ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
+      const showCTA = on_stage_exp?.off_stage_roles?.includes(peer?.roleName || '');
+      ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
     }
   }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore]);
