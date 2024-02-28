@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { match, P } from 'ts-pattern';
 import { selectAppData, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
 import { usePollViewState } from './useUISettings';
 import { APP_DATA, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../../common/constants';
@@ -45,8 +46,22 @@ export const usePollViewToggle = () => {
 
   const togglePollView = useCallback(
     id => {
-      id = typeof id === 'string' ? id : undefined;
-      const newView = id ? POLL_VIEWS.VOTE : isOpen && view ? null : POLL_VIEWS.CREATE_POLL_QUIZ;
+      const newView = match({ id, isOpen, view })
+        .with(
+          {
+            id: P.string,
+          },
+          () => POLL_VIEWS.VOTE,
+        )
+        .with(
+          {
+            isOpen: true,
+            view: P.when(view => !!view),
+          },
+          () => null,
+        )
+        .otherwise(() => POLL_VIEWS.CREATE_POLL_QUIZ);
+
       setPollState({
         [POLL_STATE.pollInView]: id,
         [POLL_STATE.view]: newView,

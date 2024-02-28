@@ -56,15 +56,16 @@ export const ConferenceScreen = () => {
   const noAVPermissions = !(toggleAudio || toggleVideo);
   // using it in hls stream to show action button when chat is disabled
   const showChat = !!screenProps.elements?.chat;
-  const toggleControls = () => {
-    if (dropdownListRef.current?.length === 0 && isMobileDevice) {
-      setHideControls(value => !value);
-    }
-  };
   const autoRoomJoined = useRef(isPreviewScreenEnabled);
   const isMobileHLSStream = useMobileHLSStream();
   const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMwebHLSStream = isMobileHLSStream || isLandscapeHLSStream;
+
+  const toggleControls = () => {
+    if (dropdownListRef.current?.length === 0 && isMobileDevice && !isMwebHLSStream) {
+      setHideControls(value => !value);
+    }
+  };
 
   useEffect(() => {
     let timeout: undefined | ReturnType<typeof setTimeout>;
@@ -117,6 +118,8 @@ export const ConferenceScreen = () => {
     return <FullPageProgress text={roomState === HMSRoomState.Connecting ? 'Joining...' : ''} />;
   }
 
+  const hideControlsForStreaming = isMwebHLSStream ? true : hideControls;
+
   return (
     <>
       {isHLSStarted ? (
@@ -131,7 +134,7 @@ export const ConferenceScreen = () => {
             css={{
               h: '$18',
               transition: 'margin 0.3s ease-in-out',
-              marginTop: hideControls ? `-${headerRef.current?.clientHeight}px` : 'none',
+              marginTop: hideControlsForStreaming ? `-${headerRef.current?.clientHeight}px` : 'none',
               '@md': {
                 h: '$17',
               },
@@ -163,7 +166,7 @@ export const ConferenceScreen = () => {
             <VideoStreamingSection
               screenType={screenProps.screenType}
               elements={screenProps.elements}
-              hideControls={hideControls}
+              hideControls={hideControlsForStreaming}
             />
           ) : null}
         </Box>
@@ -175,7 +178,7 @@ export const ConferenceScreen = () => {
               maxHeight: '$24',
               transition: 'margin 0.3s ease-in-out',
               bg: '$background_dim',
-              marginBottom: hideControls ? `-${footerRef.current?.clientHeight}px` : undefined,
+              marginBottom: hideControlsForStreaming ? `-${footerRef.current?.clientHeight}px` : undefined,
               '@md': {
                 maxHeight: 'unset',
                 bg: screenProps.screenType === 'hls_live_streaming' ? 'transparent' : '$background_dim',
