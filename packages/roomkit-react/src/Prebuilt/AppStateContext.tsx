@@ -73,7 +73,7 @@ export const useAppStateManager = () => {
           redirectToLeave(1000); // to clear toasts after 1 second
         },
       )
-      .with([HMSRoomState.Disconnected, P.not(P.nullish)], () => {
+      .with([HMSRoomState.Disconnected, P.nullish], () => {
         setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
       });
   }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
