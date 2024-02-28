@@ -273,51 +273,62 @@ const HLSView = () => {
     hmsActions.setAppData(APP_DATA.hlsStats, !enablHlsStats);
   };
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (controlsVisible && isFullScreen && !qualityDropDownOpen) {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
-      controlsTimerRef.current = setTimeout(() => {
-        setControlsVisible(false);
-      }, 5000);
     }
     if (!isFullScreen && controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
     }
+    controlsTimerRef.current = setTimeout(() => {
+      setControlsVisible(false);
+    }, 5000);
     return () => {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
     };
-  }, [controlsVisible, isFullScreen, qualityDropDownOpen]); */
+  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
 
+  const onSeekTo = useCallback(seek => {
+    hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
+  }, []);
   const onDoubleClickHandler = useCallback(
-    (event, seek = -1) => {
+    event => {
       if (!(isMobile || isLandscape)) {
         return;
       }
+      const sidePercentage = (event.screenX * 100) / event.target.clientWidth;
       setIsSeekEnabled(true);
-      hlsPlayer?.seekTo(seek !== -1 ? seek : videoRef.current?.currentTime - 10);
+      // there is space for pause/unpause button
+      if (sidePercentage < 45) {
+        onSeekTo(-10);
+      } else {
+        onSeekTo(10);
+      }
       setTimeout(() => {
         setIsSeekEnabled(false);
       }, 200);
     },
-    [isLandscape, isMobile],
+    [isLandscape, isMobile, onSeekTo],
   );
   const onClickHandler = useCallback(() => {
+    if (!(isMobile || isLandscape)) {
+      return;
+    }
     setControlsVisible(value => !value);
     if (controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
     }
-  }, []);
+  }, [isLandscape, isMobile]);
   const onHoverHandler = useCallback(
     event => {
       event.preventDefault();
       if (isMobile || isLandscape) {
         return;
       }
-      // normal scemnario
       if (event.type === 'mouseenter' || qualityDropDownOpen) {
         setControlsVisible(true);
         return;
@@ -379,7 +390,7 @@ const HLSView = () => {
                 onMouseLeave={onHoverHandler}
                 onClick={onClickHandler}
                 onDoubleClick={e => {
-                  onDoubleClickHandler(e, videoRef.current?.currentTime - 10);
+                  onDoubleClickHandler(e);
                 }}
               >
                 <>
@@ -391,7 +402,6 @@ const HLSView = () => {
                           justify="center"
                           css={{
                             bg: '#00000066',
-                            // transform: 'translateY(-40%) translateX(-50%)',
                             display: 'inline-flex',
                             gap: '$2',
                             zIndex: 1,
@@ -472,7 +482,7 @@ const HLSView = () => {
                   ) : null}
                   <Flex
                     ref={controlsRef}
-                    direction="column"
+                    direction={isMobile ? 'columnReverse' : 'column'}
                     justify="end"
                     align="start"
                     css={{
@@ -492,9 +502,7 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!isMobile && (
-                      <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
-                    )}
+                    <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
                     <HMSVideoPlayer.Controls.Root
                       css={{
                         p: '$4 $8',
@@ -504,8 +512,8 @@ const HLSView = () => {
                         {!(isMobile || isLandscape) && (
                           <>
                             <HMSVideoPlayer.Seeker
-                              onClick={e => {
-                                onDoubleClickHandler(e, videoRef.current?.currentTime - 10);
+                              onClick={() => {
+                                onSeekTo(-10);
                               }}
                               title="backward"
                             >
@@ -513,8 +521,8 @@ const HLSView = () => {
                             </HMSVideoPlayer.Seeker>
                             <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
                             <HMSVideoPlayer.Seeker
-                              onClick={e => {
-                                onDoubleClickHandler(e, videoRef.current?.currentTime + 10);
+                              onClick={() => {
+                                onSeekTo(10);
                               }}
                               title="forward"
                             >
@@ -577,9 +585,6 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {isMobile ? (
-                      <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
-                    ) : null}
                   </Flex>
                 </>
               </HMSVideoPlayer.Root>
