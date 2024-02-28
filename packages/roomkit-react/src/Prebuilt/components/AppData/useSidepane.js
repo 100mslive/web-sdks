@@ -46,27 +46,39 @@ export const usePollViewToggle = () => {
 
   const togglePollView = useCallback(
     id => {
-      const newView = match({ id, isOpen, view })
+      match({ id, isOpen, view })
         .with(
           {
             id: P.string,
           },
-          () => POLL_VIEWS.VOTE,
+          () => {
+            setPollState({
+              [POLL_STATE.pollInView]: id,
+              [POLL_STATE.view]: POLL_VIEWS.VOTE,
+            });
+            hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.POLLS);
+          },
         )
         .with(
           {
             isOpen: true,
             view: P.when(view => !!view),
           },
-          () => null,
+          () => {
+            setPollState({
+              [POLL_STATE.pollInView]: undefined,
+              [POLL_STATE.view]: null,
+            });
+            hmsActions.setAppData(APP_DATA.sidePane, '');
+          },
         )
-        .otherwise(() => POLL_VIEWS.CREATE_POLL_QUIZ);
-
-      setPollState({
-        [POLL_STATE.pollInView]: id,
-        [POLL_STATE.view]: newView,
-      });
-      hmsActions.setAppData(APP_DATA.sidePane, newView ? SIDE_PANE_OPTIONS.POLLS : '');
+        .otherwise(() => {
+          setPollState({
+            [POLL_STATE.pollInView]: undefined,
+            [POLL_STATE.view]: POLL_VIEWS.CREATE_POLL_QUIZ,
+          });
+          hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.POLLS);
+        });
     },
     [hmsActions, view, setPollState, isOpen],
   );
