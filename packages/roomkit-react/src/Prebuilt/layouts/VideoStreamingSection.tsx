@@ -4,6 +4,7 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -78,26 +79,6 @@ export const VideoStreamingSection = ({
     return null;
   }
 
-  let ViewComponent;
-  if (screenType === 'hls_live_streaming') {
-    ViewComponent = <HLSView />;
-  } else if (localPeerRole === waitingViewerRole) {
-    ViewComponent = <WaitingView />;
-  } else if (pdfAnnotatorActive) {
-    ViewComponent = <PDFView />;
-  } else if (urlToIframe) {
-    ViewComponent = <EmbedView />;
-  } else if (peerSharing) {
-    // screen share should take preference over whiteboard
-    //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
-  } else if (isWhiteboardOpen) {
-    ViewComponent = <WhiteboardView />;
-  } else {
-    //@ts-ignore
-    ViewComponent = <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
-  }
-
   return (
     <Suspense fallback={<FullPageProgress />}>
       <Flex
@@ -108,7 +89,38 @@ export const VideoStreamingSection = ({
         }}
         direction={isMobileHLSStream ? 'column' : 'row'}
       >
-        {ViewComponent}
+        {match({ screenType, localPeerRole, pdfAnnotatorActive, urlToIframe, peerSharing, isWhiteboardOpen })
+          .with(
+            {
+              screenType: 'hls_live_streaming',
+            },
+            () => <HLSView />,
+          )
+          .when(
+            ({ localPeerRole }) => localPeerRole === waitingViewerRole,
+            () => <WaitingView />,
+          )
+          .with({ pdfAnnotatorActive: true }, () => <PDFView />)
+          .when(
+            ({ urlToIframe }) => !!urlToIframe,
+            () => <EmbedView />,
+          )
+          .when(
+            ({ peerSharing }) => !!peerSharing,
+            () => {
+              // @ts-ignore
+              return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
+            },
+          )
+          .when(
+            ({ isWhiteboardOpen }) => !!isWhiteboardOpen,
+            () => <WhiteboardView />,
+          )
+          .otherwise(() => {
+            // @ts-ignore
+            return <GridLayout {...(elements as DefaultConferencingScreen_Elements)?.video_tile_layout?.grid} />;
+          })}
+
         <Box
           css={{
             flex: isMobileHLSStream ? '1 1 0' : undefined,
