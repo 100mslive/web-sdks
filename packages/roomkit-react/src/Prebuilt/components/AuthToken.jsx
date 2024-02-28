@@ -89,7 +89,7 @@ const convertError = error => {
     'If you think this is a mistake on our side, please reach out to us over Discord:',
     'https://discord.com/invite/kGdmszyzq2',
   );
-  match([error.action, error.code])
+  return match([error.action, error.code])
     .with(['GET_TOKEN', 403], () => ({
       title: 'Psst! This room is currently inactive.',
       body: 'Please feel free to join another open room for more conversations. Thanks for stopping by!',
