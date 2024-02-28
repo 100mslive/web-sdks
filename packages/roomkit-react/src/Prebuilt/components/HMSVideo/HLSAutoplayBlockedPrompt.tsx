@@ -1,7 +1,10 @@
 import React from 'react';
-import { Button, Dialog, Text } from '../../..';
+import { useMedia } from 'react-use';
+import { VolumeTwoIcon } from '@100mslive/react-icons';
+import { Button, config, Dialog, IconButton, Text } from '../../..';
 // @ts-ignore
 import { DialogContent, DialogRow } from '../../primitives/DialogContent';
+import { useIsLandscape } from '../../common/hooks';
 
 export function HLSAutoplayBlockedPrompt({
   open,
@@ -10,6 +13,33 @@ export function HLSAutoplayBlockedPrompt({
   open: boolean;
   unblockAutoPlay: () => Promise<void>;
 }) {
+  const isLandscape = useIsLandscape();
+  const isMobile = useMedia(config.media.md);
+  if ((isMobile || isLandscape) && open) {
+    return (
+      <IconButton
+        css={{
+          border: '1px solid white',
+          bg: 'white',
+          color: '#000',
+          r: '$2',
+        }}
+        onClick={async () => await unblockAutoPlay()}
+      >
+        <VolumeTwoIcon width="32" height="32" />
+        <Text
+          variant="body1"
+          css={{
+            fontWeight: '$semiBold',
+            px: '$2',
+            color: '#000',
+          }}
+        >
+          Tap To Unmute
+        </Text>
+      </IconButton>
+    );
+  }
   return (
     <Dialog.Root
       open={open}

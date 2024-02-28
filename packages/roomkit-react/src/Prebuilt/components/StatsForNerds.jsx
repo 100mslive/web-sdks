@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { match, P } from 'ts-pattern';
 import {
   selectHMSStats,
   selectLocalPeerID,
@@ -188,11 +189,15 @@ const LocalPeerStats = () => {
 };
 
 const TrackStats = ({ trackID, layer, local }) => {
-  const selector = layer
-    ? selectHMSStats.localVideoTrackStatsByLayer(layer)(trackID)
-    : local
-    ? selectHMSStats.localAudioTrackStatsByID(trackID)
-    : selectHMSStats.trackStatsByID(trackID);
+  const selector = match({ trackID, layer, local })
+    .with(
+      {
+        layer: P.when(layer => !!layer),
+      },
+      () => selectHMSStats.localVideoTrackStatsByLayer(layer)(trackID),
+    )
+    .with({ local: P.when(local => !!local) }, () => selectHMSStats.localAudioTrackStatsByID(trackID))
+    .otherwise(() => selectHMSStats.trackStatsByID(trackID));
   const stats = useHMSStatsStore(selector);
   if (!stats) {
     return null;
@@ -215,7 +220,10 @@ const TrackStats = ({ trackID, layer, local }) => {
           {!inbound && <StatsRow label="Quality Limitation Reason" value={stats.qualityLimitationReason} />}
         </>
       )}
-      <StatsRow label="Round Trip Time" value={stats.roundTripTime ? `${stats.roundTripTime * 1000} ms` : '-'} />
+      <StatsRow
+        label="Round Trip Time"
+        value={stats.roundTripTime ? `${(stats.roundTripTime * 1000).toFixed(3)} ms` : '-'}
+      />
     </Flex>
   );
 };

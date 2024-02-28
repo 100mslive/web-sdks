@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useMedia } from 'react-use';
 import { DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import { selectPeerCount, useHMSStore } from '@100mslive/react-sdk';
 import { CrossIcon } from '@100mslive/react-icons';
-// @ts-ignore: No implicit Any
 import { Chat } from './Chat/Chat';
 import { PaginatedParticipants } from './Footer/PaginatedParticipants';
 import { ParticipantList } from './Footer/ParticipantList';
 import { Box, config as cssConfig, Flex, IconButton, Tabs, Text } from '../..';
 import { Tooltip } from '../../Tooltip';
 import { ChatSettings } from './ChatSettings';
-// @ts-ignore: No implicit Any
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
@@ -19,12 +18,15 @@ import { getFormattedCount } from '../common/utils';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
 
 const tabTriggerCSS = {
-  color: '$on_surface_high',
+  color: '$on_surface_low',
   p: '$4',
   fontWeight: '$semiBold',
   fontSize: '$sm',
   w: '100%',
   justifyContent: 'center',
+  '&[data-state="active"]': {
+    color: '$on_surface_high',
+  },
 };
 
 const ParticipantCount = ({ count }: { count: number }) => {
@@ -60,13 +62,16 @@ export const SidePaneTabs = React.memo<{
   const showChatSettings = showChat && isChatOpen && (!isMobile || !isOverlayChat);
 
   useEffect(() => {
-    if (activeTab === SIDE_PANE_OPTIONS.CHAT && !showChat && showParticipants) {
-      setActiveTab(SIDE_PANE_OPTIONS.PARTICIPANTS);
-    } else if (activeTab === SIDE_PANE_OPTIONS.PARTICIPANTS && showChat && !showParticipants) {
-      setActiveTab(SIDE_PANE_OPTIONS.CHAT);
-    } else if (!showChat && !showParticipants) {
-      resetSidePane();
-    }
+    match({ activeTab, showChat, showParticipants })
+      .with({ activeTab: SIDE_PANE_OPTIONS.CHAT, showChat: false, showParticipants: true }, () => {
+        setActiveTab(SIDE_PANE_OPTIONS.PARTICIPANTS);
+      })
+      .with({ activeTab: SIDE_PANE_OPTIONS.PARTICIPANTS, showChat: true, showParticipants: false }, () => {
+        setActiveTab(SIDE_PANE_OPTIONS.CHAT);
+      })
+      .with({ showChat: false, showParticipants: false }, () => {
+        resetSidePane();
+      });
   }, [showChat, activeTab, showParticipants, resetSidePane]);
 
   useEffect(() => {
@@ -102,11 +107,10 @@ export const SidePaneTabs = React.memo<{
         transition: 'margin 0.3s ease-in-out',
       }}
     >
-      {isOverlayChat && isChatOpen && showChat ? (
-        <Chat />
-      ) : (
-        <>
-          {hideTabs ? (
+      {match({ isOverlayChat, isChatOpen, showChat, hideTabs })
+        .with({ isOverlayChat: true, isChatOpen: true, showChat: true }, () => <Chat />)
+        .with({ hideTabs: true }, () => {
+          return (
             <>
               <Flex justify="between" css={{ w: '100%', '&:empty': { display: 'none' } }}>
                 <Text
@@ -159,7 +163,10 @@ export const SidePaneTabs = React.memo<{
                 <ParticipantList offStageRoles={off_stage_roles} onActive={setActiveRole} />
               )}
             </>
-          ) : (
+          );
+        })
+        .otherwise(() => {
+          return (
             <Tabs.Root
               value={activeTab}
               onValueChange={setActiveTab}
@@ -170,24 +177,10 @@ export const SidePaneTabs = React.memo<{
             >
               <Flex css={{ w: '100%' }}>
                 <Tabs.List css={{ flexGrow: 1, borderRadius: '$2', bg: '$surface_default' }}>
-                  <Tabs.Trigger
-                    value={SIDE_PANE_OPTIONS.CHAT}
-                    onClick={toggleChat}
-                    css={{
-                      ...tabTriggerCSS,
-                      color: activeTab !== SIDE_PANE_OPTIONS.CHAT ? '$on_surface_low' : '$on_surface_high',
-                    }}
-                  >
+                  <Tabs.Trigger value={SIDE_PANE_OPTIONS.CHAT} onClick={toggleChat} css={tabTriggerCSS}>
                     {chat_title}
                   </Tabs.Trigger>
-                  <Tabs.Trigger
-                    value={SIDE_PANE_OPTIONS.PARTICIPANTS}
-                    onClick={toggleParticipants}
-                    css={{
-                      ...tabTriggerCSS,
-                      color: activeTab !== SIDE_PANE_OPTIONS.PARTICIPANTS ? '$on_surface_low' : '$on_surface_high',
-                    }}
-                  >
+                  <Tabs.Trigger value={SIDE_PANE_OPTIONS.PARTICIPANTS} onClick={toggleParticipants} css={tabTriggerCSS}>
                     Participants&nbsp;
                     <ParticipantCount count={peerCount} />
                   </Tabs.Trigger>
@@ -217,9 +210,8 @@ export const SidePaneTabs = React.memo<{
                 <Chat />
               </Tabs.Content>
             </Tabs.Root>
-          )}
-        </>
-      )}
+          );
+        })}
     </Flex>
   );
 });
