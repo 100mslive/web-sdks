@@ -357,7 +357,9 @@ const HLSView = () => {
                 margin: '0 auto',
               }}
             >
-              <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
+              {!(isMobile || isLandscape) && (
+                <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
+              )}
               {showLoader && (
                 <Flex
                   align="center"
@@ -440,8 +442,10 @@ const HLSView = () => {
                         >
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
-                            {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
-                            {availableLayers.length > 0 ? (
+                            {hasCaptions && !isHlsAutoplayBlocked && (
+                              <HLSCaptionSelector isEnabled={isCaptionEnabled} />
+                            )}
+                            {availableLayers.length > 0 && !isHlsAutoplayBlocked ? (
                               <HLSQualitySelector
                                 layers={availableLayers}
                                 onOpenChange={setQualityDropDownOpen}
@@ -451,6 +455,7 @@ const HLSView = () => {
                                 isAuto={isUserSelectedAuto}
                               />
                             ) : null}
+                            <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
                           </HMSVideoPlayer.Controls.Right>
                         </HMSVideoPlayer.Controls.Root>
                       </Flex>
