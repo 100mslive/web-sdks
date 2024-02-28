@@ -14,7 +14,7 @@ import {
   useHMSStore,
   useHMSVanillaStore,
 } from '@100mslive/react-sdk';
-import { ColoredHandIcon, GoLiveIcon, PauseIcon, PlayIcon } from '@100mslive/react-icons';
+import { BackwardArrowIcon, ColoredHandIcon, ForwardArrowIcon, GoLiveIcon } from '@100mslive/react-icons';
 import { ChatToggle } from '../components/Footer/ChatToggle';
 import { HlsStatsOverlay } from '../components/HlsStatsOverlay';
 import { HMSVideoPlayer } from '../components/HMSVideo';
@@ -24,6 +24,7 @@ import { HLSCaptionSelector } from '../components/HMSVideo/HLSCaptionSelector';
 import { HLSQualitySelector } from '../components/HMSVideo/HLSQualitySelector';
 import { HLSViewTitle } from '../components/HMSVideo/MwebHLSViewTitle';
 import { HMSPlayerContext } from '../components/HMSVideo/PlayerContext';
+import { LeaveRoom } from '../components/Leave/LeaveRoom';
 import { ToastManager } from '../components/Toast/ToastManager';
 import { Button } from '../../Button';
 import { IconButton } from '../../IconButton';
@@ -58,6 +59,7 @@ const HLSView = () => {
   const [hasCaptions, setHasCaptions] = useState(false);
   const [currentSelectedQuality, setCurrentSelectedQuality] = useState(null);
   const [isHlsAutoplayBlocked, setIsHlsAutoplayBlocked] = useState(false);
+  const [isSeekEnabled, setIsSeekEnabled] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
   const lastHlsUrl = usePrevious(hlsUrl);
@@ -276,13 +278,13 @@ const HLSView = () => {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
-      controlsTimerRef.current = setTimeout(() => {
-        setControlsVisible(false);
-      }, 5000);
     }
     if (!isFullScreen && controlsTimerRef.current) {
       clearTimeout(controlsTimerRef.current);
     }
+    controlsTimerRef.current = setTimeout(() => {
+      setControlsVisible(false);
+    }, 5000);
     return () => {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
@@ -290,31 +292,43 @@ const HLSView = () => {
     };
   }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
 
-  const onTouchHandler = useCallback(
+  const onSeekTo = useCallback(seek => {
+    hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
+  }, []);
+  const onDoubleClickHandler = useCallback(
     event => {
-      event.preventDefault();
-      // logic for invisible when tapping
-      if (event.type === 'ontouchstart' && controlsVisible) {
-        setControlsVisible(false);
+      if (!(isMobile || isLandscape)) {
         return;
       }
-      // normal scemnario
-      if (event.type === 'ontouchstart' || qualityDropDownOpen) {
-        setControlsVisible(true);
-        return;
+      const sidePercentage = (event.screenX * 100) / event.target.clientWidth;
+      setIsSeekEnabled(true);
+      // there is space for pause/unpause button
+      if (sidePercentage < 45) {
+        onSeekTo(-10);
+      } else {
+        onSeekTo(10);
       }
-      if (isFullScreen && !controlsVisible && event.type === 'touchmove') {
-        setControlsVisible(true);
-        if (controlsTimerRef.current) {
-          clearTimeout(controlsTimerRef.current);
-        }
-      }
+      setTimeout(() => {
+        setIsSeekEnabled(false);
+      }, 200);
     },
-    [controlsVisible, isFullScreen, qualityDropDownOpen],
+    [isLandscape, isMobile, onSeekTo],
   );
+  const onClickHandler = useCallback(() => {
+    if (!(isMobile || isLandscape)) {
+      return;
+    }
+    setControlsVisible(value => !value);
+    if (controlsTimerRef.current) {
+      clearTimeout(controlsTimerRef.current);
+    }
+  }, [isLandscape, isMobile]);
   const onHoverHandler = useCallback(
     event => {
-      // normal scemnario
+      event.preventDefault();
+      if (isMobile || isLandscape) {
+        return;
+      }
       if (event.type === 'mouseenter' || qualityDropDownOpen) {
         setControlsVisible(true);
         return;
@@ -328,7 +342,7 @@ const HLSView = () => {
         }
       }
     },
-    [controlsVisible, isFullScreen, qualityDropDownOpen],
+    [controlsVisible, isFullScreen, isLandscape, isMobile, qualityDropDownOpen],
   );
 
   return (
@@ -375,49 +389,55 @@ const HLSView = () => {
                 onMouseEnter={onHoverHandler}
                 onMouseMove={onHoverHandler}
                 onMouseLeave={onHoverHandler}
-                onTouchStart={onTouchHandler}
-                onTouchMove={onTouchHandler}
+                onClick={onClickHandler}
+                onDoubleClick={e => {
+                  onDoubleClickHandler(e);
+                }}
               >
                 <>
                   {isMobile || isLandscape ? (
                     <>
                       {!showLoader && (
-                        <Box
+                        <Flex
+                          align="center"
+                          justify="center"
                           css={{
-                            position: 'absolute',
-                            top: '40%',
-                            left: '50%',
-                            transform: 'translateY(-40%) translateX(-50%)',
-                            padding: '$4',
+                            bg: '#00000066',
                             display: 'inline-flex',
-                            r: '$round',
-                            gap: '$1',
-                            bg: 'rgba(0, 0, 0, 0.6)',
+                            gap: '$2',
                             zIndex: 1,
+                            size: '100%',
                             visibility: controlsVisible ? `` : `hidden`,
                             opacity: controlsVisible ? `1` : '0',
                           }}
                         >
-                          {isPaused ? (
-                            <IconButton
-                              onClick={async () => {
-                                await hlsPlayer?.play();
-                              }}
-                              data-testid="play_btn"
-                            >
-                              <PlayIcon width="48px" height="48px" />
-                            </IconButton>
-                          ) : (
-                            <IconButton
-                              onClick={async () => {
-                                await hlsPlayer?.pause();
-                              }}
-                              data-testid="pause_btn"
-                            >
-                              <PauseIcon width="48px" height="48px" />
-                            </IconButton>
-                          )}
-                        </Box>
+                          <HMSVideoPlayer.Seeker
+                            title="backward"
+                            css={{
+                              visibility: isSeekEnabled ? `` : `hidden`,
+                              opacity: isSeekEnabled ? `1` : '0',
+                            }}
+                          >
+                            <BackwardArrowIcon width={32} height={32} />
+                          </HMSVideoPlayer.Seeker>
+                          <Box
+                            css={{
+                              bg: 'rgba(0, 0, 0, 0.6)',
+                              r: '$round',
+                            }}
+                          >
+                            <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
+                          </Box>
+                          <HMSVideoPlayer.Seeker
+                            title="forward"
+                            css={{
+                              visibility: isSeekEnabled ? `` : `hidden`,
+                              opacity: isSeekEnabled ? `1` : '0',
+                            }}
+                          >
+                            <ForwardArrowIcon width={32} height={32} />
+                          </HMSVideoPlayer.Seeker>
+                        </Flex>
                       )}
                       <Flex
                         ref={controlsRef}
@@ -430,6 +450,7 @@ const HLSView = () => {
                           left: '0',
                           width: '100%',
                           flexShrink: 0,
+                          zIndex: 1,
                           visibility: controlsVisible ? `` : `hidden`,
                           opacity: controlsVisible ? `1` : '0',
                         }}
@@ -439,6 +460,9 @@ const HLSView = () => {
                             p: '$4 $8',
                           }}
                         >
+                          <HMSVideoPlayer.Controls.Left>
+                            <LeaveRoom screenType={screenType} />
+                          </HMSVideoPlayer.Controls.Left>
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
                             {hasCaptions && <HLSCaptionSelector isEnabled={isCaptionEnabled} />}
@@ -459,13 +483,14 @@ const HLSView = () => {
                   ) : null}
                   <Flex
                     ref={controlsRef}
-                    direction="column"
+                    direction={isMobile ? 'columnReverse' : 'column'}
                     justify="end"
                     align="start"
                     css={{
                       position: 'absolute',
                       bottom: '0',
                       left: '0',
+                      zIndex: 1,
                       background:
                         isMobile || isLandscape
                           ? ''
@@ -478,9 +503,7 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    {!(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
-                      <HMSVideoPlayer.Progress />
-                    )}
+                    <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
                     <HMSVideoPlayer.Controls.Root
                       css={{
                         p: '$4 $8',
@@ -489,12 +512,23 @@ const HLSView = () => {
                       <HMSVideoPlayer.Controls.Left>
                         {!(isMobile || isLandscape) && (
                           <>
-                            <HMSVideoPlayer.PlayButton
-                              onClick={async () => {
-                                isPaused ? await hlsPlayer?.play() : hlsPlayer?.pause();
+                            <HMSVideoPlayer.Seeker
+                              onClick={() => {
+                                onSeekTo(-10);
                               }}
-                              isPaused={isPaused}
-                            />
+                              title="backward"
+                            >
+                              <BackwardArrowIcon width={20} height={20} />
+                            </HMSVideoPlayer.Seeker>
+                            <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
+                            <HMSVideoPlayer.Seeker
+                              onClick={() => {
+                                onSeekTo(10);
+                              }}
+                              title="forward"
+                            >
+                              <ForwardArrowIcon width={20} height={20} />
+                            </HMSVideoPlayer.Seeker>
                             {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
                             <HMSVideoPlayer.Volume />
                           </>
@@ -552,9 +586,6 @@ const HLSView = () => {
                         ) : null}
                       </HMSVideoPlayer.Controls.Right>
                     </HMSVideoPlayer.Controls.Root>
-                    {(isMobile || isLandscape) && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
-                      <HMSVideoPlayer.Progress />
-                    ) : null}
                   </Flex>
                 </>
               </HMSVideoPlayer.Root>
@@ -565,6 +596,9 @@ const HLSView = () => {
         </>
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+          <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
+            <LeaveRoom screenType={screenType} />
+          </Flex>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
             {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
           </Flex>

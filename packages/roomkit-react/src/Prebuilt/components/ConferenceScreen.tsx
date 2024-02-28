@@ -11,7 +11,6 @@ import {
   useHMSStore,
 } from '@100mslive/react-sdk';
 import { Footer } from './Footer/Footer';
-import { LeaveRoom } from './Leave/LeaveRoom';
 import { MoreSettings } from './MoreSettings/MoreSettings';
 import { HLSFailureModal } from './Notifications/HLSFailureModal';
 // @ts-ignore: No implicit Any
@@ -144,11 +143,6 @@ export const ConferenceScreen = () => {
           >
             <Header />
           </Box>
-        )}
-        {isMwebHLSStream && (
-          <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
-            <LeaveRoom screenType={screenProps.screenType} />
-          </Flex>
         )}
         <Box
           css={{

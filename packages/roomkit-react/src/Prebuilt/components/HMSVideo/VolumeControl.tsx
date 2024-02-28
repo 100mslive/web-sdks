@@ -5,7 +5,7 @@ import { useHMSPlayerContext } from './PlayerContext';
 
 export const VolumeControl = () => {
   const { hlsPlayer } = useHMSPlayerContext();
-  const [volume, setVolume] = useState(hlsPlayer?.volume || 0);
+  const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);
   const [showSlider, setShowSlider] = useState(false);
 
   return (
