@@ -52,7 +52,7 @@ const Wrapper = styled('div', {
     landscapeStream: {
       true: {
         '@lg': {
-          position: 'unset !important',
+          position: 'unset',
           minHeight: '100%',
         },
       },
@@ -60,8 +60,7 @@ const Wrapper = styled('div', {
     mobileStream: {
       true: {
         '@md': {
-          position: 'unset !important',
-          background: 'red',
+          position: 'unset',
         },
       },
     },

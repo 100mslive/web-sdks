@@ -353,8 +353,8 @@ const HLSView = () => {
       direction={isMobile || isLandscape ? 'column' : 'row'}
       css={{
         w: sidepane !== '' && isLandscape ? '' : '100%',
-        h: sidepane !== '' && isMobile ? '36%' : '100%',
-        flex: '1 1 0',
+        h: sidepane !== '' && isMobile ? '' : '100%',
+        flex: sidepane !== '' && isMobile ? '' : '1 1 0',
       }}
     >
       {hlsUrl && !streamEnded ? (
@@ -409,6 +409,9 @@ const HLSView = () => {
                             gap: '$2',
                             zIndex: 1,
                             size: '100%',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
                             visibility: controlsVisible ? `` : `hidden`,
                             opacity: controlsVisible ? `1` : '0',
                           }}
@@ -502,7 +505,6 @@ const HLSView = () => {
                           : `linear-gradient(180deg, ${theme.colors.background_dim.value}00 29.46%, ${theme.colors.background_dim.value}A3 100%);`,
                       width: '100%',
                       pt: '$8',
-                      flexShrink: 0,
                       transition: 'visibility 0s 0.5s, opacity 0.5s linear',
                       visibility: controlsVisible ? `` : `hidden`,
                       opacity: controlsVisible ? `1` : '0',

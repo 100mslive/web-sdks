@@ -1,13 +1,9 @@
 import React, { forwardRef } from 'react';
-import { useMedia } from 'react-use';
-import { config, Flex } from '../../../';
-import { useIsLandscape } from '../../common/hooks';
+import { Box } from '../../../Layout';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
-  const isLandscape = useIsLandscape();
-  const isMobile = useMedia(config.media.md);
   return (
-    <Flex
+    <Box
       data-testid="hms-video"
       css={{
         size: '100%',
@@ -35,18 +31,19 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
     >
       <video
         style={{
-          flex: '1 1 0',
           margin: '0 auto',
-          minHeight: '0',
           objectFit: 'contain',
-          width: 'inherit',
-          height: isLandscape || isMobile ? '100%' : '',
-          position: isLandscape || isMobile ? 'absolute' : '',
+          maxWidth: '100%',
+          height: '100%',
+          '@lg': {
+            width: '100%',
+            heigth: 'auto',
+          },
         }}
         ref={videoRef}
         playsInline
       />
       {children}
-    </Flex>
+    </Box>
   );
 });

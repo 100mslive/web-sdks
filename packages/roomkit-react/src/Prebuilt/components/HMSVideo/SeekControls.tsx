@@ -1,5 +1,5 @@
 import React, { MouseEventHandler } from 'react';
-import { IconButton, Tooltip } from '../../..';
+import { CSS, IconButton, Tooltip } from '../../..';
 
 export const SeekControls = ({
   title,
@@ -9,7 +9,7 @@ export const SeekControls = ({
 }: {
   title: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
-  css: any;
+  css: CSS;
   children: React.ReactNode;
 }) => {
   return (
