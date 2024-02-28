@@ -75,6 +75,9 @@ export const useAppStateManager = () => {
       )
       .with([HMSRoomState.Disconnected, P.nullish], () => {
         setActiveState(isPreviewScreenEnabled ? PrebuiltStates.PREVIEW : PrebuiltStates.MEETING);
+      })
+      .otherwise(() => {
+        // do nothing
       });
   }, [roomLayout, roomState, isLeaveScreenEnabled, isPreviewScreenEnabled, prevRoomState, redirectToLeave]);
 
