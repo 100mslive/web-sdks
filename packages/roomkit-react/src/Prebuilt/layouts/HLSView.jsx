@@ -353,7 +353,6 @@ const HLSView = () => {
       direction={isMobile || isLandscape ? 'column' : 'row'}
       css={{
         w: sidepane !== '' && isLandscape ? '' : '100%',
-        h: sidepane !== '' && isMobile ? '36%' : '100%',
         flex: '1 1 0',
       }}
     >
@@ -405,6 +404,7 @@ const HLSView = () => {
                           justify="center"
                           css={{
                             bg: '#00000066',
+                            position: 'absolute',
                             display: 'inline-flex',
                             gap: '$2',
                             zIndex: 1,

@@ -31,7 +31,7 @@ import {
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
-import { useMobileHLSStream } from '../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -57,6 +57,7 @@ export const VideoStreamingSection = ({
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
   const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -104,7 +105,7 @@ export const VideoStreamingSection = ({
         css={{
           size: '100%',
           position: 'relative',
-          gap: '$4',
+          gap: isMobileHLSStream || isLandscapeHLSStream ? '' : '$4',
         }}
         direction={isMobileHLSStream ? 'column' : 'row'}
       >
