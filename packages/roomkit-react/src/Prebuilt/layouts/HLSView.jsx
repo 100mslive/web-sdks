@@ -352,8 +352,9 @@ const HLSView = () => {
       ref={hlsViewRef}
       direction={isMobile || isLandscape ? 'column' : 'row'}
       css={{
-        w: sidepane !== '' && isLandscape ? '55%' : '100%',
+        w: sidepane !== '' && isLandscape ? '' : '100%',
         h: sidepane !== '' && isMobile ? '36%' : '100%',
+        flex: '1 1 0',
       }}
     >
       {hlsUrl && !streamEnded ? (

@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
 import { useMedia } from 'react-use';
+import { match } from 'ts-pattern';
 import { selectAppData, selectVideoTrackByPeerID, useHMSStore } from '@100mslive/react-sdk';
 import { Polls } from '../components/Polls/Polls';
 import { RoomDetailsPane } from '../components/RoomDetails/RoomDetailsPane';
 import { LayoutMode } from '../components/Settings/LayoutSettings';
 import { SidePaneTabs } from '../components/SidePaneTabs';
 import { TileCustomisationProps } from '../components/VideoLayouts/GridLayout';
-// @ts-ignore: No implicit Any
 import VideoTile from '../components/VideoTile';
-// @ts-ignore: No implicit Any
 import { VBPicker } from '../components/VirtualBackground/VBPicker';
-import { Box, Flex } from '../../Layout';
-import { config as cssConfig } from '../../Theme';
+import { Flex } from '../../Layout';
+import { config as cssConfig, styled } from '../../Theme';
 // @ts-ignore: No implicit Any
 import { useSidepaneReset } from '../components/AppData/useSidepane';
 // @ts-ignore: No implicit Any
@@ -20,9 +19,84 @@ import {
   useRoomLayoutConferencingScreen,
   useRoomLayoutPreviewScreen,
 } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useIsLandscape, useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { translateAcross } from '../../utils';
 import { APP_DATA, SIDE_PANE_OPTIONS, UI_SETTINGS } from '../common/constants';
+
+const Wrapper = styled('div', {
+  w: '$100',
+  h: '100%',
+  p: '$10',
+  flex: '1 1 0',
+  background: '$surface_dim',
+  r: '$1',
+  position: 'relative',
+  '@lg': {
+    w: '100%',
+    h: '100%',
+    ml: 0,
+    right: 0,
+    position: 'fixed',
+    bottom: 0,
+    borderRadius: 0,
+    zIndex: 10,
+  },
+  '@md': {
+    p: '$6 $8',
+    pb: '$12',
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
+  },
+  variants: {
+    landscapeStream: {
+      true: {
+        '@lg': {
+          position: 'unset !important',
+          minHeight: '100%',
+        },
+      },
+    },
+    mobileStream: {
+      true: {
+        '@md': {
+          position: 'unset !important',
+          background: 'red',
+        },
+      },
+    },
+    overlayChat: {
+      true: {
+        height: 'unset',
+        maxHeight: 300,
+        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
+        '@md': {
+          pb: '$20',
+        },
+      },
+    },
+  },
+  compoundVariants: [
+    {
+      landscapeStream: true,
+      overlayChat: true,
+      css: {
+        position: 'unset',
+        height: '100%',
+        maxHeight: 'unset',
+      },
+    },
+    {
+      mobileStream: true,
+      overlayChat: true,
+      css: {
+        position: 'unset',
+        height: '100%',
+        maxHeight: 'unset',
+      },
+    },
+  ],
+});
 
 const SidePane = ({
   tileProps,
@@ -32,7 +106,6 @@ const SidePane = ({
   hideControls?: boolean;
 }) => {
   const isMobile = useMedia(cssConfig.media.md);
-  const isLandscape = useIsLandscape();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const activeScreensharePeerId = useHMSStore(selectAppData(APP_DATA.activeScreensharePeerId));
   const trackId = useHMSStore(selectVideoTrackByPeerID(activeScreensharePeerId))?.id;
@@ -48,21 +121,6 @@ const SidePane = ({
     : elements?.virtual_background?.background_media || [];
 
   const resetSidePane = useSidepaneReset();
-  let ViewComponent;
-  if (sidepane === SIDE_PANE_OPTIONS.POLLS) {
-    ViewComponent = <Polls />;
-  }
-  if (sidepane === SIDE_PANE_OPTIONS.PARTICIPANTS || sidepane === SIDE_PANE_OPTIONS.CHAT) {
-    ViewComponent = (
-      <SidePaneTabs hideControls={hideControls} active={sidepane} hideTab={isMobileHLSStream || isLandscapeHLSStream} />
-    );
-  }
-  if (sidepane === SIDE_PANE_OPTIONS.VB) {
-    ViewComponent = <VBPicker backgroundMedia={backgroundMedia} />;
-  }
-  if (sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS) {
-    ViewComponent = <RoomDetailsPane />;
-  }
 
   useEffect(() => {
     return () => {
@@ -70,9 +128,6 @@ const SidePane = ({
     };
   }, [resetSidePane]);
 
-  if (!ViewComponent && (!trackId || layoutMode !== LayoutMode.GALLERY)) {
-    return null;
-  }
   const tileLayout = {
     hideParticipantNameOnTile: tileProps?.hide_participant_name_on_tile,
     roundedVideoTile: tileProps?.rounded_video_tile,
@@ -80,8 +135,11 @@ const SidePane = ({
     hideMetadataOnTile: tileProps?.hide_metadata_on_tile,
     objectFit: tileProps?.video_object_fit,
   };
-  const VB = sidepane === SIDE_PANE_OPTIONS.VB;
   const mwebStreamingChat = isMobile && sidepane === SIDE_PANE_OPTIONS.CHAT && elements?.chat?.is_overlay;
+  const commonProps = {
+    landscapeStream: isLandscapeHLSStream,
+    mobileStream: isMobileHLSStream,
+  };
 
   return (
     <Flex
@@ -89,11 +147,14 @@ const SidePane = ({
       justify="center"
       css={{
         w: '$100',
-        h: isMobileHLSStream ? '64%' : '100%',
+        h: '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
-        '@md': { position: mwebStreamingChat || isLandscape ? 'absolute' : '', zIndex: 12 },
+        '&:empty': { display: 'none' },
+        '@ls': {
+          w: isMobileHLSStream || isLandscapeHLSStream ? '340px' : '$100',
+        },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (
@@ -106,46 +167,43 @@ const SidePane = ({
           {...tileLayout}
         />
       )}
-      {!!ViewComponent && (
-        <Box
-          css={{
-            w: '$100',
-            h: mwebStreamingChat || isLandscape ? '0' : '100%',
-            p: VB ? '$10 $6 $10 $10' : '$10',
-            flex: '1 1 0',
-            minHeight: 0,
-            maxHeight: mwebStreamingChat || isLandscape ? '300px' : 'unset',
-            background:
-              mwebStreamingChat || isLandscape
-                ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)'
-                : '$surface_dim',
-            r: '$1',
-            position: 'relative',
-            '@lg': {
-              w: '100%',
-              h: '100%',
-              ml: 0,
-              right: 0,
-              position: isLandscapeHLSStream ? '' : 'fixed',
-              minHeight: isLandscapeHLSStream ? '100%' : '',
-              bottom: 0,
-              borderRadius: 0,
-              zIndex: 10,
-            },
-            '@md': {
-              p: '$6 $8',
-              h: isMobileHLSStream ? '64%' : '100%',
-              pb: '$12',
-              minHeight: isMobileHLSStream ? '64%' : '',
-              borderTopLeftRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
-              borderTopRightRadius: sidepane === SIDE_PANE_OPTIONS.POLLS ? '$2' : '0',
-              animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
-            },
-          }}
-        >
-          {ViewComponent}
-        </Box>
-      )}
+
+      {match(sidepane)
+        .with(SIDE_PANE_OPTIONS.POLLS, () => (
+          <Wrapper
+            css={{
+              '@md': {
+                borderTopLeftRadius: '$2',
+                borderTopRightRadius: '$2',
+              },
+            }}
+            {...commonProps}
+          >
+            <Polls />
+          </Wrapper>
+        ))
+        .with(SIDE_PANE_OPTIONS.VB, () => (
+          <Wrapper css={{ p: '$10 $6 $10 $10' }} {...commonProps}>
+            <VBPicker backgroundMedia={backgroundMedia} />
+          </Wrapper>
+        ))
+        .with(SIDE_PANE_OPTIONS.CHAT, SIDE_PANE_OPTIONS.PARTICIPANTS, () => (
+          <Wrapper {...commonProps} overlayChat={mwebStreamingChat}>
+            <SidePaneTabs
+              hideControls={hideControls}
+              active={sidepane}
+              hideTab={isMobileHLSStream || isLandscapeHLSStream}
+            />
+          </Wrapper>
+        ))
+        .with(SIDE_PANE_OPTIONS.ROOM_DETAILS, () => (
+          <Wrapper {...commonProps}>
+            <RoomDetailsPane />
+          </Wrapper>
+        ))
+        .otherwise(() => {
+          return null;
+        })}
     </Flex>
   );
 };
