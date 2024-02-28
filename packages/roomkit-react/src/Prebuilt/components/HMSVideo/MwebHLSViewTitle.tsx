@@ -4,7 +4,10 @@ import { Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit any
 import { Logo } from '../Header/HeaderComponents';
-import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
+import {
+  useRoomLayoutConferencingScreen,
+  useRoomLayoutHeader,
+} from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../../common/utils';
 import { getTime } from './utils';
@@ -19,6 +22,7 @@ export const HLSViewTitle = () => {
   const peerCount = useHMSStore(selectPeerCount);
   const hlsState = useHMSStore(selectHLSState);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { title } = useRoomLayoutHeader();
   const { screenType } = useRoomLayoutConferencingScreen();
   const [liveTime, setLiveTime] = useState(0);
 
@@ -64,9 +68,11 @@ export const HLSViewTitle = () => {
     >
       <Logo />
       <Flex direction="column">
-        <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
-          Tech Talk
-        </Text>
+        {title ? (
+          <Text variant="sub2" css={{ fontWeight: '$semiBold' }}>
+            {title}
+          </Text>
+        ) : null}
         <Flex gap="1">
           <Text variant="caption" css={{ color: '$on_surface_medium' }}>
             {getFormattedCount(peerCount) + ' watching'}
