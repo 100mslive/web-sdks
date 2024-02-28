@@ -4,7 +4,6 @@ import { Box, Flex } from '../../../Layout';
 import { Text } from '../../../Text';
 // @ts-ignore: No implicit any
 import { Logo } from '../Header/HeaderComponents';
-// @ts-ignore
 import { RoomDetailsRow } from './RoomDetailsRow';
 import { useRoomLayoutHeader } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore
