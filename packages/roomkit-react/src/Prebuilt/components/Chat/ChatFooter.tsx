@@ -99,7 +99,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       setRoleSelector(defaultSelection);
     } else {
       // @ts-ignore
-      if (!(isMobile || isLandscapeHLSStream) || !elements?.chat?.disable_autofocus) {
+      if (!(isMobile || isLandscapeHLSStream) && !elements?.chat?.disable_autofocus) {
         inputRef.current?.focus();
       }
     }
