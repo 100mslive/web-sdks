@@ -25,7 +25,12 @@ import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvid
 import { getMetadata } from '../../common/utils';
 
 const dropdownItemCSS = { backgroundColor: '$surface_default', gap: '$4', p: '$8' };
-const optionTextCSS = { fontWeight: '$semiBold', color: '$on_surface_high', textTransform: 'none' };
+const optionTextCSS = {
+  fontWeight: '$semiBold',
+  color: '$on_surface_high',
+  textTransform: 'none',
+  whiteSpace: 'nowrap',
+};
 
 const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleName: string }) => {
   const vanillaStore = useHMSVanillaStore();
@@ -34,8 +39,8 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
   const permissions = useHMSStore(selectPermissions);
   const role = useHMSStore(selectRoleByRoleName(roleName));
 
-  let allPeersHaveVideoOn = true;
-  let allPeersHaveAudioOn = true;
+  let isVideoOnForSomePeers = false;
+  let isAudioOnForSomePeers = false;
 
   peerList.forEach(peer => {
     if (peer.isLocal) {
@@ -43,8 +48,8 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
     }
     const isAudioOn = !!peer.audioTrack && store.tracks[peer.audioTrack]?.enabled;
     const isVideoOn = !!peer.videoTrack && store.tracks[peer.videoTrack]?.enabled;
-    allPeersHaveAudioOn = allPeersHaveAudioOn && isAudioOn;
-    allPeersHaveVideoOn = allPeersHaveVideoOn && isVideoOn;
+    isAudioOnForSomePeers = isAudioOnForSomePeers || isAudioOn;
+    isVideoOnForSomePeers = isVideoOnForSomePeers || isVideoOn;
   });
 
   const setTrackEnabled = async (type: 'audio' | 'video', enabled = false) => {
@@ -63,7 +68,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
     <>
       {role.publishParams.allowed.includes('audio') && (
         <>
-          {allPeersHaveAudioOn && permissions?.mute ? (
+          {isAudioOnForSomePeers && permissions?.mute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
               <MicOffIcon />
               <Text variant="sm" css={optionTextCSS}>
@@ -72,7 +77,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
             </Dropdown.Item>
           ) : null}
 
-          {!allPeersHaveAudioOn && permissions?.unmute ? (
+          {!isAudioOnForSomePeers && permissions?.unmute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', true)}>
               <MicOnIcon />
               <Text variant="sm" css={optionTextCSS}>
@@ -85,7 +90,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
 
       {role.publishParams.allowed.includes('video') && (
         <>
-          {allPeersHaveVideoOn && permissions?.mute ? (
+          {isVideoOnForSomePeers && permissions?.mute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
               <VideoOffIcon />
               <Text variant="sm" css={optionTextCSS}>
@@ -94,7 +99,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
             </Dropdown.Item>
           ) : null}
 
-          {!allPeersHaveVideoOn && permissions?.unmute ? (
+          {!isVideoOnForSomePeers && permissions?.unmute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', true)}>
               <VideoOnIcon />
               <Text variant="sm" css={optionTextCSS}>
@@ -122,7 +127,13 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const canRemoveRoleFromRoom =
     permissions?.removeOthers && (on_stage_role === roleName || off_stage_roles?.includes(roleName));
 
-  if (!(canMuteOrUnmute || canRemoveRoleFromStage || canRemoveRoleFromRoom) || peerList.length === 0 || !role) {
+  if (
+    !(canMuteOrUnmute || canRemoveRoleFromStage || canRemoveRoleFromRoom) ||
+    peerList.length === 0 ||
+    // if only local peer is present no need to show any options
+    (peerList.length === 1 && peerList[0].isLocal) ||
+    !role
+  ) {
     return null;
   }
 
@@ -171,7 +182,7 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
       </Dropdown.Trigger>
       <Dropdown.Content
         onClick={e => e.stopPropagation()}
-        css={{ w: 'max-content', maxWidth: '$64', bg: '$surface_default', py: 0 }}
+        css={{ w: 'max-content', bg: '$surface_default', py: 0 }}
         align="end"
       >
         {canRemoveRoleFromStage && (
