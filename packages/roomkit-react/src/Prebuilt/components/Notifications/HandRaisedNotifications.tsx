@@ -28,12 +28,12 @@ export const HandRaisedNotifications = () => {
     }
 
     // Don't show toast message in case of local peer.
-    if (roomState !== HMSRoomState.Connected || notification.data.isLocal || !on_stage_exp || !isSubscribing) {
+    if (roomState !== HMSRoomState.Connected || notification.data.isLocal || !isSubscribing) {
       return;
     }
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
     if (hasPeerHandRaised) {
-      ToastBatcher.showToast({ notification, type: 'RAISE_HAND' });
+      ToastBatcher.showToast({ notification, type: on_stage_exp ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
     }
   }, [isSubscribing, notification, on_stage_exp, roomState, vanillaStore]);

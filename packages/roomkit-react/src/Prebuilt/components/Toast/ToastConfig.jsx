@@ -127,6 +127,23 @@ export const ToastConfig = {
       return {
         title: `${notification.data?.name} raised hand`,
         icon: <HandIcon />,
+      };
+    },
+    multiple: notifications => {
+      const count = new Set(notifications.map(notification => notification.data?.id)).size;
+      return {
+        title: `${notifications[notifications.length - 1].data?.name} ${
+          count > 1 ? `${count} and others` : ''
+        } raised hand`,
+        icon: <HandIcon />,
+      };
+    },
+  },
+  RAISE_HAND_HLS: {
+    single: notification => {
+      return {
+        title: `${notification.data?.name} raised hand`,
+        icon: <HandIcon />,
         action: <HandRaiseAction id={notification.data?.id} />,
       };
     },

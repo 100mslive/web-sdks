@@ -20,8 +20,7 @@ export const PeerNotifications = () => {
   const [selectedPeer, setPeerSelector] = useSetSubscribedChatSelector(CHAT_SELECTOR.PEER);
 
   useEffect(() => {
-    // @ts-ignore
-    if (!notification?.data || !notification.data?.id) {
+    if (!notification?.data) {
       return;
     }
 
@@ -50,7 +49,7 @@ export const PeerNotifications = () => {
     }
 
     ToastBatcher.showToast({ notification });
-  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed]);
+  }, [notification, isPeerJoinSubscribed, isPeerLeftSubscribed, selectedPeer.id, setPeerSelector]);
 
   return null;
 };
