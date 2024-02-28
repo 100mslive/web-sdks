@@ -81,7 +81,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', true)}>
               <MicOnIcon />
               <Text variant="sm" css={optionTextCSS}>
-                Request Unmute Audio for All
+                Request to Unmute Audio for All
               </Text>
             </Dropdown.Item>
           ) : null}
@@ -103,7 +103,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', true)}>
               <VideoOnIcon />
               <Text variant="sm" css={optionTextCSS}>
-                Request Unmute Video for All
+                Request to Unmute Video for All
               </Text>
             </Dropdown.Item>
           ) : null}
