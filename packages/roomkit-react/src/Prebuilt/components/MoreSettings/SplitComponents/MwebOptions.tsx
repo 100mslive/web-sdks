@@ -291,7 +291,8 @@ export const MwebOptions = ({
                   {match({ isBrowserRecordingOn, isRecordingLoading })
                     .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
                     .with({ isRecordingLoading: true }, () => 'Starting Recording')
-                    .with({ isRecordingLoading: false }, () => 'Start Recording')}
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')
+                    .otherwise(() => null)}
                 </ActionTile.Title>
               </ActionTile.Root>
             ) : null}
