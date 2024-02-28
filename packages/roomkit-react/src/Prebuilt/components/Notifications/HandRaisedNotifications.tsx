@@ -35,7 +35,7 @@ export const HandRaisedNotifications = () => {
     const hasPeerHandRaised = vanillaStore.getState(selectHasPeerHandRaised(notification.data.id));
     const peer = vanillaStore.getState(selectPeerByID(notification.data.id));
     if (hasPeerHandRaised) {
-      const showCTA = on_stage_exp?.off_stage_roles?.includes(peer?.roleName || '');
+      const showCTA = peer?.roleName && (on_stage_exp?.off_stage_roles || [])?.includes(peer.roleName);
       ToastBatcher.showToast({ notification, type: showCTA ? 'RAISE_HAND_HLS' : 'RAISE_HAND' });
       console.debug('Metadata updated', notification.data);
     }
