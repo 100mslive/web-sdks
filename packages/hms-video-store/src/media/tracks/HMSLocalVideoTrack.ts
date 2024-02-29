@@ -17,6 +17,7 @@ import { HMSMediaStreamPlugin, HMSVideoPluginsManager } from '../../plugins/vide
 import { HMSMediaStreamPluginsManager } from '../../plugins/video/HMSMediaStreamPluginsManager';
 import { LocalTrackManager } from '../../sdk/LocalTrackManager';
 import HMSLogger from '../../utils/logger';
+import { isBrowser, isMobile } from '../../utils/support';
 import { getVideoTrack, isEmptyTrack } from '../../utils/track';
 import { HMSVideoTrackSettings, HMSVideoTrackSettingsBuilder } from '../settings';
 import { HMSLocalStream } from '../streams';
@@ -36,6 +37,7 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
   private processedTrack?: MediaStreamTrack;
   private _layerDefinitions: HMSSimulcastLayerDefinition[] = [];
   private TAG = '[HMSLocalVideoTrack]';
+  private enabledStateBeforeBackground = false;
 
   /**
    * true if it's screenshare and current tab is what is being shared. Browser dependent, Chromium only
@@ -80,6 +82,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     this.pluginsManager = new HMSVideoPluginsManager(this, eventBus);
     this.mediaStreamPluginsManager = new HMSMediaStreamPluginsManager(eventBus);
     this.setFirstTrackId(this.trackId);
+    if (isBrowser && isMobile()) {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /** @internal */
@@ -232,6 +237,9 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
     await this.pluginsManager.cleanup();
     this.processedTrack?.stop();
     this.isPublished = false;
+    if (isBrowser && isMobile()) {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   /**
@@ -476,5 +484,17 @@ export class HMSLocalVideoTrack extends HMSVideoTrack {
       this.processedTrack = processedTrack;
     }
     await this.replaceSenderTrack(this.processedTrack || this.nativeTrack);
+  };
+
+  private handleVisibilityChange = async () => {
+    if (document.visibilityState === 'hidden' && this.source === 'regular') {
+      this.enabledStateBeforeBackground = this.enabled;
+      this.nativeTrack.enabled = false;
+      this.replaceSenderTrack(this.nativeTrack);
+    } else {
+      this.nativeTrack.enabled = this.enabledStateBeforeBackground;
+      this.replaceSenderTrack(this.nativeTrack);
+    }
+    this.eventBus.localVideoEnabled.publish({ enabled: this.nativeTrack.enabled, track: this });
   };
 }

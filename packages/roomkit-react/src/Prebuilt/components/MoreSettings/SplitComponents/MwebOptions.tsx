@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useClickAway } from 'react-use';
 import { ConferencingScreen, DefaultConferencingScreen_Elements } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectPeerCount,
@@ -120,7 +121,7 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton>
+            <IconButton css={{ '@md': { bg: screenType === 'hls_live_streaming' ? '$surface_default' : '' } }}>
               <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>
@@ -287,11 +288,11 @@ export const MwebOptions = ({
               >
                 {isRecordingLoading ? <Loading /> : <RecordIcon />}
                 <ActionTile.Title>
-                  {isBrowserRecordingOn
-                    ? 'Recording On'
-                    : isRecordingLoading
-                    ? 'Starting Recording'
-                    : 'Start Recording'}
+                  {match({ isBrowserRecordingOn, isRecordingLoading })
+                    .with({ isBrowserRecordingOn: true, isRecordingLoading: false }, () => 'Recording On')
+                    .with({ isRecordingLoading: true }, () => 'Starting Recording')
+                    .with({ isRecordingLoading: false }, () => 'Start Recording')
+                    .otherwise(() => null)}
                 </ActionTile.Title>
               </ActionTile.Root>
             ) : null}

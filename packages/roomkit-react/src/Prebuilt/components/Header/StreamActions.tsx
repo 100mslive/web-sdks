@@ -42,7 +42,7 @@ export const LiveStatus = () => {
         setLiveTime(Date.now() - timeStamp.getTime());
       }
     }, 1000);
-  }, [hlsState?.running, hlsState?.variants]);
+  }, [hlsState?.running, hlsState?.variants, screenType]);
 
   useEffect(() => {
     if (hlsState?.running) {

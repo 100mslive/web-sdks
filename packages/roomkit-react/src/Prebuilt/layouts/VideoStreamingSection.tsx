@@ -31,6 +31,7 @@ import {
   // @ts-ignore: No implicit Any
 } from '../components/AppData/useUISettings';
 import { useCloseScreenshareWhiteboard } from '../components/hooks/useCloseScreenshareWhiteboard';
+import { useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { SESSION_STORE_KEY } from '../common/constants';
 
@@ -55,6 +56,7 @@ export const VideoStreamingSection = ({
   const waitingViewerRole = useWaitingViewerRole();
   const urlToIframe = useUrlToEmbed();
   const pdfAnnotatorActive = usePDFConfig();
+  const isMobileHLSStream = useMobileHLSStream();
   useCloseScreenshareWhiteboard();
 
   useEffect(() => {
@@ -104,9 +106,18 @@ export const VideoStreamingSection = ({
           position: 'relative',
           gap: '$4',
         }}
+        direction={isMobileHLSStream ? 'column' : 'row'}
       >
         {ViewComponent}
-        <Box css={{ height: '100%', maxHeight: '100%', overflowY: 'clip', '&:empty': { display: 'none' } }}>
+        <Box
+          css={{
+            flex: isMobileHLSStream ? '1 1 0' : undefined,
+            height: !isMobileHLSStream ? '100%' : undefined,
+            maxHeight: '100%',
+            '&:empty': { display: 'none' },
+            overflowY: 'clip',
+          }}
+        >
           <SidePane
             screenType={screenType}
             // @ts-ignore

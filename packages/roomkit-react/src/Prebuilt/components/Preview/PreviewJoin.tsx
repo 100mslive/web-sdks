@@ -225,7 +225,7 @@ export const PreviewTile = ({ name, error }: { name: string; error?: boolean }) 
     >
       {localPeer ? (
         <>
-          <TileConnection name={name} peerId={localPeer.id} hideLabel={true} />
+          <TileConnection name="" peerId={localPeer.id} hideLabel={false} />
           <Video
             mirror={track?.facingMode !== 'environment' && mirrorLocalVideo}
             trackId={localPeer.videoTrack}

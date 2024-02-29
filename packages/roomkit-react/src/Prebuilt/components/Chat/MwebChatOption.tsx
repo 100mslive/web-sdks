@@ -8,7 +8,7 @@ export const MwebChatOption = ({
   onClick,
   color = '$on_surface_high',
 }: {
-  icon: any;
+  icon: React.ReactNode;
   text: string;
   onClick: () => void | Promise<void>;
   color?: string;

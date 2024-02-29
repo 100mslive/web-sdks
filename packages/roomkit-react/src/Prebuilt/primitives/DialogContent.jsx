@@ -11,6 +11,7 @@ import { Dialog } from '../../Modal';
 import { Select } from '../../Select';
 import { Switch } from '../../Switch';
 import { Text } from '../../Text';
+import { flexCenter } from '../../utils';
 
 export const DialogContent = ({ Icon, title, closeable = true, children, css, iconCSS = {}, ...props }) => {
   return (
@@ -21,9 +22,9 @@ export const DialogContent = ({ Icon, title, closeable = true, children, css, ic
           <Flex justify="between">
             <Flex align="center" css={{ mb: '$1' }}>
               {Icon ? (
-                <Box css={{ mr: '$2', color: '$on_primary_high', ...iconCSS }}>
+                <Flex css={{ mr: '$2', color: '$on_primary_high', ...flexCenter, ...iconCSS }}>
                   <Icon />
-                </Box>
+                </Flex>
               ) : null}
               <Text variant="h6" inline>
                 {title}

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { VolumeOneIcon, VolumeTwoIcon, VolumeZeroIcon } from '@100mslive/react-icons';
-import { Flex, Slider } from '../../../';
+import { Flex, Slider } from '../../..';
+import { useHMSPlayerContext } from './PlayerContext';
 
-export const VolumeControl = ({ hlsPlayer }) => {
+export const VolumeControl = () => {
+  const { hlsPlayer } = useHMSPlayerContext();
   const [volume, setVolume] = useState(hlsPlayer?.volume ?? 100);
   const [showSlider, setShowSlider] = useState(false);
 
@@ -47,7 +49,7 @@ export const VolumeControl = ({ hlsPlayer }) => {
         step={1}
         value={[volume]}
         onValueChange={volume => {
-          hlsPlayer.setVolume(volume[0]);
+          hlsPlayer?.setVolume(volume[0]);
           setVolume(volume[0]);
         }}
         thumbStyles={{ w: '$6', h: '$6' }}
@@ -56,7 +58,7 @@ export const VolumeControl = ({ hlsPlayer }) => {
   );
 };
 
-const VolumeIcon = ({ volume, onClick }) => {
+const VolumeIcon = ({ volume, onClick }: { volume: number; onClick: () => void }) => {
   if (volume === 0) {
     return <VolumeZeroIcon style={{ cursor: 'pointer', transition: 'color 0.3s' }} onClick={onClick} />;
   }

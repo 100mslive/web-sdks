@@ -20,7 +20,7 @@ type UserAgent = {
   framework_sdk_version?: HMSFrameworkInfo['sdkVersion'];
 };
 
-export async function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo) {
+export function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HMSFrameworkInfo): string {
   const sdk = 'web';
   const env = domainCategory !== DomainCategory.LOCAL && sdkEnv === ENV.PROD ? 'prod' : 'debug';
 
@@ -39,13 +39,9 @@ export async function createUserAgent(sdkEnv: ENV = ENV.PROD, frameworkInfo?: HM
     });
   }
 
-  /**
-   * User agent client hints are not yet supported on firefox and safari https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API#browser_compatibility
-   * the fallback navigator.userAgent would still report the old/incorrect versions on these browsers
-   */
-  const parsedOs = await parsedUserAgent.getOS().withClientHints();
-  const parsedDevice = await parsedUserAgent.getDevice().withClientHints();
-  const parsedBrowser = await parsedUserAgent.getBrowser().withClientHints();
+  const parsedOs = parsedUserAgent.getOS();
+  const parsedDevice = parsedUserAgent.getDevice();
+  const parsedBrowser = parsedUserAgent.getBrowser();
 
   const os = replaceSpaces(`web_${parsedOs.name}`);
   const os_version = parsedOs.version || '';

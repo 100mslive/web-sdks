@@ -58,6 +58,10 @@ const StyledContent = styled(DialogPrimitive.Content, {
       animation: `${sheetSlideOut} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
     },
   },
+  '@ls': {
+    maxWidth: '50%',
+    margin: '0 auto',
+  },
 
   variants: {
     side: {

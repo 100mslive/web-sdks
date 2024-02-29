@@ -1,7 +1,11 @@
 import React, { forwardRef } from 'react';
-import { Flex } from '../../../';
+import { useMedia } from 'react-use';
+import { config, Flex } from '../../../';
+import { useIsLandscape } from '../../common/hooks';
 
 export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
+  const isLandscape = useIsLandscape();
+  const isMobile = useMedia(config.media.md);
   return (
     <Flex
       data-testid="hms-video"
@@ -20,6 +24,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         },
         '& video::-webkit-media-text-track-display': {
           padding: '0 $4',
+          boxShadow: '0px 1px 3px 0px #000000A3',
         },
         '& video::-webkit-media-text-track-container': {
           fontSize: '$space$10 !important',
@@ -33,6 +38,10 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
           flex: '1 1 0',
           margin: '0 auto',
           minHeight: '0',
+          objectFit: 'contain',
+          width: 'inherit',
+          height: isLandscape || isMobile ? '100%' : '',
+          position: isLandscape || isMobile ? 'absolute' : '',
         }}
         ref={videoRef}
         playsInline
