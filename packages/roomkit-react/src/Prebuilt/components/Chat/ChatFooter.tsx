@@ -206,6 +206,8 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
               maxHeight: '$24',
               position: 'relative',
+              minHeight: '$16',
+              py: '$6',
               pl: '$8',
               flexGrow: '1',
               r: '$1',
