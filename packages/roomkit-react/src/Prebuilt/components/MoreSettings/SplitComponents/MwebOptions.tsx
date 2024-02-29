@@ -197,7 +197,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null} */}
 
-            {elements?.emoji_reactions && (
+            {elements?.emoji_reactions && !isHLSRunning && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);

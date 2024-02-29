@@ -38,9 +38,9 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
       <Flex
         align="center"
         css={{
-          gap: '$6',
+          gap: '$4',
           py: '$6',
-          px: '$10',
+          px: '$8',
           my: '$4',
           w: '100%',
           color: '$on_surface_high',
@@ -60,6 +60,7 @@ export const Voting = ({ id, toggleVoting }: { id: string; toggleVoting: () => v
             marginLeft: 'auto',
             cursor: 'pointer',
             '&:hover': { opacity: '0.8' },
+            height: 'fit-content',
           }}
         >
           <CrossIcon onClick={toggleVoting} />
