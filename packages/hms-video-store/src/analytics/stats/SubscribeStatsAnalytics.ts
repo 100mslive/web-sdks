@@ -119,38 +119,36 @@ class RunningRemoteTrackAnalytics extends RunningTrackAnalytics {
       total_packets_lost: this.calculateDifferenceForSample('packetsLost'),
       total_pli_count: this.calculateDifferenceForSample('pliCount'),
       total_nack_count: this.calculateDifferenceForSample('nackCount'),
+      avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
     };
 
     if (latestStat.kind === 'video') {
-      return removeUndefinedFromObject<RemoteAudioSample | RemoteVideoSample>(
-        Object.assign(baseSample, {
-          avg_av_sync_ms: this.calculateAvgAvSyncForSample(),
-          avg_frames_received_per_sec: this.calculateDifferenceAverage('framesReceived'),
-          avg_frames_dropped_per_sec: this.calculateDifferenceAverage('framesDropped'),
-          avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
-          frame_width: this.calculateAverage('frameWidth'),
-          frame_height: this.calculateAverage('frameHeight'),
-          pause_count: this.calculateDifferenceForSample('pauseCount'),
-          pause_duration_seconds: this.calculateDifferenceForSample('totalPausesDuration'),
-          freeze_count: this.calculateDifferenceForSample('freezeCount'),
-          freeze_duration_seconds: this.calculateDifferenceForSample('totalFreezesDuration'),
-          avg_jitter_buffer_delay: this.calculateAverage('calculatedJitterBufferDelay'),
-        }),
-      );
+      return removeUndefinedFromObject<RemoteVideoSample>({
+        ...baseSample,
+        avg_av_sync_ms: this.calculateAvgAvSyncForSample(),
+        avg_frames_received_per_sec: this.calculateDifferenceAverage('framesReceived'),
+        avg_frames_dropped_per_sec: this.calculateDifferenceAverage('framesDropped'),
+        avg_frames_decoded_per_sec: this.calculateDifferenceAverage('framesDecoded'),
+        frame_width: this.calculateAverage('frameWidth'),
+        frame_height: this.calculateAverage('frameHeight'),
+        pause_count: this.calculateDifferenceForSample('pauseCount'),
+        pause_duration_seconds: this.calculateDifferenceForSample('totalPausesDuration'),
+        freeze_count: this.calculateDifferenceForSample('freezeCount'),
+        freeze_duration_seconds: this.calculateDifferenceForSample('totalFreezesDuration'),
+      });
     } else {
       const audio_concealed_samples =
         (latestStat.concealedSamples || 0) -
         (latestStat.silentConcealedSamples || 0) -
         ((firstStat.concealedSamples || 0) - (firstStat.silentConcealedSamples || 0));
 
-      return removeUndefinedFromObject<RemoteAudioSample>(
-        Object.assign(baseSample, {
-          audio_concealed_samples,
-          audio_level: this.calculateInstancesOfHigh('audioLevel', 0.05),
-          audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
-          audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
-        }),
-      );
+      return removeUndefinedFromObject<RemoteAudioSample>({
+        ...baseSample,
+        audio_level: this.calculateInstancesOfHigh('audioLevel', 0.05),
+        audio_concealed_samples,
+        audio_total_samples_received: this.calculateDifferenceForSample('totalSamplesReceived'),
+        audio_concealment_events: this.calculateDifferenceForSample('concealmentEvents'),
+      });
     }
   };
 

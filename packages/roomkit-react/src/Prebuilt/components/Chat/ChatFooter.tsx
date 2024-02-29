@@ -6,18 +6,20 @@ import { HMSException, selectLocalPeer, useAVToggle, useHMSActions, useHMSStore 
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
+// @ts-ignore: No implicit any
+import { EmojiReaction } from '../EmojiReaction';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { ToastManager } from '../Toast/ToastManager';
 import { ChatSelectorContainer } from './ChatSelectorContainer';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useChatDraftMessage } from '../AppData/useChatState';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useSetSubscribedChatSelector, useSubscribeChatSelector } from '../AppData/useUISettings';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
-// @ts-ignore
+// @ts-ignore: No implicit any
 import { useEmojiPickerStyles } from './useEmojiPickerStyles';
 import { useDefaultChatSelection, useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 import { CHAT_SELECTOR, SESSION_STORE_KEY } from '../../common/constants';
@@ -148,7 +150,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
   }
 
   return (
-    <Box>
+    <Box css={{ position: 'relative' }}>
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
@@ -266,15 +268,20 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             </BaseIconButton>
           </Flex>
           {(isMwebHLSStream || isLandscapeHLSStream) && (
-            <Flex
-              css={{
-                alignItems: 'center',
-              }}
-              gap="1"
-            >
-              {noAVPermissions ? <RaiseHand /> : null}
-              <MoreSettings elements={elements} screenType={screenType} />
-            </Flex>
+            <>
+              <Flex
+                css={{
+                  alignItems: 'center',
+                }}
+                gap="1"
+              >
+                {noAVPermissions ? <RaiseHand /> : null}
+                <MoreSettings elements={elements} screenType={screenType} />
+              </Flex>
+              <Box css={{ position: 'absolute', bottom: '$16', right: 0 }}>
+                <EmojiReaction />
+              </Box>
+            </>
           )}
         </Flex>
       )}
