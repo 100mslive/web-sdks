@@ -88,7 +88,7 @@ export const EmojiReaction = () => {
       </Dropdown.Trigger>
       <Dropdown.Content
         sideOffset={5}
-        align={isMobile || isLandscape ? 'end' : 'center'}
+        align={isMobileHLSStream || isLandscapeStream ? 'end' : 'center'}
         css={{ p: '$8', bg: '$surface_default' }}
       >
         <EmojiCard sendReaction={sendReaction} />
