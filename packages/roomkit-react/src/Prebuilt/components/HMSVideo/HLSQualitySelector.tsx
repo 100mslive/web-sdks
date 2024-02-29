@@ -14,6 +14,7 @@ export function HLSQualitySelector({
   onQualityChange,
   selection,
   isAuto,
+  containerRef,
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
@@ -21,9 +22,14 @@ export function HLSQualitySelector({
   onQualityChange: (quality: { [key: string]: string | number } | HMSHLSLayer) => void;
   selection: HMSHLSLayer;
   isAuto: boolean;
+  containerRef?: HTMLDivElement;
 }) {
   const isMobile = useMedia(config.media.md);
   const isLandscape = useIsLandscape();
+
+  if (layers.length === 0) {
+    return null;
+  }
   if (isMobile || isLandscape) {
     return (
       <Sheet.Root open={open} onOpenChange={onOpenChange}>
@@ -39,86 +45,87 @@ export function HLSQualitySelector({
             <SettingsIcon />
           </Flex>
         </Sheet.Trigger>
-
-        {layers.length > 0 && (
-          <Sheet.Content css={{ bg: '$surface_default', pb: '$1' }} onClick={() => onOpenChange(false)}>
-            <Sheet.Title
-              css={{
-                display: 'flex',
-                color: '$on_surface_high',
-                w: '100%',
-                justifyContent: 'space-between',
-                mt: '$8',
-                fontSize: '$md',
-                px: '$10',
-                pb: '$8',
-                borderBottom: '1px solid $border_bright',
-                alignItems: 'center',
-              }}
-            >
-              Quality
-              <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpenChange(false)}>
-                <CrossIcon />
-              </Sheet.Close>
-            </Sheet.Title>
-            {layers.map(layer => {
-              return (
-                <Flex
-                  align="center"
-                  css={{
-                    w: '100%',
-                    bg: '$surface_default',
-                    '&:hover': {
-                      bg: '$surface_brighter',
-                    },
-                    cursor: 'pointer',
-                    gap: '$4',
-                    py: '$8',
-                    px: '$10',
-                  }}
-                  key={layer.width}
-                  onClick={() => onQualityChange(layer)}
-                >
-                  <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
-                    {getQualityText(layer)}
-                  </Text>
-                  <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
-                    {getBitrateText(layer)}
-                  </Text>
-                  {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
-                    <CheckIcon width="16px" height="16px" />
-                  )}
-                </Flex>
-              );
-            })}
-            <Flex
-              align="center"
-              css={{
-                w: '100%',
-                bg: '$surface_default',
-                '&:hover': {
-                  bg: '$surface_brighter',
-                },
-                cursor: 'pointer',
-                gap: '$4',
-                py: '$8',
-                px: '$10',
-              }}
-              key="auto"
-              onClick={() => onQualityChange({ height: 'auto' })}
-            >
-              <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
-                Auto
-              </Text>
-              {isAuto && <CheckIcon width="16px" height="16px" />}
-            </Flex>
-          </Sheet.Content>
-        )}
+        <Sheet.Content
+          container={containerRef}
+          css={{ bg: '$surface_default', pb: '$1' }}
+          onClick={() => onOpenChange(false)}
+        >
+          <Sheet.Title
+            css={{
+              display: 'flex',
+              color: '$on_surface_high',
+              w: '100%',
+              justifyContent: 'space-between',
+              mt: '$8',
+              fontSize: '$md',
+              px: '$10',
+              pb: '$8',
+              borderBottom: '1px solid $border_bright',
+              alignItems: 'center',
+            }}
+          >
+            Quality
+            <Sheet.Close css={{ color: '$on_surface_high' }} onClick={() => onOpenChange(false)}>
+              <CrossIcon />
+            </Sheet.Close>
+          </Sheet.Title>
+          {layers.map(layer => {
+            return (
+              <Flex
+                align="center"
+                css={{
+                  w: '100%',
+                  bg: '$surface_default',
+                  '&:hover': {
+                    bg: '$surface_brighter',
+                  },
+                  cursor: 'pointer',
+                  gap: '$4',
+                  py: '$8',
+                  px: '$10',
+                }}
+                key={layer.width}
+                onClick={() => onQualityChange(layer)}
+              >
+                <Text variant="caption" css={{ fontWeight: '$semiBold' }}>
+                  {getQualityText(layer)}
+                </Text>
+                <Text variant="caption" css={{ flex: '1 1 0', c: '$on_surface_low', pl: '$2' }}>
+                  {getBitrateText(layer)}
+                </Text>
+                {!isAuto && layer.width === selection?.width && layer.height === selection?.height && (
+                  <CheckIcon width="16px" height="16px" />
+                )}
+              </Flex>
+            );
+          })}
+          <Flex
+            align="center"
+            css={{
+              w: '100%',
+              bg: '$surface_default',
+              '&:hover': {
+                bg: '$surface_brighter',
+              },
+              cursor: 'pointer',
+              gap: '$4',
+              py: '$8',
+              px: '$10',
+            }}
+            key="auto"
+            onClick={() => onQualityChange({ height: 'auto' })}
+          >
+            <Text variant="caption" css={{ fontWeight: '$semiBold', flex: '1 1 0' }}>
+              Auto
+            </Text>
+            {isAuto && <CheckIcon width="16px" height="16px" />}
+          </Flex>
+        </Sheet.Content>
       </Sheet.Root>
     );
   }
   return (
-    <Dropdown.Root open={open} onOpenChange={value => onOpenChange(value)}>
+    <Dropdown.Root open={open} onOpenChange={value => onOpenChange(value)} modal={false}>
       <Dropdown.Trigger asChild data-testid="quality_selector">
         <Flex
           css={{
@@ -169,7 +176,7 @@ export function HLSQualitySelector({
           </Tooltip>
         </Flex>
       </Dropdown.Trigger>
-      {layers.length > 0 && (
+      <Dropdown.Portal container={containerRef}>
         <Dropdown.Content
           sideOffset={5}
           align="end"
@@ -232,7 +239,7 @@ export function HLSQualitySelector({
             {isAuto && <CheckIcon width="16px" height="16px" />}
           </Dropdown.Item>
         </Dropdown.Content>
-      )}
+      </Dropdown.Portal>
     </Dropdown.Root>
   );
 }
