@@ -29,7 +29,7 @@ export const OptionInputWithDelete = ({
         key={index}
         onChange={event => handleOptionTextChange(index, event.target.value)}
       />
-      <IconButton onClick={() => removeOption(index)} css={{ bg: '$transparent', border: 'none' }}>
+      <IconButton onClick={() => removeOption(index)} css={{ bg: 'transparent', border: 'none' }}>
         <TrashIcon />
       </IconButton>
     </>

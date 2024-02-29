@@ -54,6 +54,7 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 // @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
@@ -99,6 +100,8 @@ export const MwebOptions = ({
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const { title, description } = useRoomLayoutHeader();
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
+  const isLandscapeHLSStream = useLandscapeHLSStream();
+  const isMobileHLSStream = useMobileHLSStream();
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -121,7 +124,7 @@ export const MwebOptions = ({
       <Sheet.Root open={openOptionsSheet} onOpenChange={setOpenOptionsSheet}>
         <Tooltip title="More options">
           <Sheet.Trigger asChild data-testid="more_settings_btn">
-            <IconButton css={{ '@md': { bg: screenType === 'hls_live_streaming' ? '$surface_default' : '' } }}>
+            <IconButton css={{ bg: isMobileHLSStream || isLandscapeHLSStream ? '$surface_default' : '' }}>
               <HamburgerMenuIcon />
             </IconButton>
           </Sheet.Trigger>

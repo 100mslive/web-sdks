@@ -36,7 +36,7 @@ export const UploadedFile = ({ pdfFile, setPDFFile, onOpenChange }) => {
                 w: '100%',
                 '&:focus': {
                   boxShadow: '0 0 0 1px $colors$primary_default',
-                  border: '1px solid $transparent',
+                  border: '1px solid transparent',
                 },
                 mb: 0,
                 mt: '$6',

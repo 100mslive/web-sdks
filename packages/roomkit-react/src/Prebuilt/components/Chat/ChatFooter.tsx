@@ -275,7 +275,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 }}
                 gap="1"
               >
-                {noAVPermissions ? <RaiseHand /> : null}
+                {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
                 <MoreSettings elements={elements} screenType={screenType} />
               </Flex>
               <Box css={{ position: 'absolute', bottom: '$16', right: 0 }}>
