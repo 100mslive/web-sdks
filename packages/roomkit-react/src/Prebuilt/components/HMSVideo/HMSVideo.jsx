@@ -14,13 +14,12 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         position: 'relative',
         '& video::cue': {
           color: 'white',
-          // textShadow: '0px 0px 4px #000',
           whiteSpace: 'pre-line',
-          fontSize: '$lg',
+          fontSize: '$sm',
           fontStyle: 'normal',
-          fontWeight: '$semiBold',
+          fontWeight: '$regular',
           lineHeight: '$sm',
-          letterSpacing: '0.5px',
+          letterSpacing: '0.25px',
         },
         '& video::-webkit-media-text-track-display': {
           padding: '0 $4',
