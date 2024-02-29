@@ -12,7 +12,8 @@ export const VideoTime = () => {
     const timeupdateHandler = (currentTime: number) => {
       const videoEl = hlsPlayer?.getVideoElement();
       if (videoEl) {
-        setVideoTime(getDurationFromSeconds(videoEl.duration - currentTime));
+        const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable.end(0) || 0;
+        setVideoTime(getDurationFromSeconds(duration - currentTime));
       } else {
         setVideoTime(getDurationFromSeconds(currentTime));
       }
