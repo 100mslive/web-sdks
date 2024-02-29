@@ -493,7 +493,7 @@ const HLSView = () => {
                     align="start"
                     css={{
                       position: 'absolute',
-                      bottom: isFullScreen ? '2%' : '0',
+                      bottom: isFullScreen && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? '$8' : '0',
                       left: '0',
                       zIndex: 1,
                       background:
