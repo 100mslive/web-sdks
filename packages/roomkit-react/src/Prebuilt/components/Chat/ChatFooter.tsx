@@ -6,8 +6,6 @@ import { HMSException, selectLocalPeer, useAVToggle, useHMSActions, useHMSStore 
 import { EmojiIcon, PauseCircleIcon, SendIcon, VerticalMenuIcon } from '@100mslive/react-icons';
 import { Box, config as cssConfig, Flex, IconButton as BaseIconButton, Popover, styled, Text } from '../../..';
 import { IconButton } from '../../../IconButton';
-// @ts-ignore: No implicit any
-import { EmojiReaction } from '../EmojiReaction';
 import { MoreSettings } from '../MoreSettings/MoreSettings';
 import { RaiseHand } from '../RaiseHand';
 // @ts-ignore: No implicit any
@@ -280,9 +278,6 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
                 <MoreSettings elements={elements} screenType={screenType} />
               </Flex>
-              <Box css={{ position: 'absolute', bottom: '$16', right: 0 }}>
-                <EmojiReaction />
-              </Box>
             </>
           )}
         </Flex>
