@@ -48,7 +48,6 @@ export const MwebLeaveRoom = ({
           <Sheet.Trigger asChild>
             <LeaveButton
               onClick={() => {
-                console.log('leave called');
                 setOpen(open => !open);
               }}
             />
