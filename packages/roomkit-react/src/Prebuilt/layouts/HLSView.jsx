@@ -170,25 +170,27 @@ const HLSView = () => {
         const poll = vanillaStore.getState(selectPollByID(pollId));
         const pollStartedBy = vanillaStore.getState(selectPeerNameByID(poll.startedBy)) || 'Participant';
         // launch poll
-        const toastID = ToastManager.addToast({
-          title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
-          action: (
-            <Button
-              onClick={() => togglePollView(pollId)}
-              variant="standard"
-              css={{
-                backgroundColor: '$surface_bright',
-                fontWeight: '$semiBold',
-                color: '$on_surface_high',
-                p: '$xs $md',
-              }}
-            >
-              {poll.type === 'quiz' ? 'Answer' : 'Vote'}
-            </Button>
-          ),
-          duration: Infinity,
-        });
-        toastMap[pollId] = toastID;
+        if (!toastMap[pollId]) {
+          const toastID = ToastManager.addToast({
+            title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
+            action: (
+              <Button
+                onClick={() => togglePollView(pollId)}
+                variant="standard"
+                css={{
+                  backgroundColor: '$surface_bright',
+                  fontWeight: '$semiBold',
+                  color: '$on_surface_high',
+                  p: '$xs $md',
+                }}
+              >
+                {poll.type === 'quiz' ? 'Answer' : 'Vote'}
+              </Button>
+            ),
+            duration: Infinity,
+          });
+          toastMap[pollId] = toastID;
+        }
         return;
       }
       switch (parsedPayload.type) {
@@ -463,7 +465,7 @@ const HLSView = () => {
                           }}
                         >
                           <HMSVideoPlayer.Controls.Left>
-                            <LeaveRoom screenType={screenType} />
+                            {!isFullScreen ? <LeaveRoom screenType={screenType} /> : null}
                           </HMSVideoPlayer.Controls.Left>
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
@@ -493,7 +495,7 @@ const HLSView = () => {
                     align="start"
                     css={{
                       position: 'absolute',
-                      bottom: '0',
+                      bottom: isFullScreen && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? '$8' : '0',
                       left: '0',
                       zIndex: 1,
                       background:
@@ -602,7 +604,7 @@ const HLSView = () => {
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
           <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
-            <LeaveRoom screenType={screenType} />
+            {isMobile || isLandscape ? <LeaveRoom screenType={screenType} /> : null}
           </Flex>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
             {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
