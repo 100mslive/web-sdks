@@ -16,7 +16,7 @@ export const getFormattedTime = (milliseconds: number | undefined, precise = tru
   if (!precise && (hours || minutes)) {
     return formattedTime;
   }
-  formattedTime += `${minutes >= 1 ? Math.floor(seconds) : seconds.toFixed(3)}s`;
+  formattedTime += `${Math.floor(seconds)}s`;
 
   return formattedTime;
 };
