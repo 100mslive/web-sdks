@@ -54,6 +54,7 @@ import { useDropdownList } from '../../hooks/useDropdownList';
 // @ts-ignore: No implicit any
 import { useMyMetadata } from '../../hooks/useMetadata';
 import { useUnreadPollQuizPresent } from '../../hooks/useUnreadPollQuizPresent';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../../common/hooks';
 // @ts-ignore: No implicit any
 import { getFormattedCount } from '../../../common/utils';
 // @ts-ignore: No implicit any
@@ -99,6 +100,8 @@ export const MwebOptions = ({
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const { title, description } = useRoomLayoutHeader();
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -197,7 +200,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null} */}
 
-            {elements?.emoji_reactions && !isHLSRunning && (
+            {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);

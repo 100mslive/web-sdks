@@ -8,7 +8,6 @@ import {
   selectLocalPeerID,
   useCustomEvent,
   useHMSStore,
-  useRecordingStreaming,
 } from '@100mslive/react-sdk';
 import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
@@ -18,6 +17,7 @@ import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
 import { useDropdownList } from './hooks/useDropdownList';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 init({ data });
@@ -25,7 +25,6 @@ init({ data });
 export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
-  const { isHLSRunning } = useRecordingStreaming();
   useDropdownList({ open: open, name: 'EmojiReaction' });
 
   // const hmsActions = useHMSActions();
@@ -34,6 +33,8 @@ export const EmojiReaction = () => {
   // const { isStreamingOn } = useRecordingStreaming();
   const isMobile = useMedia(cssConfig.media.md);
   const isLandscape = useMedia(cssConfig.media.ls);
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeStream = useLandscapeHLSStream();
 
   const { sendEvent } = useCustomEvent({
     type: EMOJI_REACTION_TYPE,
@@ -66,7 +67,7 @@ export const EmojiReaction = () => {
   if (!isConnected) {
     return null;
   }
-  return (isMobile || isLandscape) && !isHLSRunning ? (
+  return (isMobile || isLandscape) && !(isLandscapeStream || isMobileHLSStream) ? (
     <EmojiCard sendReaction={sendReaction} />
   ) : (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
