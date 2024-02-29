@@ -170,25 +170,27 @@ const HLSView = () => {
         const poll = vanillaStore.getState(selectPollByID(pollId));
         const pollStartedBy = vanillaStore.getState(selectPeerNameByID(poll.startedBy)) || 'Participant';
         // launch poll
-        const toastID = ToastManager.addToast({
-          title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
-          action: (
-            <Button
-              onClick={() => togglePollView(pollId)}
-              variant="standard"
-              css={{
-                backgroundColor: '$surface_bright',
-                fontWeight: '$semiBold',
-                color: '$on_surface_high',
-                p: '$xs $md',
-              }}
-            >
-              {poll.type === 'quiz' ? 'Answer' : 'Vote'}
-            </Button>
-          ),
-          duration: Infinity,
-        });
-        toastMap[pollId] = toastID;
+        if (!toastMap[pollId]) {
+          const toastID = ToastManager.addToast({
+            title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
+            action: (
+              <Button
+                onClick={() => togglePollView(pollId)}
+                variant="standard"
+                css={{
+                  backgroundColor: '$surface_bright',
+                  fontWeight: '$semiBold',
+                  color: '$on_surface_high',
+                  p: '$xs $md',
+                }}
+              >
+                {poll.type === 'quiz' ? 'Answer' : 'Vote'}
+              </Button>
+            ),
+            duration: Infinity,
+          });
+          toastMap[pollId] = toastID;
+        }
         return;
       }
       switch (parsedPayload.type) {
