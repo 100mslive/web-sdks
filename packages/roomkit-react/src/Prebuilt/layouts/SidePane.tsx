@@ -60,8 +60,7 @@ const Wrapper = styled('div', {
     mobileStream: {
       true: {
         '@md': {
-          position: 'unset !important',
-          background: 'red',
+          position: 'unset',
         },
       },
     },

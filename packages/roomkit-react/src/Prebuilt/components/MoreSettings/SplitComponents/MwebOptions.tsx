@@ -100,8 +100,8 @@ export const MwebOptions = ({
   const { unreadPollQuiz, setUnreadPollQuiz } = useUnreadPollQuizPresent();
   const { title, description } = useRoomLayoutHeader();
   const toggleDetailsSheet = useSheetToggle(SHEET_OPTIONS.ROOM_DETAILS);
-  const isLandscapeHLSStream = useLandscapeHLSStream();
   const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeHLSStream = useLandscapeHLSStream();
 
   useDropdownList({ open: openModals.size > 0 || openOptionsSheet || openSettingsSheet, name: 'MoreSettings' });
 
@@ -200,7 +200,7 @@ export const MwebOptions = ({
               </ActionTile.Root>
             ) : null} */}
 
-            {elements?.emoji_reactions && !isHLSRunning && (
+            {elements?.emoji_reactions && !(isLandscapeHLSStream || isMobileHLSStream) && (
               <ActionTile.Root
                 onClick={() => {
                   setShowEmojiCard(true);

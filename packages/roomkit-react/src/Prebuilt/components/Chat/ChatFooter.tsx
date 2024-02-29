@@ -204,12 +204,12 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
             align="center"
             css={{
               bg: isOverlayChat && isMobile ? '$surface_dim' : '$surface_default',
+              minHeight: '$16',
               maxHeight: '$24',
               position: 'relative',
-              minHeight: '$16',
               py: '$6',
               pl: '$8',
-              flexGrow: '1',
+              flexGrow: 1,
               r: '$1',
               '@md': {
                 minHeight: 'unset',
