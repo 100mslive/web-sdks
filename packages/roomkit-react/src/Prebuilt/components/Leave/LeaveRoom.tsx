@@ -70,7 +70,7 @@ export const LeaveRoom = ({
     return null;
   }
   if (isMobileHLSStream || isLandscapeHLSStream) {
-    return <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />;
+    return <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} container={container} />;
   }
   return isMobile ? (
     <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} container={container} />

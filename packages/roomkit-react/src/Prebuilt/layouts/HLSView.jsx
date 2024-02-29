@@ -464,11 +464,9 @@ const HLSView = () => {
                             p: '$4 $8',
                           }}
                         >
-                          {hlsViewRef.current && (
-                            <HMSVideoPlayer.Controls.Left>
-                              <LeaveRoom screenType={screenType} container={hlsViewRef.current} />
-                            </HMSVideoPlayer.Controls.Left>
-                          )}
+                          <HMSVideoPlayer.Controls.Left>
+                            {hlsViewRef.current && <LeaveRoom screenType={screenType} container={hlsViewRef.current} />}
+                          </HMSVideoPlayer.Controls.Left>
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
                             {hasCaptions && !isHlsAutoplayBlocked && (

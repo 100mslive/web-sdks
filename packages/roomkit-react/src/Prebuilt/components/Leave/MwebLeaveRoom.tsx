@@ -46,7 +46,12 @@ export const MwebLeaveRoom = ({
       {showLeaveOptions ? (
         <Sheet.Root open={open} onOpenChange={setOpen}>
           <Sheet.Trigger asChild>
-            <LeaveButton onClick={() => setOpen(!open)} />
+            <LeaveButton
+              onClick={() => {
+                console.log('leave called');
+                setOpen(open => !open);
+              }}
+            />
           </Sheet.Trigger>
           <Sheet.Content container={container}>
             <LeaveCard
@@ -119,7 +124,7 @@ const LeaveButton = ({ onClick }: { onClick: () => void }) => {
         borderTopRightRadius: '$1',
         borderBottomRightRadius: '$1',
       }}
-      onClick={() => onClick()}
+      onClick={onClick}
     >
       <Tooltip title="Leave Room">
         <Box>
