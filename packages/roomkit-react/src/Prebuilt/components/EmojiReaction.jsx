@@ -72,7 +72,11 @@ export const EmojiReaction = () => {
   ) : (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
       <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
-        <IconButton css={isMobile || isLandscape ? { bg: 'transparent', r: '$round' } : {}}>
+        <IconButton
+          css={
+            isMobile || isLandscape ? { bg: '$surface_default', r: '$round', border: '1px solid $border_bright' } : {}
+          }
+        >
           <Tooltip title="Emoji reaction">
             <EmojiIcon />
           </Tooltip>

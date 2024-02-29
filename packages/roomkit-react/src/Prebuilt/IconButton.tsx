@@ -11,7 +11,7 @@ const IconButton = styled(BaseIconButton, {
     active: {
       true: {
         color: '$on_surface_high',
-        backgroundColor: '$transparent',
+        backgroundColor: 'transparent',
       },
       false: {
         border: '1px solid transparent',
