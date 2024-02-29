@@ -17,10 +17,12 @@ export const DesktopLeaveRoom = ({
   leaveRoom,
   screenType,
   endRoom,
+  container,
 }: {
   leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   screenType: keyof ConferencingScreen;
   endRoom: () => Promise<void>;
+  container?: HTMLElement;
 }) => {
   const [open, setOpen] = useState(false);
   const [showLeaveRoomAlert, setShowLeaveRoomAlert] = useState(false);
@@ -69,54 +71,56 @@ export const DesktopLeaveRoom = ({
                 <VerticalMenuIcon />
               </MenuTriggerButton>
             </Dropdown.Trigger>
-            <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
-              <Dropdown.Item
-                css={{
-                  bg: '$surface_dim',
-                  color: '$on_surface_medium',
-                  '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
-                  p: '0',
-                }}
-                data-testid="just_leave_btn"
-              >
-                <LeaveCard
-                  title={showStream ? 'Leave Stream' : 'Leave Session'}
-                  subtitle={`Others will continue after you leave. You can join the ${
-                    showStream ? 'stream' : 'session'
-                  } again.`}
-                  bg=""
-                  titleColor="$on_surface_high"
-                  icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
-                  onClick={async () => await leaveRoom()}
-                  css={{ p: '$8 $4' }}
-                />
-              </Dropdown.Item>
-
-              <Dropdown.Item
-                css={{
-                  bg: '$alert_error_dim',
-                  color: '$alert_error_bright',
-                  '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
-                  p: '0',
-                }}
-                data-testid="end_room_btn"
-              >
-                <LeaveCard
-                  title={showStream ? 'End Stream' : 'End Session'}
-                  subtitle={`The ${
-                    showStream ? 'stream' : 'session'
-                  } will end for everyone. You can't undo this action.`}
-                  bg=""
-                  titleColor="$alert_error_brighter"
-                  icon={<StopIcon height={24} width={24} />}
-                  onClick={() => {
-                    setOpen(false);
-                    setShowEndStreamAlert(true);
+            <Dropdown.Portal container={container}>
+              <Dropdown.Content css={{ p: 0, w: '$100' }} alignOffset={-50} sideOffset={10}>
+                <Dropdown.Item
+                  css={{
+                    bg: '$surface_dim',
+                    color: '$on_surface_medium',
+                    '&:hover': { bg: '$surface_default', color: '$on_surface_high' },
+                    p: '0',
                   }}
-                  css={{ p: '$8 $4' }}
-                />
-              </Dropdown.Item>
-            </Dropdown.Content>
+                  data-testid="just_leave_btn"
+                >
+                  <LeaveCard
+                    title={showStream ? 'Leave Stream' : 'Leave Session'}
+                    subtitle={`Others will continue after you leave. You can join the ${
+                      showStream ? 'stream' : 'session'
+                    } again.`}
+                    bg=""
+                    titleColor="$on_surface_high"
+                    icon={<ExitIcon height={24} width={24} style={{ transform: 'rotate(180deg)' }} />}
+                    onClick={async () => await leaveRoom()}
+                    css={{ p: '$8 $4' }}
+                  />
+                </Dropdown.Item>
+
+                <Dropdown.Item
+                  css={{
+                    bg: '$alert_error_dim',
+                    color: '$alert_error_bright',
+                    '&:hover': { bg: '$alert_error_dim', color: '$alert_error_brighter' },
+                    p: '0',
+                  }}
+                  data-testid="end_room_btn"
+                >
+                  <LeaveCard
+                    title={showStream ? 'End Stream' : 'End Session'}
+                    subtitle={`The ${
+                      showStream ? 'stream' : 'session'
+                    } will end for everyone. You can't undo this action.`}
+                    bg=""
+                    titleColor="$alert_error_brighter"
+                    icon={<StopIcon height={24} width={24} />}
+                    onClick={() => {
+                      setOpen(false);
+                      setShowEndStreamAlert(true);
+                    }}
+                    css={{ p: '$8 $4' }}
+                  />
+                </Dropdown.Item>
+              </Dropdown.Content>
+            </Dropdown.Portal>
           </Dropdown.Root>
         </Flex>
       ) : (

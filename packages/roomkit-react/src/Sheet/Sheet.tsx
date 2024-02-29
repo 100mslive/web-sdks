@@ -92,11 +92,11 @@ const StyledContent = styled(DialogPrimitive.Content, {
 
 type SheetContentVariants = VariantProps<typeof StyledContent>;
 type DialogContentPrimitiveProps = React.ComponentProps<typeof DialogPrimitive.Content>;
-type SheetContentProps = DialogContentPrimitiveProps & SheetContentVariants & { css?: CSS };
+type SheetContentProps = DialogContentPrimitiveProps & SheetContentVariants & { css?: CSS; container?: HTMLElement };
 
 const SheetContent = React.forwardRef<React.ElementRef<typeof StyledContent>, SheetContentProps>(
-  ({ children, ...props }, forwardedRef) => (
-    <Dialog.Portal>
+  ({ children, container, ...props }, forwardedRef) => (
+    <Dialog.Portal container={container}>
       <StyledOverlay />
       <StyledContent {...props} ref={forwardedRef}>
         {children}

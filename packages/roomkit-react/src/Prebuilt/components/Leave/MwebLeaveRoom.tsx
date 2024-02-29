@@ -19,9 +19,11 @@ import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 export const MwebLeaveRoom = ({
   leaveRoom,
   endRoom,
+  container,
 }: {
   leaveRoom: (options?: { endStream?: boolean }) => Promise<void>;
   endRoom: () => Promise<void>;
+  container?: HTMLElement;
 }) => {
   const [open, setOpen] = useState(false);
   const { screenType } = useRoomLayoutConferencingScreen();
@@ -46,7 +48,7 @@ export const MwebLeaveRoom = ({
           <Sheet.Trigger asChild>
             <LeaveButton onClick={() => setOpen(!open)} />
           </Sheet.Trigger>
-          <Sheet.Content>
+          <Sheet.Content container={container}>
             <LeaveCard
               title={showStream ? 'Leave Stream' : 'Leave Session'}
               subtitle={`Others will continue after you leave. You can join the ${
@@ -79,7 +81,7 @@ export const MwebLeaveRoom = ({
         <LeaveButton onClick={() => setShowLeaveRoomAlert(true)} />
       )}
       <Sheet.Root open={showEndStreamAlert} onOpenChange={setShowEndStreamAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <EndSessionContent
             setShowEndStreamAlert={setShowEndStreamAlert}
             leaveRoom={isStreamingOn ? leaveRoom : endRoom}
@@ -89,7 +91,7 @@ export const MwebLeaveRoom = ({
       </Sheet.Root>
 
       <Sheet.Root open={showLeaveRoomAlert} onOpenChange={setShowLeaveRoomAlert}>
-        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }}>
+        <Sheet.Content css={{ bg: '$surface_dim', p: '$10', pb: '$12' }} container={container}>
           <LeaveSessionContent setShowLeaveRoomAlert={setShowLeaveRoomAlert} leaveRoom={leaveRoom} />
         </Sheet.Content>
       </Sheet.Root>
@@ -102,7 +104,7 @@ const LeaveButton = ({ onClick }: { onClick: () => void }) => {
   const isLandscapeHLSStream = useLandscapeHLSStream();
 
   return isMobileHLSStream || isLandscapeHLSStream ? (
-    <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={() => onClick()}>
+    <IconButton key="LeaveRoom" data-testid="leave_room_btn" onClick={onClick}>
       <Tooltip title="Leave Room">
         <Box>
           <CrossIcon />

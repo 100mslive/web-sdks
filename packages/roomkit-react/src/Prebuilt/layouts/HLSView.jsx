@@ -43,7 +43,7 @@ const toastMap = {};
 
 const HLSView = () => {
   const videoRef = useRef(null);
-  const hlsViewRef = useRef(null);
+  const hlsViewRef = useRef();
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
   const { elements, screenType } = useRoomLayoutConferencingScreen();
@@ -464,15 +464,17 @@ const HLSView = () => {
                             p: '$4 $8',
                           }}
                         >
-                          <HMSVideoPlayer.Controls.Left>
-                            {!isFullScreen ? <LeaveRoom screenType={screenType} /> : null}
-                          </HMSVideoPlayer.Controls.Left>
+                          {hlsViewRef.current && (
+                            <HMSVideoPlayer.Controls.Left>
+                              <LeaveRoom screenType={screenType} container={hlsViewRef.current} />
+                            </HMSVideoPlayer.Controls.Left>
+                          )}
                           <HMSVideoPlayer.Controls.Right>
                             {isLandscape && <ChatToggle />}
                             {hasCaptions && !isHlsAutoplayBlocked && (
                               <HLSCaptionSelector isEnabled={isCaptionEnabled} />
                             )}
-                            {availableLayers.length > 0 && !isHlsAutoplayBlocked ? (
+                            {hlsViewRef.current && availableLayers.length > 0 && !isHlsAutoplayBlocked ? (
                               <HLSQualitySelector
                                 layers={availableLayers}
                                 onOpenChange={setQualityDropDownOpen}
@@ -480,6 +482,7 @@ const HLSView = () => {
                                 selection={currentSelectedQuality}
                                 onQualityChange={handleQuality}
                                 isAuto={isUserSelectedAuto}
+                                containerRef={hlsViewRef.current}
                               />
                             ) : null}
                             <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />

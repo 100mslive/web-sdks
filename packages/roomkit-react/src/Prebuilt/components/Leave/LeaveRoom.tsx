@@ -14,13 +14,18 @@ import {
 } from '@100mslive/react-sdk';
 import { config as cssConfig } from '../../../Theme';
 // @ts-ignore: No implicit Any
-// @ts-ignore: No implicit Any
 import { ToastManager } from '../Toast/ToastManager';
 import { DesktopLeaveRoom } from './DesktopLeaveRoom';
 import { MwebLeaveRoom } from './MwebLeaveRoom';
 import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
-export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen }) => {
+export const LeaveRoom = ({
+  screenType,
+  container,
+}: {
+  screenType: keyof ConferencingScreen;
+  container?: HTMLElement;
+}) => {
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   const permissions = useHMSStore(selectPermissions);
   const isMobile = useMedia(cssConfig.media.md);
@@ -68,8 +73,8 @@ export const LeaveRoom = ({ screenType }: { screenType: keyof ConferencingScreen
     return <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />;
   }
   return isMobile ? (
-    <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} />
+    <MwebLeaveRoom leaveRoom={leaveRoom} endRoom={endRoom} container={container} />
   ) : (
-    <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} />
+    <DesktopLeaveRoom leaveRoom={leaveRoom} screenType={screenType} endRoom={endRoom} container={container} />
   );
 };
