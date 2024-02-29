@@ -13,6 +13,7 @@ import { EmojiIcon } from '@100mslive/react-icons';
 import { EmojiCard } from './Footer/EmojiCard';
 // import { ToastManager } from './Toast/ToastManager';
 import { Dropdown } from '../../Dropdown';
+import { Box } from '../../Layout';
 import { config as cssConfig } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import IconButton from '../IconButton';
@@ -26,7 +27,6 @@ export const EmojiReaction = () => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   useDropdownList({ open: open, name: 'EmojiReaction' });
-
   // const hmsActions = useHMSActions();
   const roles = useHMSStore(selectAvailableRoleNames);
   const localPeerId = useHMSStore(selectLocalPeerID);
@@ -67,9 +67,11 @@ export const EmojiReaction = () => {
   if (!isConnected) {
     return null;
   }
-  return (isMobile || isLandscape) && !(isLandscapeStream || isMobileHLSStream) ? (
-    <EmojiCard sendReaction={sendReaction} />
-  ) : (
+
+  if ((isMobile || isLandscape) && !(isLandscapeStream || isMobileHLSStream)) {
+    return <EmojiCard sendReaction={sendReaction} />;
+  }
+  return (
     <Dropdown.Root open={open} onOpenChange={setOpen}>
       <Dropdown.Trigger asChild data-testid="emoji_reaction_btn">
         <IconButton
@@ -78,11 +80,17 @@ export const EmojiReaction = () => {
           }
         >
           <Tooltip title="Emoji reaction">
-            <EmojiIcon />
+            <Box>
+              <EmojiIcon />
+            </Box>
           </Tooltip>
         </IconButton>
       </Dropdown.Trigger>
-      <Dropdown.Content sideOffset={5} align="center" css={{ p: '$8', bg: '$surface_default' }}>
+      <Dropdown.Content
+        sideOffset={5}
+        align={isMobile || isLandscape ? 'end' : 'center'}
+        css={{ p: '$8', bg: '$surface_default' }}
+      >
         <EmojiCard sendReaction={sendReaction} />
       </Dropdown.Content>
     </Dropdown.Root>
