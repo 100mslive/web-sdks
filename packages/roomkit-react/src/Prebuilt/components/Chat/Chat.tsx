@@ -66,7 +66,6 @@ export const Chat = () => {
         <Box
           css={{
             position: 'absolute',
-            zINdex: 11,
             ...match({ isLandscapeStream, isChatEnabled })
               .with(
                 {
