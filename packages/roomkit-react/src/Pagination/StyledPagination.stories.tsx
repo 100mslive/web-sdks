@@ -41,7 +41,7 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
         disabled={disableLeft}
         onClick={prevPage}
         type="button"
-        css={{ padding: 0, border: 'none', backgroundColor: '$transparent' }}
+        css={{ padding: 0, border: 'none', backgroundColor: 'transparent' }}
       >
         <ChevronLeftIcon width={16} height={16} style={{ cursor: disableLeft ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>
@@ -54,7 +54,7 @@ const PaginationComponent = ({ page: propsPage, setPage: propsSetPage, numPages 
         disabled={disableRight}
         onClick={nextPage}
         type="button"
-        css={{ padding: 0, border: 'none', backgroundColor: '$transparent' }}
+        css={{ padding: 0, border: 'none', backgroundColor: 'transparent' }}
       >
         <ChevronRightIcon width={16} height={16} style={{ cursor: disableRight ? 'not-allowed' : 'pointer' }} />
       </StyledPagination.Chevron>

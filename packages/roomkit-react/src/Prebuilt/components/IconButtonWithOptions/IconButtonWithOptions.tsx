@@ -24,7 +24,7 @@ const IconSection = styled(IconButton, {
   h: '$14',
   p: '$4',
   r: '$1',
-  bg: '$transparent',
+  bg: 'transparent',
   borderTopRightRadius: 0,
   borderColor: '$border_bright',
   borderBottomRightRadius: 0,
