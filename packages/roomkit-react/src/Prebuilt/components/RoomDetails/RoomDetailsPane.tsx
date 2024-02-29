@@ -46,17 +46,18 @@ const ShowRoomDetailHeader = () => {
     <>
       <Flex justify="between" align="center" css={{ w: '100%' }}>
         <Text variant="h6">{title}</Text>
-        <Flex
-          onClick={toggleDetailsPane}
-          css={{
-            color: '$on_surface_high',
-            cursor: 'pointer',
-            '&:hover': { opacity: '0.8' },
-            display: isMwebHLSStream ? 'none' : '',
-          }}
-        >
-          <CrossIcon />
-        </Flex>
+        {!isMwebHLSStream && (
+          <Flex
+            onClick={toggleDetailsPane}
+            css={{
+              color: '$on_surface_high',
+              cursor: 'pointer',
+              '&:hover': { opacity: '0.8' },
+            }}
+          >
+            <CrossIcon />
+          </Flex>
+        )}
       </Flex>
       <RoomDetailsRow details={details} />
     </>
