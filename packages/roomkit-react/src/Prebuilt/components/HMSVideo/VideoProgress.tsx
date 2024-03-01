@@ -20,10 +20,11 @@ export const VideoProgress = () => {
       if (!videoEl) {
         return;
       }
-      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, videoEl.duration));
+      const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
+      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
       let bufferProgress = 0;
       if (videoEl.buffered.length > 0) {
-        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), videoEl.duration));
+        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), duration));
       }
 
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
