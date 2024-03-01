@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getPercentage } from './utils';
@@ -7,42 +7,42 @@ export const VideoProgress = () => {
   const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [bufferProgress, setBufferProgress] = useState(0);
+  const [pauseProgress, setPauseProgress] = useState(false);
   const videoEl = hlsPlayer?.getVideoElement();
 
-  const onValueChange = (time: number) => {
-    hlsPlayer?.seekTo(time);
-  };
+  const setProgress = useCallback(() => {
+    const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
+    const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
+    let bufferProgress = 0;
+    if (videoEl.buffered.length > 0) {
+      bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), duration));
+    }
+    setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
+    setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
+  }, [videoEl]);
+  const timeupdateHandler = useCallback(() => {
+    if (!videoEl || pauseProgress) {
+      return;
+    }
+    setProgress();
+  }, [pauseProgress, setProgress, videoEl]);
   useEffect(() => {
     if (!videoEl) {
       return;
     }
-    const timeupdateHandler = () => {
-      if (!videoEl) {
-        return;
-      }
-      const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
-      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
-      let bufferProgress = 0;
-      if (videoEl.buffered.length > 0) {
-        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), duration));
-      }
-
-      setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
-      setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
-    };
     videoEl.addEventListener('timeupdate', timeupdateHandler);
     return function cleanup() {
       videoEl?.removeEventListener('timeupdate', timeupdateHandler);
     };
-  }, [videoEl]);
+  }, [timeupdateHandler, videoEl]);
 
   const onProgress = (progress: number[]) => {
     const progress1 = Math.floor(getPercentage(progress[0], 100));
     const videoEl = hlsPlayer?.getVideoElement();
-    const currentTime = (progress1 * (videoEl?.duration || 0)) / 100;
-    if (onValueChange) {
-      onValueChange(currentTime);
-    }
+    const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
+    const currentTime = (progress1 * duration) / 100;
+    hlsPlayer?.seekTo(currentTime);
+    setProgress();
   };
 
   if (!videoEl) {
@@ -63,7 +63,9 @@ export const VideoProgress = () => {
         step={1}
         value={[videoProgress]}
         showTooltip={false}
-        onValueChange={onProgress}
+        onValueChange={(progress: number[]) => onProgress(progress)}
+        onPointerDown={() => setPauseProgress(true)}
+        onPointerUp={() => setPauseProgress(false)}
         thumbStyles={{ w: '$6', h: '$6' }}
       />
       <Box
