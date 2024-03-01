@@ -52,7 +52,7 @@ const Wrapper = styled('div', {
     landscapeStream: {
       true: {
         '@lg': {
-          position: 'unset !important',
+          position: 'unset',
           minHeight: '100%',
         },
       },
@@ -83,6 +83,9 @@ const Wrapper = styled('div', {
         position: 'unset',
         height: '100%',
         maxHeight: 'unset',
+        '@md': {
+          pb: 0,
+        },
       },
     },
     {
@@ -92,6 +95,9 @@ const Wrapper = styled('div', {
         position: 'unset',
         height: '100%',
         maxHeight: 'unset',
+        '@md': {
+          pb: '$8',
+        },
       },
     },
   ],
