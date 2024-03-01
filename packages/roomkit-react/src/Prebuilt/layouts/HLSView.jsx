@@ -624,9 +624,6 @@ const HLSView = () => {
         </>
       ) : (
         <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
-          <Flex align="center" gap="2" css={{ position: 'absolute', left: '$4', top: '$4', zIndex: 1 }}>
-            {isMobile || isLandscape ? <LeaveRoom screenType={screenType} /> : null}
-          </Flex>
           <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
             {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
           </Flex>
