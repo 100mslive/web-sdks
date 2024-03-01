@@ -140,6 +140,47 @@ const SidePane = ({
     mobileStream: isMobileHLSStream,
   };
 
+  const SidepaneComponent = match(sidepane)
+    .with(SIDE_PANE_OPTIONS.POLLS, () => (
+      <Wrapper
+        css={{
+          '@md': {
+            borderTopLeftRadius: '$2',
+            borderTopRightRadius: '$2',
+          },
+        }}
+        {...commonProps}
+      >
+        <Polls />
+      </Wrapper>
+    ))
+    .with(SIDE_PANE_OPTIONS.VB, () => (
+      <Wrapper css={{ p: '$10 $6 $10 $10' }} {...commonProps}>
+        <VBPicker backgroundMedia={backgroundMedia} />
+      </Wrapper>
+    ))
+    .with(SIDE_PANE_OPTIONS.CHAT, SIDE_PANE_OPTIONS.PARTICIPANTS, () => (
+      <Wrapper {...commonProps} overlayChat={mwebStreamingChat}>
+        <SidePaneTabs
+          hideControls={hideControls}
+          active={sidepane}
+          hideTab={isMobileHLSStream || isLandscapeHLSStream}
+        />
+      </Wrapper>
+    ))
+    .with(SIDE_PANE_OPTIONS.ROOM_DETAILS, () => (
+      <Wrapper {...commonProps}>
+        <RoomDetailsPane />
+      </Wrapper>
+    ))
+    .otherwise(() => {
+      return null;
+    });
+
+  if (!trackId && !SidepaneComponent) {
+    return null;
+  }
+
   return (
     <Flex
       direction="column"
@@ -166,43 +207,7 @@ const SidePane = ({
           {...tileLayout}
         />
       )}
-
-      {match(sidepane)
-        .with(SIDE_PANE_OPTIONS.POLLS, () => (
-          <Wrapper
-            css={{
-              '@md': {
-                borderTopLeftRadius: '$2',
-                borderTopRightRadius: '$2',
-              },
-            }}
-            {...commonProps}
-          >
-            <Polls />
-          </Wrapper>
-        ))
-        .with(SIDE_PANE_OPTIONS.VB, () => (
-          <Wrapper css={{ p: '$10 $6 $10 $10' }} {...commonProps}>
-            <VBPicker backgroundMedia={backgroundMedia} />
-          </Wrapper>
-        ))
-        .with(SIDE_PANE_OPTIONS.CHAT, SIDE_PANE_OPTIONS.PARTICIPANTS, () => (
-          <Wrapper {...commonProps} overlayChat={mwebStreamingChat}>
-            <SidePaneTabs
-              hideControls={hideControls}
-              active={sidepane}
-              hideTab={isMobileHLSStream || isLandscapeHLSStream}
-            />
-          </Wrapper>
-        ))
-        .with(SIDE_PANE_OPTIONS.ROOM_DETAILS, () => (
-          <Wrapper {...commonProps}>
-            <RoomDetailsPane />
-          </Wrapper>
-        ))
-        .otherwise(() => {
-          return null;
-        })}
+      {SidepaneComponent}
     </Flex>
   );
 };
