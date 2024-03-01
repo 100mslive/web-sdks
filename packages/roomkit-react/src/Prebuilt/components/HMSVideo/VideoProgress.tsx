@@ -3,7 +3,7 @@ import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getPercentage } from './utils';
 
-export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
+export const VideoProgress = () => {
   const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [bufferProgress, setBufferProgress] = useState(0);
@@ -20,10 +20,11 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
       if (!videoEl) {
         return;
       }
-      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, videoEl.duration));
+      const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
+      const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
       let bufferProgress = 0;
       if (videoEl.buffered.length > 0) {
-        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), videoEl.duration));
+        bufferProgress = Math.floor(getPercentage(videoEl.buffered?.end(0), duration));
       }
 
       setVideoProgress(isNaN(videoProgress) ? 0 : videoProgress);
@@ -48,7 +49,7 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
     return null;
   }
   return (
-    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch', pointerEvents: isDvr ? '' : 'none' }}>
+    <Flex align="center" css={{ cursor: 'pointer', h: '$2', alignSelf: 'stretch' }}>
       <Slider
         id="video-actual-rest"
         css={{
@@ -56,7 +57,6 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
           h: '$2',
           zIndex: 1,
           transition: `all .2s ease .5s`,
-          pointerEvents: isDvr ? '' : 'none',
         }}
         min={0}
         max={100}
@@ -64,7 +64,7 @@ export const VideoProgress = ({ isDvr = true }: { isDvr: boolean }) => {
         value={[videoProgress]}
         showTooltip={false}
         onValueChange={onProgress}
-        thumbStyles={{ w: '$6', h: '$6', display: isDvr ? '' : 'none' }}
+        thumbStyles={{ w: '$6', h: '$6' }}
       />
       <Box
         id="video-buffer"

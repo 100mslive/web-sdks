@@ -299,7 +299,7 @@ const HLSView = () => {
   }, []);
   const onDoubleClickHandler = useCallback(
     event => {
-      if (!(isMobile || isLandscape)) {
+      if (!(isMobile || isLandscape) || hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
         return;
       }
       const sidePercentage = (event.screenX * 100) / event.target.clientWidth;
@@ -314,7 +314,7 @@ const HLSView = () => {
         setIsSeekEnabled(false);
       }, 200);
     },
-    [isLandscape, isMobile, onSeekTo],
+    [hlsState?.variants, isLandscape, isMobile, onSeekTo],
   );
   const onClickHandler = useCallback(() => {
     if (!(isMobile || isLandscape)) {
@@ -401,7 +401,7 @@ const HLSView = () => {
                 <>
                   {isMobile || isLandscape ? (
                     <>
-                      {!showLoader && (
+                      {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
                         <Flex
                           align="center"
                           justify="center"
@@ -511,7 +511,7 @@ const HLSView = () => {
                       opacity: controlsVisible ? `1` : '0',
                     }}
                   >
-                    <HMSVideoPlayer.Progress isDvr={hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR} />
+                    {hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? <HMSVideoPlayer.Progress /> : null}
                     <HMSVideoPlayer.Controls.Root
                       css={{
                         p: '$4 $8',
@@ -520,24 +520,28 @@ const HLSView = () => {
                       <HMSVideoPlayer.Controls.Left>
                         {!(isMobile || isLandscape) && (
                           <>
-                            <HMSVideoPlayer.Seeker
-                              onClick={() => {
-                                onSeekTo(-10);
-                              }}
-                              title="backward"
-                            >
-                              <BackwardArrowIcon width={20} height={20} />
-                            </HMSVideoPlayer.Seeker>
-                            <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
-                            <HMSVideoPlayer.Seeker
-                              onClick={() => {
-                                onSeekTo(10);
-                              }}
-                              title="forward"
-                            >
-                              <ForwardArrowIcon width={20} height={20} />
-                            </HMSVideoPlayer.Seeker>
-                            {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
+                            {hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
+                              <>
+                                <HMSVideoPlayer.Seeker
+                                  onClick={() => {
+                                    onSeekTo(-10);
+                                  }}
+                                  title="backward"
+                                >
+                                  <BackwardArrowIcon width={20} height={20} />
+                                </HMSVideoPlayer.Seeker>
+                                <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} />
+                                <HMSVideoPlayer.Seeker
+                                  onClick={() => {
+                                    onSeekTo(10);
+                                  }}
+                                  title="forward"
+                                >
+                                  <ForwardArrowIcon width={20} height={20} />
+                                </HMSVideoPlayer.Seeker>
+                                {!isVideoLive ? <HMSVideoPlayer.Duration /> : null}
+                              </>
+                            ) : null}
                             <HMSVideoPlayer.Volume />
                           </>
                         )}
@@ -572,7 +576,11 @@ const HLSView = () => {
                             </Flex>
                           </Tooltip>
                         </IconButton>
-                        {(isMobile || isLandscape) && !isVideoLive ? <HMSVideoPlayer.Duration /> : null}
+                        {(isMobile || isLandscape) &&
+                        !isVideoLive &&
+                        hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
+                          <HMSVideoPlayer.Duration />
+                        ) : null}
                       </HMSVideoPlayer.Controls.Left>
 
                       <HMSVideoPlayer.Controls.Right>
