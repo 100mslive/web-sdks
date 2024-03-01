@@ -86,7 +86,7 @@ export class DeviceManager implements HMSDeviceManager {
     return newDevice;
   };
 
-  async init(force = false) {
+  async init(force = false, logAnalytics = true) {
     if (this.initialized && !force) {
       return;
     }
@@ -98,13 +98,15 @@ export class DeviceManager implements HMSDeviceManager {
     this.eventBus.deviceChange.publish({
       devices: this.getDevices(),
     } as HMSDeviceChangeEvent);
-    this.eventBus.analytics.publish(
-      AnalyticsEventFactory.deviceChange({
-        selection: this.getCurrentSelection(),
-        type: 'list',
-        devices: this.getDevices(),
-      }),
-    );
+    if (logAnalytics) {
+      this.eventBus.analytics.publish(
+        AnalyticsEventFactory.deviceChange({
+          selection: this.getCurrentSelection(),
+          type: 'list',
+          devices: this.getDevices(),
+        }),
+      );
+    }
   }
 
   getDevices(): DeviceMap {
