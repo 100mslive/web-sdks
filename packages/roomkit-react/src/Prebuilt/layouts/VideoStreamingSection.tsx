@@ -116,7 +116,10 @@ export const VideoStreamingSection = ({
         {ViewComponent}
         <Box
           css={{
-            flex: isMobileHLSStream ? '2 1 0' : undefined,
+            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+              .with({ isMobileHLSStream: true }, () => '2 1 0')
+              .otherwise(() => undefined),
             height: !isMobileHLSStream ? '100%' : undefined,
             maxHeight: '100%',
             '&:empty': { display: 'none' },

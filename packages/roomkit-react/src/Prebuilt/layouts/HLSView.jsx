@@ -358,7 +358,7 @@ const HLSView = () => {
       direction={isMobile || isLandscape ? 'column' : 'row'}
       justify="center"
       css={{
-        flex: '1 1 0',
+        flex: isLandscape ? '2 1 0' : '1 1 0',
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (
