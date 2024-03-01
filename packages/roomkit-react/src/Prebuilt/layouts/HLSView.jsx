@@ -417,6 +417,7 @@ const HLSView = () => {
                           align="center"
                           justify="center"
                           css={{
+                            position: 'absolute',
                             bg: '#00000066',
                             display: 'inline-flex',
                             gap: '$2',
