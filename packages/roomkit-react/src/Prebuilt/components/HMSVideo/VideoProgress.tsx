@@ -11,6 +11,9 @@ export const VideoProgress = () => {
   const videoEl = hlsPlayer?.getVideoElement();
 
   const setProgress = useCallback(() => {
+    if (!videoEl) {
+      return;
+    }
     const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
     const videoProgress = Math.floor(getPercentage(videoEl.currentTime, duration));
     let bufferProgress = 0;
@@ -39,6 +42,9 @@ export const VideoProgress = () => {
   const onProgress = (progress: number[]) => {
     const progress1 = Math.floor(getPercentage(progress[0], 100));
     const videoEl = hlsPlayer?.getVideoElement();
+    if (!videoEl) {
+      return;
+    }
     const duration = isFinite(videoEl.duration) ? videoEl.duration : videoEl.seekable?.end(0) || 0;
     const currentTime = (progress1 * duration) / 100;
     hlsPlayer?.seekTo(currentTime);
@@ -63,7 +69,7 @@ export const VideoProgress = () => {
         step={1}
         value={[videoProgress]}
         showTooltip={false}
-        onValueChange={(progress: number[]) => onProgress(progress)}
+        onValueChange={onProgress}
         onPointerDown={() => setPauseProgress(true)}
         onPointerUp={() => setPauseProgress(false)}
         thumbStyles={{ w: '$6', h: '$6' }}
