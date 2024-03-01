@@ -3,11 +3,16 @@ import { Box, Flex, Slider } from '../../..';
 import { useHMSPlayerContext } from './PlayerContext';
 import { getPercentage } from './utils';
 
-export const VideoProgress = () => {
+export const VideoProgress = ({
+  seekProgress,
+  setSeekProgress,
+}: {
+  seekProgress: boolean;
+  setSeekProgress: (value: boolean) => void;
+}) => {
   const { hlsPlayer } = useHMSPlayerContext();
   const [videoProgress, setVideoProgress] = useState<number>(0);
   const [bufferProgress, setBufferProgress] = useState(0);
-  const [pauseProgress, setPauseProgress] = useState(false);
   const videoEl = hlsPlayer?.getVideoElement();
 
   const setProgress = useCallback(() => {
@@ -24,11 +29,11 @@ export const VideoProgress = () => {
     setBufferProgress(isNaN(bufferProgress) ? 0 : bufferProgress);
   }, [videoEl]);
   const timeupdateHandler = useCallback(() => {
-    if (!videoEl || pauseProgress) {
+    if (!videoEl || seekProgress) {
       return;
     }
     setProgress();
-  }, [pauseProgress, setProgress, videoEl]);
+  }, [seekProgress, setProgress, videoEl]);
   useEffect(() => {
     if (!videoEl) {
       return;
@@ -70,8 +75,8 @@ export const VideoProgress = () => {
         value={[videoProgress]}
         showTooltip={false}
         onValueChange={onProgress}
-        onPointerDown={() => setPauseProgress(true)}
-        onPointerUp={() => setPauseProgress(false)}
+        onPointerDown={() => setSeekProgress(true)}
+        onPointerUp={() => setSeekProgress(false)}
         thumbStyles={{ w: '$6', h: '$6' }}
       />
       <Box
