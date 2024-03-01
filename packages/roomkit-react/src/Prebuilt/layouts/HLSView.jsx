@@ -72,6 +72,7 @@ const HLSView = () => {
   const controlsTimerRef = useRef();
   const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const [seekProgress, setSeekProgress] = useState(false);
   const showChat = !!elements?.chat;
   const isFullScreenSupported = screenfull.isEnabled;
 
@@ -285,14 +286,16 @@ const HLSView = () => {
       clearTimeout(controlsTimerRef.current);
     }
     controlsTimerRef.current = setTimeout(() => {
-      setControlsVisible(false);
+      if (!seekProgress) {
+        setControlsVisible(false);
+      }
     }, 5000);
     return () => {
       if (controlsTimerRef.current) {
         clearTimeout(controlsTimerRef.current);
       }
     };
-  }, [controlsVisible, isFullScreen, qualityDropDownOpen]);
+  }, [controlsVisible, isFullScreen, seekProgress, qualityDropDownOpen]);
 
   const onSeekTo = useCallback(seek => {
     hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
@@ -335,16 +338,16 @@ const HLSView = () => {
         setControlsVisible(true);
         return;
       }
-      if (event.type === 'mouseleave') {
+      if (event.type === 'mouseleave' && !seekProgress) {
         setControlsVisible(false);
-      } else if (isFullScreen && !controlsVisible && event.type === 'mousemove') {
+      } else if (!controlsVisible && event.type === 'mousemove') {
         setControlsVisible(true);
         if (controlsTimerRef.current) {
           clearTimeout(controlsTimerRef.current);
         }
       }
     },
-    [controlsVisible, isFullScreen, isLandscape, isMobile, qualityDropDownOpen],
+    [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
   return (
@@ -517,7 +520,7 @@ const HLSView = () => {
                       }}
                     >
                       {hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR ? (
-                        <HMSVideoPlayer.Progress />
+                        <HMSVideoPlayer.Progress seekProgress={seekProgress} setSeekProgress={setSeekProgress} />
                       ) : null}
                       <HMSVideoPlayer.Controls.Root
                         css={{
