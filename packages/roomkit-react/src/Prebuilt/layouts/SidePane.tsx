@@ -186,15 +186,15 @@ const SidePane = ({
       direction="column"
       justify="center"
       css={{
-        w: '$100',
+        w: match({ isMobileHLSStream, isLandscapeHLSStream })
+          .with({ isLandscapeHLSStream: true }, () => '340px')
+          .with({ isMobileHLSStream: true }, () => '100%')
+          .otherwise(() => '$100'),
         h: '100%',
         flexShrink: 0,
         gap: '$4',
         position: 'relative',
         '&:empty': { display: 'none' },
-        '@ls': {
-          w: isMobileHLSStream || isLandscapeHLSStream ? '340px' : '$100',
-        },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (

@@ -86,7 +86,7 @@ export const Chat = () => {
                   isLandscapeStream: false,
                   isChatEnabled: true,
                 },
-                () => ({ bottom: '$19', right: '$8' }),
+                () => ({ bottom: '$20', right: '$8' }),
               )
               .otherwise(() => ({})),
           }}
