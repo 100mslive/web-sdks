@@ -64,9 +64,16 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
     return null;
   }
 
+  const canPublishAudio = role.publishParams.allowed.includes('audio');
+  const canPublishVideo = role.publishParams.allowed.includes('video');
+
+  if (!canPublishAudio && !canPublishVideo) {
+    return null;
+  }
+
   return (
     <>
-      {role.publishParams.allowed.includes('audio') && (
+      {canPublishAudio && (
         <>
           {isAudioOnForSomePeers && permissions?.mute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('audio', false)}>
@@ -88,7 +95,7 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
         </>
       )}
 
-      {role.publishParams.allowed.includes('video') && (
+      {canPublishVideo && (
         <>
           {isVideoOnForSomePeers && permissions?.mute ? (
             <Dropdown.Item css={dropdownItemCSS} onClick={() => setTrackEnabled('video', false)}>
@@ -113,8 +120,47 @@ const MuteUnmuteOption = ({ roleName, peerList }: { peerList: HMSPeer[]; roleNam
   );
 };
 
-export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList: HMSPeer[] }) => {
+const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
   const [openOptions, setOpenOptions] = useState(false);
+  if (React.Children.count(children) === 0) {
+    return null;
+  }
+  return (
+    <Dropdown.Root open={openOptions} onOpenChange={setOpenOptions}>
+      <Dropdown.Trigger
+        data-testid="role_group_options"
+        onClick={e => e.stopPropagation()}
+        className="role_actions"
+        asChild
+        css={{
+          p: '$1',
+          r: '$0',
+          c: '$on_surface_high',
+          visibility: openOptions ? 'visible' : 'hidden',
+          '&:hover': {
+            c: '$on_surface_medium',
+          },
+          '@md': {
+            visibility: 'visible',
+          },
+        }}
+      >
+        <Flex>
+          <VerticalMenuIcon />
+        </Flex>
+      </Dropdown.Trigger>
+      <Dropdown.Content
+        onClick={e => e.stopPropagation()}
+        css={{ w: 'max-content', bg: '$surface_default', py: 0 }}
+        align="end"
+      >
+        {children}
+      </Dropdown.Content>
+    </Dropdown.Root>
+  );
+};
+
+export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList: HMSPeer[] }) => {
   const permissions = useHMSStore(selectPermissions);
   const hmsActions = useHMSActions();
   const { elements } = useRoomLayoutConferencingScreen();
@@ -157,60 +203,32 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   };
 
   return (
-    <Dropdown.Root open={openOptions} onOpenChange={setOpenOptions}>
-      <Dropdown.Trigger
-        data-testid="role_group_options"
-        onClick={e => e.stopPropagation()}
-        className="role_actions"
-        asChild
-        css={{
-          p: '$1',
-          r: '$0',
-          c: '$on_surface_high',
-          visibility: openOptions ? 'visible' : 'hidden',
-          '&:hover': {
-            c: '$on_surface_medium',
-          },
-          '@md': {
-            visibility: 'visible',
-          },
-        }}
-      >
-        <Flex>
-          <VerticalMenuIcon />
-        </Flex>
-      </Dropdown.Trigger>
-      <Dropdown.Content
-        onClick={e => e.stopPropagation()}
-        css={{ w: 'max-content', bg: '$surface_default', py: 0 }}
-        align="end"
-      >
-        {canRemoveRoleFromStage && (
-          <Dropdown.Item
-            css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
-            onClick={removeAllFromStage}
-          >
-            <PersonRectangleIcon />
-            <Text variant="sm" css={optionTextCSS}>
-              Remove all from Stage
-            </Text>
-          </Dropdown.Item>
-        )}
+    <DropdownWrapper>
+      {canRemoveRoleFromStage && (
+        <Dropdown.Item
+          css={{ ...dropdownItemCSS, borderBottom: '1px solid $border_bright' }}
+          onClick={removeAllFromStage}
+        >
+          <PersonRectangleIcon />
+          <Text variant="sm" css={optionTextCSS}>
+            Remove all from Stage
+          </Text>
+        </Dropdown.Item>
+      )}
 
-        {canMuteOrUnmute && <MuteUnmuteOption peerList={peerList} roleName={roleName} />}
+      {canMuteOrUnmute && <MuteUnmuteOption peerList={peerList} roleName={roleName} />}
 
-        {canRemoveRoleFromRoom && (
-          <Dropdown.Item
-            css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: '$alert_error_default' }}
-            onClick={removePeersFromRoom}
-          >
-            <RemoveUserIcon />
-            <Text variant="sm" css={{ ...optionTextCSS, color: 'inherit' }}>
-              Remove all from Room
-            </Text>
-          </Dropdown.Item>
-        )}
-      </Dropdown.Content>
-    </Dropdown.Root>
+      {canRemoveRoleFromRoom && (
+        <Dropdown.Item
+          css={{ ...dropdownItemCSS, borderTop: '1px solid $border_bright', color: '$alert_error_default' }}
+          onClick={removePeersFromRoom}
+        >
+          <RemoveUserIcon />
+          <Text variant="sm" css={{ ...optionTextCSS, color: 'inherit' }}>
+            Remove all from Room
+          </Text>
+        </Dropdown.Item>
+      )}
+    </DropdownWrapper>
   );
 };
