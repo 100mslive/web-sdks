@@ -13,7 +13,6 @@ import { ChatSettings } from './ChatSettings';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 // @ts-ignore: No implicit Any
 import { useIsSidepaneTypeOpen, useSidepaneReset, useSidepaneToggle } from './AppData/useSidepane';
-import { useLandscapeHLSStream, useMobileHLSStream } from '../common/hooks';
 // @ts-ignore: No implicit Any
 import { getFormattedCount } from '../common/utils';
 import { SIDE_PANE_OPTIONS } from '../common/constants';
@@ -42,9 +41,8 @@ const ParticipantCount = ({ count }: { count: number }) => {
 
 export const SidePaneTabs = React.memo<{
   active: 'Participants | Chat';
-  hideControls?: boolean;
   hideTab?: boolean;
-}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideControls, hideTab = false }) => {
+}>(({ active = SIDE_PANE_OPTIONS.CHAT, hideTab = false }) => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const toggleParticipants = useSidepaneToggle(SIDE_PANE_OPTIONS.PARTICIPANTS);
   const resetSidePane = useSidepaneReset();
@@ -61,8 +59,6 @@ export const SidePaneTabs = React.memo<{
   const { off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const isChatOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.CHAT);
   const showChatSettings = showChat && isChatOpen && (!isMobile || !isOverlayChat);
-  const isMobileHLSStream = useMobileHLSStream();
-  const isLandscapeStream = useLandscapeHLSStream();
 
   useEffect(() => {
     match({ activeTab, showChat, showParticipants })
@@ -88,7 +84,6 @@ export const SidePaneTabs = React.memo<{
         css={{
           color: '$on_primary_high',
           h: '100%',
-          marginTop: hideControls && isOverlayChat && !(isMobileHLSStream || isLandscapeStream) ? '$17' : '0',
           transition: 'margin 0.3s ease-in-out',
           position: 'relative',
         }}
@@ -106,7 +101,6 @@ export const SidePaneTabs = React.memo<{
       css={{
         color: '$on_primary_high',
         h: '100%',
-        marginTop: hideControls && isOverlayChat && !(isMobileHLSStream || isLandscapeStream) ? '$17' : '0',
         transition: 'margin 0.3s ease-in-out',
       }}
     >

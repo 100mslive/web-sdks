@@ -43,9 +43,6 @@ const Wrapper = styled('div', {
   },
   '@md': {
     p: '$6 $8',
-    pb: '$12',
-    borderTopLeftRadius: 0,
-    borderTopRightRadius: 0,
     animation: `${translateAcross({ yFrom: '100%' })} 150ms cubic-bezier(0.22, 1, 0.36, 1)`,
   },
   variants: {
@@ -66,13 +63,18 @@ const Wrapper = styled('div', {
     },
     overlayChat: {
       true: {
-        height: 'unset',
-        maxHeight: 300,
-        background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
-        '@md': {
-          pb: '$20',
+        '@lg': {
+          maxHeight: '300px',
+          background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.00) 35.94%, rgba(0, 0, 0, 0.64) 100%)',
+          position: 'fixed',
+          zIndex: 12,
+          bottom: 0,
+          pb: '$12',
         },
       },
+    },
+    hideControls: {
+      true: {},
     },
   },
   compoundVariants: [
@@ -95,9 +97,13 @@ const Wrapper = styled('div', {
         position: 'unset',
         height: '100%',
         maxHeight: 'unset',
-        '@md': {
-          pb: '$8',
-        },
+      },
+    },
+    {
+      hideControls: false,
+      overlayChat: true,
+      css: {
+        pb: '$17',
       },
     },
   ],
@@ -144,6 +150,8 @@ const SidePane = ({
   const commonProps = {
     landscapeStream: isLandscapeHLSStream,
     mobileStream: isMobileHLSStream,
+    hideControls,
+    overlayChat: !!elements?.chat?.is_overlay,
   };
 
   const SidepaneComponent = match(sidepane)
@@ -167,11 +175,7 @@ const SidePane = ({
     ))
     .with(SIDE_PANE_OPTIONS.CHAT, SIDE_PANE_OPTIONS.PARTICIPANTS, () => (
       <Wrapper {...commonProps} overlayChat={mwebStreamingChat}>
-        <SidePaneTabs
-          hideControls={hideControls}
-          active={sidepane}
-          hideTab={isMobileHLSStream || isLandscapeHLSStream}
-        />
+        <SidePaneTabs active={sidepane} hideTab={isMobileHLSStream || isLandscapeHLSStream} />
       </Wrapper>
     ))
     .with(SIDE_PANE_OPTIONS.ROOM_DETAILS, () => (
@@ -201,6 +205,10 @@ const SidePane = ({
         gap: '$4',
         position: 'relative',
         '&:empty': { display: 'none' },
+        '@md': {
+          position: 'absolute',
+          zIndex: 12,
+        },
       }}
     >
       {trackId && layoutMode === LayoutMode.GALLERY && (
