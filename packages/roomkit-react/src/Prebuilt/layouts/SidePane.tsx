@@ -69,7 +69,6 @@ const Wrapper = styled('div', {
           position: 'fixed',
           zIndex: 12,
           bottom: 0,
-          pb: '$12',
         },
       },
     },
