@@ -417,6 +417,14 @@ const HLSView = () => {
         },
       }}
     >
+      <Flex
+        css={{
+          filter: 'blur(40px)',
+          position: 'absolute',
+          size: '100%',
+          background: '$background_dim',
+        }}
+      />
       {hlsViewRef.current && (isMobile || isLandscape) && (
         <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
           <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
