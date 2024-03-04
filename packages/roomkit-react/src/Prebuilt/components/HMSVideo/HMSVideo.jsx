@@ -46,6 +46,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
         }}
         ref={videoRef}
         playsInline
+        disablePictureInPicture
       />
       {children}
     </Flex>
