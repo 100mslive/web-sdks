@@ -7,6 +7,7 @@ import { config as cssConfig } from '../../../Theme';
 import emptyChat from '../../images/empty-chat.svg';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsPeerBlacklisted } from '../hooks/useChatBlacklist';
+import { useLandscapeHLSStream, useMobileHLSStream } from '../../common/hooks';
 
 export const EmptyChat = () => {
   const { elements } = useRoomLayoutConferencingScreen();
@@ -18,8 +19,11 @@ export const EmptyChat = () => {
       elements.chat.private_chat_enabled ||
       (elements.chat.roles_whitelist && elements.chat.roles_whitelist.length)) &&
     !isLocalPeerBlacklisted;
+  const isMobileHLSStream = useMobileHLSStream();
+  const isLandscapeStream = useLandscapeHLSStream();
+  const streaming = isMobileHLSStream || isLandscapeStream;
 
-  if (isMobile && elements?.chat?.is_overlay) return <></>;
+  if (isMobile && elements?.chat?.is_overlay && !streaming) return <></>;
 
   return (
     <Flex
