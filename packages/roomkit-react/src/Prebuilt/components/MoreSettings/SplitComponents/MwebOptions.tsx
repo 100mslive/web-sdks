@@ -343,7 +343,7 @@ export const MwebOptions = ({
             mx: '$4',
           }}
         >
-          <EmojiReaction />
+          <EmojiReaction showCard />
         </Box>
       )}
       {showRecordingOn && (
