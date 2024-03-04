@@ -350,8 +350,6 @@ const HLSView = () => {
     [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
-  console.log('hls url ', streamEnded, hlsUrl);
-
   if (!hlsUrl || streamEnded) {
     return (
       <Flex
