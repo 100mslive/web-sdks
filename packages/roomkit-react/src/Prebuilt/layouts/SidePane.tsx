@@ -72,6 +72,13 @@ const Wrapper = styled('div', {
         },
       },
     },
+    roomDescription: {
+      true: {
+        position: 'unset',
+        minHeight: '100%',
+        overflowY: 'auto',
+      },
+    },
     hideControls: {
       true: {},
     },
@@ -151,6 +158,7 @@ const SidePane = ({
     mobileStream: isMobileHLSStream,
     hideControls,
     overlayChat: !!elements?.chat?.is_overlay,
+    roomDescription: isMobile && sidepane === SIDE_PANE_OPTIONS.ROOM_DETAILS,
   };
 
   const SidepaneComponent = match(sidepane)
