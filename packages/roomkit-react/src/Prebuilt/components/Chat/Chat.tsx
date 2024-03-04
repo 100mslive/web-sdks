@@ -42,6 +42,10 @@ export const Chat = () => {
     [hmsActions, vanillaStore],
   );
 
+  if (!elements?.chat) {
+    return null;
+  }
+
   return (
     <Flex
       direction="column"

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useFullscreen, useMedia, usePrevious, useToggle } from 'react-use';
 import { HLSPlaybackState, HMSHLSPlayer, HMSHLSPlayerEvents } from '@100mslive/hls-player';
 import screenfull from 'screenfull';
+import { match, P } from 'ts-pattern';
 import {
   HLSPlaylistType,
   HMSNotificationTypes,
@@ -47,11 +48,20 @@ const ToggleChat = () => {
   const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const showChat = !!elements?.chat;
   const isMobile = useMedia(config.media.md);
+  const hmsActions = useHMSActions();
+
   useEffect(() => {
-    if (!sidepane && isMobile && showChat) {
-      toggleChat();
-    }
-  }, [sidepane, isMobile, toggleChat, showChat]);
+    match({ sidepane, isMobile, showChat })
+      .with({ isMobile: true, showChat: true, sidepane: P.when(value => !value) }, () => {
+        toggleChat();
+      })
+      .with({ showChat: false, isMobile: true, sidepane: SIDE_PANE_OPTIONS.CHAT }, () => {
+        hmsActions.setAppData(APP_DATA.sidePane, '');
+      })
+      .otherwise(() => {
+        //do nothing
+      });
+  }, [sidepane, isMobile, toggleChat, showChat, hmsActions]);
   return null;
 };
 const HLSView = () => {
