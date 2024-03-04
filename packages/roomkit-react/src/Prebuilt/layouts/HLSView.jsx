@@ -48,7 +48,7 @@ const ToggleChat = () => {
   const showChat = !!elements?.chat;
   const isMobile = useMedia(config.media.md);
   useEffect(() => {
-    if (sidepane === '' && isMobile && showChat) {
+    if (!sidepane && isMobile && showChat) {
       toggleChat();
     }
   }, [sidepane, isMobile, toggleChat, showChat]);

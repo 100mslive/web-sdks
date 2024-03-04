@@ -1,9 +1,7 @@
 import { useCallback } from 'react';
 import { match, P } from 'ts-pattern';
 import { selectAppData, useHMSActions, useHMSStore, useHMSVanillaStore } from '@100mslive/react-sdk';
-import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { usePollViewState } from './useUISettings';
-import { useMobileHLSStream } from '../../common/hooks';
 import { APP_DATA, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../../common/constants';
 
 /**
@@ -45,8 +43,6 @@ export const usePollViewToggle = () => {
   const hmsActions = useHMSActions();
   const { view, setPollState } = usePollViewState();
   const isOpen = useSidepaneState() === SIDE_PANE_OPTIONS.POLLS;
-  const isMobileHLSStream = useMobileHLSStream();
-  const { elements } = useRoomLayoutConferencingScreen();
 
   const togglePollView = useCallback(
     id => {
@@ -73,10 +69,7 @@ export const usePollViewToggle = () => {
               [POLL_STATE.pollInView]: undefined,
               [POLL_STATE.view]: null,
             });
-            hmsActions.setAppData(
-              APP_DATA.sidePane,
-              isMobileHLSStream && !!elements?.chat ? SIDE_PANE_OPTIONS.CHAT : '',
-            );
+            hmsActions.setAppData(APP_DATA.sidePane, '');
           },
         )
         .otherwise(() => {
