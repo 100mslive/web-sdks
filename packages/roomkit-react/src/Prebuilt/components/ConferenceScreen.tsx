@@ -200,7 +200,7 @@ export const ConferenceScreen = () => {
               position: 'relative',
             }}
             justify="end"
-            gap="1"
+            gap="2"
           >
             {noAVPermissions ? <RaiseHand /> : null}
             <MoreSettings elements={screenProps.elements} screenType={screenProps.screenType} />
