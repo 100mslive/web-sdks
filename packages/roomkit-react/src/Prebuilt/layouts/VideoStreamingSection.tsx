@@ -4,6 +4,7 @@ import {
   DefaultConferencingScreen_Elements,
   HLSLiveStreamingScreen_Elements,
 } from '@100mslive/types-prebuilt';
+import { match } from 'ts-pattern';
 import {
   selectIsConnectedToRoom,
   selectLocalPeerRoleName,
@@ -107,12 +108,19 @@ export const VideoStreamingSection = ({
           position: 'relative',
           gap: isMobileHLSStream || isLandscapeHLSStream ? '0' : '$4',
         }}
-        direction={isMobileHLSStream ? 'column' : 'row'}
+        direction={match<Record<string, boolean>, 'row' | 'column'>({ isLandscapeHLSStream, isMobileHLSStream })
+          .with({ isLandscapeHLSStream: true }, () => 'row')
+          .with({ isMobileHLSStream: true }, () => 'column')
+          .otherwise(() => 'row')}
       >
         {ViewComponent}
         <Box
           css={{
-            flex: isMobileHLSStream ? '1 1 0' : undefined,
+            flex: match({ isLandscapeHLSStream, isMobileHLSStream })
+              .with({ isLandscapeHLSStream: true }, () => '1  1 0')
+              .with({ isMobileHLSStream: true }, () => '2 1 0')
+              .otherwise(() => undefined),
+            position: 'relative',
             height: !isMobileHLSStream ? '100%' : undefined,
             maxHeight: '100%',
             '&:empty': { display: 'none' },

@@ -23,7 +23,7 @@ import { EMOJI_REACTION_TYPE } from '../common/constants';
 
 init({ data });
 
-export const EmojiReaction = () => {
+export const EmojiReaction = ({ showCard = false }) => {
   const [open, setOpen] = useState(false);
   const isConnected = useHMSStore(selectIsConnectedToRoom);
   useDropdownList({ open: open, name: 'EmojiReaction' });
@@ -68,7 +68,7 @@ export const EmojiReaction = () => {
     return null;
   }
 
-  if ((isMobile || isLandscape) && !(isLandscapeStream || isMobileHLSStream)) {
+  if (showCard) {
     return <EmojiCard sendReaction={sendReaction} />;
   }
   return (

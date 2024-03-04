@@ -38,9 +38,6 @@ const DropdownWrapper = ({ children }: { children: React.ReactNode }) => {
   if (React.Children.toArray(children).length === 0) {
     return null;
   }
-  React.Children.map(children, child => {
-    console.log({ child });
-  });
   return (
     <Dropdown.Root open={openOptions} onOpenChange={setOpenOptions}>
       <Dropdown.Trigger

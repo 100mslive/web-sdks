@@ -152,7 +152,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
       <Flex>
         <ChatSelectorContainer />
         {canDisableChat && isMobile && isOverlayChat ? (
-          <Flex align="center" justify="end" css={{ mb: '$4' }}>
+          <Flex align="center" justify="end" css={{ mb: '$4' }} onClick={e => e.stopPropagation()}>
             <Popover.Root>
               <Popover.Trigger asChild>
                 <IconButton css={{ border: '1px solid $border_bright' }}>
