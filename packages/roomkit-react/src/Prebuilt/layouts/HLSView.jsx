@@ -399,6 +399,11 @@ const HLSView = () => {
       justify="center"
       css={{
         flex: isLandscape ? '2 1 0' : '1 1 0',
+        '&:fullscreen': {
+          '& video': {
+            height: 'unset !important',
+          },
+        },
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (
