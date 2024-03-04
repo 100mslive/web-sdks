@@ -80,9 +80,12 @@ export const RoleOptions = ({ roleName, peerList }: { roleName: string; peerList
   const { on_stage_role, off_stage_roles = [] } = (elements as DefaultConferencingScreen_Elements)?.on_stage_exp || {};
   const canRemoveRoleFromStage = permissions?.changeRole && roleName === on_stage_role;
   const role = useHMSStore(selectRoleByRoleName(roleName));
+  const tracks = useHMSStore(selectTracksMap);
+  if (!role) {
+    return null;
+  }
   const canPublishAudio = role.publishParams.allowed.includes('audio');
   const canPublishVideo = role.publishParams.allowed.includes('video');
-  const tracks = useHMSStore(selectTracksMap);
 
   let isVideoOnForSomePeers = false;
   let isAudioOnForSomePeers = false;
