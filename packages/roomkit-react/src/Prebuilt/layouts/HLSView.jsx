@@ -188,10 +188,11 @@ const HLSView = () => {
             action: (
               <Button
                 onClick={() => {
-                  hmsActions.setAppData({
+                  hmsActions.setAppData(APP_DATA.pollState, {
                     [POLL_STATE.pollInView]: pollId,
                     [POLL_STATE.view]: POLL_VIEWS.VOTE,
                   });
+                  hmsActions.setAppData(APP_DATA.sidePane, SIDE_PANE_OPTIONS.POLLS);
                 }}
                 variant="standard"
                 css={{
