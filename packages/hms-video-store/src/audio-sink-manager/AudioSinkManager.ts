@@ -312,10 +312,13 @@ export class AudioSinkManager {
         if (localAudioTrack.settings.deviceId === externalDeviceID) {
           return;
         }
-        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId });
-        await localAudioTrack.setSettings({
-          deviceId: externalDeviceID,
-        });
+        await localAudioTrack.setSettings({ deviceId: earpiece?.deviceId }, true);
+        await localAudioTrack.setSettings(
+          {
+            deviceId: externalDeviceID,
+          },
+          true,
+        );
       }
     }
   };
