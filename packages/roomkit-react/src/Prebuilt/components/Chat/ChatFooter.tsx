@@ -273,7 +273,7 @@ export const ChatFooter = ({ onSend, children }: { onSend: (count: number) => vo
                 css={{
                   alignItems: 'center',
                 }}
-                gap="1"
+                gap="2"
               >
                 {noAVPermissions ? <RaiseHand css={{ bg: '$surface_default' }} /> : null}
                 <MoreSettings elements={elements} screenType={screenType} />
