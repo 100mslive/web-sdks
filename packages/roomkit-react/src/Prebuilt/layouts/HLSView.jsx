@@ -33,20 +33,32 @@ import { Loading } from '../../Loading';
 import { Text } from '../../Text';
 import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
-import { usePollViewToggle, useSidepaneToggle } from '../components/AppData/useSidepane';
+import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 import { useIsLandscape } from '../common/hooks';
-import { APP_DATA, EMOJI_REACTION_TYPE, SIDE_PANE_OPTIONS } from '../common/constants';
+import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
 
 let hlsPlayer;
 const toastMap = {};
 
+const ToggleChat = () => {
+  const { elements } = useRoomLayoutConferencingScreen();
+  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
+  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
+  const showChat = !!elements?.chat;
+  const isMobile = useMedia(config.media.md);
+  useEffect(() => {
+    if (!sidepane && isMobile && showChat) {
+      toggleChat();
+    }
+  }, [sidepane, isMobile, toggleChat, showChat]);
+  return null;
+};
 const HLSView = () => {
   const videoRef = useRef(null);
   const hlsViewRef = useRef();
   const hlsState = useHMSStore(selectHLSState);
   const enablHlsStats = useHMSStore(selectAppData(APP_DATA.hlsStats));
-  const { elements, screenType } = useRoomLayoutConferencingScreen();
   const notification = useHMSNotifications(HMSNotificationTypes.POLL_STOPPED);
   const hmsActions = useHMSActions();
   const { themeType } = useTheme();
@@ -63,17 +75,13 @@ const HLSView = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [show, toggle] = useToggle(false);
   const lastHlsUrl = usePrevious(hlsUrl);
-  const togglePollView = usePollViewToggle();
   const vanillaStore = useHMSVanillaStore();
   const [controlsVisible, setControlsVisible] = useState(true);
   const [isUserSelectedAuto, setIsUserSelectedAuto] = useState(true);
   const [qualityDropDownOpen, setQualityDropDownOpen] = useState(false);
   const controlsRef = useRef(null);
   const controlsTimerRef = useRef();
-  const sidepane = useHMSStore(selectAppData(APP_DATA.sidePane));
-  const toggleChat = useSidepaneToggle(SIDE_PANE_OPTIONS.CHAT);
   const [seekProgress, setSeekProgress] = useState(false);
-  const showChat = !!elements?.chat;
   const isFullScreenSupported = screenfull.isEnabled;
 
   const isMobile = useMedia(config.media.md);
@@ -84,13 +92,6 @@ const HLSView = () => {
   });
   const [showLoader, setShowLoader] = useState(false);
 
-  const isMwebHLSStream = screenType === 'hls_live_streaming' && isMobile;
-
-  useEffect(() => {
-    if (sidepane === '' && isMwebHLSStream && showChat) {
-      toggleChat();
-    }
-  }, [sidepane, isMwebHLSStream, toggleChat, showChat]);
   // FIXME: move this logic to player controller in next release
   useEffect(() => {
     /**
@@ -176,7 +177,12 @@ const HLSView = () => {
             title: `${pollStartedBy} started a ${poll.type}: ${poll.title}`,
             action: (
               <Button
-                onClick={() => togglePollView(pollId)}
+                onClick={() => {
+                  hmsActions.setAppData({
+                    [POLL_STATE.pollInView]: pollId,
+                    [POLL_STATE.view]: POLL_VIEWS.VOTE,
+                  });
+                }}
                 variant="standard"
                 css={{
                   backgroundColor: '$surface_bright',
@@ -246,7 +252,7 @@ const HLSView = () => {
         hlsPlayer.reset();
       };
     }
-  }, [hlsUrl, togglePollView, vanillaStore]);
+  }, [hlsUrl, vanillaStore, hmsActions]);
 
   /**
    * initialize and subscribe to hlsState
@@ -352,28 +358,36 @@ const HLSView = () => {
 
   if (!hlsUrl || streamEnded) {
     return (
-      <Flex
-        key="hls-viewer"
-        id={`hls-viewer-${themeType}`}
-        ref={hlsViewRef}
-        direction={isMobile || isLandscape ? 'column' : 'row'}
-        justify="center"
-        css={{
-          flex: isLandscape ? '2 1 0' : '1 1 0',
-        }}
-      >
-        <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
-          <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-            {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
+      <>
+        <ToggleChat />
+        {hlsViewRef.current && (isMobile || isLandscape) && (
+          <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
+            <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
+          </Box>
+        )}
+        <Flex
+          key="hls-viewer"
+          id={`hls-viewer-${themeType}`}
+          ref={hlsViewRef}
+          direction={isMobile || isLandscape ? 'column' : 'row'}
+          justify="center"
+          css={{
+            flex: isLandscape ? '2 1 0' : '1 1 0',
+          }}
+        >
+          <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+            <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
+              {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
+            </Flex>
+            <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
+              {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
+            </Text>
+            <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
+              {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
+            </Text>
           </Flex>
-          <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
-            {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
-          </Text>
-          <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
-            {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
-          </Text>
         </Flex>
-      </Flex>
+      </>
     );
   }
   return (
@@ -385,11 +399,16 @@ const HLSView = () => {
       justify="center"
       css={{
         flex: isLandscape ? '2 1 0' : '1 1 0',
+        '&:fullscreen': {
+          '& video': {
+            height: 'unset !important',
+          },
+        },
       }}
     >
       {hlsViewRef.current && (isMobile || isLandscape) && (
         <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
-          <LeaveRoom screenType={screenType} container={hlsViewRef.current} />
+          <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
         </Box>
       )}
 
@@ -638,7 +657,7 @@ const HLSView = () => {
           </HMSVideoPlayer.Root>
         </Flex>
       </HMSPlayerContext.Provider>
-
+      <ToggleChat />
       {isMobile && !isFullScreen && <HLSViewTitle />}
     </Flex>
   );
