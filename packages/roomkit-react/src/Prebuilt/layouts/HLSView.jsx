@@ -360,7 +360,11 @@ const HLSView = () => {
     return (
       <>
         <ToggleChat />
-
+        {hlsViewRef.current && (isMobile || isLandscape) && (
+          <Box css={{ position: 'fixed', left: '$4', top: '$4', zIndex: 11 }}>
+            <LeaveRoom screenType="hls_live_streaming" container={hlsViewRef.current} />
+          </Box>
+        )}
         <Flex
           key="hls-viewer"
           id={`hls-viewer-${themeType}`}
