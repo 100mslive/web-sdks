@@ -358,28 +358,32 @@ const HLSView = () => {
 
   if (!hlsUrl || streamEnded) {
     return (
-      <Flex
-        key="hls-viewer"
-        id={`hls-viewer-${themeType}`}
-        ref={hlsViewRef}
-        direction={isMobile || isLandscape ? 'column' : 'row'}
-        justify="center"
-        css={{
-          flex: isLandscape ? '2 1 0' : '1 1 0',
-        }}
-      >
-        <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
-          <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
-            {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
+      <>
+        <ToggleChat />
+
+        <Flex
+          key="hls-viewer"
+          id={`hls-viewer-${themeType}`}
+          ref={hlsViewRef}
+          direction={isMobile || isLandscape ? 'column' : 'row'}
+          justify="center"
+          css={{
+            flex: isLandscape ? '2 1 0' : '1 1 0',
+          }}
+        >
+          <Flex align="center" justify="center" direction="column" css={{ size: '100%', px: '$10' }}>
+            <Flex css={{ c: '$on_surface_high', r: '$round', bg: '$surface_default', p: '$2' }}>
+              {streamEnded ? <ColoredHandIcon height={56} width={56} /> : <GoLiveIcon height={56} width={56} />}
+            </Flex>
+            <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
+              {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
+            </Text>
+            <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
+              {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
+            </Text>
           </Flex>
-          <Text variant="h5" css={{ c: '$on_surface_high', mt: '$10', mb: 0, textAlign: 'center' }}>
-            {streamEnded ? 'Stream has ended' : 'Stream yet to start'}
-          </Text>
-          <Text variant="md" css={{ textAlign: 'center', mt: '$4', c: '$on_surface_medium' }}>
-            {streamEnded ? 'Have a nice day!' : 'Sit back and relax'}
-          </Text>
         </Flex>
-      </Flex>
+      </>
     );
   }
   return (
