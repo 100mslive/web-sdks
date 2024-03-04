@@ -71,7 +71,7 @@ export const Chat = () => {
         <Box
           css={{
             position: 'absolute',
-            ...match({ isLandscapeStream, isChatEnabled })
+            ...match({ isLandscapeStream, isMobileHLSStream, isChatEnabled })
               .with(
                 {
                   isLandscapeStream: true,
@@ -85,6 +85,20 @@ export const Chat = () => {
                   isChatEnabled: false,
                 },
                 () => ({ bottom: '$20', right: '$10' }),
+              )
+              .with(
+                {
+                  isMobileHLSStream: true,
+                  isChatEnabled: false,
+                },
+                () => ({ bottom: '$19', right: '$8' }),
+              )
+              .with(
+                {
+                  isMobileHLSStream: true,
+                  isChatEnabled: true,
+                },
+                () => ({ bottom: '$17', right: '$8' }),
               )
               .with(
                 {
