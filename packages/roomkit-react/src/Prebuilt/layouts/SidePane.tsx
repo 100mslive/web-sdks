@@ -74,8 +74,6 @@ const Wrapper = styled('div', {
     },
     roomDescription: {
       true: {
-        position: 'unset',
-        minHeight: '100%',
         overflowY: 'auto',
       },
     },
