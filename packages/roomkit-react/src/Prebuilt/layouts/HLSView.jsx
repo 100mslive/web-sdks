@@ -455,49 +455,51 @@ const HLSView = () => {
             <>
               {isMobile || isLandscape ? (
                 <>
-                  {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
-                    <Flex
-                      align="center"
-                      justify="center"
-                      css={{
-                        position: 'absolute',
-                        bg: '#00000066',
-                        display: 'inline-flex',
-                        gap: '$2',
-                        zIndex: 1,
-                        size: '100%',
-                        visibility: controlsVisible ? `` : `hidden`,
-                        opacity: controlsVisible ? `1` : '0',
-                      }}
-                    >
-                      <HMSVideoPlayer.Seeker
-                        title="backward"
-                        css={{
-                          visibility: isSeekEnabled ? `` : `hidden`,
-                          opacity: isSeekEnabled ? `1` : '0',
-                        }}
-                      >
-                        <BackwardArrowIcon width={32} height={32} />
-                      </HMSVideoPlayer.Seeker>
-                      <Box
-                        css={{
-                          bg: 'rgba(0, 0, 0, 0.6)',
-                          r: '$round',
-                        }}
-                      >
-                        <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
-                      </Box>
-                      <HMSVideoPlayer.Seeker
-                        title="forward"
-                        css={{
-                          visibility: isSeekEnabled ? `` : `hidden`,
-                          opacity: isSeekEnabled ? `1` : '0',
-                        }}
-                      >
-                        <ForwardArrowIcon width={32} height={32} />
-                      </HMSVideoPlayer.Seeker>
-                    </Flex>
-                  )}
+                  <Flex
+                    align="center"
+                    justify="center"
+                    css={{
+                      position: 'absolute',
+                      bg: '#00000066',
+                      display: 'inline-flex',
+                      gap: '$2',
+                      zIndex: 1,
+                      size: '100%',
+                      visibility: controlsVisible ? `` : `hidden`,
+                      opacity: controlsVisible ? `1` : '0',
+                    }}
+                  >
+                    {!showLoader && hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR && (
+                      <>
+                        <HMSVideoPlayer.Seeker
+                          title="backward"
+                          css={{
+                            visibility: isSeekEnabled ? `` : `hidden`,
+                            opacity: isSeekEnabled ? `1` : '0',
+                          }}
+                        >
+                          <BackwardArrowIcon width={32} height={32} />
+                        </HMSVideoPlayer.Seeker>
+                        <Box
+                          css={{
+                            bg: 'rgba(0, 0, 0, 0.6)',
+                            r: '$round',
+                          }}
+                        >
+                          <HMSVideoPlayer.PlayPauseButton isPaused={isPaused} width={48} height={48} />
+                        </Box>
+                        <HMSVideoPlayer.Seeker
+                          title="forward"
+                          css={{
+                            visibility: isSeekEnabled ? `` : `hidden`,
+                            opacity: isSeekEnabled ? `1` : '0',
+                          }}
+                        >
+                          <ForwardArrowIcon width={32} height={32} />
+                        </HMSVideoPlayer.Seeker>
+                      </>
+                    )}
+                  </Flex>
                   <Flex
                     ref={controlsRef}
                     direction="column"
