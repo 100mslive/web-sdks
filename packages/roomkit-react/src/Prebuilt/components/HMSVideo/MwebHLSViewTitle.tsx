@@ -17,7 +17,7 @@ import { SIDE_PANE_OPTIONS } from '../../common/constants';
 	half page will have chat or participant view
 */
 export const HLSViewTitle = () => {
-  const { title, details } = useRoomLayoutHeader();
+  const { title, details, description } = useRoomLayoutHeader();
   const toggleDetailsPane = useSidepaneToggle(SIDE_PANE_OPTIONS.ROOM_DETAILS);
   const isDetailSidepaneOpen = useIsSidepaneTypeOpen(SIDE_PANE_OPTIONS.ROOM_DETAILS);
 
@@ -74,9 +74,11 @@ export const HLSViewTitle = () => {
         ) : null}
         <Flex>
           <RoomDetailsRow details={details} />
-          <Text variant="caption" css={{ color: '$on_surface_medium' }} onClick={toggleDetailsPane}>
-            &nbsp;...more
-          </Text>
+          {description ? (
+            <Text variant="caption" css={{ color: '$on_surface_medium' }} onClick={toggleDetailsPane}>
+              &nbsp;...more
+            </Text>
+          ) : null}
         </Flex>
       </Flex>
     </Flex>
