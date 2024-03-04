@@ -273,6 +273,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     const hasPropertyChanged = generateHasPropertyChanged(settings, this.settings);
     if (hasPropertyChanged('deviceId')) {
       this.manuallySelectedDeviceId = !internal ? settings.deviceId : this.manuallySelectedDeviceId;
+      console.log('device change', this.manuallySelectedDeviceId, settings.deviceId);
       await this.replaceTrackWith(settings);
       const groupId = this.nativeTrack.getSettings().groupId;
       if (!internal && settings.deviceId) {

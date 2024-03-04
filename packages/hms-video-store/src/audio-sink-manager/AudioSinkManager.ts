@@ -308,6 +308,7 @@ export class AudioSinkManager {
       const localAudioTrack = this.store.getLocalPeer()?.audioTrack;
       if (localAudioTrack && earpiece) {
         const externalDeviceID = bluetoothDevice?.deviceId || wired?.deviceId || speakerPhone?.deviceId;
+        console.log('externalDeviceID', externalDeviceID);
         // already selected appropriate device
         if (localAudioTrack.settings.deviceId === externalDeviceID) {
           return;
