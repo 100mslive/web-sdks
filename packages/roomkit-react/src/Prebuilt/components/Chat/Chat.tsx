@@ -45,6 +45,7 @@ export const Chat = () => {
   if (!elements?.chat) {
     return null;
   }
+  const streaming = isMobileHLSStream || isLandscapeStream;
 
   return (
     <Flex
@@ -55,12 +56,12 @@ export const Chat = () => {
         gap: '$4',
       }}
     >
-      {isMobile && elements?.chat?.is_overlay ? null : <PinnedMessage />}
+      {isMobile && elements?.chat?.is_overlay && !streaming ? null : <PinnedMessage />}
       <ChatBody ref={listRef} scrollToBottom={scrollToBottom} />
 
       <ChatPaused />
       <ChatBlocked />
-      {isMobile && elements?.chat?.is_overlay ? <PinnedMessage /> : null}
+      {isMobile && elements?.chat?.is_overlay && !streaming ? <PinnedMessage /> : null}
       {isChatEnabled ? (
         <ChatFooter onSend={scrollToBottom}>
           <NewMessageIndicator scrollToBottom={scrollToBottom} listRef={listRef} />
