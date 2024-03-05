@@ -422,7 +422,7 @@ const HLSView = () => {
           filter: 'blur(40px)',
           position: 'absolute',
           size: '100%',
-          background: '$background_dim',
+          background: '$surface_dim',
         }}
       />
       {hlsViewRef.current && (isMobile || isLandscape) && (
@@ -442,6 +442,7 @@ const HLSView = () => {
           css={{
             size: '100%',
             margin: '0 auto',
+            backgroundColor: 'inherit',
             '@md': {
               height: 'auto',
             },
