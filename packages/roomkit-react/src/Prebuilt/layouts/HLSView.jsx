@@ -367,6 +367,31 @@ const HLSView = () => {
     [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
+  const keyPressHandler = useCallback(
+    async event => {
+      if (hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
+        return;
+      }
+      switch (event.key) {
+        case ' ':
+          if (isPaused) {
+            await hlsPlayer?.play();
+          } else {
+            hlsPlayer?.pause();
+          }
+          break;
+        case 'ArrowRight':
+          onSeekTo(10);
+          break;
+        case 'ArrowLeft':
+          onSeekTo(-10);
+          break;
+        default:
+      }
+    },
+    [hlsState?.variants, isPaused, onSeekTo],
+  );
+
   if (!hlsUrl || streamEnded) {
     return (
       <>
@@ -437,7 +462,10 @@ const HLSView = () => {
             '@md': {
               height: 'auto',
             },
+            outline: 'none',
           }}
+          onKeyDown={keyPressHandler}
+          tabIndex="0"
         >
           {!(isMobile || isLandscape) && (
             <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />
