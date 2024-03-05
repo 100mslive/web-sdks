@@ -113,6 +113,10 @@ export abstract class RunningTrackAnalytics {
   }
 
   createSample() {
+    if (this.tempStats.length === 0) {
+      return;
+    }
+
     this.samples.push(this.collateSample());
     this.tempStats.length = 0;
   }
