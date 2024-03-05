@@ -8,6 +8,7 @@ export const HMSVideo = forwardRef(({ children, ...props }, videoRef) => {
       css={{
         size: '100%',
         position: 'relative',
+        background: '$background_dim',
         justifyContent: 'center',
         '@md': {
           height: 'auto',

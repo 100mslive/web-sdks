@@ -442,7 +442,6 @@ const HLSView = () => {
           css={{
             size: '100%',
             margin: '0 auto',
-            backgroundColor: 'inherit',
             '@md': {
               height: 'auto',
             },
