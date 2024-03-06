@@ -367,17 +367,7 @@ const HLSView = () => {
     [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
-  const keyHandler = useKeyboardHandler(
-    async () => {
-      if (isPaused) {
-        await hlsPlayer?.play();
-      } else {
-        hlsPlayer?.pause();
-      }
-    },
-    onSeekTo,
-    ['ArrowRight', 'ArrowLeft', ' '],
-  );
+  const keyHandler = useKeyboardHandler(isPaused, hlsPlayer);
 
   if (!hlsUrl || streamEnded) {
     return (

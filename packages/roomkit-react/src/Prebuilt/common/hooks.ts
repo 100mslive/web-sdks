@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   parsedUserAgent,
@@ -122,29 +123,26 @@ export const useMobileHLSStream = () => {
   return isMobile && screenType === 'hls_live_streaming';
 };
 
-export const useKeyboardHandler = (
-  handlePlayPause: () => Promise<void>,
-  onSeekTo: (value: number) => void,
-  targetKeys: string[],
-) => {
+export const useKeyboardHandler = (isPaused: boolean, hlsPlayer: HMSHLSPlayer) => {
   const handleKeyEvent = useCallback(
     async (event: KeyboardEvent) => {
-      const { key } = event;
-      if (targetKeys.includes(key)) {
-        switch (event.key) {
-          case ' ':
-            await handlePlayPause();
-            break;
-          case 'ArrowRight':
-            onSeekTo(10);
-            break;
-          case 'ArrowLeft':
-            onSeekTo(-10);
-            break;
-        }
+      switch (event.key) {
+        case ' ':
+          if (isPaused) {
+            await hlsPlayer?.play();
+          } else {
+            hlsPlayer?.pause();
+          }
+          break;
+        case 'ArrowRight':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime + 10);
+          break;
+        case 'ArrowLeft':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime - 10);
+          break;
       }
     },
-    [handlePlayPause, onSeekTo, targetKeys],
+    [hlsPlayer, isPaused],
   );
 
   return handleKeyEvent;
