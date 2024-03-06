@@ -44,6 +44,8 @@ const SecondarySection = ({
         gridTemplateColumns: '1fr',
         gridTemplateRows: `repeat(${tiles.length}, minmax(0, 1fr))`,
         maxHeight: '100%',
+        width: 240,
+        height: '100%',
       }
     : {
         gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
@@ -69,7 +71,6 @@ const SecondarySection = ({
             rootCSS={{
               padding: 0,
               maxWidth: 240,
-              h: '100%',
               aspectRatio: 16 / 9,
               '@md': { aspectRatio: 1 },
             }}
