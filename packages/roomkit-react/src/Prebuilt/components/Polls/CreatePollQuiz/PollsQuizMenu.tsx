@@ -140,7 +140,7 @@ const AddMenu = () => {
           type="text"
           placeholder="Enter a name to continue"
           value={title}
-          onChange={event => setTitle(event.target.value)}
+          onChange={event => setTitle(event.target.value.trimStart())}
           css={{
             backgroundColor: '$surface_bright',
             border: '1px solid $border_default',
