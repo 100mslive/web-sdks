@@ -171,6 +171,9 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     return this.pluginsManager.removePlugin(plugin);
   }
 
+  getPluginUsageDuration(pluginName: string): number {
+    return this.pluginsManager.getPluginUsageDuration(pluginName);
+  }
   /**
    * @see HMSAudioPlugin
    */

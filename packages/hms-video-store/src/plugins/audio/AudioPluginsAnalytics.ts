@@ -11,12 +11,14 @@ export class AudioPluginsAnalytics {
   private readonly addedTimestamps: Record<string, number>;
   private readonly pluginAdded: Record<string, boolean>;
   private readonly pluginSampleRate: Record<string, number>;
+  private readonly pluginTotalDuration: Record<string, number>;
 
   constructor(private eventBus: EventBus) {
     this.initTime = {};
     this.addedTimestamps = {};
     this.pluginAdded = {};
     this.pluginSampleRate = {};
+    this.pluginTotalDuration = {};
   }
 
   added(name: string, sampleRate: number) {
@@ -38,6 +40,10 @@ export class AudioPluginsAnalytics {
       };
       //send stats
       this.eventBus.analytics.publish(MediaPluginsAnalyticsFactory.audioPluginStats(stats));
+      if (!this.pluginTotalDuration[name]) {
+        this.pluginTotalDuration[name] = 0;
+      }
+      this.pluginTotalDuration[name] += Date.now() - this.addedTimestamps[name];
       //clean the plugin details
       this.clean(name);
     }
@@ -78,6 +84,10 @@ export class AudioPluginsAnalytics {
     }
   }
 
+  getPluginUsageDuration(plugin: string) {
+    return this.pluginTotalDuration[plugin] || 0;
+  }
+
   private async timeInMs<T>(fn: () => Promise<T>): Promise<number> {
     const start = Date.now();
     await fn();
@@ -89,5 +99,6 @@ export class AudioPluginsAnalytics {
     delete this.initTime[name];
     delete this.pluginAdded[name];
     delete this.pluginSampleRate[name];
+    delete this.pluginTotalDuration[name];
   }
 }

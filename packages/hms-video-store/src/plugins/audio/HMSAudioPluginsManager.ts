@@ -137,6 +137,10 @@ export class HMSAudioPluginsManager {
     }
   }
 
+  getPluginUsageDuration(pluginName: string) {
+    return this.analytics.getPluginUsageDuration(pluginName);
+  }
+
   async removePlugin(plugin: HMSAudioPlugin) {
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
