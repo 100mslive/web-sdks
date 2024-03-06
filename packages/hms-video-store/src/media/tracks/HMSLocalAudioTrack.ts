@@ -1,6 +1,8 @@
 import isEqual from 'lodash.isequal';
 import { HMSAudioTrack } from './HMSAudioTrack';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
+import { AnalyticsEventLevel } from '../../analytics/AnalyticsEventLevel';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { HMSException } from '../../error/HMSException';
 import { EventBus } from '../../events/EventBus';
@@ -214,6 +216,14 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
   }
 
   async cleanup() {
+    const duration = this.pluginsManager.getPluginUsageDuration('HMSKrispPlugin');
+    this.eventBus.analytics.publish(
+      new AnalyticsEvent({
+        name: 'client.krisp.usage',
+        level: AnalyticsEventLevel.INFO,
+        properties: { duration },
+      }),
+    );
     super.cleanup();
     await this.pluginsManager.cleanup();
     await this.pluginsManager.closeContext();
