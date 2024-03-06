@@ -36,7 +36,7 @@ import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useIsLandscape } from '../common/hooks';
+import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
 
 let hlsPlayer;
@@ -315,6 +315,7 @@ const HLSView = () => {
   }, [controlsVisible, isFullScreen, seekProgress, qualityDropDownOpen]);
 
   const onSeekTo = useCallback(seek => {
+    console.log('current time ', videoRef.current?.currentTime);
     hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
   }, []);
   const onDoubleClickHandler = useCallback(
@@ -367,29 +368,16 @@ const HLSView = () => {
     [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
-  const keyPressHandler = useCallback(
-    async event => {
-      if (hlsState?.variants[0]?.playlist_type !== HLSPlaylistType.DVR) {
-        return;
-      }
-      switch (event.key) {
-        case ' ':
-          if (isPaused) {
-            await hlsPlayer?.play();
-          } else {
-            hlsPlayer?.pause();
-          }
-          break;
-        case 'ArrowRight':
-          onSeekTo(10);
-          break;
-        case 'ArrowLeft':
-          onSeekTo(-10);
-          break;
-        default:
+  const keyHandler = useKeyboardHandler(
+    async () => {
+      if (isPaused) {
+        await hlsPlayer?.play();
+      } else {
+        hlsPlayer?.pause();
       }
     },
-    [hlsState?.variants, isPaused, onSeekTo],
+    onSeekTo,
+    ['ArrowRight', 'ArrowLeft', ' '],
   );
 
   if (!hlsUrl || streamEnded) {
@@ -464,7 +452,7 @@ const HLSView = () => {
             },
             outline: 'none',
           }}
-          onKeyDown={keyPressHandler}
+          onKeyDown={keyHandler}
           tabIndex="0"
         >
           {!(isMobile || isLandscape) && (

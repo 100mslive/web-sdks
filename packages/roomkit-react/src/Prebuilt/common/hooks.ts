@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
@@ -120,4 +120,32 @@ export const useMobileHLSStream = () => {
   const isMobile = useMedia(config.media.md);
   const { screenType } = useRoomLayoutConferencingScreen();
   return isMobile && screenType === 'hls_live_streaming';
+};
+
+export const useKeyboardHandler = (
+  handlePlayPause: () => Promise<void>,
+  onSeekTo: (value: number) => void,
+  targetKeys: string[],
+) => {
+  const handleKeyEvent = useCallback(
+    async (event: KeyboardEvent) => {
+      const { key } = event;
+      if (targetKeys.includes(key)) {
+        switch (event.key) {
+          case ' ':
+            await handlePlayPause();
+            break;
+          case 'ArrowRight':
+            onSeekTo(10);
+            break;
+          case 'ArrowLeft':
+            onSeekTo(-10);
+            break;
+        }
+      }
+    },
+    [handlePlayPause, onSeekTo, targetKeys],
+  );
+
+  return handleKeyEvent;
 };
