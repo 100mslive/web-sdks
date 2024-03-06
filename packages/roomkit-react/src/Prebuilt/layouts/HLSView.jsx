@@ -315,7 +315,6 @@ const HLSView = () => {
   }, [controlsVisible, isFullScreen, seekProgress, qualityDropDownOpen]);
 
   const onSeekTo = useCallback(seek => {
-    console.log('current time ', videoRef.current?.currentTime);
     hlsPlayer?.seekTo(videoRef.current?.currentTime + seek);
   }, []);
   const onDoubleClickHandler = useCallback(
