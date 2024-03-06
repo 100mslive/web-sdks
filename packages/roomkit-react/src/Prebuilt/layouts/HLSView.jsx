@@ -441,7 +441,11 @@ const HLSView = () => {
             },
             outline: 'none',
           }}
-          onKeyDown={keyHandler}
+          onKeyDown={async event => {
+            if (hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR) {
+              await keyHandler(event);
+            }
+          }}
           tabIndex="0"
         >
           {!(isMobile || isLandscape) && (
