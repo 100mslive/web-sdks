@@ -36,6 +36,7 @@ const SecondarySection = ({
   hasSidebar,
 }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
+  console.log('secondary section', { tilesLength: tiles?.length });
   if (!tiles?.length) {
     return null;
   }
