@@ -55,6 +55,8 @@ export const ScreenshareLayout = ({ peers, onPageChange, onPageSize, edgeToEdge 
     };
   }, [activeSharePeer?.id, isMobile, setActiveScreenSharePeer]);
 
+  console.log({ activeSharePeer, secondaryPeers });
+
   return (
     <ProminenceLayout.Root edgeToEdge={edgeToEdge} hasSidebar={hasSidebar}>
       <ProminenceLayout.ProminentSection>
