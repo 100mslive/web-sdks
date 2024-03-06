@@ -7,7 +7,7 @@ export default function App() {
   return (
     <HMSPrebuilt
       // roomCode={roomCode}
-      authToken={""}
+      authToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2ZXJzaW9uIjoyLCJ0eXBlIjoiYXBwIiwiYXBwX2RhdGEiOm51bGwsImFjY2Vzc19rZXkiOiI2MmU5MjlmMzNkZWM2M2JkNDlmNTM5MmEiLCJyb2xlIjoiX19pbnRlcm5hbF9yZWNvcmRlciIsInJvb21faWQiOiI2NTVhZjAyMjIwOTA2YWY5MjRiYzQ5NjIiLCJ1c2VyX2lkIjoiMTAwbXNfOWVlMzdmYTctZWEwMC00NWU0LTg0YTQtNDA5NmNhYmVkMWYwIiwiZXhwIjoxNzA5ODIzOTU3LCJqdGkiOiJlMjkzZjkxYi1mZWYzLTQ5ZjItOTM2Yi0xOWEzYzBlNTc3MjIiLCJpYXQiOjE3MDk3Mzc1NTcsImlzcyI6IjYyZTkyOWYzM2RlYzYzYmQ0OWY1MzkyNyIsIm5iZiI6MTcwOTczNzU1Nywic3ViIjoiYXBpIn0.RRCQm3eXCeXB97xJqpREN25vGIo_OttZeUnTEqfb0Nc"
       options={{
         endpoints: {
           tokenByRoomCode: 'https://auth-nonprod.100ms.live/v2/token',
