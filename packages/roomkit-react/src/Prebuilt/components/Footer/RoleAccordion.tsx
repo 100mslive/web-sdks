@@ -16,6 +16,7 @@ const ITER_TIMER = 5000;
 
 export interface ItemData {
   peerList: HMSPeer[];
+  isHandRaisedAccordion?: boolean;
   isConnected: boolean;
 }
 
@@ -29,6 +30,7 @@ export const VirtualizedParticipantItem = React.memo(
       <Participant
         key={data.peerList[index].id}
         peer={data.peerList[index]}
+        isHandRaisedAccordion={data.isHandRaisedAccordion}
         isConnected={data.isConnected}
         style={style}
       />
@@ -113,7 +115,7 @@ export const RoleAccordion = ({
       <Accordion.Content contentStyles={{ border: '1px solid $border_default', borderTop: 'none' }}>
         <FixedSizeList
           itemSize={ROW_HEIGHT}
-          itemData={{ peerList: peersInAccordion, isConnected }}
+          itemData={{ peerList: peersInAccordion, isConnected, isHandRaisedAccordion }}
           itemKey={itemKey}
           itemCount={peersInAccordion.length}
           width={width}
