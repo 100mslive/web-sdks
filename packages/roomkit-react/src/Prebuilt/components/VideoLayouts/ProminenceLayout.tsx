@@ -36,6 +36,7 @@ const SecondarySection = ({
   hasSidebar,
 }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
+  console.log('secondary section', { tilesLength: tiles?.length });
   if (!tiles?.length) {
     return null;
   }
@@ -72,6 +73,7 @@ const SecondarySection = ({
               maxWidth: 240,
               h: hasSidebar ? undefined : '100%',
               aspectRatio: 16 / 9,
+              h: '100%',
               '@md': { aspectRatio: 1 },
             }}
             objectFit="contain"
