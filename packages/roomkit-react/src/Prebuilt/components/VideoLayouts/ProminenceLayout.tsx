@@ -70,7 +70,7 @@ const SecondarySection = ({
             rootCSS={{
               padding: 0,
               maxWidth: 240,
-              h: '100%',
+              h: hasSidebar ? undefined : '100%',
               aspectRatio: 16 / 9,
               '@md': { aspectRatio: 1 },
             }}
