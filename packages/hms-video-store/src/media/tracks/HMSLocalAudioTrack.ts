@@ -46,6 +46,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     source: string,
     private eventBus: EventBus,
     settings: HMSAudioTrackSettings = new HMSAudioTrackSettingsBuilder().build(),
+    onPluginAddRemoveCallback?: (name: string, timeStamp: number, event: 'added' | 'removed') => void,
   ) {
     super(stream, track, source);
     stream.tracks.push(this);
@@ -56,7 +57,7 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     if (settings.deviceId !== track.getSettings().deviceId && !isEmptyTrack(track)) {
       this.settings = this.buildNewSettings({ deviceId: track.getSettings().deviceId });
     }
-    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus);
+    this.pluginsManager = new HMSAudioPluginsManager(this, eventBus, onPluginAddRemoveCallback);
     this.setFirstTrackId(track.id);
     if (isIOS() && isBrowser) {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
@@ -172,9 +173,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
     return this.pluginsManager.removePlugin(plugin);
   }
 
-  getPluginUsageDuration(pluginName: string): number {
-    return this.pluginsManager.getPluginUsageDuration(pluginName);
-  }
   /**
    * @see HMSAudioPlugin
    */

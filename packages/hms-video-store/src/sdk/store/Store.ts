@@ -50,17 +50,34 @@ class Store {
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
-  private krispUsage = 0;
+  private pluginUsage: Record<string, number> = {};
+  private pluginLastAddedAt: Record<string, number> = {};
 
   getConfig() {
     return this.config;
   }
 
-  getKrispUsage() {
-    return this.krispUsage;
+  getPluginUsage(name: string) {
+    if (!this.pluginUsage[name]) {
+      this.pluginUsage[name] = 0;
+    }
+    if (this.pluginLastAddedAt[name]) {
+      this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + Date.now() - this.pluginLastAddedAt[name];
+      this.pluginLastAddedAt[name] = 0;
+    }
+    return this.pluginUsage[name];
   }
-  updateKrispUsage(millis: number) {
-    this.krispUsage += millis;
+  updatePluginUsage(name: string, timeStamp: number, event: 'added' | 'removed') {
+    if (!this.pluginUsage[name]) {
+      this.pluginUsage[name] = 0;
+    }
+
+    if (event === 'added') {
+      this.pluginLastAddedAt[name] = timeStamp;
+    } else {
+      this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + timeStamp - this.pluginLastAddedAt[name];
+      this.pluginLastAddedAt[name] = 0;
+    }
   }
 
   setSimulcastEnabled(enabled: boolean) {
