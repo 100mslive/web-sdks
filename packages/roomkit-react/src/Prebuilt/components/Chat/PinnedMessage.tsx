@@ -71,13 +71,14 @@ export const PinnedMessage = () => {
       <Flex
         css={{
           p: '$4',
-          color: '$on_surface_medium',
-          bg: isMobile ? 'rgba(0, 0, 0, 0.64)' : '$surface_default',
+          color: '$on_surface_high',
+          bg: isMobile && elements?.chat?.is_overlay ? 'rgba(0, 0, 0, 0.64)' : '$surface_brighter',
           r: '$1',
           gap: '$4',
           mb: '$8',
           mt: '$8',
           flexGrow: 1,
+          border: '1px solid $border_bright',
         }}
         align="center"
         justify="between"
@@ -98,7 +99,7 @@ export const PinnedMessage = () => {
         >
           <Text
             variant="sm"
-            css={{ color: '$on_surface_medium' }}
+            css={{ color: '$on_surface_high' }}
             {...swipeHandlers}
             title={pinnedMessages[pinnedMessageIndex]?.text}
           >

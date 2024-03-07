@@ -193,6 +193,7 @@ const SidePane = ({
     });
 
   if (!trackId && !SidepaneComponent) {
+    console.log('sidepane not rendered', { trackId, SidepaneComponent });
     return null;
   }
 

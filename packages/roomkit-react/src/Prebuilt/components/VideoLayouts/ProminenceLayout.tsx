@@ -36,6 +36,7 @@ const SecondarySection = ({
   hasSidebar,
 }: React.PropsWithChildren<{ tiles: TrackWithPeerAndDimensions[]; edgeToEdge?: boolean; hasSidebar?: boolean }>) => {
   const tileLayoutProps = useVideoTileContext();
+  console.log('secondary section', { tilesLength: tiles?.length });
   if (!tiles?.length) {
     return null;
   }
@@ -44,6 +45,7 @@ const SecondarySection = ({
         gridTemplateColumns: '1fr',
         gridTemplateRows: `repeat(${tiles.length}, minmax(0, 1fr))`,
         maxHeight: '100%',
+        width: 240,
       }
     : {
         gridTemplateRows: React.Children.count(children) > 0 ? '136px auto' : '154px',
@@ -69,8 +71,8 @@ const SecondarySection = ({
             rootCSS={{
               padding: 0,
               maxWidth: 240,
-              h: '100%',
               aspectRatio: 16 / 9,
+              h: '100%',
               '@md': { aspectRatio: 1 },
             }}
             objectFit="contain"
