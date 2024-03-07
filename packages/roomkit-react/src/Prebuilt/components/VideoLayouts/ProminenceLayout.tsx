@@ -73,7 +73,6 @@ const SecondarySection = ({
               maxWidth: 240,
               h: hasSidebar ? undefined : '100%',
               aspectRatio: 16 / 9,
-              h: '100%',
               '@md': { aspectRatio: 1 },
             }}
             objectFit="contain"
