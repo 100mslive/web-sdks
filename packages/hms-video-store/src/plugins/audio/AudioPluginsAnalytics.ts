@@ -84,8 +84,8 @@ export class AudioPluginsAnalytics {
     }
   }
 
-  getPluginUsageDuration(plugin: string) {
-    return this.pluginTotalDuration[plugin] || 0;
+  getPluginUsageDuration(name: string) {
+    return this.pluginTotalDuration[name] || 0;
   }
 
   private async timeInMs<T>(fn: () => Promise<T>): Promise<number> {
@@ -99,6 +99,5 @@ export class AudioPluginsAnalytics {
     delete this.initTime[name];
     delete this.pluginAdded[name];
     delete this.pluginSampleRate[name];
-    delete this.pluginTotalDuration[name];
   }
 }

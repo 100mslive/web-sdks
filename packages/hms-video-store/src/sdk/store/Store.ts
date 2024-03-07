@@ -50,9 +50,17 @@ class Store {
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
+  private krispUsage = 0;
 
   getConfig() {
     return this.config;
+  }
+
+  getKrispUsage() {
+    return this.krispUsage;
+  }
+  updateKrispUsage(millis: number) {
+    this.krispUsage += millis;
   }
 
   setSimulcastEnabled(enabled: boolean) {
