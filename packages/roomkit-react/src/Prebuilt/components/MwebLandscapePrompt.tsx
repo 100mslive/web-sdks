@@ -31,8 +31,8 @@ export const MwebLandscapePrompt = () => {
       const type = window.screen.orientation.type || '';
       // Angle check needed to diff bw mobile and desktop
       setShowMwebLandscapePrompt(
-        match({ angle, isLandscapeHLSStream: true, isLandscape: true, type })
-          .with({ isLandscapeHLSStream }, () => false)
+        match({ angle, isLandscapeHLSStream, isLandscape, type })
+          .with({ isLandscapeHLSStream: true }, () => false)
           .with({ angle: P.when(angle => angle && angle >= 90) }, ({ type }) => type.includes('landscape'))
           .otherwise(() => isLandscape),
       );
