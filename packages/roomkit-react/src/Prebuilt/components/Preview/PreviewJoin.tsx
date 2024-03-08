@@ -20,7 +20,7 @@ import { useHMSPrebuiltContext } from '../../AppContext';
 import IconButton from '../../IconButton';
 import SidePane from '../../layouts/SidePane';
 // @ts-ignore: No implicit Any
-import { AudioVideoToggle } from '../AudioVideoToggle';
+import { AudioVideoToggle, NoiseCancellation } from '../AudioVideoToggle';
 // @ts-ignore: No implicit Any
 import Chip from '../Chip';
 // @ts-ignore: No implicit Any
@@ -269,7 +269,10 @@ export const PreviewControls = ({ hideSettings, vbEnabled }: { hideSettings: boo
         <AudioVideoToggle />
         {vbEnabled && !isMobile ? <VBToggle /> : null}
       </Flex>
-      {!hideSettings ? <PreviewSettings /> : null}
+      <Flex css={{ gap: '$4' }}>
+        <NoiseCancellation asButton={isMobile} />
+        {!hideSettings ? <PreviewSettings /> : null}
+      </Flex>
     </Flex>
   );
 };

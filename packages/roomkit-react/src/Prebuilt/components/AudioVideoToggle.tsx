@@ -95,7 +95,7 @@ const OptionLabel = ({ children, icon }: { children: React.ReactNode; icon: Reac
 };
 
 const plugin = new HMSKrispPlugin();
-const NoiseCancellation = () => {
+export const NoiseCancellation = ({ asButton = false }: { asButton?: boolean }) => {
   const localPeerAudioTrackID = useHMSStore(selectLocalAudioTrackID);
   const isPluginAdded = useHMSStore(selectIsLocalAudioPluginPresent(plugin.getName()));
   const [active, setActive] = useState(isPluginAdded);
@@ -118,6 +118,14 @@ const NoiseCancellation = () => {
 
   if (!plugin.isSupported() || !room.isNoiseCancellationEnabled || !localPeerAudioTrackID) {
     return null;
+  }
+
+  if (asButton) {
+    return (
+      <IconButton active={!active} onClick={() => setActive(value => !value)}>
+        <AudioLevelIcon />
+      </IconButton>
+    );
   }
 
   return (
