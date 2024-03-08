@@ -504,6 +504,7 @@ export default class HMSTransport {
           properties: { duration: pluginUsageTracker.getPluginUsage('HMSKrispPlugin') },
         }),
       );
+      pluginUsageTracker.cleanup();
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();

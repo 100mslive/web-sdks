@@ -28,7 +28,7 @@ class PluginUsageTracker {
     }
   };
 
-  reset = () => {
+  cleanup = () => {
     this.pluginUsage.clear();
     this.pluginLastAddedAt.clear();
   };
