@@ -11,6 +11,7 @@ import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
+import { pluginUsageTracker } from '../common/PluginUsageTracker';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -495,8 +496,7 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
-      const krispUsage = this.store.getPluginUsage('HMSKrispPlugin');
-      console.log('krisp final value', krispUsage);
+      console.log('krisp final value', pluginUsageTracker.getPluginUsage('HMSKrispPlugin'));
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();

@@ -1,6 +1,5 @@
 import { AudioPluginsAnalytics } from './AudioPluginsAnalytics';
 import { HMSAudioPlugin, HMSPluginUnsupportedTypes } from './HMSAudioPlugin'; //HMSAudioPluginType
-import AnalyticsEventFactory from '../../analytics/AnalyticsEventFactory';
 import { ErrorFactory } from '../../error/ErrorFactory';
 import { HMSAction } from '../../error/HMSAction';
 import { EventBus } from '../../events/EventBus';
@@ -41,13 +40,11 @@ export class HMSAudioPluginsManager {
   // This will replace the native track in peer connection when plugins are enabled
   private outputTrack?: MediaStreamTrack;
   private pluginAddInProgress = false;
-  private eventBus;
 
   constructor(track: HMSLocalAudioTrack, eventBus: EventBus) {
     this.hmsTrack = track;
     this.pluginsMap = new Map();
     this.analytics = new AudioPluginsAnalytics(eventBus);
-    this.eventBus = eventBus;
     this.createAudioContext();
   }
 
@@ -103,7 +100,6 @@ export class HMSAudioPluginsManager {
       this.pluginsMap.set(name, plugin);
       await this.processPlugin(plugin);
       await this.connectToDestination();
-      this.eventBus.analytics.publish(AnalyticsEventFactory.pluginStateChanged(name));
     } catch (err) {
       HMSLogger.e(this.TAG, 'failed to add plugin', err);
       throw err;
@@ -142,7 +138,6 @@ export class HMSAudioPluginsManager {
   }
 
   async removePlugin(plugin: HMSAudioPlugin) {
-    this.eventBus.analytics.publish(AnalyticsEventFactory.pluginStateChanged(plugin.getName()));
     await this.removePluginInternal(plugin);
     if (this.pluginsMap.size === 0) {
       // remove all previous nodes

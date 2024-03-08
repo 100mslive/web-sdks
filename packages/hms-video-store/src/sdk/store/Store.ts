@@ -1,5 +1,4 @@
 import { KnownRoles, TrackStateEntry } from './StoreInterfaces';
-import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
@@ -51,40 +50,10 @@ class Store {
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
-  private pluginUsage: Record<string, number> = { HMSKrispPlugin: 0 };
-  private pluginLastAddedAt: Record<string, number> = { HMSKrispPlugin: 0 };
 
   getConfig() {
     return this.config;
   }
-
-  getPluginUsage = (name: string) => {
-    if (!this.pluginUsage[name]) {
-      this.pluginUsage[name] = 0;
-    }
-    if (this.pluginLastAddedAt[name]) {
-      this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + Date.now() - this.pluginLastAddedAt[name];
-      this.pluginLastAddedAt[name] = 0;
-    }
-    return this.pluginUsage[name];
-  };
-
-  updatePluginUsage = (event: AnalyticsEvent) => {
-    if (event.name === 'plugin.state.changed') {
-      const name = event.properties.pluginName;
-      if (!this.pluginUsage[name]) {
-        this.pluginUsage[name] = 0;
-      }
-
-      if (!this.pluginLastAddedAt[name]) {
-        this.pluginLastAddedAt[name] = event.timestamp;
-      } else {
-        this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + event.timestamp - this.pluginLastAddedAt[name];
-        this.pluginLastAddedAt[name] = 0;
-      }
-      console.log('krisp usage value:', this.pluginUsage[name]);
-    }
-  };
 
   setSimulcastEnabled(enabled: boolean) {
     this.simulcastEnabled = enabled;

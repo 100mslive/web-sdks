@@ -12,6 +12,7 @@ import { HMSAnalyticsLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { AudioSinkManager } from '../audio-sink-manager';
+import { pluginUsageTracker } from '../common/PluginUsageTracker';
 import { DeviceManager } from '../device-manager';
 import { AudioOutputManager } from '../device-manager/AudioOutputManager';
 import { DeviceStorageManager } from '../device-manager/DeviceStorage';
@@ -187,7 +188,7 @@ export class HMSSdk implements HMSInterface {
      * to not miss events that are published before the handlers are subscribed.
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
-    this.eventBus.analytics.subscribe(this.store.updatePluginUsage);
+    this.eventBus.analytics.subscribe(pluginUsageTracker.updatePluginUsage);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }
