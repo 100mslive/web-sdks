@@ -1,3 +1,4 @@
+import { match, P } from 'ts-pattern';
 import { HMSPeer, selectPermissions, useHMSActions, useHMSStore } from '@100mslive/react-sdk';
 import { useRoomLayoutConferencingScreen } from '../../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
 
@@ -13,13 +14,17 @@ export const useGroupOnStageActions = ({ peers }: { peers: HMSPeer[] }) => {
   } = elements.on_stage_exp || {};
   const canChangeRole = useHMSStore(selectPermissions)?.changeRole;
 
-  const offStageRolePeers = peers.filter(
-    peer =>
-      on_stage_role &&
-      bring_to_stage_label &&
-      peer.roleName &&
-      off_stage_roles?.includes(peer.roleName) &&
-      !(peer.roleName === on_stage_role),
+  const offStageRolePeers = peers.filter(peer =>
+    match({ on_stage_role, bring_to_stage_label, roleName: peer.roleName })
+      .with(
+        {
+          on_stage_role: P.when(role => !!role),
+          bring_to_stage_label: P.when(label => !!label),
+          roleName: P.when(role => !!role && off_stage_roles.includes(role)),
+        },
+        () => true,
+      )
+      .otherwise(() => false),
   );
 
   const lowerAllHands = async () => {
