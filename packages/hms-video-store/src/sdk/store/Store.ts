@@ -51,19 +51,13 @@ class Store {
   private userAgent: string = createUserAgent(this.env);
   private polls = new Map<string, HMSPoll>();
   private whiteboards = new Map<string, HMSWhiteboard>();
-  private pluginUsage: Record<string, number> = {};
-  private pluginLastAddedAt: Record<string, number> = {};
+  private pluginUsage: Record<string, number> = { HMSKrispPlugin: 0 };
+  private pluginLastAddedAt: Record<string, number> = { HMSKrispPlugin: 0 };
 
   getConfig() {
     return this.config;
   }
 
-  subscribeToPluginStateEvents(event: AnalyticsEvent) {
-    if (event.name === 'plugin.state.changed') {
-      const name = event.properties.pluginName;
-      this.updatePluginUsage(name, event.timestamp);
-    }
-  }
   getPluginUsage(name: string) {
     if (!this.pluginUsage[name]) {
       this.pluginUsage[name] = 0;
@@ -74,16 +68,20 @@ class Store {
     }
     return this.pluginUsage[name];
   }
-  updatePluginUsage(name: string, timeStamp: number) {
-    if (!this.pluginUsage[name]) {
-      this.pluginUsage[name] = 0;
-    }
+  updatePluginUsage(event: AnalyticsEvent) {
+    if (event.name === 'plugin.state.changed') {
+      const name = event.properties.pluginName;
+      if (!this.pluginUsage[name]) {
+        this.pluginUsage[name] = 0;
+      }
 
-    if (!this.pluginLastAddedAt[name]) {
-      this.pluginLastAddedAt[name] = timeStamp;
-    } else {
-      this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + timeStamp - this.pluginLastAddedAt[name];
-      this.pluginLastAddedAt[name] = 0;
+      if (!this.pluginLastAddedAt[name]) {
+        this.pluginLastAddedAt[name] = event.timestamp;
+      } else {
+        this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + event.timestamp - this.pluginLastAddedAt[name];
+        this.pluginLastAddedAt[name] = 0;
+      }
+      console.log('krisp usage value:', this.pluginUsage[name]);
     }
   }
 
