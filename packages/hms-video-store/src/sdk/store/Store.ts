@@ -58,7 +58,7 @@ class Store {
     return this.config;
   }
 
-  getPluginUsage(name: string) {
+  getPluginUsage = (name: string) => {
     if (!this.pluginUsage[name]) {
       this.pluginUsage[name] = 0;
     }
@@ -67,8 +67,9 @@ class Store {
       this.pluginLastAddedAt[name] = 0;
     }
     return this.pluginUsage[name];
-  }
-  updatePluginUsage(event: AnalyticsEvent) {
+  };
+
+  updatePluginUsage = (event: AnalyticsEvent) => {
     if (event.name === 'plugin.state.changed') {
       const name = event.properties.pluginName;
       if (!this.pluginUsage[name]) {
@@ -83,7 +84,7 @@ class Store {
       }
       console.log('krisp usage value:', this.pluginUsage[name]);
     }
-  }
+  };
 
   setSimulcastEnabled(enabled: boolean) {
     this.simulcastEnabled = enabled;
