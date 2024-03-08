@@ -235,6 +235,15 @@ export default class AnalyticsEventFactory {
     });
   }
 
+  static pluginStateChanged(name: string) {
+    return new AnalyticsEvent({
+      name: 'plugin.state.changed',
+      timestamp: new Date().getTime(),
+      properties: { pluginName: name },
+      level: AnalyticsEventLevel.INFO,
+    });
+  }
+
   private static eventNameFor(name: string, ok: boolean) {
     const suffix = ok ? 'success' : 'failed';
     return `${name}.${suffix}`;

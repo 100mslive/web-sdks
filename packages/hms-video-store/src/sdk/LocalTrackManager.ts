@@ -224,7 +224,6 @@ export class LocalTrackManager {
         'screen',
         this.eventBus,
         screenSettings?.audio,
-        this.store.updatePluginUsage,
       );
       tracks.push(audioTrack);
     }
@@ -591,7 +590,6 @@ export class LocalTrackManager {
         'regular',
         this.eventBus,
         settings.audio,
-        this.store.updatePluginUsage,
       );
       tracks.push(audioTrack);
     }
