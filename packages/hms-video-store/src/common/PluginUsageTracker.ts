@@ -21,11 +21,10 @@ class PluginUsageTracker {
       const name = event.properties.plugin_name;
       const addedAt = event.properties.added_at;
       this.pluginLastAddedAt.set(name, addedAt);
-      console.log('krisp last added at', addedAt);
     } else if (event.name === 'mediaPlugin.stats') {
       const name = event.properties.plugin_name;
       const duration = event.properties.duration;
-      this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + duration);
+      this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + duration * 1000);
     }
   };
 

@@ -24,6 +24,7 @@ export class AudioPluginsAnalytics {
     this.addedTimestamps[name] = Date.now();
     this.initTime[name] = 0;
     this.pluginSampleRate[name] = sampleRate;
+    this.eventBus.analytics.publish(MediaPluginsAnalyticsFactory.added(name, this.addedTimestamps[name]));
   }
 
   removed(name: string) {

@@ -6,6 +6,7 @@ import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
+import { AnalyticsEventLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
@@ -496,7 +497,13 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
-      console.log('krisp final value', pluginUsageTracker.getPluginUsage('HMSKrispPlugin'));
+      this.eventBus.analytics.publish(
+        new AnalyticsEvent({
+          name: 'krisp.usage',
+          level: AnalyticsEventLevel.INFO,
+          properties: { duration: pluginUsageTracker.getPluginUsage('HMSKrispPlugin') },
+        }),
+      );
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();
