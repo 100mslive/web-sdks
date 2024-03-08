@@ -187,6 +187,7 @@ export class HMSSdk implements HMSInterface {
      * to not miss events that are published before the handlers are subscribed.
      */
     this.eventBus.analytics.subscribe(this.sendAnalyticsEvent);
+    this.eventBus.analytics.subscribe(this.store.subscribeToPluginStateEvents);
     this.eventBus.deviceChange.subscribe(this.handleDeviceChange);
     this.eventBus.audioPluginFailed.subscribe(this.handleAudioPluginError);
   }

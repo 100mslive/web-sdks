@@ -1,4 +1,5 @@
 import { KnownRoles, TrackStateEntry } from './StoreInterfaces';
+import AnalyticsEvent from '../../analytics/AnalyticsEvent';
 import { HTTPAnalyticsTransport } from '../../analytics/HTTPAnalyticsTransport';
 import { DeviceStorageManager } from '../../device-manager/DeviceStorage';
 import { ErrorFactory } from '../../error/ErrorFactory';
@@ -57,6 +58,12 @@ class Store {
     return this.config;
   }
 
+  subscribeToPluginStateEvents(event: AnalyticsEvent) {
+    if (event.name === 'plugin.state.changed') {
+      const name = event.properties.pluginName;
+      this.updatePluginUsage(name, event.timestamp);
+    }
+  }
   getPluginUsage(name: string) {
     if (!this.pluginUsage[name]) {
       this.pluginUsage[name] = 0;
@@ -67,12 +74,12 @@ class Store {
     }
     return this.pluginUsage[name];
   }
-  updatePluginUsage(name: string, timeStamp: number, event: 'added' | 'removed') {
+  updatePluginUsage(name: string, timeStamp: number) {
     if (!this.pluginUsage[name]) {
       this.pluginUsage[name] = 0;
     }
 
-    if (event === 'added') {
+    if (!this.pluginLastAddedAt[name]) {
       this.pluginLastAddedAt[name] = timeStamp;
     } else {
       this.pluginUsage[name] = (this.pluginUsage?.[name] || 0) + timeStamp - this.pluginLastAddedAt[name];

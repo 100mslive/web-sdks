@@ -168,7 +168,6 @@ export class HMSLocalAudioTrack extends HMSAudioTrack {
    * @see HMSAudioPlugin
    */
   async removePlugin(plugin: HMSAudioPlugin): Promise<void> {
-    // Sync here?
     return this.pluginsManager.removePlugin(plugin);
   }
 
