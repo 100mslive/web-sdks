@@ -36,7 +36,7 @@ import { config, theme, useTheme } from '../../Theme';
 import { Tooltip } from '../../Tooltip';
 import { useSidepaneToggle } from '../components/AppData/useSidepane';
 import { useRoomLayoutConferencingScreen } from '../provider/roomLayoutProvider/hooks/useRoomLayoutScreen';
-import { useIsLandscape } from '../common/hooks';
+import { useIsLandscape, useKeyboardHandler } from '../common/hooks';
 import { APP_DATA, EMOJI_REACTION_TYPE, POLL_STATE, POLL_VIEWS, SIDE_PANE_OPTIONS } from '../common/constants';
 
 let hlsPlayer;
@@ -367,6 +367,8 @@ const HLSView = () => {
     [controlsVisible, isLandscape, isMobile, qualityDropDownOpen, seekProgress],
   );
 
+  const keyHandler = useKeyboardHandler(isPaused, hlsPlayer);
+
   if (!hlsUrl || streamEnded) {
     return (
       <>
@@ -445,7 +447,14 @@ const HLSView = () => {
             '@md': {
               height: 'auto',
             },
+            outline: 'none',
           }}
+          onKeyDown={async event => {
+            if (hlsState?.variants[0]?.playlist_type === HLSPlaylistType.DVR) {
+              await keyHandler(event);
+            }
+          }}
+          tabIndex="0"
         >
           {!(isMobile || isLandscape) && (
             <HLSAutoplayBlockedPrompt open={isHlsAutoplayBlocked} unblockAutoPlay={unblockAutoPlay} />

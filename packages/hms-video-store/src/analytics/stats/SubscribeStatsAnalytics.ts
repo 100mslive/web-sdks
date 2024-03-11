@@ -76,6 +76,13 @@ export class SubscribeStatsAnalytics extends BaseStatsAnalytics {
       }
     });
 
+    // delete track analytics if track is not present in store and no samples are present
+    this.trackAnalytics.forEach(trackAnalytic => {
+      if (!this.store.hasTrack(trackAnalytic.track) && !(trackAnalytic.samples.length > 0)) {
+        this.trackAnalytics.delete(trackAnalytic.track_id);
+      }
+    });
+
     if (shouldCreateSample) {
       this.trackAnalytics.forEach(trackAnalytic => {
         trackAnalytic.createSample();

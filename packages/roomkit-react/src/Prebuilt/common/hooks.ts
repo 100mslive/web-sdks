@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMedia } from 'react-use';
+import { HMSHLSPlayer } from '@100mslive/hls-player';
 import { JoinForm_JoinBtnType } from '@100mslive/types-prebuilt/elements/join_form';
 import {
   parsedUserAgent,
@@ -120,4 +121,29 @@ export const useMobileHLSStream = () => {
   const isMobile = useMedia(config.media.md);
   const { screenType } = useRoomLayoutConferencingScreen();
   return isMobile && screenType === 'hls_live_streaming';
+};
+
+export const useKeyboardHandler = (isPaused: boolean, hlsPlayer: HMSHLSPlayer) => {
+  const handleKeyEvent = useCallback(
+    async (event: KeyboardEvent) => {
+      switch (event.key) {
+        case ' ':
+          if (isPaused) {
+            await hlsPlayer?.play();
+          } else {
+            hlsPlayer?.pause();
+          }
+          break;
+        case 'ArrowRight':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime + 10);
+          break;
+        case 'ArrowLeft':
+          hlsPlayer?.seekTo(hlsPlayer?.getVideoElement().currentTime - 10);
+          break;
+      }
+    },
+    [hlsPlayer, isPaused],
+  );
+
+  return handleKeyEvent;
 };
