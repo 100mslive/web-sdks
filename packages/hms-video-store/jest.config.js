@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   transform: {
     '.(ts|tsx)$': '../../node_modules/ts-jest/dist/index.js',
     '.(js|jsx)$': '../../node_modules/babel-jest/build/index.js',
@@ -9,3 +9,5 @@ module.exports = {
   setupFiles: ['jest-canvas-mock', 'jsdom-worker'],
   testEnvironment: 'jsdom',
 };
+
+export default config;
