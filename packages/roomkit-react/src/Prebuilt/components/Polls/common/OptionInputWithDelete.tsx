@@ -28,6 +28,7 @@ export const OptionInputWithDelete = ({
         value={option?.text || ''}
         key={index}
         onChange={event => handleOptionTextChange(index, event.target.value.trimStart())}
+        maxLength={100}
       />
       <IconButton onClick={() => removeOption(index)} css={{ bg: 'transparent', border: 'none' }}>
         <TrashIcon />
