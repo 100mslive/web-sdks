@@ -593,6 +593,7 @@ export class HMSSdk implements HMSInterface {
     LocalTrackManager.cleanup();
     this.notificationManager = undefined;
     HMSLogger.cleanup();
+    pluginUsageTracker.cleanup();
     this.sdkState = { ...INITIAL_STATE };
     /**
      * when leave is called after preview itself without join.

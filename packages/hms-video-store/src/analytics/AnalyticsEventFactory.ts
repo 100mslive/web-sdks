@@ -238,7 +238,6 @@ export default class AnalyticsEventFactory {
 
   static getKrispUsage() {
     const duration = pluginUsageTracker.getPluginUsage('HMSKrispPlugin');
-    pluginUsageTracker.cleanup();
     return new AnalyticsEvent({
       name: 'krisp.usage',
       level: AnalyticsEventLevel.INFO,
