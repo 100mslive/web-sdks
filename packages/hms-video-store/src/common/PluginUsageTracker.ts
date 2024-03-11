@@ -10,7 +10,8 @@ class PluginUsageTracker {
     }
     if (this.pluginLastAddedAt.has(name)) {
       const lastAddedAt = this.pluginLastAddedAt.get(name) || 0;
-      this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + lastAddedAt ? Date.now() - lastAddedAt : 0);
+      const extraDuration = lastAddedAt ? Date.now() - lastAddedAt : 0;
+      this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + extraDuration);
       this.pluginLastAddedAt.delete(name);
     }
     return this.pluginUsage.get(name);
@@ -25,6 +26,7 @@ class PluginUsageTracker {
       const name = event.properties.plugin_name;
       const duration = event.properties.duration;
       this.pluginUsage.set(name, (this.pluginUsage.get(name) || 0) + duration * 1000);
+      this.pluginLastAddedAt.delete(name);
     }
   };
 

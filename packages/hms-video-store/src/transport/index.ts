@@ -6,13 +6,11 @@ import { RetryScheduler } from './RetryScheduler';
 import { AdditionalAnalyticsProperties } from '../analytics/AdditionalAnalyticsProperties';
 import AnalyticsEvent from '../analytics/AnalyticsEvent';
 import AnalyticsEventFactory from '../analytics/AnalyticsEventFactory';
-import { AnalyticsEventLevel } from '../analytics/AnalyticsEventLevel';
 import { AnalyticsEventsService } from '../analytics/AnalyticsEventsService';
 import { AnalyticsTimer, TimedEvent } from '../analytics/AnalyticsTimer';
 import { HTTPAnalyticsTransport } from '../analytics/HTTPAnalyticsTransport';
 import { SignalAnalyticsTransport } from '../analytics/signal-transport/SignalAnalyticsTransport';
 import { PublishStatsAnalytics, SubscribeStatsAnalytics } from '../analytics/stats';
-import { pluginUsageTracker } from '../common/PluginUsageTracker';
 import { HMSConnectionRole, HMSTrickle } from '../connection/model';
 import { IPublishConnectionObserver } from '../connection/publish/IPublishConnectionObserver';
 import HMSPublishConnection from '../connection/publish/publishConnection';
@@ -497,14 +495,8 @@ export default class HMSTransport {
     this.joinParameters = undefined;
     HMSLogger.d(TAG, 'leaving in transport');
     try {
-      this.eventBus.analytics.publish(
-        new AnalyticsEvent({
-          name: 'krisp.usage',
-          level: AnalyticsEventLevel.INFO,
-          properties: { duration: pluginUsageTracker.getPluginUsage('HMSKrispPlugin') },
-        }),
-      );
-      pluginUsageTracker.cleanup();
+      this.eventBus.analytics.publish(AnalyticsEventFactory.getKrispUsage());
+
       this.state = TransportState.Leaving;
       this.publishStatsAnalytics?.stop();
       this.subscribeStatsAnalytics?.stop();
